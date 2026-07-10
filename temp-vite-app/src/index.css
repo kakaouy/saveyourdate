@@ -1,0 +1,126 @@
+:root {
+  /* Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #fef8f9;
+  --bg-card: #ffffff;
+  --color-primary: #f4a6b6;      /* Soft/pastel pink */
+  --color-primary-light: #fbeef0;
+  --color-accent: #e0004d;       /* Vibrant red/pink for CTA */
+  --color-accent-hover: #b8003f;
+  --color-mint: #73c6b6;         /* Mint green for details */
+  --color-mint-light: #eef9f7;
+  --color-text-main: #333333;
+  --color-text-secondary: #666666;
+  --color-text-light: #999999;
+  --color-border: #f0e6e8;
+  --shadow-sm: 0 2px 8px rgba(244, 166, 182, 0.1);
+  --shadow-md: 0 8px 24px rgba(244, 166, 182, 0.15);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
+
+  /* Fonts */
+  --font-serif: 'EB Garamond', Garamond, Georgia, serif;
+  --font-sans: 'Nunito', system-ui, -apple-system, sans-serif;
+
+  font-family: var(--font-sans);
+  color: var(--color-text-main);
+  background-color: var(--bg-primary);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: var(--bg-primary);
+  color: var(--color-text-main);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Animations */
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(224, 0, 77, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 12px rgba(224, 0, 77, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(224, 0, 77, 0);
+  }
+}
+
+@keyframes pulse-subtle {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 2s infinite ease-in-out;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s infinite ease-in-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Utilities */
+.container {
+  width: 1200px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section {
+  padding: 100px 0;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  section {
+    padding: 60px 0;
+  }
+}

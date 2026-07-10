@@ -1,0 +1,4 @@
+.DS_Store
+.npm-local-cache/
+temp-vite-app/node_modules/
+temp-vite-app/dist/
