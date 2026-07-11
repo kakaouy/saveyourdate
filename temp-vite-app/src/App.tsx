@@ -1507,7 +1507,7 @@ function App() {
 
                           <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
                             <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.weddingForm.civilTitle}</span>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                            <div className="form-row-2col-mb12">
                               <div className="form-group">
                                 <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.civilDate}</label>
                                 <input className="form-input" type="date" value={weddingData.civilDate} onChange={e => setWeddingData({...weddingData, civilDate: e.target.value})} />
@@ -1525,7 +1525,7 @@ function App() {
 
                           <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
                             <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.weddingForm.partyTitle}</span>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                            <div className="form-row-2col-mb12">
                               <div className="form-group">
                                 <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.partyDate}</label>
                                 <input className="form-input" type="date" required value={weddingData.ceremonyDate} onChange={e => setWeddingData({...weddingData, ceremonyDate: e.target.value})} />
@@ -1547,7 +1547,7 @@ function App() {
 
                           <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
                             <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.weddingForm.giftTitle}</span>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                            <div className="form-row-2col-mb12">
                               <div className="form-group">
                                 <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.alias}</label>
                                 <input className="form-input" type="text" placeholder="Ej. boda.sofi.mati" value={weddingData.giftAlias} onChange={e => setWeddingData({...weddingData, giftAlias: e.target.value})} />
@@ -1594,7 +1594,7 @@ function App() {
 
                           <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
                             <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.quinceForm.partyTitle}</span>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                            <div className="form-row-2col-mb12">
                               <div className="form-group">
                                 <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.partyDate}</label>
                                 <input className="form-input" type="date" required value={quinceData.partyDate} onChange={e => setQuinceData({...quinceData, partyDate: e.target.value})} />
@@ -1616,7 +1616,7 @@ function App() {
 
                           <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
                             <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.quinceForm.styleTitle}</span>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                            <div className="form-row-2col-mb12">
                               <div className="form-group">
                                 <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.alias}</label>
                                 <input className="form-input" type="text" placeholder="Ej. mis15.martu" value={quinceData.giftAlias} onChange={e => setQuinceData({...quinceData, giftAlias: e.target.value})} />
@@ -1679,7 +1679,7 @@ function App() {
 
                           <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
                             <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.otherForm.whenTitle}</span>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                            <div className="form-row-2col-mb12">
                               <div className="form-group">
                                 <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.date}</label>
                                 <input className="form-input" type="date" required value={otherEventData.eventDate} onChange={e => setOtherEventData({...otherEventData, eventDate: e.target.value})} />
@@ -1701,7 +1701,7 @@ function App() {
 
                           <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
                             <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.otherForm.giftTitle}</span>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                            <div className="form-row-2col-mb12">
                               <div className="form-group">
                                 <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.alias}</label>
                                 <input className="form-input" type="text" placeholder="Ej. baby.benja.regalos" value={otherEventData.giftAlias} onChange={e => setOtherEventData({...otherEventData, giftAlias: e.target.value})} />

@@ -1426,8 +1426,77 @@
   animation: fadeIn 0.4s ease;
 }
 
+/* Prevent horizontal overflow on root layouts */
+html, body, .app-wrapper {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Responsive Wizard & Form Row Classes */
+.category-select-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 576px) {
+  .category-select-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+}
+
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 576px) {
+  .form-row-2col {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.form-row-2col-mb12 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 576px) {
+  .form-row-2col-mb12 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+}
+
+.checkout-container-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 768px) {
+  .checkout-container-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
+  .burger-button {
+    display: block;
+  }
+  .desktop-nav {
+    display: none;
+  }
   .models-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1437,12 +1506,6 @@
 }
 
 @media (max-width: 768px) {
-  .burger-button {
-    display: block;
-  }
-  .desktop-nav {
-    display: none;
-  }
   .hero-grid {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -1478,5 +1541,36 @@
   .contact-grid {
     grid-template-columns: 1fr;
     gap: 40px;
+  }
+}
+
+/* Mobile Modal Enhancements */
+@media (max-width: 576px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+  .modal-container {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 20px;
+    border: none;
+  }
+  .modal-close-btn {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  .sim-cover {
+    height: 180px;
+    padding: 16px;
+  }
+  .sim-cover-title {
+    font-size: 26px;
+  }
+  .sim-section {
+    padding: 16px 12px;
   }
 }
