@@ -82,7 +82,11 @@ const TRANSLATIONS = {
         { q: "¿Cómo confirman asistencia los invitados?", a: "Tus invitados completan un formulario RSVP dentro de la misma invitación web. La respuesta te llega automáticamente a tu planilla de Google Sheets vinculada en tiempo real para que veas el listado organizado al instante." },
         { q: "¿Por cuánto tiempo permanece activo el enlace web?", a: "La invitación permanece activa, online y funcional hasta 30 días después de realizado tu evento. Si necesitás extender el tiempo por algún motivo, podés solicitarlo." },
         { q: "¿Qué métodos de pago aceptan?", a: "Aceptamos transferencias bancarias directas (CBU/Alias) y todas las tarjetas de crédito o débito a través de la pasarela de Mercado Pago." },
-        { q: "¿Cómo recibo mi código de validación después de realizar el pago?", a: "Una vez que el pago es aprobado (de forma inmediata con tarjeta o Mercado Pago), nuestro sistema valida la transacción automáticamente y te envía un mensaje de WhatsApp y un correo electrónico con tu confirmación de pago y tu código de validación único (SYD-XXXXXX) para que comiences a cargar tus datos al instante." }
+        { q: "¿Cómo recibo mi código de validación después de realizar el pago?", a: "Una vez que el pago es aprobado (de forma inmediata con tarjeta o Mercado Pago), nuestro sistema valida la transacción automáticamente y te envía un mensaje de WhatsApp y un correo electrónico con tu confirmación de pago y tu código de validación único (SYD-XXXXXX) para que comiences a cargar tus datos al instante." },
+        { q: "¿Cuáles son los precios de los planes?", a: "Nuestros precios varían según el plan de interactividad que elijas y la moneda de tu país. Podés consultar las tarifas actualizadas y realizar tu simulación de pago de forma segura en la sección <a href='#pago'>Elegí tu Plan Save Your Date</a>." },
+        { q: "¿Qué incluye el Plan Bronce?", a: "El Plan Bronce es ideal para eventos sencillos y elegantes. Incluye: invitación web de link único activa hasta 30 días después del evento, reloj de cuenta regresiva, detalles de ubicación con mapas GPS interactivos, datos de regalo o alias bancario para transferencias, y galería con hasta 5 fotos." },
+        { q: "¿Qué incluye el Plan Plata?", a: "El Plan Plata es nuestro plan Premium más elegido. Incluye todo lo del Plan Bronce (con hasta 10 fotos en la galería) más funciones interactivas avanzadas: música de fondo a tu elección y el formulario digital RSVP para que tus invitados confirmen asistencia directamente desde la web, con las respuestas sincronizadas en tiempo real en tu planilla privada de Google Sheets." },
+        { q: "¿Qué incluye el Plan Oro?", a: "El Plan Oro es la experiencia interactiva definitiva. Incluye todo lo del Plan Plata (con hasta 15 fotos en la galería) más beneficios avanzados: playlist colaborativa de Spotify para que tus invitados sugieran canciones para la fiesta y un panel de administración privado y avanzado para gestionar tus invitados." }
       ]
     },
     portal: {
@@ -336,7 +340,11 @@ const TRANSLATIONS = {
         { q: "Can I make changes after it is published?", a: "Yes, absolutely! We know unexpected adjustments happen (schedule changes, table numbers, etc.). Text and location updates are free throughout the duration of your event." },
         { q: "How do guests confirm their attendance?", a: "Your guests fill out an RSVP form within the web invitation. Answers are automatically added to your linked Google Sheet in real time." },
         { q: "How long does the web link remain active?", a: "The invitation remains active and fully functional online up to 30 days after your event has taken place." },
-        { q: "What payment methods do you accept?", a: "We accept local bank transfers, wire transfers, and all credit/debit cards processed securely through Mercado Pago or PayPal." }
+        { q: "What payment methods do you accept?", a: "We accept local bank transfers, wire transfers, and all credit/debit cards processed securely through Mercado Pago or PayPal." },
+        { q: "What are the prices of the plans?", a: "Our prices vary depending on the interactivity plan you choose and your country's currency. You can check the updated rates and make your secure payment simulation in the <a href='#pago'>Choose Your Save Your Date Plan</a> section." },
+        { q: "What does the Bronze Plan include?", a: "The Bronze Plan is perfect for simple and elegant events. It includes: single web link invitation active up to 30 days after the event, live countdown timer, location details with interactive GPS maps, gift registry or bank wire details, and a photo gallery with up to 5 photos." },
+        { q: "What does the Silver Plan include?", a: "The Silver Plan is our most popular Premium plan. It includes everything in the Bronze Plan (with up to 10 gallery photos) plus advanced interactive features: background music of your choice and the digital RSVP form so your guests can confirm attendance directly from the website, with answers synced in real-time to your private Google Sheets spreadsheet." },
+        { q: "What does the Gold Plan include?", a: "The Gold Plan is the ultimate interactive experience. It includes everything in the Silver Plan (with up to 15 gallery photos) plus advanced benefits: a collaborative Spotify playlist for your guests to suggest party songs and an advanced private admin panel to manage guests." }
       ]
     },
     portal: {
@@ -590,7 +598,11 @@ const TRANSLATIONS = {
         { q: "Posso fazer alterações depois de publicado?", a: "Sim, com certeza! Sabemos que imprevistos acontecem (mudanças de horário, mesa, etc.). Alterações de texto e localização são gratuitas durante todo o evento." },
         { q: "Como os convidados confirmam presença?", a: "Seus convidados preenchem o formulário RSVP dentro do próprio convite digital. A resposta chega de forma automática na sua planilha do Google Sheets vinculada em tempo real." },
         { q: "Por quanto tempo o link permanece ativo?", a: "O convite digital permanece ativo e totalmente funcional online até 30 dias após a realização do seu evento." },
-        { q: "Quais métodos de pagamento são aceitos?", a: "Aceitamos transferências bancárias locais, PIX (no Brasil) e todos os cartões de crédito ou débito através do Mercado Pago ou PayPal." }
+        { q: "Quais métodos de pagamento são aceitos?", a: "Aceitamos transferências bancárias locais, PIX (no Brasil) e todos os cartões de crédito ou débito através do Mercado Pago ou PayPal." },
+        { q: "Quais são os preços dos planos?", a: "Nossos preços variam de acordo com o plano de interatividade escolhido e a moeda do seu país. Você pode consultar as tarifas atualizadas e simular seu pagamento com segurança na seção <a href='#pago'>Escolha seu Plano Save Your Date</a>." },
+        { q: "O que inclui o Plano Bronze?", a: "O Plano Bronze é ideal para eventos simples e elegantes. Inclui: convite web de link único ativo até 30 dias após o evento, relógio de contagem regressiva, detalhes de localização com mapas GPS interativos, dados de presente ou chave bancária para transferências, e galeria de fotos com até 5 fotos." },
+        { q: "O que inclui o Plano Prata?", a: "O Plano Prata é o nosso plano Premium mais escolhido. Inclui tudo do Plano Bronze (com até 10 fotos na galeria) além de recursos interativos avançados: música de fundo de sua escolha e o formulário digital RSVP para seus convidados confirmarem presença diretamente pelo site, com as respostas sincronizadas em tempo real na sua planilha privada do Google Sheets." },
+        { q: "O que inclui o Plano Ouro?", a: "O Plano Ouro é a experiência interativa definitiva. Inclui tudo do Plano Prata (com até 15 fotos na galeria) além de benefícios avançados: playlist colaborativa do Spotify para os convidados sugerirem músicas para a festa e um painel de administração privado e avançado para gerenciar convidados." }
       ]
     },
     portal: {
@@ -1370,7 +1382,7 @@ function App() {
                   <span className={`faq-toggle-icon ${activeFaqIndex === index ? 'open' : ''}`}>+</span>
                 </button>
                 <div className={`faq-answer ${activeFaqIndex === index ? 'open' : ''}`}>
-                  <p style={{ margin: 0 }}>{item.a}</p>
+                  <p style={{ margin: 0 }} dangerouslySetInnerHTML={{ __html: item.a }}></p>
                 </div>
               </div>
             ))}
