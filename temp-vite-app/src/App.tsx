@@ -836,7 +836,6 @@ function App() {
 
   // MOCK PAYMENT & CHECKOUT STATES
   const [paymentPlan, setPaymentPlan] = useState<'bronze' | 'silver' | 'gold'>('silver');
-  const [paymentMethod, setPaymentMethod] = useState<'transfer' | 'mercadopago'>('transfer');
   const [buyerName, setBuyerName] = useState('');
   const [buyerEmail, setBuyerEmail] = useState('');
   const [buyerWhatsapp, setBuyerWhatsApp] = useState('');
@@ -1871,32 +1870,24 @@ function App() {
                         <input className="form-input" type="tel" required placeholder="Ej. 11 5555 5555" value={buyerWhatsapp} onChange={e => setBuyerWhatsApp(e.target.value)} />
                       </div>
 
-                      {/* Payment Method select */}
-                      <div className="form-group">
-                        <span className="form-label">{t.payment.method}</span>
-                        <div style={{ display: 'flex', gap: '12px', marginTop: '6px' }}>
-                          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', flexGrow: 1, padding: '10px', border: '1px solid var(--color-border)', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}>
-                            <input type="radio" name="paymethod" checked={paymentMethod === 'transfer'} onChange={() => setPaymentMethod('transfer')} />
-                            {t.payment.transfer}
-                          </label>
-                          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', flexGrow: 1, padding: '10px', border: '1px solid var(--color-border)', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}>
-                            <input type="radio" name="paymethod" checked={paymentMethod === 'mercadopago'} onChange={() => setPaymentMethod('mercadopago')} />
-                            {t.payment.mercadopago}
-                          </label>
+                      {/* Secure Payment Details - Mercado Pago Only */}
+                      <div style={{ background: '#fafafa', padding: '14px', borderRadius: '12px', fontSize: '12px', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', marginBottom: '16px', lineHeight: 1.4 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', color: 'var(--color-accent)', marginBottom: '6px' }}>
+                          <span>💳</span>
+                          <span>{t.payment.mercadopago}</span>
                         </div>
+                        <p style={{ margin: '0 0 8px 0', fontSize: '11px' }}>
+                          {t.payment.gatewayInstruct} {selectedCurrency !== 'USD' ? selectedCurrency : 'USD (International)'}.
+                        </p>
+                        {paymentPlan === 'gold' && (
+                          <div style={{ marginTop: '10px', borderTop: '1px dashed var(--color-border)', paddingTop: '8px' }}>
+                            <strong>Enlace de Pago Oficial:</strong> <br />
+                            <a href="https://mpago.la/1W6btGs" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '4px', backgroundColor: '#009EE3', color: 'white', fontWeight: 'bold', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontSize: '11px' }}>
+                              Pagar con Mercado Pago ↗
+                            </a>
+                          </div>
+                        )}
                       </div>
-
-                      {paymentMethod === 'transfer' ? (
-                        <div style={{ background: '#fafafa', padding: '12px', borderRadius: '8px', fontSize: '11px', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                          <strong>{CURRENCY_DATA[selectedCurrency].bank}</strong> <br />
-                          {CURRENCY_DATA[selectedCurrency].bankDetails} <br />
-                          <em>{t.payment.transferInstruct}</em>
-                        </div>
-                      ) : (
-                        <div style={{ background: '#fafafa', padding: '12px', borderRadius: '8px', fontSize: '11px', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                          <em>{t.payment.gatewayInstruct} {selectedCurrency !== 'USD' ? selectedCurrency : 'USD (International)'}.</em>
-                        </div>
-                      )}
 
                       <button className="btn-form-submit" type="submit" disabled={isPaying}>
                         {isPaying ? t.payment.btnPaying : t.payment.btnPay}
