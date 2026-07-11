@@ -1924,8 +1924,8 @@ function App() {
                 <div>
                   <span className="contact-method-label">{t.contact.wa}</span>
                   <div>
-                    <a href="https://wa.me/5491100000000?text=Hola!%20Me%20interesa%20saber%20mas%20sobre%20las%20invitaciones%20de%20Save%20Your%20Date" target="_blank" rel="noopener noreferrer" className="contact-method-val">
-                      +54 9 11 0000-0000
+                    <a href="https://wa.me/59899134504?text=Hola!%20Me%20interesa%20saber%20mas%20sobre%20las%20invitaciones%20de%20Save%20Your%20Date" target="_blank" rel="noopener noreferrer" className="contact-method-val">
+                      +598 99 134 504
                     </a>
                   </div>
                 </div>
@@ -1948,8 +1948,8 @@ function App() {
                 <div>
                   <span className="contact-method-label">{t.contact.social}</span>
                   <div>
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="contact-method-val">
-                      @saveyourdate.invites
+                    <a href="https://instagram.com/saveyourdate.invite" target="_blank" rel="noopener noreferrer" className="contact-method-val">
+                      @saveyourdate.invite
                     </a>
                   </div>
                 </div>
@@ -2031,9 +2031,9 @@ function App() {
           </div>
 
           <div className="footer-socials">
-            <a href="https://instagram.com" className="social-icon-btn" target="_blank" rel="noopener noreferrer">📸</a>
+            <a href="https://instagram.com/saveyourdate.invite" className="social-icon-btn" target="_blank" rel="noopener noreferrer">📸</a>
             <a href="https://facebook.com" className="social-icon-btn" target="_blank" rel="noopener noreferrer">👤</a>
-            <a href="https://wa.me/5491100000000" className="social-icon-btn" target="_blank" rel="noopener noreferrer">💬</a>
+            <a href="https://wa.me/59899134504" className="social-icon-btn" target="_blank" rel="noopener noreferrer">💬</a>
           </div>
 
           <p className="footer-copy">

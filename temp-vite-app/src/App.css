@@ -1100,7 +1100,7 @@
 
 /* Footer styling */
 .footer {
-  background-color: white;
+  background-color: #ff93cd;
   padding: 40px 0;
   text-align: center;
 }
@@ -1116,8 +1116,8 @@
   width: auto;
   display: block;
   margin: 0 auto;
-  /* CSS Filter to convert black (#000000) into our accent red (#E0004D) */
-  filter: invert(12%) sepia(95%) saturate(7126%) hue-rotate(345deg) brightness(88%) contrast(116%);
+  /* CSS Filter to make any black SVG logo pure white */
+  filter: brightness(0) invert(1);
   transition: transform 0.3s ease;
 }
 
@@ -1134,13 +1134,14 @@
 
 .footer-link {
   font-size: 14px;
-  color: var(--color-text-secondary);
+  color: white;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .footer-link:hover {
-  color: var(--color-accent);
+  color: white;
+  text-decoration: underline;
 }
 
 .footer-socials {
@@ -1154,8 +1155,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: var(--bg-secondary);
-  color: var(--color-text-secondary);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1165,14 +1166,14 @@
 }
 
 .social-icon-btn:hover {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: white;
+  color: #ff93cd;
   transform: translateY(-2px);
 }
 
 .footer-copy {
   font-size: 13px;
-  color: var(--color-text-light);
+  color: rgba(255, 255, 255, 0.8);
   margin: 0;
 }
 
