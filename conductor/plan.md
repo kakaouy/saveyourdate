@@ -1,57 +1,54 @@
-# Plan de Implementación: Save Your Date (Prototipo Frontend)
+# Implementation Plan: Private Admin Dashboard Module
 
-## 1. Objetivo y Alcance
-Crear un prototipo funcional y estéticamente atractivo para la plataforma de invitaciones "Save Your Date", inspirado en la navegación y estructura de Fixdate. La aplicación será una *Landing Page* tipo "One-Page" orientada a la conversión, donde el usuario podrá ver modelos de invitaciones y realizar pedidos.
+## Background & Motivation
+Currently, "Save Your Date" offers premium plans (Silver and Gold) where users manage their RSVPs via a Google Sheet. The new requirement introduces a "Private Admin Dashboard" specifically for the Gold plan (or all premium plans). This dashboard provides a secure, passwordless entry (Email/Phone + Validation Code) to access an interactive control panel where hosts can view real-time metrics, arrange tables, and send WhatsApp reminders directly from the application.
 
-## 2. Stack Tecnológico
-*   **Framework Frontend:** React (con TypeScript) inicializado vía Vite. Esta es la opción más sencilla de mantener, con recarga rápida y sin la complejidad de renderizado en servidor de Next.js.
-*   **Estilos:** Vanilla CSS (CSS Modules o archivos globales) para garantizar la máxima flexibilidad y cumplimiento estricto del diseño visual solicitado, sin depender de utilitarios como Tailwind.
-*   **Iconos:** React Icons (opcional) o SVGs integrados.
-*   **Datos:** Archivos JSON estáticos (Mocks) para la galería y modelos de invitaciones.
+## Scope & Impact
+- **App.tsx**: Add new states for authentication (`isAdminLoggedIn`, `adminLoginStep`). Implement the Login UI and the full-screen Admin Dashboard View. Add new translation keys for the dashboard to ES, EN, and PT.
+- **App.css**: Add new styles for the admin dashboard layout, sidebar/navigation, metric cards, table arrangement drag-and-drop/dropdown UI, and guest lists.
+- **Data/Models**: Add mock RSVP guest data and table structure to simulate the dashboard experience since no backend exists.
 
-## 3. Guía de Diseño y Estilos
-*   **Paleta de Colores:**
-    *   **Fondo principal:** Blanco (`#FFFFFF`).
-    *   **Color Primario:** Rosado suave/pastel (ej. `#F4A6B6`) para destacar delicadeza.
-    *   **Color Secundario / Acento:** Rojo (ej. `#D32F2F` o `#E0004D`) para destacar botones de conversión o detalles clave.
-    *   **Color de Detalles:** Verde Agua / Mint (ej. `#73C6B6` o `#A3E4D7`) para iconos, hovers, o etiquetas (tags) en los modelos.
-*   **Tipografía:**
-    *   **Títulos y Encabezados:** `Garamond` (fuente serif clásica y elegante).
-    *   **Cuerpo de Texto y UI:** `Nunito` (o similar, fuente sans-serif redonda, moderna y amigable).
-*   **Animaciones:**
-    *   **Tipo "Latido" (Pulse / Heartbeat):** Aplicado sutilmente al botón principal "Crea tu invite" y en el acceso a "Ver modelos" para llamar la atención sin saturar.
-    *   **Scroll:** Comportamiento `smooth` (suave) al navegar entre las secciones desde el menú.
+## Proposed Solution (App Takeover View)
+We will implement an App Takeover approach. When the user successfully authenticates using their validation code, the main application view will be completely replaced by the Admin Dashboard.
 
-## 4. Estructura de la Aplicación (Componentes)
+### 1. Authentication View
+- Accessible via a new "Ingresar / Mi Evento" button in the main navigation.
+- Shows a clean form requesting: Email/Phone and Validation Code (e.g., WEDDING2026).
+- Successful validation sets `isAdminLoggedIn = true`.
 
-La aplicación constará de los siguientes bloques renderizados verticalmente:
+### 2. Dashboard Layout
+- **Sidebar/Header**: Contains the event name (e.g., "Boda de Sofía & Mateo"), a menu to switch between "Vista General", "Invitados", and "Mesas", and a "Cerrar Sesión / Volver" button to exit back to the landing page.
+- **Vista General (Overview)**: High-level metric cards showing total confirmed, pending, adults, kids, and special diets.
+- **Invitados (Guest List)**: A table of guests with their RSVP status and a "WhatsApp" button to send reminders to pending guests.
+- **Mesas (Table Assignment)**: A visual area to group confirmed guests into "Mesa 1", "Mesa 2", etc.
 
-1.  **Layout y Navegación (Header/Sidebar):**
-    *   Un menú lateral derecho o un menú hamburguesa que se despliega desde la derecha.
-    *   **Enlaces de navegación (anclas):** Inicio, Modelos, ¿Qué incluyen?, Hace tu pedido, Contacto.
-2.  **Sección 1: Inicio (Hero):**
-    *   Mensaje de bienvenida y propuesta de valor ("Save Your Date").
-    *   Botones de Acción (CTAs): "Crea tu invite" (con animación de latido) y "Ver modelos".
-3.  **Sección 2: Modelos (Galería):**
-    *   Filtros tipo pestañas o botones para categorías: **Bodas, 15 años, Otros Eventos**.
-    *   Cuadrícula (Grid) de tarjetas mostrando los diseños, alimentada por datos de prueba (Mocks).
-4.  **Sección 3: ¿Qué incluyen?:**
-    *   Listado visual con iconos (verde agua) de las características (ej. cuenta regresiva, confirmación de asistencia, música, etc.).
-5.  **Sección 4: Hace tu pedido (Proceso):**
-    *   Breve explicación de los pasos para contratar/crear la invitación y un CTA destacado en rojo/rosado.
-6.  **Sección 5: Contacto & Footer:**
-    *   Formulario simple de contacto y/o botón directo a WhatsApp.
-    *   Enlaces a redes sociales.
+## Alternatives Considered
+- **Full-Screen Modal Overlay**: Considered opening the admin panel as a modal over the landing page. Rejected by user preference in favor of a clean, dedicated app-takeover view.
 
-## 5. Fases de Implementación
+## Implementation Plan
 
-*   **Fase 1: Configuración Base.** Inicialización del proyecto Vite + React + TS. Configuración de variables CSS (colores y fuentes desde Google Fonts).
-*   **Fase 2: Layout y Navegación.** Construcción del menú lateral derecho y la estructura One-Page con anclas (`#inicio`, `#modelos`, etc.).
-*   **Fase 3: Secciones Principales.** Desarrollo del Hero, Sección de características y flujo de pedido.
-*   **Fase 4: Galería de Modelos.** Creación del mock de datos (JSON) para las tarjetas de Bodas/15 años/Otros eventos y la cuadrícula interactiva.
-*   **Fase 5: Estilización Final y Animaciones.** Ajuste de paleta de colores, aplicación de la animación de "latido" y detalles en verde agua.
+### Phase 1: Authentication & Navigation Setup
+1. Add the "Ingresar" button to the desktop and mobile navigation menus.
+2. Add new states `showAdminLogin` and `isAdminLoggedIn` to `App.tsx`.
+3. Create the Login Form UI that replaces the main content or opens before takeover.
+4. Add the translation keys for the new module.
 
-## 6. Verificación y Testing
-*   El sitio será responsivo (adaptable a móviles, tablets y escritorio).
-*   Se verificará que los enlaces del menú realicen un scroll fluido hasta la sección correspondiente.
-*   Validación visual de la paleta de colores y combinación tipográfica (Garamond + Nunito).
+### Phase 2: Mock Data & Dashboard Structure
+1. Create mock guest list data with various statuses (confirmed, pending, declined, adults, kids, diets) in `App.tsx` state.
+2. Create the main wrapper for the `<AdminDashboard>` functional component (or render block) to replace the landing page when `isAdminLoggedIn` is true.
+
+### Phase 3: Dashboard Views UI
+1. **Overview Tab**: Implement the summary cards with dynamic metric counts.
+2. **Guests Tab**: Implement the guest list table and the WhatsApp action button.
+3. **Tables Tab**: Implement a simplified drag-and-drop or dropdown-based table assignment UI.
+4. Update `App.css` with sleek, modern, and responsive styles for these components.
+
+## Verification
+- Test passwordless login with mock code `WEDDING2026`.
+- Verify the app correctly transitions from the landing page to the dashboard.
+- Check that the metrics correctly aggregate the mock data.
+- Ensure the table assignment interface is functional and responsive on mobile devices.
+- Verify the "Volver al Inicio" (Logout) button returns to the landing page safely without breaking styles.
+
+## Migration & Rollback
+- Since there is no backend, all changes are front-end state additions. If issues arise, we can rollback the Git commit. The existing `App.tsx` state will not be broken as the new view is conditionally rendered cleanly alongside the main layout.
