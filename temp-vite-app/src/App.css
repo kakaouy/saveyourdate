@@ -1101,23 +1101,23 @@
 /* Footer styling */
 .footer {
   background-color: #ff93cd;
-  padding: 40px 0;
+  padding: 24px 0;
   text-align: center;
 }
 
 .footer-logo {
   text-decoration: none;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   display: inline-block;
 }
 
 .footer-logo-img {
-  height: 80px;
+  height: 60px;
   width: auto;
   display: block;
   margin: 0 auto;
-  /* CSS Filter to make any black SVG logo pure white */
-  filter: brightness(0) invert(1);
+  /* CSS Filter to convert black (#000000) into our accent red (#E0004D) */
+  filter: invert(12%) sepia(95%) saturate(7126%) hue-rotate(345deg) brightness(88%) contrast(116%);
   transition: transform 0.3s ease;
 }
 
@@ -1129,7 +1129,7 @@
   display: flex;
   justify-content: center;
   gap: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .footer-link {
@@ -1145,30 +1145,11 @@
 }
 
 .footer-socials {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 24px;
+  display: none;
 }
 
 .social-icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 18px;
-  text-decoration: none;
-  transition: all 0.3s;
-}
-
-.social-icon-btn:hover {
-  background-color: white;
-  color: #ff93cd;
-  transform: translateY(-2px);
+  display: none;
 }
 
 .footer-copy {
@@ -1547,6 +1528,10 @@ html, body, .app-wrapper {
 
 /* Mobile Modal Enhancements */
 @media (max-width: 576px) {
+  .contact-form-box {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
   .modal-overlay {
     padding: 10px;
   }

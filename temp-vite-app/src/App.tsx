@@ -1413,7 +1413,7 @@ function App() {
                         {t.portal.categoryDesc}
                       </p>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '32px' }}>
+                      <div className="category-select-grid">
                         <button 
                           className={`filter-btn ${wizardCategory === 'wedding' ? 'active' : ''}`}
                           onClick={() => { setWizardCategory('wedding'); setWizardModel('boda-marfil'); }}
@@ -2028,12 +2028,6 @@ function App() {
             <a href="#modelos" className="footer-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
             <a href="#incluyen" className="footer-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
             <a href="#contacto" className="footer-link" onClick={(e) => handleScrollToSection(e, 'contacto')}>{t.nav.contact}</a>
-          </div>
-
-          <div className="footer-socials">
-            <a href="https://instagram.com/saveyourdate.invite" className="social-icon-btn" target="_blank" rel="noopener noreferrer">📸</a>
-            <a href="https://facebook.com" className="social-icon-btn" target="_blank" rel="noopener noreferrer">👤</a>
-            <a href="https://wa.me/59899134504" className="social-icon-btn" target="_blank" rel="noopener noreferrer">💬</a>
           </div>
 
           <p className="footer-copy">
