@@ -845,14 +845,14 @@ function App() {
 
   // Regional Currency and Payment Data (Rounded locally)
   const CURRENCY_DATA = {
-    USD: { symbol: '$', suffix: 'USD', bronze: 10, silver: 15, gold: 25, label: 'Dólar (Internacional)', bank: 'PayPal / Stripe (USD)', bankDetails: 'Email de pago: pagos@saveyourdate.com' },
-    ARS: { symbol: '$', suffix: 'ARS', bronze: 9500, silver: 14500, gold: 24000, label: 'Peso Argentino', bank: 'Mercado Pago / Transferencia', bankDetails: 'ALIAS: saveyourdate.mp | CBU: 0000003100099999987654' },
-    MXN: { symbol: '$', suffix: 'MXN', bronze: 180, silver: 270, gold: 450, label: 'Peso Mexicano', bank: 'Mercado Pago México / SPEI', bankDetails: 'CLABE SPEI: 012180009999999888 | BANCO: BBVA México' },
-    CLP: { symbol: '$', suffix: 'CLP', bronze: 9500, silver: 14000, gold: 23500, label: 'Peso Chileno', bank: 'Mercado Pago Chile / Transferencia', bankDetails: 'Banco de Chile - Cuenta Corriente: 123-45678-90 | RUT: 77.777.777-7' },
-    COP: { symbol: '$', suffix: 'COP', bronze: 40000, silver: 60000, gold: 100000, label: 'Peso Colombiano', bank: 'Mercado Pago / PSE / Nequi', bankDetails: 'Nequi / Daviplata: 310 000 0000 | Convenio PSE: Save Your Date' },
-    PEN: { symbol: 'S/. ', suffix: 'PEN', bronze: 38, silver: 55, gold: 95, label: 'Sol Peruano', bank: 'Mercado Pago Perú / Yape / Plin', bankDetails: 'Yape / Plin: 999 999 999 | BCP Cuenta Corriente: 191-9999999-0-99' },
-    UYU: { symbol: '$', suffix: 'UYU', bronze: 400, silver: 600, gold: 1000, label: 'Peso Uruguayo', bank: 'Mercado Pago Uruguay / Transferencia', bankDetails: 'BROU (Banco República) - Caja de Ahorros: 0015-1234567' },
-    BRL: { symbol: 'R$ ', suffix: 'BRL', bronze: 55, silver: 80, gold: 140, label: 'Real Brasileño', bank: 'Mercado Pago Brasil / PIX', bankDetails: 'Chave PIX (E-mail): pix@saveyourdate.com.br' }
+    USD: { symbol: '$', suffix: 'USD', bronze: 50, silver: 70, gold: 100, label: 'Dólar (Internacional)', bank: 'PayPal / Stripe (USD)', bankDetails: 'Email de pago: saveyourdate.invite@gmail.com' },
+    ARS: { symbol: '$', suffix: 'ARS', bronze: 50000, silver: 70000, gold: 100000, label: 'Peso Argentino', bank: 'Mercado Pago / Transferencia', bankDetails: 'ALIAS: saveyourdate.mp | CBU: 0000003100099999987654' },
+    MXN: { symbol: '$', suffix: 'MXN', bronze: 900, silver: 1250, gold: 1800, label: 'Peso Mexicano', bank: 'Mercado Pago México / SPEI', bankDetails: 'CLABE SPEI: 012180009999999888 | BANCO: BBVA México' },
+    CLP: { symbol: '$', suffix: 'CLP', bronze: 48000, silver: 68000, gold: 95000, label: 'Peso Chileno', bank: 'Mercado Pago Chile / Transferencia', bankDetails: 'Banco de Chile - Cuenta Corriente: 123-45678-90 | RUT: 77.777.777-7' },
+    COP: { symbol: '$', suffix: 'COP', bronze: 200000, silver: 280000, gold: 400000, label: 'Peso Colombiano', bank: 'Mercado Pago / PSE / Nequi', bankDetails: 'Nequi / Daviplata: 310 000 0000 | Convenio PSE: Save Your Date' },
+    PEN: { symbol: 'S/. ', suffix: 'PEN', bronze: 190, silver: 260, gold: 370, label: 'Sol Peruano', bank: 'Mercado Pago Perú / Yape / Plin', bankDetails: 'Yape / Plin: 999 999 999 | BCP Cuenta Corriente: 191-9999999-0-99' },
+    UYU: { symbol: '$', suffix: 'UYU', bronze: 2000, silver: 2800, gold: 4000, label: 'Peso Uruguayo', bank: 'Mercado Pago Uruguay / Transferencia', bankDetails: 'BROU (Banco República) - Caja de Ahorros: 0015-1234567' },
+    BRL: { symbol: 'R$ ', suffix: 'BRL', bronze: 275, silver: 385, gold: 550, label: 'Real Brasileño', bank: 'Mercado Pago Brasil / PIX', bankDetails: 'Chave PIX (E-mail): pix@saveyourdate.com.br' }
   };
 
   // Valid pre-approved mock codes for testing!
@@ -1927,8 +1927,8 @@ function App() {
                 <div>
                   <span className="contact-method-label">{t.contact.email}</span>
                   <div>
-                    <a href="mailto:hola@saveyourdate.com" className="contact-method-val">
-                      hola@saveyourdate.com
+                    <a href="mailto:saveyourdate.invite@gmail.com" className="contact-method-val">
+                      saveyourdate.invite@gmail.com
                     </a>
                   </div>
                 </div>
