@@ -81,7 +81,8 @@ const TRANSLATIONS = {
         { q: "¿Puedo realizar cambios después de que esté publicada?", a: "¡Sí, totalmente! Sabemos que pueden surgir imprevistos (cambios de horario, mesa, etc.). Los cambios de información de texto, cronograma y ubicación son gratuitos y los realizamos a la brevedad durante todo tu evento." },
         { q: "¿Cómo confirman asistencia los invitados?", a: "Tus invitados completan un formulario RSVP dentro de la misma invitación web. La respuesta te llega automáticamente a tu planilla de Google Sheets vinculada en tiempo real para que veas el listado organizado al instante." },
         { q: "¿Por cuánto tiempo permanece activo el enlace web?", a: "La invitación permanece activa, online y funcional hasta 30 días después de realizado tu evento. Si necesitás extender el tiempo por algún motivo, podés solicitarlo." },
-        { q: "¿Qué métodos de pago aceptan?", a: "Aceptamos transferencias bancarias directas (CBU/Alias) y todas las tarjetas de crédito o débito a través de la pasarela de Mercado Pago." }
+        { q: "¿Qué métodos de pago aceptan?", a: "Aceptamos transferencias bancarias directas (CBU/Alias) y todas las tarjetas de crédito o débito a través de la pasarela de Mercado Pago." },
+        { q: "¿Cómo recibo mi código de validación después de realizar el pago?", a: "Una vez que el pago es aprobado (de forma inmediata con tarjeta o Mercado Pago), nuestro sistema valida la transacción automáticamente y te envía un mensaje de WhatsApp y un correo electrónico con tu confirmación de pago y tu código de validación único (SYD-XXXXXX) para que comiences a cargar tus datos al instante." }
       ]
     },
     portal: {
@@ -779,6 +780,27 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'wedding' | '15years' | 'other'>('all');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showExtrasModal, setShowExtrasModal] = useState(false);
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollCarouselLeft = () => {
+    if (carouselRef.current) {
+      const clientWidth = carouselRef.current.clientWidth;
+      carouselRef.current.scrollBy({
+        left: -clientWidth * 0.8,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const scrollCarouselRight = () => {
+    if (carouselRef.current) {
+      const clientWidth = carouselRef.current.clientWidth;
+      carouselRef.current.scrollBy({
+        left: clientWidth * 0.8,
+        behavior: 'smooth'
+      });
+    }
+  };
   
   // Interactive Simulator Modal States
   const [demoModel, setDemoModel] = useState<InvitationModel | null>(null);
@@ -803,7 +825,6 @@ function App() {
   });
 
   // PORTAL DE CREACIÓN / ORDER WIZARD STATES
-  const [creationTrack, setCreationTrack] = useState<'wizard' | 'payment'>('wizard');
   const [validationCode, setValidationCode] = useState('');
   const [isCodeValid, setIsCodeValid] = useState<boolean | null>(null);
   const [wizardCategory, setWizardCategory] = useState<'wedding' | '15years' | 'other'>('wedding');
@@ -909,7 +930,6 @@ function App() {
       else setWizardCategory('other');
     }
     
-    setCreationTrack('wizard');
     const contactSection = document.getElementById('crear');
     if (contactSection) {
       contactSection.scrollIntoView({ behavior: 'smooth' });
@@ -964,13 +984,18 @@ function App() {
 
   // Use the newly generated code directly in the form
   const handleUseGeneratedCode = () => {
-    setCreationTrack('wizard');
     setIsCodeValid(true);
     setWizardStep(2);
     setPaymentSuccess(false);
     setBuyerName('');
     setBuyerEmail('');
     setBuyerWhatsApp('');
+
+    // Smooth scroll back to the Creation Portal section to complete details!
+    const crearSection = document.getElementById('crear');
+    if (crearSection) {
+      crearSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   // Handle Wizard Submit (Simulation)
@@ -1195,56 +1220,68 @@ function App() {
             <button className={`filter-btn ${selectedCategory === 'other' ? 'active' : ''}`} onClick={() => setSelectedCategory('other')}>{t.catalog.filterOther}</button>
           </div>
 
-          {/* Grid of models */}
-          <div className="models-grid">
-            {filteredModels.map((model) => (
-              <article className="model-card" key={model.id}>
-                <div className="card-visual">
-                  {model.badge && (
-                    <span className="card-badge">
-                      {model.badge === 'Más Elegido' ? t.catalog.popularBadge : (model.badge === 'Nuevo' ? t.catalog.newBadge : t.catalog.trendBadge)}
-                    </span>
-                  )}
-                  
-                  {/* Styled procedural preview of the card style */}
-                  <div className={`mock-card-content ${model.themeClass}`}>
-                    {model.illustrationType === 'rings' && (
-                      <div className="mock-illustration-rings"></div>
+          {/* Grid of models (now horizontal swimlane carousel) */}
+          <div className="models-carousel-wrapper">
+            <div ref={carouselRef} className="models-swimlane-container">
+              {filteredModels.map((model) => (
+                <article className="model-card" key={model.id}>
+                  <div className="card-visual">
+                    {model.badge && (
+                      <span className="card-badge">
+                        {model.badge === 'Más Elegido' ? t.catalog.popularBadge : (model.badge === 'Nuevo' ? t.catalog.newBadge : t.catalog.trendBadge)}
+                      </span>
                     )}
-                    {model.illustrationType === 'crown' && (
-                      <div className="mock-illustration-crown">👑</div>
-                    )}
-                    {model.illustrationType === 'balloon' && (
-                      <div className="mock-illustration-balloon">🎈</div>
-                    )}
-                    <div className="mock-card-text-primary">{model.demoName1}</div>
-                    {model.demoName2 && <div className="mock-card-text-primary" style={{ marginTop: '0px' }}>{model.demoName2}</div>}
-                    <div className="mock-card-text-sec">{model.date}</div>
-                  </div>
-                </div>
-
-                <div className="card-info">
-                  <h3 className="card-title">{model.title}</h3>
-                  <p className="card-desc">{model.description}</p>
-                  
-                  <div className="card-features">
-                    {model.features.slice(0, 3).map((feat, index) => (
-                      <span className="card-feature-tag" key={index}>{feat}</span>
-                    ))}
-                    {model.features.length > 3 && <span className="card-feature-tag">+{model.features.length - 3}</span>}
+                    
+                    {/* Styled procedural preview of the card style */}
+                    <div className={`mock-card-content ${model.themeClass}`}>
+                      {model.illustrationType === 'rings' && (
+                        <div className="mock-illustration-rings"></div>
+                      )}
+                      {model.illustrationType === 'crown' && (
+                        <div className="mock-illustration-crown">👑</div>
+                      )}
+                      {model.illustrationType === 'balloon' && (
+                        <div className="mock-illustration-balloon">🎈</div>
+                      )}
+                      <div className="mock-card-text-primary">{model.demoName1}</div>
+                      {model.demoName2 && <div className="mock-card-text-primary" style={{ marginTop: '0px' }}>{model.demoName2}</div>}
+                      <div className="mock-card-text-sec">{model.date}</div>
+                    </div>
                   </div>
 
-                  <div className="card-footer">
-                    <button className="btn-card-demo" onClick={() => handleOpenDemo(model)}>
-                      {t.catalog.verDemo}
-                    </button>
-                    <button className="btn-card-order" onClick={() => handleSelectModelForOrder(model.id)}>
-                      {t.catalog.personalize}
-                    </button>
+                  <div className="card-info">
+                    <h3 className="card-title">{model.title}</h3>
+                    <p className="card-desc">{model.description}</p>
+                    
+                    <div className="card-features">
+                      {model.features.slice(0, 3).map((feat, index) => (
+                        <span className="card-feature-tag" key={index}>{feat}</span>
+                      ))}
+                      {model.features.length > 3 && <span className="card-feature-tag">+{model.features.length - 3}</span>}
+                    </div>
+
+                    <div className="card-footer">
+                      <button className="btn-card-demo" onClick={() => handleOpenDemo(model)}>
+                        {t.catalog.verDemo}
+                      </button>
+                      <button className="btn-card-order" onClick={() => handleSelectModelForOrder(model.id)}>
+                        {t.catalog.personalize}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              ))}
+            </div>
+
+            {/* Carousel navigation controls */}
+            <div className="carousel-controls">
+              <button className="carousel-control-btn prev" onClick={scrollCarouselLeft} aria-label="Anterior">
+                ←
+              </button>
+              <button className="carousel-control-btn more" onClick={scrollCarouselRight}>
+                {lang === 'es' ? 'Ver más' : (lang === 'en' ? 'See more' : 'Ver mais')} <span className="arrow">→</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -1343,588 +1380,591 @@ function App() {
 
       {/* SECTION 6: PORTAL DE CREACIÓN / CARGA DE DATOS */}
       <section id="crear" className="features-section" style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--color-border)' }}>
-        <div className="container" style={{ maxWidth: '1000px' }}>
-          <div className="section-header" style={{ marginBottom: '40px' }}>
+        <div className="container">
+          <div className="section-header">
             <span className="section-subtitle">{t.portal.subtitle}</span>
             <h2 className="section-title">{t.portal.title}</h2>
-            <p className="section-desc">{t.portal.desc}</p>
+            <p className="section-desc">
+              {lang === 'es' 
+                ? "Ingresá tu código de validación para comenzar a diseñar tu invitación. Si todavía no tenés un código, podés generarlo en la sección de pago inmediatamente debajo." 
+                : (lang === 'en' 
+                  ? "Enter your validation code to start designing your invitation. If you don't have a code yet, you can generate one in the payment section immediately below." 
+                  : "Insira seu código de validação para começar a desenhar seu convite. Se você ainda não tem um código, pode gerá-lo na seção de pagamento logo abaixo.")}
+            </p>
           </div>
 
-          <div className="creation-track-toggle">
-            <button 
-              className={`filter-btn ${creationTrack === 'wizard' ? 'active' : ''}`}
-              onClick={() => { setCreationTrack('wizard'); setWizardStep(1); setIsCodeValid(null); }}
-            >
-              {t.portal.tabCode}
-            </button>
-            <button 
-              className={`filter-btn ${creationTrack === 'payment' ? 'active' : ''}`}
-              onClick={() => { setCreationTrack('payment'); setPaymentSuccess(false); }}
-            >
-              {t.portal.tabPay}
-            </button>
-          </div>
-
-          {/* TRACK 1: THE DYNAMIC CREATION WIZARD */}
-          {creationTrack === 'wizard' && (
-            <div className="contact-form-box" style={{ maxWidth: '750px', margin: '0 auto' }}>
-              {/* Wizard Step Indicators */}
-              <div className="wizard-steps-header">
-                <span className={`wizard-step-indicator ${wizardStep >= 1 ? 'active' : ''}`}>{t.portal.steps.s1}</span>
-                <span className={`wizard-step-indicator ${wizardStep >= 2 ? 'active' : ''}`}>{t.portal.steps.s2}</span>
-                <span className={`wizard-step-indicator ${wizardStep >= 3 ? 'active' : ''}`}>{t.portal.steps.s3}</span>
-                <span className={`wizard-step-indicator ${wizardStep >= 4 ? 'active' : ''}`}>{t.portal.steps.s4}</span>
-              </div>
-
-              {wizardSubmitted ? (
-                <div className="sim-rsvp-success" style={{ padding: '50px 20px', fontSize: '16px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '64px', marginBottom: '20px' }}>⚙️</div>
-                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', margin: '0 0 16px 0', color: 'var(--color-mint)' }}>
-                    {t.portal.successTitle}
-                  </h3>
-                  <p style={{ color: 'var(--color-text-secondary)', maxWidth: '500px', margin: '0 auto 24px auto' }}>
-                    {t.portal.successDesc}
-                  </p>
-                  <div style={{ background: 'white', padding: '16px', borderRadius: '12px', display: 'inline-block', border: '1px solid var(--color-border)', fontSize: '14px', fontFamily: 'monospace' }}>
-                    {t.portal.successTrack}: {validationCode} <br />
-                    {t.portal.successSheet}
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  {/* STEP 1: Enter Validation Code */}
-                  {wizardStep === 1 && (
-                    <form onSubmit={handleVerifyCode} className="contact-form">
-                      <div style={{ textAlign: 'left', marginBottom: '20px' }}>
-                        <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 10px 0', color: 'var(--color-accent)' }}>
-                          {t.portal.codeTitle}
-                        </h4>
-                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px' }}>
-                          {t.portal.codeDesc}
-                        </p>
-                        <p style={{ color: 'var(--color-text-light)', fontSize: '12px', fontStyle: 'italic' }}>
-                          {t.portal.codeTip}
-                        </p>
-                      </div>
-
-                      <div className="form-group">
-                        <label className="form-label" htmlFor="vcode">Código</label>
-                        <input 
-                          className="form-input" 
-                          style={{ textTransform: 'uppercase', fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px', textAlign: 'center' }}
-                          type="text" 
-                          id="vcode" 
-                          required 
-                          placeholder={t.portal.codePlaceholder} 
-                          value={validationCode}
-                          onChange={(e) => { setValidationCode(e.target.value); setIsCodeValid(null); }}
-                        />
-                      </div>
-
-                      {isCodeValid === false && (
-                        <div className="sim-rsvp-success" style={{ background: '#fef3f4', color: '#e0004d', border: '1px solid #f9d6d9', padding: '12px', borderRadius: '8px', fontSize: '14px', textAlign: 'center', marginTop: '10px' }}>
-                          {t.portal.codeInvalid}
-                        </div>
-                      )}
-
-                      <button className="btn-form-submit" style={{ marginTop: '16px' }} type="submit">{t.portal.codeBtn}</button>
-                    </form>
-                  )}
-
-                  {/* STEP 2: Selection of Category and Template */}
-                  {wizardStep === 2 && (
-                    <div style={{ textAlign: 'left' }}>
-                      <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 12px 0', color: 'var(--color-accent)' }}>
-                        {t.portal.categoryTitle}
-                      </h4>
-                      <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', marginBottom: '24px' }}>
-                        {t.portal.categoryDesc}
-                      </p>
-
-                      <div className="category-select-grid">
-                        <button 
-                          className={`filter-btn ${wizardCategory === 'wedding' ? 'active' : ''}`}
-                          onClick={() => { setWizardCategory('wedding'); setWizardModel('boda-marfil'); }}
-                          style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}
-                        >
-                          <span style={{ fontSize: '24px' }}>💍</span>
-                          <strong>{t.portal.catWedding}</strong>
-                        </button>
-                        <button 
-                          className={`filter-btn ${wizardCategory === '15years' ? 'active' : ''}`}
-                          onClick={() => { setWizardCategory('15years'); setWizardModel('15-glamour'); }}
-                          style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}
-                        >
-                          <span style={{ fontSize: '24px' }}>👑</span>
-                          <strong>{t.portal.cat15}</strong>
-                        </button>
-                        <button 
-                          className={`filter-btn ${wizardCategory === 'other' ? 'active' : ''}`}
-                          onClick={() => { setWizardCategory('other'); setWizardModel('otros-baby'); }}
-                          style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}
-                        >
-                          <span style={{ fontSize: '24px' }}>🎈</span>
-                          <strong>{t.portal.catOther}</strong>
-                        </button>
-                      </div>
-
-                      <div className="form-group" style={{ marginBottom: '24px' }}>
-                        <label className="form-label" htmlFor="wmodel">{t.portal.selectModel}</label>
-                        <select 
-                          className="form-select" 
-                          id="wmodel" 
-                          value={wizardModel}
-                          onChange={(e) => setWizardModel(e.target.value)}
-                        >
-                          {wizardCategory === 'wedding' && (
-                            <>
-                              <option value="boda-marfil">Clásico Marfil</option>
-                              <option value="boda-boho">Rústico Boho</option>
-                            </>
-                          )}
-                          {wizardCategory === '15years' && (
-                            <>
-                              <option value="15-glamour">Glamour Rosa</option>
-                              <option value="15-estrellas">Noche de Estrellas</option>
-                            </>
-                          )}
-                          {wizardCategory === 'other' && (
-                            <>
-                              <option value="otros-baby">Baby Shower Especial</option>
-                              <option value="otros-aniversario">Aniversario de Oro</option>
-                            </>
-                          )}
-                        </select>
-                      </div>
-
-                      <button className="btn-primary" onClick={() => setWizardStep(3)} style={{ width: '100%' }}>{t.portal.btnContinue}</button>
-                    </div>
-                  )}
-
-                  {/* STEP 3: Dynamic Data Form based on Category */}
-                  {wizardStep === 3 && (
-                    <form onSubmit={handleWizardSubmit} className="contact-form">
-                      {/* A. WEDDING CATEGORY FORM FIELDS */}
-                      {wizardCategory === 'wedding' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
-                          <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 10px 0', color: 'var(--color-accent)' }}>
-                            {t.weddingForm.title}
-                          </h4>
-                          
-                          <div className="form-row-2col">
-                            <div className="form-group">
-                              <label className="form-label">{t.weddingForm.p1}</label>
-                              <input className="form-input" type="text" required placeholder="Ej. Sofía" value={weddingData.partner1Name} onChange={e => setWeddingData({...weddingData, partner1Name: e.target.value})} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label">{t.weddingForm.p1wa}</label>
-                              <input className="form-input" type="tel" required placeholder="Ej. 11 1234 5678" value={weddingData.novio1WhatsApp} onChange={e => setWeddingData({...weddingData, novio1WhatsApp: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div className="form-row-2col">
-                            <div className="form-group">
-                              <label className="form-label">{t.weddingForm.p2}</label>
-                              <input className="form-input" type="text" required placeholder="Ej. Mateo" value={weddingData.partner2Name} onChange={e => setWeddingData({...weddingData, partner2Name: e.target.value})} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label">{t.weddingForm.p2wa}</label>
-                              <input className="form-input" type="tel" required placeholder="Ej. 11 8765 4321" value={weddingData.novio2WhatsApp} onChange={e => setWeddingData({...weddingData, novio2WhatsApp: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
-                            <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.weddingForm.civilTitle}</span>
-                            <div className="form-row-2col-mb12">
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.civilDate}</label>
-                                <input className="form-input" type="date" value={weddingData.civilDate} onChange={e => setWeddingData({...weddingData, civilDate: e.target.value})} />
-                              </div>
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.civilTime}</label>
-                                <input className="form-input" type="time" value={weddingData.civilTime} onChange={e => setWeddingData({...weddingData, civilTime: e.target.value})} />
-                              </div>
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.civilPlace}</label>
-                              <input className="form-input" type="text" placeholder="Ej. Registro Civil Central" value={weddingData.civilPlace} onChange={e => setWeddingData({...weddingData, civilPlace: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
-                            <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.weddingForm.partyTitle}</span>
-                            <div className="form-row-2col-mb12">
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.partyDate}</label>
-                                <input className="form-input" type="date" required value={weddingData.ceremonyDate} onChange={e => setWeddingData({...weddingData, ceremonyDate: e.target.value})} />
-                              </div>
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.partyTime}</label>
-                                <input className="form-input" type="time" required value={weddingData.ceremonyTime} onChange={e => setWeddingData({...weddingData, ceremonyTime: e.target.value})} />
-                              </div>
-                            </div>
-                            <div className="form-group" style={{ marginBottom: '12px' }}>
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.salon}</label>
-                              <input className="form-input" type="text" required placeholder="Ej. Estancia La Linda" value={weddingData.ceremonyPlace} onChange={e => setWeddingData({...weddingData, ceremonyPlace: e.target.value})} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.gps}</label>
-                              <input className="form-input" type="url" required placeholder="Ej. https://maps.google.com/?q=..." value={weddingData.ceremonyGps} onChange={e => setWeddingData({...weddingData, ceremonyGps: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
-                            <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.weddingForm.giftTitle}</span>
-                            <div className="form-row-2col-mb12">
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.alias}</label>
-                                <input className="form-input" type="text" placeholder="Ej. boda.sofi.mati" value={weddingData.giftAlias} onChange={e => setWeddingData({...weddingData, giftAlias: e.target.value})} />
-                              </div>
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.cbu}</label>
-                                <input className="form-input" type="text" placeholder="Ej. 00000031000..." value={weddingData.giftCbu} onChange={e => setWeddingData({...weddingData, giftCbu: e.target.value})} />
-                              </div>
-                            </div>
-                            <div className="form-group" style={{ marginBottom: '12px' }}>
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.music}</label>
-                              <input className="form-input" type="text" placeholder="Ej. Perfect - Ed Sheeran" value={weddingData.backgroundMusic} onChange={e => setWeddingData({...weddingData, backgroundMusic: e.target.value})} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.dress}</label>
-                              <input className="form-input" type="text" placeholder="Ej. Formal / Elegante" value={weddingData.dressCode} onChange={e => setWeddingData({...weddingData, dressCode: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div className="form-group">
-                            <label className="form-label">{t.weddingForm.upload}</label>
-                            <input className="form-input" type="file" multiple accept="image/*" style={{ padding: '8px' }} />
-                            <small style={{ color: 'var(--color-text-light)', fontSize: '11px', marginTop: '4px', display: 'block' }}>{t.weddingForm.uploadTip}</small>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* B. 15 YEARS CATEGORY FORM FIELDS */}
-                      {wizardCategory === '15years' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
-                          <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 10px 0', color: 'var(--color-accent)' }}>
-                            {t.quinceForm.title}
-                          </h4>
-                          
-                          <div className="form-group">
-                            <label className="form-label">{t.quinceForm.name}</label>
-                            <input className="form-input" type="text" required placeholder="Ej. Martina" value={quinceData.quinceName} onChange={e => setQuinceData({...quinceData, quinceName: e.target.value})} />
-                          </div>
-
-                          <div className="form-group">
-                            <label className="form-label">{t.quinceForm.parents}</label>
-                            <input className="form-input" type="text" placeholder="Ej. Elena y Roberto" value={quinceData.parentNames} onChange={e => setQuinceData({...quinceData, parentNames: e.target.value})} />
-                          </div>
-
-                          <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
-                            <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.quinceForm.partyTitle}</span>
-                            <div className="form-row-2col-mb12">
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.partyDate}</label>
-                                <input className="form-input" type="date" required value={quinceData.partyDate} onChange={e => setQuinceData({...quinceData, partyDate: e.target.value})} />
-                              </div>
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.partyTime}</label>
-                                <input className="form-input" type="time" required value={quinceData.partyTime} onChange={e => setQuinceData({...quinceData, partyTime: e.target.value})} />
-                              </div>
-                            </div>
-                            <div className="form-group" style={{ marginBottom: '12px' }}>
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.salon}</label>
-                              <input className="form-input" type="text" required placeholder="Ej. Palacio Cristal" value={quinceData.partyPlace} onChange={e => setQuinceData({...quinceData, partyPlace: e.target.value})} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.gps}</label>
-                              <input className="form-input" type="url" required placeholder="Ej. https://maps.google.com/..." value={quinceData.partyGps} onChange={e => setQuinceData({...quinceData, partyGps: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
-                            <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.quinceForm.styleTitle}</span>
-                            <div className="form-row-2col-mb12">
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.alias}</label>
-                                <input className="form-input" type="text" placeholder="Ej. mis15.martu" value={quinceData.giftAlias} onChange={e => setQuinceData({...quinceData, giftAlias: e.target.value})} />
-                              </div>
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.cbu}</label>
-                                <input className="form-input" type="text" placeholder="Ej. 0000021000..." value={quinceData.giftCbu} onChange={e => setQuinceData({...quinceData, giftCbu: e.target.value})} />
-                              </div>
-                            </div>
-                            <div className="form-group" style={{ marginBottom: '12px' }}>
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.music}</label>
-                              <input className="form-input" type="text" placeholder="Ej. Don't Start Now - Dua Lipa" value={quinceData.musicPreference} onChange={e => setQuinceData({...quinceData, musicPreference: e.target.value})} />
-                            </div>
-                            <div className="form-group" style={{ marginBottom: '12px' }}>
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.dress}</label>
-                              <input className="form-input" type="text" placeholder="Ej. Formal con toque flúor" value={quinceData.quinceDressCode} onChange={e => setQuinceData({...quinceData, quinceDressCode: e.target.value})} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.hashtag}</label>
-                              <input className="form-input" type="text" placeholder="Ej. #Los15DeMartu" value={quinceData.instagramHashtag} onChange={e => setQuinceData({...quinceData, instagramHashtag: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div className="form-group">
-                            <label className="form-label">{t.quinceForm.upload}</label>
-                            <input className="form-input" type="file" multiple accept="image/*" style={{ padding: '8px' }} />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* C. OTHER EVENT CATEGORY FORM FIELDS */}
-                      {wizardCategory === 'other' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
-                          <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 10px 0', color: 'var(--color-accent)' }}>
-                            {t.otherForm.title}
-                          </h4>
-                          
-                          <div className="form-row-2col">
-                            <div className="form-group">
-                              <label className="form-label">{t.otherForm.type}</label>
-                              <select className="form-select" value={otherEventData.eventType} onChange={e => setOtherEventData({...otherEventData, eventType: e.target.value})}>
-                                <option value="Baby Shower">Baby Shower</option>
-                                <option value="Bautismo">Bautismo</option>
-                                <option value="Aniversario">Aniversario</option>
-                                <option value="Cumpleaños Infantil">Cumpleaños Infantil</option>
-                                <option value="Cumpleaños de Adulto">Cumpleaños de Adulto</option>
-                                <option value="Fiesta Corporativa">Fiesta de Empresa</option>
-                              </select>
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label">{t.otherForm.eventTitle}</label>
-                              <input className="form-input" type="text" required placeholder="Ej. Baby Shower Especial" value={otherEventData.eventTitle} onChange={e => setOtherEventData({...otherEventData, eventTitle: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div className="form-group">
-                            <label className="form-label">{t.otherForm.organizer}</label>
-                            <input className="form-input" type="text" required placeholder="Ej. Padres de Benjamín" value={otherEventData.organizerName} onChange={e => setOtherEventData({...otherEventData, organizerName: e.target.value})} />
-                          </div>
-
-                          <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
-                            <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.otherForm.whenTitle}</span>
-                            <div className="form-row-2col-mb12">
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.date}</label>
-                                <input className="form-input" type="date" required value={otherEventData.eventDate} onChange={e => setOtherEventData({...otherEventData, eventDate: e.target.value})} />
-                              </div>
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.time}</label>
-                                <input className="form-input" type="time" required value={otherEventData.eventTime} onChange={e => setOtherEventData({...otherEventData, eventTime: e.target.value})} />
-                              </div>
-                            </div>
-                            <div className="form-group" style={{ marginBottom: '12px' }}>
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.salon}</label>
-                              <input className="form-input" type="text" required placeholder="Ej. Casa de Té - Las Lilas" value={otherEventData.eventPlace} onChange={e => setOtherEventData({...otherEventData, eventPlace: e.target.value})} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.gps}</label>
-                              <input className="form-input" type="url" required placeholder="Ej. https://maps.google.com/..." value={otherEventData.eventGps} onChange={e => setOtherEventData({...otherEventData, eventGps: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
-                            <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.otherForm.giftTitle}</span>
-                            <div className="form-row-2col-mb12">
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.alias}</label>
-                                <input className="form-input" type="text" placeholder="Ej. baby.benja.regalos" value={otherEventData.giftAlias} onChange={e => setOtherEventData({...otherEventData, giftAlias: e.target.value})} />
-                              </div>
-                              <div className="form-group">
-                                <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.cbu}</label>
-                                <input className="form-input" type="text" placeholder="Ej. 000031200..." value={otherEventData.giftCbu} onChange={e => setOtherEventData({...otherEventData, giftCbu: e.target.value})} />
-                              </div>
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.music}</label>
-                              <input className="form-input" type="text" placeholder="Ej. Lullaby - Brahms" value={otherEventData.backgroundMusic} onChange={e => setOtherEventData({...otherEventData, backgroundMusic: e.target.value})} />
-                            </div>
-                          </div>
-
-                          <div className="form-group">
-                            <label className="form-label">{t.otherForm.instructions}</label>
-                            <textarea className="form-textarea" placeholder="Ej. 'Por favor traer traje de baño', 'Sugerencias de regalos: pañales talle M'..." value={otherEventData.specialInstructions} onChange={e => setOtherEventData({...otherEventData, specialInstructions: e.target.value})}></textarea>
-                          </div>
-
-                          <div className="form-group">
-                            <label className="form-label">{t.otherForm.upload}</label>
-                            <input className="form-input" type="file" multiple accept="image/*" style={{ padding: '8px' }} />
-                          </div>
-                        </div>
-                      )}
-
-                      <button className="btn-form-submit" style={{ marginTop: '24px' }} type="submit">{t.portal.btnGenerate}</button>
-                    </form>
-                  )}
-                </div>
-              )}
+          <div className="contact-form-box">
+            {/* Wizard Step Indicators */}
+            <div className="wizard-steps-header">
+              <span className={`wizard-step-indicator ${wizardStep >= 1 ? 'active' : ''}`}>{t.portal.steps.s1}</span>
+              <span className={`wizard-step-indicator ${wizardStep >= 2 ? 'active' : ''}`}>{t.portal.steps.s2}</span>
+              <span className={`wizard-step-indicator ${wizardStep >= 3 ? 'active' : ''}`}>{t.portal.steps.s3}</span>
+              <span className={`wizard-step-indicator ${wizardStep >= 4 ? 'active' : ''}`}>{t.portal.steps.s4}</span>
             </div>
-          )}
 
-          {/* TRACK 2: PAYMENT AND CODE GENERATOR */}
-          {creationTrack === 'payment' && (
-            <div style={{ maxWidth: '850px', margin: '0 auto' }}>
-              {paymentSuccess ? (
-                <div className="contact-form-box" style={{ padding: '40px', border: '2px solid var(--color-mint)', background: 'var(--color-mint-light)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '64px', marginBottom: '16px' }}>💳🎉</div>
-                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', color: 'var(--color-mint)', margin: '0 0 10px 0' }}>
-                    {t.payment.successTitle}
-                  </h3>
-                  <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', maxWidth: '500px', margin: '0 auto 24px auto' }}>
-                    {t.payment.successDesc}
-                  </p>
-
-                  <div style={{ background: 'white', padding: '24px', borderRadius: '16px', display: 'inline-block', border: '2px dashed var(--color-mint)', marginBottom: '32px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--color-text-light)', display: 'block', marginBottom: '8px' }}>{t.payment.codeLabel}</span>
-                    <strong style={{ fontSize: '32px', fontFamily: 'monospace', letterSpacing: '4px', color: 'var(--color-accent)' }}>
-                      {newGeneratedCode}
-                    </strong>
-                    <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '8px 0 0 0' }}>
-                      {t.payment.destLabel}
-                    </p>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-                    <button className="btn-primary" onClick={handleUseGeneratedCode}>
-                      {t.payment.btnStart}
-                    </button>
-                  </div>
+            {wizardSubmitted ? (
+              <div className="sim-rsvp-success" style={{ padding: '50px 20px', fontSize: '16px', textAlign: 'center' }}>
+                <div style={{ fontSize: '64px', marginBottom: '20px' }}>⚙️</div>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', margin: '0 0 16px 0', color: 'var(--color-mint)' }}>
+                  {t.portal.successTitle}
+                </h3>
+                <p style={{ color: 'var(--color-text-secondary)', maxWidth: '500px', margin: '0 auto 24px auto' }}>
+                  {t.portal.successDesc}
+                </p>
+                <div style={{ background: 'white', padding: '16px', borderRadius: '12px', display: 'inline-block', border: '1px solid var(--color-border)', fontSize: '14px', fontFamily: 'monospace' }}>
+                  {t.portal.successTrack}: {validationCode} <br />
+                  {t.portal.successSheet}
                 </div>
-              ) : (
-                <div className="checkout-container-grid">
-                  {/* Left Column: Select Plans & benefits with Country switching */}
+              </div>
+            ) : (
+              <div>
+                {/* STEP 1: Enter Validation Code */}
+                {wizardStep === 1 && (
+                  <form onSubmit={handleVerifyCode} className="contact-form">
+                    <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+                      <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 10px 0', color: 'var(--color-accent)' }}>
+                        {t.portal.codeTitle}
+                      </h4>
+                      <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px' }}>
+                        {t.portal.codeDesc}
+                      </p>
+                      <p style={{ color: 'var(--color-text-light)', fontSize: '12px', fontStyle: 'italic' }}>
+                        {t.portal.codeTip}
+                      </p>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="vcode">Código</label>
+                      <input 
+                        className="form-input" 
+                        style={{ textTransform: 'uppercase', fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px', textAlign: 'center' }}
+                        type="text" 
+                        id="vcode" 
+                        required 
+                        placeholder={t.portal.codePlaceholder} 
+                        value={validationCode}
+                        onChange={(e) => { setValidationCode(e.target.value); setIsCodeValid(null); }}
+                      />
+                    </div>
+
+                    {isCodeValid === false && (
+                      <div className="sim-rsvp-success" style={{ background: '#fef3f4', color: '#e0004d', border: '1px solid #f9d6d9', padding: '12px', borderRadius: '8px', fontSize: '14px', textAlign: 'center', marginTop: '10px' }}>
+                        {t.portal.codeInvalid}
+                      </div>
+                    )}
+
+                    <button className="btn-form-submit" style={{ marginTop: '16px' }} type="submit">{t.portal.codeBtn}</button>
+                  </form>
+                )}
+
+                {/* STEP 2: Selection of Category and Template */}
+                {wizardStep === 2 && (
                   <div style={{ textAlign: 'left' }}>
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', margin: '0 0 12px 0' }}>{t.payment.title}</h3>
+                    <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 12px 0', color: 'var(--color-accent)' }}>
+                      {t.portal.categoryTitle}
+                    </h4>
                     <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', marginBottom: '24px' }}>
-                      {t.payment.desc}
+                      {t.portal.categoryDesc}
                     </p>
 
-                    {/* Dynamic Country Selector Dropdown */}
-                    <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontWeight: 'bold', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.payment.countryLabel}</span>
+                    <div className="category-select-grid">
+                      <button 
+                        className={`filter-btn ${wizardCategory === 'wedding' ? 'active' : ''}`}
+                        onClick={() => { setWizardCategory('wedding'); setWizardModel('boda-marfil'); }}
+                        style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}
+                      >
+                        <span style={{ fontSize: '24px' }}>💍</span>
+                        <strong>{t.portal.catWedding}</strong>
+                      </button>
+                      <button 
+                        className={`filter-btn ${wizardCategory === '15years' ? 'active' : ''}`}
+                        onClick={() => { setWizardCategory('15years'); setWizardModel('15-glamour'); }}
+                        style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}
+                      >
+                        <span style={{ fontSize: '24px' }}>👑</span>
+                        <strong>{t.portal.cat15}</strong>
+                      </button>
+                      <button 
+                        className={`filter-btn ${wizardCategory === 'other' ? 'active' : ''}`}
+                        onClick={() => { setWizardCategory('other'); setWizardModel('otros-baby'); }}
+                        style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}
+                      >
+                        <span style={{ fontSize: '24px' }}>🎈</span>
+                        <strong>{t.portal.catOther}</strong>
+                      </button>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '24px' }}>
+                      <label className="form-label" htmlFor="wmodel">{t.portal.selectModel}</label>
                       <select 
                         className="form-select" 
-                        style={{ width: 'auto', padding: '6px 12px', fontSize: '14px' }}
-                        value={selectedCurrency}
-                        onChange={(e) => {
-                          const curr = e.target.value as any;
-                          setSelectedCurrency(curr);
-                        }}
+                        id="wmodel" 
+                        value={wizardModel}
+                        onChange={(e) => setWizardModel(e.target.value)}
                       >
-                        <option value="USD">💵 USD (International - USD)</option>
-                        <option value="ARS">🇦🇷 ARS (Argentina)</option>
-                        <option value="UYU">🇺🇾 UYU (Uruguay)</option>
-                        <option value="MXN">🇲🇽 MXN (México)</option>
-                        <option value="CLP">🇨🇱 CLP (Chile)</option>
-                        <option value="COP">🇨🇴 COP (Colombia)</option>
-                        <option value="PEN">🇵🇪 PEN (Perú)</option>
-                        <option value="BRL">🇧🇷 BRL (Brasil)</option>
+                        {wizardCategory === 'wedding' && (
+                          <>
+                            <option value="boda-marfil">Clásico Marfil</option>
+                            <option value="boda-boho">Rústico Boho</option>
+                            <option value="boda-eucalipto">Eucalipto Elegante</option>
+                          </>
+                        )}
+                        {wizardCategory === '15years' && (
+                          <>
+                            <option value="15-glamour">Glamour Rosa</option>
+                            <option value="15-estrellas">Noche de Estrellas</option>
+                            <option value="15-neon">Neón Party</option>
+                          </>
+                        )}
+                        {wizardCategory === 'other' && (
+                          <>
+                            <option value="otros-baby">Baby Shower Especial</option>
+                            <option value="otros-aniversario">Aniversario de Oro</option>
+                            <option value="otros-graduacion">Graduación Premium</option>
+                          </>
+                        )}
                       </select>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                      <div 
-                        className={`plan-payment-card ${paymentPlan === 'bronze' ? 'active' : ''}`}
-                        onClick={() => setPaymentPlan('bronze')}
-                        style={{ border: '2px solid ' + (paymentPlan === 'bronze' ? 'var(--color-accent)' : 'var(--color-border)'), borderRadius: '12px', padding: '16px', cursor: 'pointer', background: 'white' }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-                          <span>🥉 {t.payment.bronzeTitle}</span>
-                          <span style={{ color: 'var(--color-accent)' }}>
-                            {CURRENCY_DATA[selectedCurrency].symbol}{CURRENCY_DATA[selectedCurrency].bronze} {CURRENCY_DATA[selectedCurrency].suffix}
-                          </span>
-                        </div>
-                        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '6px 0 0 0' }}>
-                          {t.payment.bronzeDesc}
-                        </p>
-                      </div>
+                    <button className="btn-primary" onClick={() => setWizardStep(3)} style={{ width: '100%' }}>{t.portal.btnContinue}</button>
+                  </div>
+                )}
 
-                      <div 
-                        className={`plan-payment-card ${paymentPlan === 'silver' ? 'active' : ''}`}
-                        onClick={() => setPaymentPlan('silver')}
-                        style={{ border: '2px solid ' + (paymentPlan === 'silver' ? 'var(--color-accent)' : 'var(--color-border)'), borderRadius: '12px', padding: '16px', cursor: 'pointer', background: 'white' }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-                          <span>🥈 {t.payment.silverTitle}</span>
-                          <span style={{ color: 'var(--color-accent)' }}>
-                            {CURRENCY_DATA[selectedCurrency].symbol}{CURRENCY_DATA[selectedCurrency].silver} {CURRENCY_DATA[selectedCurrency].suffix}
-                          </span>
+                {/* STEP 3: Dynamic Data Form based on Category */}
+                {wizardStep === 3 && (
+                  <form onSubmit={handleWizardSubmit} className="contact-form">
+                    {/* A. WEDDING CATEGORY FORM FIELDS */}
+                    {wizardCategory === 'wedding' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
+                        <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 10px 0', color: 'var(--color-accent)' }}>
+                          {t.weddingForm.title}
+                        </h4>
+                        
+                        <div className="form-row-2col">
+                          <div className="form-group">
+                            <label className="form-label">{t.weddingForm.p1}</label>
+                            <input className="form-input" type="text" required placeholder="Ej. Sofía" value={weddingData.partner1Name} onChange={e => setWeddingData({...weddingData, partner1Name: e.target.value})} />
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label">{t.weddingForm.p1wa}</label>
+                            <input className="form-input" type="tel" required placeholder="Ej. 11 1234 5678" value={weddingData.novio1WhatsApp} onChange={e => setWeddingData({...weddingData, novio1WhatsApp: e.target.value})} />
+                          </div>
                         </div>
-                        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '6px 0 0 0' }}>
-                          {t.payment.silverDesc}
-                        </p>
-                      </div>
 
-                      <div 
-                        className={`plan-payment-card ${paymentPlan === 'gold' ? 'active' : ''}`}
-                        onClick={() => setPaymentPlan('gold')}
-                        style={{ border: '2px solid ' + (paymentPlan === 'gold' ? 'var(--color-accent)' : 'var(--color-border)'), borderRadius: '12px', padding: '16px', cursor: 'pointer', background: 'white' }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-                          <span>🥇 {t.payment.goldTitle}</span>
-                          <span style={{ color: 'var(--color-accent)' }}>
-                            {CURRENCY_DATA[selectedCurrency].symbol}{CURRENCY_DATA[selectedCurrency].gold} {CURRENCY_DATA[selectedCurrency].suffix}
-                          </span>
+                        <div className="form-row-2col">
+                          <div className="form-group">
+                            <label className="form-label">{t.weddingForm.p2}</label>
+                            <input className="form-input" type="text" required placeholder="Ej. Mateo" value={weddingData.partner2Name} onChange={e => setWeddingData({...weddingData, partner2Name: e.target.value})} />
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label">{t.weddingForm.p2wa}</label>
+                            <input className="form-input" type="tel" required placeholder="Ej. 11 8765 4321" value={weddingData.novio2WhatsApp} onChange={e => setWeddingData({...weddingData, novio2WhatsApp: e.target.value})} />
+                          </div>
                         </div>
-                        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '6px 0 0 0' }}>
-                          {t.payment.goldDesc}
-                        </p>
+
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
+                          <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.weddingForm.civilTitle}</span>
+                          <div className="form-row-2col-mb12">
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.civilDate}</label>
+                              <input className="form-input" type="date" value={weddingData.civilDate} onChange={e => setWeddingData({...weddingData, civilDate: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.civilTime}</label>
+                              <input className="form-input" type="time" value={weddingData.civilTime} onChange={e => setWeddingData({...weddingData, civilTime: e.target.value})} />
+                            </div>
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.civilPlace}</label>
+                            <input className="form-input" type="text" placeholder="Ej. Registro Civil Central" value={weddingData.civilPlace} onChange={e => setWeddingData({...weddingData, civilPlace: e.target.value})} />
+                          </div>
+                        </div>
+
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
+                          <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.weddingForm.partyTitle}</span>
+                          <div className="form-row-2col-mb12">
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.partyDate}</label>
+                              <input className="form-input" type="date" required value={weddingData.ceremonyDate} onChange={e => setWeddingData({...weddingData, ceremonyDate: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.partyTime}</label>
+                              <input className="form-input" type="time" required value={weddingData.ceremonyTime} onChange={e => setWeddingData({...weddingData, ceremonyTime: e.target.value})} />
+                            </div>
+                          </div>
+                          <div className="form-group" style={{ marginBottom: '12px' }}>
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.salon}</label>
+                            <input className="form-input" type="text" required placeholder="Ej. Estancia La Linda" value={weddingData.ceremonyPlace} onChange={e => setWeddingData({...weddingData, ceremonyPlace: e.target.value})} />
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.gps}</label>
+                            <input className="form-input" type="url" required placeholder="Ej. https://maps.google.com/?q=..." value={weddingData.ceremonyGps} onChange={e => setWeddingData({...weddingData, ceremonyGps: e.target.value})} />
+                          </div>
+                        </div>
+
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
+                          <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.weddingForm.giftTitle}</span>
+                          <div className="form-row-2col-mb12">
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.alias}</label>
+                              <input className="form-input" type="text" placeholder="Ej. boda.sofi.mati" value={weddingData.giftAlias} onChange={e => setWeddingData({...weddingData, giftAlias: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.cbu}</label>
+                              <input className="form-input" type="text" placeholder="Ej. 00000031000..." value={weddingData.giftCbu} onChange={e => setWeddingData({...weddingData, giftCbu: e.target.value})} />
+                            </div>
+                          </div>
+                          <div className="form-group" style={{ marginBottom: '12px' }}>
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.music}</label>
+                            <input className="form-input" type="text" placeholder="Ej. Perfect - Ed Sheeran" value={weddingData.backgroundMusic} onChange={e => setWeddingData({...weddingData, backgroundMusic: e.target.value})} />
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.weddingForm.dress}</label>
+                            <input className="form-input" type="text" placeholder="Ej. Formal / Elegante" value={weddingData.dressCode} onChange={e => setWeddingData({...weddingData, dressCode: e.target.value})} />
+                          </div>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">{t.weddingForm.upload}</label>
+                          <input className="form-input" type="file" multiple accept="image/*" style={{ padding: '8px' }} />
+                          <small style={{ color: 'var(--color-text-light)', fontSize: '11px', marginTop: '4px', display: 'block' }}>{t.weddingForm.uploadTip}</small>
+                        </div>
                       </div>
+                    )}
+
+                    {/* B. 15 YEARS CATEGORY FORM FIELDS */}
+                    {wizardCategory === '15years' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
+                        <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 10px 0', color: 'var(--color-accent)' }}>
+                          {t.quinceForm.title}
+                        </h4>
+                        
+                        <div className="form-group">
+                          <label className="form-label">{t.quinceForm.name}</label>
+                          <input className="form-input" type="text" required placeholder="Ej. Martina" value={quinceData.quinceName} onChange={e => setQuinceData({...quinceData, quinceName: e.target.value})} />
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">{t.quinceForm.parents}</label>
+                          <input className="form-input" type="text" placeholder="Ej. Elena y Roberto" value={quinceData.parentNames} onChange={e => setQuinceData({...quinceData, parentNames: e.target.value})} />
+                        </div>
+
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
+                          <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.quinceForm.partyTitle}</span>
+                          <div className="form-row-2col-mb12">
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.partyDate}</label>
+                              <input className="form-input" type="date" required value={quinceData.partyDate} onChange={e => setQuinceData({...quinceData, partyDate: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.partyTime}</label>
+                              <input className="form-input" type="time" required value={quinceData.partyTime} onChange={e => setQuinceData({...quinceData, partyTime: e.target.value})} />
+                            </div>
+                          </div>
+                          <div className="form-group" style={{ marginBottom: '12px' }}>
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.salon}</label>
+                            <input className="form-input" type="text" required placeholder="Ej. Palacio Cristal" value={quinceData.partyPlace} onChange={e => setQuinceData({...quinceData, partyPlace: e.target.value})} />
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.gps}</label>
+                            <input className="form-input" type="url" required placeholder="Ej. https://maps.google.com/..." value={quinceData.partyGps} onChange={e => setQuinceData({...quinceData, partyGps: e.target.value})} />
+                          </div>
+                        </div>
+
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
+                          <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.quinceForm.styleTitle}</span>
+                          <div className="form-row-2col-mb12">
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.alias}</label>
+                              <input className="form-input" type="text" placeholder="Ej. mis15.martu" value={quinceData.giftAlias} onChange={e => setQuinceData({...quinceData, giftAlias: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.cbu}</label>
+                              <input className="form-input" type="text" placeholder="Ej. 0000021000..." value={quinceData.giftCbu} onChange={e => setQuinceData({...quinceData, giftCbu: e.target.value})} />
+                            </div>
+                          </div>
+                          <div className="form-group" style={{ marginBottom: '12px' }}>
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.music}</label>
+                            <input className="form-input" type="text" placeholder="Ej. Don't Start Now - Dua Lipa" value={quinceData.musicPreference} onChange={e => setQuinceData({...quinceData, musicPreference: e.target.value})} />
+                          </div>
+                          <div className="form-group" style={{ marginBottom: '12px' }}>
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.dress}</label>
+                            <input className="form-input" type="text" placeholder="Ej. Formal con toque flúor" value={quinceData.quinceDressCode} onChange={e => setQuinceData({...quinceData, quinceDressCode: e.target.value})} />
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.hashtag}</label>
+                            <input className="form-input" type="text" placeholder="Ej. #Los15DeMartu" value={quinceData.instagramHashtag} onChange={e => setQuinceData({...quinceData, instagramHashtag: e.target.value})} />
+                          </div>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">{t.quinceForm.upload}</label>
+                          <input className="form-input" type="file" multiple accept="image/*" style={{ padding: '8px' }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* C. OTHER EVENT CATEGORY FORM FIELDS */}
+                    {wizardCategory === 'other' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
+                        <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', margin: '0 0 10px 0', color: 'var(--color-accent)' }}>
+                          {t.otherForm.title}
+                        </h4>
+                        
+                        <div className="form-row-2col">
+                          <div className="form-group">
+                            <label className="form-label">{t.otherForm.type}</label>
+                            <select className="form-select" value={otherEventData.eventType} onChange={e => setOtherEventData({...otherEventData, eventType: e.target.value})}>
+                              <option value="Baby Shower">Baby Shower</option>
+                              <option value="Bautismo">Bautismo</option>
+                              <option value="Aniversario">Aniversario</option>
+                              <option value="Cumpleaños Infantil">Cumpleaños Infantil</option>
+                              <option value="Cumpleaños de Adulto">Cumpleaños de Adulto</option>
+                              <option value="Fiesta Corporativa">Fiesta de Empresa</option>
+                            </select>
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label">{t.otherForm.eventTitle}</label>
+                            <input className="form-input" type="text" required placeholder="Ej. Baby Shower Especial" value={otherEventData.eventTitle} onChange={e => setOtherEventData({...otherEventData, eventTitle: e.target.value})} />
+                          </div>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">{t.otherForm.organizer}</label>
+                          <input className="form-input" type="text" required placeholder="Ej. Padres de Benjamín" value={otherEventData.organizerName} onChange={e => setOtherEventData({...otherEventData, organizerName: e.target.value})} />
+                        </div>
+
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px', background: '#fafafa' }}>
+                          <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.otherForm.whenTitle}</span>
+                          <div className="form-row-2col-mb12">
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.date}</label>
+                              <input className="form-input" type="date" required value={otherEventData.eventDate} onChange={e => setOtherEventData({...otherEventData, eventDate: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.time}</label>
+                              <input className="form-input" type="time" required value={otherEventData.eventTime} onChange={e => setOtherEventData({...otherEventData, eventTime: e.target.value})} />
+                            </div>
+                          </div>
+                          <div className="form-group" style={{ marginBottom: '12px' }}>
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.salon}</label>
+                            <input className="form-input" type="text" required placeholder="Ej. Casa de Té - Las Lilas" value={otherEventData.eventPlace} onChange={e => setOtherEventData({...otherEventData, eventPlace: e.target.value})} />
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.gps}</label>
+                            <input className="form-input" type="url" required placeholder="Ej. https://maps.google.com/..." value={otherEventData.eventGps} onChange={e => setOtherEventData({...otherEventData, eventGps: e.target.value})} />
+                          </div>
+                        </div>
+
+                        <div style={{ border: '1px solid var(--color-border)', borderRadius: '12px', padding: '16px' }}>
+                          <span style={{ fontWeight: 'bold', display: 'block', marginBottom: '10px', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.otherForm.giftTitle}</span>
+                          <div className="form-row-2col-mb12">
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.alias}</label>
+                              <input className="form-input" type="text" placeholder="Ej. baby.benja.regalos" value={otherEventData.giftAlias} onChange={e => setOtherEventData({...otherEventData, giftAlias: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.cbu}</label>
+                              <input className="form-input" type="text" placeholder="Ej. 000031200..." value={otherEventData.giftCbu} onChange={e => setOtherEventData({...otherEventData, giftCbu: e.target.value})} />
+                            </div>
+                          </div>
+                          <div className="form-group">
+                            <label className="form-label" style={{ fontSize: '12px' }}>{t.otherForm.music}</label>
+                            <input className="form-input" type="text" placeholder="Ej. Lullaby - Brahms" value={otherEventData.backgroundMusic} onChange={e => setOtherEventData({...otherEventData, backgroundMusic: e.target.value})} />
+                          </div>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">{t.otherForm.instructions}</label>
+                          <textarea className="form-textarea" placeholder="Ej. 'Por favor traer traje de baño', 'Sugerencias de regalos: pañales talle M'..." value={otherEventData.specialInstructions} onChange={e => setOtherEventData({...otherEventData, specialInstructions: e.target.value})}></textarea>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">{t.otherForm.upload}</label>
+                          <input className="form-input" type="file" multiple accept="image/*" style={{ padding: '8px' }} />
+                        </div>
+                      </div>
+                    )}
+
+                    <button className="btn-form-submit" style={{ marginTop: '24px' }} type="submit">{t.portal.btnGenerate}</button>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 6.5: COMPRAR / OBTENER CÓDIGO */}
+      <section id="pago" className="features-section" style={{ background: '#ffffff', borderBottom: '1px solid var(--color-border)' }}>
+        <div className="container">
+          <div className="section-header">
+            <span className="section-subtitle">💳 {lang === 'es' ? 'Simulación de Pago' : (lang === 'en' ? 'Payment Simulation' : 'Simulação de Pagamento')}</span>
+            <h2 className="section-title">{lang === 'es' ? 'Obtené tu Código de Validación' : (lang === 'en' ? 'Get Your Validation Code' : 'Obtenha seu Código de Validação')}</h2>
+            <p className="section-desc">
+              {lang === 'es' 
+                ? "Elegí el plan que mejor se adapte a tu evento y obtené tu código de validación premium de forma inmediata." 
+                : (lang === 'en' 
+                  ? "Choose the plan that best suits your event and get your premium validation code immediately." 
+                  : "Escolha o plano que melhor se adapta ao seu evento e obtenha seu código de validação premium imediatamente.")}
+            </p>
+          </div>
+
+          {paymentSuccess ? (
+            <div className="contact-form-box" style={{ padding: '40px', border: '2px solid var(--color-mint)', background: 'var(--color-mint-light)', textAlign: 'center' }}>
+              <div style={{ fontSize: '64px', marginBottom: '16px' }}>💳🎉</div>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '28px', color: 'var(--color-mint)', margin: '0 0 10px 0' }}>
+                {t.payment.successTitle}
+              </h3>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px', maxWidth: '500px', margin: '0 auto 24px auto' }}>
+                {t.payment.successDesc}
+              </p>
+
+              <div style={{ background: 'white', padding: '24px', borderRadius: '16px', display: 'inline-block', border: '2px dashed var(--color-mint)', marginBottom: '32px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--color-text-light)', display: 'block', marginBottom: '8px' }}>{t.payment.codeLabel}</span>
+                <strong style={{ fontSize: '32px', fontFamily: 'monospace', letterSpacing: '4px', color: 'var(--color-accent)' }}>
+                  {newGeneratedCode}
+                </strong>
+                <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '8px 0 0 0' }}>
+                  {t.payment.destLabel}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+                <button className="btn-primary animate-heartbeat" onClick={handleUseGeneratedCode}>
+                  {t.payment.btnStart}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="checkout-container-grid">
+              {/* Left Column: Select Plans & benefits with Country switching */}
+              <div style={{ textAlign: 'left' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', margin: '0 0 12px 0' }}>{t.payment.title}</h3>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', marginBottom: '24px' }}>
+                  {t.payment.desc}
+                </p>
+
+                {/* Dynamic Country Selector Dropdown */}
+                <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontWeight: 'bold', fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.payment.countryLabel}</span>
+                  <select 
+                    className="form-select" 
+                    style={{ width: 'auto', padding: '6px 12px', fontSize: '14px' }}
+                    value={selectedCurrency}
+                    onChange={(e) => {
+                      const curr = e.target.value as any;
+                      setSelectedCurrency(curr);
+                    }}
+                  >
+                    <option value="USD">💵 USD (International - USD)</option>
+                    <option value="ARS">🇦🇷 ARS (Argentina)</option>
+                    <option value="UYU">🇺🇾 UYU (Uruguay)</option>
+                    <option value="MXN">🇲🇽 MXN (México)</option>
+                    <option value="CLP">🇨🇱 CLP (Chile)</option>
+                    <option value="COP">🇨🇴 COP (Colombia)</option>
+                    <option value="PEN">🇵🇪 PEN (Perú)</option>
+                    <option value="BRL">🇧🇷 BRL (Brasil)</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div 
+                    className={`plan-payment-card ${paymentPlan === 'bronze' ? 'active' : ''}`}
+                    onClick={() => setPaymentPlan('bronze')}
+                    style={{ border: '2px solid ' + (paymentPlan === 'bronze' ? 'var(--color-accent)' : 'var(--color-border)'), borderRadius: '12px', padding: '16px', cursor: 'pointer', background: 'white' }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                      <span>🥉 {t.payment.bronzeTitle}</span>
+                      <span style={{ color: 'var(--color-accent)' }}>
+                        {CURRENCY_DATA[selectedCurrency].symbol}{CURRENCY_DATA[selectedCurrency].bronze} {CURRENCY_DATA[selectedCurrency].suffix}
+                      </span>
                     </div>
+                    <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '6px 0 0 0' }}>
+                      {t.payment.bronzeDesc}
+                    </p>
                   </div>
 
-                  {/* Right Column: Checkout Simulated Form */}
-                  <div className="contact-form-box">
-                    <form onSubmit={handleSimulatedPayment} className="contact-form" style={{ textAlign: 'left' }}>
-                      <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', margin: '0 0 16px 0', color: 'var(--color-accent)' }}>
-                        {t.payment.formTitle}
-                      </h4>
+                  <div 
+                    className={`plan-payment-card ${paymentPlan === 'silver' ? 'active' : ''}`}
+                    onClick={() => setPaymentPlan('silver')}
+                    style={{ border: '2px solid ' + (paymentPlan === 'silver' ? 'var(--color-accent)' : 'var(--color-border)'), borderRadius: '12px', padding: '16px', cursor: 'pointer', background: 'white' }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                      <span>🥈 {t.payment.silverTitle}</span>
+                      <span style={{ color: 'var(--color-accent)' }}>
+                        {CURRENCY_DATA[selectedCurrency].symbol}{CURRENCY_DATA[selectedCurrency].silver} {CURRENCY_DATA[selectedCurrency].suffix}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '6px 0 0 0' }}>
+                      {t.payment.silverDesc}
+                    </p>
+                  </div>
 
-                      <div className="form-group">
-                        <label className="form-label">{t.payment.name}</label>
-                        <input className="form-input" type="text" required placeholder="Ej. Florencia Rodríguez" value={buyerName} onChange={e => setBuyerName(e.target.value)} />
-                      </div>
-
-                      <div className="form-group">
-                        <label className="form-label">{t.payment.email}</label>
-                        <input className="form-input" type="email" required placeholder="Ej. flor@correo.com" value={buyerEmail} onChange={e => setBuyerEmail(e.target.value)} />
-                      </div>
-
-                      <div className="form-group">
-                        <label className="form-label">{t.payment.phone}</label>
-                        <input className="form-input" type="tel" required placeholder="Ej. 11 5555 5555" value={buyerWhatsapp} onChange={e => setBuyerWhatsApp(e.target.value)} />
-                      </div>
-
-                      {/* Secure Payment Details - Mercado Pago Only */}
-                      <div style={{ background: '#fafafa', padding: '14px', borderRadius: '12px', fontSize: '12px', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', marginBottom: '16px', lineHeight: 1.4 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', color: 'var(--color-accent)', marginBottom: '6px' }}>
-                          <span>💳</span>
-                          <span>{t.payment.mercadopago}</span>
-                        </div>
-                        <p style={{ margin: '0 0 8px 0', fontSize: '11px' }}>
-                          {t.payment.gatewayInstruct} {selectedCurrency !== 'USD' ? selectedCurrency : 'USD (International)'}.
-                        </p>
-                        {paymentPlan === 'gold' && (
-                          <div style={{ marginTop: '10px', borderTop: '1px dashed var(--color-border)', paddingTop: '8px' }}>
-                            <strong>Enlace de Pago Oficial:</strong> <br />
-                            <a href="https://mpago.la/1W6btGs" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '4px', backgroundColor: '#009EE3', color: 'white', fontWeight: 'bold', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontSize: '11px' }}>
-                              Pagar con Mercado Pago ↗
-                            </a>
-                          </div>
-                        )}
-                      </div>
-
-                      <button className="btn-form-submit" type="submit" disabled={isPaying}>
-                        {isPaying ? t.payment.btnPaying : t.payment.btnPay}
-                      </button>
-                    </form>
+                  <div 
+                    className={`plan-payment-card ${paymentPlan === 'gold' ? 'active' : ''}`}
+                    onClick={() => setPaymentPlan('gold')}
+                    style={{ border: '2px solid ' + (paymentPlan === 'gold' ? 'var(--color-accent)' : 'var(--color-border)'), borderRadius: '12px', padding: '16px', cursor: 'pointer', background: 'white' }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                      <span>🥇 {t.payment.goldTitle}</span>
+                      <span style={{ color: 'var(--color-accent)' }}>
+                        {CURRENCY_DATA[selectedCurrency].symbol}{CURRENCY_DATA[selectedCurrency].gold} {CURRENCY_DATA[selectedCurrency].suffix}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '6px 0 0 0' }}>
+                      {t.payment.goldDesc}
+                    </p>
                   </div>
                 </div>
-              )}
+              </div>
+
+              {/* Right Column: Checkout Simulated Form */}
+              <div className="contact-form-box">
+                <form onSubmit={handleSimulatedPayment} className="contact-form" style={{ textAlign: 'left' }}>
+                  <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', margin: '0 0 16px 0', color: 'var(--color-accent)' }}>
+                    {t.payment.formTitle}
+                  </h4>
+
+                  <div className="form-group">
+                    <label className="form-label">{t.payment.name}</label>
+                    <input className="form-input" type="text" required placeholder="Ej. Florencia Rodríguez" value={buyerName} onChange={e => setBuyerName(e.target.value)} />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">{t.payment.email}</label>
+                    <input className="form-input" type="email" required placeholder="Ej. flor@correo.com" value={buyerEmail} onChange={e => setBuyerEmail(e.target.value)} />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">{t.payment.phone}</label>
+                    <input className="form-input" type="tel" required placeholder="Ej. 11 5555 5555" value={buyerWhatsapp} onChange={e => setBuyerWhatsApp(e.target.value)} />
+                  </div>
+
+                  {/* Secure Payment Details - Mercado Pago Only */}
+                  <div style={{ background: '#fafafa', padding: '14px', borderRadius: '12px', fontSize: '12px', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', marginBottom: '16px', lineHeight: 1.4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', color: 'var(--color-accent)', marginBottom: '6px' }}>
+                      <span>💳</span>
+                      <span>{t.payment.mercadopago}</span>
+                    </div>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '11px' }}>
+                      {t.payment.gatewayInstruct} {selectedCurrency !== 'USD' ? selectedCurrency : 'USD (International)'}.
+                    </p>
+                    {paymentPlan === 'gold' && (
+                      <div style={{ marginTop: '10px', borderTop: '1px dashed var(--color-border)', paddingTop: '8px' }}>
+                        <strong>Enlace de Pago Oficial:</strong> <br />
+                        <a href="https://mpago.la/1W6btGs" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '4px', backgroundColor: '#009EE3', color: 'white', fontWeight: 'bold', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontSize: '11px' }}>
+                          Pagar con Mercado Pago ↗
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  <button className="btn-form-submit" type="submit" disabled={isPaying}>
+                    {isPaying ? t.payment.btnPaying : t.payment.btnPay}
+                  </button>
+                </form>
+              </div>
             </div>
           )}
         </div>
@@ -1937,44 +1977,6 @@ function App() {
           <div className="contact-info">
             <h2 className="contact-info-title">{t.contact.title}</h2>
             <p className="contact-info-desc">{t.contact.desc}</p>
-
-            <div className="contact-methods">
-              <div className="contact-method-item">
-                <div className="contact-method-icon">💬</div>
-                <div>
-                  <span className="contact-method-label">{t.contact.wa}</span>
-                  <div>
-                    <a href="https://wa.me/59899134504?text=Hola!%20Me%20interesa%20saber%20mas%20sobre%20las%20invitaciones%20de%20Save%20Your%20Date" target="_blank" rel="noopener noreferrer" className="contact-method-val">
-                      +598 99 134 504
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <div className="contact-method-item">
-                <div className="contact-method-icon">✉</div>
-                <div>
-                  <span className="contact-method-label">{t.contact.email}</span>
-                  <div>
-                    <a href="mailto:saveyourdate.invite@gmail.com" className="contact-method-val">
-                      saveyourdate.invite@gmail.com
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <div className="contact-method-item">
-                <div className="contact-method-icon">📸</div>
-                <div>
-                  <span className="contact-method-label">{t.contact.social}</span>
-                  <div>
-                    <a href="https://instagram.com/saveyourdate.invite" target="_blank" rel="noopener noreferrer" className="contact-method-val">
-                      @saveyourdate.invite
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Form Column: Standard Simple Contact Form */}
