@@ -983,11 +983,38 @@ function App() {
     }, 10000);
   };
 
-  // Handle Simple Contact Form Submit (Simulation)
+  // Handle Simple Contact Form Submit (Real Email Delivery via FormSubmit)
   const handleSimpleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!simpleContactData.name || !simpleContactData.message) return;
+    
+    // Set submitted state immediately to show success message on client
     setSimpleContactSubmitted(true);
+
+    // Send the data securely in the background to saveyourdate.invite@gmail.com
+    fetch("https://formsubmit.co/ajax/saveyourdate.invite@gmail.com", {
+      method: "POST",
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        Nombre: simpleContactData.name,
+        WhatsApp: simpleContactData.whatsapp,
+        Mensaje: simpleContactData.message,
+        _subject: `Nueva consulta de ${simpleContactData.name} - Save Your Date`
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.error("Error sending contact form:", response.statusText);
+      }
+    })
+    .catch(error => {
+      console.error("Error sending contact form:", error);
+    });
+
+    // Auto reset form and state after 8 seconds
     setTimeout(() => {
       setSimpleContactSubmitted(false);
       setSimpleContactData({ name: '', whatsapp: '', message: '' });
