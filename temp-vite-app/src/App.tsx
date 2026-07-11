@@ -41,7 +41,9 @@ const TRANSLATIONS = {
       newBadge: "Nuevo",
       trendBadge: "Tendencia",
       verDemo: "Ver Demo",
-      personalize: "Personalizar"
+      personalize: "Personalizar",
+      viewMore: "Ver más modelos",
+      viewLess: "Ver menos"
     },
     features: {
       subtitle: "Funciones Premium",
@@ -1509,7 +1511,7 @@ function App() {
                             {t.weddingForm.title}
                           </h4>
                           
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                          <div className="form-row-2col">
                             <div className="form-group">
                               <label className="form-label">{t.weddingForm.p1}</label>
                               <input className="form-input" type="text" required placeholder="Ej. Sofía" value={weddingData.partner1Name} onChange={e => setWeddingData({...weddingData, partner1Name: e.target.value})} />
@@ -1520,7 +1522,7 @@ function App() {
                             </div>
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                          <div className="form-row-2col">
                             <div className="form-group">
                               <label className="form-label">{t.weddingForm.p2}</label>
                               <input className="form-input" type="text" required placeholder="Ej. Mateo" value={weddingData.partner2Name} onChange={e => setWeddingData({...weddingData, partner2Name: e.target.value})} />
@@ -1680,7 +1682,7 @@ function App() {
                             {t.otherForm.title}
                           </h4>
                           
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                          <div className="form-row-2col">
                             <div className="form-group">
                               <label className="form-label">{t.otherForm.type}</label>
                               <select className="form-select" value={otherEventData.eventType} onChange={e => setOtherEventData({...otherEventData, eventType: e.target.value})}>
@@ -1793,7 +1795,7 @@ function App() {
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+                <div className="checkout-container-grid">
                   {/* Left Column: Select Plans & benefits with Country switching */}
                   <div style={{ textAlign: 'left' }}>
                     <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', margin: '0 0 12px 0' }}>{t.payment.title}</h3>
