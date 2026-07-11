@@ -104,5 +104,51 @@ export const INVITATION_MODELS: InvitationModel[] = [
     musicTitle: 'Fly Me to the Moon',
     musicArtist: 'Frank Sinatra',
     location: 'Salón De las Américas, Recoleta, CABA'
+  },
+  {
+    id: 'boda-eucalipto',
+    title: 'Minimalista Eucalipto',
+    category: 'wedding',
+    description: 'Menos es más. Tipografías modernas sans-serif combinadas con sutiles ramas de eucalipto sobre fondos blancos y limpios. Ideal para bodas contemporáneas e íntimas.',
+    badge: 'Nuevo',
+    demoName1: 'Tomás & Sofía',
+    date: '16 de Enero, 2027',
+    features: ['Cuenta Regresiva', 'Música', 'Confirmación RSVP', 'Código de Vestimenta'],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    musicTitle: 'L-O-V-E',
+    musicArtist: 'Nat King Cole',
+    location: 'Salón Quinta de Olivos, Buenos Aires'
+  },
+  {
+    id: '15-neon',
+    title: 'Neon Party',
+    category: '15years',
+    description: 'Estilo vibrante y moderno con luces de neón rosa, azul y morado sobre fondo oscuro. Diseñado para una fiesta llena de ritmo, baile y diversión.',
+    badge: 'Tendencia',
+    demoName1: 'Sofía',
+    date: '07 de Noviembre, 2026',
+    features: ['Cuenta Regresiva', 'Playlist Spotify', 'Confirmación RSVP', 'Dress Code'],
+    themeClass: 'mock-theme-15years',
+    illustrationType: 'crown',
+    musicTitle: 'Levitating',
+    musicArtist: 'Dua Lipa',
+    location: 'Espacio Black, San Isidro'
+  },
+  {
+    id: 'otros-graduacion',
+    title: 'Graduación Elegante',
+    category: 'other',
+    description: 'Celebrá el fin de una gran etapa con un diseño en negro y dorado brillante. Marcos elegantes y detalles de confeti para destacar tus logros.',
+    badge: 'Popular',
+    demoName1: 'Graduación de Lucía',
+    demoName2: 'Ingeniera Civil',
+    date: '18 de Diciembre, 2026',
+    features: ['Confirmación RSVP', 'Ubicación', 'Sugerencia de Regalos'],
+    themeClass: 'mock-theme-other',
+    illustrationType: 'balloon',
+    musicTitle: 'Celebration',
+    musicArtist: 'Kool & The Gang',
+    location: 'Salón del Sol, Recoleta'
   }
 ];
