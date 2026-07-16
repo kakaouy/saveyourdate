@@ -1,0 +1,96 @@
+plantillas-base/invitacion-completa_003/index.html
+  h_978362ea3daf54 1-1367
+plantillas-base/invitacion-completa/README.md
+  h_978362ea3daf54 1-535
+plantillas-base/invitacion-completa_004/config.js
+  h_978362ea3daf54 1-415
+plantillas-base/invitacion-completa_005/css/responsive.css
+  h_978362ea3daf54 1-1383,1385-1388,1390-1394,1397-1403,1407-1410,1412-1413,1416-1419,1421-1422,1425-1428,1430-1434,1437-1445,1447-1979,1981-2618
+plantillas-base/invitacion-completa/css/animations.css
+  h_978362ea3daf54 1-457
+plantillas-base/invitacion-completa_004/index.html
+  h_978362ea3daf54 1-1452
+plantillas-base/invitacion-completa_005/config.js
+  h_978362ea3daf54 1-415
+plantillas-base/invitacion-completa_005/css/variables.css
+  h_978362ea3daf54 1-251
+plantillas-base/invitacion-completa_002/css/responsive.css
+  h_978362ea3daf54 1-988
+plantillas-base/invitacion-completa/js/gallery.js
+  h_978362ea3daf54 1-873
+plantillas-base/invitacion-completa/js/render-config.js
+  h_978362ea3daf54 1-746
+plantillas-base/invitacion-completa/js/rsvp.js
+  h_978362ea3daf54 1-291,294-1463
+plantillas-base/invitacion-completa/integrations/google-sheets/apps-script.gs
+  h_978362ea3daf54 1-443
+plantillas-base/invitacion-completa/css/layout.css
+  h_978362ea3daf54 1-421
+plantillas-base/invitacion-completa_003/css/base.css
+  h_978362ea3daf54 1-453
+plantillas-base/invitacion-completa/css/responsive.css
+  h_978362ea3daf54 1-588
+plantillas-base/invitacion-completa/integrations/google-sheets/README.md
+  h_978362ea3daf54 1-1019
+modelos/quince/quince-001-elegante/css/components.css
+  h_978362ea3daf54 1-829
+plantillas-base/invitacion-completa_004/css/components.css
+  h_978362ea3daf54 1-2187
+plantillas-base/invitacion-completa_004/css/responsive.css
+  h_978362ea3daf54 1-1437
+plantillas-base/invitacion-completa/js/utils.js
+  h_978362ea3daf54 1-688
+plantillas-base/invitacion-completa/css/variables.css
+  h_978362ea3daf54 1-169
+plantillas-base/invitacion-completa_003/css/components.css
+  h_978362ea3daf54 1-1850
+plantillas-base/invitacion-completa/js/modals.js
+  h_978362ea3daf54 1-429
+plantillas-base/invitacion-completa/js/loader.js
+  h_978362ea3daf54 1-30
+plantillas-base/invitacion-completa/js/main.js
+  h_978362ea3daf54 1-409
+plantillas-base/invitacion-completa/css/base.css
+  h_978362ea3daf54 1-443
+modelos/quince/quince-001-elegante/css/responsive.css
+  h_978362ea3daf54 1-583
+plantillas-base/invitacion-completa/js/countdown.js
+  h_978362ea3daf54 1-339
+plantillas-base/invitacion-completa/css/components.css
+  h_978362ea3daf54 1-907
+plantillas-base/invitacion-completa/js/playlist.js
+  h_978362ea3daf54 1-746
+plantillas-base/invitacion-completa/js/music.js
+  h_978362ea3daf54 1-394
+plantillas-base/invitacion-completa/config.js
+  h_978362ea3daf54 1-341
+plantillas-base/invitacion-completa/integrations/google-sheets/sheet-structure.md
+  h_978362ea3daf54 1-557
+plantillas-base/invitacion-completa_005/index.html
+  h_978362ea3daf54 1-375,378-395,397-465,468-470,473-479,482-489,492-508,511-1085,1087-1876
+plantillas-base/invitacion-completa_005/css/base.css
+  h_978362ea3daf54 1-516
+plantillas-base/invitacion-completa_003/css/variables.css
+  h_978362ea3daf54 1-112
+plantillas-base/invitacion-completa/index.html
+  h_978362ea3daf54 1-1371
+plantillas-base/invitacion-completa_002/css/components.css
+  h_978362ea3daf54 1-1638
+plantillas-base/invitacion-completa_005/css/components.css
+  h_978362ea3daf54 1-3004
+modelos/quince/quince-001-elegante/config.js
+  h_978362ea3daf54 1-331
+plantillas-base/invitacion-completa_004/css/variables.css
+  h_978362ea3daf54 1-113
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9a902c41b4fe0c8f65add4cc2ee5fdfb9a104d7c",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
