@@ -16,7 +16,8 @@ const TRANSLATIONS = {
       questions: "Preguntas",
       upload: "Cargar Datos",
       contact: "Contacto",
-      cta: "Crea tu invite"
+      cta: "Crea tu invite",
+      myEvent: "Mi Evento"
     },
     hero: {
       tag: "Invitaciones Digitales Premium",
@@ -266,6 +267,50 @@ const TRANSLATIONS = {
         "Mensaje de agradecimiento después del evento.",
         "Alojamiento en la nube hasta 30 días posteriores al evento."
       ]
+    },
+    admin: {
+      loginTitle: "Ingreso al Panel de Control",
+      loginDesc: "Iniciá sesión de forma segura usando tu correo electrónico o teléfono y tu código de validación Save Your Date.",
+      inputContact: "Correo Electrónico o Celular",
+      inputContactPlaceholder: "Ej: novios@correo.com o 11 5555 5555",
+      inputCode: "Código de Validación Save Your Date",
+      inputCodePlaceholder: "Ej: SYD-123456",
+      btnLogin: "Ingresar de forma segura 🔑",
+      invalidLogin: "✗ Los datos ingresados no coinciden con un evento premium activo.",
+      title: "Panel de Control",
+      logout: "Volver al Inicio",
+      tabOverview: "Vista General",
+      tabGuests: "Lista de Invitados",
+      tabTables: "Organizar Mesas",
+      statsConfirmed: "Total Confirmados",
+      statsDeclined: "Declinados",
+      statsPending: "Pendientes",
+      statsAdults: "Adultos",
+      statsKids: "Niños",
+      statsDiets: "Menús Especiales",
+      guestTableHead: {
+        name: "Nombre",
+        status: "Asiste",
+        companions: "Acompañantes",
+        diet: "Restricciones",
+        actions: "Acciones"
+      },
+      btnSendReminder: "Recordatorio WhatsApp",
+      reminderTemplate: "¡Hola! Esperamos que puedas acompañarnos. Te recordamos que podés confirmar tu asistencia directamente en nuestra invitación Save Your Date. ¡Un abrazo!",
+      tableTitle: "Gestión de Mesas",
+      tableDesc: "Asigná a tus invitados confirmados a mesas virtuales para organizar la distribución del salón de forma visual.",
+      unassignedGuests: "Invitados sin mesa asignada",
+      tableLabel: "Mesa",
+      btnAssign: "Asignar",
+      noGuests: "No hay invitados en esta sección.",
+      noUnassigned: "¡Todos los invitados confirmados ya tienen mesa asignada! 🎉",
+      addGuest: "Agregar Invitado",
+      deleteGuest: "Eliminar",
+      guestAdded: "✓ Invitado agregado exitosamente.",
+      placeholderAdd: "Nombre del invitado",
+      addTable: "Agregar Mesa",
+      deleteTable: "Eliminar Mesa",
+      placeholderAddTable: "Nombre de la mesa (Ej: Mesa 4)"
     }
   },
   en: {
@@ -277,7 +322,8 @@ const TRANSLATIONS = {
       questions: "FAQ",
       upload: "Upload Data",
       contact: "Contact",
-      cta: "Create invite"
+      cta: "Create invite",
+      myEvent: "My Event"
     },
     hero: {
       tag: "Premium Digital Invitations",
@@ -524,6 +570,50 @@ const TRANSLATIONS = {
         "Thank-you message page post-event.",
         "Cloud hosting active up to 30 days after the event."
       ]
+    },
+    admin: {
+      loginTitle: "Control Panel Login",
+      loginDesc: "Log in securely using your email or phone number and your unique Save Your Date validation code.",
+      inputContact: "Email or Phone Number",
+      inputContactPlaceholder: "e.g. hosts@email.com or 11 5555 5555",
+      inputCode: "Save Your Date Validation Code",
+      inputCodePlaceholder: "e.g. SYD-123456",
+      btnLogin: "Secure Login 🔑",
+      invalidLogin: "✗ The entered credentials do not match an active premium event.",
+      title: "Control Panel",
+      logout: "Back to Home",
+      tabOverview: "Overview",
+      tabGuests: "Guest List",
+      tabTables: "Manage Tables",
+      statsConfirmed: "Total Confirmed",
+      statsDeclined: "Declined",
+      statsPending: "Pending",
+      statsAdults: "Adults",
+      statsKids: "Kids",
+      statsDiets: "Special Menus",
+      guestTableHead: {
+        name: "Name",
+        status: "Attending",
+        companions: "Companions",
+        diet: "Restrictions",
+        actions: "Actions"
+      },
+      btnSendReminder: "WhatsApp Reminder",
+      reminderTemplate: "Hi! We hope you can join us. We kindly remind you that you can confirm your attendance directly on our Save Your Date digital invitation. Hugs!",
+      tableTitle: "Table Assignment",
+      tableDesc: "Assign confirmed guests to virtual tables to visually organize your venue's seating chart layout.",
+      unassignedGuests: "Guests with no table assigned",
+      tableLabel: "Table",
+      btnAssign: "Assign",
+      noGuests: "No guests found in this section.",
+      noUnassigned: "All confirmed guests have a table assigned! 🎉",
+      addGuest: "Add Guest",
+      deleteGuest: "Delete",
+      guestAdded: "✓ Guest added successfully.",
+      placeholderAdd: "Guest name",
+      addTable: "Add Table",
+      deleteTable: "Delete Table",
+      placeholderAddTable: "Table name (e.g. Table 4)"
     }
   },
   pt: {
@@ -535,7 +625,8 @@ const TRANSLATIONS = {
       questions: "Perguntas",
       upload: "Carregar Dados",
       contact: "Contato",
-      cta: "Crie seu convite"
+      cta: "Crie seu convite",
+      myEvent: "Meu Evento"
     },
     hero: {
       tag: "Convites Digitais Premium",
@@ -781,10 +872,54 @@ const TRANSLATIONS = {
         "Galeria ou álbum colaborativo de fotos.",
         "Mensagem de agradecimento pós-evento.",
         "Hospedagem em nuvem ativa até 30 dias após o evento."
-      ]
-    }
-  }
-};
+        ]
+        },
+        admin: {
+        loginTitle: "Login do Painel de Controle",
+        loginDesc: "Faça login com segurança usando seu e-mail ou telefone e seu código de validação Save Your Date exclusivo.",
+        inputContact: "E-mail ou Telefone Celular",
+        inputContactPlaceholder: "Ex: noivos@email.com ou 11 5555 5555",
+        inputCode: "Código de Validação Save Your Date",
+        inputCodePlaceholder: "Ex: SYD-123456",
+        btnLogin: "Acessar com Segurança 🔑",
+        invalidLogin: "✗ Os dados digitados não correspondem a um evento premium ativo.",
+        title: "Painel de Controle",
+        logout: "Voltar ao Início",
+        tabOverview: "Visão Geral",
+        tabGuests: "Lista de Convidados",
+        tabTables: "Organizar Mesas",
+        statsConfirmed: "Total Confirmados",
+        statsDeclined: "Declinados",
+        statsPending: "Pendentes",
+        statsAdults: "Adultos",
+        statsKids: "Crianças",
+        statsDiets: "Cardápios Especiais",
+        guestTableHead: {
+        name: "Nome",
+        status: "Comparece",
+        companions: "Acompanhantes",
+        diet: "Restrições",
+        actions: "Ações"
+        },
+        btnSendReminder: "Lembrete de WhatsApp",
+        reminderTemplate: "Olá! Esperamos que possa nos acompanhar. Lembramos que você pode confirmar sua presença diretamente em nosso convite digital Save Your Date. Um grande abraço!",
+        tableTitle: "Gestão de Mesas",
+        tableDesc: "Atribua convidados confirmados a mesas virtuais para organizar visualmente o layout das mesas do salão.",
+        unassignedGuests: "Convidados sem mesa atribuída",
+        tableLabel: "Mesa",
+        btnAssign: "Atribuir",
+        noGuests: "Nenhum convidado encontrado nesta seção.",
+        noUnassigned: "Todos os convidados confirmados já possuem mesa atribuída! 🎉",
+        addGuest: "Adicionar Convidado",
+        deleteGuest: "Excluir",
+        guestAdded: "✓ Convidado adicionado com sucesso.",
+        placeholderAdd: "Nome do convidado",
+        addTable: "Adicionar Mesa",
+        deleteTable: "Excluir Mesa",
+        placeholderAddTable: "Nome da mesa (Ex: Mesa 4)"
+        }
+        }
+        };
 
 function App() {
   // Navigation & Language UI States
@@ -892,6 +1027,36 @@ function App() {
 
   // Valid pre-approved mock codes for testing!
   const VALID_MOCK_CODES = ['WEDDING2026', 'QUINCE2026', 'VIPCUSTOMER', 'MP-PAY-OK'];
+
+  // ADMIN CONTROL STATES & MOCK GUEST LIST DATA
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminActiveTab, setAdminActiveTab] = useState<'overview' | 'guests' | 'tables'>('overview');
+  const [loginContact, setLoginContact] = useState('');
+  const [loginCode, setLoginCode] = useState('');
+  const [loginError, setLoginError] = useState(false);
+  
+  // Dashboard mock guest data
+  const [guests, setGuests] = useState([
+    { id: 1, name: "Carlos Gómez", rsvp: "yes", companions: 2, diet: "Ninguna / None", table: "Mesa 1" },
+    { id: 2, name: "María Rodriguez", rsvp: "yes", companions: 1, diet: "Vegano / Vegan", table: "Mesa 1" },
+    { id: 3, name: "Jorge Blanco", rsvp: "yes", companions: 1, diet: "Celíaco / Gluten-free", table: "Mesa 2" },
+    { id: 4, name: "Ana Martínez", rsvp: "yes", companions: 3, diet: "Ninguna / None", table: "Mesa 2" },
+    { id: 5, name: "Pedro Soto", rsvp: "no", companions: 0, diet: "Ninguna / None", table: "" },
+    { id: 6, name: "Laura Díaz", rsvp: "pending", companions: 1, diet: "Vegano / Vegan", table: "" },
+    { id: 7, name: "Sofía Peralta", rsvp: "yes", companions: 1, diet: "Ninguna / None", table: "" },
+    { id: 8, name: "Luis Benítez", rsvp: "pending", companions: 2, diet: "Ninguna / None", table: "" },
+    { id: 9, name: "Elena Vázquez", rsvp: "yes", companions: 2, diet: "Vegano / Vegan", table: "" },
+    { id: 10, name: "Esteban Ruiz", rsvp: "pending", companions: 1, diet: "Hipertenso / Low sodium", table: "" }
+  ]);
+
+  const [tables, setTables] = useState(["Mesa 1", "Mesa 2", "Mesa 3", "Mesa Familiar", "Mesa Amigos"]);
+  const [adminNewTableName, setAdminNewTableName] = useState('');
+  
+  // Add Guest state
+  const [adminNewGuestName, setAdminNewGuestName] = useState('');
+  const [adminNewGuestDiet, setAdminNewGuestDiet] = useState('Ninguna / None');
+  const [adminNewGuestCompanions, setAdminNewGuestCompanions] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -1067,8 +1232,473 @@ function App() {
     setRsvpSuccess(true);
   };
 
+  // ADMIN ACTION HANDLERS
+  const handleAdminLoginSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = loginCode.trim().toUpperCase();
+    if (VALID_MOCK_CODES.includes(code) || code.startsWith('SYD-')) {
+      setIsAdminLoggedIn(true);
+      setLoginError(false);
+    } else {
+      setLoginError(true);
+    }
+  };
+
+  const handleAddGuestSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminNewGuestName.trim()) return;
+    const newGuest = {
+      id: Date.now(),
+      name: adminNewGuestName.trim(),
+      rsvp: 'yes',
+      companions: adminNewGuestCompanions,
+      diet: adminNewGuestDiet,
+      table: ""
+    };
+    setGuests([...guests, newGuest]);
+    setAdminNewGuestName("");
+    setAdminNewGuestCompanions(0);
+    setAdminNewGuestDiet("Ninguna / None");
+  };
+
+  const handleDeleteGuest = (id: number) => {
+    setGuests(guests.filter(g => g.id !== id));
+  };
+
+  const handleAssignGuestTable = (id: number, tableName: string) => {
+    setGuests(guests.map(g => g.id === id ? { ...g, table: tableName } : g));
+  };
+
+  const handleRemoveGuestTable = (id: number) => {
+    setGuests(guests.map(g => g.id === id ? { ...g, table: "" } : g));
+  };
+
+  const handleAddTableSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = adminNewTableName.trim();
+    if (!trimmed) return;
+    if (tables.includes(trimmed)) return;
+    setTables([...tables, trimmed]);
+    setAdminNewTableName('');
+  };
+
+  const handleDeleteTable = (tableName: string) => {
+    setTables(tables.filter(t => t !== tableName));
+    setGuests(guests.map(g => g.table === tableName ? { ...g, table: "" } : g));
+  };
+
   // Shortcut for translations based on active language
   const t = TRANSLATIONS[lang];
+
+  // ==========================================
+  // VIEW TAKEOVERS (LOGIN & DASHBOARD)
+  // ==========================================
+
+  // 1. ADMIN LOGIN VIEW
+  if (showAdminLogin && !isAdminLoggedIn) {
+    return (
+      <div className="admin-login-takeover">
+        <header className="admin-header">
+          <div className="container admin-header-container">
+            <div className="logo" style={{ cursor: 'pointer' }} onClick={() => setShowAdminLogin(false)}>
+              <img src="/logo.svg" alt="Save Your Date" className="logo-img" />
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              {/* Language Selector */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#fafafa', border: '1px solid var(--color-border)', borderRadius: '15px', padding: '2px 8px' }}>
+                🌐
+                <select 
+                  value={lang} 
+                  onChange={(e) => setLang(e.target.value as any)}
+                  style={{ border: 'none', background: 'transparent', fontStyle: 'normal', fontSize: '13px', fontWeight: 'bold', fontFamily: 'var(--font-sans)', color: 'var(--color-text-secondary)', outline: 'none', cursor: 'pointer' }}
+                >
+                  <option value="es">ES</option>
+                  <option value="en">EN</option>
+                  <option value="pt">PT</option>
+                </select>
+              </div>
+
+              <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px', borderRadius: '20px' }} onClick={() => setShowAdminLogin(false)}>
+                ← {lang === 'es' ? 'Volver' : (lang === 'en' ? 'Back' : 'Voltar')}
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main className="admin-login-main container">
+          <div className="contact-form-box" style={{ maxWidth: '500px', margin: '40px auto' }}>
+            <form onSubmit={handleAdminLoginSubmit} className="contact-form" style={{ textAlign: 'left' }}>
+              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <span style={{ fontSize: '48px' }}>🔐</span>
+                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', color: 'var(--color-accent)', marginTop: '8px' }}>
+                  {t.admin.loginTitle}
+                </h2>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: '13px', lineHeight: 1.4 }}>
+                  {t.admin.loginDesc}
+                </p>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="adminContact">{t.admin.inputContact}</label>
+                <input 
+                  className="form-input" 
+                  type="text" 
+                  id="adminContact" 
+                  required 
+                  placeholder={t.admin.inputContactPlaceholder} 
+                  value={loginContact}
+                  onChange={(e) => setLoginContact(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="adminCode">{t.admin.inputCode}</label>
+                <input 
+                  className="form-input" 
+                  type="text" 
+                  id="adminCode" 
+                  required 
+                  placeholder={t.admin.inputCodePlaceholder} 
+                  value={loginCode}
+                  onChange={(e) => setLoginCode(e.target.value)}
+                  style={{ textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '1px' }}
+                />
+              </div>
+
+              {loginError && (
+                <div style={{ color: '#e0004d', fontSize: '13px', fontWeight: 'bold', marginBottom: '16px' }}>
+                  {t.admin.invalidLogin}
+                </div>
+              )}
+
+              <button className="btn-form-submit" type="submit">
+                {t.admin.btnLogin}
+              </button>
+            </form>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // 2. ADMIN DASHBOARD VIEW
+  if (isAdminLoggedIn) {
+    // Dynamic Computations
+    const confirmedCount = guests.filter(g => g.rsvp === 'yes').length;
+    const pendingCount = guests.filter(g => g.rsvp === 'pending').length;
+    const declinedCount = guests.filter(g => g.rsvp === 'no').length;
+    const companionCount = guests.filter(g => g.rsvp === 'yes').reduce((acc, curr) => acc + curr.companions, 0);
+    const totalPeopleCount = confirmedCount + companionCount;
+    const specialDietsCount = guests.filter(g => g.rsvp === 'yes' && g.diet !== 'Ninguna / None' && g.diet !== 'Ninguna').length;
+
+    return (
+      <div className="admin-dashboard-takeover">
+        {/* Navigation Header */}
+        <header className="admin-header">
+          <div className="container admin-header-container">
+            <div className="admin-header-logo-group">
+              <img src="/logo.svg" alt="Save Your Date" className="logo-img" />
+              <span className="admin-header-badge">GOLD</span>
+              <h2 className="admin-event-title">Sofía & Mateo</h2>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              {/* Language Switcher */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#fafafa', border: '1px solid var(--color-border)', borderRadius: '15px', padding: '2px 8px' }}>
+                🌐
+                <select 
+                  value={lang} 
+                  onChange={(e) => setLang(e.target.value as any)}
+                  style={{ border: 'none', background: 'transparent', fontStyle: 'normal', fontSize: '13px', fontWeight: 'bold', fontFamily: 'var(--font-sans)', color: 'var(--color-text-secondary)', outline: 'none', cursor: 'pointer' }}
+                >
+                  <option value="es">ES</option>
+                  <option value="en">EN</option>
+                  <option value="pt">PT</option>
+                </select>
+              </div>
+
+              <button className="btn-secondary" style={{ padding: '6px 16px', borderRadius: '20px', fontSize: '13px' }} onClick={() => { setIsAdminLoggedIn(false); setLoginCode(''); setLoginContact(''); }}>
+                🚪 {t.admin.logout}
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Dashboard Tabs & Content Area */}
+        <div className="admin-dashboard-body container">
+          {/* Sub Navigation Tabs */}
+          <div className="filter-tabs" style={{ justifyContent: 'flex-start', margin: '24px 0' }}>
+            <button className={`filter-btn ${adminActiveTab === 'overview' ? 'active' : ''}`} onClick={() => setAdminActiveTab('overview')}>
+              📊 {t.admin.tabOverview}
+            </button>
+            <button className={`filter-btn ${adminActiveTab === 'guests' ? 'active' : ''}`} onClick={() => setAdminActiveTab('guests')}>
+              👥 {t.admin.tabGuests} ({guests.length})
+            </button>
+            <button className={`filter-btn ${adminActiveTab === 'tables' ? 'active' : ''}`} onClick={() => setAdminActiveTab('tables')}>
+              🍽️ {t.admin.tabTables}
+            </button>
+          </div>
+
+          {/* TAB 1: OVERVIEW */}
+          {adminActiveTab === 'overview' && (
+            <div className="admin-overview-grid animate-fade-in">
+              <div className="admin-card stats-card">
+                <span className="stats-icon">👥</span>
+                <div className="stats-info">
+                  <h4>{t.admin.statsConfirmed}</h4>
+                  <strong>{totalPeopleCount}</strong>
+                  <p>{confirmedCount} {lang === 'es' ? 'invitados directos' : (lang === 'en' ? 'direct guests' : 'convidados diretos')} + {companionCount} {lang === 'es' ? 'acompañantes' : (lang === 'en' ? 'companions' : 'acompanhantes')}</p>
+                </div>
+              </div>
+
+              <div className="admin-card stats-card" style={{ borderLeftColor: '#f39c12' }}>
+                <span className="stats-icon">⏳</span>
+                <div className="stats-info">
+                  <h4>{t.admin.statsPending}</h4>
+                  <strong style={{ color: '#f39c12' }}>{pendingCount}</strong>
+                  <p>{lang === 'es' ? 'Respuestas pendientes de envío' : (lang === 'en' ? 'Pending guest responses' : 'Respostas pendentes')}</p>
+                </div>
+              </div>
+
+              <div className="admin-card stats-card" style={{ borderLeftColor: '#e74c3c' }}>
+                <span className="stats-icon">❌</span>
+                <div className="stats-info">
+                  <h4>{t.admin.statsDeclined}</h4>
+                  <strong style={{ color: '#e74c3c' }}>{declinedCount}</strong>
+                  <p>{lang === 'es' ? 'Invitados que no asisten' : (lang === 'en' ? 'Guests who declined' : 'Convidados que não vão')}</p>
+                </div>
+              </div>
+
+              <div className="admin-card stats-card" style={{ borderLeftColor: 'var(--color-mint)' }}>
+                <span className="stats-icon">🥦</span>
+                <div className="stats-info">
+                  <h4>{t.admin.statsDiets}</h4>
+                  <strong style={{ color: 'var(--color-mint)' }}>{specialDietsCount}</strong>
+                  <p>{lang === 'es' ? 'Requerimientos de catering' : (lang === 'en' ? 'Catering menu requirements' : 'Requisitos de cardápio')}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: GUEST LIST */}
+          {adminActiveTab === 'guests' && (
+            <div className="admin-guests-tab animate-fade-in" style={{ textAlign: 'left' }}>
+              {/* Add Guest mini form */}
+              <div className="admin-card" style={{ marginBottom: '24px', padding: '20px' }}>
+                <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', color: 'var(--color-accent)', marginBottom: '16px' }}>➕ {t.admin.addGuest}</h4>
+                <form onSubmit={handleAddGuestSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'flex-end' }}>
+                  <div className="form-group" style={{ flex: '2 1 200px', marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '12px' }}>{t.admin.guestTableHead.name}</label>
+                    <input className="form-input" type="text" placeholder={t.admin.placeholderAdd} value={adminNewGuestName} onChange={(e) => setAdminNewGuestName(e.target.value)} required />
+                  </div>
+                  <div className="form-group" style={{ flex: '1 1 100px', marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '12px' }}>{t.admin.guestTableHead.companions}</label>
+                    <input className="form-input" type="number" min="0" value={adminNewGuestCompanions} onChange={(e) => setAdminNewGuestCompanions(parseInt(e.target.value) || 0)} />
+                  </div>
+                  <div className="form-group" style={{ flex: '1 1 150px', marginBottom: 0 }}>
+                    <label className="form-label" style={{ fontSize: '12px' }}>{t.admin.guestTableHead.diet}</label>
+                    <select className="form-select" value={adminNewGuestDiet} onChange={(e) => setAdminNewGuestDiet(e.target.value)}>
+                      <option value="Ninguna / None">Ninguna / None</option>
+                      <option value="Vegano / Vegan">Vegano / Vegan</option>
+                      <option value="Celíaco / Gluten-free">Celíaco / Gluten-free</option>
+                      <option value="Hipertenso / Low sodium">Hipertenso / Low sodium</option>
+                    </select>
+                  </div>
+                  <button className="btn-primary" type="submit" style={{ padding: '12px 24px', height: '42px' }}>{t.admin.addGuest}</button>
+                </form>
+              </div>
+
+              {/* Guest list table */}
+              <div className="admin-card" style={{ padding: 0, overflowX: 'auto' }}>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>{t.admin.guestTableHead.name}</th>
+                      <th>{t.admin.guestTableHead.status}</th>
+                      <th>{t.admin.guestTableHead.companions}</th>
+                      <th>{t.admin.guestTableHead.diet}</th>
+                      <th>{t.admin.tableLabel}</th>
+                      <th>{t.admin.guestTableHead.actions}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {guests.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} style={{ textAlign: 'center', padding: '24px', color: 'var(--color-text-light)' }}>
+                          {t.admin.noGuests}
+                        </td>
+                      </tr>
+                    ) : (
+                      guests.map((g) => (
+                        <tr key={g.id}>
+                          <td style={{ fontWeight: 'bold' }}>{g.name}</td>
+                          <td>
+                            <span className={`admin-status-badge ${g.rsvp}`}>
+                              {g.rsvp === 'yes' ? (lang === 'es' ? 'Confirmado' : (lang === 'en' ? 'Confirmed' : 'Confirmado')) : 
+                               g.rsvp === 'no' ? (lang === 'es' ? 'No asiste' : (lang === 'en' ? 'Declined' : 'Não asiste')) : 
+                               (lang === 'es' ? 'Pendiente' : (lang === 'en' ? 'Pending' : 'Pendente'))}
+                            </span>
+                          </td>
+                          <td>{g.companions}</td>
+                          <td>{g.diet}</td>
+                          <td>
+                            {g.table ? (
+                              <span className="admin-table-badge">{g.table}</span>
+                            ) : (
+                              <span style={{ color: 'var(--color-text-light)', fontStyle: 'italic', fontSize: '12px' }}>-</span>
+                            )}
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              {g.rsvp === 'pending' && (
+                                <button 
+                                  className="btn-secondary" 
+                                  style={{ padding: '4px 12px', fontSize: '11px', color: '#25D366', borderColor: '#25D366', borderRadius: '15px' }}
+                                  onClick={() => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(t.admin.reminderTemplate)}`, '_blank')}
+                                >
+                                  💬 {t.admin.btnSendReminder}
+                                </button>
+                              )}
+                              <button 
+                                className="btn-secondary" 
+                                style={{ padding: '4px 12px', fontSize: '11px', color: '#e74c3c', borderColor: '#e74c3c', borderRadius: '15px' }}
+                                onClick={() => handleDeleteGuest(g.id)}
+                              >
+                                🗑️ {t.admin.deleteGuest}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: TABLE ASSIGNMENT */}
+          {adminActiveTab === 'tables' && (
+            <div className="admin-tables-tab animate-fade-in" style={{ textAlign: 'left' }}>
+              <div className="admin-card" style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '24px', color: 'var(--color-accent)', margin: '0 0 8px 0' }}>
+                  {t.admin.tableTitle}
+                </h3>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: '14px', margin: 0 }}>
+                  {t.admin.tableDesc}
+                </p>
+              </div>
+
+              {/* Add Table form */}
+              <div className="admin-card" style={{ marginBottom: '24px', padding: '20px' }}>
+                <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', color: 'var(--color-accent)', marginBottom: '16px' }}>➕ {t.admin.addTable || 'Agregar Mesa'}</h4>
+                <form onSubmit={handleAddTableSubmit} style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <input 
+                    className="form-input" 
+                    type="text" 
+                    placeholder={t.admin.placeholderAddTable || 'Nombre de la mesa...'} 
+                    value={adminNewTableName} 
+                    onChange={(e) => setAdminNewTableName(e.target.value)} 
+                    required 
+                    style={{ flex: '1', maxWidth: '300px', marginBottom: 0 }}
+                  />
+                  <button className="btn-primary" type="submit" style={{ padding: '10px 20px', height: '42px' }}>
+                    {t.admin.addTable || 'Agregar Mesa'}
+                  </button>
+                </form>
+              </div>
+
+              <div className="admin-tables-layout-grid">
+                {/* Unassigned guests side */}
+                <div className="admin-card" style={{ padding: '20px' }}>
+                  <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', color: 'var(--color-text-secondary)', borderBottom: '1px solid var(--color-border)', paddingBottom: '10px', marginBottom: '16px' }}>
+                    👥 {t.admin.unassignedGuests}
+                  </h4>
+                  
+                  {guests.filter(g => g.rsvp === 'yes' && !g.table).length === 0 ? (
+                    <p style={{ color: 'var(--color-mint)', fontSize: '14px', fontStyle: 'italic', textAlign: 'center', padding: '24px 0' }}>
+                      {t.admin.noUnassigned}
+                    </p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {guests.filter(g => g.rsvp === 'yes' && !g.table).map((g) => (
+                        <div key={g.id} className="admin-unassigned-guest-row">
+                          <span style={{ fontWeight: 'bold', fontSize: '14px' }}>{g.name}</span>
+                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <select 
+                              className="form-select" 
+                              style={{ padding: '4px 8px', fontSize: '12px', width: 'auto' }}
+                              onChange={(e) => handleAssignGuestTable(g.id, e.target.value)}
+                              defaultValue=""
+                            >
+                              <option value="" disabled>{t.admin.tableLabel}...</option>
+                              {tables.map((tbl) => (
+                                <option key={tbl} value={tbl}>{tbl}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Assigned Tables side */}
+                <div className="admin-tables-visual-grid">
+                  {tables.map((tableName) => {
+                    const guestsInTable = guests.filter(g => g.table === tableName);
+                    return (
+                      <div key={tableName} className="admin-card table-visual-card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px', marginBottom: '12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: 'var(--color-accent)', margin: 0 }}>
+                              🍽️ {tableName}
+                            </h4>
+                            <button 
+                              onClick={() => handleDeleteTable(tableName)}
+                              style={{ border: 'none', background: 'transparent', color: '#e74c3c', cursor: 'pointer', padding: 0, fontSize: '14px', display: 'flex', alignItems: 'center' }}
+                              title={t.admin.deleteTable || 'Eliminar Mesa'}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                          <span className="admin-table-badge" style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-accent)', padding: '2px 8px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold' }}>
+                            {guestsInTable.length}
+                          </span>
+                        </div>
+
+                        {guestsInTable.length === 0 ? (
+                          <p style={{ color: 'var(--color-text-light)', fontStyle: 'italic', fontSize: '12px', textAlign: 'center', padding: '16px 0', margin: 0 }}>
+                            {lang === 'es' ? 'Mesa vacía' : (lang === 'en' ? 'Empty table' : 'Mesa vazia')}
+                          </p>
+                        ) : (
+                          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {guestsInTable.map((g) => (
+                              <li key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', background: '#fdfdfd', border: '1px solid #f0f0f0', padding: '6px 10px', borderRadius: '8px' }}>
+                                <span>{g.name}</span>
+                                <button 
+                                  onClick={() => handleRemoveGuestTable(g.id)}
+                                  style={{ border: 'none', background: 'transparent', color: '#e74c3c', fontSize: '14px', cursor: 'pointer', padding: 0 }}
+                                  title={t.admin.deleteGuest}
+                                >
+                                  ×
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-wrapper">
@@ -1087,6 +1717,7 @@ function App() {
             <a href="#pedido" className="nav-link" onClick={(e) => handleScrollToSection(e, 'pedido')}>{t.nav.process}</a>
             <a href="#preguntas" className="nav-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{t.nav.questions}</a>
             <a href="#contacto" className="nav-link" onClick={(e) => handleScrollToSection(e, 'contacto')}>{t.nav.contact}</a>
+            <a href="#admin" className="nav-link" onClick={(e) => { e.preventDefault(); setShowAdminLogin(true); }} style={{ color: 'var(--color-accent)', fontWeight: 'bold' }}>🔐 {t.nav.myEvent}</a>
             
             {/* Language Selector in Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#fafafa', border: '1px solid var(--color-border)', borderRadius: '15px', padding: '2px 8px', marginLeft: '8px' }}>
@@ -1123,6 +1754,7 @@ function App() {
         <a href="#pedido" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'pedido')}>{t.nav.process}</a>
         <a href="#preguntas" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{t.nav.questions}</a>
         <a href="#contacto" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'contacto')}>{t.nav.contact}</a>
+        <a href="#admin" className="sidebar-link" onClick={(e) => { e.preventDefault(); setShowAdminLogin(true); setSidebarOpen(false); }} style={{ color: 'var(--color-accent)', fontWeight: 'bold' }}>🔐 {t.nav.myEvent}</a>
         
         {/* Language Selector in Sidebar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 0', borderBottom: '1px solid var(--color-border)' }}>
