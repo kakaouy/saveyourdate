@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Invitación digital para evento"
+  >
+
+  <title>
+    Invitación | Save Your Date
+  </title>
+
+
+  <!-- =====================================================
+       FAVICON
+  ====================================================== -->
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="assets/icons/favicon.png"
+  >
+
+
+  <!-- =====================================================
+       GOOGLE FONTS
+  ====================================================== -->
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&family=Parisienne&display=swap"
+    rel="stylesheet"
+  >
+
+
+  <!-- =====================================================
+       ESTILOS
+  ====================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="css/variables.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/base.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/layout.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/components.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/animations.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/responsive.css"
+  >
+
+
+  <!-- =====================================================
+       AJUSTES FINALES DEL MODELO
+  ====================================================== -->
+
+  <style>
+    /* Regalos, Matrimonio y Confirmar asistencia */
+    #gifts-title,
+    .timeline-section__title,
+    #rsvp-title {
+      margin-left: auto;
+      margin-right: auto;
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 9vw, 7rem);
+      font-weight: 600;
+      line-height: 0.94;
+      letter-spacing: 0.025em;
+      text-transform: uppercase;
+    }
+
+    #gifts-title,
+    .timeline-section__title {
+      color: #a98f84;
+    }
+
+    #rsvp-title {
+      color: var(--color-white);
+    }
+
+    /* Todos los botones */
+    button,
+    .btn,
+    a.btn,
+    .location-wedding__button,
+    .rsvp-wedding__button,
+    .guest-card__option,
+    .copy-button,
+    .copy-button--all {
+      border-radius: 10px !important;
+      text-transform: uppercase !important;
+    }
+
+    button *,
+    .btn *,
+    a.btn *,
+    .location-wedding__button *,
+    .rsvp-wedding__button * {
+      text-transform: uppercase !important;
+    }
+
+    /* Cierre final compacto */
+    .final-wedding-section {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 260px;
+      padding: 3rem var(--container-padding);
+      overflow: visible;
+      background: var(--color-secondary);
+      color: var(--color-white);
+      text-align: center;
+    }
+
+    .final-wedding-section .container {
+      position: relative;
+      z-index: 3;
+    }
+
+    .closing {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: min(100%, 600px);
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .closing__icon {
+      display: block;
+      width: 58px;
+      height: auto;
+      margin: 0 auto 0.9rem;
+      object-fit: contain;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .closing__message {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 500;
+      line-height: 1;
+      color: var(--color-white);
+    }
+
+    @media (max-width: 900px) {
+      #gifts-title,
+      .timeline-section__title,
+      #rsvp-title {
+        font-size: clamp(3.8rem, 8vw, 6rem);
+      }
+    }
+
+    @media (max-width: 600px) {
+      #gifts-title,
+      .timeline-section__title,
+      #rsvp-title {
+        font-size: clamp(3rem, 14vw, 4.8rem);
+        line-height: 0.94;
+      }
+
+      .final-wedding-section {
+        min-height: 210px;
+        padding: 2.6rem 1rem;
+      }
+
+      .closing__icon {
+        width: 48px;
+        margin-bottom: 0.75rem;
+      }
+
+      .closing__message {
+        font-size: clamp(2.1rem, 11vw, 3rem);
+      }
+    }
+
+    @media (max-width: 380px) {
+      #gifts-title,
+      .timeline-section__title,
+      #rsvp-title {
+        font-size: clamp(2.6rem, 13vw, 4rem);
+      }
+
+      .final-wedding-section {
+        min-height: 190px;
+        padding: 2.25rem 0.75rem;
+      }
+
+      .closing__icon {
+        width: 43px;
+      }
+
+      .closing__message {
+        font-size: 2.15rem;
+      }
+    }
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <!-- =====================================================
+       LOADER
+  ====================================================== -->
+
+  <div
+    id="page-loader"
+    class="page-loader"
+    aria-hidden="true"
+  >
+
+    <svg
+      class="page-loader__heart"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 500 500"
+    >
+
+      <path
+        class="svg-elem-1"
+        d="M 249.893 134.37 C 249.893 134.37 250.207 134.75 250.313 134.873 C 250.313 134.873 248.908 133.577 249.373 133.869 C 249.628 134.102 249.971 134.425 250.053 134.52 C 250.121 134.599 250.213 134.715 250.241 134.751 C 250.266 134.784 250.27 134.789 250.281 134.804 C 250.171 134.657 249.944 134.36 249.533 133.836 L 249.534 133.838 L 249.533 133.838 L 250.171 133.801 L 250.159 133.834 C 256.982 115.382 276.788 91.335 304.033 78.508 C 331.072 65.31 365.513 63.193 401.41 87.941 C 421.689 101.943 436.638 122.172 444.324 145.287 C 452.23 168.329 452.912 194.264 445.075 219.591 C 432.89 258.952 413.335 296.04 262.812 418.432 C 259.254 421.269 256.16 425.466 249.466 426.448 C 244.413 426.113 238.061 419.56 235.475 417.474 C 84.951 295.08 65.415 258.029 53.23 218.669 C 45.393 193.342 46.066 167.378 53.972 144.336 C 61.658 121.221 76.533 101.042 96.812 87.041 C 132.71 62.294 167.665 64.745 195.147 78.319 C 208.97 84.977 220.95 94.415 230.314 104.468 C 239.609 114.257 249.893 134.374 249.893 134.374"
+      ></path>
+
+    </svg>
+
+  </div>
+
+
+  <!-- =====================================================
+       PANTALLA DE BIENVENIDA
+  ====================================================== -->
+
+  <div
+    id="welcome-screen"
+    class="welcome-screen"
+    aria-hidden="false"
+  >
+
+    <div class="welcome-screen__content">
+
+      <p
+        id="welcome-pretitle"
+        class="welcome-screen__pretitle"
+      >
+        Estás invitado a
+      </p>
+
+
+      <h1
+        id="welcome-title"
+        class="welcome-screen__title"
+      >
+        Nuestra boda
+      </h1>
+
+
+      <p
+        id="welcome-message"
+        class="welcome-screen__message"
+      >
+        Tenemos algo muy especial para compartir contigo.
+      </p>
+
+
+      <div class="welcome-screen__actions">
+
+        <button
+          id="enter-with-music"
+          class="btn btn--primary"
+          type="button"
+        >
+          ENTRAR CON MÚSICA
+        </button>
+
+
+        <button
+          id="enter-without-music"
+          class="btn btn--secondary"
+          type="button"
+        >
+          ENTRAR SIN MÚSICA
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       SITIO
+  ====================================================== -->
+
+  <div
+    id="site-wrapper"
+    class="site-wrapper"
+  >
+
+
+    <!-- ===================================================
+         PORTADA
+    ==================================================== -->
+
+    <header
+      id="hero"
+      class="hero"
+      data-section="hero"
+    >
+
+      <img
+        src="assets/decorations/flores/hero-botanica.png"
+        alt=""
+        class="hero-botanica hero-botanica--top"
+        aria-hidden="true"
+      >
+
+
+      <img
+        src="assets/decorations/flores/hojas-botanica.png"
+        alt=""
+        class="hero-hojas hero-hojas--left"
+        aria-hidden="true"
+      >
+
+
+      <img
+        src="assets/decorations/flores/hojas-botanica.png"
+        alt=""
+        class="hero-hojas hero-hojas--right"
+        aria-hidden="true"
+      >
+
+
+      <img
+        src="assets/decorations/flores/hero-botanica.png"
+        alt=""
+        class="hero-botanica hero-botanica--bottom"
+        aria-hidden="true"
+      >
+
+
+      <div class="hero__frame hero__frame--outer">
+
+        <div class="hero__frame hero__frame--inner">
+
+          <div class="hero__content">
+
+            <p class="hero__pretitle">
+              NOS CASAMOS
+            </p>
+
+
+            <h1 class="hero__title">
+
+              JUAN
+
+              <span class="hero__ampersand">
+                &amp;
+              </span>
+
+              ANA
+
+            </h1>
+
+
+            <div class="hero__text-block">
+
+              <p>
+                TENEMOS EL AGRADO DE
+              </p>
+
+              <p>
+                INVITARLOS A LA CELEBRACIÓN DE
+              </p>
+
+              <p>
+                NUESTRO MATRIMONIO
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+
+    <main>
+
+
+      <!-- =================================================
+           FECHA Y HORA
+      ================================================== -->
+
+      <section
+        class="wedding-date-section"
+        data-section="date"
+      >
+
+        <div class="wedding-date-section__content">
+
+
+          <div class="wedding-date-section__date">
+
+            <span class="wedding-date-section__day-name">
+              SÁBADO
+            </span>
+
+
+            <span class="wedding-date-section__day">
+              22
+            </span>
+
+
+            <span class="wedding-date-section__month">
+              agosto
+            </span>
+
+
+            <span class="wedding-date-section__year">
+              - 2026 -
+            </span>
+
+          </div>
+
+
+          <div class="wedding-date-section__time">
+
+            <span class="wedding-date-section__time-label">
+              A LAS
+            </span>
+
+
+            <span class="wedding-date-section__hour">
+              21:00
+            </span>
+
+
+            <span class="wedding-date-section__hours-word">
+              horas
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- Decoración montada entre rosa y foto -->
+
+        <div
+          class="
+            section-overlap-decoration
+            section-overlap-decoration--right
+          "
+          aria-hidden="true"
+        >
+
+          <img
+            src="assets/decorations/flores/hojas-botanica.png"
+            alt=""
+          >
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =================================================
+           FOTO COMPLETA 1
+      ================================================== -->
+
+      <section
+        id="foto-section"   
+        class="full-width-photo"
+        aria-label="Fotografía de los novios"
+      >
+
+        <img
+          src="assets/images/galeria/foto-01.jpg"
+          alt="Ana y Juan"
+        >
+
+      </section>
+
+<!-- =================================================
+     UBICACIÓN
+================================================== -->
+
+<section
+  id="location-section"
+  class="
+    section
+    location-wedding-section
+  "
+  data-section="location"
+>
+
+  <div class="container">
+
+    <div class="location-wedding">
+
+      <p class="location-wedding__pretitle">
+        CEREMONIA Y
+        <br>
+        RECEPCIÓN EN
+      </p>
+
+
+      <img
+        src="assets/icons/icon-rings-gd.png"
+        alt=""
+        class="location-wedding__icon"
+        aria-hidden="true"
+      >
+
+
+      <p class="location-wedding__venue-label">
+        CENTRO DE EVENTOS
+      </p>
+
+
+      <h2
+        id="location-name"
+        class="location-wedding__name"
+      >
+QUINTA LOS CAPIBARAS      </h2>
+
+
+      <p
+        id="location-address"
+        class="location-wedding__address"
+      >
+        CAMINITO DE LOS CAPIBARAS 1234, MONTEVIDEO, URUGUAY
+      </p>
+
+
+      <button
+        id="open-location"
+        class="location-wedding__button"
+        type="button"
+      >
+
+        <strong>
+          CLICK AQUÍ
+        </strong>
+
+        <span>
+          PARA IR A LA UBICACIÓN
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =================================================
+       HOJAS ENTRE UBICACIÓN Y RSVP
+  ================================================== -->
+
+  <div
+    class="
+      section-overlap-decoration
+      section-overlap-decoration--left
+    "
+    aria-hidden="true"
+  >
+
+    <img
+      src="assets/decorations/flores/hojas-botanica.png"
+      alt=""
+    >
+
+  </div>
+
+</section>
+
+
+
+<!-- =================================================
+     CONFIRMAR ASISTENCIA
+================================================== -->
+
+<section
+  id="rsvp-section"
+  class="
+    section
+    section--color
+    rsvp-wedding-section
+  "
+  data-section="rsvp"
+>
+
+  <div class="container">
+
+    <div class="rsvp-wedding">
+
+
+      <img
+        src="assets/icons/icon-rsvp-wh.png"
+        alt=""
+        class="rsvp-wedding__icon"
+        aria-hidden="true"
+      >
+
+
+      <p
+        id="rsvp-eyebrow"
+        class="rsvp-wedding__pretitle"
+      >
+        QUEREMOS CONTAR CONTIGO
+      </p>
+
+
+      <h2
+        id="rsvp-title"
+        class="rsvp-wedding__title"
+      >
+        Confirmar asistencia
+      </h2>
+
+
+      <p
+        id="rsvp-message"
+        class="rsvp-wedding__message"
+      >
+        Por favor, confirmá tu asistencia.
+      </p>
+
+
+      <button
+        id="open-rsvp-modal"
+        class="rsvp-wedding__button"
+        type="button"
+      >
+        CONFIRMAR ASISTENCIA
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- =================================================
+     CUENTA REGRESIVA
+================================================== -->
+
+<section
+  id="countdown-section"
+  class="
+    section
+    section--color
+    section--botanical
+  "
+  data-section="countdown"
+>
+
+  <div class="container">
+
+    <div class="section-heading">
+
+      <p
+        id="countdown-eyebrow"
+        class="section-heading__eyebrow"
+      >
+        Falta muy poco
+      </p>
+
+
+      <h2
+        id="countdown-title"
+        class="section-heading__title"
+      >
+        Cuenta regresiva
+      </h2>
+
+    </div>
+
+
+    <div
+      id="countdown"
+      class="countdown"
+      aria-label="Cuenta regresiva para el evento"
+    >
+
+      <div class="countdown__item">
+
+        <span
+          id="countdown-days"
+          class="countdown__number"
+        >
+          00
+        </span>
+
+        <span class="countdown__label">
+          Días
+        </span>
+
+      </div>
+
+
+      <span
+        class="countdown__separator"
+        aria-hidden="true"
+      >
+        :
+      </span>
+
+
+      <div class="countdown__item">
+
+        <span
+          id="countdown-hours"
+          class="countdown__number"
+        >
+          00
+        </span>
+
+        <span class="countdown__label">
+          Horas
+        </span>
+
+      </div>
+
+
+      <span
+        class="countdown__separator"
+        aria-hidden="true"
+      >
+        :
+      </span>
+
+
+      <div class="countdown__item">
+
+        <span
+          id="countdown-minutes"
+          class="countdown__number"
+        >
+          00
+        </span>
+
+        <span class="countdown__label">
+          Minutos
+        </span>
+
+      </div>
+
+
+      <span
+        class="countdown__separator"
+        aria-hidden="true"
+      >
+        :
+      </span>
+
+
+      <div class="countdown__item">
+
+        <span
+          id="countdown-seconds"
+          class="countdown__number"
+        >
+          00
+        </span>
+
+        <span class="countdown__label">
+          Segundos
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+      <!-- =================================================
+           REGALOS
+      ================================================== -->
+
+      <section
+        id="gifts-section"
+        class="
+          section
+          section--light
+          section--botanical
+        "
+        data-section="gifts"
+      >
+
+        <div class="container">
+
+          <div class="gifts-card">
+
+            <div class="gifts-card__icon">
+
+              <img
+                id="gifts-icon"
+                src="assets/icons/icon-gift-gd.png"
+                alt=""
+              >
+
+            </div>
+
+
+            <div class="section-heading">
+
+              <p
+                id="gifts-eyebrow"
+                class="section-heading__eyebrow"
+              >
+                Un detalle
+              </p>
+
+
+              <h2
+                id="gifts-title"
+                class="section-heading__title"
+              >
+                Regalos
+              </h2>
+
+            </div>
+
+
+            <p
+              id="gifts-message"
+              class="gifts-card__message"
+            >
+              Tu presencia es nuestro mejor regalo.
+            </p>
+
+
+            <button
+              id="open-gifts-modal"
+              class="btn btn--primary"
+              type="button"
+            >
+              VER INFORMACIÓN
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+<div
+  class="section-overlap-decoration section-overlap-decoration--gifts-photo"
+  aria-hidden="true"
+>
+  <img
+    src="assets/decorations/flores/hojas-botanica.png"
+    alt=""
+  >
+</div>
+
+      <!-- =================================================
+           FOTO COMPLETA 2
+      ================================================== -->
+
+      <section
+        class="full-width-photo"
+        aria-label="Fotografía de los novios"
+      >
+
+        <img
+          src="assets/images/galeria/foto-02.jpg"
+          alt="Ana y Juan"
+        >
+
+      </section>
+
+<!-- =========================================================
+  ITINERARIO
+========================================================= -->
+<section
+  id="timeline-section"
+  class="timeline-section"
+>
+  <div class="container timeline-section__container">
+
+    <p class="section__eyebrow timeline-section__eyebrow">
+      Itinerario
+    </p>
+
+    <h2 class="section__title timeline-section__title">
+      Matrimonio
+    </h2>
+
+    <div class="timeline">
+
+      <!-- Línea central -->
+      <div class="timeline__line"></div>
+      <div class="timeline__start"></div>
+      <div class="timeline__end"></div>
+
+      <!-- 19:00 -->
+      <div class="timeline__item timeline__item--left">
+        <div class="timeline__content">
+          <div class="timeline__marker"></div>
+
+          <div class="timeline__text">
+            <p class="timeline__time">19:00</p>
+            <p class="timeline__label">Citación invitados</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 19:30 -->
+      <div class="timeline__item timeline__item--right">
+        <div class="timeline__content">
+          <div class="timeline__marker"></div>
+
+          <img
+            src="assets/icons/icon-church-gd.png"
+            alt=""
+            class="timeline__icon"
+            aria-hidden="true"
+          >
+
+          <div class="timeline__text">
+            <p class="timeline__time">19:30</p>
+            <p class="timeline__label">Iglesia religiosa</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 21:00 -->
+      <div class="timeline__item timeline__item--left">
+        <div class="timeline__content">
+          <div class="timeline__marker"></div>
+
+          <img
+            src="assets/icons/icon-flower-gd.png"
+            alt=""
+            class="timeline__icon"
+            aria-hidden="true"
+          >
+
+          <div class="timeline__text">
+            <p class="timeline__time">21:00</p>
+            <p class="timeline__label">Llegada novios</p>
+            <p class="timeline__subtext">Quinta Los Capibaras</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 22:00 -->
+      <div class="timeline__item timeline__item--right">
+        <div class="timeline__content">
+          <div class="timeline__marker"></div>
+
+          <img
+            src="assets/icons/icon-cake-gd.png"
+            alt=""
+            class="timeline__icon"
+            aria-hidden="true"
+          >
+
+          <div class="timeline__text">
+            <p class="timeline__time">22:00</p>
+            <p class="timeline__label">Cena</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 23:00 -->
+      <div class="timeline__item timeline__item--left">
+        <div class="timeline__content">
+          <div class="timeline__marker"></div>
+
+          <img
+            src="assets/icons/icon-heart-gd.png"
+            alt=""
+            class="timeline__icon"
+            aria-hidden="true"
+          >
+
+          <div class="timeline__text">
+            <p class="timeline__time">23:00</p>
+            <p class="timeline__label">Fiesta</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =================================================
+     CIERRE FINAL
+================================================== -->
+
+<section
+  id="closing-section"
+  class="final-wedding-section"
+  data-section="closing"
+>
+
+  <div
+    class="
+      section-overlap-decoration
+      section-overlap-decoration--timeline-final
+    "
+    aria-hidden="true"
+  >
+    <img
+      src="assets/decorations/flores/hojas-botanica.png"
+      alt=""
+    >
+  </div>
+
+  <div class="container">
+
+    <div class="closing">
+
+      <img
+        src="assets/icons/icon-rings-wh.png"
+        alt=""
+        class="closing__icon"
+        aria-hidden="true"
+      >
+
+      <p
+        id="closing-message"
+        class="closing__message"
+      >
+        Te esperamos!
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+      <!-- =================================================
+           DRESS CODE
+      ================================================== -->
+
+      <section
+        id="dresscode-section"
+        class="
+          section
+          section--color
+          section--botanical
+        "
+        data-section="dressCode"
+      >
+
+        <div class="container">
+
+          <div class="dresscode-card">
+
+            <div class="dresscode-card__icon">
+
+              <img
+                id="dresscode-icon"
+                src="assets/icons/dress-code.svg"
+                alt=""
+              >
+
+            </div>
+
+
+            <div class="section-heading">
+
+              <p
+                id="dresscode-eyebrow"
+                class="section-heading__eyebrow"
+              >
+                Para la ocasión
+              </p>
+
+
+              <h2
+                id="dresscode-title"
+                class="section-heading__title"
+              >
+                Dress Code
+              </h2>
+
+            </div>
+
+
+            <p
+              id="dresscode-description"
+              class="dresscode-card__description"
+            >
+              Elegante
+            </p>
+
+
+            <p
+              id="dresscode-note"
+              class="dresscode-card__note"
+            ></p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =================================================
+           PLAYLIST
+      ================================================== -->
+
+      <section
+        id="playlist-section"
+        class="
+          section
+          section--light
+          section--botanical
+        "
+        data-section="playlist"
+      >
+
+        <img
+          src="assets/decorations/flores/hojas-botanica.png"
+          alt=""
+          class="
+            botanical-decoration
+            botanical-decoration--medium
+            botanical-decoration--bottom-right
+          "
+          aria-hidden="true"
+        >
+
+
+        <div class="container">
+
+          <div class="playlist-card">
+
+            <div class="playlist-card__icon">
+
+              <img
+                id="playlist-icon"
+                src="assets/icons/music.svg"
+                alt=""
+              >
+
+            </div>
+
+
+            <div class="section-heading">
+
+              <p
+                id="playlist-eyebrow"
+                class="section-heading__eyebrow"
+              >
+                La música
+              </p>
+
+
+              <h2
+                id="playlist-title"
+                class="section-heading__title"
+              >
+                Playlist
+              </h2>
+
+            </div>
+
+
+            <p
+              id="playlist-message"
+              class="playlist-card__message"
+            >
+              Sugerinos una canción que no puede faltar.
+            </p>
+
+
+            <button
+              id="open-playlist-modal"
+              class="btn btn--primary"
+              type="button"
+            >
+              SUGERIR CANCIÓN
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =================================================
+           GALERÍA
+      ================================================== -->
+
+      <section
+        id="gallery-section"
+        class="
+          section
+          section--light
+        "
+        data-section="gallery"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="gallery-eyebrow"
+              class="section-heading__eyebrow"
+            >
+              Nuestra historia
+            </p>
+
+
+            <h2
+              id="gallery-title"
+              class="section-heading__title"
+            >
+              Algunos recuerdos
+            </h2>
+
+          </div>
+
+
+          <div
+            id="gallery"
+            class="gallery"
+          >
+            <!-- Se genera desde JavaScript -->
+          </div>
+
+
+          <div
+            id="gallery-dots"
+            class="gallery-dots"
+            aria-hidden="true"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+
+
+
+
+    </main>
+
+
+
+    <!-- ===================================================
+         FOOTER
+    ==================================================== -->
+
+    <footer
+      id="footer"
+      class="footer"
+      data-section="footer"
+    >
+
+      <div class="container footer__content">
+
+        <div class="footer__top">
+
+          <p
+            id="footer-event-name"
+            class="footer__event-name"
+          >
+            Ana &amp; Juan
+          </p>
+
+
+          <a
+            href="https://saveyourdate.site"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer__logo-link"
+            aria-label="Save Your Date"
+          >
+
+            <div
+              class="footer__logo"
+              aria-hidden="true"
+            ></div>
+
+          </a>
+
+        </div>
+
+
+        <div class="footer__bottom">
+
+          <p class="footer__copyright">
+            © 2026 Todos los derechos reservados
+          </p>
+
+
+          <p class="footer__credits">
+
+            Diseño y desarrollo por
+
+            <a
+              href="https://saveyourdate.site"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Save Your Date
+            </a>
+
+          </p>
+
+        </div>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       BOTÓN DE MÚSICA
+  ====================================================== -->
+
+  <button
+    id="music-toggle"
+    class="music-toggle"
+    type="button"
+    aria-label="Activar o pausar música"
+    aria-pressed="false"
+  >
+
+    <img
+      id="music-toggle-icon"
+      src="assets/icons/music.svg"
+      alt=""
+    >
+
+  </button>
+
+
+
+  <!-- =====================================================
+       AUDIO
+  ====================================================== -->
+
+  <audio
+    id="background-music"
+    loop
+    preload="metadata"
+  >
+
+    <source
+      id="background-music-source"
+      src=""
+      type="audio/mpeg"
+    >
+
+  </audio>
+
+
+
+  <!-- =====================================================
+       MODAL UBICACIÓN
+  ====================================================== -->
+
+  <div
+    id="location-modal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="location-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <h2
+        id="location-modal-title"
+        class="modal__title"
+      >
+        Cómo llegar
+      </h2>
+
+
+      <p
+        id="location-modal-address"
+        class="modal__text"
+      ></p>
+
+
+      <div class="modal__actions">
+
+        <a
+          id="location-modal-maps"
+          class="btn btn--primary"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GOOGLE MAPS
+        </a>
+
+
+        <a
+          id="location-modal-waze"
+          class="btn btn--secondary"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          WAZE
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MODAL REGALOS
+  ====================================================== -->
+
+  <div
+    id="gifts-modal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="gifts-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <h2
+        id="gifts-modal-title"
+        class="modal__title"
+      >
+        Regalos
+      </h2>
+
+
+      <p
+        id="gifts-modal-message"
+        class="modal__text"
+      ></p>
+
+
+      <div
+        id="gifts-details"
+        class="gifts-details"
+      >
+        <!-- Se genera desde JavaScript -->
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MODAL PLAYLIST
+  ====================================================== -->
+
+  <div
+    id="playlist-modal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="playlist-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <h2
+        id="playlist-modal-title"
+        class="modal__title"
+      >
+        Sugerí una canción
+      </h2>
+
+
+      <form
+        id="playlist-form"
+        class="form"
+      >
+
+        <div class="form__group">
+
+          <label
+            for="playlist-name"
+            class="form__label"
+          >
+            Tu nombre
+          </label>
+
+
+          <input
+            id="playlist-name"
+            class="form__input"
+            type="text"
+            name="name"
+            autocomplete="name"
+          >
+
+        </div>
+
+
+        <div class="form__group">
+
+          <label
+            for="playlist-song"
+            class="form__label"
+          >
+            Canción
+          </label>
+
+
+          <input
+            id="playlist-song"
+            class="form__input"
+            type="text"
+            name="song"
+            required
+          >
+
+        </div>
+
+
+        <div class="form__group">
+
+          <label
+            for="playlist-link"
+            class="form__label"
+          >
+            Link opcional
+          </label>
+
+
+          <input
+            id="playlist-link"
+            class="form__input"
+            type="url"
+            name="link"
+          >
+
+        </div>
+
+
+        <button
+          id="playlist-submit"
+          class="btn btn--primary"
+          type="submit"
+        >
+          ENVIAR CANCIÓN
+        </button>
+
+
+        <p
+          id="playlist-form-status"
+          class="form__status"
+          aria-live="polite"
+        ></p>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MODAL RSVP
+  ====================================================== -->
+
+  <div
+    id="rsvp-modal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+
+    <div
+      class="modal__dialog modal__dialog--large"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="rsvp-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <h2
+        id="rsvp-modal-title"
+        class="modal__title"
+      >
+        Confirmar asistencia
+      </h2>
+
+
+      <p
+        id="rsvp-modal-message"
+        class="modal__text"
+      >
+        Seleccioná la asistencia de cada invitado.
+      </p>
+
+
+      <div
+        id="guest-list"
+        class="guest-list"
+      >
+        <!-- Se genera desde JavaScript -->
+      </div>
+
+
+      <div
+        id="rsvp-extra-fields"
+        class="rsvp-extra-fields"
+      >
+
+        <div class="form__group">
+
+          <label
+            for="rsvp-comment"
+            class="form__label"
+          >
+            Comentario
+          </label>
+
+
+          <textarea
+            id="rsvp-comment"
+            class="form__textarea"
+            name="comment"
+            rows="4"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+
+      <button
+        id="submit-rsvp"
+        class="btn btn--primary"
+        type="button"
+      >
+        GUARDAR CONFIRMACIÓN
+      </button>
+
+
+      <p
+        id="rsvp-status"
+        class="form__status"
+        aria-live="polite"
+      ></p>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       LIGHTBOX
+  ====================================================== -->
+
+  <div
+    id="gallery-lightbox"
+    class="lightbox"
+    aria-hidden="true"
+  >
+
+    <button
+      id="lightbox-close"
+      class="lightbox__close"
+      type="button"
+      aria-label="Cerrar galería"
+    >
+      ×
+    </button>
+
+
+    <button
+      id="lightbox-prev"
+      class="lightbox__nav lightbox__nav--prev"
+      type="button"
+      aria-label="Imagen anterior"
+    >
+      ‹
+    </button>
+
+
+    <img
+      id="lightbox-image"
+      class="lightbox__image"
+      src=""
+      alt=""
+    >
+
+
+    <button
+      id="lightbox-next"
+      class="lightbox__nav lightbox__nav--next"
+      type="button"
+      aria-label="Imagen siguiente"
+    >
+      ›
+    </button>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       SCRIPTS
+  ====================================================== -->
+
+  <script src="config.js"></script>
+
+  <script src="js/utils.js"></script>
+
+  <script src="js/render-config.js"></script>
+
+  <script src="js/loader.js"></script>
+
+  <script src="js/modals.js"></script>
+
+  <script src="js/countdown.js"></script>
+
+  <script src="js/music.js"></script>
+
+  <script src="js/gallery.js"></script>
+
+  <script src="js/playlist.js"></script>
+
+  <script src="js/rsvp.js"></script>
+
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>

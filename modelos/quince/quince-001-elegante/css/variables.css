@@ -1,0 +1,167 @@
+:root {
+
+  /* =========================================================
+     COLORES
+  ========================================================= */
+
+  --color-primary: #1e2733;
+  --color-primary-light: #3a4654;
+
+  --color-secondary: #d8b6ae;
+  --color-secondary-light: #ead8d3;
+
+  --color-background: #f8f5f2;
+  --color-surface: #ffffff;
+
+  --color-text: #2d2d2d;
+  --color-text-light: #6f6f6f;
+
+  --color-border: rgba(0, 0, 0, 0.10);
+
+  --color-overlay: rgba(0, 0, 0, 0.25);
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+
+  /* =========================================================
+     TIPOGRAFÍAS
+  ========================================================= */
+
+  --font-display: Georgia, "Times New Roman", serif;
+
+  --font-body: Arial, Helvetica, sans-serif;
+
+
+  /* =========================================================
+     TAMAÑOS DE TEXTO
+  ========================================================= */
+
+  --font-size-xs: 0.75rem;
+
+  --font-size-sm: 0.875rem;
+
+  --font-size-base: 1rem;
+
+  --font-size-md: 1.125rem;
+
+  --font-size-lg: 1.5rem;
+
+  --font-size-xl: 2rem;
+
+  --font-size-2xl: 3rem;
+
+  --font-size-hero: clamp(
+    3rem,
+    9vw,
+    7rem
+  );
+
+
+  /* =========================================================
+     ALTURA DE LÍNEA
+  ========================================================= */
+
+  --line-height-tight: 1.1;
+
+  --line-height-normal: 1.5;
+
+  --line-height-relaxed: 1.7;
+
+
+  /* =========================================================
+     ESPACIADO
+  ========================================================= */
+
+  --space-xs: 0.5rem;
+
+  --space-sm: 1rem;
+
+  --space-md: 1.5rem;
+
+  --space-lg: 2rem;
+
+  --space-xl: 3rem;
+
+  --space-2xl: 5rem;
+
+  --space-3xl: 7rem;
+
+
+  /* =========================================================
+     SECCIONES
+  ========================================================= */
+
+  --section-padding-desktop: 100px;
+
+  --section-padding-mobile: 70px;
+
+
+  /* =========================================================
+     CONTENEDORES
+  ========================================================= */
+
+  --container-width: 1100px;
+
+  --container-padding: 24px;
+
+
+  /* =========================================================
+     BORDES
+  ========================================================= */
+
+  --radius-sm: 8px;
+
+  --radius-md: 16px;
+
+  --radius-lg: 24px;
+
+  --radius-pill: 999px;
+
+
+  /* =========================================================
+     SOMBRAS
+  ========================================================= */
+
+  --shadow-sm:
+    0 4px 14px rgba(0, 0, 0, 0.08);
+
+  --shadow-md:
+    0 10px 35px rgba(0, 0, 0, 0.12);
+
+  --shadow-lg:
+    0 20px 60px rgba(0, 0, 0, 0.18);
+
+
+  /* =========================================================
+     TRANSICIONES
+  ========================================================= */
+
+  --transition-fast:
+    0.2s ease;
+
+  --transition-normal:
+    0.35s ease;
+
+  --transition-slow:
+    0.7s ease;
+
+
+  /* =========================================================
+     Z-INDEX
+  ========================================================= */
+
+  --z-base: 1;
+
+  --z-decoration: 5;
+
+  --z-content: 10;
+
+  --z-header: 100;
+
+  --z-floating: 500;
+
+  --z-modal: 1000;
+
+  --z-welcome: 2000;
+}

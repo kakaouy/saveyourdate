@@ -1,0 +1,588 @@
+/* =========================================================
+   TABLETS Y PANTALLAS MEDIANAS
+========================================================= */
+
+@media (max-width: 900px) {
+
+  :root {
+    --container-padding: 20px;
+    --section-padding-desktop: 80px;
+  }
+
+
+  /* GALERÍA */
+
+  .gallery {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  /* FOOTER */
+
+  .footer__content {
+    flex-direction: column;
+
+    text-align: center;
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES
+========================================================= */
+
+@media (max-width: 600px) {
+
+  :root {
+    --container-padding: 18px;
+  }
+
+  .footer__content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+   .hero__top-decoration {
+    top: 0;
+    width: 135%;
+  }
+  
+  /* =======================================================
+     GENERAL
+  ======================================================= */
+
+  body {
+    font-size: 0.95rem;
+  }
+
+
+  .section {
+    padding-block:
+      var(--section-padding-mobile);
+  }
+
+
+  .section-heading {
+    margin-bottom: var(--space-lg);
+  }
+
+
+  .section-heading__eyebrow {
+    font-size: 0.72rem;
+
+    letter-spacing: 0.13em;
+  }
+
+
+  .section-heading__title {
+    font-size: clamp(
+      2rem,
+      10vw,
+      3rem
+    );
+    
+  }
+
+    .gifts-details__item {
+    align-items: flex-start;
+  }
+
+
+  .copy-button {
+    margin-top: 0.2rem;
+  }
+
+  /* =======================================================
+     BOTONES
+  ======================================================= */
+
+  .btn {
+    width: 100%;
+
+    min-height: 46px;
+
+    padding:
+      0.8rem
+      1.2rem;
+  }
+
+
+  /* =======================================================
+     PANTALLA DE BIENVENIDA
+  ======================================================= */
+
+  .welcome-screen {
+    padding: var(--space-md);
+  }
+
+
+  .welcome-screen__content {
+    width: 100%;
+  }
+
+
+  .welcome-screen__title {
+    font-size: clamp(
+      2.8rem,
+      15vw,
+      5rem
+    );
+  }
+
+
+  .welcome-screen__message {
+    font-size: 1rem;
+  }
+
+
+  .welcome-screen__actions {
+    flex-direction: column;
+
+    width: 100%;
+  }
+
+
+  /* =======================================================
+     HERO
+  ======================================================= */
+
+  .hero {
+    min-height: 100svh;
+
+    padding:
+      var(--space-xl)
+      var(--container-padding);
+  }
+
+
+  .hero__content {
+    width: 100%;
+  }
+
+
+  .hero__title {
+    font-size: clamp(
+      3rem,
+      17vw,
+      5.5rem
+    );
+  }
+
+
+  .hero__subtitle {
+    font-size: 1rem;
+  }
+
+
+  .hero__date {
+    font-size: 0.95rem;
+  }
+
+
+  .hero__scroll {
+    bottom: 20px;
+  }
+
+
+  /* =======================================================
+     CUENTA REGRESIVA
+  ======================================================= */
+
+  .countdown {
+    gap: 0.35rem;
+
+    flex-wrap: nowrap;
+  }
+
+
+  .countdown__item {
+    min-width: 0;
+
+    flex: 1;
+  }
+
+
+  .countdown__number {
+    font-size: clamp(
+      2rem,
+      11vw,
+      3.2rem
+    );
+  }
+
+
+  .countdown__separator {
+    flex: 0 0 auto;
+
+    font-size: clamp(
+      1.8rem,
+      9vw,
+      2.8rem
+    );
+  }
+
+
+  .countdown__label {
+    font-size: 0.58rem;
+
+    letter-spacing: 0.07em;
+  }
+
+
+  /* =======================================================
+     TARJETAS PRINCIPALES
+  ======================================================= */
+
+  .event-card,
+  .location-card,
+  .dresscode-card,
+  .gifts-card,
+  .playlist-card,
+  .rsvp-card {
+    padding:
+      var(--space-lg)
+      var(--space-md);
+
+    border-radius: var(--radius-md);
+  }
+
+
+  .event-card__icon,
+  .location-card__icon,
+  .dresscode-card__icon,
+  .gifts-card__icon,
+  .playlist-card__icon {
+    width: 54px;
+    height: 54px;
+  }
+
+
+  /* =======================================================
+     EVENTO
+  ======================================================= */
+
+  .event-card__date {
+    font-size: clamp(
+      1.7rem,
+      9vw,
+      2.4rem
+    );
+  }
+
+
+  .event-card__time {
+    font-size: 1.25rem;
+  }
+
+
+  /* =======================================================
+     UBICACIÓN
+  ======================================================= */
+
+  .location-card__actions {
+    flex-direction: column;
+  }
+
+
+  /* =======================================================
+     DRESS CODE
+  ======================================================= */
+
+  .dresscode-card__description {
+    font-size: clamp(
+      1.7rem,
+      9vw,
+      2.4rem
+    );
+  }
+
+
+  /* =======================================================
+     GALERÍA
+  ======================================================= */
+
+  .gallery {
+    grid-template-columns: 1fr;
+
+    gap: var(--space-sm);
+  }
+
+
+  .gallery__item {
+    aspect-ratio: 4 / 5;
+  }
+
+
+  /* =======================================================
+     REGALOS
+  ======================================================= */
+
+  .gifts-details__item {
+    flex-direction: column;
+
+    gap: 0.25rem;
+  }
+
+
+  .gifts-details__value {
+    text-align: left;
+
+    word-break: break-word;
+  }
+
+
+  /* =======================================================
+     MODALES
+  ======================================================= */
+
+  .modal {
+    align-items: flex-end;
+
+    padding: 0;
+  }
+
+
+  .modal__dialog,
+  .modal__dialog--large {
+    width: 100%;
+
+    max-height: 92svh;
+
+    padding:
+      var(--space-xl)
+      var(--space-md)
+      var(--space-lg);
+
+    border-radius:
+      var(--radius-lg)
+      var(--radius-lg)
+      0
+      0;
+  }
+
+
+  .modal__title {
+    font-size: clamp(
+      1.8rem,
+      9vw,
+      2.7rem
+    );
+  }
+
+
+  .modal__actions {
+    flex-direction: column;
+  }
+
+
+  /* =======================================================
+     RSVP
+  ======================================================= */
+
+  .guest-card {
+    padding: var(--space-md);
+  }
+
+
+  .guest-card__name {
+    margin-bottom: var(--space-lg);
+
+    font-size: 1.35rem;
+
+    text-align: center;
+  }
+
+
+  .guest-card__actions {
+    flex-direction: column;
+  }
+
+
+  .guest-card__option {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+
+  /* =======================================================
+     LIGHTBOX
+  ======================================================= */
+
+  .lightbox {
+    padding: var(--space-sm);
+  }
+
+
+  .lightbox__image {
+    max-width: 100%;
+    max-height: 82svh;
+  }
+
+
+  .lightbox__close {
+    top: 12px;
+    right: 12px;
+  }
+
+
+  .lightbox__nav {
+    width: 42px;
+    height: 42px;
+
+    font-size: 2.4rem;
+  }
+
+
+  .lightbox__nav--prev {
+    left: 8px;
+  }
+
+
+  .lightbox__nav--next {
+    right: 8px;
+  }
+
+
+  /* =======================================================
+     BOTÓN DE MÚSICA
+  ======================================================= */
+
+  .music-toggle {
+    right: 14px;
+    bottom: 14px;
+
+    width: 48px;
+    height: 48px;
+  }
+
+
+  .music-toggle img {
+    width: 21px;
+    height: 21px;
+  }
+
+
+  /* =======================================================
+     MENSAJE FINAL
+  ======================================================= */
+
+  .closing__title {
+    font-size: clamp(
+      2.3rem,
+      12vw,
+      4rem
+    );
+  }
+
+
+  /* =======================================================
+     FOOTER
+  ======================================================= */
+
+  .footer {
+    padding:
+      var(--space-lg)
+      0;
+  }
+
+
+  .footer__content {
+    gap: var(--space-sm);
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES MUY CHICOS
+========================================================= */
+
+@media (max-width: 380px) {
+
+  :root {
+    --container-padding: 14px;
+  }
+
+
+  .countdown__number {
+    font-size: 1.9rem;
+  }
+
+
+  .countdown__separator {
+    font-size: 1.8rem;
+  }
+
+
+  .countdown__label {
+    font-size: 0.52rem;
+  }
+
+
+  .event-card,
+  .location-card,
+  .dresscode-card,
+  .gifts-card,
+  .playlist-card,
+  .rsvp-card {
+    padding:
+      var(--space-lg)
+      var(--space-sm);
+  }
+
+}
+
+
+/* =========================================================
+   ALTURA BAJA DE PANTALLA
+========================================================= */
+
+@media (max-height: 650px) {
+
+  .welcome-screen {
+    overflow-y: auto;
+
+    align-items: flex-start;
+  }
+
+
+  .welcome-screen__content {
+    margin-block: auto;
+
+    padding-block: var(--space-lg);
+  }
+
+
+  .hero {
+    min-height: 650px;
+  }
+
+}
+
+
+/* =========================================================
+   PREFERENCIA DE MENOS MOVIMIENTO
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+  }
+
+}

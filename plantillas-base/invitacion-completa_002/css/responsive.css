@@ -1,0 +1,988 @@
+/* =========================================================
+   TABLETS Y PANTALLAS MEDIANAS
+========================================================= */
+
+@media (max-width: 900px) {
+
+  :root {
+    --container-padding: 20px;
+    --section-padding-desktop: 80px;
+  }
+
+
+  /* =======================================================
+     GALERÍA
+  ======================================================= */
+
+  .gallery {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  /* =======================================================
+     FOOTER
+  ======================================================= */
+
+  .footer__content {
+    flex-direction: column;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES
+========================================================= */
+
+@media (max-width: 600px) {
+
+  :root {
+    --container-padding: 18px;
+  }
+
+
+  /* =======================================================
+     GENERAL
+  ======================================================= */
+
+  body {
+    font-size: 0.95rem;
+  }
+
+
+  .section {
+    padding-block:
+      var(--section-padding-mobile);
+  }
+
+
+  .section-heading {
+    margin-bottom:
+      var(--space-lg);
+  }
+
+
+  .section-heading__eyebrow {
+    font-size: 0.72rem;
+
+    letter-spacing: 0.13em;
+  }
+
+
+  .section-heading__title {
+    font-size:
+      clamp(
+        2rem,
+        10vw,
+        3rem
+      );
+  }
+
+
+  /* =======================================================
+     BOTONES GENERALES
+  ======================================================= */
+
+  .btn {
+    width: 100%;
+
+    min-height: 46px;
+
+    padding:
+      0.8rem
+      1.2rem;
+  }
+
+
+  /* =======================================================
+     PANTALLA DE BIENVENIDA
+  ======================================================= */
+
+  .welcome-screen {
+    padding:
+      var(--space-md);
+  }
+
+
+  .welcome-screen__content {
+    width: 100%;
+  }
+
+
+  .welcome-screen__title {
+    font-size:
+      clamp(
+        2.8rem,
+        15vw,
+        5rem
+      );
+  }
+
+
+  .welcome-screen__message {
+    font-size: 1rem;
+  }
+
+
+  .welcome-screen__actions {
+    flex-direction: column;
+
+    width: 100%;
+  }
+
+
+  /* =======================================================
+     HERO GENERAL
+  ======================================================= */
+
+  .hero {
+    min-height: 100svh;
+
+    padding:
+      var(--space-xl)
+      var(--container-padding);
+  }
+
+
+  .hero__content {
+    width: 100%;
+  }
+
+
+  .hero__title {
+    font-size:
+      clamp(
+        3rem,
+        17vw,
+        5.5rem
+      );
+  }
+
+
+  .hero__subtitle {
+    font-size: 1rem;
+  }
+
+
+  .hero__date {
+    font-size: 0.95rem;
+  }
+
+
+  .hero__scroll {
+    bottom: 20px;
+  }
+
+
+  .hero__top-decoration {
+    top: 0;
+
+    width: 135%;
+  }
+
+
+  /* =======================================================
+     HERO EDITORIAL
+  ======================================================= */
+
+  .hero.hero--editorial {
+    min-height: auto;
+
+    padding:
+      3rem
+      var(--container-padding)
+      7rem;
+
+    overflow: visible;
+  }
+
+
+  .hero-editorial {
+    width: 100%;
+  }
+
+
+  .hero-editorial__pretitle {
+    margin-bottom: 1rem;
+
+    font-size: 0.68rem;
+
+    letter-spacing: 0.3em;
+  }
+
+
+  .hero-editorial__names {
+    gap: 0.35rem;
+
+    font-size:
+      clamp(
+        2.7rem,
+        14vw,
+        4.5rem
+      );
+
+    line-height: 0.9;
+  }
+
+
+  .hero-editorial__meta {
+    gap: 0.8rem;
+
+    margin-top: 1.3rem;
+
+    font-size: 0.65rem;
+
+    letter-spacing: 0.18em;
+  }
+
+
+  .hero-editorial__line {
+    width: 38px;
+  }
+
+  .hero-editorial__section-divider {
+    width: min(82%, 320px);
+    margin: 2rem auto 0;
+  }
+
+  /* =======================================================
+     POLAROIDS
+  ======================================================= */
+
+  .polaroid-section {
+    margin-top: -4rem;
+
+    padding:
+      0
+      0.75rem
+      3rem;
+  }
+
+
+  .polaroid-gallery {
+    width: 100%;
+
+    height: 410px;
+  }
+
+
+  .polaroid {
+    width: 145px;
+
+    padding:
+      0.4rem
+      0.4rem
+      1.35rem;
+  }
+
+
+  .polaroid--1 {
+    top: 25px;
+    left: -2%;
+
+    z-index: 2;
+  }
+
+
+  .polaroid--2 {
+    top: -5px;
+    left: 36%;
+
+    z-index: 4;
+  }
+
+
+  .polaroid--3 {
+    top: 178px;
+    left: 8%;
+    right: auto;
+
+    z-index: 5;
+  }
+
+
+  .polaroid--4 {
+    top: 150px;
+    right: -1%;
+
+    z-index: 3;
+  }
+
+
+  /* =======================================================
+     FRASE EDITORIAL
+  ======================================================= */
+
+  .editorial-quote {
+    padding:
+      4rem
+      1.25rem
+      2.5rem;
+  }
+
+
+  .editorial-quote__text {
+    font-size:
+      clamp(
+        2rem,
+        10vw,
+        2.8rem
+      );
+
+    line-height: 1.05;
+  }
+
+
+  .editorial-quote__author {
+    margin-top: 1.75rem;
+
+    font-size: 0.65rem;
+
+    letter-spacing: 0.25em;
+  }
+
+
+  /* =======================================================
+     CRONOGRAMA
+  ======================================================= */
+
+  .schedule-section {
+    padding:
+      1.5rem
+      1rem
+      4rem;
+  }
+
+
+  .schedule-section .section-heading {
+    margin-bottom: 2.5rem;
+  }
+
+
+  .schedule__date {
+    margin-bottom: 2rem;
+
+    font-size: 1rem;
+
+    text-align: center;
+  }
+
+
+  .schedule {
+    width: 100%;
+
+    transform: none;
+  }
+
+
+  .schedule__item {
+    grid-template-columns:
+      24px
+      70px
+      minmax(0, 1fr);
+
+    min-height: 105px;
+
+    justify-content: stretch;
+  }
+
+
+  .schedule__line span {
+    width: 8px;
+    height: 8px;
+  }
+
+
+  .schedule__time {
+    font-size: 0.95rem;
+  }
+
+
+  .schedule__content {
+    padding-left: 0.5rem;
+  }
+
+
+  .schedule__content h3 {
+    font-size: 1.05rem;
+  }
+
+
+  .schedule__content p {
+    width: 100%;
+
+    margin-top: 0.45rem;
+
+    font-size: 0.82rem;
+
+    line-height: 1.35;
+  }
+
+
+  /* =======================================================
+     SECCIONES EDITORIALES
+  ======================================================= */
+
+  .section--editorial {
+    padding:
+      2.5rem
+      1.25rem;
+  }
+
+
+  .section--editorial::before {
+    width:
+      min(100%, 280px);
+
+    margin:
+      0
+      auto
+      1.75rem;
+  }
+
+
+  .section--editorial .editorial-content {
+    width: 100%;
+
+    max-width: 100%;
+
+    margin:
+      0
+      auto;
+  }
+
+
+  .section--editorial .section-heading {
+    margin-bottom: 1.5rem;
+  }
+
+
+  .section--editorial
+  .section-heading__eyebrow {
+    margin-bottom: 0.6rem;
+
+    font-size: 0.65rem;
+
+    letter-spacing: 0.22em;
+  }
+
+
+  .section--editorial
+  .section-heading__title {
+    font-size:
+      clamp(
+        2.1rem,
+        10vw,
+        3rem
+      );
+  }
+
+
+  .section--editorial p {
+    max-width: 100%;
+
+    margin:
+      0
+      auto
+      1.5rem;
+
+    font-size: 1rem;
+
+    line-height: 1.5;
+  }
+
+
+  /* =======================================================
+     BOTONES EDITORIALES
+  ======================================================= */
+
+  .btn--editorial,
+  .section--editorial .btn {
+    width: auto;
+
+    min-width: 155px;
+    min-height: auto;
+
+    padding:
+      0.8rem
+      1.35rem;
+
+    font-size: 0.95rem;
+  }
+
+
+  /* =======================================================
+     CUENTA REGRESIVA
+  ======================================================= */
+
+  .countdown {
+    gap: 0.35rem;
+
+    flex-wrap: nowrap;
+  }
+
+
+  .countdown__item {
+    min-width: 0;
+
+    flex: 1;
+  }
+
+
+  .countdown__number {
+    font-size:
+      clamp(
+        2rem,
+        11vw,
+        3.2rem
+      );
+  }
+
+
+  .countdown__separator {
+    flex: 0 0 auto;
+
+    font-size:
+      clamp(
+        1.8rem,
+        9vw,
+        2.8rem
+      );
+  }
+
+
+  .countdown__label {
+    font-size: 0.58rem;
+
+    letter-spacing: 0.07em;
+  }
+
+
+  /* =======================================================
+     TARJETAS PRINCIPALES
+  ======================================================= */
+
+  .event-card,
+  .location-card,
+  .dresscode-card,
+  .gifts-card,
+  .playlist-card,
+  .rsvp-card {
+    padding:
+      var(--space-lg)
+      var(--space-md);
+
+    border-radius:
+      var(--radius-md);
+  }
+
+
+  .event-card__icon,
+  .location-card__icon,
+  .dresscode-card__icon,
+  .gifts-card__icon,
+  .playlist-card__icon {
+    width: 54px;
+    height: 54px;
+  }
+
+
+  /* =======================================================
+     EVENTO
+  ======================================================= */
+
+  .event-card__date {
+    font-size:
+      clamp(
+        1.7rem,
+        9vw,
+        2.4rem
+      );
+  }
+
+
+  .event-card__time {
+    font-size: 1.25rem;
+  }
+
+
+  /* =======================================================
+     UBICACIÓN
+  ======================================================= */
+
+  .location-card__actions {
+    flex-direction: column;
+  }
+
+
+  /* =======================================================
+     DRESS CODE
+  ======================================================= */
+
+  .dresscode-card__description {
+    font-size:
+      clamp(
+        1.7rem,
+        9vw,
+        2.4rem
+      );
+  }
+
+
+  /* =======================================================
+     GALERÍA GENERAL
+  ======================================================= */
+
+  .gallery {
+    grid-template-columns: 1fr;
+
+    gap:
+      var(--space-sm);
+  }
+
+
+  .gallery__item {
+    aspect-ratio: 4 / 5;
+  }
+
+
+  /* =======================================================
+     REGALOS
+  ======================================================= */
+
+  .gifts-details__item {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 0.25rem;
+  }
+
+
+  .gifts-details__value {
+    text-align: left;
+
+    word-break: break-word;
+  }
+
+
+  .copy-button {
+    margin-top: 0.2rem;
+  }
+
+
+  /* =======================================================
+     MODALES
+  ======================================================= */
+
+  .modal {
+    align-items: flex-end;
+
+    padding: 0;
+  }
+
+
+  .modal__dialog,
+  .modal__dialog--large {
+    width: 100%;
+
+    max-height: 92svh;
+
+    padding:
+      var(--space-xl)
+      var(--space-md)
+      var(--space-lg);
+
+    border-radius:
+      var(--radius-lg)
+      var(--radius-lg)
+      0
+      0;
+  }
+
+
+  .modal__title {
+    font-size:
+      clamp(
+        1.8rem,
+        9vw,
+        2.7rem
+      );
+  }
+
+
+  .modal__actions {
+    flex-direction: column;
+  }
+
+
+  /* =======================================================
+     RSVP
+  ======================================================= */
+
+  .guest-card {
+    padding:
+      var(--space-md);
+  }
+
+
+  .guest-card__name {
+    margin-bottom:
+      var(--space-lg);
+
+    font-size: 1.35rem;
+
+    text-align: center;
+  }
+
+
+  .guest-card__actions {
+    flex-direction: column;
+  }
+
+
+  .guest-card__option {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+
+  /* =======================================================
+     LIGHTBOX
+  ======================================================= */
+
+  .lightbox {
+    padding:
+      var(--space-sm);
+  }
+
+
+  .lightbox__image {
+    max-width: 100%;
+
+    max-height: 82svh;
+  }
+
+
+  .lightbox__close {
+    top: 12px;
+    right: 12px;
+  }
+
+
+  .lightbox__nav {
+    width: 42px;
+    height: 42px;
+
+    font-size: 2.4rem;
+  }
+
+
+  .lightbox__nav--prev {
+    left: 8px;
+  }
+
+
+  .lightbox__nav--next {
+    right: 8px;
+  }
+
+
+  /* =======================================================
+     BOTÓN DE MÚSICA
+  ======================================================= */
+
+  .music-toggle {
+    right: 14px;
+    bottom: 14px;
+
+    width: 48px;
+    height: 48px;
+  }
+
+
+  .music-toggle img {
+    width: 21px;
+    height: 21px;
+  }
+
+
+  /* =======================================================
+     MENSAJE FINAL
+  ======================================================= */
+
+  .closing__title {
+    font-size:
+      clamp(
+        2.3rem,
+        12vw,
+        4rem
+      );
+  }
+
+
+  /* =======================================================
+     FOOTER
+  ======================================================= */
+
+  .footer {
+    padding:
+      var(--space-lg)
+      0;
+  }
+
+
+  .footer__content {
+    flex-direction: column;
+
+    gap:
+      var(--space-sm);
+
+    text-align: center;
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES MUY CHICOS
+========================================================= */
+
+@media (max-width: 380px) {
+
+  :root {
+    --container-padding: 14px;
+  }
+
+
+  .hero-editorial__names {
+    font-size: 2.55rem;
+  }
+
+
+  .hero-editorial__meta {
+    gap: 0.55rem;
+
+    letter-spacing: 0.12em;
+  }
+
+
+  .hero-editorial__line {
+    width: 28px;
+  }
+
+
+  .polaroid {
+    width: 135px;
+  }
+
+
+  .polaroid--2 {
+    left: 36%;
+  }
+
+
+  .polaroid--3 {
+    top: 170px;
+  }
+
+
+  .polaroid--4 {
+    top: 145px;
+  }
+
+
+  .schedule__item {
+    grid-template-columns:
+      20px
+      62px
+      minmax(0, 1fr);
+  }
+
+
+  .schedule__time {
+    font-size: 0.86rem;
+  }
+
+
+  .schedule__content h3 {
+    font-size: 1rem;
+  }
+
+
+  .countdown__number {
+    font-size: 1.9rem;
+  }
+
+
+  .countdown__separator {
+    font-size: 1.8rem;
+  }
+
+
+  .countdown__label {
+    font-size: 0.52rem;
+  }
+
+}
+
+
+/* =========================================================
+   ALTURA BAJA DE PANTALLA
+========================================================= */
+
+@media
+  (max-height: 650px)
+  and
+  (min-width: 601px) {
+
+  .welcome-screen {
+    overflow-y: auto;
+
+    align-items: flex-start;
+  }
+
+
+  .welcome-screen__content {
+    margin-block: auto;
+
+    padding-block:
+      var(--space-lg);
+  }
+
+
+  .hero:not(.hero--editorial) {
+    min-height: 650px;
+  }
+
+}
+
+
+/* =========================================================
+   PREFERENCIA DE MENOS MOVIMIENTO
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+  }
+
+}

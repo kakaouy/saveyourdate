@@ -1,0 +1,3004 @@
+/* =========================================================
+   COMPONENTS.CSS
+   MODELO BODA - ROSA BOTÁNICA
+========================================================= */
+
+
+/* =========================================================
+   PAGE LOADER
+========================================================= */
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100dvh;
+
+  background:
+    var(--color-background);
+
+  z-index:
+    var(--z-loader);
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 0.6s ease,
+    visibility 0.6s ease;
+}
+
+
+.page-loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+}
+
+
+.page-loader__heart {
+  width: 72px;
+  height: auto;
+}
+
+
+/* =========================================================
+   WELCOME SCREEN
+========================================================= */
+
+.welcome-screen__pretitle {
+  margin-bottom:
+    var(--space-xs);
+
+  font-size:
+    var(--font-size-xs);
+
+  letter-spacing:
+    0.28em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    var(--color-text-light);
+}
+
+
+.welcome-screen__title {
+  margin-bottom:
+    var(--space-md);
+
+  font-family:
+    var(--font-script);
+
+  font-size:
+    clamp(
+      4rem,
+      12vw,
+      8rem
+    );
+
+  font-weight:
+    400;
+
+  line-height:
+    0.9;
+
+  color:
+    var(--color-primary);
+}
+
+
+.welcome-screen__message {
+  width:
+    min(100%, 500px);
+
+  margin:
+    0
+    auto
+    var(--space-xl);
+
+  color:
+    var(--color-text-light);
+}
+
+
+/* =========================================================
+   HERO - PORTADA BOTÁNICA
+========================================================= */
+
+.hero {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 100svh;
+
+  padding:
+    6rem
+    1.5rem;
+
+  overflow: hidden;
+
+  background:
+    #f6f4f1;
+}
+
+
+/* =========================================================
+   HERO - FLORALES SUPERIOR E INFERIOR
+========================================================= */
+
+.hero-botanica {
+  position: absolute;
+
+  left: 50%;
+
+  width: 100%;
+  max-width: none;
+  height: auto;
+
+  z-index: 1;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+.hero-botanica--top {
+  top: 0;
+
+  transform:
+    translateX(-50%);
+}
+
+
+.hero-botanica--bottom {
+  top: auto;
+  bottom: 0;
+
+  transform:
+    translateX(-50%)
+    scaleX(-1)
+    scaleY(-1);
+}
+
+
+/* =========================================================
+   HERO - HOJAS LATERALES
+========================================================= */
+
+.hero-hojas {
+  position: absolute;
+
+  width: 180px;
+  height: auto;
+
+  z-index: 1;
+
+  opacity: 0.9;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+.hero-hojas--left {
+  top: 42%;
+  left: -28px;
+
+  transform:
+    translateY(-50%)
+    rotate(-12deg);
+}
+
+
+.hero-hojas--right {
+  top: 54%;
+  right: -28px;
+
+  transform:
+    translateY(-50%)
+    scaleX(-1)
+    rotate(-12deg);
+}
+
+
+/* =========================================================
+   HERO - DOBLE RECUADRO
+========================================================= */
+
+.hero__frame {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+}
+
+
+.hero__frame--outer {
+  width:
+    min(92%, 860px);
+
+  padding:
+    34px;
+
+  background:
+    rgba(255, 255, 255, 0.48);
+}
+
+
+.hero__frame--inner {
+  width: 100%;
+
+  padding:
+    4.5rem
+    3rem;
+
+  background:
+    #f6f4f1;
+}
+
+
+/* =========================================================
+   HERO - CONTENIDO
+========================================================= */
+
+.hero__content {
+  position: relative;
+
+  width: 100%;
+
+  margin:
+    0 auto;
+
+  text-align:
+    center;
+
+  color:
+    #ad978d;
+
+  z-index: 3;
+}
+
+
+.hero__pretitle {
+  margin:
+    0
+    0
+    1.8rem;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.78rem;
+
+  font-weight:
+    400;
+
+  letter-spacing:
+    0.3em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    #ad978d;
+}
+
+
+/* =========================================================
+   HERO - NOMBRES
+========================================================= */
+
+.hero__title {
+  margin: 0;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      3.8rem,
+      9vw,
+      6.8rem
+    );
+
+  font-weight:
+    600;
+
+  line-height:
+    0.94;
+
+  letter-spacing:
+    0.035em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    #a98f84;
+}
+
+
+.hero__ampersand {
+  display: block;
+
+  margin:
+    0.25rem
+    0
+    0.35rem;
+
+  font-family:
+    var(--font-script);
+
+  font-size:
+    clamp(
+      3rem,
+      5vw,
+      4.8rem
+    );
+
+  font-weight:
+    400;
+
+  line-height:
+    1;
+
+  text-transform:
+    none;
+
+  color:
+    #a98f84;
+}
+
+
+/* =========================================================
+   HERO - TEXTO INVITACIÓN
+========================================================= */
+
+.hero__text-block {
+  width:
+    min(100%, 650px);
+
+  margin:
+    3.5rem
+    auto
+    0;
+}
+
+
+.hero__text-block p {
+  margin:
+    0
+    0
+    1rem;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.9rem;
+
+  font-weight:
+    300;
+
+  line-height:
+    1.7;
+
+  letter-spacing:
+    0.24em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    #b19c92;
+}
+
+
+.hero__text-block p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   FECHA Y HORA - SECCIÓN ROSA
+========================================================= */
+
+.wedding-date-section {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 100svh;
+
+  padding:
+    7rem
+    var(--container-padding);
+
+  overflow: visible;
+
+  background:
+    var(--color-secondary);
+
+  color:
+    var(--color-white);
+
+  z-index: 3;
+}
+
+
+.wedding-date-section__content {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap:
+    8rem;
+
+  width:
+    min(100%, 700px);
+
+  margin:
+    0 auto;
+
+  text-align:
+    center;
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   FECHA
+========================================================= */
+
+.wedding-date-section__date,
+.wedding-date-section__time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+}
+
+
+.wedding-date-section__day-name,
+.wedding-date-section__time-label {
+  font-family:
+    var(--font-body);
+
+  font-size:
+    1.15rem;
+
+  font-weight:
+    300;
+
+  letter-spacing:
+    0.26em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    var(--color-white);
+}
+
+
+.wedding-date-section__day {
+  margin-top:
+    0.8rem;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      8rem,
+      20vw,
+      14rem
+    );
+
+  font-weight:
+    400;
+
+  line-height:
+    0.78;
+
+  color:
+    var(--color-white);
+}
+
+
+.wedding-date-section__month {
+  margin-top:
+    1rem;
+
+  font-family:
+    var(--font-script);
+
+  font-size:
+    clamp(
+      4rem,
+      9vw,
+      7rem
+    );
+
+  font-weight:
+    400;
+
+  line-height:
+    0.9;
+
+  color:
+    var(--color-white);
+}
+
+
+.wedding-date-section__year {
+  margin-top:
+    1.2rem;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    1.15rem;
+
+  font-weight:
+    300;
+
+  letter-spacing:
+    0.22em;
+
+  color:
+    var(--color-white);
+}
+
+
+/* =========================================================
+   HORA
+========================================================= */
+
+.wedding-date-section__hour {
+  margin-top:
+    0.7rem;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      7rem,
+      19vw,
+      13rem
+    );
+
+  font-weight:
+    400;
+
+  line-height:
+    0.82;
+
+  color:
+    var(--color-white);
+}
+
+
+.wedding-date-section__hours-word {
+  margin-top:
+    0.6rem;
+
+  font-family:
+    var(--font-script);
+
+  font-size:
+    clamp(
+      3.6rem,
+      8vw,
+      6rem
+    );
+
+  font-weight:
+    400;
+
+  line-height:
+    0.9;
+
+  color:
+    var(--color-white);
+}
+
+
+/* =========================================================
+   DECORACIÓN ENTRE FECHA ROSA Y FOTO
+========================================================= */
+
+.section-overlap-decoration {
+  position: absolute;
+
+  z-index: 10;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+.section-overlap-decoration img {
+  display: block;
+
+  width: 240px;
+  height: auto;
+}
+
+
+.section-overlap-decoration--right {
+  right: -28px;
+  bottom: -105px;
+}
+
+
+.section-overlap-decoration--right img {
+  transform:
+    scaleX(-1)
+    rotate(-5deg);
+}
+
+
+/* =========================================================
+   DECORACIONES BOTÁNICAS
+========================================================= */
+
+.botanical-decoration {
+  position: absolute;
+
+  display: block;
+
+  height: auto;
+
+  z-index:
+    var(--z-decoration);
+
+  pointer-events:
+    none;
+
+  user-select:
+    none;
+}
+
+
+.botanical-decoration--large {
+  width:
+    var(--flower-large-width);
+}
+
+
+.botanical-decoration--medium {
+  width:
+    var(--flower-medium-width);
+}
+
+
+.botanical-decoration--small {
+  width:
+    var(--flower-small-width);
+}
+
+
+.botanical-decoration--top-left {
+  top:
+    -25px;
+
+  left:
+    -35px;
+}
+
+
+.botanical-decoration--top-right {
+  top:
+    -25px;
+
+  right:
+    -35px;
+
+  transform:
+    scaleX(-1);
+}
+
+
+.botanical-decoration--bottom-left {
+  bottom:
+    -35px;
+
+  left:
+    -50px;
+
+  transform:
+    scaleY(-1);
+}
+
+
+.botanical-decoration--bottom-right {
+  right:
+    -50px;
+
+  bottom:
+    -35px;
+
+  transform:
+    scale(-1, -1);
+}
+
+
+/* =========================================================
+   SECCIONES BOTÁNICAS
+========================================================= */
+
+.section--botanical {
+  position: relative;
+
+  text-align:
+    center;
+
+  overflow:
+    hidden;
+}
+
+
+.section--botanical .container {
+  position: relative;
+
+  z-index:
+    var(--z-content);
+}
+
+
+.section--botanical.section--light {
+  background:
+    var(--section-background-light);
+}
+
+
+.section--botanical.section--color {
+  background:
+    var(--section-background-color);
+
+  color:
+    var(--color-white);
+}
+
+
+/* =========================================================
+   UBICACIÓN - BODA BOTÁNICA
+========================================================= */
+
+.location-wedding-section {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 100svh;
+
+  padding:
+    7rem
+    var(--container-padding)
+    8rem;
+
+  overflow: visible;
+
+  background:
+    #f6f4f1;
+
+  color:
+    #a98f84;
+
+  z-index: 3;
+}
+
+
+.location-wedding-section .container {
+  position: relative;
+
+  z-index: 2;
+}
+
+
+.location-wedding {
+  width:
+    min(100%, 720px);
+
+  margin:
+    0 auto;
+
+  text-align:
+    center;
+}
+
+
+.location-wedding__pretitle {
+  margin:
+    0
+    0
+    2.5rem;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    1rem;
+
+  font-weight:
+    300;
+
+  line-height:
+    2;
+
+  letter-spacing:
+    0.3em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    #ad978d;
+}
+
+
+.location-wedding__icon {
+  display: block;
+
+  width: 95px;
+  height: auto;
+
+  margin:
+    0
+    auto
+    2.3rem;
+}
+
+
+.location-wedding__venue-label {
+  margin:
+    0
+    0
+    1.5rem;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    1rem;
+
+  font-weight:
+    500;
+
+  letter-spacing:
+    0.3em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    #a98f84;
+}
+
+
+.location-wedding__name {
+  width:
+    min(100%, 650px);
+
+  margin:
+    0 auto;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      4rem,
+      9vw,
+      7rem
+    );
+
+  font-weight:
+    600;
+
+  line-height:
+    0.94;
+
+  letter-spacing:
+    0.025em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    #a98f84;
+}
+
+
+.location-wedding__address {
+  width:
+    min(100%, 680px);
+
+  margin:
+    3rem
+    auto
+    0;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.9rem;
+
+  font-weight:
+    300;
+
+  line-height:
+    1.7;
+
+  letter-spacing:
+    0.22em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    #ad978d;
+}
+
+
+.location-wedding__button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    0.2rem;
+
+  width:
+    min(100%, 430px);
+
+  margin:
+    3rem
+    auto
+    0;
+
+  padding:
+    1rem
+    1.5rem;
+
+  border:
+    0;
+
+  border-radius:
+    10px;
+
+  background:
+    var(--color-accent);
+
+  color:
+    var(--color-white);
+
+  text-align:
+    center;
+
+  transition:
+    transform
+    var(--transition-fast),
+    opacity
+    var(--transition-fast);
+}
+
+
+.location-wedding__button strong {
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.95rem;
+
+  font-weight:
+    600;
+
+  letter-spacing:
+    0.18em;
+
+  color:
+    var(--color-white);
+}
+
+
+.location-wedding__button span {
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.78rem;
+
+  font-weight:
+    300;
+
+  letter-spacing:
+    0.18em;
+
+  color:
+    var(--color-white);
+}
+
+
+.location-wedding__button:hover {
+  transform:
+    translateY(-2px);
+
+  opacity:
+    0.92;
+}
+
+
+/* =========================================================
+   HOJAS ENTRE UBICACIÓN Y RSVP
+========================================================= */
+
+.section-overlap-decoration--left {
+  left:
+    -32px;
+
+  bottom:
+    -105px;
+}
+
+
+.section-overlap-decoration--left img {
+  display: block;
+
+  width:
+    240px;
+
+  height:
+    auto;
+
+  transform:
+    rotate(8deg);
+}
+
+
+/* =========================================================
+   RSVP - BODA BOTÁNICA
+========================================================= */
+
+.rsvp-wedding-section {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  min-height:
+    70svh;
+
+  padding:
+    7rem
+    var(--container-padding);
+
+  overflow: hidden;
+
+  background:
+    var(--color-secondary);
+
+  color:
+    var(--color-white);
+
+  z-index: 1;
+}
+
+
+.rsvp-wedding-section .container {
+  position: relative;
+
+  z-index: 2;
+}
+
+
+.rsvp-wedding {
+  width:
+    min(100%, 760px);
+
+  margin:
+    0 auto;
+
+  text-align:
+    center;
+}
+
+
+.rsvp-wedding__icon {
+  display: block;
+
+  width:
+    76px;
+
+  height:
+    auto;
+
+  margin:
+    0
+    auto
+    1.8rem;
+}
+
+
+.rsvp-wedding__pretitle {
+  margin:
+    0
+    0
+    1rem;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.78rem;
+
+  font-weight:
+    500;
+
+  letter-spacing:
+    0.28em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    var(--color-white);
+}
+
+
+.rsvp-wedding__title {
+  width:
+    min(100%, 720px);
+
+  margin:
+    0 auto;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      3.5rem,
+      8vw,
+      6rem
+    );
+
+  font-weight:
+    500;
+
+  line-height:
+    1;
+
+  color:
+    var(--color-white);
+}
+
+
+.rsvp-wedding__message {
+  margin:
+    2.8rem
+    auto
+    0;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    1rem;
+
+  font-weight:
+    300;
+
+  line-height:
+    1.6;
+
+  color:
+    var(--color-white);
+}
+
+
+.rsvp-wedding__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width:
+    330px;
+
+  margin-top:
+    2.5rem;
+
+  padding:
+    1rem
+    2rem;
+
+  border:
+    1px solid
+    var(--color-white);
+
+  border-radius:
+    0;
+
+  background:
+    transparent;
+
+  color:
+    var(--color-white);
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.88rem;
+
+  font-weight:
+    500;
+
+  letter-spacing:
+    0.15em;
+
+  text-transform:
+    uppercase;
+
+  transition:
+    background
+    var(--transition-fast),
+    color
+    var(--transition-fast);
+}
+
+
+.rsvp-wedding__button:hover {
+  background:
+    var(--color-white);
+
+  color:
+    var(--color-secondary);
+}
+
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
+.countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    0.75rem;
+}
+
+
+.countdown__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  min-width:
+    78px;
+}
+
+
+.countdown__number {
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      2.8rem,
+      8vw,
+      5.5rem
+    );
+
+  font-weight:
+    400;
+
+  line-height:
+    1;
+
+  color:
+    inherit;
+}
+
+
+.countdown__label {
+  margin-top:
+    0.5rem;
+
+  font-size:
+    0.66rem;
+
+  letter-spacing:
+    0.16em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    inherit;
+
+  opacity:
+    0.82;
+}
+
+
+.countdown__separator {
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      2.4rem,
+      6vw,
+      4.5rem
+    );
+
+  line-height:
+    1;
+
+  color:
+    inherit;
+}
+
+
+/* =========================================================
+   TARJETAS PRINCIPALES - SIN TARJETA VISUAL
+========================================================= */
+
+.event-card,
+.location-card,
+.dresscode-card,
+.gifts-card,
+.playlist-card,
+.rsvp-card {
+  width:
+    min(100%, 760px);
+
+  margin:
+    0 auto;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 0;
+
+  background:
+    transparent;
+
+  box-shadow:
+    none;
+
+  text-align:
+    center;
+}
+
+
+/* =========================================================
+   ICONOS PRINCIPALES
+========================================================= */
+
+.event-card__icon,
+.location-card__icon,
+.dresscode-card__icon,
+.gifts-card__icon,
+.playlist-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width:
+    58px;
+
+  height:
+    58px;
+
+  margin:
+    0
+    auto
+    var(--space-md);
+}
+
+
+.event-card__icon img,
+.location-card__icon img,
+.dresscode-card__icon img,
+.gifts-card__icon img,
+.playlist-card__icon img {
+  width:
+    100%;
+
+  height:
+    100%;
+
+  object-fit:
+    contain;
+}
+
+
+/* =========================================================
+   DRESS CODE
+========================================================= */
+
+.dresscode-card__description {
+  margin-bottom:
+    var(--space-sm);
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      2.2rem,
+      5vw,
+      4rem
+    );
+
+  line-height:
+    1;
+}
+
+
+.dresscode-card__note {
+  margin-bottom:
+    0;
+
+  opacity:
+    0.8;
+}
+
+
+/* =========================================================
+   FOTO A ANCHO COMPLETO
+========================================================= */
+
+.full-width-photo {
+  position: relative;
+
+  width:
+    100%;
+
+  height:
+    clamp(
+      320px,
+      58vw,
+      720px
+    );
+
+  overflow:
+    hidden;
+
+  z-index: 1;
+}
+
+
+.full-width-photo img {
+  width:
+    100%;
+
+  height:
+    100%;
+
+  object-fit:
+    cover;
+
+  object-position:
+    center;
+
+  transition:
+    transform
+    1.2s
+    ease;
+}
+
+
+.full-width-photo:hover img {
+  transform:
+    scale(1.025);
+}
+
+
+/* =========================================================
+   GALERÍA
+========================================================= */
+
+.gallery__item {
+  position: relative;
+
+  aspect-ratio:
+    4 / 5;
+
+  overflow:
+    hidden;
+
+  border-radius:
+    0;
+
+  background:
+    var(--color-background);
+
+  cursor:
+    pointer;
+}
+
+
+.gallery__item img {
+  width:
+    100%;
+
+  height:
+    100%;
+
+  object-fit:
+    cover;
+
+  transition:
+    transform
+    var(--transition-slow);
+}
+
+
+.gallery__item:hover img {
+  transform:
+    scale(1.04);
+}
+
+
+.gallery-dot {
+  width:
+    8px;
+
+  height:
+    8px;
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(111, 80, 76, 0.25);
+}
+
+
+.gallery-dot.is-active {
+  background:
+    var(--color-accent);
+}
+
+
+/* =========================================================
+   REGALOS / PLAYLIST / RSVP
+========================================================= */
+
+.gifts-card__message,
+.playlist-card__message,
+.rsvp-card__message {
+  width:
+    min(100%, 540px);
+
+  margin:
+    0
+    auto
+    var(--space-xl);
+
+  line-height:
+    1.7;
+
+  color:
+    inherit;
+
+  opacity:
+    0.88;
+}
+
+
+/* =========================================================
+   DATOS DE REGALO
+========================================================= */
+
+.gifts-details {
+  display: flex;
+  flex-direction: column;
+
+  gap:
+    var(--space-sm);
+
+  margin-top:
+    var(--space-xl);
+}
+
+
+.gifts-details__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap:
+    var(--space-lg);
+
+  padding-bottom:
+    var(--space-sm);
+
+  border-bottom:
+    1px solid
+    var(--color-border);
+}
+
+
+.gifts-details__content {
+  display: flex;
+  flex-direction: column;
+
+  gap:
+    0.25rem;
+
+  min-width:
+    0;
+}
+
+
+.gifts-details__label {
+  font-weight:
+    600;
+}
+
+
+.gifts-details__value {
+  color:
+    var(--color-text-light);
+
+  word-break:
+    break-word;
+}
+
+
+/* =========================================================
+   COPIAR DATOS
+========================================================= */
+
+.copy-button {
+  flex-shrink:
+    0;
+
+  padding:
+    0.65rem
+    1rem;
+
+  border:
+    1px solid
+    var(--color-accent);
+
+  border-radius:
+    0;
+
+  font-size:
+    var(--font-size-xs);
+
+  letter-spacing:
+    0.08em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    var(--color-accent);
+
+  background:
+    transparent;
+
+  transition:
+    background-color
+    var(--transition-fast),
+    color
+    var(--transition-fast);
+}
+
+
+.copy-button:hover,
+.copy-button.is-copied {
+  color:
+    var(--color-white);
+
+  background:
+    var(--color-accent);
+}
+
+
+.copy-button--all {
+  display:
+    block;
+
+  width:
+    fit-content;
+
+  margin:
+    1.75rem
+    auto
+    0;
+}
+
+
+/* =========================================================
+   MODALES
+========================================================= */
+
+.modal__dialog {
+  padding:
+    var(--space-xl);
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius:
+    var(--radius-lg);
+
+  background:
+    var(--modal-background);
+
+  box-shadow:
+    var(--shadow-lg);
+
+  color:
+    var(--color-text);
+}
+
+
+.modal__close {
+  position: absolute;
+
+  top:
+    14px;
+
+  right:
+    18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width:
+    38px;
+
+  height:
+    38px;
+
+  font-size:
+    2rem;
+
+  line-height:
+    1;
+
+  color:
+    var(--color-text-light);
+}
+
+
+.modal__title {
+  margin-bottom:
+    var(--space-sm);
+
+  padding-right:
+    36px;
+
+  font-size:
+    clamp(
+      2.2rem,
+      5vw,
+      3.4rem
+    );
+
+  color:
+    var(--color-primary);
+}
+
+
+.modal__text {
+  margin-bottom:
+    var(--space-lg);
+
+  color:
+    var(--color-text-light);
+}
+
+
+.modal input,
+.modal textarea,
+.modal select {
+  width:
+    100%;
+
+  padding:
+    1rem
+    1.1rem;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    var(--color-white);
+
+  box-shadow:
+    none;
+
+  color:
+    var(--color-text);
+
+  outline:
+    none;
+
+  transition:
+    border-color
+    var(--transition-fast),
+    box-shadow
+    var(--transition-fast);
+}
+
+
+.modal input::placeholder,
+.modal textarea::placeholder {
+  color:
+    var(--color-text-soft);
+}
+
+
+.modal input:focus,
+.modal textarea:focus,
+.modal select:focus {
+  border-color:
+    var(--color-accent);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(120, 149, 111, 0.12);
+}
+
+
+/* =========================================================
+   BOTONES PRINCIPALES DE MODALES
+========================================================= */
+
+.modal .btn--primary,
+#submit-rsvp,
+#playlist-submit {
+  margin-top:
+    2rem;
+
+  border:
+    1px solid
+    var(--color-accent);
+
+  background:
+    var(--color-accent);
+
+  color:
+    var(--color-white);
+}
+
+
+.modal .btn--primary:hover,
+#submit-rsvp:hover,
+#playlist-submit:hover {
+  border-color:
+    var(--color-primary);
+
+  background:
+    var(--color-primary);
+
+  color:
+    var(--color-white);
+}
+
+
+/* =========================================================
+   RSVP - TARJETA DE INVITADO
+========================================================= */
+
+.guest-card {
+  padding:
+    var(--space-lg);
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius:
+    var(--radius-md);
+
+  background:
+    var(--color-white);
+}
+
+
+.guest-card__name {
+  margin-bottom:
+    var(--space-md);
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    var(--font-size-lg);
+
+  color:
+    var(--color-primary);
+}
+
+
+.guest-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap:
+    var(--space-sm);
+}
+
+
+.guest-card__option {
+  flex: 1;
+
+  min-width:
+    130px;
+
+  padding:
+    0.8rem
+    1rem;
+
+  border:
+    1px solid
+    var(--color-accent);
+
+  border-radius:
+    0;
+
+  color:
+    var(--color-accent);
+
+  background:
+    transparent;
+
+  transition:
+    background-color
+    var(--transition-fast),
+    color
+    var(--transition-fast);
+}
+
+
+.guest-card__option.is-selected {
+  color:
+    var(--color-white);
+
+  background:
+    var(--color-accent);
+}
+
+
+/* =========================================================
+   RSVP - RESTRICCIONES ALIMENTARIAS
+========================================================= */
+
+.guest-card__dietary {
+  margin-top:
+    var(--space-lg);
+
+  padding-top:
+    var(--space-md);
+
+  border-top:
+    1px solid
+    var(--color-border);
+}
+
+
+.guest-card__dietary-title {
+  margin-bottom:
+    var(--space-md);
+
+  font-weight:
+    500;
+}
+
+
+.guest-card__dietary-options {
+  display: flex;
+  flex-direction: column;
+
+  gap:
+    0.75rem;
+}
+
+
+.dietary-option {
+  display: flex;
+  align-items: center;
+
+  gap:
+    0.75rem;
+
+  cursor:
+    pointer;
+}
+
+
+.dietary-option input {
+  width:
+    18px;
+
+  height:
+    18px;
+
+  accent-color:
+    var(--color-accent);
+}
+
+
+.guest-card__dietary-detail {
+  margin-top:
+    var(--space-md);
+}
+
+
+.guest-list__empty {
+  margin-bottom: 0;
+
+  text-align:
+    center;
+
+  color:
+    var(--color-text-light);
+}
+
+
+/* =========================================================
+   FORM STATUS
+========================================================= */
+
+.form__status.is-success {
+  color:
+    #4f7a5a;
+}
+
+
+.form__status.is-error {
+  color:
+    #a34d4d;
+}
+
+
+.form__status.is-info {
+  color:
+    var(--color-text-light);
+}
+
+
+/* =========================================================
+   BOTÓN DE MÚSICA
+========================================================= */
+
+.music-toggle {
+  background:
+    var(--color-accent);
+
+  box-shadow:
+    var(--shadow-md);
+
+  transition:
+    transform
+    var(--transition-fast),
+    box-shadow
+    var(--transition-fast);
+}
+
+
+.music-toggle:hover {
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    var(--shadow-lg);
+}
+
+
+.music-toggle img {
+  width:
+    24px;
+
+  height:
+    24px;
+}
+
+
+/* =========================================================
+   LIGHTBOX
+========================================================= */
+
+.lightbox__close,
+.lightbox__nav {
+  color:
+    var(--color-white);
+}
+
+
+.lightbox__close {
+  font-size:
+    2.5rem;
+}
+
+
+.lightbox__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width:
+    50px;
+
+  height:
+    50px;
+
+  border-radius:
+    50%;
+
+  font-size:
+    3rem;
+
+  background:
+    rgba(255, 255, 255, 0.12);
+}
+
+
+/* =========================================================
+   CLOSING
+========================================================= */
+
+.closing {
+  width:
+    min(100%, 700px);
+
+  margin-inline:
+    auto;
+
+  text-align:
+    center;
+}
+
+
+.closing__pretitle {
+  margin-bottom:
+    var(--space-xs);
+
+  font-size:
+    var(--font-size-sm);
+
+  letter-spacing:
+    0.18em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.closing__title {
+  margin-bottom:
+    var(--space-md);
+
+  font-family:
+    var(--font-script);
+
+  font-size:
+    clamp(
+      4rem,
+      10vw,
+      7rem
+    );
+
+  font-weight:
+    400;
+
+  line-height:
+    0.9;
+}
+
+
+.closing__message {
+  margin-bottom: 0;
+
+  font-size:
+    var(--font-size-md);
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+  padding:
+    2rem
+    0
+    1.25rem;
+
+  background:
+    var(--color-white);
+
+  color:
+    var(--color-primary);
+}
+
+
+.footer__content {
+  display: flex;
+  flex-direction: column;
+
+  gap:
+    1.75rem;
+
+  padding:
+    0
+    32px;
+}
+
+
+.footer__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap:
+    1rem;
+}
+
+
+.footer__event-name {
+  margin: 0;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    var(--font-size-lg);
+
+  color:
+    var(--color-primary);
+}
+
+
+.footer__logo-link {
+  display: block;
+
+  flex-shrink:
+    0;
+}
+
+
+.footer__logo {
+  display: block;
+
+  width:
+    85px;
+
+  height:
+    34px;
+
+  background-color:
+    var(--color-primary);
+
+  -webkit-mask-image:
+    url("../assets/icons/logo.svg");
+
+  -webkit-mask-repeat:
+    no-repeat;
+
+  -webkit-mask-position:
+    center;
+
+  -webkit-mask-size:
+    contain;
+
+  mask-image:
+    url("../assets/icons/logo.svg");
+
+  mask-repeat:
+    no-repeat;
+
+  mask-position:
+    center;
+
+  mask-size:
+    contain;
+}
+
+
+.footer__bottom {
+  padding-top:
+    1rem;
+
+  border-top:
+    1px solid
+    var(--color-border-soft);
+
+  text-align:
+    center;
+}
+
+
+.footer__copyright,
+.footer__credits {
+  margin: 0;
+
+  font-size:
+    0.7rem;
+
+  line-height:
+    1.6;
+
+  color:
+    var(--color-primary);
+
+  opacity:
+    0.7;
+}
+
+
+.footer__credits a {
+  color:
+    var(--color-primary);
+
+  font-weight:
+    600;
+}
+
+
+.footer__credits a:hover {
+  text-decoration:
+    underline;
+}
+
+
+/* =========================================================
+   BOTONES DESHABILITADOS
+========================================================= */
+
+button:disabled {
+  opacity:
+    0.6;
+
+  cursor:
+    not-allowed;
+
+  transform:
+    none;
+}
+
+/* =========================================================
+   MODAL UBICACIÓN - CORRECCIÓN VISUAL
+========================================================= */
+
+#location-modal .modal__dialog {
+  width: min(90%, 620px);
+
+  padding:
+    3rem
+    3.5rem;
+
+  border-radius:
+    16px;
+
+  background:
+    #fffdfb;
+}
+
+
+#location-modal .modal__title {
+  margin:
+    0
+    0
+    1rem;
+
+  padding-right:
+    2.5rem;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      2.8rem,
+      5vw,
+      4rem
+    );
+
+  font-weight:
+    500;
+
+  line-height:
+    1;
+
+  color:
+    var(--color-primary);
+}
+
+
+#location-modal .modal__text {
+  margin:
+    0
+    0
+    2.5rem;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    1rem;
+
+  color:
+    var(--color-text-light);
+}
+
+
+#location-modal .modal__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    1rem;
+
+  width:
+    100%;
+}
+
+
+#location-modal .modal__actions .btn {
+  flex:
+    0
+    0
+    210px;
+
+  width:
+    210px;
+
+  min-height:
+    54px;
+
+  margin:
+    0;
+
+  padding:
+    0.9rem
+    1.2rem;
+
+  border:
+    1px solid
+    var(--color-accent);
+
+  border-radius:
+    0;
+
+  background:
+    var(--color-accent);
+
+  color:
+    var(--color-white);
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.85rem;
+
+  font-weight:
+    500;
+
+  letter-spacing:
+    0.14em;
+
+  text-transform:
+    uppercase;
+}
+
+
+#location-modal .modal__actions .btn:hover {
+  border-color:
+    var(--color-primary);
+
+  background:
+    var(--color-primary);
+
+  color:
+    var(--color-white);
+}
+
+/* =========================================================
+   DECORACIÓN ENTRE REGALOS Y FOTO
+========================================================= */
+
+.gifts-wedding-section,
+.foto-section--novios,
+.full-width-photo,
+.foto-section {
+  position: relative;
+  overflow: visible;
+}
+
+
+.section-overlap-decoration--gifts-photo {
+  position: relative;
+  height: 0;
+  z-index: 40;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+.section-overlap-decoration--gifts-photo img {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  width: 230px;
+  height: auto;
+  display: block;
+
+  transform: translate(12%, -52%) scaleX(-1);
+  z-index: 40;
+}
+
+/* =========================================================
+   ITINERARIO / TIMELINE
+========================================================= */
+
+.timeline-section {
+  position: relative;
+  background:
+    var(--color-background);
+  padding:
+    110px 24px 120px;
+  overflow: hidden;
+}
+
+.timeline-section__container {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.timeline-section__eyebrow {
+  margin-bottom:
+    0.7rem;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.82rem;
+
+  font-weight:
+    400;
+
+  letter-spacing:
+    0.28em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    var(--color-text-light);
+}
+.timeline-section__title {
+  margin:
+    0
+    0
+    3.5rem;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      3.6rem,
+      8vw,
+      5.8rem
+    );
+
+  font-weight:
+    500;
+
+  line-height:
+    1;
+
+  letter-spacing:
+    0;
+
+  text-transform:
+    none;
+
+  color:
+    var(--color-primary);
+}
+
+
+.timeline {
+  position:
+    relative;
+
+  width:
+    100%;
+
+  max-width:
+    620px;
+
+  margin:
+    0 auto;
+
+  padding:
+    20px
+    0
+    24px;
+}
+
+.timeline__line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgba(151, 122, 112, 0.75);
+}
+
+.timeline__start,
+.timeline__end {
+  position: absolute;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: rgba(151, 122, 112, 0.85);
+}
+
+.timeline__start {
+  top: -2px;
+}
+
+.timeline__end {
+  bottom: -2px;
+}
+
+.timeline__item {
+  position:
+    relative;
+
+  width:
+    50%;
+
+  padding:
+    10px
+    0;
+}
+
+
+.timeline__item--left {
+  margin-right:
+    auto;
+
+  padding-right:
+    42px;
+
+  text-align:
+    right;
+}
+
+
+.timeline__item--right {
+  margin-left:
+    auto;
+
+  padding-left:
+    42px;
+
+  text-align:
+    left;
+}
+
+
+.timeline__content {
+  position: relative;
+    min-height:
+    125px;
+}
+
+.timeline__marker {
+  position:
+    absolute;
+
+  top:
+    30px;
+
+  width:
+    42px;
+
+  height:
+    2px;
+
+  background:
+    rgba(151, 122, 112, 0.75);
+}
+
+
+.timeline__item--left .timeline__marker {
+  right:
+    -42px;
+}
+
+
+.timeline__item--right .timeline__marker {
+  left:
+    -42px;
+}
+
+.timeline__icon {
+  width:
+    54px;
+
+  height:
+    54px;
+
+  margin-bottom:
+    8px;
+}
+
+.timeline__item--left .timeline__icon {
+  margin-left: auto;
+}
+
+.timeline__item--right .timeline__icon {
+  margin-right: auto;
+}
+
+.timeline__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timeline__time {
+  margin:
+    0;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      1.7rem,
+      2.8vw,
+      2.15rem
+    );
+
+  font-weight:
+    400;
+
+  line-height:
+    1;
+
+  color:
+    var(--color-primary);
+}
+.timeline__label {
+  margin:
+    0;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.9rem;
+
+  font-weight:
+    400;
+
+  line-height:
+    1.55;
+
+  letter-spacing:
+    0.14em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    var(--color-primary);
+}
+
+
+.timeline__subtext {
+  margin:
+    0.2rem
+    0
+    0;
+
+  font-family:
+    var(--font-body);
+
+  font-size:
+    0.76rem;
+
+  line-height:
+    1.5;
+
+  letter-spacing:
+    0.09em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    var(--color-text-light);
+}
+
+.timeline-section__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.95rem;
+  color: var(--color-text-light);
+}
+
+.timeline-section__title {
+  font-family: var(--font-title);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1;
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   CIERRE FINAL ROSA
+========================================================= */
+
+.final-wedding-section {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 70svh;
+
+  padding:
+    7rem
+    var(--container-padding);
+
+  overflow: visible;
+
+  background:
+    var(--color-secondary);
+
+  color:
+    var(--color-white);
+
+  text-align: center;
+
+  z-index: 1;
+}
+
+
+.final-wedding-section .container {
+  position: relative;
+
+  z-index: 3;
+}
+
+
+.final-wedding {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width:
+    min(100%, 700px);
+
+  margin:
+    0 auto;
+}
+
+
+.final-wedding__icon {
+  display: block;
+
+  width: 90px;
+  height: auto;
+
+  margin:
+    0
+    auto
+    2rem;
+}
+
+
+.final-wedding__title {
+  margin: 0;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    clamp(
+      4rem,
+      9vw,
+      7rem
+    );
+
+  font-weight: 500;
+
+  line-height: 1;
+
+  color:
+    var(--color-white);
+}
+
+
+/* =========================================================
+   HOJAS ENTRE ITINERARIO Y CIERRE FINAL
+========================================================= */
+
+.section-overlap-decoration--timeline-final {
+  top: -95px;
+  left: -35px;
+
+  z-index: 20;
+}
+
+
+.section-overlap-decoration--timeline-final img {
+  display: block;
+
+  width: 245px;
+  height: auto;
+
+  transform:
+    rotate(8deg);
+}

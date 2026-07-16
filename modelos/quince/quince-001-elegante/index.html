@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Invitación digital para evento"
+  >
+
+  <title>Invitación | Save Your Date</title>
+
+  <!-- Favicon -->
+  <link
+    rel="icon"
+    type="image/png"
+    href="assets/icons/favicon.png"
+  >
+
+  <!-- =========================
+       ESTILOS
+  ========================== -->
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+  <!-- =========================
+       PANTALLA DE BIENVENIDA
+  ========================== -->
+
+  <div
+    id="welcome-screen"
+    class="welcome-screen"
+    aria-hidden="false"
+  >
+
+    <div class="welcome-screen__content">
+
+      <p
+        id="welcome-pretitle"
+        class="welcome-screen__pretitle"
+      >
+        Estás invitado a
+      </p>
+
+      <h1
+        id="welcome-title"
+        class="welcome-screen__title"
+      >
+        Nombre del evento
+      </h1>
+
+      <p
+        id="welcome-message"
+        class="welcome-screen__message"
+      >
+        Tenemos algo especial para compartir contigo
+      </p>
+
+      <div class="welcome-screen__actions">
+
+        <button
+          id="enter-with-music"
+          class="btn btn--primary"
+          type="button"
+        >
+          Entrar con música
+        </button>
+
+        <button
+          id="enter-without-music"
+          class="btn btn--secondary"
+          type="button"
+        >
+          Entrar sin música
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       CONTENIDO PRINCIPAL
+  ========================== -->
+
+  <div
+    id="site-wrapper"
+    class="site-wrapper"
+  >
+
+
+    <!-- =========================
+         PORTADA
+    ========================== -->
+
+    <header
+      id="hero"
+      class="hero section"
+    >
+
+      <div
+        id="hero-background"
+        class="hero__background"
+      ></div>
+
+      <div class="hero__overlay"></div>
+
+      <div class="hero__content container">
+
+        <p
+          id="hero-pretitle"
+          class="hero__pretitle"
+        >
+          Te invitamos a celebrar
+        </p>
+
+        <h1
+          id="hero-title"
+          class="hero__title"
+        >
+          Nombre
+        </h1>
+
+        <p
+          id="hero-subtitle"
+          class="hero__subtitle"
+        >
+          Un momento muy especial
+        </p>
+
+        <div
+          id="hero-date"
+          class="hero__date"
+        >
+          Fecha del evento
+        </div>
+
+      </div>
+
+      <button
+        id="scroll-down"
+        class="hero__scroll"
+        type="button"
+        aria-label="Continuar"
+      >
+        <span></span>
+      </button>
+
+    </header>
+
+
+    <main>
+
+
+      <!-- =========================
+           CUENTA REGRESIVA
+      ========================== -->
+
+      <section
+        id="countdown-section"
+        class="section section--countdown"
+        data-section="countdown"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="countdown-eyebrow"
+              class="section-heading__eyebrow"
+            >
+              Falta muy poco
+            </p>
+
+            <h2
+              id="countdown-title"
+              class="section-heading__title"
+            >
+              Cuenta regresiva
+            </h2>
+
+          </div>
+
+
+          <div
+            id="countdown"
+            class="countdown"
+            aria-label="Cuenta regresiva para el evento"
+          >
+
+            <div class="countdown__item">
+              <span
+                id="countdown-days"
+                class="countdown__number"
+              >
+                00
+              </span>
+
+              <span class="countdown__label">
+                Días
+              </span>
+            </div>
+
+
+            <span
+              class="countdown__separator"
+              aria-hidden="true"
+            >
+              :
+            </span>
+
+
+            <div class="countdown__item">
+              <span
+                id="countdown-hours"
+                class="countdown__number"
+              >
+                00
+              </span>
+
+              <span class="countdown__label">
+                Horas
+              </span>
+            </div>
+
+
+            <span
+              class="countdown__separator"
+              aria-hidden="true"
+            >
+              :
+            </span>
+
+
+            <div class="countdown__item">
+              <span
+                id="countdown-minutes"
+                class="countdown__number"
+              >
+                00
+              </span>
+
+              <span class="countdown__label">
+                Minutos
+              </span>
+            </div>
+
+
+            <span
+              class="countdown__separator"
+              aria-hidden="true"
+            >
+              :
+            </span>
+
+
+            <div class="countdown__item">
+              <span
+                id="countdown-seconds"
+                class="countdown__number"
+              >
+                00
+              </span>
+
+              <span class="countdown__label">
+                Segundos
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           INFORMACIÓN DEL EVENTO
+      ========================== -->
+
+      <section
+        id="event-section"
+        class="section section--event"
+        data-section="event"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="event-eyebrow"
+              class="section-heading__eyebrow"
+            >
+              Guardá la fecha
+            </p>
+
+            <h2
+              id="event-title"
+              class="section-heading__title"
+            >
+              El evento
+            </h2>
+
+          </div>
+
+
+          <div class="event-card">
+
+            <div class="event-card__icon">
+              <img
+                id="event-icon"
+                src="assets/icons/calendar.svg"
+                alt=""
+              >
+            </div>
+
+
+            <p
+              id="event-day"
+              class="event-card__day"
+            >
+              Sábado
+            </p>
+
+
+            <p
+              id="event-date"
+              class="event-card__date"
+            >
+              00 de mes de 0000
+            </p>
+
+
+            <p
+              id="event-time"
+              class="event-card__time"
+            >
+              21:00
+            </p>
+
+
+            <p
+              id="event-venue"
+              class="event-card__venue"
+            >
+              Nombre del lugar
+            </p>
+
+
+            <p
+              id="event-address"
+              class="event-card__address"
+            >
+              Dirección del evento
+            </p>
+
+
+            <button
+              id="open-location"
+              class="btn btn--outline"
+              type="button"
+            >
+              Cómo llegar
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           UBICACIÓN
+      ========================== -->
+
+      <section
+        id="location-section"
+        class="section section--location"
+        data-section="location"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p class="section-heading__eyebrow">
+              Te esperamos
+            </p>
+
+            <h2
+              id="location-title"
+              class="section-heading__title"
+            >
+              Ubicación
+            </h2>
+
+          </div>
+
+
+          <div class="location-card">
+
+            <div class="location-card__icon">
+
+              <img
+                src="assets/icons/location.svg"
+                alt=""
+              >
+
+            </div>
+
+
+            <h3
+              id="location-name"
+              class="location-card__name"
+            >
+              Nombre del lugar
+            </h3>
+
+
+            <p
+              id="location-address"
+              class="location-card__address"
+            >
+              Dirección
+            </p>
+
+
+            <div class="location-card__actions">
+
+              <a
+                id="location-google-maps"
+                class="btn btn--primary"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Google Maps
+              </a>
+
+
+              <a
+                id="location-waze"
+                class="btn btn--secondary"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Waze
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           DRESS CODE
+      ========================== -->
+
+      <section
+        id="dresscode-section"
+        class="section section--dresscode"
+        data-section="dressCode"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="dresscode-eyebrow"
+              class="section-heading__eyebrow"
+            >
+              Para la ocasión
+            </p>
+
+            <h2
+              id="dresscode-title"
+              class="section-heading__title"
+            >
+              Dress Code
+            </h2>
+
+          </div>
+
+
+          <div class="dresscode-card">
+
+            <div class="dresscode-card__icon">
+
+              <img
+                id="dresscode-icon"
+                src="assets/icons/dress-code.svg"
+                alt=""
+              >
+
+            </div>
+
+
+            <p
+              id="dresscode-description"
+              class="dresscode-card__description"
+            >
+              Elegante
+            </p>
+
+
+            <p
+              id="dresscode-note"
+              class="dresscode-card__note"
+            ></p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           GALERÍA
+      ========================== -->
+
+      <section
+        id="gallery-section"
+        class="section section--gallery"
+        data-section="gallery"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="gallery-eyebrow"
+              class="section-heading__eyebrow"
+            >
+              Algunos recuerdos
+            </p>
+
+            <h2
+              id="gallery-title"
+              class="section-heading__title"
+            >
+              Galería
+            </h2>
+
+          </div>
+
+
+          <div
+            id="gallery"
+            class="gallery"
+          >
+
+            <!-- Las imágenes se generan desde JavaScript -->
+
+          </div>
+
+
+          <div
+            id="gallery-dots"
+            class="gallery-dots"
+            aria-hidden="true"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           REGALOS
+      ========================== -->
+
+      <section
+        id="gifts-section"
+        class="section section--gifts"
+        data-section="gifts"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="gifts-eyebrow"
+              class="section-heading__eyebrow"
+            >
+              Un detalle
+            </p>
+
+            <h2
+              id="gifts-title"
+              class="section-heading__title"
+            >
+              Regalos
+            </h2>
+
+          </div>
+
+
+          <div class="gifts-card">
+
+            <div class="gifts-card__icon">
+
+              <img
+                id="gifts-icon"
+                src="assets/icons/gift.svg"
+                alt=""
+              >
+
+            </div>
+
+
+            <p
+              id="gifts-message"
+              class="gifts-card__message"
+            >
+              Tu presencia es nuestro mejor regalo.
+            </p>
+
+
+            <button
+              id="open-gifts-modal"
+              class="btn btn--outline"
+              type="button"
+            >
+              Ver información
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           PLAYLIST
+      ========================== -->
+
+      <section
+        id="playlist-section"
+        class="section section--playlist"
+        data-section="playlist"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="playlist-eyebrow"
+              class="section-heading__eyebrow"
+            >
+              Hagamos juntos la fiesta
+            </p>
+
+            <h2
+              id="playlist-title"
+              class="section-heading__title"
+            >
+              Playlist
+            </h2>
+
+          </div>
+
+
+          <div class="playlist-card">
+
+            <div class="playlist-card__icon">
+
+              <img
+                id="playlist-icon"
+                src="assets/icons/music.svg"
+                alt=""
+              >
+
+            </div>
+
+
+            <p
+              id="playlist-message"
+              class="playlist-card__message"
+            >
+              Sugerinos una canción que no puede faltar.
+            </p>
+
+
+            <button
+              id="open-playlist-modal"
+              class="btn btn--outline"
+              type="button"
+            >
+              Sugerir canción
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           CONFIRMACIÓN DE ASISTENCIA
+      ========================== -->
+
+      <section
+        id="rsvp-section"
+        class="section section--rsvp"
+        data-section="rsvp"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="rsvp-eyebrow"
+              class="section-heading__eyebrow"
+            >
+              Queremos contar contigo
+            </p>
+
+            <h2
+              id="rsvp-title"
+              class="section-heading__title"
+            >
+              Confirmar asistencia
+            </h2>
+
+          </div>
+
+
+          <div class="rsvp-card">
+
+            <p
+              id="rsvp-message"
+              class="rsvp-card__message"
+            >
+              Por favor, confirmá tu asistencia.
+            </p>
+
+
+            <button
+              id="open-rsvp-modal"
+              class="btn btn--primary"
+              type="button"
+            >
+              Confirmar asistencia
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           MENSAJE FINAL
+      ========================== -->
+
+      <section
+        id="closing-section"
+        class="section section--closing"
+        data-section="closing"
+      >
+
+        <div class="container">
+
+          <div class="closing">
+
+            <p
+              id="closing-pretitle"
+              class="closing__pretitle"
+            >
+              Nos encantará compartir
+            </p>
+
+
+            <h2
+              id="closing-title"
+              class="closing__title"
+            >
+              Este momento contigo
+            </h2>
+
+
+            <p
+              id="closing-message"
+              class="closing__message"
+            >
+              Gracias por ser parte.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer
+      id="footer"
+      class="footer"
+    >
+
+      <div class="container footer__content">
+
+        <p
+          id="footer-event-name"
+          class="footer__event-name"
+        >
+          Nombre
+        </p>
+
+
+        <p class="footer__brand">
+          Invitación creada por
+          <a
+            href="https://saveyourdate.site"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Save Your Date
+          </a>
+        </p>
+
+      </div>
+
+    </footer>
+
+
+  </div>
+
+
+  <!-- =========================
+       BOTÓN DE MÚSICA
+  ========================== -->
+
+  <button
+    id="music-toggle"
+    class="music-toggle"
+    type="button"
+    aria-label="Activar o pausar música"
+    aria-pressed="false"
+  >
+
+    <img
+      id="music-toggle-icon"
+      src="assets/icons/music.svg"
+      alt=""
+    >
+
+  </button>
+
+
+  <!-- =========================
+       AUDIO
+  ========================== -->
+
+  <audio
+    id="background-music"
+    loop
+    preload="metadata"
+  >
+    <source
+      id="background-music-source"
+      src=""
+      type="audio/mpeg"
+    >
+  </audio>
+
+
+  <!-- =========================
+       MODAL GENERAL
+       UBICACIÓN
+  ========================== -->
+
+  <div
+    id="location-modal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="location-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <h2
+        id="location-modal-title"
+        class="modal__title"
+      >
+        Cómo llegar
+      </h2>
+
+
+      <p
+        id="location-modal-address"
+        class="modal__text"
+      ></p>
+
+
+      <div class="modal__actions">
+
+        <a
+          id="location-modal-maps"
+          class="btn btn--primary"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Google Maps
+        </a>
+
+
+        <a
+          id="location-modal-waze"
+          class="btn btn--secondary"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Waze
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       MODAL REGALOS
+  ========================== -->
+
+  <div
+    id="gifts-modal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="gifts-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <h2
+        id="gifts-modal-title"
+        class="modal__title"
+      >
+        Regalos
+      </h2>
+
+
+      <p
+        id="gifts-modal-message"
+        class="modal__text"
+      ></p>
+
+
+      <div
+        id="gifts-details"
+        class="gifts-details"
+      >
+        <!-- Se genera desde JavaScript -->
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       MODAL PLAYLIST
+  ========================== -->
+
+  <div
+    id="playlist-modal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="playlist-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <h2
+        id="playlist-modal-title"
+        class="modal__title"
+      >
+        Sugerí una canción
+      </h2>
+
+
+      <form
+        id="playlist-form"
+        class="form"
+      >
+
+        <div class="form__group">
+
+          <label
+            for="playlist-name"
+            class="form__label"
+          >
+            Tu nombre
+          </label>
+
+          <input
+            id="playlist-name"
+            class="form__input"
+            type="text"
+            name="name"
+            autocomplete="name"
+          >
+
+        </div>
+
+
+        <div class="form__group">
+
+          <label
+            for="playlist-song"
+            class="form__label"
+          >
+            Canción
+          </label>
+
+          <input
+            id="playlist-song"
+            class="form__input"
+            type="text"
+            name="song"
+            required
+          >
+
+        </div>
+
+
+        <div class="form__group">
+
+          <label
+            for="playlist-link"
+            class="form__label"
+          >
+            Link opcional
+          </label>
+
+          <input
+            id="playlist-link"
+            class="form__input"
+            type="url"
+            name="link"
+          >
+
+        </div>
+
+
+        <button
+          class="btn btn--primary"
+          type="submit"
+        >
+          Enviar canción
+        </button>
+
+
+        <p
+          id="playlist-form-status"
+          class="form__status"
+          aria-live="polite"
+        ></p>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       MODAL RSVP
+  ========================== -->
+
+  <div
+    id="rsvp-modal"
+    class="modal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+
+    <div
+      class="modal__dialog modal__dialog--large"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="rsvp-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <h2
+        id="rsvp-modal-title"
+        class="modal__title"
+      >
+        Confirmar asistencia
+      </h2>
+
+
+      <p
+        id="rsvp-modal-message"
+        class="modal__text"
+      >
+        Seleccioná la asistencia de cada invitado.
+      </p>
+
+
+      <div
+        id="guest-list"
+        class="guest-list"
+      >
+        <!-- Se genera dinámicamente -->
+      </div>
+
+
+      <div
+        id="rsvp-extra-fields"
+        class="rsvp-extra-fields"
+      >
+
+        <div class="form__group">
+
+          <label
+            for="rsvp-comment"
+            class="form__label"
+          >
+            Comentario
+          </label>
+
+          <textarea
+            id="rsvp-comment"
+            class="form__textarea"
+            name="comment"
+            rows="4"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+
+      <button
+        id="submit-rsvp"
+        class="btn btn--primary"
+        type="button"
+      >
+        Guardar confirmación
+      </button>
+
+
+      <p
+        id="rsvp-status"
+        class="form__status"
+        aria-live="polite"
+      ></p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       LIGHTBOX GALERÍA
+  ========================== -->
+
+  <div
+    id="gallery-lightbox"
+    class="lightbox"
+    aria-hidden="true"
+  >
+
+    <button
+      id="lightbox-close"
+      class="lightbox__close"
+      type="button"
+      aria-label="Cerrar galería"
+    >
+      ×
+    </button>
+
+
+    <button
+      id="lightbox-prev"
+      class="lightbox__nav lightbox__nav--prev"
+      type="button"
+      aria-label="Imagen anterior"
+    >
+      ‹
+    </button>
+
+
+    <img
+      id="lightbox-image"
+      class="lightbox__image"
+      src=""
+      alt=""
+    >
+
+
+    <button
+      id="lightbox-next"
+      class="lightbox__nav lightbox__nav--next"
+      type="button"
+      aria-label="Imagen siguiente"
+    >
+      ›
+    </button>
+
+  </div>
+
+
+  <!-- =========================
+       SCRIPTS
+  ========================== -->
+
+  <script src="config.js"></script>
+
+  <script src="js/utils.js"></script>
+  <script src="js/render-config.js"></script>
+  <script src="js/modals.js"></script>
+  <script src="js/countdown.js"></script>
+  <script src="js/music.js"></script>
+  <script src="js/gallery.js"></script>
+  <script src="js/playlist.js"></script>
+  <script src="js/rsvp.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>

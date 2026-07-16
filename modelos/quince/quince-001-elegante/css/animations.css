@@ -1,0 +1,420 @@
+/* =========================================================
+   ANIMACIONES GENERALES
+========================================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@keyframes fadeLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+@keyframes fadeRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* =========================================================
+   CLASES DE ANIMACIÓN
+========================================================= */
+
+.animate-fade-in {
+  animation:
+    fadeIn
+    0.7s
+    ease
+    both;
+}
+
+
+.animate-fade-up {
+  animation:
+    fadeUp
+    0.7s
+    ease
+    both;
+}
+
+
+.animate-fade-down {
+  animation:
+    fadeDown
+    0.7s
+    ease
+    both;
+}
+
+
+.animate-fade-left {
+  animation:
+    fadeLeft
+    0.7s
+    ease
+    both;
+}
+
+
+.animate-fade-right {
+  animation:
+    fadeRight
+    0.7s
+    ease
+    both;
+}
+
+
+.animate-scale-in {
+  animation:
+    scaleIn
+    0.7s
+    ease
+    both;
+}
+
+
+/* =========================================================
+   REVEAL AL HACER SCROLL
+========================================================= */
+
+[data-animate] {
+  opacity: 0;
+
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+
+
+[data-animate="fade-up"] {
+  transform: translateY(30px);
+}
+
+
+[data-animate="fade-down"] {
+  transform: translateY(-30px);
+}
+
+
+[data-animate="fade-left"] {
+  transform: translateX(-30px);
+}
+
+
+[data-animate="fade-right"] {
+  transform: translateX(30px);
+}
+
+
+[data-animate="scale-in"] {
+  transform: scale(0.94);
+}
+
+
+[data-animate].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+
+/* =========================================================
+   DELAYS
+========================================================= */
+
+[data-delay="100"] {
+  transition-delay: 0.1s;
+}
+
+
+[data-delay="200"] {
+  transition-delay: 0.2s;
+}
+
+
+[data-delay="300"] {
+  transition-delay: 0.3s;
+}
+
+
+[data-delay="400"] {
+  transition-delay: 0.4s;
+}
+
+
+[data-delay="500"] {
+  transition-delay: 0.5s;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+@keyframes heroZoom {
+  from {
+    transform: scale(1.02);
+  }
+
+  to {
+    transform: scale(1.08);
+  }
+}
+
+
+.hero__background {
+  animation:
+    heroZoom
+    14s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+/* =========================================================
+   FLECHA DE SCROLL
+========================================================= */
+
+@keyframes scrollBounce {
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(45deg);
+  }
+
+  50% {
+    transform:
+      translateY(8px)
+      rotate(45deg);
+  }
+}
+
+
+.hero__scroll span {
+  animation:
+    scrollBounce
+    1.8s
+    ease-in-out
+    infinite;
+}
+
+
+/* =========================================================
+   BOTÓN DE MÚSICA
+========================================================= */
+
+@keyframes musicPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+
+.music-toggle.is-playing {
+  animation:
+    musicPulse
+    2s
+    ease-in-out
+    infinite;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal__dialog {
+  transform:
+    translateY(20px)
+    scale(0.98);
+
+  opacity: 0;
+
+  transition:
+    transform var(--transition-normal),
+    opacity var(--transition-normal);
+}
+
+
+.modal.is-open .modal__dialog {
+  transform:
+    translateY(0)
+    scale(1);
+
+  opacity: 1;
+}
+
+
+/* =========================================================
+   LIGHTBOX
+========================================================= */
+
+.lightbox__image {
+  transform: scale(0.96);
+
+  opacity: 0;
+
+  transition:
+    transform var(--transition-normal),
+    opacity var(--transition-normal);
+}
+
+
+.lightbox.is-open .lightbox__image {
+  transform: scale(1);
+
+  opacity: 1;
+}
+
+
+/* =========================================================
+   GALERÍA
+========================================================= */
+
+.gallery__item {
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+
+.gallery__item:hover {
+  transform: translateY(-4px);
+
+  box-shadow: var(--shadow-md);
+}
+
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.btn {
+  position: relative;
+
+  overflow: hidden;
+}
+
+
+.btn::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  opacity: 0;
+
+  transition:
+    opacity var(--transition-fast);
+}
+
+
+.btn:hover::after {
+  opacity: 1;
+}
+
+
+/* =========================================================
+   APARICIÓN DEL SITIO
+========================================================= */
+
+.site-wrapper {
+  animation:
+    fadeIn
+    0.8s
+    ease
+    both;
+}
+
+
+/* =========================================================
+   RESPETO POR REDUCCIÓN DE MOVIMIENTO
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .hero__background,
+  .hero__scroll span,
+  .music-toggle.is-playing {
+    animation: none;
+  }
+
+
+  [data-animate] {
+    opacity: 1;
+    transform: none;
+  }
+
+}

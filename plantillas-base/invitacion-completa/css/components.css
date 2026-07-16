@@ -1,0 +1,907 @@
+/* =========================================================
+   PAGE LOADER
+========================================================= */
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100dvh;
+
+  background: var(--color-background);
+
+  z-index: 99999;
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 0.6s ease,
+    visibility 0.6s ease;
+}
+
+.page-loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.page-loader__heart {
+  width: 82px;
+  height: auto;
+  overflow: visible;
+}
+
+/* =========================================================
+   WELCOME SCREEN
+========================================================= */
+
+.welcome-screen__pretitle {
+  margin-bottom: var(--space-xs);
+
+  font-size: var(--font-size-sm);
+
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  color: var(--color-text-light);
+}
+
+
+.welcome-screen__title {
+  margin-bottom: var(--space-md);
+
+  font-size: clamp(
+    3rem,
+    10vw,
+    7rem
+  );
+
+  color: var(--color-primary);
+}
+
+
+.welcome-screen__message {
+  width: min(100%, 500px);
+
+  margin:
+    0 auto
+    var(--space-md);
+
+  font-size: var(--font-size-md);
+
+  color: var(--color-text-light);
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero__pretitle {
+  margin-bottom: var(--space-sm);
+
+  font-size: var(--font-size-sm);
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+
+.hero__title {
+  margin-bottom: var(--space-sm);
+
+  font-size: var(--font-size-hero);
+
+  color: inherit;
+}
+
+
+.hero__subtitle {
+  margin-bottom: var(--space-md);
+
+  font-size: clamp(
+    1rem,
+    2vw,
+    1.35rem
+  );
+}
+
+
+.hero__date {
+  font-size: var(--font-size-md);
+
+  letter-spacing: 0.08em;
+}
+
+/* =========================================================
+   DECORACIÓN SUPERIOR DE PORTADA
+========================================================= */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero__top-decoration {
+  position: absolute;
+
+  top: -10px;
+  left: 50%;
+
+  width: 110%;
+  max-width: none;
+  height: auto;
+
+  transform: translateX(-50%);
+
+  z-index: 2;
+  opacity: var(--hero-decoration-opacity);
+  
+  pointer-events: none;
+}
+
+.hero__overlay {
+  z-index: 1;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 3;
+}
+
+.hero__scroll {
+  z-index: 3;
+}
+
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
+.countdown__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  min-width: 72px;
+}
+
+
+.countdown__number {
+  font-family: var(--font-display);
+
+  font-size: clamp(
+    2.4rem,
+    8vw,
+    5rem
+  );
+
+  line-height: 1;
+
+  color: var(--color-primary);
+}
+
+
+.countdown__label {
+  margin-top: 0.5rem;
+
+  font-size: var(--font-size-xs);
+
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  color: var(--color-text-light);
+}
+
+
+.countdown__separator {
+  font-family: var(--font-display);
+
+  font-size: clamp(
+    2rem,
+    6vw,
+    4rem
+  );
+
+  line-height: 1;
+
+  color: var(--color-primary);
+}
+
+
+/* =========================================================
+   TARJETAS PRINCIPALES
+========================================================= */
+
+.event-card,
+.location-card,
+.dresscode-card,
+.gifts-card,
+.playlist-card,
+.rsvp-card {
+  padding: var(--space-xl);
+
+  border-radius: var(--radius-lg);
+
+  background: var(--color-surface);
+
+  box-shadow: var(--shadow-sm);
+}
+
+
+.event-card__icon,
+.location-card__icon,
+.dresscode-card__icon,
+.gifts-card__icon,
+.playlist-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 64px;
+  height: 64px;
+
+  margin:
+    0 auto
+    var(--space-md);
+}
+
+
+.event-card__icon img,
+.location-card__icon img,
+.dresscode-card__icon img,
+.gifts-card__icon img,
+.playlist-card__icon img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+
+/* =========================================================
+   EVENTO
+========================================================= */
+
+.event-card__day {
+  margin-bottom: 0.25rem;
+
+  font-size: var(--font-size-md);
+
+  color: var(--color-text-light);
+}
+
+
+.event-card__date {
+  margin-bottom: 0.5rem;
+
+  font-family: var(--font-display);
+  font-size: clamp(
+    1.8rem,
+    4vw,
+    2.8rem
+  );
+
+  color: var(--color-primary);
+}
+
+
+.event-card__time {
+  margin-bottom: var(--space-md);
+
+  font-size: var(--font-size-lg);
+}
+
+
+.event-card__venue {
+  margin-bottom: 0.35rem;
+
+  font-weight: 600;
+}
+
+
+.event-card__address {
+  margin-bottom: var(--space-lg);
+
+  color: var(--color-text-light);
+}
+
+
+/* =========================================================
+   UBICACIÓN
+========================================================= */
+
+.location-card__name {
+  margin-bottom: 0.35rem;
+
+  font-size: var(--font-size-lg);
+
+  color: var(--color-primary);
+}
+
+
+.location-card__address {
+  margin-bottom: var(--space-lg);
+
+  color: var(--color-text-light);
+}
+
+
+.location-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  gap: var(--space-sm);
+}
+
+
+/* =========================================================
+   DRESS CODE
+========================================================= */
+
+.dresscode-card__description {
+  margin-bottom: var(--space-xs);
+
+  font-family: var(--font-display);
+  font-size: clamp(
+    1.8rem,
+    4vw,
+    2.8rem
+  );
+
+  color: var(--color-primary);
+}
+
+
+.dresscode-card__note {
+  margin-bottom: 0;
+
+  color: var(--color-text-light);
+}
+
+
+/* =========================================================
+   GALERÍA
+========================================================= */
+
+.gallery__item {
+  position: relative;
+
+  aspect-ratio: 4 / 5;
+
+  overflow: hidden;
+
+  border-radius: var(--radius-md);
+
+  background: var(--color-surface);
+
+  cursor: pointer;
+}
+
+
+.gallery__item img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform var(--transition-slow);
+}
+
+
+.gallery__item:hover img {
+  transform: scale(1.04);
+}
+
+
+.gallery-dot {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(0, 0, 0, 0.2);
+}
+
+
+.gallery-dot.is-active {
+  background: var(--color-primary);
+}
+
+
+/* =========================================================
+   REGALOS
+========================================================= */
+
+.gifts-card__message,
+.playlist-card__message,
+.rsvp-card__message {
+  width: min(100%, 500px);
+
+  margin:
+    0 auto
+    var(--space-lg);
+
+  color: var(--color-text-light);
+}
+
+
+.gifts-details {
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--space-sm);
+
+  margin-top: var(--space-lg);
+}
+
+
+.gifts-details__item {
+  display: flex;
+  justify-content: space-between;
+
+  gap: var(--space-lg);
+
+  padding-bottom: var(--space-sm);
+
+  border-bottom:
+    1px solid
+    var(--color-border);
+}
+
+
+.gifts-details__label {
+  font-weight: 600;
+}
+
+
+.gifts-details__value {
+  text-align: right;
+
+  color: var(--color-text-light);
+}
+
+
+/* =========================================================
+   MODALES
+========================================================= */
+
+.modal__dialog {
+  padding: var(--space-xl);
+
+  border-radius: var(--radius-lg);
+
+  background: var(--color-surface);
+
+  box-shadow: var(--shadow-lg);
+}
+
+
+.modal__close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  font-size: 2rem;
+  line-height: 1;
+
+  color: var(--color-text-light);
+}
+
+
+.modal__title {
+  margin-bottom: var(--space-sm);
+
+  padding-right: 36px;
+
+  font-size: clamp(
+    2rem,
+    5vw,
+    3rem
+  );
+
+  color: var(--color-primary);
+}
+
+
+.modal__text {
+  margin-bottom: var(--space-lg);
+
+  color: var(--color-text-light);
+}
+
+
+/* =========================================================
+   BOTÓN DE MÚSICA
+========================================================= */
+
+.music-toggle {
+  background: var(--color-primary);
+
+  box-shadow: var(--shadow-md);
+
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+
+.music-toggle:hover {
+  transform: translateY(-2px);
+
+  box-shadow: var(--shadow-lg);
+}
+
+
+.music-toggle img {
+  width: 24px;
+  height: 24px;
+}
+
+
+/* =========================================================
+   LIGHTBOX
+========================================================= */
+
+.lightbox__close,
+.lightbox__nav {
+  color: var(--color-white);
+}
+
+
+.lightbox__close {
+  font-size: 2.5rem;
+}
+
+
+.lightbox__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 50px;
+  height: 50px;
+
+  border-radius: 50%;
+
+  font-size: 3rem;
+
+  background:
+    rgba(255, 255, 255, 0.1);
+}
+
+
+/* =========================================================
+   RSVP - TARJETA DE INVITADO
+========================================================= */
+
+.guest-card {
+  padding: var(--space-md);
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: var(--radius-md);
+
+  background: var(--color-surface);
+}
+
+
+.guest-card__name {
+  margin-bottom: var(--space-md);
+
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+
+  color: var(--color-primary);
+}
+
+
+.guest-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: var(--space-sm);
+}
+
+
+.guest-card__option {
+  flex: 1;
+
+  min-width: 130px;
+
+  padding:
+    0.8rem
+    1rem;
+
+  border:
+    1px solid
+    var(--color-primary);
+
+  border-radius: var(--radius-pill);
+
+  color: var(--color-primary);
+
+  background: transparent;
+
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+
+.guest-card__option.is-selected {
+  color: var(--color-white);
+
+  background: var(--color-primary);
+}
+
+
+/* =========================================================
+   MENSAJE FINAL
+========================================================= */
+
+.closing {
+  width: min(100%, 700px);
+
+  margin-inline: auto;
+
+  text-align: center;
+}
+
+
+.closing__pretitle {
+  margin-bottom: var(--space-xs);
+
+  font-size: var(--font-size-sm);
+
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  color: var(--color-text-light);
+}
+
+
+.closing__title {
+  margin-bottom: var(--space-md);
+
+  font-size: clamp(
+    2.5rem,
+    7vw,
+    5rem
+  );
+
+  color: var(--color-primary);
+}
+
+
+.closing__message {
+  margin-bottom: 0;
+
+  font-size: var(--font-size-md);
+
+  color: var(--color-text-light);
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer__event-name,
+.footer__brand {
+  margin-bottom: 0;
+}
+
+
+.footer__event-name {
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+}
+
+
+.footer__brand {
+  font-size: var(--font-size-sm);
+}
+
+
+.footer__brand a {
+  font-weight: 600;
+}
+
+
+
+
+/* =========================================================
+   ESTADOS DEL FORMULARIO
+========================================================= */
+
+.form__status.is-success {
+  color: #4f7a5a;
+}
+
+.form__status.is-error {
+  color: #a34d4d;
+}
+
+.form__status.is-info {
+  color: var(--color-text-light);
+}
+
+
+/* =========================================================
+   BOTONES DESHABILITADOS
+========================================================= */
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   RSVP - RESTRICCIONES ALIMENTARIAS
+========================================================= */
+
+.guest-card__dietary {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+
+  border-top:
+    1px solid
+    var(--color-border);
+}
+
+
+.guest-card__dietary-title {
+  margin-bottom: var(--space-md);
+
+  font-weight: 500;
+}
+
+
+.guest-card__dietary-options {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.75rem;
+}
+
+
+.dietary-option {
+  display: flex;
+  align-items: center;
+
+  gap: 0.75rem;
+
+  cursor: pointer;
+}
+
+
+.dietary-option input {
+  width: 18px;
+  height: 18px;
+
+  accent-color:
+    var(--color-primary);
+}
+
+
+.guest-card__dietary-detail {
+  margin-top: var(--space-md);
+}
+
+
+.guest-list__empty {
+  margin-bottom: 0;
+
+  text-align: center;
+
+  color:
+    var(--color-text-light);
+}
+
+/* =========================================================
+   COPIAR DATOS DE REGALO
+========================================================= */
+
+.gifts-details__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: var(--space-md);
+}
+
+
+.gifts-details__content {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.25rem;
+
+  min-width: 0;
+}
+
+
+.gifts-details__value {
+  word-break: break-word;
+}
+
+
+.copy-button {
+  flex-shrink: 0;
+
+  padding:
+    0.55rem
+    0.9rem;
+
+  border:
+    1px solid
+    var(--color-primary);
+
+  border-radius:
+    var(--radius-pill);
+
+  font-size:
+    var(--font-size-xs);
+
+  color:
+    var(--color-primary);
+
+  background:
+    transparent;
+
+  transition:
+    background-color
+    var(--transition-fast),
+    color
+    var(--transition-fast);
+}
+
+
+.copy-button:hover,
+.copy-button.is-copied {
+  color:
+    var(--color-white);
+
+  background:
+    var(--color-primary);
+}
+
+.copy-button--all {
+  display: block;
+  width: fit-content;
+  margin: 1.5rem auto 0;
+}
+
+/* =========================================================
+   FOOTER LOGO
+========================================================= */
+
+.footer__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+}
+
+.footer__logo {
+  width: 110px;
+  height: auto;
+}

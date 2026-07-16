@@ -1,0 +1,2618 @@
+/* =========================================================
+   RESPONSIVE.CSS
+   MODELO BODA - ROSA BOTÁNICA
+========================================================= */
+
+
+/* =========================================================
+   TABLETS Y PANTALLAS MEDIANAS
+========================================================= */
+
+@media (max-width: 900px) {
+
+  :root {
+    --container-padding: 20px;
+    --section-padding-desktop: 5.5rem;
+
+    --flower-large-width: 260px;
+    --flower-medium-width: 190px;
+    --flower-small-width: 110px;
+  }
+
+
+  /* =======================================================
+     HERO
+  ======================================================= */
+
+  .hero {
+    padding:
+      5rem
+      var(--container-padding);
+  }
+
+
+  .hero__frame--outer {
+    width:
+      min(90%, 720px);
+
+    padding:
+      26px;
+  }
+
+
+  .hero__frame--inner {
+    padding:
+      4rem
+      2.5rem;
+  }
+
+
+  .hero__title {
+    font-size:
+      clamp(
+        3.8rem,
+        9vw,
+        5.8rem
+      );
+  }
+
+
+  .hero__text-block {
+    width:
+      min(100%, 600px);
+  }
+
+
+  .hero-hojas {
+    width:
+      150px;
+  }
+
+
+  .hero-hojas--left {
+    left:
+      -35px;
+  }
+
+
+  .hero-hojas--right {
+    top:
+      56%;
+
+    right:
+      -35px;
+  }
+
+
+  /* =======================================================
+     FECHA Y HORA
+  ======================================================= */
+
+  .wedding-date-section {
+    padding:
+      6rem
+      var(--container-padding);
+  }
+
+
+  .wedding-date-section__content {
+    gap:
+      7rem;
+  }
+
+
+  /* =======================================================
+     FOTO A ANCHO COMPLETO
+  ======================================================= */
+
+  .full-width-photo {
+    height:
+      clamp(
+        360px,
+        65vw,
+        620px
+      );
+  }
+
+
+  /* =======================================================
+     UBICACIÓN
+  ======================================================= */
+
+  .location-wedding-section {
+    padding:
+      6rem
+      var(--container-padding)
+      7rem;
+  }
+
+
+  .location-wedding__name {
+    font-size:
+      clamp(
+        3.8rem,
+        8vw,
+        6rem
+      );
+  }
+
+
+  /* =======================================================
+     RSVP
+  ======================================================= */
+
+  .rsvp-wedding-section {
+    padding:
+      6rem
+      var(--container-padding);
+  }
+
+
+  /* =======================================================
+     ITINERARIO
+  ======================================================= */
+
+  .timeline-section {
+    padding:
+      5.5rem
+      1.5rem
+      6rem;
+  }
+
+
+  .timeline-section__title {
+    font-size:
+      clamp(
+        3.4rem,
+        8vw,
+        5rem
+      );
+  }
+
+
+  .timeline {
+    max-width:
+      580px;
+  }
+
+
+  .timeline__content {
+    min-height:
+      118px;
+  }
+
+
+  /* =======================================================
+     GALERÍA
+  ======================================================= */
+
+  .gallery {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+
+  /* =======================================================
+     FOOTER
+  ======================================================= */
+
+  .footer__content {
+    padding:
+      0
+      20px;
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES
+========================================================= */
+
+@media (max-width: 600px) {
+
+  :root {
+    --container-padding: 18px;
+    --section-padding-mobile: 4rem;
+
+    --flower-large-width: 190px;
+    --flower-medium-width: 140px;
+    --flower-small-width: 90px;
+  }
+
+
+  /* =======================================================
+     GENERAL
+  ======================================================= */
+
+  body {
+    font-size:
+      0.95rem;
+  }
+
+
+  .section {
+    padding-block:
+      var(--section-padding-mobile);
+  }
+
+
+  .section-heading {
+    margin-bottom:
+      var(--space-xl);
+  }
+
+
+  .section-heading__eyebrow {
+    margin-bottom:
+      0.65rem;
+
+    font-size:
+      0.66rem;
+
+    letter-spacing:
+      0.2em;
+  }
+
+
+  .section-heading__title {
+    font-size:
+      clamp(
+        2.4rem,
+        11vw,
+        3.6rem
+      );
+
+    line-height:
+      1;
+  }
+
+/* =======================================================
+   CIERRE FINAL
+======================================================= */
+
+.final-wedding-section {
+  min-height: 60svh;
+
+  padding:
+    5rem
+    1rem;
+}
+
+
+.final-wedding__icon {
+  width: 66px;
+
+  margin-bottom:
+    1.5rem;
+}
+
+
+.final-wedding__title {
+  font-size:
+    clamp(
+      3rem,
+      15vw,
+      4.8rem
+    );
+}
+
+
+/* =======================================================
+   HOJAS ITINERARIO / CIERRE
+======================================================= */
+
+.section-overlap-decoration--timeline-final {
+  top: -62px;
+  left: -38px;
+}
+
+
+.section-overlap-decoration--timeline-final img {
+  width: 165px;
+}
+  /* =======================================================
+     BOTONES
+  ======================================================= */
+
+  .btn {
+    width:
+      100%;
+
+    min-height:
+      46px;
+
+    padding:
+      0.85rem
+      1.2rem;
+
+    font-size:
+      0.82rem;
+
+    letter-spacing:
+      0.1em;
+  }
+
+
+  /* =======================================================
+     PANTALLA DE BIENVENIDA
+  ======================================================= */
+
+  .welcome-screen {
+    padding:
+      var(--space-md);
+  }
+
+
+  .welcome-screen__content {
+    width:
+      100%;
+  }
+
+
+  .welcome-screen__title {
+    font-size:
+      clamp(
+        3.5rem,
+        18vw,
+        5.5rem
+      );
+  }
+
+
+  .welcome-screen__message {
+    width:
+      100%;
+
+    font-size:
+      0.95rem;
+  }
+
+
+  .welcome-screen__actions {
+    flex-direction:
+      column;
+
+    width:
+      100%;
+  }
+
+
+  /* =======================================================
+     HERO - ESTRUCTURA
+  ======================================================= */
+
+  .hero {
+    min-height:
+      100svh;
+
+    padding:
+      4rem
+      12px;
+
+    align-items:
+      center;
+  }
+
+
+  .hero__frame--outer {
+    width:
+      88%;
+
+    padding:
+      14px;
+
+    background:
+      rgba(
+        255,
+        255,
+        255,
+        0.44
+      );
+  }
+
+
+  .hero__frame--inner {
+    width:
+      100%;
+
+    padding:
+      3.2rem
+      1.2rem
+      3.4rem;
+  }
+
+
+  .hero__content {
+    width:
+      100%;
+  }
+
+
+  /* =======================================================
+     HERO - TEXTO
+  ======================================================= */
+
+  .hero__pretitle {
+    margin-bottom:
+      1.2rem;
+
+    font-size:
+      0.6rem;
+
+    letter-spacing:
+      0.24em;
+  }
+
+
+  .hero__title {
+    margin:
+      0;
+
+    font-size:
+      clamp(
+        2.7rem,
+        13vw,
+        4.5rem
+      );
+
+    line-height:
+      0.94;
+
+    letter-spacing:
+      0.02em;
+  }
+
+
+  .hero__ampersand {
+    margin:
+      0.15rem
+      0
+      0.25rem;
+
+    font-size:
+      clamp(
+        2.3rem,
+        11vw,
+        3.6rem
+      );
+  }
+
+
+  .hero__text-block {
+    width:
+      100%;
+
+    margin-top:
+      2.3rem;
+  }
+
+
+  .hero__text-block p {
+    margin-bottom:
+      0.8rem;
+
+    font-size:
+      0.68rem;
+
+    line-height:
+      1.65;
+
+    letter-spacing:
+      0.16em;
+  }
+
+
+  /* =======================================================
+     HERO - FLORALES
+  ======================================================= */
+
+  .hero-botanica {
+    width:
+      118%;
+  }
+
+
+  .hero-botanica--top {
+    top:
+      0;
+  }
+
+
+  .hero-botanica--bottom {
+    bottom:
+      0;
+
+    width:
+      118%;
+
+    transform:
+      translateX(-50%)
+      scaleX(-1)
+      scaleY(-1);
+  }
+
+
+  /* =======================================================
+     HERO - HOJAS LATERALES
+  ======================================================= */
+
+  .hero-hojas {
+    width:
+      105px;
+
+    opacity:
+      0.82;
+  }
+
+
+  .hero-hojas--left {
+    top:
+      44%;
+
+    left:
+      -42px;
+  }
+
+
+  .hero-hojas--right {
+    top:
+      58%;
+
+    right:
+      -42px;
+  }
+
+
+  /* =======================================================
+     FECHA Y HORA
+  ======================================================= */
+
+  .wedding-date-section {
+    min-height:
+      100svh;
+
+    padding:
+      5rem
+      1rem;
+  }
+
+
+  .wedding-date-section__content {
+    gap:
+      5.5rem;
+  }
+
+
+  .wedding-date-section__day-name,
+  .wedding-date-section__time-label {
+    font-size:
+      0.82rem;
+
+    letter-spacing:
+      0.22em;
+  }
+
+
+  .wedding-date-section__day {
+    font-size:
+      clamp(
+        6.5rem,
+        32vw,
+        9.5rem
+      );
+  }
+
+
+  .wedding-date-section__month {
+    margin-top:
+      0.8rem;
+
+    font-size:
+      clamp(
+        3.5rem,
+        18vw,
+        5.5rem
+      );
+  }
+
+
+  .wedding-date-section__year {
+    margin-top:
+      1rem;
+
+    font-size:
+      0.88rem;
+
+    letter-spacing:
+      0.18em;
+  }
+
+
+  .wedding-date-section__hour {
+    font-size:
+      clamp(
+        5rem,
+        27vw,
+        8rem
+      );
+
+    white-space:
+      nowrap;
+  }
+
+
+  .wedding-date-section__hours-word {
+    font-size:
+      clamp(
+        3rem,
+        16vw,
+        5rem
+      );
+  }
+
+
+  /* =======================================================
+     HOJAS ENTRE FECHA Y FOTO
+  ======================================================= */
+
+  .section-overlap-decoration--right {
+    right:
+      -18px;
+
+    bottom:
+      -58px;
+  }
+
+
+  .section-overlap-decoration--right img {
+    width:
+      155px;
+  }
+
+
+  /* =======================================================
+     FOTO A ANCHO COMPLETO
+  ======================================================= */
+
+  .full-width-photo {
+    height:
+      58svh;
+
+    min-height:
+      360px;
+
+    max-height:
+      560px;
+  }
+
+
+  .full-width-photo img {
+    object-position:
+      center;
+  }
+
+
+  /* =======================================================
+     DECORACIÓN REGALOS / FOTO
+  ======================================================= */
+
+  .section-overlap-decoration--gifts-photo img {
+    width:
+      170px;
+
+    transform:
+      translate(10%, -48%)
+      scaleX(-1);
+  }
+
+
+  /* =======================================================
+     UBICACIÓN
+  ======================================================= */
+
+  .location-wedding-section {
+    min-height:
+      100svh;
+
+    padding:
+      5.5rem
+      1.25rem
+      6rem;
+  }
+
+
+  .location-wedding__pretitle {
+    margin-bottom:
+      2rem;
+
+    font-size:
+      0.72rem;
+
+    line-height:
+      2;
+
+    letter-spacing:
+      0.24em;
+  }
+
+
+  .location-wedding__icon {
+    width:
+      78px;
+
+    margin-bottom:
+      1.8rem;
+  }
+
+
+  .location-wedding__venue-label {
+    margin-bottom:
+      1.2rem;
+
+    font-size:
+      0.72rem;
+
+    letter-spacing:
+      0.24em;
+  }
+
+
+  .location-wedding__name {
+    font-size:
+      clamp(
+        3rem,
+        14vw,
+        4.8rem
+      );
+
+    line-height:
+      0.94;
+  }
+
+
+  .location-wedding__address {
+    margin-top:
+      2.3rem;
+
+    font-size:
+      0.68rem;
+
+    letter-spacing:
+      0.16em;
+
+    line-height:
+      1.7;
+  }
+
+
+  .location-wedding__button {
+    width:
+      min(92%, 360px);
+
+    margin-top:
+      2.5rem;
+
+    padding:
+      0.9rem
+      1.2rem;
+  }
+
+
+  .location-wedding__button strong {
+    font-size:
+      0.82rem;
+  }
+
+
+  .location-wedding__button span {
+    font-size:
+      0.66rem;
+  }
+
+
+  /* =======================================================
+     HOJAS ENTRE UBICACIÓN Y RSVP
+  ======================================================= */
+
+  .section-overlap-decoration--left {
+    left:
+      -38px;
+
+    bottom:
+      -62px;
+  }
+
+
+  .section-overlap-decoration--left img {
+    width:
+      165px;
+  }
+
+
+  /* =======================================================
+     RSVP
+  ======================================================= */
+
+  .rsvp-wedding-section {
+    min-height:
+      65svh;
+
+    padding:
+      5rem
+      1.25rem;
+  }
+
+
+  .rsvp-wedding__icon {
+    width:
+      58px;
+
+    margin-bottom:
+      1.5rem;
+  }
+
+
+  .rsvp-wedding__pretitle {
+    font-size:
+      0.64rem;
+
+    letter-spacing:
+      0.2em;
+  }
+
+
+  .rsvp-wedding__title {
+    font-size:
+      clamp(
+        2.8rem,
+        13vw,
+        4.2rem
+      );
+  }
+
+
+  .rsvp-wedding__message {
+    margin-top:
+      2rem;
+
+    font-size:
+      0.9rem;
+  }
+
+
+  .rsvp-wedding__button {
+    width:
+      100%;
+
+    min-width:
+      0;
+
+    margin-top:
+      2rem;
+
+    padding:
+      0.9rem
+      1rem;
+
+    font-size:
+      0.76rem;
+  }
+
+
+  /* =======================================================
+     ITINERARIO
+  ======================================================= */
+
+  .timeline-section {
+    padding:
+      4.5rem
+      1rem
+      5rem;
+  }
+
+
+  .timeline-section__eyebrow {
+    margin-bottom:
+      0.55rem;
+
+    font-size:
+      0.7rem;
+
+    letter-spacing:
+      0.24em;
+  }
+
+
+  .timeline-section__title {
+    margin:
+      0
+      0
+      2.7rem;
+
+    font-family:
+      var(--font-display);
+
+    font-size:
+      clamp(
+        3rem,
+        14vw,
+        4.5rem
+      );
+
+    font-weight:
+      500;
+
+    line-height:
+      1;
+
+    letter-spacing:
+      0;
+
+    text-transform:
+      none;
+
+    color:
+      var(--color-primary);
+  }
+
+
+  .timeline {
+    position:
+      relative;
+
+    width:
+      min(100%, 360px);
+
+    margin:
+      0 auto;
+
+    padding:
+      14px
+      0
+      18px
+      28px;
+  }
+
+
+  .timeline__line,
+  .timeline__start,
+  .timeline__end {
+    left:
+      14px;
+
+    transform:
+      none;
+  }
+
+
+  .timeline__item,
+  .timeline__item--left,
+  .timeline__item--right {
+    width:
+      100%;
+
+    margin:
+      0;
+
+    padding:
+      7px
+      0
+      7px
+      38px;
+
+    text-align:
+      left;
+  }
+
+
+  .timeline__content {
+    min-height:
+      108px;
+  }
+
+
+  .timeline__marker,
+  .timeline__item--left .timeline__marker,
+  .timeline__item--right .timeline__marker {
+    top:
+      28px;
+
+    left:
+      -24px;
+
+    right:
+      auto;
+
+    width:
+      24px;
+
+    height:
+      2px;
+  }
+
+
+  .timeline__icon,
+  .timeline__item--left .timeline__icon,
+  .timeline__item--right .timeline__icon {
+    display:
+      block;
+
+    width:
+      48px;
+
+    height:
+      48px;
+
+    margin:
+      0
+      0
+      6px;
+  }
+
+
+  .timeline__time {
+    font-size:
+      1.6rem;
+
+    line-height:
+      1;
+  }
+
+
+  .timeline__label {
+    font-size:
+      0.78rem;
+
+    line-height:
+      1.5;
+
+    letter-spacing:
+      0.11em;
+  }
+
+
+  .timeline__subtext {
+    margin-top:
+      0.15rem;
+
+    font-size:
+      0.68rem;
+
+    line-height:
+      1.45;
+
+    letter-spacing:
+      0.07em;
+  }
+
+
+  /* =======================================================
+     COUNTDOWN
+  ======================================================= */
+
+  .countdown {
+    gap:
+      0.2rem;
+
+    flex-wrap:
+      nowrap;
+  }
+
+
+  .countdown__item {
+    min-width:
+      0;
+
+    flex:
+      1;
+  }
+
+
+  .countdown__number {
+    font-size:
+      clamp(
+        2rem,
+        11vw,
+        3.2rem
+      );
+  }
+
+
+  .countdown__separator {
+    flex:
+      0
+      0
+      auto;
+
+    font-size:
+      clamp(
+        1.8rem,
+        8vw,
+        2.8rem
+      );
+  }
+
+
+  .countdown__label {
+    margin-top:
+      0.4rem;
+
+    font-size:
+      0.54rem;
+
+    letter-spacing:
+      0.06em;
+  }
+
+
+  /* =======================================================
+     DECORACIONES BOTÁNICAS
+  ======================================================= */
+
+  .botanical-decoration--top-left {
+    top:
+      -15px;
+
+    left:
+      -55px;
+  }
+
+
+  .botanical-decoration--top-right {
+    top:
+      -20px;
+
+    right:
+      -60px;
+  }
+
+
+  .botanical-decoration--bottom-left {
+    bottom:
+      -25px;
+
+    left:
+      -55px;
+  }
+
+
+  .botanical-decoration--bottom-right {
+    right:
+      -55px;
+
+    bottom:
+      -25px;
+  }
+
+
+  /* =======================================================
+     DRESS CODE
+  ======================================================= */
+
+  .dresscode-card__description {
+    font-size:
+      clamp(
+        2.2rem,
+        11vw,
+        3.4rem
+      );
+  }
+
+
+  .dresscode-card__note {
+    font-size:
+      0.9rem;
+  }
+
+
+  /* =======================================================
+     REGALOS / PLAYLIST
+  ======================================================= */
+
+  .gifts-card,
+  .playlist-card {
+    width:
+      100%;
+
+    padding:
+      0;
+  }
+
+
+  .gifts-card__message,
+  .playlist-card__message {
+    width:
+      100%;
+
+    margin-bottom:
+      var(--space-lg);
+
+    font-size:
+      0.95rem;
+
+    line-height:
+      1.6;
+  }
+
+
+  /* =======================================================
+     ICONOS
+  ======================================================= */
+
+  .gifts-card__icon,
+  .playlist-card__icon,
+  .dresscode-card__icon {
+    width:
+      50px;
+
+    height:
+      50px;
+
+    margin-bottom:
+      var(--space-sm);
+  }
+
+
+  /* =======================================================
+     GALERÍA
+  ======================================================= */
+
+  .gallery {
+    grid-template-columns:
+      1fr;
+
+    gap:
+      var(--space-sm);
+  }
+
+
+  .gallery__item {
+    aspect-ratio:
+      4 / 5;
+  }
+
+
+  /* =======================================================
+     REGALOS - DATOS
+  ======================================================= */
+
+  .gifts-details__item {
+    flex-direction:
+      column;
+
+    align-items:
+      flex-start;
+
+    gap:
+      0.3rem;
+  }
+
+
+  .gifts-details__value {
+    text-align:
+      left;
+
+    word-break:
+      break-word;
+  }
+
+
+  .copy-button--all {
+    width:
+      100%;
+
+    margin-top:
+      1.5rem;
+  }
+
+
+  /* =======================================================
+     MODALES
+  ======================================================= */
+
+  .modal {
+    align-items:
+      flex-end;
+
+    padding:
+      0;
+  }
+
+
+  .modal__dialog,
+  .modal__dialog--large {
+    width:
+      100%;
+
+    max-height:
+      92svh;
+
+    padding:
+      var(--space-xl)
+      var(--space-md)
+      var(--space-lg);
+
+    border-radius:
+      var(--radius-lg)
+      var(--radius-lg)
+      0
+      0;
+
+    overflow-y:
+      auto;
+  }
+
+
+  .modal__title {
+    font-size:
+      clamp(
+        2rem,
+        10vw,
+        3rem
+      );
+  }
+
+
+  .modal__text {
+    font-size:
+      0.92rem;
+
+    line-height:
+      1.55;
+  }
+
+
+  .modal__actions {
+    flex-direction:
+      column;
+
+    width:
+      100%;
+  }
+
+
+  /* =======================================================
+     MODAL UBICACIÓN
+  ======================================================= */
+
+  #location-modal .modal__dialog {
+    width:
+      100%;
+
+    padding:
+      2.8rem
+      1.25rem
+      2rem;
+
+    border-radius:
+      18px
+      18px
+      0
+      0;
+  }
+
+
+  #location-modal .modal__title {
+    font-size:
+      clamp(
+        2.5rem,
+        12vw,
+        3.5rem
+      );
+  }
+
+
+  #location-modal .modal__text {
+    margin-bottom:
+      2rem;
+
+    font-size:
+      0.92rem;
+  }
+
+
+  #location-modal .modal__actions {
+    flex-direction:
+      column;
+
+    gap:
+      0.8rem;
+  }
+
+
+  #location-modal .modal__actions .btn {
+    flex:
+      none;
+
+    width:
+      100%;
+
+    min-height:
+      50px;
+  }
+
+
+  /* =======================================================
+     RSVP MODAL
+  ======================================================= */
+
+  .guest-card {
+    padding:
+      var(--space-md);
+  }
+
+
+  .guest-card__name {
+    margin-bottom:
+      var(--space-lg);
+
+    font-size:
+      1.3rem;
+
+    text-align:
+      center;
+  }
+
+
+  .guest-card__actions {
+    flex-direction:
+      column;
+  }
+
+
+  .guest-card__option {
+    width:
+      100%;
+
+    min-width:
+      0;
+  }
+
+
+  #submit-rsvp {
+    width:
+      100%;
+
+    margin-top:
+      2rem;
+  }
+
+
+  /* =======================================================
+     LIGHTBOX
+  ======================================================= */
+
+  .lightbox {
+    padding:
+      var(--space-sm);
+  }
+
+
+  .lightbox__image {
+    max-width:
+      100%;
+
+    max-height:
+      82svh;
+  }
+
+
+  .lightbox__nav {
+    width:
+      42px;
+
+    height:
+      42px;
+
+    font-size:
+      2.4rem;
+  }
+
+
+  /* =======================================================
+     BOTÓN DE MÚSICA
+  ======================================================= */
+
+  .music-toggle {
+    right:
+      14px;
+
+    bottom:
+      14px;
+
+    width:
+      48px;
+
+    height:
+      48px;
+  }
+
+
+  .music-toggle img {
+    width:
+      21px;
+
+    height:
+      21px;
+  }
+
+
+  /* =======================================================
+     CIERRE
+  ======================================================= */
+
+  .closing__title {
+    font-size:
+      clamp(
+        3.5rem,
+        18vw,
+        5.5rem
+      );
+
+    line-height:
+      0.86;
+  }
+
+
+  /* =======================================================
+     FOOTER
+  ======================================================= */
+
+  .footer {
+    padding:
+      var(--space-lg)
+      0
+      var(--space-md);
+  }
+
+
+  .footer__content {
+    gap:
+      1.25rem;
+
+    padding:
+      0
+      20px;
+  }
+
+
+  .footer__event-name {
+    font-size:
+      1.1rem;
+  }
+
+
+  .footer__logo {
+    width:
+      72px;
+
+    height:
+      30px;
+  }
+
+
+  .footer__copyright,
+  .footer__credits {
+    font-size:
+      0.65rem;
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES CHICOS
+========================================================= */
+
+@media (max-width: 480px) {
+
+  /* =======================================================
+     DECORACIÓN REGALOS / FOTO
+  ======================================================= */
+
+  .section-overlap-decoration--gifts-photo img {
+    width:
+      145px;
+
+    transform:
+      translate(8%, -42%)
+      scaleX(-1);
+  }
+
+
+  /* =======================================================
+     FECHA Y HORA
+  ======================================================= */
+
+  .wedding-date-section {
+    padding:
+      4.5rem
+      0.75rem;
+  }
+
+
+  .wedding-date-section__content {
+    gap:
+      5rem;
+  }
+
+
+  .wedding-date-section__day {
+    font-size:
+      7rem;
+  }
+
+
+  .wedding-date-section__month {
+    font-size:
+      3.8rem;
+  }
+
+
+  .wedding-date-section__hour {
+    font-size:
+      5.6rem;
+  }
+
+
+  .wedding-date-section__hours-word {
+    font-size:
+      3.5rem;
+  }
+
+
+  /* =======================================================
+     FOTO
+  ======================================================= */
+
+  .full-width-photo {
+    min-height:
+      330px;
+
+    height:
+      54svh;
+  }
+
+
+  /* =======================================================
+     UBICACIÓN
+  ======================================================= */
+
+  .location-wedding-section {
+    padding:
+      4.5rem
+      0.9rem
+      5.5rem;
+  }
+
+
+  .location-wedding__pretitle {
+    font-size:
+      0.64rem;
+  }
+
+
+  .location-wedding__icon {
+    width:
+      72px;
+  }
+
+
+  .location-wedding__venue-label {
+    font-size:
+      0.64rem;
+  }
+
+
+  .location-wedding__name {
+    font-size:
+      clamp(
+        2.6rem,
+        13vw,
+        4rem
+      );
+  }
+
+
+  .location-wedding__address {
+    font-size:
+      0.6rem;
+
+    letter-spacing:
+      0.12em;
+  }
+
+
+  .section-overlap-decoration--left {
+    left:
+      -38px;
+
+    bottom:
+      -52px;
+  }
+
+
+  .section-overlap-decoration--left img {
+    width:
+      145px;
+  }
+
+
+  /* =======================================================
+     RSVP
+  ======================================================= */
+
+  .rsvp-wedding-section {
+    padding:
+      4.5rem
+      0.9rem;
+  }
+
+
+  .rsvp-wedding__icon {
+    width:
+      52px;
+  }
+
+
+  .rsvp-wedding__title {
+    font-size:
+      clamp(
+        2.5rem,
+        12vw,
+        3.7rem
+      );
+  }
+
+
+  /* =======================================================
+     ITINERARIO
+  ======================================================= */
+
+  .timeline-section {
+    padding:
+      4rem
+      0.75rem
+      4.5rem;
+  }
+
+
+  .timeline-section__title {
+    margin-bottom:
+      2.3rem;
+
+    font-size:
+      clamp(
+        2.8rem,
+        15vw,
+        4rem
+      );
+  }
+
+
+  .timeline {
+    width:
+      min(100%, 330px);
+
+    padding-left:
+      24px;
+  }
+
+
+  .timeline__line,
+  .timeline__start,
+  .timeline__end {
+    left:
+      11px;
+  }
+
+
+  .timeline__item,
+  .timeline__item--left,
+  .timeline__item--right {
+    padding:
+      6px
+      0
+      6px
+      34px;
+  }
+
+
+  .timeline__content {
+    min-height:
+      98px;
+  }
+
+
+  .timeline__marker,
+  .timeline__item--left .timeline__marker,
+  .timeline__item--right .timeline__marker {
+    top:
+      25px;
+
+    left:
+      -23px;
+
+    width:
+      23px;
+  }
+
+
+  .timeline__icon,
+  .timeline__item--left .timeline__icon,
+  .timeline__item--right .timeline__icon {
+    width:
+      43px;
+
+    height:
+      43px;
+
+    margin-bottom:
+      5px;
+  }
+
+
+  .timeline__time {
+    font-size:
+      1.45rem;
+  }
+
+
+  .timeline__label {
+    font-size:
+      0.72rem;
+
+    letter-spacing:
+      0.09em;
+  }
+
+
+  .timeline__subtext {
+    font-size:
+      0.63rem;
+  }
+
+
+  /* =======================================================
+     COUNTDOWN
+  ======================================================= */
+
+  .countdown__number {
+    font-size:
+      1.85rem;
+  }
+
+
+  .countdown__separator {
+    font-size:
+      1.7rem;
+  }
+
+
+  .countdown__label {
+    font-size:
+      0.48rem;
+
+    letter-spacing:
+      0.04em;
+  }
+
+
+  /* =======================================================
+     MODALES
+  ======================================================= */
+
+  .modal__dialog,
+  .modal__dialog--large {
+    padding:
+      var(--space-xl)
+      14px
+      var(--space-lg);
+  }
+
+
+  .modal__title {
+    font-size:
+      clamp(
+        1.9rem,
+        9vw,
+        2.6rem
+      );
+  }
+
+
+  /* =======================================================
+     FOOTER
+  ======================================================= */
+
+  .footer__content {
+    padding:
+      0
+      14px;
+  }
+
+
+  .footer__event-name {
+    font-size:
+      1rem;
+  }
+
+
+  .footer__logo {
+    width:
+      64px;
+
+    height:
+      28px;
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES MUY CHICOS
+========================================================= */
+
+@media (max-width: 380px) {
+
+  :root {
+    --container-padding: 14px;
+    --section-padding-mobile: 3.5rem;
+
+    --flower-large-width: 165px;
+    --flower-medium-width: 120px;
+    --flower-small-width: 78px;
+  }
+
+
+  /* =======================================================
+     HERO
+  ======================================================= */
+
+  .hero {
+    padding:
+      3.5rem
+      8px;
+  }
+
+
+  .hero__frame--outer {
+    width:
+      90%;
+
+    padding:
+      10px;
+  }
+
+
+  .hero__frame--inner {
+    padding:
+      2.7rem
+      0.9rem
+      2.9rem;
+  }
+
+
+  .hero__pretitle {
+    font-size:
+      0.54rem;
+
+    letter-spacing:
+      0.2em;
+  }
+
+
+  .hero__title {
+    font-size:
+      clamp(
+        2.4rem,
+        12vw,
+        3.8rem
+      );
+  }
+
+
+  .hero__ampersand {
+    font-size:
+      clamp(
+        2rem,
+        10vw,
+        3rem
+      );
+  }
+
+
+  .hero__text-block {
+    margin-top:
+      1.9rem;
+  }
+
+
+  .hero__text-block p {
+    margin-bottom:
+      0.65rem;
+
+    font-size:
+      0.58rem;
+
+    letter-spacing:
+      0.12em;
+  }
+
+
+  .hero-botanica {
+    width:
+      132%;
+  }
+
+
+  .hero-botanica--bottom {
+    width:
+      132%;
+  }
+
+
+  .hero-hojas {
+    width:
+      88px;
+  }
+
+
+  .hero-hojas--left {
+    top:
+      43%;
+
+    left:
+      -38px;
+  }
+
+
+  .hero-hojas--right {
+    top:
+      59%;
+
+    right:
+      -38px;
+  }
+
+.final-wedding-section {
+  min-height: 55svh;
+
+  padding:
+    4.5rem
+    0.75rem;
+}
+
+
+.final-wedding__icon {
+  width: 56px;
+}
+
+
+.final-wedding__title {
+  font-size: 3rem;
+}
+
+
+.section-overlap-decoration--timeline-final {
+  top: -52px;
+  left: -38px;
+}
+
+
+.section-overlap-decoration--timeline-final img {
+  width: 145px;
+}
+
+  /* =======================================================
+     ITINERARIO
+  ======================================================= */
+
+  .timeline-section {
+    padding:
+      3.7rem
+      0.5rem
+      4.2rem;
+  }
+
+
+  .timeline-section__eyebrow {
+    font-size:
+      0.62rem;
+  }
+
+
+  .timeline-section__title {
+    margin-bottom:
+      2rem;
+
+    font-size:
+      2.75rem;
+  }
+
+
+  .timeline {
+    width:
+      min(100%, 300px);
+
+    padding-left:
+      21px;
+  }
+
+
+  .timeline__line,
+  .timeline__start,
+  .timeline__end {
+    left:
+      9px;
+  }
+
+
+  .timeline__item,
+  .timeline__item--left,
+  .timeline__item--right {
+    padding-left:
+      31px;
+  }
+
+
+  .timeline__content {
+    min-height:
+      91px;
+  }
+
+
+  .timeline__marker,
+  .timeline__item--left .timeline__marker,
+  .timeline__item--right .timeline__marker {
+    top:
+      23px;
+
+    left:
+      -22px;
+
+    width:
+      22px;
+  }
+
+
+  .timeline__icon,
+  .timeline__item--left .timeline__icon,
+  .timeline__item--right .timeline__icon {
+    width:
+      39px;
+
+    height:
+      39px;
+  }
+
+
+  .timeline__time {
+    font-size:
+      1.35rem;
+  }
+
+
+  .timeline__label {
+    font-size:
+      0.66rem;
+
+    letter-spacing:
+      0.08em;
+  }
+
+
+  .timeline__subtext {
+    font-size:
+      0.58rem;
+  }
+
+}
+
+
+/* =========================================================
+   ALTURA BAJA DE PANTALLA
+========================================================= */
+
+@media
+  (max-height: 650px)
+  and
+  (min-width: 601px) {
+
+  .welcome-screen {
+    overflow-y:
+      auto;
+
+    align-items:
+      flex-start;
+  }
+
+
+  .welcome-screen__content {
+    margin-block:
+      auto;
+
+    padding-block:
+      var(--space-lg);
+  }
+
+
+  .hero {
+    min-height:
+      650px;
+  }
+
+}
+
+
+/* =========================================================
+   PREFERENCIA DE MENOS MOVIMIENTO
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior:
+      auto;
+  }
+
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior:
+      auto !important;
+
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.01ms !important;
+  }
+
+}
+
+/* =========================================================
+   AJUSTES DEFINITIVOS
+   TÍTULOS, BOTONES Y CIERRE FINAL
+   Este bloque debe permanecer al final del archivo.
+========================================================= */
+
+/* =========================================================
+   TÍTULOS PRINCIPALES
+   Mismo estilo que QUINTA LOS CAPIBARAS
+========================================================= */
+
+#gifts-title,
+.timeline-section__title,
+#rsvp-title {
+  margin-left: auto;
+  margin-right: auto;
+
+  font-family:
+    var(--font-display);
+
+  font-weight:
+    600;
+
+  line-height:
+    0.94;
+
+  letter-spacing:
+    0.025em;
+
+  text-transform:
+    uppercase;
+}
+
+
+#gifts-title,
+.timeline-section__title {
+  color:
+    #a98f84;
+}
+
+
+#rsvp-title {
+  color:
+    var(--color-white);
+}
+
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+button,
+.btn,
+a.btn,
+.location-wedding__button,
+.rsvp-wedding__button,
+.guest-card__option,
+.copy-button,
+.copy-button--all {
+  border-radius:
+    10px !important;
+
+  text-transform:
+    uppercase !important;
+}
+
+
+button *,
+.btn *,
+a.btn *,
+.location-wedding__button *,
+.rsvp-wedding__button * {
+  text-transform:
+    uppercase !important;
+}
+
+
+/* =========================================================
+   TABLETS
+========================================================= */
+
+@media (max-width: 900px) {
+
+  #gifts-title,
+  .timeline-section__title,
+  #rsvp-title {
+    font-size:
+      clamp(
+        3.8rem,
+        8vw,
+        6rem
+      );
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES
+========================================================= */
+
+@media (max-width: 600px) {
+
+  #gifts-title,
+  .timeline-section__title,
+  #rsvp-title {
+    font-size:
+      clamp(
+        3rem,
+        14vw,
+        4.8rem
+      );
+
+    line-height:
+      0.94;
+
+    letter-spacing:
+      0.02em;
+  }
+
+
+  /* Cierre final compacto */
+
+  .final-wedding-section {
+    min-height:
+      210px;
+
+    padding:
+      2.6rem
+      1rem;
+  }
+
+
+  .closing {
+    width:
+      min(100%, 600px);
+
+    margin:
+      0 auto;
+
+    text-align:
+      center;
+  }
+
+
+  .closing__icon {
+    display:
+      block;
+
+    width:
+      48px;
+
+    height:
+      auto;
+
+    margin:
+      0
+      auto
+      0.75rem;
+
+    object-fit:
+      contain;
+
+    opacity:
+      1;
+
+    visibility:
+      visible;
+  }
+
+
+  .closing__message {
+    margin:
+      0;
+
+    font-family:
+      var(--font-display);
+
+    font-size:
+      clamp(
+        2.1rem,
+        11vw,
+        3rem
+      );
+
+    font-weight:
+      500;
+
+    line-height:
+      1;
+
+    color:
+      var(--color-white);
+  }
+
+
+  /* Hojas entre itinerario y cierre */
+
+  .section-overlap-decoration--timeline-final {
+    top:
+      -62px;
+
+    left:
+      -38px;
+
+    z-index:
+      20;
+  }
+
+
+  .section-overlap-decoration--timeline-final img {
+    width:
+      165px;
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES CHICOS
+========================================================= */
+
+@media (max-width: 480px) {
+
+  #gifts-title,
+  .timeline-section__title,
+  #rsvp-title {
+    font-size:
+      clamp(
+        2.6rem,
+        13vw,
+        4rem
+      );
+  }
+
+
+  .final-wedding-section {
+    min-height:
+      195px;
+
+    padding:
+      2.35rem
+      0.8rem;
+  }
+
+
+  .closing__icon {
+    width:
+      44px;
+
+    margin-bottom:
+      0.65rem;
+  }
+
+
+  .closing__message {
+    font-size:
+      clamp(
+        2rem,
+        10vw,
+        2.7rem
+      );
+  }
+
+
+  .section-overlap-decoration--timeline-final {
+    top:
+      -52px;
+
+    left:
+      -38px;
+  }
+
+
+  .section-overlap-decoration--timeline-final img {
+    width:
+      145px;
+  }
+
+}
+
+
+/* =========================================================
+   CELULARES MUY CHICOS
+========================================================= */
+
+@media (max-width: 380px) {
+
+  #gifts-title,
+  .timeline-section__title,
+  #rsvp-title {
+    font-size:
+      clamp(
+        2.4rem,
+        12.5vw,
+        3.6rem
+      );
+  }
+
+
+  .final-wedding-section {
+    min-height:
+      180px;
+
+    padding:
+      2.15rem
+      0.7rem;
+  }
+
+
+  .closing__icon {
+    width:
+      41px;
+
+    margin-bottom:
+      0.6rem;
+  }
+
+
+  .closing__message {
+    font-size:
+      2.1rem;
+  }
+
+
+  .section-overlap-decoration--timeline-final {
+    top:
+      -48px;
+  }
+
+
+  .section-overlap-decoration--timeline-final img {
+    width:
+      135px;
+  }
+
+}
