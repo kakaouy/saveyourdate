@@ -972,6 +972,8 @@ function App() {
 
   // FAQ STATE
   const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(null);
+  const [faqExpanded, setFaqExpanded] = useState(false);
+  const faqSectionRef = React.useRef<HTMLElement>(null);
 
   // SIMPLE CONTACT FORM STATE
   const [simpleContactSubmitted, setSimpleContactSubmitted] = useState(false);
@@ -1156,6 +1158,19 @@ function App() {
       setActiveFaqIndex(index);
     }
   };
+
+  useEffect(() => {
+    const section = faqSectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) {
+        setFaqExpanded(false);
+        setActiveFaqIndex(null);
+      }
+    }, { threshold: 0.08 });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
 
   // Check entered Validation Code
   const handleVerifyCode = (e: React.FormEvent) => {
@@ -1780,7 +1795,7 @@ function App() {
         
         {/* Language Selector in Sidebar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 0', borderBottom: '1px solid var(--color-border)' }}>
-          <span style={{ fontSize: '18px' }}>🌐 Idioma / Language:</span>
+          <span style={{ fontSize: '15px' }}>{lang === 'en' ? 'Lang.' : 'Idioma'}</span>
           <select 
             value={lang} 
             onChange={(e) => setLang(e.target.value as any)}
@@ -2097,15 +2112,30 @@ function App() {
       </section>
 
       {/* SECTION 5: FAQ ACCORDION */}
-      <section id="preguntas" className="faq-section">
+      <section id="preguntas" className="faq-section" ref={faqSectionRef}>
         <div className="container">
           <div className="section-header">
             <span className="section-subtitle">{t.faq.subtitle}</span>
             <h2 className="section-title">{t.faq.title}</h2>
             <p className="section-desc">{t.faq.desc}</p>
+            <button
+              type="button"
+              className="faq-section-toggle"
+              aria-expanded={faqExpanded}
+              aria-controls="faq-list"
+              onClick={() => {
+                setFaqExpanded((current) => !current);
+                if (faqExpanded) setActiveFaqIndex(null);
+              }}
+            >
+              {faqExpanded
+                ? (lang === 'es' ? 'Ocultar preguntas' : lang === 'en' ? 'Hide questions' : 'Ocultar perguntas')
+                : (lang === 'es' ? 'Ver preguntas' : lang === 'en' ? 'View questions' : 'Ver perguntas')}
+              <span aria-hidden="true">{faqExpanded ? '−' : '+'}</span>
+            </button>
           </div>
 
-          <div className="faq-container">
+          <div id="faq-list" className={`faq-container ${faqExpanded ? 'expanded' : 'collapsed'}`} aria-hidden={!faqExpanded}>
             {t.faq.items.filter((_, index) => lang === 'es' ? [0,1,2,3,5,7,8,9].includes(index) : [0,1,2,3,4,7,8,9].includes(index)).map((item, index) => (
               <div className="faq-item" key={index}>
                 <button className="faq-question-btn" onClick={() => toggleFaq(index)}>
@@ -2820,18 +2850,17 @@ function App() {
       {/* EXTRAS MODAL */}
       {showExtrasModal && (
         <div className="modal-overlay" onClick={() => setShowExtrasModal(false)}>
-          <div className="modal-container extras-modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+          <div className="modal-container extras-modal-container" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={() => setShowExtrasModal(false)} aria-label="Cerrar">×</button>
             
             <div className="modal-content-scroll">
               <div className="extras-modal-header" style={{ 
-                backgroundColor: 'var(--color-accent)', 
+                backgroundColor: 'var(--syd-dark)', 
                 color: 'white', 
-                padding: '40px 24px', 
+                padding: '26px 24px 18px', 
                 textAlign: 'center',
                 position: 'relative'
               }}>
-                <img src="/logo.svg" alt="Save Your Date" style={{ height: '70px', width: 'auto', marginBottom: '16px', filter: 'brightness(0) invert(1)' }} />
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', margin: '0 0 10px 0', color: 'white' }}>
                   {t.extras?.title || "Beneficios Premium Incluidos"}
                 </h3>
@@ -2840,18 +2869,18 @@ function App() {
                 </p>
               </div>
 
-              <div className="extras-modal-body" style={{ padding: '30px 24px' }}>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+              <div className="extras-modal-body" style={{ padding: '18px 24px' }}>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '11px', textAlign: 'left' }}>
                   {(t.extras?.items || []).map((item: string, idx: number) => (
-                    <li key={idx} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
-                      <span style={{ color: 'var(--color-accent)', fontSize: '16px', fontWeight: 'bold', lineHeight: 1 }}>♥</span>
+                    <li key={idx} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', fontSize: '13px', color: 'rgba(255,255,255,.82)', lineHeight: 1.4 }}>
+                      <span style={{ color: 'var(--syd-yellow)', fontSize: '15px', fontWeight: 'bold', lineHeight: 1 }}>♥</span>
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div style={{ padding: '0 24px 30px 24px', textAlign: 'center' }}>
+              <div style={{ padding: '2px 24px 22px', textAlign: 'center' }}>
                 <button className="btn-primary" onClick={() => setShowExtrasModal(false)} style={{ width: '100%', padding: '12px' }}>
                   {lang === 'es' ? "Entendido, ¡espectacular! ♥" : (lang === 'en' ? "Got it, amazing! ♥" : "Entendido, maravilhoso! ♥")}
                 </button>
