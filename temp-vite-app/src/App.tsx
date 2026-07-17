@@ -1977,22 +1977,30 @@ function App() {
           </div>
 
           <div className="features-grid">
-            {t.features.cards.map((card, idx) => (
-              <div className="feature-card" key={idx}>
-                <div className="feature-icon-wrapper">
-                  {idx === 0 && "⏱"}
-                  {idx === 1 && "✉"}
-                  {idx === 2 && "🎵"}
-                  {idx === 3 && "📍"}
-                  {idx === 4 && "🎁"}
-                  {idx === 5 && "👗"}
-                  {idx === 6 && "📸"}
-                  {idx === 7 && "📱"}
-                </div>
-                <h3 className="feature-title">{card.t}</h3>
-                <p className="feature-desc">{card.d}</p>
-              </div>
-            ))}
+            {t.features.cards.map((card, idx) => {
+              const featureIcons = [
+                '/features/feature-countdown.png',
+                '/features/feature-rsvp.png',
+                '/features/feature-music.png',
+                '/features/feature-location.png',
+                '/features/feature-gift.png',
+                '/features/feature-dress-code.png',
+                '/features/feature-camera.png',
+                '/features/feature-responsive.png'
+              ];
+
+              return (
+                <article className="feature-card" key={idx}>
+                  <div className="feature-icon-wrapper">
+                    <img src={featureIcons[idx]} alt="" className="feature-icon-img" aria-hidden="true" />
+                  </div>
+                  <div className="feature-copy">
+                    <h3 className="feature-title">{card.t}</h3>
+                    <p className="feature-desc">{card.d}</p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
