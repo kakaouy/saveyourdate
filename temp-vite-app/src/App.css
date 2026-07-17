@@ -3751,3 +3751,47 @@ html {
 @media (max-width: 700px) {
   .hero-section { background: linear-gradient(180deg, var(--syd-turquoise), var(--syd-turquoise-deep)); }
 }
+/* Final decorative-line and contrast refinements. */
+.hero-section::before,
+.plans-section::before {
+  display: none;
+}
+
+.hero-benefits {
+  margin: 10px 0 38px;
+  column-gap: 28px;
+  row-gap: 14px;
+}
+
+.hero-section::after {
+  left: 50%;
+  width: 58px;
+  height: 6px;
+  background: #fff;
+  box-shadow: 70px 0 0 var(--syd-yellow), 140px 0 0 var(--syd-pink);
+  transform: translateX(-99px);
+}
+
+.section-header::after {
+  width: 58px;
+  height: 5px;
+  background: var(--syd-dark);
+  box-shadow: 70px 0 0 var(--syd-yellow), 140px 0 0 var(--syd-pink);
+  transform: translateX(-70px);
+}
+
+.plans-section .section-header::after,
+#incluyen .section-header::after,
+.process-section .section-header::after,
+.contact-section .section-header::after {
+  background: #fff;
+}
+
+.plans-section .section-subtitle {
+  color: var(--syd-dark);
+}
+
+.plans-section .section-title,
+.plans-section .section-desc {
+  color: #fff;
+}
