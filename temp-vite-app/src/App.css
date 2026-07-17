@@ -2575,6 +2575,37 @@ html, body, .app-wrapper {
 .order-plan-card strong { font-size: 13px; }
 .order-plan-card p { margin: 6px 0 0; color: #766d79; font-size: 12px; }
 
+.order-event-categories {
+  margin: 7px 0 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.order-event-categories button {
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 2px solid rgba(57,46,59,.12);
+  border-radius: 13px;
+  background: #fff;
+  color: #625866;
+  font: 800 13px/1.2 var(--font-sans);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, color .2s ease, transform .2s ease;
+}
+
+.order-event-categories button:hover {
+  border-color: #ff6f91;
+  transform: translateY(-1px);
+}
+
+.order-event-categories button.active {
+  border-color: #ff6f91;
+  background: #fff0f4;
+  color: #392e3b;
+  box-shadow: 0 0 0 3px rgba(255,111,145,.10);
+}
+
 .order-sections-grid { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 .order-color-field { margin-top: 18px; padding: 16px; border-radius: 14px; background: #fafafa; }
@@ -4016,6 +4047,10 @@ html {
     min-width: 0;
     max-width: 100%;
     box-sizing: border-box;
+  }
+
+  .order-event-categories {
+    grid-template-columns: 1fr;
   }
 
   input,

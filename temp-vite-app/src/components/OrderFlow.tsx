@@ -3,6 +3,7 @@ import type { InvitationModel } from '../data/models';
 
 type Plan = 'basic' | 'premium';
 type FlowTab = 'new' | 'payment';
+type EventCategory = InvitationModel['category'];
 
 const PAYMENT_LINKS: Record<Plan, string> = {
   basic: '',
@@ -34,6 +35,7 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
   const [activeTab, setActiveTab] = useState<FlowTab>('new');
   const [plan, setPlan] = useState<Plan>('basic');
   const [modelId, setModelId] = useState(initialModelId);
+  const [eventCategory, setEventCategory] = useState<EventCategory>(() => models.find((model) => model.id === initialModelId)?.category || 'wedding');
   const [sections, setSections] = useState<string[]>([]);
   const [hasMusic, setHasMusic] = useState(false);
   const [photoCount, setPhotoCount] = useState(0);
@@ -50,7 +52,9 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
 
   useEffect(() => {
     setModelId(initialModelId);
-  }, [initialModelId]);
+    const initialModel = models.find((model) => model.id === initialModelId);
+    if (initialModel) setEventCategory(initialModel.category);
+  }, [initialModelId, models]);
 
   useEffect(() => {
     const startOrder = (event: Event) => {
@@ -71,7 +75,14 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
     }
   }, [plan, sectionLimit, photoCount, photoLimit, sections.length]);
 
+  const filteredModels = useMemo(() => models.filter((model) => model.category === eventCategory), [models, eventCategory]);
   const selectedModel = useMemo(() => models.find((model) => model.id === modelId), [models, modelId]);
+
+  const selectEventCategory = (category: EventCategory) => {
+    setEventCategory(category);
+    const firstModel = models.find((model) => model.category === category);
+    if (firstModel) setModelId(firstModel.id);
+  };
 
   const toggleSection = (sectionId: string) => {
     setSections((current) => {
@@ -103,6 +114,7 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
     form.append('_subject', `Nuevo pedido ${orderNumber} - Save Your Date`);
     form.append('Número de pedido', orderNumber);
     form.append('Plan', plan === 'basic' ? 'Básico' : 'Premium');
+    form.append('Tipo de evento', eventCategory === 'wedding' ? 'Boda' : eventCategory === '15years' ? '15 Años' : 'Otros eventos');
     form.append('Modelo', selectedModel?.title || modelId);
     form.append('Color elegido', selectedColor);
     form.append('Secciones', sections.map((id) => SECTION_OPTIONS.find((item) => item.id === id)?.title).filter(Boolean).join(', '));
@@ -188,9 +200,27 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
 
             <div className="order-form-block">
               <div className="order-block-title"><span>2</span><div><h3>Elegí el modelo y las secciones</h3><p>{sections.length} de {sectionLimit} secciones seleccionadas.</p></div></div>
+              <span className="form-label">Primero, elegí el tipo de evento</span>
+              <div className="order-event-categories" role="group" aria-label="Tipo de evento">
+                {([
+                  ['wedding', 'Boda'],
+                  ['15years', '15 Años'],
+                  ['other', 'Otros eventos']
+                ] as [EventCategory, string][]).map(([category, label]) => (
+                  <button
+                    type="button"
+                    key={category}
+                    className={eventCategory === category ? 'active' : ''}
+                    aria-pressed={eventCategory === category}
+                    onClick={() => selectEventCategory(category)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
               <label className="form-label" htmlFor="order-model">Modelo de invitación</label>
               <select id="order-model" className="form-select" value={modelId} onChange={(event) => setModelId(event.target.value)}>
-                {models.map((model) => <option key={model.id} value={model.id}>{model.title}</option>)}
+                {filteredModels.map((model) => <option key={model.id} value={model.id}>{model.title}</option>)}
               </select>
               <div className="order-color-field">
                 <span className="form-label">Color principal de la invitación</span>
