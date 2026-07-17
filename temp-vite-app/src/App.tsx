@@ -2791,155 +2791,167 @@ function App() {
         </div>
       )}
 
-      {/* INTERACTIVE INVITATION SIMULATOR MODAL */}
+      {/* FULL SCREEN MODEL DEMO */}
       {demoModel && (
-        <div className="modal-overlay" onClick={() => setDemoModel(null)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={() => setDemoModel(null)} aria-label="Cerrar">×</button>
-            
-            <div className="modal-content-scroll">
-              {/* Simulated invitation top header */}
-              <div className="sim-cover" style={{ 
-                background: `linear-gradient(rgba(0,0,0, 0.25), rgba(0,0,0, 0.45)), linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%)`
-              }}>
-                <span className="sim-cover-sub">{t.modal.invited}</span>
-                <h2 className="sim-cover-title">{demoModel.demoName1}</h2>
-                {demoModel.demoName2 && <h2 className="sim-cover-title" style={{ marginTop: '2px', fontSize: '24px' }}>{demoModel.demoName2}</h2>}
-                <p className="sim-cover-sub" style={{ marginTop: '12px', fontSize: '11px', background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: '15px' }}>
-                  {demoModel.date}
-                </p>
-              </div>
+        <div className="demo-page" role="dialog" aria-modal="true" aria-label={`Demo de ${demoModel.title}`}>
+          <button className="demo-page-close" onClick={() => setDemoModel(null)} aria-label="Cerrar demo">×</button>
 
-              {/* Music Player Widget */}
-              {demoModel.musicTitle && (
-                <div className="sim-section" style={{ backgroundColor: '#fafafa' }}>
-                  <span className="section-subtitle" style={{ fontSize: '11px' }}>{t.modal.musicTitle}</span>
-                  <div className="sim-audio-widget">
-                    <div className="sim-audio-info">
-                      <p className="sim-audio-title">{demoModel.musicTitle}</p>
-                      <p className="sim-audio-artist">{demoModel.musicArtist}</p>
+          <div className="demo-page-inner">
+            <div className="demo-phone-column">
+              <div
+                className="demo-phone"
+                style={{ '--demo-color': selectedModelColors[demoModel.id] || MODEL_COLOR_OPTIONS[0].color } as React.CSSProperties}
+              >
+                <div className="demo-phone-speaker"></div>
+                <div className="demo-phone-screen">
+                  <div className="demo-invitation-scroll">
+                    <div className="sim-cover demo-cover" style={{
+                      background: `linear-gradient(rgba(57,46,59,.12), rgba(57,46,59,.35)), linear-gradient(145deg, #fff 0%, ${selectedModelColors[demoModel.id] || MODEL_COLOR_OPTIONS[0].color} 145%)`
+                    }}>
+                      <span className="sim-cover-sub">{t.modal.invited}</span>
+                      <h2 className="sim-cover-title">{demoModel.demoName1}</h2>
+                      {demoModel.demoName2 && <h2 className="sim-cover-title demo-second-name">{demoModel.demoName2}</h2>}
+                      <p className="demo-date">{demoModel.date}</p>
+                      <span className="demo-scroll-hint">Deslizá para descubrir ↓</span>
                     </div>
-                    <button className="sim-audio-playbtn" onClick={() => setIsPlayingMusic(!isPlayingMusic)}>
-                      {isPlayingMusic ? '❚❚' : '▶'}
-                    </button>
-                  </div>
-                  {isPlayingMusic && (
-                    <div style={{ display: 'flex', gap: '3px', justifyContent: 'center', marginTop: '10px' }}>
-                      <span style={{ width: '4px', height: '15px', backgroundColor: 'var(--color-mint)', animation: 'heartbeat 1s infinite' }}></span>
-                      <span style={{ width: '4px', height: '22px', backgroundColor: 'var(--color-mint)', animation: 'heartbeat 0.8s infinite 0.2s' }}></span>
-                      <span style={{ width: '4px', height: '12px', backgroundColor: 'var(--color-mint)', animation: 'heartbeat 1.2s infinite 0.4s' }}></span>
-                      <span style={{ width: '4px', height: '18px', backgroundColor: 'var(--color-mint)', animation: 'heartbeat 0.9s infinite 0.1s' }}></span>
-                    </div>
-                  )}
-                </div>
-              )}
 
-              {/* Countdown Sim */}
-              <div className="sim-section">
-                <h3 className="sim-sec-title">{t.modal.countdownTitle}</h3>
-                <p className="sim-sec-desc">{t.modal.countdownDesc}</p>
-                
-                <div className="sim-countdown">
-                  <div className="sim-cd-item">
-                    <span className="sim-cd-num">{timeLeft.days}</span>
-                    <span className="sim-cd-label">{t.modal.days}</span>
-                  </div>
-                  <div className="sim-cd-item">
-                    <span className="sim-cd-num">{timeLeft.hours}</span>
-                    <span className="sim-cd-label">{t.modal.hours}</span>
-                  </div>
-                  <div className="sim-cd-item">
-                    <span className="sim-cd-num">{timeLeft.minutes}</span>
-                    <span className="sim-cd-label">{t.modal.mins}</span>
-                  </div>
-                  <div className="sim-cd-item">
-                    <span className="sim-cd-num">{timeLeft.seconds}</span>
-                    <span className="sim-cd-label">{t.modal.segs}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Location details */}
-              {demoModel.location && (
-                <div className="sim-section" style={{ backgroundColor: '#fdfdfd' }}>
-                  <h3 className="sim-sec-title">{t.modal.where}</h3>
-                  <p className="sim-sec-desc" style={{ fontWeight: 'bold' }}>{demoModel.location}</p>
-                  <p className="sim-sec-desc">{t.modal.whereDesc}</p>
-                  <button className="sim-map-btn" onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(demoModel.location || '')}`, '_blank')}>
-                    {t.modal.btnMap}
-                  </button>
-                </div>
-              )}
-
-              {/* RSVP Form */}
-              <div className="sim-section" style={{ backgroundColor: 'var(--color-primary-light)' }}>
-                <h3 className="sim-sec-title" style={{ color: 'var(--color-accent)' }}>{t.modal.rsvpTitle}</h3>
-                <p className="sim-sec-desc">{t.modal.rsvpDesc}</p>
-                
-                {rsvpSuccess ? (
-                  <div className="sim-rsvp-success">
-                    {t.modal.rsvpSuccess}
-                  </div>
-                ) : (
-                  <form className="sim-rsvp-form" onSubmit={handleRsvpSubmit}>
-                    <input 
-                      type="text" 
-                      placeholder={t.modal.rsvpName} 
-                      className="form-input" 
-                      style={{ fontSize: '13px', padding: '10px' }}
-                      value={rsvpName}
-                      onChange={(e) => setRsvpName(e.target.value)}
-                      required 
-                    />
-                    
-                    <select 
-                      className="sim-rsvp-select"
-                      value={selectedRsvpOption}
-                      onChange={(e) => setSelectedRsvpOption(e.target.value)}
-                      required
-                    >
-                      <option value="">{t.modal.rsvpOption}</option>
-                      <option value="yes">{t.modal.rsvpYes}</option>
-                      <option value="no">{t.modal.rsvpNo}</option>
-                    </select>
-
-                    {selectedRsvpOption === 'yes' && (
-                      <div style={{ textAlign: 'left', fontSize: '12px' }}>
-                        <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>{t.modal.guestLabel}</label>
-                        <select 
-                          className="sim-rsvp-select" 
-                          value={guestCount}
-                          onChange={(e) => setGuestCount(e.target.value)}
-                        >
-                          <option value="1">{t.modal.guestSolo}</option>
-                          <option value="2">{t.modal.guestMultiple.replace('{count}', '2')}</option>
-                          <option value="3">{t.modal.guestMultiple.replace('{count}', '3')}</option>
-                          <option value="4">{t.modal.guestMultiple.replace('{count}', '4')}</option>
-                        </select>
+                    {demoModel.musicTitle && (
+                      <div className="sim-section demo-sim-section">
+                        <span className="section-subtitle demo-mini-label">{t.modal.musicTitle}</span>
+                        <div className="sim-audio-widget">
+                          <div className="sim-audio-info">
+                            <p className="sim-audio-title">{demoModel.musicTitle}</p>
+                            <p className="sim-audio-artist">{demoModel.musicArtist}</p>
+                          </div>
+                          <button className="sim-audio-playbtn" onClick={() => setIsPlayingMusic(!isPlayingMusic)} aria-label="Reproducir música">
+                            {isPlayingMusic ? '❚❚' : '▶'}
+                          </button>
+                        </div>
                       </div>
                     )}
 
-                    <button type="submit" className="sim-rsvp-submit">{t.modal.btnConfirm}</button>
-                  </form>
-                )}
-              </div>
+                    <div className="sim-section demo-sim-section">
+                      <h3 className="sim-sec-title">{t.modal.countdownTitle}</h3>
+                      <p className="sim-sec-desc">{t.modal.countdownDesc}</p>
+                      <div className="sim-countdown">
+                        {[
+                          [timeLeft.days, t.modal.days],
+                          [timeLeft.hours, t.modal.hours],
+                          [timeLeft.minutes, t.modal.mins],
+                          [timeLeft.seconds, t.modal.segs]
+                        ].map(([number, label]) => (
+                          <div className="sim-cd-item" key={String(label)}>
+                            <span className="sim-cd-num">{number}</span>
+                            <span className="sim-cd-label">{label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
 
-              {/* Simulated Dress Code & gifts */}
-              <div className="sim-section" style={{ fontSize: '13px' }}>
-                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🎁</span>
-                <p style={{ fontWeight: 'bold', margin: '0' }}>{t.modal.giftTitle}</p>
-                <p style={{ color: '#666', margin: '4px 0 0 0' }}>
-                  {t.modal.giftDesc}
-                </p>
-                <div style={{ background: '#f5f5f5', padding: '8px', borderRadius: '8px', marginTop: '10px', fontSize: '12px', fontFamily: 'monospace' }}>
-                  ALIAS: boda.sofi.mati.2026 <br />
-                  CBU: 000000310009876543210
+                    {demoModel.location && (
+                      <div className="sim-section demo-sim-section demo-soft-section">
+                        <h3 className="sim-sec-title">{t.modal.where}</h3>
+                        <p className="sim-sec-desc demo-location">{demoModel.location}</p>
+                        <p className="sim-sec-desc">{t.modal.whereDesc}</p>
+                        <button className="sim-map-btn" onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(demoModel.location || '')}`, '_blank')}>
+                          {t.modal.btnMap}
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="sim-section demo-sim-section demo-rsvp-section">
+                      <h3 className="sim-sec-title">{t.modal.rsvpTitle}</h3>
+                      <p className="sim-sec-desc">{t.modal.rsvpDesc}</p>
+                      {rsvpSuccess ? (
+                        <div className="sim-rsvp-success">{t.modal.rsvpSuccess}</div>
+                      ) : (
+                        <form className="sim-rsvp-form" onSubmit={handleRsvpSubmit}>
+                          <input type="text" placeholder={t.modal.rsvpName} className="form-input" value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} required />
+                          <select className="sim-rsvp-select" value={selectedRsvpOption} onChange={(e) => setSelectedRsvpOption(e.target.value)} required>
+                            <option value="">{t.modal.rsvpOption}</option>
+                            <option value="yes">{t.modal.rsvpYes}</option>
+                            <option value="no">{t.modal.rsvpNo}</option>
+                          </select>
+                          {selectedRsvpOption === 'yes' && (
+                            <select className="sim-rsvp-select" value={guestCount} onChange={(e) => setGuestCount(e.target.value)}>
+                              <option value="1">{t.modal.guestSolo}</option>
+                              <option value="2">{t.modal.guestMultiple.replace('{count}', '2')}</option>
+                              <option value="3">{t.modal.guestMultiple.replace('{count}', '3')}</option>
+                              <option value="4">{t.modal.guestMultiple.replace('{count}', '4')}</option>
+                            </select>
+                          )}
+                          <button type="submit" className="sim-rsvp-submit">{t.modal.btnConfirm}</button>
+                        </form>
+                      )}
+                    </div>
+
+                    <div className="sim-section demo-sim-section demo-gift-section">
+                      <span className="demo-gift-icon">♡</span>
+                      <h3 className="sim-sec-title">{t.modal.giftTitle}</h3>
+                      <p className="sim-sec-desc">{t.modal.giftDesc}</p>
+                      <div className="demo-bank-data">ALIAS: nuestro.dia.2026</div>
+                    </div>
+                  </div>
                 </div>
               </div>
+              <p className="demo-phone-caption">La invitación es interactiva: probá los botones y navegá dentro del celular.</p>
             </div>
+
+            <aside className="demo-info-panel">
+              <span className="demo-eyebrow">{demoModel.category === 'wedding' ? 'Casamiento' : demoModel.category === '15years' ? '15 años' : 'Evento especial'}</span>
+              <h2>{demoModel.title}</h2>
+              <p className="demo-description">{demoModel.description}</p>
+
+              <div className="demo-info-block">
+                <h3>Esta invitación incluye</h3>
+                <ul className="demo-feature-list">
+                  {demoModel.features.map((feature) => (
+                    <li key={feature}><span>✓</span>{feature}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="demo-info-block">
+                <h3>Probá otra paleta</h3>
+                <div className="demo-palette-list">
+                  {MODEL_COLOR_OPTIONS.map((option) => {
+                    const activeColor = selectedModelColors[demoModel.id] || MODEL_COLOR_OPTIONS[0].color;
+                    return (
+                      <button
+                        key={option.color}
+                        className={`demo-palette-option ${activeColor === option.color ? 'active' : ''}`}
+                        onClick={() => setSelectedModelColors((current) => ({ ...current, [demoModel.id]: option.color }))}
+                        aria-label={`Usar paleta ${option.name}`}
+                        aria-pressed={activeColor === option.color}
+                      >
+                        <span style={{ backgroundColor: option.color }}></span>
+                        {option.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="demo-actions">
+                <button className="demo-primary-action" onClick={() => {
+                  const selectedId = demoModel.id;
+                  setDemoModel(null);
+                  handleSelectModelForOrder(selectedId);
+                }}>
+                  Creá tu invite
+                </button>
+                <button className="demo-secondary-action" onClick={() => {
+                  setDemoModel(null);
+                  requestAnimationFrame(() => document.getElementById('modelos')?.scrollIntoView({ behavior: 'smooth' }));
+                }}>
+                  ← Ver más modelos
+                </button>
+              </div>
+            </aside>
           </div>
         </div>
       )}
+
     </div>
   );
 }
