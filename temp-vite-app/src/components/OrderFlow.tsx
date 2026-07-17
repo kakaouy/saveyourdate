@@ -5,8 +5,8 @@ type Plan = 'basic' | 'premium';
 type FlowTab = 'new' | 'payment';
 
 const PAYMENT_LINKS: Record<Plan, string> = {
-  basic: 'https://mpago.la/1W6btGs',
-  premium: 'https://mpago.la/1W6btGs'
+  basic: '',
+  premium: ''
 };
 
 const SECTION_OPTIONS = [
@@ -216,7 +216,11 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
             <div className="order-form-block order-payment-choice">
               <div className="order-block-title"><span>4</span><div><h3>Pago, ahora o después</h3><p>No necesitás pagar para enviar el pedido.</p></div></div>
               <div className="order-payment-actions">
-                <a href={PAYMENT_LINKS[plan]} target="_blank" rel="noopener noreferrer" className="mercado-pago-link">Pagar Plan {plan === 'basic' ? 'Básico' : 'Premium'} con Mercado Pago ↗</a>
+                {PAYMENT_LINKS[plan] ? (
+                  <a href={PAYMENT_LINKS[plan]} target="_blank" rel="noopener noreferrer" className="mercado-pago-link">Pagar Plan {plan === 'basic' ? 'Básico' : 'Premium'} con Mercado Pago ↗</a>
+                ) : (
+                  <div className="mercado-pago-link payment-link-pending">Link de pago del Plan {plan === 'basic' ? 'Básico' : 'Premium'} pendiente de configurar</div>
+                )}
                 <div className="form-group"><label className="form-label">Si ya pagaste, pegá el número de operación</label><input name="paymentOperation" className="form-input" placeholder="Ej. 12345678901 (opcional)" /></div>
               </div>
             </div>
