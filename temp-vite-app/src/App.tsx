@@ -1952,20 +1952,6 @@ function App() {
                   </article>
                 );
               })}
-                      {model.features.length > 3 && <span className="card-feature-tag">+{model.features.length - 3}</span>}
-                    </div>
-
-                    <div className="card-footer">
-                      <button className="btn-card-demo" onClick={() => handleOpenDemo(model)}>
-                        {t.catalog.verDemo}
-                      </button>
-                      <button className="btn-card-order" onClick={() => handleSelectModelForOrder(model.id)}>
-                        {t.catalog.personalize}
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              ))}
             </div>
 
             {/* Carousel navigation controls */}
