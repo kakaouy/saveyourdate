@@ -1714,10 +1714,7 @@ function App() {
             <a href="#inicio" className="nav-link" onClick={(e) => handleScrollToSection(e, 'inicio')}>{t.nav.home}</a>
             <a href="#modelos" className="nav-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
             <a href="#incluyen" className="nav-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
-            <a href="#pedido" className="nav-link" onClick={(e) => handleScrollToSection(e, 'pedido')}>{t.nav.process}</a>
-            <a href="#preguntas" className="nav-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{t.nav.questions}</a>
             <a href="#contacto" className="nav-link" onClick={(e) => handleScrollToSection(e, 'contacto')}>{t.nav.contact}</a>
-            <a href="#admin" className="nav-link" onClick={(e) => { e.preventDefault(); setShowAdminLogin(true); }} style={{ color: 'var(--color-accent)', fontWeight: 'bold' }}>🔐 {t.nav.myEvent}</a>
             
             {/* Language Selector in Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#fafafa', border: '1px solid var(--color-border)', borderRadius: '15px', padding: '2px 8px', marginLeft: '8px' }}>
@@ -1751,10 +1748,7 @@ function App() {
         <a href="#inicio" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'inicio')}>{t.nav.home}</a>
         <a href="#modelos" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
         <a href="#incluyen" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
-        <a href="#pedido" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'pedido')}>{t.nav.process}</a>
-        <a href="#preguntas" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{t.nav.questions}</a>
         <a href="#contacto" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'contacto')}>{t.nav.contact}</a>
-        <a href="#admin" className="sidebar-link" onClick={(e) => { e.preventDefault(); setShowAdminLogin(true); setSidebarOpen(false); }} style={{ color: 'var(--color-accent)', fontWeight: 'bold' }}>🔐 {t.nav.myEvent}</a>
         
         {/* Language Selector in Sidebar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 0', borderBottom: '1px solid var(--color-border)' }}>
