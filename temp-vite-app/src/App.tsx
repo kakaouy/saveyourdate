@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { INVITATION_MODELS } from './data/models';
 import type { InvitationModel } from './data/models';
+import OrderFlow from './components/OrderFlow';
 
 
 const MODEL_COLOR_OPTIONS = [
@@ -91,11 +92,11 @@ const TRANSLATIONS = {
         { q: "¿Cómo confirman asistencia los invitados?", a: "Tus invitados completan un formulario RSVP dentro de la misma invitación web. La respuesta te llega automáticamente a tu planilla de Google Sheets vinculada en tiempo real para que veas el listado organizado al instante." },
         { q: "¿Por cuánto tiempo permanece activo el enlace web?", a: "La invitación permanece activa, online y funcional hasta 30 días después de realizado tu evento. Si necesitás extender el tiempo por algún motivo, podés solicitarlo." },
         { q: "¿Qué métodos de pago aceptan?", a: "Aceptamos transferencias bancarias directas (CBU/Alias) y todas las tarjetas de crédito o débito a través de la pasarela de Mercado Pago." },
-        { q: "¿Cómo recibo mi código de validación después de realizar el pago?", a: "Una vez que el pago es aprobado (de forma inmediata con tarjeta o Mercado Pago), nuestro sistema valida la transacción automáticamente y te envía un mensaje de WhatsApp y un correo electrónico con tu confirmación de pago y tu código de validación único (SYD-XXXXXX) para que comiences a cargar tus datos al instante." },
-        { q: "¿Cuáles son los precios de los planes?", a: "Nuestros precios varían según el plan de interactividad que elijas y la moneda de tu país. Podés consultar las tarifas actualizadas y realizar tu simulación de pago de forma segura en la sección <a href='#pago'>Elegí tu Plan Save Your Date</a>." },
-        { q: "¿Qué incluye el Plan Bronce?", a: "El Plan Bronce es ideal para eventos sencillos y elegantes. Incluye: invitación web de link único activa hasta 30 días después del evento, reloj de cuenta regresiva, detalles de ubicación con mapas GPS interactivos, datos de regalo o alias bancario para transferencias, y galería con hasta 5 fotos." },
-        { q: "¿Qué incluye el Plan Plata?", a: "El Plan Plata es nuestro plan Premium más elegido. Incluye todo lo del Plan Bronce (con hasta 10 fotos en la galería) más funciones interactivas avanzadas: música de fondo a tu elección y el formulario digital RSVP para que tus invitados confirmen asistencia directamente desde la web, con las respuestas sincronizadas en tiempo real en tu planilla privada de Google Sheets." },
-        { q: "¿Qué incluye el Plan Oro?", a: "El Plan Oro es la experiencia interactiva definitiva. Incluye todo lo del Plan Plata (con hasta 15 fotos en la galería) más beneficios avanzados: playlist colaborativa de Spotify para que tus invitados sugieran canciones para la fiesta y un panel de administración privado y avanzado para gestionar tus invitados." }
+        { q: "¿Puedo hacer el pedido antes de pagar?", a: "Sí. Podés elegir el modelo, completar todos los datos y enviar el pedido sin realizar el pago. La invitación se libera una vez que validamos el pago internamente." },
+        { q: "¿Cómo informo un pago de Mercado Pago?", a: "Si ya pagaste, podés pegar el número de operación en el formulario del pedido. Si pagás después, ingresá en ‘Ya creaste tu invite’ y enviá tu número de pedido junto con el número de operación." },
+        { q: "¿Qué incluye el Plan Básico?", a: "Incluye portada cuando el modelo la lleve, hasta 5 secciones elegidas por vos y galería de hasta 5 fotos cuando la galería sea una de las secciones seleccionadas. También podés agregar música de fondo sin consumir una sección." },
+        { q: "¿Qué incluye el Plan Premium?", a: "Incluye portada cuando el modelo la lleve, hasta 8 secciones elegidas por vos y galería de hasta 8 fotos cuando la galería sea una de las secciones seleccionadas. También podés agregar música de fondo sin consumir una sección." },
+        { q: "¿Qué incluye la confirmación de asistencia?", a: "La sección RSVP incluye formulario de confirmación, Google Sheets, link de envío, registro de restricciones alimentarias para catering y cédula de identidad para control de ingreso." }
       ]
     },
     portal: {
@@ -2067,8 +2068,10 @@ function App() {
         </div>
       </section>
 
-      {/* SECTION 6: PORTAL DE CREACIÓN / CARGA DE DATOS */}
-      <section id="crear" className="features-section" style={{ background: 'var(--color-primary)', borderBottom: '1px solid var(--color-border)' }}>
+      <OrderFlow models={INVITATION_MODELS} initialModelId={wizardModel} />
+
+      {/* LEGACY ORDER FLOW: kept temporarily for reference, hidden from customers */}
+      <section id="crear-anterior" className="features-section legacy-order-flow" style={{ background: 'var(--color-primary)', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container">
           <div className="section-header">
             <span className="section-subtitle">{t.portal.subtitle}</span>
@@ -2485,7 +2488,7 @@ function App() {
       </section>
 
       {/* SECTION 6.5: COMPRAR / OBTENER CÓDIGO */}
-      <section id="pago" className="features-section" style={{ background: 'var(--color-soft-white)', borderBottom: '1px solid var(--color-border)' }}>
+      <section id="pago-anterior" className="features-section legacy-order-flow" style={{ background: 'var(--color-soft-white)', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container">
           <div className="section-header">
             <span className="section-subtitle">💳 {lang === 'es' ? 'Simulación de Pago' : (lang === 'en' ? 'Payment Simulation' : 'Simulação de Pagamento')}</span>
