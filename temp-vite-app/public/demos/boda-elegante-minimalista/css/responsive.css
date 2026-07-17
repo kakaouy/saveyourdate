@@ -1,0 +1,682 @@
+/* =========================================================
+   TABLETS Y PANTALLAS MEDIANAS
+========================================================= */
+
+@media (max-width: 1000px) {
+  .hero--editorial {
+    min-height: auto;
+
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .hero-editorial-layout {
+    grid-template-columns: 1fr;
+
+    min-height: auto;
+
+    gap: 2rem;
+  }
+
+  .hero-editorial {
+    text-align: center;
+  }
+
+  .hero-editorial__pretitle {
+    margin-bottom: var(--space-sm);
+  }
+
+  .hero-editorial__names {
+    justify-content: center;
+
+    font-size: clamp(4rem, 12vw, 7rem);
+  }
+
+  .hero-editorial__meta {
+    justify-content: center;
+  }
+
+  .hero-polaroids {
+    width: min(100%, 680px);
+    min-height: 510px;
+
+    margin-inline: auto;
+  }
+
+  .polaroid-gallery--hero {
+    height: 510px;
+  }
+
+  .polaroid {
+    width: clamp(175px, 27vw, 225px);
+  }
+
+  .polaroid--1 {
+    top: 9%;
+    left: 8%;
+  }
+
+  .polaroid--2 {
+    top: 1%;
+    right: 10%;
+  }
+
+  .polaroid--3 {
+    bottom: 2%;
+    left: 17%;
+  }
+
+  .polaroid--4 {
+    right: 10%;
+    bottom: 8%;
+  }
+
+  .schedule {
+    width: min(100%, 740px);
+  }
+}
+
+
+/* =========================================================
+   TABLETS PEQUEÑAS
+========================================================= */
+
+@media (max-width: 768px) {
+  :root {
+    --section-padding-desktop:
+      var(--section-padding-mobile);
+  }
+
+  .section {
+    padding-block: var(--section-padding-mobile);
+  }
+
+  .section-heading {
+    margin-bottom: 2.75rem;
+  }
+
+  .section-heading__title {
+    font-size: clamp(2.7rem, 12vw, 4.5rem);
+  }
+
+  .hero--editorial {
+    padding:
+      4rem
+      var(--container-padding);
+  }
+
+  .hero-editorial-layout {
+    gap: 1.25rem;
+  }
+
+  .hero-editorial__names {
+    gap: 0.6rem;
+
+    font-size: clamp(3.6rem, 14vw, 6rem);
+  }
+
+  .hero-editorial__meta {
+    margin-top: var(--space-md);
+  }
+
+  .hero-polaroids {
+    min-height: 450px;
+  }
+
+  .polaroid-gallery--hero {
+    height: 450px;
+  }
+
+  .polaroid {
+    width: clamp(150px, 31vw, 200px);
+
+    padding:
+      8px
+      8px
+      28px;
+  }
+
+  .polaroid--1 {
+    top: 10%;
+    left: 6%;
+  }
+
+  .polaroid--2 {
+    top: 2%;
+    right: 7%;
+  }
+
+  .polaroid--3 {
+    bottom: 2%;
+    left: 15%;
+  }
+
+  .polaroid--4 {
+    right: 5%;
+    bottom: 7%;
+  }
+
+  .schedule__date {
+    font-size: var(--font-size-xs);
+    line-height: 1.7;
+  }
+
+  .schedule__item {
+    grid-template-columns:
+      78px
+      38px
+      minmax(0, 1fr);
+
+    min-height: 145px;
+  }
+
+  .schedule__time {
+    padding-right: 0.5rem;
+
+    font-size: 1.7rem;
+    line-height: 28px;
+  }
+
+  .schedule__line {
+    min-height: 145px;
+  }
+
+  .schedule__line span {
+    width: 12px;
+    height: 12px;
+
+    margin-top: 8px;
+  }
+
+  .schedule__line::after {
+    top: 20px;
+    bottom: -10px;
+  }
+
+  .schedule__content {
+    padding:
+      0
+      0
+      3rem
+      0.55rem;
+  }
+
+  .schedule__content h3 {
+    font-size: clamp(2rem, 7vw, 2.8rem);
+    line-height: 28px;
+  }
+
+  .schedule__content p {
+    font-size: var(--font-size-sm);
+  }
+
+    .full-photo-reveal {
+    height: 125vh;
+  }
+
+  .full-photo-reveal__sticky {
+    height: 100svh;
+  }
+
+  .full-photo-reveal__image {
+    height: 110%;
+
+    object-position: center center;
+
+    transform: translateY(-5%);
+  }
+
+  .countdown {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .countdown__item:nth-child(3) {
+    border-left: 0;
+    border-top: var(--border-editorial);
+  }
+
+  .countdown__item:nth-child(4) {
+    border-top: var(--border-editorial);
+  }
+
+  .modal__dialog {
+    padding:
+      3.5rem
+      1.5rem
+      2rem;
+  }
+
+  .account-item {
+    grid-template-columns: 90px minmax(0, 1fr);
+  }
+
+  .account-item__copy {
+    grid-column: 1 / -1;
+
+    justify-self: start;
+  }
+}
+
+
+/* =========================================================
+   CELULARES
+========================================================= */
+
+@media (max-width: 560px) {
+  :root {
+    --container-padding: 1.15rem;
+    --section-padding-mobile: 4rem;
+    --section-divider-width: min(82%, 360px);
+  }
+
+  body {
+    font-size: 0.95rem;
+  }
+
+  .btn {
+    min-height: 48px;
+
+    padding:
+      0.85rem
+      1.3rem;
+
+    font-size: 0.7rem;
+  }
+
+  .hero--editorial {
+    min-height: 100svh;
+
+    padding:
+      3.75rem
+      1rem
+      2.5rem;
+  }
+
+  .hero-editorial-layout {
+    display: flex;
+    flex-direction: column;
+
+    gap: 1.2rem;
+  }
+
+  .hero-editorial {
+    z-index: 10;
+  }
+
+  .hero-editorial__pretitle {
+    margin-bottom: 0.75rem;
+
+    font-size: 0.65rem;
+    letter-spacing: 0.17em;
+  }
+
+  .hero-editorial__names {
+    justify-content: center;
+
+    gap: 0.35rem;
+
+    font-size: clamp(3rem, 15vw, 4.5rem);
+    line-height: 0.9;
+  }
+
+  .hero-editorial__ampersand {
+    font-size: 0.44em;
+  }
+
+  .hero-editorial__meta {
+    justify-content: center;
+
+    gap: 0.55rem;
+
+    margin-top: 1rem;
+
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-editorial__separator {
+    width: 18px;
+  }
+
+  .hero-polaroids {
+    width: 100%;
+    min-height: 365px;
+  }
+
+  .polaroid-gallery--hero {
+    height: 365px;
+  }
+
+  .polaroid {
+    width: clamp(130px, 40vw, 168px);
+
+    padding:
+      7px
+      7px
+      24px;
+
+    box-shadow:
+      0 6px 15px
+      rgba(0, 0, 0, 0.09);
+  }
+
+  .polaroid:hover,
+  .polaroid:focus-within {
+    transform:
+      rotate(0deg)
+      translateY(-4px)
+      scale(1.035) !important;
+  }
+
+  .polaroid--1 {
+    top: 9%;
+    left: 0;
+
+    transform: rotate(-7deg);
+  }
+
+  .polaroid--2 {
+    top: 1%;
+    right: 1%;
+
+    transform: rotate(5deg);
+  }
+
+  .polaroid--3 {
+    bottom: 0;
+    left: 8%;
+
+    transform: rotate(4deg);
+  }
+
+  .polaroid--4 {
+    right: 2%;
+    bottom: 6%;
+
+    transform: rotate(-5deg);
+  }
+
+  .editorial-quote {
+    padding:
+      var(--section-padding-mobile)
+      var(--container-padding);
+  }
+
+  .editorial-quote__text {
+    font-size: clamp(2.2rem, 11vw, 3.5rem);
+  }
+
+  .schedule-section {
+    padding:
+      var(--section-padding-mobile)
+      0.85rem;
+  }
+
+  .schedule__date {
+    width: min(100%, 330px);
+
+    margin-top: -1.1rem;
+    margin-bottom: 2.75rem;
+
+    letter-spacing: 0.13em;
+  }
+
+  .schedule__item {
+    grid-template-columns:
+      60px
+      28px
+      minmax(0, 1fr);
+
+    min-height: 142px;
+  }
+
+  .schedule__time {
+    padding-right: 0.3rem;
+
+    font-size: 1.3rem;
+    line-height: 24px;
+  }
+
+  .schedule__line {
+    min-height: 142px;
+  }
+
+  .schedule__line span {
+    width: 11px;
+    height: 11px;
+
+    margin-top: 6px;
+  }
+
+  .schedule__line::after {
+    top: 17px;
+    bottom: -7px;
+  }
+
+  .schedule__content {
+    padding:
+      0
+      0
+      2.75rem
+      0.5rem;
+  }
+
+  .schedule__content h3 {
+    margin-bottom: 0.45rem;
+
+    font-size: clamp(1.75rem, 8vw, 2.35rem);
+    line-height: 24px;
+  }
+
+  .schedule__content p {
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  .section--editorial {
+    padding:
+      var(--section-padding-mobile)
+      var(--container-padding);
+  }
+
+  .section--editorial .section__message,
+  .gifts__message,
+  .playlist__message,
+  .rsvp__message {
+    font-size: var(--font-size-base);
+  }
+
+  .full-photo-reveal {
+    height: 68svh;
+    min-height: 470px;
+
+    background-position: center center;
+  }
+
+  .modal {
+    align-items: end;
+
+    padding: 0;
+  }
+
+  .modal__dialog {
+    width: 100%;
+    max-height: 92svh;
+
+    padding:
+      3.75rem
+      1.2rem
+      2rem;
+
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+
+    border-radius: 0;
+  }
+
+  .modal__close {
+    top: 0.85rem;
+    right: 0.85rem;
+  }
+
+  .modal__title {
+    font-size: clamp(2.3rem, 12vw, 3.3rem);
+  }
+
+  .account-item {
+    grid-template-columns: 1fr;
+
+    gap: 0.4rem;
+  }
+
+  .account-item__copy {
+    grid-column: auto;
+  }
+
+  .guest-item__options {
+    flex-direction: column;
+
+    gap: var(--space-sm);
+  }
+
+  .music-toggle {
+    right: 0.9rem;
+    bottom: 0.9rem;
+
+    width: 48px;
+    height: 48px;
+  }
+
+  .footer {
+    padding:
+      3.5rem
+      var(--container-padding);
+  }
+}
+
+
+/* =========================================================
+   CELULARES MUY PEQUEÑOS
+========================================================= */
+
+@media (max-width: 375px) {
+  .hero-editorial__names {
+    font-size: 2.8rem;
+  }
+
+  .hero-polaroids {
+    min-height: 335px;
+  }
+
+  .polaroid-gallery--hero {
+    height: 335px;
+  }
+
+  .polaroid {
+    width: 138px;
+  }
+
+  .schedule__item {
+    grid-template-columns:
+      53px
+      25px
+      minmax(0, 1fr);
+  }
+
+  .schedule__time {
+    font-size: 1.15rem;
+  }
+
+  .schedule__content h3 {
+    font-size: 1.7rem;
+  }
+}
+
+
+/* =========================================================
+   PANTALLAS HORIZONTALES BAJAS
+========================================================= */
+
+@media (
+  max-height: 650px
+) and (
+  min-width: 769px
+) {
+  .hero--editorial {
+    min-height: 720px;
+  }
+}
+
+
+/* =========================================================
+   DISPOSITIVOS SIN HOVER
+========================================================= */
+
+@media (hover: none) {
+  .polaroid:hover {
+    box-shadow: var(--shadow-photo);
+
+    transform: inherit;
+  }
+
+  .btn:hover {
+    color: var(--color-primary);
+    background: var(--color-white);
+
+    transform: none;
+  }
+}
+
+
+/* =========================================================
+   MOVIMIENTO REDUCIDO
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+  }
+
+
+}
+
+
+/* =========================================================
+   VENTANA DE FOTO EN TABLETS
+========================================================= */
+
+@media (max-width: 900px) {
+  .photo-window {
+    height: 62vh;
+    min-height: 430px;
+
+    background-position: center center;
+  }
+}
+
+
+/* =========================================================
+   VENTANA DE FOTO EN CELULARES
+========================================================= */
+
+@media (max-width: 600px) {
+  .photo-window {
+    height: 72svh;
+    min-height: 480px;
+
+    /*
+      Se mantiene fixed para conservar el efecto solicitado.
+    */
+    background-attachment: scroll !important;
+    background-position: center center;
+    background-size: cover;
+  }
+}
