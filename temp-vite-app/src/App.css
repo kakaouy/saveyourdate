@@ -2597,6 +2597,7 @@ html, body, .app-wrapper {
 .order-payment-choice { border-color: rgba(0,158,227,.25); }
 .order-payment-actions { display: grid; grid-template-columns: .8fr 1.2fr; gap: 18px; align-items: center; }
 .mercado-pago-link { padding: 14px 18px; border-radius: 999px; background: #009ee3; color: #fff; font-size: 13px; font-weight: 900; text-align: center; text-decoration: none; }
+.payment-link-pending { background: #ece9ed; color: #766d79; cursor: not-allowed; }
 .order-submit { width: min(420px, 100%); margin: 4px auto 0; }
 
 .order-success-card {
