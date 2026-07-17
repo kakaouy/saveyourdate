@@ -2151,7 +2151,7 @@ function App() {
         </div>
       </section>
 
-      <OrderFlow models={INVITATION_MODELS} initialModelId={wizardModel} />
+      <OrderFlow models={INVITATION_MODELS} initialModelId={wizardModel} lang={lang} />
 
       {/* LEGACY ORDER FLOW: kept temporarily for reference, hidden from customers */}
       <section id="crear-anterior" className="features-section legacy-order-flow" style={{ background: 'var(--color-primary)', borderBottom: '1px solid var(--color-border)' }}>
