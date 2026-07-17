@@ -2734,7 +2734,7 @@ function App() {
 
       {/* FOOTER */}
       <footer className="footer">
-        <div className="container">
+        <div className="container footer-layout">
           <a href="#inicio" className="footer-logo" onClick={(e) => handleScrollToSection(e, 'inicio')}>
             <img src="/logo.svg" alt="Save Your Date" className="footer-logo-img" />
           </a>
