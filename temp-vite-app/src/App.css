@@ -4071,3 +4071,99 @@ html {
     }
   }
 }
+
+/* Final interaction and contrast refinements. */
+.order-submit {
+  background: #392e3b;
+  color: #fff;
+}
+
+.order-submit:hover {
+  background: #211b22;
+}
+
+.faq-container.collapsed {
+  display: none;
+}
+
+.faq-section-toggle {
+  margin: 24px auto 0;
+  padding: 12px 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid #392e3b;
+  border-radius: 999px;
+  background: #392e3b;
+  color: #fff;
+  font: 800 13px/1 var(--font-sans);
+  cursor: pointer;
+}
+
+.faq-section-toggle span {
+  font-size: 18px;
+  line-height: .8;
+}
+
+.order-flow-section .section-header::after {
+  background: #fff;
+  box-shadow: 70px 0 0 var(--syd-yellow), 140px 0 0 var(--syd-dark);
+}
+
+.process-section .process-cta-box .btn-primary {
+  color: #fff !important;
+}
+
+.extras-modal-container {
+  max-width: 460px;
+  background: var(--syd-dark);
+  color: #fff;
+}
+
+.extras-modal-container .modal-content-scroll,
+.extras-modal-container .extras-modal-body {
+  background: var(--syd-dark);
+}
+
+.extras-modal-container .modal-close-btn {
+  color: #fff;
+  border-color: rgba(255,255,255,.28);
+  background: rgba(255,255,255,.10);
+}
+
+.extras-modal-container .btn-primary {
+  background: var(--syd-yellow);
+  color: var(--syd-dark);
+}
+
+.hero-section::after {
+  bottom: 48px;
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    width: min(82vw, 280px);
+    padding: 70px 20px 24px;
+    gap: 6px;
+  }
+
+  .sidebar-link {
+    padding: 7px 0;
+    font-size: 15px;
+  }
+
+  .sidebar > div span {
+    font-size: 13px !important;
+  }
+
+  .hero-section::after {
+    bottom: 18px;
+  }
+
+  .extras-modal-container {
+    width: calc(100% - 24px);
+    height: auto;
+    max-height: calc(100dvh - 24px);
+  }
+}
