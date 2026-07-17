@@ -1104,6 +1104,7 @@ function App() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+    if (id === 'crear') window.dispatchEvent(new CustomEvent('start-saveyourdate-order'));
     setSidebarOpen(false);
   };
 
@@ -1120,6 +1121,7 @@ function App() {
     const contactSection = document.getElementById('crear');
     if (contactSection) {
       contactSection.scrollIntoView({ behavior: 'smooth' });
+      window.dispatchEvent(new CustomEvent('start-saveyourdate-order'));
     }
   };
 
