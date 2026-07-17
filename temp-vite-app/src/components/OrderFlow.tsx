@@ -4,6 +4,7 @@ import type { InvitationModel } from '../data/models';
 type Plan = 'basic' | 'premium';
 type FlowTab = 'new' | 'payment';
 type EventCategory = InvitationModel['category'];
+type Language = 'es' | 'en' | 'pt';
 
 const PAYMENT_LINKS: Record<Plan, string> = {
   basic: '',
@@ -28,9 +29,11 @@ const createOrderNumber = () => `SYD-${Date.now().toString().slice(-6)}`;
 interface OrderFlowProps {
   models: InvitationModel[];
   initialModelId: string;
+  lang: Language;
 }
 
-export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
+export default function OrderFlow({ models, initialModelId, lang }: OrderFlowProps) {
+  const l = (es: string, en: string, pt: string) => lang === 'es' ? es : lang === 'en' ? en : pt;
   const [started, setStarted] = useState(false);
   const [activeTab, setActiveTab] = useState<FlowTab>('new');
   const [plan, setPlan] = useState<Plan>('basic');
@@ -49,6 +52,22 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
   const photoLimit = plan === 'basic' ? 5 : 8;
   const gallerySelected = sections.includes('gallery');
   const rsvpSelected = sections.includes('rsvp');
+  const sectionOptions = useMemo(() => SECTION_OPTIONS.map((section) => {
+    const translations: Record<string, [string, string, string, string, string, string]> = {
+      countdown: ['Cuenta regresiva', 'Countdown', 'Contagem regressiva', 'Contador dinámico hasta el día del evento.', 'Dynamic countdown to the event date.', 'Contador dinâmico até o dia do evento.'],
+      agenda: ['Agenda o itinerario', 'Schedule or itinerary', 'Agenda ou itinerário', 'Horarios y momentos importantes del evento.', 'Times and important moments of the event.', 'Horários e momentos importantes do evento.'],
+      location: ['Ubicación y mapa', 'Location and map', 'Localização e mapa', 'Dirección, Google Maps o Waze.', 'Address, Google Maps or Waze.', 'Endereço, Google Maps ou Waze.'],
+      rsvp: ['Confirmación de asistencia', 'RSVP', 'Confirmação de presença', 'Incluye Google Sheets, link de envío, restricciones alimentarias y cédula para control de ingreso.', 'Includes Google Sheets, sending link, dietary restrictions and ID for access control.', 'Inclui Google Sheets, link de envio, restrições alimentares e documento para controle de entrada.'],
+      gallery: ['Galería de fotos', 'Photo gallery', 'Galeria de fotos', 'Hasta 5 fotos en Básico y hasta 8 en Premium.', 'Up to 5 photos in Basic and 8 in Premium.', 'Até 5 fotos no Básico e 8 no Premium.'],
+      gifts: ['Regalos', 'Gifts', 'Presentes', 'Alias, cuenta bancaria o lista de regalos.', 'Bank details, registry or gift list.', 'Dados bancários, lista ou sugestões de presentes.'],
+      dresscode: ['Código de vestimenta', 'Dress code', 'Código de vestimenta', 'Dress code y recomendaciones para los invitados.', 'Dress code and recommendations for guests.', 'Código de vestimenta e recomendações para os convidados.'],
+      playlist: ['Playlist', 'Playlist', 'Playlist', 'Sugerencias de canciones de los invitados.', 'Song suggestions from guests.', 'Sugestões de músicas dos convidados.'],
+      instagram: ['Instagram y hashtag', 'Instagram and hashtag', 'Instagram e hashtag', 'Usuario, hashtag o álbum compartido.', 'Username, hashtag or shared album.', 'Usuário, hashtag ou álbum compartilhado.'],
+      messages: ['Muro de saludos', 'Message wall', 'Mural de mensagens', 'Mensajes y buenos deseos para los anfitriones.', 'Messages and wishes for the hosts.', 'Mensagens e votos para os anfitriões.']
+    };
+    const copy = translations[section.id];
+    return { ...section, title: l(copy[0], copy[1], copy[2]), description: l(copy[3], copy[4], copy[5]) };
+  }), [lang]);
 
   useEffect(() => {
     setModelId(initialModelId);
@@ -117,7 +136,7 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
     form.append('Tipo de evento', eventCategory === 'wedding' ? 'Boda' : eventCategory === '15years' ? '15 Años' : 'Otros eventos');
     form.append('Modelo', selectedModel?.title || modelId);
     form.append('Color elegido', selectedColor);
-    form.append('Secciones', sections.map((id) => SECTION_OPTIONS.find((item) => item.id === id)?.title).filter(Boolean).join(', '));
+    form.append('Secciones', sections.map((id) => sectionOptions.find((item) => item.id === id)?.title).filter(Boolean).join(', '));
     form.append('Música de fondo', hasMusic ? String(form.get('music') || 'Sí, a definir') : 'No');
     form.append('Estado del pago', form.get('paymentOperation') ? 'Pago informado' : 'Pago pendiente');
     setSending(true);
@@ -155,57 +174,57 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
     <section id="crear" className="order-flow-section">
       <div className="container">
         <div className="section-header order-flow-heading">
-          <span className="section-subtitle">Tu invitación, a tu manera</span>
-          <h2 className="section-title">Creá tu invite</h2>
-          <p className="section-desc">Podés enviar todos los datos ahora y pagar después. La invitación se libera cuando validamos internamente el pago.</p>
+          <span className="section-subtitle">{l('Tu invitación, a tu manera', 'Your invitation, your way', 'Seu convite, do seu jeito')}</span>
+          <h2 className="section-title">{l('Creá tu invite', 'Create your invite', 'Crie seu convite')}</h2>
+          <p className="section-desc">{l('Podés enviar todos los datos ahora y pagar después. La invitación se libera cuando validamos internamente el pago.', 'You can send all the details now and pay later. Your invitation is released after we validate the payment.', 'Você pode enviar todos os dados agora e pagar depois. O convite é liberado após validarmos o pagamento.')}</p>
         </div>
 
         {!started ? (
           <div className="order-start-card">
-            <h3>¿Qué querés hacer?</h3>
-            <p>El formulario aparece únicamente cuando iniciás un pedido o necesitás informar el pago de uno existente.</p>
+            <h3>{l('¿Qué querés hacer?', 'What would you like to do?', 'O que você quer fazer?')}</h3>
+            <p>{l('El formulario aparece únicamente cuando iniciás un pedido o necesitás informar el pago de uno existente.', 'The form appears only when you start an order or report payment for an existing one.', 'O formulário aparece somente quando você inicia um pedido ou informa o pagamento de um pedido existente.')}</p>
             <div className="order-start-actions">
-              <button className="btn-primary" onClick={() => { setStarted(true); setActiveTab('new'); }}>Iniciar mi pedido</button>
-              <button className="btn-secondary" onClick={() => { setStarted(true); setActiveTab('payment'); }}>Ya creé mi invite</button>
+              <button className="btn-primary" onClick={() => { setStarted(true); setActiveTab('new'); }}>{l('Iniciar mi pedido', 'Start my order', 'Iniciar meu pedido')}</button>
+              <button className="btn-secondary" onClick={() => { setStarted(true); setActiveTab('payment'); }}>{l('Ya creé mi invite', 'I already created my invite', 'Já criei meu convite')}</button>
             </div>
           </div>
         ) : <>
         <div className="order-flow-tabs" role="tablist">
-          <button className={activeTab === 'new' ? 'active' : ''} onClick={() => setActiveTab('new')}>Creá tu invite</button>
-          <button className={activeTab === 'payment' ? 'active' : ''} onClick={() => setActiveTab('payment')}>Ya creaste tu invite</button>
+          <button className={activeTab === 'new' ? 'active' : ''} onClick={() => setActiveTab('new')}>{l('Creá tu invite', 'Create your invite', 'Crie seu convite')}</button>
+          <button className={activeTab === 'payment' ? 'active' : ''} onClick={() => setActiveTab('payment')}>{l('Ya creaste tu invite', 'Already created yours?', 'Já criou seu convite?')}</button>
         </div>
 
         {activeTab === 'new' && (submittedOrder ? (
           <div className="order-success-card">
             <span>✓</span>
-            <h3>¡Recibimos tu pedido!</h3>
-            <p>Guardá este número para consultar o informar el pago más adelante.</p>
+            <h3>{l('¡Recibimos tu pedido!', 'We received your order!', 'Recebemos seu pedido!')}</h3>
+            <p>{l('Guardá este número para consultar o informar el pago más adelante.', 'Save this number to check or report payment later.', 'Guarde este número para consultar ou informar o pagamento depois.')}</p>
             <strong>{submittedOrder}</strong>
-            <p className="order-status-note">Estado inicial: pedido recibido. La publicación final se libera después de validar el pago.</p>
-            <button className="btn-secondary" onClick={() => { setActiveTab('payment'); setPaymentUpdated(false); }}>Informar un pago</button>
+            <p className="order-status-note">{l('Estado inicial: pedido recibido. La publicación final se libera después de validar el pago.', 'Initial status: order received. Final publication is released after payment validation.', 'Estado inicial: pedido recebido. A publicação final é liberada após a validação do pagamento.')}</p>
+            <button className="btn-secondary" onClick={() => { setActiveTab('payment'); setPaymentUpdated(false); }}>{l('Informar un pago', 'Report a payment', 'Informar um pagamento')}</button>
           </div>
         ) : (
           <form className="order-form" onSubmit={submitOrder}>
             <div className="order-form-block">
-              <div className="order-block-title"><span>1</span><div><h3>Elegí tu plan</h3><p>La portada está incluida y no cuenta como sección.</p></div></div>
+              <div className="order-block-title"><span>1</span><div><h3>{l('Elegí tu plan', 'Choose your plan', 'Escolha seu plano')}</h3><p>{l('La portada está incluida y no cuenta como sección.', 'The cover is included and does not count as a section.', 'A capa está incluída e não conta como seção.')}</p></div></div>
               <div className="order-plan-grid">
                 <button type="button" className={`order-plan-card ${plan === 'basic' ? 'active' : ''}`} onClick={() => setPlan('basic')}>
-                  <small>PLAN</small><h4>Básico</h4><strong>Hasta 5 secciones</strong><p>Galería de hasta 5 fotos si la elegís.</p>
+                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{l('Básico', 'Basic', 'Básico')}</h4><strong>{l('Hasta 5 secciones', 'Up to 5 sections', 'Até 5 seções')}</strong><p>{l('Galería de hasta 5 fotos si la elegís.', 'Gallery with up to 5 photos if selected.', 'Galeria de até 5 fotos, se escolhida.')}</p>
                 </button>
                 <button type="button" className={`order-plan-card ${plan === 'premium' ? 'active' : ''}`} onClick={() => setPlan('premium')}>
-                  <small>PLAN</small><h4>Premium</h4><strong>Hasta 8 secciones</strong><p>Galería de hasta 8 fotos si la elegís.</p>
+                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>Premium</h4><strong>{l('Hasta 8 secciones', 'Up to 8 sections', 'Até 8 seções')}</strong><p>{l('Galería de hasta 8 fotos si la elegís.', 'Gallery with up to 8 photos if selected.', 'Galeria de até 8 fotos, se escolhida.')}</p>
                 </button>
               </div>
             </div>
 
             <div className="order-form-block">
-              <div className="order-block-title"><span>2</span><div><h3>Elegí el modelo y las secciones</h3><p>{sections.length} de {sectionLimit} secciones seleccionadas.</p></div></div>
-              <span className="form-label">Primero, elegí el tipo de evento</span>
+              <div className="order-block-title"><span>2</span><div><h3>{l('Elegí el modelo y las secciones', 'Choose the model and sections', 'Escolha o modelo e as seções')}</h3><p>{sections.length} {l('de', 'of', 'de')} {sectionLimit} {l('secciones seleccionadas.', 'sections selected.', 'seções selecionadas.')}</p></div></div>
+              <span className="form-label">{l('Primero, elegí el tipo de evento', 'First, choose the event type', 'Primeiro, escolha o tipo de evento')}</span>
               <div className="order-event-categories" role="group" aria-label="Tipo de evento">
                 {([
-                  ['wedding', 'Boda'],
-                  ['15years', '15 Años'],
-                  ['other', 'Otros eventos']
+                  ['wedding', l('Boda', 'Wedding', 'Casamento')],
+                  ['15years', l('15 Años', 'Quinceañera', '15 Anos')],
+                  ['other', l('Otros eventos', 'Other events', 'Outros eventos')]
                 ] as [EventCategory, string][]).map(([category, label]) => (
                   <button
                     type="button"
@@ -218,13 +237,13 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
                   </button>
                 ))}
               </div>
-              <label className="form-label" htmlFor="order-model">Modelo de invitación</label>
+              <label className="form-label" htmlFor="order-model">{l('Modelo de invitación', 'Invitation model', 'Modelo de convite')}</label>
               <select id="order-model" className="form-select" value={modelId} onChange={(event) => setModelId(event.target.value)}>
                 {filteredModels.map((model) => <option key={model.id} value={model.id}>{model.title}</option>)}
               </select>
               <div className="order-color-field">
-                <span className="form-label">Color principal de la invitación</span>
-                <p>Elegilo cuando el modelo admita cambio de paleta. Lo confirmaremos al revisar el pedido.</p>
+                <span className="form-label">{l('Color principal de la invitación', 'Main invitation color', 'Cor principal do convite')}</span>
+                <p>{l('Elegilo cuando el modelo admita cambio de paleta. Lo confirmaremos al revisar el pedido.', 'Choose it when the model supports palette changes. We will confirm it when reviewing the order.', 'Escolha quando o modelo permitir mudança de paleta. Confirmaremos ao revisar o pedido.')}</p>
                 <div className="order-color-options">
                   {[
                     ['#ff6f91', 'Rosa'], ['#ff9671', 'Coral'], ['#ffc75f', 'Amarillo'],
@@ -237,7 +256,7 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
                 </div>
               </div>
               <div className="order-sections-grid">
-                {SECTION_OPTIONS.map((section) => {
+                {sectionOptions.map((section) => {
                   const selected = sections.includes(section.id);
                   const disabled = !selected && sections.length >= sectionLimit;
                   return (
@@ -248,78 +267,78 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
                   );
                 })}
               </div>
-              {rsvpSelected && <div className="rsvp-included-note"><strong>RSVP completo incluido</strong><span>Google Sheets · link de envío · restricciones alimentarias para catering · cédula para control de ingreso.</span></div>}
+              {rsvpSelected && <div className="rsvp-included-note"><strong>{l('RSVP completo incluido', 'Complete RSVP included', 'RSVP completo incluído')}</strong><span>{l('Google Sheets · link de envío · restricciones alimentarias para catering · cédula para control de ingreso.', 'Google Sheets · sending link · dietary restrictions for catering · ID for access control.', 'Google Sheets · link de envio · restrições alimentares para catering · documento para controle de entrada.')}</span></div>}
             </div>
 
             <div className="order-form-block">
-              <div className="order-block-title"><span>3</span><div><h3>Completá todos los datos</h3><p>Los campos cambian según las secciones que elegiste.</p></div></div>
+              <div className="order-block-title"><span>3</span><div><h3>{l('Completá todos los datos', 'Complete all the details', 'Preencha todos os dados')}</h3><p>{l('Los campos cambian según las secciones que elegiste.', 'Fields change according to the sections you selected.', 'Os campos mudam conforme as seções escolhidas.')}</p></div></div>
               <div className="form-row-2col">
-                <div className="form-group"><label className="form-label">Nombre y apellido</label><input name="name" className="form-input" required /></div>
+                <div className="form-group"><label className="form-label">{l('Nombre y apellido', 'Full name', 'Nome e sobrenome')}</label><input name="name" className="form-input" required /></div>
                 <div className="form-group"><label className="form-label">WhatsApp</label><input name="whatsapp" className="form-input" type="tel" required /></div>
               </div>
               <div className="form-row-2col">
                 <div className="form-group"><label className="form-label">Email</label><input name="email" className="form-input" type="email" required /></div>
-                <div className="form-group"><label className="form-label">Título o protagonistas</label><input name="eventTitle" className="form-input" required placeholder="Ej. Ana & Juan" /></div>
+                <div className="form-group"><label className="form-label">{l('Título o protagonistas', 'Title or hosts', 'Título ou protagonistas')}</label><input name="eventTitle" className="form-input" required placeholder={l('Ej. Ana & Juan', 'E.g. Ana & Juan', 'Ex. Ana & Juan')} /></div>
               </div>
               <div className="form-row-2col">
-                <div className="form-group"><label className="form-label">Fecha principal del evento</label><input name="eventDate" className="form-input" type="date" required /></div>
-                <div className="form-group"><label className="form-label">Hora principal</label><input name="eventTime" className="form-input" type="time" required /></div>
+                <div className="form-group"><label className="form-label">{l('Fecha principal del evento', 'Main event date', 'Data principal do evento')}</label><input name="eventDate" className="form-input" type="date" required /></div>
+                <div className="form-group"><label className="form-label">{l('Hora principal', 'Main time', 'Horário principal')}</label><input name="eventTime" className="form-input" type="time" required /></div>
               </div>
-              <div className="form-group"><label className="form-label">Foto principal o imagen de portada</label><input name="coverImage" className="form-input" type="file" accept="image/*" /><small>Podés subirla ahora o dejarla pendiente si el modelo no lleva fotografía.</small></div>
+              <div className="form-group"><label className="form-label">{l('Foto principal o imagen de portada', 'Main photo or cover image', 'Foto principal ou imagem de capa')}</label><input name="coverImage" className="form-input" type="file" accept="image/*" /><small>{l('Podés subirla ahora o dejarla pendiente si el modelo no lleva fotografía.', 'You can upload it now or leave it pending if the model has no photo.', 'Você pode enviar agora ou deixar pendente se o modelo não usar foto.')}</small></div>
 
-              {sections.includes('countdown') && <div className="dynamic-section-fields"><h4>Cuenta regresiva</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">Fecha objetivo</label><input name="countdownDate" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">Hora objetivo</label><input name="countdownTime" className="form-input" type="time" required /></div></div><div className="form-group"><label className="form-label">Título del contador</label><input name="countdownTitle" className="form-input" required placeholder="Ej. Falta muy poco" /></div></div>}
+              {sections.includes('countdown') && <div className="dynamic-section-fields"><h4>{l('Cuenta regresiva', 'Countdown', 'Contagem regressiva')}</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha objetivo', 'Target date', 'Data de destino')}</label><input name="countdownDate" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Hora objetivo', 'Target time', 'Horário de destino')}</label><input name="countdownTime" className="form-input" type="time" required /></div></div><div className="form-group"><label className="form-label">{l('Título del contador', 'Countdown title', 'Título do contador')}</label><input name="countdownTitle" className="form-input" required placeholder={l('Ej. Falta muy poco', 'E.g. Almost there', 'Ex. Falta muito pouco')} /></div></div>}
 
-              {sections.includes('agenda') && <div className="dynamic-section-fields"><h4>Agenda o itinerario</h4><p>Indicá cada momento con hora, título, lugar y una breve descripción.</p>{[1, 2, 3].map((item) => <div className="agenda-row" key={item}><input name={`agenda${item}Time`} className="form-input" type="time" required={item === 1} /><input name={`agenda${item}Title`} className="form-input" required={item === 1} placeholder={`Momento ${item}${item > 1 ? ' (opcional)' : ''}`} /><input name={`agenda${item}Place`} className="form-input" required={item === 1} placeholder="Lugar" /></div>)}</div>}
+              {sections.includes('agenda') && <div className="dynamic-section-fields"><h4>{l('Agenda o itinerario', 'Schedule or itinerary', 'Agenda ou itinerário')}</h4><p>{l('Indicá cada momento con hora, título, lugar y una breve descripción.', 'Add each moment with its time, title and venue.', 'Informe cada momento com horário, título e local.')}</p>{[1, 2, 3].map((item) => <div className="agenda-row" key={item}><input name={`agenda${item}Time`} className="form-input" type="time" required={item === 1} /><input name={`agenda${item}Title`} className="form-input" required={item === 1} placeholder={`${l('Momento', 'Moment', 'Momento')} ${item}${item > 1 ? ` (${l('opcional', 'optional', 'opcional')})` : ''}`} /><input name={`agenda${item}Place`} className="form-input" required={item === 1} placeholder={l('Lugar', 'Venue', 'Local')} /></div>)}</div>}
 
-              {sections.includes('location') && <div className="dynamic-section-fields"><h4>Ubicación y mapa</h4><div className="form-group"><label className="form-label">Nombre del lugar</label><input name="locationName" className="form-input" required /></div><div className="form-group"><label className="form-label">Dirección completa</label><input name="locationAddress" className="form-input" required /></div><div className="form-group"><label className="form-label">Link de Google Maps o Waze</label><input name="locationMap" className="form-input" type="url" required placeholder="https://..." /></div></div>}
+              {sections.includes('location') && <div className="dynamic-section-fields"><h4>{l('Ubicación y mapa', 'Location and map', 'Localização e mapa')}</h4><div className="form-group"><label className="form-label">{l('Nombre del lugar', 'Venue name', 'Nome do local')}</label><input name="locationName" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Dirección completa', 'Full address', 'Endereço completo')}</label><input name="locationAddress" className="form-input" required /></div><div className="form-group"><label className="form-label">Google Maps / Waze</label><input name="locationMap" className="form-input" type="url" required placeholder="https://..." /></div></div>}
 
-              {sections.includes('rsvp') && <div className="dynamic-section-fields"><h4>Confirmación de asistencia</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">Fecha límite para confirmar</label><input name="rsvpDeadline" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">Cantidad máxima por invitación</label><input name="rsvpMaxGuests" className="form-input" type="number" min="1" required /></div></div><div className="form-group"><label className="form-label">Texto o indicaciones para confirmar</label><textarea name="rsvpInstructions" className="form-textarea" required placeholder="Ej. Confirmar antes del 10 de octubre." /></div><p className="dynamic-help">La planilla incluirá nombre, asistencia, acompañantes, restricciones alimentarias y cédula de identidad.</p></div>}
+              {sections.includes('rsvp') && <div className="dynamic-section-fields"><h4>RSVP</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha límite para confirmar', 'RSVP deadline', 'Prazo para confirmação')}</label><input name="rsvpDeadline" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Cantidad máxima por invitación', 'Maximum guests per invitation', 'Máximo de convidados por convite')}</label><input name="rsvpMaxGuests" className="form-input" type="number" min="1" required /></div></div><div className="form-group"><label className="form-label">{l('Texto o indicaciones para confirmar', 'RSVP instructions', 'Instruções para confirmação')}</label><textarea name="rsvpInstructions" className="form-textarea" required /></div><p className="dynamic-help">{l('La planilla incluirá nombre, asistencia, acompañantes, restricciones alimentarias y cédula de identidad.', 'The spreadsheet will include name, attendance, guests, dietary restrictions and ID.', 'A planilha incluirá nome, presença, acompanhantes, restrições alimentares e documento.')}</p></div>}
 
               {sections.includes('gifts') && <div className="dynamic-section-fields"><h4>Regalos</h4><p>Podés agregar hasta 3 cuentas bancarias, listas o lugares de compra.</p>{[1, 2, 3].map((item) => <div className="gift-row" key={item}><select name={`gift${item}Type`} className="form-select" required={item === 1}><option value="">Tipo {item}</option><option>Cuenta bancaria</option><option>Link de compra</option><option>Lista de regalos</option><option>Otro</option></select><input name={`gift${item}Label`} className="form-input" required={item === 1} placeholder={`Banco, tienda o título${item > 1 ? ' (opcional)' : ''}`} /><input name={`gift${item}Detail`} className="form-input" required={item === 1} placeholder="Alias, número de cuenta o link" /></div>)}</div>}
 
-              {sections.includes('dresscode') && <div className="dynamic-section-fields"><h4>Código de vestimenta</h4><div className="form-group"><label className="form-label">Tipo de vestimenta</label><input name="dressCode" className="form-input" required placeholder="Ej. Elegante sport" /></div><div className="form-group"><label className="form-label">Aclaraciones</label><textarea name="dressCodeDetails" className="form-textarea" required placeholder="Colores, calzado, prendas que se deben evitar, etc." /></div></div>}
+              {sections.includes('dresscode') && <div className="dynamic-section-fields"><h4>{l('Código de vestimenta', 'Dress code', 'Código de vestimenta')}</h4><div className="form-group"><label className="form-label">{l('Tipo de vestimenta', 'Attire', 'Tipo de traje')}</label><input name="dressCode" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Aclaraciones', 'Additional details', 'Observações')}</label><textarea name="dressCodeDetails" className="form-textarea" required /></div></div>}
 
-              {sections.includes('playlist') && <div className="dynamic-section-fields"><h4>Playlist</h4><div className="form-group"><label className="form-label">Link de Spotify o plataforma</label><input name="playlistLink" className="form-input" type="url" required /></div><div className="form-group"><label className="form-label">Texto para pedir canciones</label><input name="playlistPrompt" className="form-input" required placeholder="Ej. Ayudanos a armar la música de la fiesta" /></div></div>}
+              {sections.includes('playlist') && <div className="dynamic-section-fields"><h4>Playlist</h4><div className="form-group"><label className="form-label">{l('Link de Spotify o plataforma', 'Spotify or platform link', 'Link do Spotify ou plataforma')}</label><input name="playlistLink" className="form-input" type="url" required /></div><div className="form-group"><label className="form-label">{l('Texto para pedir canciones', 'Song request text', 'Texto para pedir músicas')}</label><input name="playlistPrompt" className="form-input" required /></div></div>}
 
-              {sections.includes('instagram') && <div className="dynamic-section-fields"><h4>Instagram y hashtag</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">Usuario de Instagram</label><input name="instagramUser" className="form-input" required placeholder="@usuario" /></div><div className="form-group"><label className="form-label">Hashtag</label><input name="instagramHashtag" className="form-input" required placeholder="#NuestroEvento" /></div></div></div>}
+              {sections.includes('instagram') && <div className="dynamic-section-fields"><h4>{l('Instagram y hashtag', 'Instagram and hashtag', 'Instagram e hashtag')}</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">Instagram</label><input name="instagramUser" className="form-input" required placeholder="@user" /></div><div className="form-group"><label className="form-label">Hashtag</label><input name="instagramHashtag" className="form-input" required placeholder="#OurEvent" /></div></div></div>}
 
-              {sections.includes('messages') && <div className="dynamic-section-fields"><h4>Muro de saludos</h4><div className="form-group"><label className="form-label">Título de la sección</label><input name="messagesTitle" className="form-input" required placeholder="Ej. Dejanos un mensaje" /></div><div className="form-group"><label className="form-label">Consigna para los invitados</label><textarea name="messagesPrompt" className="form-textarea" required /></div></div>}
+              {sections.includes('messages') && <div className="dynamic-section-fields"><h4>{l('Muro de saludos', 'Message wall', 'Mural de mensagens')}</h4><div className="form-group"><label className="form-label">{l('Título de la sección', 'Section title', 'Título da seção')}</label><input name="messagesTitle" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Consigna para los invitados', 'Prompt for guests', 'Instrução para os convidados')}</label><textarea name="messagesPrompt" className="form-textarea" required /></div></div>}
 
               <label className="order-toggle-row">
                 <input type="checkbox" checked={hasMusic} onChange={(event) => setHasMusic(event.target.checked)} />
-                <span><strong>Música de fondo</strong><small>Está disponible en ambos planes y no cuenta como sección.</small></span>
+                <span><strong>{l('Música de fondo', 'Background music', 'Música de fundo')}</strong><small>{l('Está disponible en ambos planes y no cuenta como sección.', 'Available in both plans and does not count as a section.', 'Disponível nos dois planos e não conta como seção.')}</small></span>
               </label>
-              {hasMusic && <div className="form-group order-reveal"><label className="form-label">Canción o enlace</label><input name="music" className="form-input" required placeholder="Spotify, YouTube o nombre de la canción" /></div>}
+              {hasMusic && <div className="form-group order-reveal"><label className="form-label">{l('Canción o enlace', 'Song or link', 'Música ou link')}</label><input name="music" className="form-input" required placeholder={l('Spotify, YouTube o nombre de la canción', 'Spotify, YouTube or song name', 'Spotify, YouTube ou nome da música')} /></div>}
 
-              {gallerySelected && <div className="form-group order-reveal"><label className="form-label">Fotos para la galería (máximo {photoLimit})</label><input name="galleryPhotos" className="form-input" type="file" multiple accept="image/*" required onChange={(event) => handlePhotos(event.target.files)} /><small>{photoCount} foto(s) seleccionada(s).</small>{photoError && <p className="order-error">{photoError}</p>}</div>}
+              {gallerySelected && <div className="form-group order-reveal"><label className="form-label">{l('Fotos para la galería', 'Gallery photos', 'Fotos para a galeria')} ({l('máximo', 'maximum', 'máximo')} {photoLimit})</label><input name="galleryPhotos" className="form-input" type="file" multiple accept="image/*" required onChange={(event) => handlePhotos(event.target.files)} /><small>{photoCount} {l('foto(s) seleccionada(s).', 'photo(s) selected.', 'foto(s) selecionada(s).')}</small>{photoError && <p className="order-error">{photoError}</p>}</div>}
             </div>
 
             <div className="order-form-block order-payment-choice">
-              <div className="order-block-title"><span>4</span><div><h3>Pago, ahora o después</h3><p>No necesitás pagar para enviar el pedido.</p></div></div>
+              <div className="order-block-title"><span>4</span><div><h3>{l('Pago, ahora o después', 'Payment, now or later', 'Pagamento, agora ou depois')}</h3><p>{l('No necesitás pagar para enviar el pedido.', 'You do not need to pay to submit the order.', 'Você não precisa pagar para enviar o pedido.')}</p></div></div>
               <div className="order-payment-actions">
                 {PAYMENT_LINKS[plan] ? (
                   <a href={PAYMENT_LINKS[plan]} target="_blank" rel="noopener noreferrer" className="mercado-pago-link">Pagar Plan {plan === 'basic' ? 'Básico' : 'Premium'} con Mercado Pago ↗</a>
                 ) : (
                   <div className="mercado-pago-link payment-link-pending">Link de pago del Plan {plan === 'basic' ? 'Básico' : 'Premium'} pendiente de configurar</div>
                 )}
-                <div className="form-group"><label className="form-label">Si ya pagaste, pegá el número de operación</label><input name="paymentOperation" className="form-input" placeholder="Ej. 12345678901 (opcional)" /></div>
+                <div className="form-group"><label className="form-label">{l('Si ya pagaste, pegá el número de operación', 'If you already paid, enter the transaction number', 'Se já pagou, informe o número da operação')}</label><input name="paymentOperation" className="form-input" placeholder={l('Ej. 12345678901 (opcional)', 'E.g. 12345678901 (optional)', 'Ex. 12345678901 (opcional)')} /></div>
               </div>
             </div>
 
-            <button className="btn-form-submit order-submit" type="submit" disabled={sending || sections.length === 0 || !!photoError}>{sending ? 'Enviando pedido…' : 'Enviar mi pedido'}</button>
+            <button className="btn-form-submit order-submit" type="submit" disabled={sending || sections.length === 0 || !!photoError}>{sending ? l('Enviando pedido…', 'Sending order…', 'Enviando pedido…') : l('Enviar mi pedido', 'Send my order', 'Enviar meu pedido')}</button>
           </form>
         ))}
 
         {activeTab === 'payment' && (paymentUpdated ? (
-          <div className="order-success-card"><span>✓</span><h3>Pago informado</h3><p>Recibimos el número de operación. Lo verificaremos internamente y actualizaremos el estado de tu pedido.</p><strong>Pendiente de validación</strong></div>
+          <div className="order-success-card"><span>✓</span><h3>{l('Pago informado', 'Payment reported', 'Pagamento informado')}</h3><p>{l('Recibimos el número de operación. Lo verificaremos internamente y actualizaremos el estado de tu pedido.', 'We received the transaction number. We will verify it and update your order status.', 'Recebemos o número da operação. Vamos verificá-lo e atualizar o status do seu pedido.')}</p><strong>{l('Pendiente de validación', 'Pending validation', 'Pendente de validação')}</strong></div>
         ) : (
           <form className="order-form payment-update-form" onSubmit={submitPaymentUpdate}>
             <div className="order-form-block">
-              <div className="order-block-title"><span>✓</span><div><h3>Informá el pago de un pedido existente</h3><p>No necesitás volver a cargar los datos de tu invitación.</p></div></div>
-              <div className="form-group"><label className="form-label">Número de pedido</label><input name="orderNumber" className="form-input" required placeholder="SYD-123456" pattern="SYD-[0-9]{6}" /></div>
-              <div className="form-group"><label className="form-label">Número de operación de Mercado Pago</label><input name="paymentOperation" className="form-input" required /></div>
-              <div className="form-group"><label className="form-label">Email o WhatsApp usado en el pedido</label><input name="contact" className="form-input" required /></div>
-              <button className="btn-form-submit" type="submit" disabled={sending}>{sending ? 'Enviando…' : 'Enviar número de operación'}</button>
+              <div className="order-block-title"><span>✓</span><div><h3>{l('Informá el pago de un pedido existente', 'Report payment for an existing order', 'Informe o pagamento de um pedido existente')}</h3><p>{l('No necesitás volver a cargar los datos de tu invitación.', 'You do not need to enter your invitation details again.', 'Você não precisa preencher novamente os dados do convite.')}</p></div></div>
+              <div className="form-group"><label className="form-label">{l('Número de pedido', 'Order number', 'Número do pedido')}</label><input name="orderNumber" className="form-input" required placeholder="SYD-123456" pattern="SYD-[0-9]{6}" /></div>
+              <div className="form-group"><label className="form-label">{l('Número de operación de Mercado Pago', 'Mercado Pago transaction number', 'Número da operação do Mercado Pago')}</label><input name="paymentOperation" className="form-input" required /></div>
+              <div className="form-group"><label className="form-label">{l('Email o WhatsApp usado en el pedido', 'Email or WhatsApp used for the order', 'E-mail ou WhatsApp usado no pedido')}</label><input name="contact" className="form-input" required /></div>
+              <button className="btn-form-submit" type="submit" disabled={sending}>{sending ? l('Enviando…', 'Sending…', 'Enviando…') : l('Enviar número de operación', 'Send transaction number', 'Enviar número da operação')}</button>
             </div>
           </form>
         ))}
