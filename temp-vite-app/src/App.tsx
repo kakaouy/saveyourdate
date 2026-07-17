@@ -2017,7 +2017,7 @@ function App() {
       </section>
 
       {/* SECTION 6: PORTAL DE CREACIÓN / CARGA DE DATOS */}
-      <section id="crear" className="features-section" style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--color-border)' }}>
+      <section id="crear" className="features-section" style={{ background: 'var(--color-primary)', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container">
           <div className="section-header">
             <span className="section-subtitle">{t.portal.subtitle}</span>
@@ -2434,7 +2434,7 @@ function App() {
       </section>
 
       {/* SECTION 6.5: COMPRAR / OBTENER CÓDIGO */}
-      <section id="pago" className="features-section" style={{ background: '#ffffff', borderBottom: '1px solid var(--color-border)' }}>
+      <section id="pago" className="features-section" style={{ background: 'var(--color-soft-white)', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container">
           <div className="section-header">
             <span className="section-subtitle">💳 {lang === 'es' ? 'Simulación de Pago' : (lang === 'en' ? 'Payment Simulation' : 'Simulação de Pagamento')}</span>

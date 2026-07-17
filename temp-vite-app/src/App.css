@@ -1914,3 +1914,133 @@ html, body, .app-wrapper {
   }
 }
 
+
+
+/* ==========================================
+   SAVE YOUR DATE PALETTE & CLEAN SECTIONS
+   ========================================== */
+.header {
+  background-color: rgba(249, 249, 251, 0.94);
+}
+
+.hero-section {
+  background: var(--color-soft-white);
+}
+
+.models-section {
+  background-color: #ffffff;
+}
+
+.features-section {
+  background-color: var(--color-yellow);
+}
+
+.process-section {
+  background-color: #ffffff;
+}
+
+.faq-section {
+  background-color: var(--color-coral);
+}
+
+.contact-section {
+  background-color: var(--color-ink);
+  color: #ffffff;
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+
+.contact-section .contact-info-title,
+.contact-section .section-title {
+  color: #ffffff;
+}
+
+.contact-section .contact-info-desc,
+.contact-section .section-desc {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.contact-section .section-subtitle {
+  color: var(--color-yellow);
+}
+
+.feature-card,
+.faq-item,
+.contact-form-box,
+.model-card {
+  background-color: #ffffff;
+}
+
+.feature-icon-wrapper {
+  background-color: var(--color-mint-light);
+  color: var(--color-mint);
+}
+
+.section-subtitle {
+  color: var(--color-ink);
+}
+
+.models-section .section-subtitle,
+.process-section .section-subtitle {
+  color: var(--color-accent);
+}
+
+/* More compact invitation examples */
+.models-swimlane-container {
+  grid-auto-columns: calc((100% - 60px) / 4);
+  gap: 20px;
+}
+
+.card-visual {
+  height: 230px;
+  padding: 16px;
+}
+
+.mock-card-content {
+  width: 145px;
+  height: 200px;
+  padding: 12px;
+}
+
+.card-info {
+  padding: 18px;
+}
+
+.card-title {
+  font-size: 21px;
+}
+
+.card-desc {
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.card-features {
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.card-feature-tag {
+  font-size: 11px;
+}
+
+@media (max-width: 1100px) {
+  .models-swimlane-container {
+    grid-auto-columns: calc((100% - 40px) / 3);
+  }
+}
+
+@media (max-width: 820px) {
+  .models-swimlane-container {
+    grid-auto-columns: calc((100% - 20px) / 2);
+  }
+}
+
+@media (max-width: 576px) {
+  .models-swimlane-container {
+    grid-auto-columns: 82%;
+  }
+
+  .card-visual {
+    height: 220px;
+  }
+}
