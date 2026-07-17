@@ -3128,6 +3128,271 @@ html {
   }
 }
 
+/* ==========================================
+   UX REORGANIZATION & SOFTER COLOR BALANCE
+   ========================================== */
+.hero-section {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 88% 28%, rgba(255,111,145,.18), transparent 31%),
+    linear-gradient(110deg, #ffffff 0%, #ffffff 58%, #fff3f6 100%);
+}
+
+.hero-title { color: #392e3b; }
+.hero-title span { color: #ff6f91; }
+.hero-description { color: #625866; }
+
+.hero-tag {
+  background: #fff0f4;
+  color: #392e3b;
+}
+
+.hero-benefits {
+  margin: -18px 0 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.hero-benefits span {
+  color: #4e454f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.hero-benefits span::first-letter { color: #73c6b6; }
+
+.hero-section .btn-secondary {
+  border-color: #392e3b;
+  color: #392e3b;
+}
+
+.plans-section {
+  padding: 88px 0;
+  background: #f8fbfa;
+}
+
+.plans-header { margin-bottom: 36px; }
+.plans-header .section-subtitle { color: #4f9185; }
+
+.plans-comparison {
+  width: min(900px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.plan-card-simple {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(57,46,59,.12);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(57,46,59,.055);
+}
+
+.plan-card-simple.featured {
+  border-color: rgba(255,111,145,.55);
+  background: linear-gradient(145deg, #fff 0%, #fff5f7 100%);
+}
+
+.plan-label {
+  width: max-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef9f7;
+  color: #397d70;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.plan-card-simple.featured .plan-label {
+  background: #fff0f4;
+  color: #d94e70;
+}
+
+.plan-card-simple h3 {
+  margin: 18px 0 18px;
+  color: #392e3b;
+  font: 700 27px/1.1 var(--font-serif);
+}
+
+.plan-card-simple ul {
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  color: #625866;
+  list-style: none;
+}
+
+.plan-card-simple li::before {
+  content: '✓';
+  margin-right: 9px;
+  color: #73c6b6;
+  font-weight: 900;
+}
+
+.plan-card-simple li strong { color: #392e3b; }
+
+.plan-cta {
+  margin-top: auto;
+  padding: 13px 18px;
+  border: 1px solid #392e3b;
+  border-radius: 999px;
+  background: #392e3b;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+}
+
+.plan-card-simple.featured .plan-cta {
+  border-color: #ff6f91;
+  background: #ff6f91;
+}
+
+.plans-rsvp-note {
+  width: min(760px, 100%);
+  margin: 20px auto 0;
+  padding: 13px 17px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-radius: 14px;
+  background: #fff;
+  color: #625866;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.plans-rsvp-note img { width: 30px; height: 30px; object-fit: contain; }
+
+#incluyen.features-section {
+  background: #f9f9fb;
+}
+
+#incluyen.features-section::after { display: none; }
+#incluyen .section-subtitle { color: #d94e70; }
+#incluyen .section-title { color: #392e3b; }
+#incluyen .section-desc { color: #625866; }
+
+.feature-groups {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 20px;
+}
+
+.feature-group {
+  padding: 25px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  border: 1px solid rgba(57,46,59,.10);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(57,46,59,.045);
+}
+
+.organizer-group {
+  grid-template-columns: 1fr;
+  background: #f1faf8;
+}
+
+.feature-group-heading {
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.feature-group-heading > span {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff0f4;
+  color: #d94e70;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.organizer-group .feature-group-heading > span {
+  background: #73c6b6;
+  color: #fff;
+}
+
+.feature-group-heading h3 { margin: 0 0 2px; font: 700 24px/1 var(--font-serif); }
+.feature-group-heading p { margin: 0; color: #766d79; font-size: 11px; }
+
+.feature-line {
+  min-height: 92px;
+  padding: 13px;
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  border-radius: 13px;
+  background: #fafafa;
+}
+
+.organizer-group .feature-line { background: rgba(255,255,255,.72); }
+.feature-line img { width: 31px; height: 31px; object-fit: contain; }
+.feature-line h4 { margin: 0 0 3px; color: #392e3b; font-size: 13px; }
+.feature-line p { margin: 0; color: #766d79; font-size: 10px; line-height: 1.4; }
+
+#incluyen .btn-secondary {
+  border-color: #392e3b !important;
+  background: #fff;
+  color: #392e3b !important;
+}
+
+.simplified-process {
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.simplified-process::before {
+  right: 16%;
+  left: 16%;
+}
+
+.process-section .process-cta-box .btn-primary {
+  background: #392e3b;
+}
+
+.faq-section {
+  background: #67b9aa;
+}
+
+.contact-section {
+  padding: 68px 0;
+}
+
+@media (max-width: 900px) {
+  .feature-groups { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+  .hero-section {
+    background: linear-gradient(180deg, #fff 0%, #fff 66%, #fff3f6 100%);
+  }
+  .hero-benefits { justify-content: center; }
+  .plans-comparison, .feature-group { grid-template-columns: 1fr; }
+  .plans-section { padding: 64px 0; }
+  .plan-card-simple { padding: 24px 20px; }
+  .feature-group { padding: 18px; }
+  .simplified-process { grid-template-columns: 1fr; }
+}
+
 
 /* ==========================================
    PALETTE REFINEMENTS: HERO, FEATURES, FAQ, FOOTER
