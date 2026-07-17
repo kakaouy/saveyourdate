@@ -3077,6 +3077,14 @@ html {
   background: #fff;
 }
 
+.demo-real-invitation-frame {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+  background: #fff;
+}
+
 .demo-invitation-scroll {
   height: 100%;
   overflow-y: auto;

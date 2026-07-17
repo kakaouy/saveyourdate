@@ -1,0 +1,576 @@
+/* =========================================================
+   ESTRUCTURA GENERAL DEL SITIO
+========================================================= */
+
+.site-wrapper {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+
+  background:
+    var(--color-background);
+}
+
+
+main {
+  position: relative;
+
+  width: 100%;
+}
+
+
+/* =========================================================
+   PANTALLA DE BIENVENIDA
+========================================================= */
+
+.welcome-screen {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 100dvh;
+
+  padding:
+    var(--container-padding);
+
+  background:
+    var(--color-background);
+
+  z-index:
+    var(--z-modal);
+}
+
+
+.welcome-screen__content {
+  width:
+    min(
+      100%,
+      680px
+    );
+
+  margin-inline: auto;
+
+  text-align: center;
+}
+
+
+.welcome-screen__actions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    var(--space-sm);
+
+  margin-top:
+    var(--space-lg);
+}
+
+
+/* =========================================================
+   PORTADA
+========================================================= */
+
+.hero {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 100dvh;
+
+  padding:
+    var(--space-xl)
+    var(--container-padding);
+
+  overflow: hidden;
+}
+
+
+.hero__background {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    rgba(0, 0, 0, 0.2);
+}
+
+
+.hero__content {
+  position: relative;
+
+  width:
+    min(
+      100%,
+      900px
+    );
+
+  margin-inline: auto;
+
+  text-align: center;
+
+  z-index:
+    var(--z-content);
+}
+
+
+/* =========================================================
+   CUENTA REGRESIVA
+========================================================= */
+
+.countdown {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    clamp(
+      0.5rem,
+      3vw,
+      2rem
+    );
+
+  width: 100%;
+
+  margin-inline: auto;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   TARJETAS CENTRALES
+========================================================= */
+
+.event-card,
+.location-card,
+.dresscode-card,
+.gifts-card,
+.playlist-card,
+.rsvp-card {
+  width:
+    min(
+      100%,
+      700px
+    );
+
+  margin-inline: auto;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   UBICACIÓN
+========================================================= */
+
+.location-card__actions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    var(--space-sm);
+
+  margin-top:
+    var(--space-lg);
+}
+
+
+/* =========================================================
+   GALERÍA
+========================================================= */
+
+.gallery {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    var(--space-md);
+
+  width: 100%;
+}
+
+
+.gallery-dots {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    0.6rem;
+
+  margin-top:
+    var(--space-lg);
+}
+
+
+/* =========================================================
+   FORMULARIOS Y LISTAS
+========================================================= */
+
+.guest-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap:
+    var(--space-md);
+
+  width: 100%;
+}
+
+
+.rsvp-extra-fields {
+  display: flex;
+
+  flex-direction: column;
+
+  gap:
+    var(--space-md);
+
+  margin-top:
+    var(--space-lg);
+}
+
+
+/* =========================================================
+   MODALES
+========================================================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100dvh;
+
+  padding:
+    var(--container-padding);
+
+  z-index:
+    var(--z-modal);
+}
+
+
+.modal[hidden] {
+  display: none !important;
+}
+
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background:
+    rgba(20, 22, 20, 0.68);
+
+  backdrop-filter:
+    blur(5px);
+
+  -webkit-backdrop-filter:
+    blur(5px);
+}
+
+
+.modal__dialog {
+  position: relative;
+
+  width:
+    min(
+      100%,
+      560px
+    );
+
+  max-height:
+    calc(
+      100dvh - 48px
+    );
+
+  overflow-y: auto;
+
+  z-index:
+    1;
+}
+
+
+.modal__dialog--large {
+  width:
+    min(
+      100%,
+      760px
+    );
+}
+
+
+.modal__actions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: center;
+  justify-content: center;
+
+  gap:
+    var(--space-sm);
+
+  margin-top:
+    var(--space-lg);
+}
+
+
+/* =========================================================
+   LIGHTBOX
+========================================================= */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100dvh;
+
+  padding:
+    clamp(
+      1rem,
+      4vw,
+      3rem
+    );
+
+  background:
+    rgba(0, 0, 0, 0.9);
+
+  z-index:
+    calc(
+      var(--z-modal) + 10
+    );
+}
+
+
+.lightbox[hidden] {
+  display: none !important;
+}
+
+
+.lightbox__image {
+  width: auto;
+  max-width: 92vw;
+
+  height: auto;
+  max-height: 88dvh;
+
+  object-fit: contain;
+}
+
+
+/* =========================================================
+   BOTÓN DE MÚSICA
+========================================================= */
+
+.music-toggle {
+  position: fixed;
+
+  right:
+    clamp(
+      16px,
+      3vw,
+      30px
+    );
+
+  bottom:
+    clamp(
+      16px,
+      3vw,
+      30px
+    );
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  z-index:
+    calc(
+      var(--z-modal) - 1
+    );
+}
+
+
+/* =========================================================
+   CIERRE
+========================================================= */
+
+.section--closing {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 55vh;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+  position: relative;
+
+  width: 100%;
+
+  padding:
+    var(--space-lg)
+    0;
+
+  color:
+    var(--color-background);
+
+  background:
+    var(--color-primary);
+}
+
+
+.footer__content {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap:
+    var(--space-md);
+}
+
+
+/* =========================================================
+   RESPONSIVE ESTRUCTURAL
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .gallery {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .welcome-screen__actions,
+  .modal__actions,
+  .location-card__actions {
+    flex-direction: column;
+  }
+
+
+  .welcome-screen__actions .btn,
+  .modal__actions .btn,
+  .location-card__actions .btn {
+    width: 100%;
+  }
+
+
+  .hero {
+    min-height: 100svh;
+
+    padding:
+      var(--space-lg)
+      var(--container-padding);
+  }
+
+
+  .countdown {
+    gap: 0.35rem;
+  }
+
+
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+
+
+  .modal {
+    align-items: flex-end;
+
+    padding: 12px;
+  }
+
+
+  .modal__dialog {
+    width: 100%;
+
+    max-height:
+      calc(
+        100dvh - 24px
+      );
+  }
+
+
+  .footer__content {
+    flex-direction: column;
+
+    text-align: center;
+  }
+
+}

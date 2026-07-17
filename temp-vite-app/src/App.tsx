@@ -2903,6 +2903,13 @@ function App() {
               >
                 <div className="demo-phone-speaker"></div>
                 <div className="demo-phone-screen">
+                  {demoModel.id === 'boda-marfil' ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src="/demos/boda-elegante-minimalista/index.html?preview=1"
+                      title="Demo interactiva Boda elegante minimalista"
+                    />
+                  ) : (
                   <div className="demo-invitation-scroll">
                     <div className="sim-cover demo-cover" style={{
                       background: `linear-gradient(rgba(57,46,59,.12), rgba(57,46,59,.35)), linear-gradient(145deg, #fff 0%, ${selectedModelColors[demoModel.id] || MODEL_COLOR_OPTIONS[0].color} 145%)`
@@ -2991,6 +2998,7 @@ function App() {
                       <div className="demo-bank-data">ALIAS: nuestro.dia.2026</div>
                     </div>
                   </div>
+                  )}
                 </div>
               </div>
               <p className="demo-phone-caption">La invitación es interactiva: probá los botones y navegá dentro del celular.</p>

@@ -1,0 +1,153 @@
+:root {
+  /* =========================================================
+     PALETA EDITORIAL
+  ========================================================= */
+
+  --color-primary: #1f261f;
+  --color-primary-light: #343d34;
+  --color-secondary: #1f261f;
+  --color-accent: #1f261f;
+
+  --color-background: #f2eee5;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f2eee5;
+
+  --color-text: #1f261f;
+  --color-text-soft: #666960;
+  --color-text-light: #767970;
+
+  --color-border: #1f261f;
+  --color-border-soft: rgba(31, 38, 31, 0.22);
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+
+  /* =========================================================
+     TIPOGRAFÍAS
+  ========================================================= */
+
+  --font-display:
+    "Cormorant Garamond",
+    Georgia,
+    serif;
+
+  --font-body:
+    "Montserrat",
+    Arial,
+    sans-serif;
+
+
+  /* =========================================================
+     TAMAÑOS DE TEXTO
+  ========================================================= */
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-md: 1.125rem;
+  --font-size-lg: 1.5rem;
+  --font-size-xl: 2.2rem;
+  --font-size-2xl: 3.5rem;
+  --font-size-3xl: 5rem;
+
+
+  /* =========================================================
+     ALTURAS DE LÍNEA
+  ========================================================= */
+
+  --line-height-tight: 1.05;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.8;
+
+
+  /* =========================================================
+     ESPACIADOS
+  ========================================================= */
+
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+  --space-xl: 3.5rem;
+  --space-2xl: 6rem;
+
+  --section-padding-desktop: clamp(5rem, 9vw, 8rem);
+  --section-padding-mobile: 4.5rem;
+
+  --container-width: 1200px;
+  --container-padding: clamp(1.25rem, 4vw, 3rem);
+
+
+  /* =========================================================
+     BORDES EDITORIALES
+  ========================================================= */
+
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-pill: 2px;
+
+  --border-editorial:
+    1px solid var(--color-primary);
+
+  --border-soft:
+    1px solid var(--color-border-soft);
+
+
+  /* =========================================================
+     SOMBRAS
+  ========================================================= */
+
+  --shadow-sm:
+    0 5px 15px rgba(0, 0, 0, 0.06);
+
+  --shadow-soft:
+    0 10px 30px rgba(0, 0, 0, 0.08);
+
+  --shadow-photo:
+    0 8px 20px rgba(0, 0, 0, 0.09);
+
+  --shadow-photo-hover:
+    0 16px 34px rgba(0, 0, 0, 0.16);
+
+
+  /* =========================================================
+     TRANSICIONES
+  ========================================================= */
+
+  --transition-fast:
+    0.25s ease;
+
+  --transition-base:
+    0.45s ease;
+
+  --transition-photo:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+
+
+  /* =========================================================
+     CAPAS
+  ========================================================= */
+
+  --z-background: 0;
+  --z-content: 2;
+  --z-decoration: 3;
+  --z-header: 100;
+  --z-modal: 1000;
+  --z-loader: 2000;
+
+
+  /* =========================================================
+     DECORACIONES
+  ========================================================= */
+
+  --hero-decoration-opacity: 0;
+
+  --section-divider-width:
+    min(78%, 500px);
+
+  --section-divider-color:
+    var(--color-primary);
+}

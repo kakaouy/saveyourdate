@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Invitación de casamiento de Ana y Juan"
+  >
+
+  <title>Ana & Juan | Nos casamos</title>
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="assets/icons/favicon.png"
+  >
+
+  <!-- Google Fonts -->
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Estilos -->
+
+  <link
+    rel="stylesheet"
+    href="css/variables.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/base.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/layout.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/components.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/animations.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="css/responsive.css"
+  >
+
+</head>
+
+
+<body>
+
+
+  <!-- =====================================================
+       LOADER
+  ====================================================== -->
+
+  <div
+    id="page-loader"
+    class="page-loader"
+    aria-hidden="true"
+  >
+
+    <svg
+      class="page-loader__heart"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 500 500"
+      aria-hidden="true"
+    >
+
+      <path
+        class="svg-elem-1"
+        d="M249.9 134.4C266.9 88.3 327.9 47.6 401.4 87.9C477.4 129.6 453.5 228.3 262.8 418.4C255.5 425.5 247.5 429.1 237.2 419.7C47.3 229.3 22.2 130.2 96.8 87C170.5 44.3 232.7 87.8 249.9 134.4Z"
+      ></path>
+
+    </svg>
+
+  </div>
+
+
+  <!-- =====================================================
+       PANTALLA DE BIENVENIDA
+  ====================================================== -->
+
+  <div
+    id="welcome-screen"
+    class="welcome-screen"
+    aria-hidden="false"
+  >
+
+    <div class="welcome-screen__content">
+
+      <p
+        id="welcome-pretitle"
+        class="welcome-screen__pretitle"
+      >
+        Estás invitado a
+      </p>
+
+      <h1
+        id="welcome-title"
+        class="welcome-screen__title"
+      >
+        Nuestro casamiento
+      </h1>
+
+      <p
+        id="welcome-message"
+        class="welcome-screen__message"
+      >
+        Queremos compartir contigo un momento muy especial.
+      </p>
+
+      <div class="welcome-screen__actions">
+
+        <button
+          id="enter-with-music"
+          class="btn btn--primary"
+          type="button"
+        >
+          Entrar con música
+        </button>
+
+        <button
+          id="enter-without-music"
+          class="btn btn--secondary"
+          type="button"
+        >
+          Entrar sin música
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       SITIO
+  ====================================================== -->
+
+  <div
+    id="site-wrapper"
+    class="site-wrapper"
+  >
+
+
+    <!-- ===================================================
+         PORTADA EDITORIAL CON POLAROIDS
+    ==================================================== -->
+
+    <header
+      id="hero"
+      class="hero hero--editorial"
+      data-section="hero"
+    >
+
+      <div class="hero-editorial-layout">
+
+
+        <!-- Nombres -->
+
+        <div class="hero-editorial">
+
+          <p
+            id="hero-pretitle"
+            class="hero-editorial__pretitle"
+          >
+            Nos casamos
+          </p>
+
+          <div class="hero-editorial__names">
+
+            <span id="hero-name-one">
+              Ana
+            </span>
+
+            <span
+              class="hero-editorial__ampersand"
+              aria-hidden="true"
+            >
+              &
+            </span>
+
+            <span id="hero-name-two">
+              Juan
+            </span>
+
+          </div>
+
+          <div class="hero-editorial__meta">
+
+            <span id="hero-location">
+              Montevideo
+            </span>
+
+            <span
+              class="hero-editorial__line"
+              aria-hidden="true"
+            ></span>
+
+            <span id="hero-year">
+              2026
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- Polaroids -->
+
+        <div
+          id="polaroid-section"
+          class="hero-polaroids"
+          data-section="polaroids"
+        >
+
+          <div
+            id="polaroid-gallery"
+            class="polaroid-gallery polaroid-gallery--hero"
+          >
+            <!-- Se genera desde config.js -->
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <main>
+
+
+      <!-- =================================================
+           FRASE
+      ================================================== -->
+
+      <section
+        id="quote-section"
+        class="editorial-quote"
+        data-section="quote"
+      >
+
+        <div class="container">
+
+          <blockquote
+            id="quote-text"
+            class="editorial-quote__text"
+          ></blockquote>
+
+          <p
+            id="quote-author"
+            class="editorial-quote__author"
+          ></p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           CRONOGRAMA
+      ================================================== -->
+
+      <section
+        id="schedule-section"
+        class="schedule-section"
+        data-section="schedule"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="schedule-eyebrow"
+              class="section-heading__eyebrow"
+            ></p>
+
+            <h2
+              id="schedule-title"
+              class="section-heading__title"
+            >
+              Cronograma
+            </h2>
+
+          </div>
+
+          <p
+            id="schedule-date"
+            class="schedule__date"
+          ></p>
+
+          <div
+            id="schedule"
+            class="schedule"
+          >
+            <!-- Se genera desde config.js -->
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           CUENTA REGRESIVA
+      ================================================== -->
+
+      <section
+        id="countdown-section"
+        class="section section--editorial section--countdown"
+        data-section="countdown"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="countdown-eyebrow"
+              class="section-heading__eyebrow"
+            >
+              Falta muy poco
+            </p>
+
+            <h2
+              id="countdown-title"
+              class="section-heading__title"
+            >
+              Cuenta regresiva
+            </h2>
+
+          </div>
+
+          <div
+            id="countdown"
+            class="countdown"
+            aria-label="Cuenta regresiva para el evento"
+          >
+
+            <div class="countdown__item">
+              <span
+                id="countdown-days"
+                class="countdown__number"
+              >
+                00
+              </span>
+
+              <span class="countdown__label">
+                Días
+              </span>
+            </div>
+
+            <span
+              class="countdown__separator"
+              aria-hidden="true"
+            >
+              :
+            </span>
+
+            <div class="countdown__item">
+              <span
+                id="countdown-hours"
+                class="countdown__number"
+              >
+                00
+              </span>
+
+              <span class="countdown__label">
+                Horas
+              </span>
+            </div>
+
+            <span
+              class="countdown__separator"
+              aria-hidden="true"
+            >
+              :
+            </span>
+
+            <div class="countdown__item">
+              <span
+                id="countdown-minutes"
+                class="countdown__number"
+              >
+                00
+              </span>
+
+              <span class="countdown__label">
+                Minutos
+              </span>
+            </div>
+
+            <span
+              class="countdown__separator"
+              aria-hidden="true"
+            >
+              :
+            </span>
+
+            <div class="countdown__item">
+              <span
+                id="countdown-seconds"
+                class="countdown__number"
+              >
+                00
+              </span>
+
+              <span class="countdown__label">
+                Segundos
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           EVENTO
+      ================================================== -->
+
+      <section
+        id="event-section"
+        class="section section--editorial section--event"
+        data-section="event"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="event-eyebrow"
+              class="section-heading__eyebrow"
+            ></p>
+
+            <h2
+              id="event-title"
+              class="section-heading__title"
+            ></h2>
+
+          </div>
+
+          <div class="event-card">
+
+            <div class="event-card__icon">
+              <img
+                id="event-icon"
+                src="assets/icons/calendar.svg"
+                alt=""
+              >
+            </div>
+
+            <p
+              id="event-day"
+              class="event-card__day"
+            ></p>
+
+            <p
+              id="event-date"
+              class="event-card__date"
+            ></p>
+
+            <p
+              id="event-time"
+              class="event-card__time"
+            ></p>
+
+            <h3
+              id="event-venue"
+              class="event-card__venue"
+            ></h3>
+
+            <p
+              id="event-address"
+              class="event-card__address"
+            ></p>
+
+            <button
+              id="open-location"
+              class="btn btn--editorial"
+              type="button"
+            >
+              Cómo llegar
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           UBICACIÓN
+      ================================================== -->
+
+      <section
+        id="location-section"
+        class="section section--editorial section--location"
+        data-section="location"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <h2
+              id="location-title"
+              class="section-heading__title"
+            >
+              Ubicación
+            </h2>
+
+          </div>
+
+          <div class="location-card">
+
+            <div class="location-card__icon">
+              <img
+                src="assets/icons/location.svg"
+                alt=""
+              >
+            </div>
+
+            <h3
+              id="location-name"
+              class="location-card__name"
+            ></h3>
+
+            <p
+              id="location-address"
+              class="location-card__address"
+            ></p>
+
+            <div class="location-card__actions">
+
+              <a
+                id="location-google-maps"
+                class="btn btn--editorial"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Google Maps
+              </a>
+
+              <a
+                id="location-waze"
+                class="btn btn--editorial"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Waze
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           DRESS CODE
+      ================================================== -->
+
+      <section
+        id="dresscode-section"
+        class="section section--editorial section--dresscode"
+        data-section="dressCode"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="dresscode-eyebrow"
+              class="section-heading__eyebrow"
+            ></p>
+
+            <h2
+              id="dresscode-title"
+              class="section-heading__title"
+            ></h2>
+
+          </div>
+
+          <div class="dresscode-card">
+
+            <div class="dresscode-card__icon">
+              <img
+                id="dresscode-icon"
+                src="assets/icons/dress-code.svg"
+                alt=""
+              >
+            </div>
+
+            <p
+              id="dresscode-description"
+              class="dresscode-card__description"
+            ></p>
+
+            <p
+              id="dresscode-note"
+              class="dresscode-card__note"
+            ></p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           GALERÍA
+      ================================================== -->
+
+      <section
+        id="gallery-section"
+        class="section section--editorial section--gallery"
+        data-section="gallery"
+      >
+
+        <div class="container">
+
+          <div class="section-heading">
+
+            <p
+              id="gallery-eyebrow"
+              class="section-heading__eyebrow"
+            ></p>
+
+            <h2
+              id="gallery-title"
+              class="section-heading__title"
+            ></h2>
+
+          </div>
+
+          <div
+            id="gallery"
+            class="gallery"
+          >
+            <!-- Se genera desde config.js -->
+          </div>
+
+          <div
+            id="gallery-dots"
+            class="gallery-dots"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           REGALOS
+      ================================================== -->
+
+      <section
+        id="gifts-section"
+        class="section section--editorial"
+        data-section="gifts"
+      >
+
+        <div class="editorial-content">
+
+          <div class="section-heading">
+
+            <p class="section-heading__eyebrow">
+              Un detalle
+            </p>
+
+            <h2 class="section-heading__title">
+              Regalos
+            </h2>
+
+          </div>
+
+          <p>
+            Tu presencia es nuestro mejor regalo.
+          </p>
+
+          <button
+            id="open-gifts-modal"
+            class="btn btn--editorial"
+            type="button"
+          >
+            Ver información
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           FOTO REVEAL A ANCHO COMPLETO
+      ================================================== -->
+
+<section
+  id="full-photo-section"
+  class="photo-window"
+  role="img"
+  aria-label="Ana y Juan"
+></section>
+
+      <!-- =================================================
+           PLAYLIST
+      ================================================== -->
+
+      <section
+        id="playlist-section"
+        class="section section--editorial"
+        data-section="playlist"
+      >
+
+        <div class="editorial-content">
+
+          <div class="section-heading">
+
+            <p class="section-heading__eyebrow">
+              La música
+            </p>
+
+            <h2 class="section-heading__title">
+              Playlist
+            </h2>
+
+          </div>
+
+          <p>
+            Sugerinos una canción que no puede faltar.
+          </p>
+
+          <button
+            id="open-playlist-modal"
+            class="btn btn--editorial"
+            type="button"
+          >
+            Sugerir canción
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           RSVP
+      ================================================== -->
+
+      <section
+        id="rsvp-section"
+        class="section section--editorial"
+        data-section="rsvp"
+      >
+
+        <div class="editorial-content">
+
+          <div class="section-heading">
+
+            <p class="section-heading__eyebrow">
+              Queremos contar contigo
+            </p>
+
+            <h2 class="section-heading__title">
+              Confirmar asistencia
+            </h2>
+
+          </div>
+
+          <p>
+            Por favor, confirmá tu asistencia.
+          </p>
+
+          <button
+            id="open-rsvp-modal"
+            class="btn btn--editorial"
+            type="button"
+          >
+            Confirmar asistencia
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           CIERRE
+      ================================================== -->
+
+      <section
+        id="closing-section"
+        class="section section--closing"
+        data-section="closing"
+      >
+
+        <div class="container">
+
+          <div class="closing">
+
+            <p
+              id="closing-pretitle"
+              class="closing__pretitle"
+            ></p>
+
+            <h2
+              id="closing-title"
+              class="closing__title"
+            ></h2>
+
+            <p
+              id="closing-message"
+              class="closing__message"
+            ></p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+    <!-- ===================================================
+         FOOTER
+    ==================================================== -->
+
+    <footer
+      id="footer"
+      class="footer"
+      data-section="footer"
+    >
+
+      <div class="container footer__content">
+
+        <p
+          id="footer-event-name"
+          class="footer__event-name"
+        >
+          Ana & Juan
+        </p>
+
+        <p class="footer__brand">
+          Invitación creada por
+
+          <a
+            href="https://saveyourdate.site"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Save Your Date
+          </a>
+        </p>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+
+  <!-- =====================================================
+       MÚSICA
+  ====================================================== -->
+
+  <button
+    id="music-toggle"
+    class="music-toggle"
+    type="button"
+    aria-label="Reproducir música"
+    aria-pressed="false"
+  >
+
+    <img
+      id="music-toggle-icon"
+      src="assets/icons/music.svg"
+      alt=""
+    >
+
+  </button>
+
+  <audio
+    id="background-music"
+    preload="metadata"
+  >
+    <source
+      id="background-music-source"
+      src=""
+      type="audio/mpeg"
+    >
+  </audio>
+
+
+  <!-- =====================================================
+       MODAL DE UBICACIÓN
+  ====================================================== -->
+
+  <div
+    id="location-modal"
+    class="modal"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="location-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+      <h2
+        id="location-modal-title"
+        class="modal__title"
+      >
+        Ubicación
+      </h2>
+
+      <p
+        id="location-modal-address"
+        class="modal__text"
+      ></p>
+
+      <div class="modal__actions">
+
+        <a
+          id="location-modal-maps"
+          class="btn btn--editorial"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Google Maps
+        </a>
+
+        <a
+          id="location-modal-waze"
+          class="btn btn--editorial"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Waze
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       MODAL DE REGALOS
+  ====================================================== -->
+
+  <div
+    id="gifts-modal"
+    class="modal"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="gifts-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+      <h2
+        id="gifts-modal-title"
+        class="modal__title"
+      >
+        Regalos
+      </h2>
+
+      <p
+        id="gifts-modal-message"
+        class="modal__text"
+      ></p>
+
+      <div
+        id="gifts-details"
+        class="gifts-details"
+      ></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       MODAL DE PLAYLIST
+  ====================================================== -->
+
+  <div
+    id="playlist-modal"
+    class="modal"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+    <div
+      class="modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="playlist-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+      <h2
+        id="playlist-modal-title"
+        class="modal__title"
+      >
+        Sugerí una canción
+      </h2>
+
+      <form
+        id="playlist-form"
+        class="form"
+      >
+
+        <div class="form__group">
+
+          <label
+            class="form__label"
+            for="playlist-name"
+          >
+            Tu nombre
+          </label>
+
+          <input
+            id="playlist-name"
+            class="form__input"
+            type="text"
+            name="name"
+          >
+
+        </div>
+
+        <div class="form__group">
+
+          <label
+            class="form__label"
+            for="playlist-song"
+          >
+            Canción
+          </label>
+
+          <input
+            id="playlist-song"
+            class="form__input"
+            type="text"
+            name="song"
+            required
+          >
+
+        </div>
+
+        <div class="form__group">
+
+          <label
+            class="form__label"
+            for="playlist-link"
+          >
+            Link opcional
+          </label>
+
+          <input
+            id="playlist-link"
+            class="form__input"
+            type="url"
+            name="link"
+          >
+
+        </div>
+
+        <button
+          class="btn btn--editorial"
+          type="submit"
+        >
+          Enviar canción
+        </button>
+
+        <p
+          id="playlist-form-status"
+          class="form__status"
+          aria-live="polite"
+        ></p>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       MODAL DE RSVP
+  ====================================================== -->
+
+  <div
+    id="rsvp-modal"
+    class="modal"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div
+      class="modal__backdrop"
+      data-close-modal
+    ></div>
+
+    <div
+      class="modal__dialog modal__dialog--large"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="rsvp-modal-title"
+    >
+
+      <button
+        class="modal__close"
+        type="button"
+        data-close-modal
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+      <h2
+        id="rsvp-modal-title"
+        class="modal__title"
+      >
+        Confirmar asistencia
+      </h2>
+
+      <p
+        id="rsvp-modal-message"
+        class="modal__text"
+      >
+        Seleccioná la asistencia de cada invitado.
+      </p>
+
+      <div
+        id="guest-list"
+        class="guest-list"
+      ></div>
+
+      <div
+        id="rsvp-extra-fields"
+        class="rsvp-extra-fields"
+      >
+
+        <div class="form__group">
+
+          <label
+            class="form__label"
+            for="rsvp-comment"
+          >
+            Comentario
+          </label>
+
+          <textarea
+            id="rsvp-comment"
+            class="form__textarea"
+            name="comment"
+            rows="4"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+      <button
+        id="submit-rsvp"
+        class="btn btn--primary"
+        type="button"
+      >
+        Guardar confirmación
+      </button>
+
+      <p
+        id="rsvp-status"
+        class="form__status"
+        aria-live="polite"
+      ></p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       LIGHTBOX
+  ====================================================== -->
+
+  <div
+    id="gallery-lightbox"
+    class="lightbox"
+    aria-hidden="true"
+    hidden
+  >
+
+    <button
+      id="lightbox-close"
+      class="lightbox__close"
+      type="button"
+      aria-label="Cerrar galería"
+    >
+      ×
+    </button>
+
+    <button
+      id="lightbox-prev"
+      class="lightbox__nav lightbox__nav--prev"
+      type="button"
+      aria-label="Imagen anterior"
+    >
+      ‹
+    </button>
+
+    <img
+      id="lightbox-image"
+      class="lightbox__image"
+      src=""
+      alt=""
+    >
+
+    <button
+      id="lightbox-next"
+      class="lightbox__nav lightbox__nav--next"
+      type="button"
+      aria-label="Imagen siguiente"
+    >
+      ›
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
+
+  <script src="config.js"></script>
+
+  <script src="js/utils.js"></script>
+  <script src="js/render-config.js"></script>
+  <script src="js/loader.js"></script>
+  <script src="js/modals.js"></script>
+  <script src="js/countdown.js"></script>
+  <script src="js/music.js"></script>
+  <script src="js/gallery.js"></script>
+  <script src="js/playlist.js"></script>
+  <script src="js/rsvp.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
