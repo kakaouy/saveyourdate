@@ -2663,6 +2663,182 @@ html, body, .app-wrapper {
   .order-flow-tabs button { border-radius: 14px; font-size: 12px; }
 }
 
+/* ==========================================
+   VIBRANT TURQUOISE SYSTEM — JULY 2026
+   ========================================== */
+:root {
+  --syd-turquoise: #12c7ca;
+  --syd-turquoise-deep: #08aeb4;
+  --syd-blue: #087f8c;
+  --syd-yellow: #ffc43d;
+  --syd-pink: #ff6f91;
+  --syd-cream: #fbfcf7;
+  --syd-dark: #392e3b;
+}
+
+.header {
+  background: rgba(8, 174, 180, .95);
+  border-bottom-color: rgba(255,255,255,.24);
+  box-shadow: 0 8px 28px rgba(8,127,140,.12);
+}
+
+.header .nav-link:hover { color: var(--syd-yellow); }
+.header .nav-link::after { background: var(--syd-yellow); }
+.header .cta-nav-button { background: var(--syd-yellow); color: var(--syd-dark); }
+.header .cta-nav-button:hover { background: #fff; color: var(--syd-blue); }
+
+.hero-section {
+  min-height: 760px;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 82% 27%, rgba(255,255,255,.18) 0 8%, transparent 28%),
+    linear-gradient(135deg, var(--syd-turquoise) 0%, #0bc1c5 55%, var(--syd-turquoise-deep) 100%);
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  top: 150px;
+  right: 5%;
+  z-index: -1;
+  border: 2px solid rgba(255,196,61,.8);
+  border-radius: 50%;
+}
+
+.hero-section::after {
+  content: '';
+  position: absolute;
+  width: 72px;
+  height: 9px;
+  left: 4%;
+  bottom: 82px;
+  border-radius: 10px;
+  background: var(--syd-yellow);
+  box-shadow: 86px 0 0 rgba(255,255,255,.75), 158px 0 0 var(--syd-pink);
+}
+
+.hero-title,
+.hero-description { color: #fff; }
+.hero-title span { color: var(--syd-dark); }
+.hero-tag { background: var(--syd-yellow); color: var(--syd-dark); }
+.hero-benefits span { color: rgba(255,255,255,.94); }
+.hero-benefits span::first-letter { color: var(--syd-yellow); }
+
+.hero-section .btn-primary { background: var(--syd-yellow); color: var(--syd-dark); }
+.hero-section .btn-primary:hover { background: #fff; color: var(--syd-blue); }
+.hero-section .btn-secondary { border-color: #fff; color: #fff; }
+.hero-section .btn-secondary:hover { border-color: var(--syd-dark); background: var(--syd-dark); }
+.hero-visual::before {
+  content: '';
+  position: absolute;
+  width: 74%;
+  height: 82%;
+  top: 12%;
+  border-radius: 50% 48% 46% 52%;
+  background: var(--syd-yellow);
+  transform: rotate(-8deg);
+  opacity: .96;
+}
+.phone-frame { box-shadow: 0 30px 55px rgba(8,127,140,.34); }
+
+.models-section { background: var(--syd-cream); }
+.models-section .section-subtitle,
+.plans-section .section-subtitle { color: var(--syd-blue); }
+.section-header::after {
+  content: '';
+  display: block;
+  width: 58px;
+  height: 5px;
+  margin: 22px auto 0;
+  border-radius: 999px;
+  background: var(--syd-yellow);
+  box-shadow: 68px 0 0 var(--syd-pink);
+}
+.filter-btn.active,
+.btn-card-order { background: var(--syd-blue); border-color: var(--syd-blue); }
+.filter-btn:hover { border-color: var(--syd-blue); color: var(--syd-blue); }
+
+.plans-section {
+  overflow: hidden;
+  background: var(--syd-turquoise);
+}
+.plans-section::before {
+  content: '';
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  top: -42px;
+  left: 6%;
+  border: 18px solid rgba(255,196,61,.85);
+  transform: rotate(18deg);
+}
+.plans-section .section-title,
+.plans-section .section-desc { color: #fff; }
+.plans-section .section-subtitle { color: var(--syd-dark); }
+.plan-card-simple { border: 0; box-shadow: 0 18px 40px rgba(8,127,140,.22); }
+.plan-card-simple.featured { border: 3px solid var(--syd-yellow); background: #fff; }
+.plan-label,
+.plan-card-simple.featured .plan-label { background: var(--syd-yellow); color: var(--syd-dark); }
+.plan-card-simple li::before { color: var(--syd-blue); }
+.plan-card-simple.featured .plan-cta,
+.plan-cta { border-color: var(--syd-dark); background: var(--syd-dark); }
+.plan-card-simple.featured .plan-cta:hover,
+.plan-cta:hover { border-color: var(--syd-blue); background: var(--syd-blue); }
+
+#incluyen.features-section { background: var(--syd-dark); }
+#incluyen .section-title,
+#incluyen .section-desc { color: #fff; }
+#incluyen .section-subtitle { color: var(--syd-yellow); }
+#incluyen .feature-group { border: 0; box-shadow: none; }
+#incluyen .feature-group-heading > span,
+#incluyen .organizer-group .feature-group-heading > span { background: var(--syd-yellow); color: var(--syd-dark); }
+#incluyen .organizer-group { background: #e8fbfa; }
+#incluyen .btn-secondary { border-color: var(--syd-yellow) !important; background: var(--syd-yellow); }
+
+.process-section { background: var(--syd-turquoise-deep); }
+.process-section .section-title,
+.process-section .section-desc,
+.process-section .step-title { color: #fff; }
+.process-section .section-subtitle { color: var(--syd-yellow); }
+.process-section .step-desc { color: rgba(255,255,255,.82); }
+.process-section .step-num { border-color: var(--syd-turquoise-deep); background: var(--syd-yellow); color: var(--syd-dark); }
+.process-section .process-steps::before { background: var(--syd-yellow); }
+.process-section .process-cta-box .btn-primary { background: #fff; color: var(--syd-blue); }
+
+.faq-section { background: var(--syd-cream); }
+.faq-section .section-title { color: var(--syd-dark); }
+.faq-section .section-desc { color: #625866; }
+.faq-section .section-subtitle { color: var(--syd-blue); }
+.faq-section .faq-item { border-left: 5px solid var(--syd-yellow); box-shadow: 0 9px 22px rgba(8,127,140,.08); }
+.faq-toggle-icon { color: var(--syd-blue); }
+
+.contact-section { background: var(--syd-dark); }
+.contact-section .contact-info-title,
+.contact-section .section-title { color: #fff; }
+.contact-section .contact-info-desc,
+.contact-section .section-desc { color: rgba(255,255,255,.76); }
+.contact-section .section-subtitle { color: var(--syd-yellow); }
+.contact-section a { color: var(--syd-yellow); }
+
+.footer { background: var(--syd-turquoise-deep); border-top: 5px solid var(--syd-yellow); }
+.footer-link:hover { color: var(--syd-yellow); }
+
+::-webkit-scrollbar-thumb { background: var(--syd-dark); }
+::-webkit-scrollbar-thumb:hover { background: var(--syd-blue); }
+
+@media (max-width: 700px) {
+  .hero-section {
+    min-height: auto;
+    background: linear-gradient(180deg, var(--syd-turquoise) 0%, var(--syd-turquoise-deep) 100%);
+  }
+  .hero-section::before { width: 110px; height: 110px; top: 120px; right: -45px; }
+  .hero-section::after { bottom: 32px; left: -25px; }
+  .hero-visual::before { width: 92%; height: 72%; top: 16%; }
+  .plans-section::before { width: 80px; height: 80px; border-width: 12px; }
+}
+
 /* Global navigation refinements */
 html {
   scrollbar-color: #392e3b #f1eff2;
@@ -3542,4 +3718,36 @@ html {
     flex-wrap: wrap;
     gap: 10px 18px;
   }
+}
+
+/* Keep the vibrant system last in the cascade. */
+.header { background: rgba(8,174,180,.95); border-bottom-color: rgba(255,255,255,.24); }
+.header .nav-link:hover { color: var(--syd-yellow); }
+.header .nav-link::after { background: var(--syd-yellow); }
+.header .cta-nav-button { background: var(--syd-yellow); color: var(--syd-dark); }
+.header .cta-nav-button:hover { background: #fff; color: var(--syd-blue); }
+.hero-section {
+  background:
+    radial-gradient(circle at 82% 27%, rgba(255,255,255,.18) 0 8%, transparent 28%),
+    linear-gradient(135deg, var(--syd-turquoise) 0%, #0bc1c5 55%, var(--syd-turquoise-deep) 100%);
+}
+.hero-title, .hero-description { color: #fff; }
+.hero-title span { color: var(--syd-dark); }
+.hero-tag { background: var(--syd-yellow); color: var(--syd-dark); }
+.hero-section .btn-primary { background: var(--syd-yellow); color: var(--syd-dark); }
+.hero-section .btn-primary:hover { background: #fff; color: var(--syd-blue); }
+.hero-section .btn-secondary { border-color: #fff; color: #fff; }
+#incluyen.features-section { background: var(--syd-dark); }
+#incluyen.features-section::before { display: none; }
+#incluyen .section-title, #incluyen .section-desc { color: #fff; }
+#incluyen .section-subtitle { color: var(--syd-yellow); }
+.faq-section { background: var(--syd-cream); }
+.faq-section .section-title { color: var(--syd-dark); }
+.faq-section .section-desc { color: #625866; }
+.faq-section .section-subtitle { color: var(--syd-blue); }
+.contact-section { background: var(--syd-dark); }
+.footer { background: var(--syd-turquoise-deep); border-top: 5px solid var(--syd-yellow); }
+
+@media (max-width: 700px) {
+  .hero-section { background: linear-gradient(180deg, var(--syd-turquoise), var(--syd-turquoise-deep)); }
 }
