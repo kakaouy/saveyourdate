@@ -1739,7 +1739,8 @@ function App() {
             <a href="#inicio" className="nav-link" onClick={(e) => handleScrollToSection(e, 'inicio')}>{t.nav.home}</a>
             <a href="#modelos" className="nav-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
             <a href="#incluyen" className="nav-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
-            <a href="#contacto" className="nav-link" onClick={(e) => handleScrollToSection(e, 'contacto')}>{t.nav.contact}</a>
+            <a href="#planes" className="nav-link" onClick={(e) => handleScrollToSection(e, 'planes')}>{lang === 'es' ? 'Planes' : (lang === 'en' ? 'Plans' : 'Planos')}</a>
+            <a href="#preguntas" className="nav-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{lang === 'es' ? 'Preguntas' : 'FAQ'}</a>
             
             {/* Language Selector in Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#fafafa', border: '1px solid var(--color-border)', borderRadius: '15px', padding: '2px 8px', marginLeft: '8px' }}>
@@ -1774,7 +1775,8 @@ function App() {
         <a href="#inicio" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'inicio')}>{t.nav.home}</a>
         <a href="#modelos" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
         <a href="#incluyen" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
-        <a href="#contacto" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'contacto')}>{t.nav.contact}</a>
+        <a href="#planes" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'planes')}>{lang === 'es' ? 'Planes' : (lang === 'en' ? 'Plans' : 'Planos')}</a>
+        <a href="#preguntas" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{lang === 'es' ? 'Preguntas' : 'FAQ'}</a>
         
         {/* Language Selector in Sidebar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 0', borderBottom: '1px solid var(--color-border)' }}>
@@ -1802,6 +1804,11 @@ function App() {
               {t.hero.title1} <span>{t.hero.titleHighlight}</span>.
             </h1>
             <p className="hero-description">{t.hero.desc}</p>
+            <div className="hero-benefits" aria-label="Beneficios principales">
+              <span>✓ {lang === 'es' ? 'Diseño personalizado' : (lang === 'en' ? 'Custom design' : 'Design personalizado')}</span>
+              <span>✓ {lang === 'es' ? 'Lista para WhatsApp' : (lang === 'en' ? 'Ready for WhatsApp' : 'Pronto para WhatsApp')}</span>
+              <span>✓ RSVP + Google Sheets</span>
+            </div>
             <div className="hero-ctas">
               <a href="#crear" className="btn-primary animate-heartbeat" onClick={(e) => handleScrollToSection(e, 'crear')}>
                 {t.hero.ctaPrimary}
@@ -1984,6 +1991,45 @@ function App() {
         </div>
       </section>
 
+      {/* PLANS: SIMPLE COMMERCIAL COMPARISON */}
+      <section id="planes" className="plans-section">
+        <div className="container">
+          <div className="section-header plans-header">
+            <span className="section-subtitle">{lang === 'es' ? 'Dos opciones simples' : (lang === 'en' ? 'Two simple options' : 'Duas opções simples')}</span>
+            <h2 className="section-title">{lang === 'es' ? 'Elegí cuánto querés contar' : (lang === 'en' ? 'Choose how much you want to share' : 'Escolha quanto você quer contar')}</h2>
+            <p className="section-desc">{lang === 'es' ? 'La portada está incluida y no consume una sección. La música de fondo es opcional en ambos planes.' : (lang === 'en' ? 'The cover is included and does not count as a section. Background music is optional in both plans.' : 'A capa está incluída e não conta como seção. A música de fundo é opcional nos dois planos.')}</p>
+          </div>
+
+          <div className="plans-comparison">
+            <article className="plan-card-simple">
+              <span className="plan-label">{lang === 'es' ? 'PLAN BÁSICO' : (lang === 'en' ? 'BASIC PLAN' : 'PLANO BÁSICO')}</span>
+              <h3>{lang === 'es' ? 'Lo esencial, bien contado' : (lang === 'en' ? 'Everything essential' : 'O essencial, bem contado')}</h3>
+              <ul>
+                <li><strong>5</strong> {lang === 'es' ? 'secciones a elección' : (lang === 'en' ? 'sections of your choice' : 'seções à escolha')}</li>
+                <li>{lang === 'es' ? 'Galería de hasta 5 fotos' : (lang === 'en' ? 'Gallery with up to 5 photos' : 'Galeria de até 5 fotos')}</li>
+                <li>{lang === 'es' ? 'Portada incluida' : (lang === 'en' ? 'Cover included' : 'Capa incluída')}</li>
+                <li>{lang === 'es' ? 'Música opcional' : (lang === 'en' ? 'Optional music' : 'Música opcional')}</li>
+              </ul>
+              <a href="#crear" className="plan-cta" onClick={(e) => { handleScrollToSection(e, 'crear'); window.dispatchEvent(new CustomEvent('start-saveyourdate-order', { detail: { plan: 'basic' } })); }}>{lang === 'es' ? 'Elegir Básico' : (lang === 'en' ? 'Choose Basic' : 'Escolher Básico')}</a>
+            </article>
+
+            <article className="plan-card-simple featured">
+              <span className="plan-label">{lang === 'es' ? 'PLAN PREMIUM' : (lang === 'en' ? 'PREMIUM PLAN' : 'PLANO PREMIUM')}</span>
+              <h3>{lang === 'es' ? 'Más espacio para cada detalle' : (lang === 'en' ? 'More room for every detail' : 'Mais espaço para cada detalhe')}</h3>
+              <ul>
+                <li><strong>8</strong> {lang === 'es' ? 'secciones a elección' : (lang === 'en' ? 'sections of your choice' : 'seções à escolha')}</li>
+                <li>{lang === 'es' ? 'Galería de hasta 8 fotos' : (lang === 'en' ? 'Gallery with up to 8 photos' : 'Galeria de até 8 fotos')}</li>
+                <li>{lang === 'es' ? 'Portada incluida' : (lang === 'en' ? 'Cover included' : 'Capa incluída')}</li>
+                <li>{lang === 'es' ? 'Música opcional' : (lang === 'en' ? 'Optional music' : 'Música opcional')}</li>
+              </ul>
+              <a href="#crear" className="plan-cta" onClick={(e) => { handleScrollToSection(e, 'crear'); window.dispatchEvent(new CustomEvent('start-saveyourdate-order', { detail: { plan: 'premium' } })); }}>{lang === 'es' ? 'Elegir Premium' : (lang === 'en' ? 'Choose Premium' : 'Escolher Premium')}</a>
+            </article>
+          </div>
+
+          <p className="plans-rsvp-note"><img src="/features/feature-rsvp.png" alt="" />{lang === 'es' ? 'Si elegís RSVP, incluye Google Sheets, link de envío, restricciones alimentarias y cédula para control de ingreso.' : (lang === 'en' ? 'If you choose RSVP, it includes Google Sheets, sending link, dietary restrictions and ID for access control.' : 'Se escolher RSVP, inclui Google Sheets, link de envio, restrições alimentares e documento para controle de entrada.')}</p>
+        </div>
+      </section>
+
       {/* SECTION 3: ¿QUÉ INCLUYEN? FEATURES */}
       <section id="incluyen" className="features-section">
         <div className="container">
@@ -1993,31 +2039,22 @@ function App() {
             <p className="section-desc">{t.features.desc}</p>
           </div>
 
-          <div className="features-grid">
-            {t.features.cards.map((card, idx) => {
-              const featureIcons = [
-                '/features/feature-countdown.png',
-                '/features/feature-rsvp.png',
-                '/features/feature-music.png',
-                '/features/feature-location.png',
-                '/features/feature-gift.png',
-                '/features/feature-dress-code.png',
-                '/features/feature-camera.png',
-                '/features/feature-responsive.png'
-              ];
-
-              return (
-                <article className="feature-card" key={idx}>
-                  <div className="feature-icon-wrapper">
-                    <img src={featureIcons[idx]} alt="" className="feature-icon-img" aria-hidden="true" />
-                  </div>
-                  <div className="feature-copy">
-                    <h3 className="feature-title">{card.t}</h3>
-                    <p className="feature-desc">{card.d}</p>
-                  </div>
-                </article>
-              );
-            })}
+          <div className="feature-groups">
+            <div className="feature-group">
+              <div className="feature-group-heading"><span>♡</span><div><h3>{lang === 'es' ? 'Para tus invitados' : (lang === 'en' ? 'For your guests' : 'Para seus convidados')}</h3><p>{lang === 'es' ? 'Todo lo que necesitan, en un único link.' : (lang === 'en' ? 'Everything they need, in one link.' : 'Tudo o que precisam, em um único link.')}</p></div></div>
+              {[0, 2, 3, 4, 5, 6].map((idx) => {
+                const icons = ['/features/feature-countdown.png','/features/feature-rsvp.png','/features/feature-music.png','/features/feature-location.png','/features/feature-gift.png','/features/feature-dress-code.png','/features/feature-camera.png','/features/feature-responsive.png'];
+                const card = t.features.cards[idx];
+                return <article className="feature-line" key={idx}><img src={icons[idx]} alt="" /><div><h4>{card.t}</h4><p>{card.d}</p></div></article>;
+              })}
+            </div>
+            <div className="feature-group organizer-group">
+              <div className="feature-group-heading"><span>✓</span><div><h3>{lang === 'es' ? 'Para organizarte' : (lang === 'en' ? 'For your planning' : 'Para sua organização')}</h3><p>{lang === 'es' ? 'Información ordenada y lista para usar.' : (lang === 'en' ? 'Organized information, ready to use.' : 'Informação organizada e pronta para usar.')}</p></div></div>
+              <article className="feature-line"><img src="/features/feature-rsvp.png" alt="" /><div><h4>RSVP + Google Sheets</h4><p>{lang === 'es' ? 'Asistencia, acompañantes y respuestas en tiempo real.' : (lang === 'en' ? 'Attendance, guests and real-time responses.' : 'Presença, acompanhantes e respostas em tempo real.')}</p></div></article>
+              <article className="feature-line"><img src="/features/feature-responsive.png" alt="" /><div><h4>{lang === 'es' ? 'Control de ingreso' : (lang === 'en' ? 'Access control' : 'Controle de entrada')}</h4><p>{lang === 'es' ? 'Cédula de identidad y listado organizado para el evento.' : (lang === 'en' ? 'ID and an organized event list.' : 'Documento e lista organizada para o evento.')}</p></div></article>
+              <article className="feature-line"><img src="/features/feature-gift.png" alt="" /><div><h4>{lang === 'es' ? 'Información para catering' : (lang === 'en' ? 'Catering information' : 'Informação para catering')}</h4><p>{lang === 'es' ? 'Restricciones alimentarias reunidas en una sola planilla.' : (lang === 'en' ? 'Dietary restrictions in one spreadsheet.' : 'Restrições alimentares em uma única planilha.')}</p></div></article>
+              <article className="feature-line"><img src="/features/feature-responsive.png" alt="" /><div><h4>{lang === 'es' ? 'Link listo para enviar' : (lang === 'en' ? 'Ready-to-send link' : 'Link pronto para enviar')}</h4><p>{lang === 'es' ? 'Compartilo fácilmente por WhatsApp o correo.' : (lang === 'en' ? 'Share it easily by WhatsApp or email.' : 'Compartilhe facilmente por WhatsApp ou e-mail.')}</p></div></article>
+            </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>
@@ -2041,12 +2078,12 @@ function App() {
             <p className="section-desc">{t.process.desc}</p>
           </div>
 
-          <div className="process-steps">
-            {t.process.steps.map((step, idx) => (
+          <div className="process-steps simplified-process">
+            {t.process.steps.slice(0, 3).map((step, idx) => (
               <div className="process-step" key={idx}>
                 <div className="step-num">{idx + 1}</div>
-                <h3 className="step-title">{step.t}</h3>
-                <p className="step-desc">{step.d}</p>
+                <h3 className="step-title">{idx === 2 ? (lang === 'es' ? 'Revisamos y publicamos' : (lang === 'en' ? 'We review and publish' : 'Revisamos e publicamos')) : step.t}</h3>
+                <p className="step-desc">{idx === 2 ? (lang === 'es' ? 'Preparamos un borrador privado, aplicamos tus correcciones y liberamos el link final cuando el pago está validado.' : (lang === 'en' ? 'We prepare a private draft, apply your corrections and release the final link after payment validation.' : 'Preparamos um rascunho privado, aplicamos suas correções e liberamos o link final após validar o pagamento.')) : step.d}</p>
               </div>
             ))}
           </div>
@@ -2069,7 +2106,7 @@ function App() {
           </div>
 
           <div className="faq-container">
-            {t.faq.items.map((item, index) => (
+            {t.faq.items.filter((_, index) => lang === 'es' ? [0,1,2,3,5,7,8,9].includes(index) : [0,1,2,3,4,7,8,9].includes(index)).map((item, index) => (
               <div className="faq-item" key={index}>
                 <button className="faq-question-btn" onClick={() => toggleFaq(index)}>
                   <span>{item.q}</span>
@@ -2770,7 +2807,8 @@ function App() {
             <a href="#inicio" className="footer-link" onClick={(e) => handleScrollToSection(e, 'inicio')}>{t.nav.home}</a>
             <a href="#modelos" className="footer-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
             <a href="#incluyen" className="footer-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
-            <a href="#contacto" className="footer-link" onClick={(e) => handleScrollToSection(e, 'contacto')}>{t.nav.contact}</a>
+            <a href="#planes" className="footer-link" onClick={(e) => handleScrollToSection(e, 'planes')}>{lang === 'es' ? 'Planes' : (lang === 'en' ? 'Plans' : 'Planos')}</a>
+            <a href="#preguntas" className="footer-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{lang === 'es' ? 'Preguntas' : 'FAQ'}</a>
           </div>
 
           <p className="footer-copy">
