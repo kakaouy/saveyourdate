@@ -53,7 +53,12 @@ export default function OrderFlow({ models, initialModelId }: OrderFlowProps) {
   }, [initialModelId]);
 
   useEffect(() => {
-    const startOrder = () => { setStarted(true); setActiveTab('new'); };
+    const startOrder = (event: Event) => {
+      const requestedPlan = (event as CustomEvent<{ plan?: Plan }>).detail?.plan;
+      if (requestedPlan) setPlan(requestedPlan);
+      setStarted(true);
+      setActiveTab('new');
+    };
     window.addEventListener('start-saveyourdate-order', startOrder);
     return () => window.removeEventListener('start-saveyourdate-order', startOrder);
   }, []);
