@@ -1097,6 +1097,19 @@ function App() {
   // Handler for Sidebar Toggling
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const closeWithEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false);
+    };
+    document.addEventListener('keydown', closeWithEscape);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', closeWithEscape);
+      document.body.style.overflow = '';
+    };
+  }, [sidebarOpen]);
+
   // Handler for custom smooth scrolling to anchor
   const handleScrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
@@ -1757,6 +1770,7 @@ function App() {
       {/* Sidebar navigation overlay */}
       <div className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={toggleSidebar}></div>
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <button className="sidebar-close-button" type="button" onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú">×</button>
         <a href="#inicio" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'inicio')}>{t.nav.home}</a>
         <a href="#modelos" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
         <a href="#incluyen" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
@@ -2731,6 +2745,19 @@ function App() {
           </div>
         </div>
       </section>
+
+      <a
+        className="whatsapp-float"
+        href="https://wa.me/59899134504?text=Hola%20Save%20Your%20Date%2C%20quiero%20consultar%20por%20una%20invitaci%C3%B3n."
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Consultar por WhatsApp al 099 134 504"
+        title="Escribinos por WhatsApp"
+      >
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path fill="currentColor" d="M16.04 3A12.9 12.9 0 0 0 5.02 22.62L3.3 29l6.53-1.7A12.98 12.98 0 1 0 16.04 3Zm0 23.62c-2.08 0-4.11-.56-5.88-1.62l-.42-.25-3.87 1.01 1.03-3.77-.27-.43a10.65 10.65 0 1 1 9.41 5.06Zm5.84-7.98c-.32-.16-1.9-.94-2.2-1.05-.29-.11-.5-.16-.72.16-.21.32-.82 1.05-1 1.26-.19.22-.37.24-.69.08-.32-.16-1.35-.5-2.57-1.58a9.61 9.61 0 0 1-1.78-2.21c-.19-.32-.02-.5.14-.66.14-.14.32-.37.48-.56.16-.18.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.72-1.73-.98-2.37-.26-.62-.52-.54-.72-.55h-.61c-.21 0-.56.08-.85.4-.29.32-1.11 1.08-1.11 2.64s1.14 3.07 1.3 3.28c.16.21 2.24 3.42 5.43 4.8.76.33 1.35.52 1.81.67.76.24 1.45.21 2 .13.61-.09 1.9-.78 2.17-1.53.27-.75.27-1.4.19-1.53-.08-.13-.29-.21-.61-.37Z"/>
+        </svg>
+      </a>
 
       {/* FOOTER */}
       <footer className="footer">
