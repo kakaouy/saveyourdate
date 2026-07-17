@@ -2044,3 +2044,291 @@ html, body, .app-wrapper {
     height: 220px;
   }
 }
+
+
+/* ==========================================
+   PHONE-STYLE MODEL CARDS
+   ========================================== */
+.models-section {
+  background: #ffffff;
+}
+
+.model-phone-card {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid rgba(57, 46, 59, 0.12);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(57, 46, 59, 0.06);
+}
+
+.model-phone-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(115, 198, 182, 0.65);
+  box-shadow: 0 14px 30px rgba(57, 46, 59, 0.1);
+}
+
+.model-card-preview {
+  position: relative;
+  min-height: 370px;
+  padding: 28px 20px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9fb;
+  border-bottom: 1px solid rgba(57, 46, 59, 0.08);
+}
+
+.model-phone-frame {
+  --model-color: #ff6f91;
+  position: relative;
+  width: 176px;
+  height: 338px;
+  padding: 9px;
+  border-radius: 30px;
+  background: #392e3b;
+  box-shadow: 0 18px 35px rgba(57, 46, 59, 0.2);
+  transition: transform 0.35s ease;
+}
+
+.model-phone-card:hover .model-phone-frame {
+  transform: translateY(-3px);
+}
+
+.model-phone-speaker {
+  position: absolute;
+  z-index: 3;
+  top: 9px;
+  left: 50%;
+  width: 48px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(-50%);
+}
+
+.model-phone-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.model-phone-screen .mock-card-content {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 40px 16px 18px;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.model-phone-card:hover .mock-card-content {
+  transform: none;
+}
+
+.model-phone-screen .mock-illustration-rings {
+  border-color: var(--model-color);
+}
+
+.model-phone-screen .mock-illustration-rings::after {
+  border-color: var(--model-color);
+}
+
+.model-phone-screen .mock-illustration-crown,
+.model-phone-screen .mock-illustration-balloon {
+  color: var(--model-color);
+}
+
+.model-second-name {
+  margin-top: 0;
+}
+
+.model-phone-accent {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  width: 46px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--model-color);
+  transform: translateX(-50%);
+}
+
+.model-feature-detail {
+  position: absolute;
+  z-index: 20;
+  top: 14px;
+  right: 14px;
+}
+
+.model-feature-trigger {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(57, 46, 59, 0.16);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  color: #392e3b;
+  font: 700 17px/1 var(--font-sans);
+  cursor: help;
+  box-shadow: 0 4px 12px rgba(57, 46, 59, 0.08);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.model-feature-trigger:hover,
+.model-feature-trigger:focus-visible {
+  transform: rotate(45deg);
+  background: #73c6b6;
+  color: #ffffff;
+  outline: none;
+}
+
+.model-features-popover {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  width: 190px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  background: rgba(57, 46, 59, 0.94);
+  color: #ffffff;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-5px);
+  pointer-events: none;
+  box-shadow: 0 14px 28px rgba(57, 46, 59, 0.22);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.model-feature-detail:hover .model-features-popover,
+.model-feature-detail:focus-within .model-features-popover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.model-features-popover strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #ffc75f;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.model-features-popover ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.model-features-popover li {
+  margin: 3px 0;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.model-phone-card .card-badge {
+  top: 14px;
+  left: 14px;
+  padding: 4px 9px;
+  font-size: 9px;
+}
+
+.model-phone-card .card-info {
+  padding: 17px 18px 18px;
+}
+
+.model-phone-card .card-title {
+  margin-bottom: 10px;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.model-color-picker {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 11px;
+}
+
+.model-color-swatch {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 2px solid #ffffff;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(57, 46, 59, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.model-color-swatch:hover,
+.model-color-swatch.active {
+  transform: scale(1.14);
+  box-shadow: 0 0 0 2px #392e3b;
+}
+
+.model-phone-card .card-desc {
+  min-height: 48px;
+  margin: 0 0 14px;
+  display: -webkit-box;
+  overflow: hidden;
+  color: #766d79;
+  font-size: 11px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.model-phone-card .card-footer {
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.model-phone-card .btn-card-demo,
+.model-phone-card .btn-card-order {
+  min-height: 38px;
+  border-radius: 999px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.model-phone-card .btn-card-demo {
+  background: #ffffff;
+  color: #392e3b;
+  border-color: #73c6b6;
+}
+
+.model-phone-card .btn-card-demo:hover {
+  background: #73c6b6;
+  color: #ffffff;
+}
+
+.model-phone-card .btn-card-order {
+  background: #392e3b;
+}
+
+.model-phone-card .btn-card-order:hover {
+  background: #ff6f91;
+}
+
+@media (max-width: 576px) {
+  .model-card-preview {
+    min-height: 350px;
+  }
+
+  .model-phone-frame {
+    width: 166px;
+    height: 318px;
+  }
+
+  .model-features-popover {
+    width: 175px;
+  }
+}
