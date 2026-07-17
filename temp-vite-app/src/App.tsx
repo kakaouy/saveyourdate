@@ -3,6 +3,14 @@ import './App.css';
 import { INVITATION_MODELS } from './data/models';
 import type { InvitationModel } from './data/models';
 
+
+const MODEL_COLOR_OPTIONS = [
+  { name: 'Rosa', color: '#ff6f91' },
+  { name: 'Coral', color: '#ff9671' },
+  { name: 'Amarillo', color: '#ffc75f' },
+  { name: 'Verde', color: '#73c6b6' }
+];
+
 // ==========================================
 // TRANSLATION DICTIONARY (ES, EN, PT)
 // ==========================================
@@ -925,6 +933,7 @@ function App() {
   // Navigation & Language UI States
   const [lang, setLang] = useState<'es' | 'en' | 'pt'>('es');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'wedding' | '15years' | 'other'>('all');
+  const [selectedModelColors, setSelectedModelColors] = useState<Record<string, string>>({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showExtrasModal, setShowExtrasModal] = useState(false);
   const carouselRef = React.useRef<HTMLDivElement>(null);
@@ -1861,40 +1870,88 @@ function App() {
           {/* Grid of models (now horizontal swimlane carousel) */}
           <div className="models-carousel-wrapper">
             <div ref={carouselRef} className="models-swimlane-container">
-              {filteredModels.map((model) => (
-                <article className="model-card" key={model.id}>
-                  <div className="card-visual">
-                    {model.badge && (
-                      <span className="card-badge">
-                        {model.badge === 'Más Elegido' ? t.catalog.popularBadge : (model.badge === 'Nuevo' ? t.catalog.newBadge : t.catalog.trendBadge)}
-                      </span>
-                    )}
-                    
-                    {/* Styled procedural preview of the card style */}
-                    <div className={`mock-card-content ${model.themeClass}`}>
-                      {model.illustrationType === 'rings' && (
-                        <div className="mock-illustration-rings"></div>
-                      )}
-                      {model.illustrationType === 'crown' && (
-                        <div className="mock-illustration-crown">👑</div>
-                      )}
-                      {model.illustrationType === 'balloon' && (
-                        <div className="mock-illustration-balloon">🎈</div>
-                      )}
-                      <div className="mock-card-text-primary">{model.demoName1}</div>
-                      {model.demoName2 && <div className="mock-card-text-primary" style={{ marginTop: '0px' }}>{model.demoName2}</div>}
-                      <div className="mock-card-text-sec">{model.date}</div>
-                    </div>
-                  </div>
+              {filteredModels.map((model) => {
+                const selectedColor = selectedModelColors[model.id] || MODEL_COLOR_OPTIONS[0].color;
 
-                  <div className="card-info">
-                    <h3 className="card-title">{model.title}</h3>
-                    <p className="card-desc">{model.description}</p>
-                    
-                    <div className="card-features">
-                      {model.features.slice(0, 3).map((feat, index) => (
-                        <span className="card-feature-tag" key={index}>{feat}</span>
-                      ))}
+                return (
+                  <article className="model-card model-phone-card" key={model.id}>
+                    <div className="model-card-preview">
+                      {model.badge && (
+                        <span className="card-badge">
+                          {model.badge === 'Más Elegido' ? t.catalog.popularBadge : (model.badge === 'Nuevo' ? t.catalog.newBadge : t.catalog.trendBadge)}
+                        </span>
+                      )}
+
+                      <div className="model-feature-detail">
+                        <button className="model-feature-trigger" type="button" aria-label="Ver componentes destacados">
+                          +
+                        </button>
+                        <div className="model-features-popover" role="tooltip">
+                          <strong>{lang === 'es' ? 'Incluye' : (lang === 'en' ? 'Includes' : 'Inclui')}</strong>
+                          <ul>
+                            {model.features.map((feature) => (
+                              <li key={feature}>{feature}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      <div
+                        className="model-phone-frame"
+                        style={{ '--model-color': selectedColor } as React.CSSProperties}
+                      >
+                        <div className="model-phone-speaker"></div>
+                        <div className="model-phone-screen">
+                          <div className={`mock-card-content ${model.themeClass}`}>
+                            {model.illustrationType === 'rings' && (
+                              <div className="mock-illustration-rings"></div>
+                            )}
+                            {model.illustrationType === 'crown' && (
+                              <div className="mock-illustration-crown">♛</div>
+                            )}
+                            {model.illustrationType === 'balloon' && (
+                              <div className="mock-illustration-balloon">✦</div>
+                            )}
+                            <div className="mock-card-text-primary">{model.demoName1}</div>
+                            {model.demoName2 && <div className="mock-card-text-primary model-second-name">{model.demoName2}</div>}
+                            <div className="mock-card-text-sec">{model.date}</div>
+                            <span className="model-phone-accent"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="card-info">
+                      <h3 className="card-title">{model.title}</h3>
+
+                      <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
+                        {MODEL_COLOR_OPTIONS.map((option) => (
+                          <button
+                            key={option.color}
+                            type="button"
+                            className={`model-color-swatch ${selectedColor === option.color ? 'active' : ''}`}
+                            style={{ backgroundColor: option.color }}
+                            aria-label={option.name}
+                            aria-pressed={selectedColor === option.color}
+                            onClick={() => setSelectedModelColors((current) => ({ ...current, [model.id]: option.color }))}
+                          />
+                        ))}
+                      </div>
+
+                      <p className="card-desc">{model.description}</p>
+
+                      <div className="card-footer">
+                        <button className="btn-card-demo" onClick={() => handleOpenDemo(model)}>
+                          {t.catalog.verDemo}
+                        </button>
+                        <button className="btn-card-order" onClick={() => handleSelectModelForOrder(model.id)}>
+                          {lang === 'es' ? 'Crear' : (lang === 'en' ? 'Create' : 'Criar')}
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
                       {model.features.length > 3 && <span className="card-feature-tag">+{model.features.length - 3}</span>}
                     </div>
 
