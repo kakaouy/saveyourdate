@@ -64,7 +64,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
   },
   {
     id: 'boda-pleno',
-    title: 'Editorial Pleno',
+    title: 'Voto Editorial',
     category: 'wedding',
     description: '',
     badge: 'Nuevo',
