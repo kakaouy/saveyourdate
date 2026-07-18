@@ -28,6 +28,120 @@ const getPaletteIdFromColor = (
   );
 };
 
+type SiteLanguage = 'es' | 'en' | 'pt';
+
+const DEMO_COPY: Record<SiteLanguage, {
+  close: string;
+  interactive: string;
+  wedding: string;
+  fifteen: string;
+  special: string;
+  includes: string;
+  palette: string;
+  usePalette: string;
+  create: string;
+  moreModels: string;
+}> = {
+  es: {
+    close: 'Cerrar demo',
+    interactive: 'La invitación es interactiva: probá los botones y navegá dentro del celular.',
+    wedding: 'Casamiento',
+    fifteen: '15 años',
+    special: 'Evento especial',
+    includes: 'Esta invitación incluye',
+    palette: 'Probá otra paleta',
+    usePalette: 'Usar paleta',
+    create: 'Creá tu invite',
+    moreModels: 'Ver más modelos'
+  },
+  en: {
+    close: 'Close demo',
+    interactive: 'This invitation is interactive: try the buttons and browse inside the phone.',
+    wedding: 'Wedding',
+    fifteen: '15th birthday',
+    special: 'Special event',
+    includes: 'This invitation includes',
+    palette: 'Try another color palette',
+    usePalette: 'Use palette',
+    create: 'Create your invitation',
+    moreModels: 'View more designs'
+  },
+  pt: {
+    close: 'Fechar demonstração',
+    interactive: 'Este convite é interativo: teste os botões e navegue dentro do celular.',
+    wedding: 'Casamento',
+    fifteen: '15 anos',
+    special: 'Evento especial',
+    includes: 'Este convite inclui',
+    palette: 'Experimente outra paleta',
+    usePalette: 'Usar paleta',
+    create: 'Crie seu convite',
+    moreModels: 'Ver mais modelos'
+  }
+};
+
+const FEATURE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
+  es: {},
+  en: {
+    'Galería de fotos': 'Photo gallery',
+    'Música': 'Music',
+    'Frase': 'Quote',
+    'Cronograma': 'Schedule',
+    'Ubicación': 'Location',
+    'Regalos': 'Gifts',
+    'Foto destacada con efecto parallax': 'Featured photo with parallax effect',
+    'Confirmación RSVP': 'RSVP confirmation',
+    'Cuenta Regresiva': 'Countdown',
+    'Regalos / CBU': 'Gifts / Bank details',
+    'Google Maps': 'Google Maps',
+    'Playlist Spotify': 'Spotify playlist',
+    'Dress Code': 'Dress code',
+    'Libro de Firmas': 'Guest book',
+    'Sugerencias de Regalo': 'Gift suggestions',
+    'Organizador': 'Organizer'
+  },
+  pt: {
+    'Galería de fotos': 'Galeria de fotos',
+    'Música': 'Música',
+    'Frase': 'Frase',
+    'Cronograma': 'Cronograma',
+    'Ubicación': 'Localização',
+    'Regalos': 'Presentes',
+    'Foto destacada con efecto parallax': 'Foto destacada com efeito parallax',
+    'Confirmación RSVP': 'Confirmação de presença',
+    'Cuenta Regresiva': 'Contagem regressiva',
+    'Regalos / CBU': 'Presentes / Dados bancários',
+    'Google Maps': 'Google Maps',
+    'Playlist Spotify': 'Playlist do Spotify',
+    'Dress Code': 'Código de vestimenta',
+    'Libro de Firmas': 'Livro de visitas',
+    'Sugerencias de Regalo': 'Sugestões de presentes',
+    'Organizador': 'Organizador'
+  }
+};
+
+const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
+  es: {},
+  en: {
+    rosa: 'Pink',
+    coral: 'Coral',
+    amarillo: 'Yellow',
+    verde: 'Green',
+    marfil: 'Ivory',
+    eucalipto: 'Eucalyptus',
+    azul: 'Blue'
+  },
+  pt: {
+    rosa: 'Rosa',
+    coral: 'Coral',
+    amarillo: 'Amarelo',
+    verde: 'Verde',
+    marfil: 'Marfim',
+    eucalipto: 'Eucalipto',
+    azul: 'Azul'
+  }
+};
+
 // ==========================================
 // TRANSLATION DICTIONARY (ES, EN, PT)
 // ==========================================
@@ -2925,8 +3039,8 @@ function App() {
 
       {/* FULL SCREEN MODEL DEMO */}
       {demoModel && (
-        <div className="demo-page" role="dialog" aria-modal="true" aria-label={`Demo de ${demoModel.title}`}>
-          <button className="demo-page-close" onClick={() => setDemoModel(null)} aria-label="Cerrar demo">×</button>
+        <div className="demo-page" role="dialog" aria-modal="true" aria-label={`${DEMO_COPY[lang].special}: ${demoModel.title}`}>
+          <button className="demo-page-close" onClick={() => setDemoModel(null)} aria-label={DEMO_COPY[lang].close}>×</button>
 
           <div className="demo-page-inner">
             <div className="demo-phone-column">
@@ -2942,7 +3056,7 @@ function App() {
                       src={`/demos/boda-elegante-minimalista/index.html?preview=1&palette=${getPaletteIdFromColor(
                         demoModel,
                         selectedModelColors[demoModel.id]
-                      )}`}
+                      )}&lang=${lang}`}
                       title="Demo interactiva Editorial Marfil"
                     />
                   ) : (
@@ -3037,23 +3151,23 @@ function App() {
                   )}
                 </div>
               </div>
-              <p className="demo-phone-caption">La invitación es interactiva: probá los botones y navegá dentro del celular.</p>
+              <p className="demo-phone-caption">{DEMO_COPY[lang].interactive}</p>
             </div>
 
             <aside className="demo-info-panel">
-              <span className="demo-eyebrow">{demoModel.category === 'wedding' ? 'Casamiento' : demoModel.category === '15years' ? '15 años' : 'Evento especial'}</span>
+              <span className="demo-eyebrow">{demoModel.category === 'wedding' ? DEMO_COPY[lang].wedding : demoModel.category === '15years' ? DEMO_COPY[lang].fifteen : DEMO_COPY[lang].special}</span>
               <h2>{demoModel.title}</h2>
                <div className="demo-info-block">
-                <h3>Esta invitación incluye</h3>
+                <h3>{DEMO_COPY[lang].includes}</h3>
                 <ul className="demo-feature-list">
                   {demoModel.features.map((feature) => (
-                    <li key={feature}><span>✓</span>{feature}</li>
+                    <li key={feature}><span>✓</span>{FEATURE_TRANSLATIONS[lang][feature] || feature}</li>
                   ))}
                 </ul>
               </div>
 
               <div className="demo-info-block">
-                <h3>Probá otra paleta</h3>
+                <h3>{DEMO_COPY[lang].palette}</h3>
                 <div className="demo-palette-list">
                   {getModelPaletteOptions(demoModel).map((option) => {
                     const activeColor =
@@ -3064,11 +3178,11 @@ function App() {
                         key={option.color}
                         className={`demo-palette-option ${activeColor === option.color ? 'active' : ''}`}
                         onClick={() => setSelectedModelColors((current) => ({ ...current, [demoModel.id]: option.color }))}
-                        aria-label={`Usar paleta ${option.name}`}
+                        aria-label={`${DEMO_COPY[lang].usePalette} ${PALETTE_TRANSLATIONS[lang][option.id] || option.name}`}
                         aria-pressed={activeColor === option.color}
                       >
                         <span style={{ backgroundColor: option.color }}></span>
-                        {option.name}
+                        {PALETTE_TRANSLATIONS[lang][option.id] || option.name}
                       </button>
                     );
                   })}
@@ -3081,13 +3195,13 @@ function App() {
                   setDemoModel(null);
                   handleSelectModelForOrder(selectedId);
                 }}>
-                  Creá tu invite
+                  {DEMO_COPY[lang].create}
                 </button>
                 <button className="demo-secondary-action" onClick={() => {
                   setDemoModel(null);
                   requestAnimationFrame(() => document.getElementById('modelos')?.scrollIntoView({ behavior: 'smooth' }));
                 }}>
-                  ← Ver más modelos
+                  ← {DEMO_COPY[lang].moreModels}
                 </button>
               </div>
             </aside>
