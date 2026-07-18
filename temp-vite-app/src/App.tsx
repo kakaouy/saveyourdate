@@ -3084,6 +3084,15 @@ function App() {
                       )}&lang=${lang}`}
                       title="Demo interactiva Voto Editorial"
                     />
+                  ) : demoModel.id === 'boda-boho' ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src={`/desarrollo/boda/invite_003/index.html?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}&lang=${lang}`}
+                      title="Demo interactiva Olivia Silvestre"
+                    />
                   ) : (
                   <div className="demo-invitation-scroll">
                     <div className="sim-cover demo-cover" style={{
