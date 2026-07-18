@@ -1958,6 +1958,15 @@ function App() {
                       >
                         <div className="model-phone-speaker"></div>
                         <div className="model-phone-screen">
+                          {model.id === 'boda-marfil' ? (
+                            <iframe
+                              className="model-real-preview-frame"
+                              src="/demos/boda-elegante-minimalista/index.html?preview=card&palette=marfil"
+                              title="Preview de Editorial Marfil"
+                              tabIndex={-1}
+                              aria-hidden="true"
+                            />
+                          ) : (
                           <div className={`mock-card-content ${model.themeClass}`}>
                             {model.illustrationType === 'rings' && (
                               <div className="mock-illustration-rings"></div>
@@ -1973,6 +1982,7 @@ function App() {
                             <div className="mock-card-text-sec">{model.date}</div>
                             <span className="model-phone-accent"></span>
                           </div>
+                          )}
                         </div>
                       </div>
                     </div>
