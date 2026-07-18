@@ -786,9 +786,9 @@
   }
 
   .photo-window__image {
-    top: -10%;
-    bottom: -10%;
-    height: 120%;
-    transform: translate3d(0, var(--photo-parallax-y, -6%), 0) scale(1.025);
+    top: -24%;
+    bottom: -24%;
+    height: 148%;
+    transform: translate3d(0, var(--photo-parallax-y, -100px), 0) scale(1.02);
   }
 }
