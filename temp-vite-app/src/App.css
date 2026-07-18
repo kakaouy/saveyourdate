@@ -4175,3 +4175,32 @@ html {
     max-height: calc(100dvh - 24px);
   }
 }
+
+
+/* Preview real de los modelos publicados */
+.model-real-preview-frame {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+  background: #f5f0e7;
+  pointer-events: none;
+}
+
+
+/* Encuadre de Editorial Marfil como viewport móvil real. */
+.model-phone-screen:has(.model-real-preview-frame) {
+  position: relative;
+  overflow: hidden;
+}
+
+.model-real-preview-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 390px;
+  height: 900px;
+  max-width: none;
+  transform: scale(0.73);
+  transform-origin: top left;
+}
