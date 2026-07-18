@@ -4197,10 +4197,10 @@ html {
 .model-real-preview-frame {
   position: absolute;
   top: 0;
-  left: 50%;
+  left: 0;
   width: 390px;
   height: 900px;
   max-width: none;
-  transform: translateX(-50%) scale(0.73);
-  transform-origin: top center;
+  transform: scale(0.73);
+  transform-origin: top left;
 }
