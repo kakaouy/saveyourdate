@@ -4175,3 +4175,14 @@ html {
     max-height: calc(100dvh - 24px);
   }
 }
+
+
+/* Preview real de los modelos publicados */
+.model-real-preview-frame {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+  background: #f5f0e7;
+  pointer-events: none;
+}
