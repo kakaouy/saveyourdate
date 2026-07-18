@@ -1439,7 +1439,7 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  height: clamp(520px, 82svh, 820px);
+  height: clamp(360px, 55svh, 560px);
   min-height: 0;
   overflow: hidden;
   background: #d8d3c9;
