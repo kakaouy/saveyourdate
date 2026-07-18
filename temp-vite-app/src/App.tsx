@@ -1959,13 +1959,18 @@ function App() {
                         <div className="model-phone-speaker"></div>
                         <div className="model-phone-screen">
                           {model.id === 'boda-marfil' ? (
-                            <iframe
-                              className="model-real-preview-frame"
-                              src="/demos/boda-elegante-minimalista/index.html?preview=card&palette=marfil"
-                              title="Preview de Editorial Marfil"
-                              tabIndex={-1}
-                              aria-hidden="true"
-                            />
+                            <div
+                              className="editorial-marfil-preview"
+                              aria-label="Portada de Editorial Marfil"
+                            >
+                              <span className="editorial-marfil-preview__eyebrow">Nos casamos</span>
+                              <strong className="editorial-marfil-preview__names">Ana <i>&amp;</i> Juan</strong>
+                              <span className="editorial-marfil-preview__meta">Montevideo · 2026</span>
+                              <div className="editorial-marfil-preview__photos" aria-hidden="true">
+                                <img src="/demos/boda-elegante-minimalista/assets/images/galeria/foto-01.jpg" alt="" />
+                                <img src="/demos/boda-elegante-minimalista/assets/images/galeria/foto-02.jpg" alt="" />
+                              </div>
+                            </div>
                           ) : (
                           <div className={`mock-card-content ${model.themeClass}`}>
                             {model.illustrationType === 'rings' && (
