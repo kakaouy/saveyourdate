@@ -129,6 +129,47 @@
   100%{clip-path:inset(0 0 0 0);opacity:var(--branch-opacity)}
 }
 
+
+/* Anclaje estricto: el tallo nace fuera del viewport */
+.section:nth-of-type(odd):not(.hero):after{
+  left:auto!important;
+  right:-20px!important;
+  top:-64px;
+  width:clamp(112px,23vw,205px);
+  transform:none!important;
+  transform-origin:right bottom!important;
+}
+.section:nth-of-type(even):not(.hero):after{
+  right:auto!important;
+  left:-20px!important;
+  top:-86px;
+  width:clamp(135px,27vw,235px);
+  transform:scaleX(-1)!important;
+  transform-origin:left bottom!important;
+}
+/* Algunas nacen desde arriba, conservando el tallo pegado al mismo borde */
+.section:nth-of-type(3):after,
+.section:nth-of-type(7):after{
+  top:-22px!important;
+  transform:scaleY(-1)!important;
+  transform-origin:right top!important;
+}
+.section:nth-of-type(4):after,
+.section:nth-of-type(8):after{
+  top:-36px!important;
+  transform:scaleX(-1) scaleY(-1)!important;
+  transform-origin:left top!important;
+}
+/* Variación de escala, posición vertical y transparencia */
+.section:nth-of-type(2):after{width:clamp(150px,30vw,260px);--branch-opacity:.09}
+.section:nth-of-type(3):after{width:clamp(100px,20vw,175px);--branch-opacity:.15}
+.section:nth-of-type(4):after{width:clamp(125px,25vw,215px);--branch-opacity:.11}
+.section:nth-of-type(5):after{width:clamp(165px,31vw,270px);--branch-opacity:.08}
+.section:nth-of-type(6):after{width:clamp(105px,22vw,185px);--branch-opacity:.16}
+.section:nth-of-type(7):after{width:clamp(140px,28vw,240px);--branch-opacity:.1}
+.section:nth-of-type(8):after{width:clamp(175px,33vw,285px);--branch-opacity:.08}
+.section:nth-of-type(9):after{width:clamp(115px,24vw,200px);--branch-opacity:.14}
+
 </style>
 </head>
 <body>
