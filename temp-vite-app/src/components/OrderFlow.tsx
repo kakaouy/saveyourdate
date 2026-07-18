@@ -203,22 +203,25 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
     setPhotoError(count > photoLimit ? `Podés seleccionar hasta ${photoLimit} fotos en el Plan ${plan === 'basic' ? 'Básico' : 'Premium'}.` : '');
   };
 
+  const sendFormData = async (form: FormData) => {
+    const response = await fetch('https://formsubmit.co/ajax/saveyourdate.invite@gmail.com', {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      body: form
+    });
+    const result = await response.json().catch(() => null) as { success?: boolean | string; message?: string } | null;
+    if (!response.ok || !result || (result.success !== true && result.success !== 'true')) {
+      throw new Error(result?.message || 'No se pudo enviar el formulario.');
+    }
+  };
+
   const sendForm = async (payload: Record<string, string>) => {
     const form = new FormData();
     Object.entries(payload).forEach(([key, value]) => form.append(key, value));
     form.append('_template', 'table');
     form.append('_captcha', 'false');
     if (payload.Email) form.append('_replyto', payload.Email);
-
-    const response = await fetch('https://formsubmit.co/ajax/saveyourdate.invite@gmail.com', {
-      method: 'POST',
-      headers: { Accept: 'application/json' },
-      body: form
-    });
-    const result = await response.json().catch(() => null) as { success?: boolean | string } | null;
-    if (!response.ok || !result || (result.success !== true && result.success !== 'true')) {
-      throw new Error('No se pudo enviar el formulario.');
-    }
+    await sendFormData(form);
   };
 
   const submitOrder = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -242,18 +245,17 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
     form.append('Secciones', Array.from(activeSections).map((id) => sectionOptions.find((item) => item.id === id)?.title || id).filter(Boolean).join(', '));
     form.append('Música de fondo', hasMusic ? String(form.get('music') || 'Sí, a definir') : 'No');
     form.append('Estado del pago', paymentOperation ? 'Pago informado - pendiente de validación' : 'Pago pendiente');
+    form.append('_template', 'table');
+    form.append('_captcha', 'false');
+    form.append('_replyto', String(form.get('email') || ''));
     setSubmitError('');
     setSending(true);
     try {
-      const response = await fetch('https://formsubmit.co/ajax/saveyourdate.invite@gmail.com', {
-        method: 'POST',
-        headers: { Accept: 'application/json' },
-        body: form
-      });
-      if (!response.ok) throw new Error('No se pudo enviar el pedido.');
+      await sendFormData(form);
       setSubmittedOrder(orderNumber);
-    } catch {
-      setSubmitError(l('No pudimos enviar el pedido. Revisá tu conexión e intentá nuevamente.', 'We could not send the order. Check your connection and try again.', 'Não foi possível enviar o pedido. Verifique sua conexão e tente novamente.'));
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : '';
+      setSubmitError(`${l('No pudimos enviar el pedido. Revisá el tamaño de las imágenes e intentá nuevamente.', 'We could not send the order. Check the image sizes and try again.', 'Não foi possível enviar o pedido. Verifique o tamanho das imagens e tente novamente.')} ${detail}`.trim());
     } finally {
       setSending(false);
     }
