@@ -31,10 +31,10 @@
     .loader.is-done{opacity:0;visibility:hidden}
     .loader__mark{font-family:var(--serif);font-size:clamp(4rem,16vw,8rem);font-weight:300;letter-spacing:-.08em;animation:breathe 1.5s ease-in-out infinite}
     @keyframes breathe{50%{opacity:.4;transform:scale(.96)}}
-    .music-control{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:80;width:52px;height:52px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;background:var(--paper);box-shadow:0 8px 24px #0002;cursor:pointer;transition:transform .25s ease,background .25s,color .25s}
+    .music-control{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:80;width:46px;height:46px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;background:var(--paper);box-shadow:0 8px 24px #0002;cursor:pointer;transition:transform .25s ease,background .25s,color .25s}
     .music-control:hover{transform:translateY(-2px)}
     .music-control:disabled{opacity:.55;cursor:default}
-    .music-control img{width:23px;height:23px}
+    .music-control img{width:19px;height:19px}
     .music-control.is-playing img{animation:spin 4s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .panel{position:relative;min-height:100svh;padding:clamp(72px,12vh,130px) max(24px,7vw);display:flex;align-items:center;justify-content:center;overflow:hidden}
@@ -130,9 +130,11 @@
     (() => {
       const palettes = {
         negro: "#10100f",
-        borgona: "#671f2c",
-        azul: "#23324c",
-        bosque: "#263a30"
+        rosa: "#c492a7",
+        frambuesa: "#a15a77",
+        cielo: "#85acb0",
+        petroleo: "#556e80",
+        tinta: "#3a3957"
       };
       const selected = new URLSearchParams(location.search).get("palette") || "negro";
       document.documentElement.style.setProperty("--ink", palettes[selected] || palettes.negro);
