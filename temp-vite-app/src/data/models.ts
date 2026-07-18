@@ -13,6 +13,7 @@ export interface InvitationModel {
   musicTitle?: string;
   musicArtist?: string;
   location?: string;
+  includedSections?: string[];
   palettes?: Array<{
     id: string;
     name: string;
@@ -44,6 +45,16 @@ export const INVITATION_MODELS: InvitationModel[] = [
     musicTitle: 'Perfect',
     musicArtist: 'Ed Sheeran',
     location: 'Estancia La Linda, Pilar, Buenos Aires',
+    includedSections: [
+      'gallery',
+      'music',
+      'quote',
+      'agenda',
+      'location',
+      'gifts',
+      'featuredPhoto',
+      'rsvp'
+    ],
     palettes: [
       { id: 'marfil', name: 'Marfil', color: '#d9cdbd' },
       { id: 'rosa', name: 'Rosa', color: '#d8b7bd' },
