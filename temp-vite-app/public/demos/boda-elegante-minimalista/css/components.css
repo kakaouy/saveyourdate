@@ -1380,12 +1380,43 @@
   height: 100svh;
   min-height: 520px;
   background-color: #d8d3c9;
-  background-image: var(--full-photo-image, url("../assets/images/galeria/foto-06.jpg"));
+  background-image: url("../assets/images/galeria/foto-06.jpg");
   background-repeat: no-repeat;
   background-position: var(--full-photo-position, center center);
   background-size: cover;
-  clip-path: inset(calc((1 - var(--photo-reveal-progress, 0)) * 18%) 0);
-  transform: scale(calc(1.06 - var(--photo-reveal-progress, 0) * 0.06));
+  clip-path: inset(var(--photo-reveal-inset, 18%) 0);
+  transform: scale(var(--photo-reveal-scale, 1.06));
   transition: clip-path 80ms linear, transform 80ms linear;
   will-change: clip-path, transform;
+}
+
+
+/* Correcciones de validación Invite 001 */
+.location-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  margin-inline: auto;
+}
+
+.location-card__icon img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  max-width: 44px;
+  max-height: 44px;
+  object-fit: contain;
+}
+
+.copy-button--account {
+  display: block;
+  width: min(100%, 300px);
+  margin: 1rem auto 0;
+}
+
+[data-animation="fade-up"] {
+  transition-duration: 0.75s;
+  transition-timing-function: cubic-bezier(.22, .61, .36, 1);
 }
