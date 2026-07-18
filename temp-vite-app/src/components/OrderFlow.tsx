@@ -53,13 +53,25 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   const sectionLimit = plan === 'basic' ? 5 : 8;
   const photoLimit = plan === 'basic' ? 5 : 8;
   const selectedModel = useMemo(() => models.find((model) => model.id === modelId), [models, modelId]);
-  const includedSections = selectedModel?.includedSections || [];
+  const defaultSections = selectedModel?.includedSections || [];
   const activeSections = useMemo(
-    () => new Set([...includedSections, ...sections]),
-    [includedSections, sections]
+    () => new Set(sections),
+    [sections]
   );
-  const usedSectionCount = activeSections.size;
-  const requiresPremium = includedSections.length > 5;
+  const galleryIncludedWithDesign =
+    defaultSections.includes('gallery');
+  const countedSections = useMemo(
+    () => sections.filter(
+      (sectionId) =>
+        sectionId !== 'music' &&
+        !(
+          sectionId === 'gallery' &&
+          galleryIncludedWithDesign
+        )
+    ),
+    [sections, galleryIncludedWithDesign]
+  );
+  const usedSectionCount = countedSections.length;
   const gallerySelected = activeSections.has('gallery');
   const rsvpSelected = activeSections.has('rsvp');
   const sectionOptions = useMemo(() => SECTION_OPTIONS.map((section) => {
@@ -122,10 +134,31 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   );
 
   useEffect(() => {
-    if (requiresPremium && plan !== 'premium') {
-      setPlan('premium');
-    }
-  }, [requiresPremium, plan]);
+    const defaults =
+      (selectedModel?.includedSections || [])
+        .filter((sectionId) => sectionId !== 'music');
+
+    setSections(defaults);
+    setHasMusic(
+      selectedModel?.includedSections?.includes('music') ||
+      false
+    );
+
+    const countedDefaults =
+      defaults.filter(
+        (sectionId) =>
+          !(
+            sectionId === 'gallery' &&
+            selectedModel?.includedSections?.includes('gallery')
+          )
+      );
+
+    setPlan(
+      countedDefaults.length > 5
+        ? 'premium'
+        : 'basic'
+    );
+  }, [modelId, selectedModel]);
 
   useEffect(() => {
     if (availableColors.length) {
@@ -140,11 +173,19 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   };
 
   const toggleSection = (sectionId: string) => {
-    if (includedSections.includes(sectionId)) return;
-
     setSections((current) => {
       if (current.includes(sectionId)) return current.filter((id) => id !== sectionId);
-      if (activeSections.size >= sectionLimit) return current;
+      const isFreeGallery =
+        sectionId === 'gallery' &&
+        galleryIncludedWithDesign;
+
+      if (
+        !isFreeGallery &&
+        usedSectionCount >= sectionLimit
+      ) {
+        return current;
+      }
+
       return [...current, sectionId];
     });
   };
@@ -246,8 +287,8 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
             <div className="order-form-block">
               <div className="order-block-title"><span>1</span><div><h3>{l('Elegí tu plan', 'Choose your plan', 'Escolha seu plano')}</h3><p>{l('La portada está incluida y no cuenta como sección.', 'The cover is included and does not count as a section.', 'A capa está incluída e não conta como seção.')}</p></div></div>
               <div className="order-plan-grid">
-                <button type="button" disabled={requiresPremium} className={`order-plan-card ${plan === 'basic' ? 'active' : ''}`} onClick={() => setPlan('basic')}>
-                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{l('Básico', 'Basic', 'Básico')}</h4><strong>{l('Hasta 5 secciones', 'Up to 5 sections', 'Até 5 seções')}</strong><p>{requiresPremium ? l('Este modelo incluye 8 secciones y requiere Premium.', 'This model includes 8 sections and requires Premium.', 'Este modelo inclui 8 seções e requer Premium.') : l('Galería de hasta 5 fotos si la elegís.', 'Gallery with up to 5 photos if selected.', 'Galeria de até 5 fotos, se escolhida.')}</p>
+                <button type="button" className={`order-plan-card ${plan === 'basic' ? 'active' : ''}`} onClick={() => setPlan('basic')}>
+                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{l('Básico', 'Basic', 'Básico')}</h4><strong>{l('Hasta 5 secciones', 'Up to 5 sections', 'Até 5 seções')}</strong><p>{l('Galería de hasta 5 fotos cuando el diseño la incluye.', 'Gallery with up to 5 photos when included in the design.', 'Galeria de até 5 fotos quando incluída no design.')}</p>
                 </button>
                 <button type="button" className={`order-plan-card ${plan === 'premium' ? 'active' : ''}`} onClick={() => setPlan('premium')}>
                   <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>Premium</h4><strong>{l('Hasta 8 secciones', 'Up to 8 sections', 'Até 8 seções')}</strong><p>{l('Galería de hasta 8 fotos si la elegís.', 'Gallery with up to 8 photos if selected.', 'Galeria de até 8 fotos, se escolhida.')}</p>
@@ -256,7 +297,7 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
             </div>
 
             <div className="order-form-block">
-              <div className="order-block-title"><span>2</span><div><h3>{l('Elegí el modelo y las secciones', 'Choose the model and sections', 'Escolha o modelo e as seções')}</h3><p>{usedSectionCount} {l('de', 'of', 'de')} {sectionLimit} {l('secciones seleccionadas.', 'sections selected.', 'seções selecionadas.')}</p></div></div>
+              <div className="order-block-title"><span>2</span><div><h3>{l('Elegí el modelo y las secciones', 'Choose the model and sections', 'Escolha o modelo e as seções')}</h3><p>{usedSectionCount} {l('de', 'of', 'de')} {sectionLimit} {l('secciones contabilizadas.', 'counted sections.', 'seções contabilizadas.')} {galleryIncludedWithDesign && l('La galería y la portada están incluidas sin consumir lugares.', 'Gallery and cover are included without using slots.', 'Galeria e capa estão incluídas sem consumir vagas.')}</p></div></div>
               <span className="form-label">{l('Primero, elegí el tipo de evento', 'First, choose the event type', 'Primeiro, escolha o tipo de evento')}</span>
               <div className="order-event-categories" role="group" aria-label="Tipo de evento">
                 {([
@@ -292,13 +333,19 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
               </div>
               <div className="order-sections-grid">
                 {sectionOptions.map((section) => {
-                  const included = includedSections.includes(section.id);
-                  const selected = included || sections.includes(section.id);
-                  const disabled = included || (!selected && usedSectionCount >= sectionLimit);
+                  const includedByDefault = defaultSections.includes(section.id);
+                  const selected = sections.includes(section.id);
+                  const isFreeGallery =
+                    section.id === 'gallery' &&
+                    galleryIncludedWithDesign;
+                  const disabled =
+                    !selected &&
+                    !isFreeGallery &&
+                    usedSectionCount >= sectionLimit;
                   return (
-                    <button type="button" key={section.id} disabled={disabled} className={`order-section-option ${selected ? 'active' : ''} ${included ? 'included' : ''}`} onClick={() => toggleSection(section.id)}>
+                    <button type="button" key={section.id} disabled={disabled} className={`order-section-option ${selected ? 'active' : ''} ${includedByDefault ? 'included' : ''}`} onClick={() => toggleSection(section.id)}>
                       <span className="order-section-check">{selected ? '✓' : '+'}</span>
-                      <span><strong>{section.title}</strong><small>{included ? l('Incluida en este modelo · ', 'Included in this model · ', 'Incluída neste modelo · ') : ''}{section.description}</small></span>
+                      <span><strong>{section.title}</strong><small>{includedByDefault ? l('Incluida por defecto; podés cambiarla · ', 'Included by default; you can change it · ', 'Incluída por padrão; você pode alterá-la · ') : ''}{section.description}</small></span>
                     </button>
                   );
                 })}
@@ -363,7 +410,7 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
               </div>
             </div>
 
-            <button className="btn-form-submit order-submit" type="submit" disabled={sending || activeSections.size === 0 || !!photoError}>{sending ? l('Enviando pedido…', 'Sending order…', 'Enviando pedido…') : l('Enviar mi pedido', 'Send my order', 'Enviar meu pedido')}</button>
+            <button className="btn-form-submit order-submit" type="submit" disabled={sending || activeSections.size === 0 || usedSectionCount > sectionLimit || !!photoError}>{sending ? l('Enviando pedido…', 'Sending order…', 'Enviando pedido…') : l('Enviar mi pedido', 'Send my order', 'Enviar meu pedido')}</button>
           </form>
         ))}
 
