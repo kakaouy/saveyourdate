@@ -63,6 +63,40 @@ export const INVITATION_MODELS: InvitationModel[] = [
     ]
   },
   {
+    id: 'boda-pleno',
+    title: 'Editorial Pleno',
+    category: 'wedding',
+    description: '',
+    badge: 'Nuevo',
+    demoName1: 'Clara & Tomás',
+    date: '12 de Diciembre, 2026',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Código de Vestimenta',
+      'Regalos',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    location: 'Casa del Lago, Montevideo',
+    includedSections: [
+      'music',
+      'countdown',
+      'dresscode',
+      'gifts',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'negro', name: 'Negro', color: '#10100f' },
+      { id: 'rosa', name: 'Rosa empolvado', color: '#c492a7' },
+      { id: 'frambuesa', name: 'Frambuesa', color: '#a15a77' },
+      { id: 'cielo', name: 'Celeste grisáceo', color: '#85acb0' },
+      { id: 'petroleo', name: 'Azul petróleo', color: '#556e80' },
+      { id: 'tinta', name: 'Azul tinta', color: '#3a3957' }
+    ]
+  },
+  {
     id: 'boda-boho',
     title: 'Rústico Boho',
     category: 'wedding',

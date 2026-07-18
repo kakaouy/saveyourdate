@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="Invitación de casamiento de Clara y Tomás">
+  <title>Clara & Tomás — Nos casamos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:#10100f;
+      --paper:#f4efe5;
+      --accent:#d84a3f;
+      --accent-2:#b8c8ff;
+      --soft:#e6d7bf;
+      --white:#fffdf8;
+      --line:currentColor;
+      --serif:"Cormorant Garamond",serif;
+      --sans:"Manrope",sans-serif;
+      --script:"Allura",cursive;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--ink)}
+    body{margin:0;color:var(--ink);background:var(--paper);font-family:var(--sans);font-weight:300;overflow-x:hidden}
+    button,input,textarea{font:inherit}
+    button{color:inherit}
+    [hidden]{display:none!important}
+    .loader{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:var(--ink);color:var(--paper);transition:opacity .65s ease,visibility .65s ease}
+    .loader.is-done{opacity:0;visibility:hidden}
+    .loader__mark{font-family:var(--serif);font-size:clamp(4rem,16vw,8rem);font-weight:300;letter-spacing:-.08em;animation:breathe 1.5s ease-in-out infinite}
+    @keyframes breathe{50%{opacity:.4;transform:scale(.96)}}
+    .music-control{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:80;width:46px;height:46px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;background:var(--paper);box-shadow:0 8px 24px #0002;cursor:pointer;transition:transform .25s ease,background .25s,color .25s}
+    .music-control:hover{transform:translateY(-2px)}
+    .music-control:disabled{opacity:.55;cursor:default}
+    .music-control img{width:19px;height:19px}
+    .music-control.is-playing img{animation:spin 4s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .panel{position:relative;min-height:100svh;padding:clamp(72px,12vh,130px) max(24px,7vw);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .panel__inner{width:min(100%,920px);position:relative;z-index:1}
+    .panel--ink{background:var(--ink);color:var(--paper)}
+    .panel--paper{background:var(--paper);color:var(--ink)}
+    .panel--accent{background:var(--accent);color:var(--white)}
+    .panel--blue{background:var(--accent-2);color:var(--ink)}
+    .panel--soft{background:var(--soft);color:var(--ink)}
+    .eyebrow{margin:0 0 30px;text-align:center;font-size:.7rem;font-weight:600;letter-spacing:.28em;text-transform:uppercase}
+    .hero{text-align:center;flex-direction:column}
+    .hero__names{margin:0;font-family:var(--serif);font-size:clamp(5rem,20vw,12.5rem);font-weight:300;line-height:.62;letter-spacing:-.075em}
+    .hero__names span{display:block}
+    .hero__and{display:block;margin:.16em 0 .08em;font-family:var(--script);font-size:.45em;font-weight:400;line-height:1;letter-spacing:0}
+    .hero__message{max-width:480px;margin:clamp(58px,11vh,100px) auto 34px;font-size:clamp(.75rem,2.7vw,.95rem);font-weight:500;line-height:1.9;letter-spacing:.1em;text-transform:uppercase}
+    .hero__date{margin:0;font-family:var(--serif);font-size:clamp(2rem,8vw,4.8rem);font-weight:300;line-height:1.05}
+    .hero__place{margin:26px 0 0;font-size:.78rem;line-height:1.8;letter-spacing:.12em;text-transform:uppercase}
+    .scroll-cue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;opacity:.65}
+    .statement{text-align:center}
+    .statement__script{display:block;font-family:var(--script);font-size:clamp(3.5rem,13vw,8rem);line-height:.8}
+    .statement h2,.section-title{margin:0;font-family:var(--serif);font-size:clamp(4.2rem,16vw,10rem);font-weight:300;line-height:.78;letter-spacing:-.055em;text-align:center}
+    .statement p{width:min(100%,560px);margin:48px auto 0;font-size:clamp(1rem,3.5vw,1.25rem);line-height:1.8}
+    .countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,4vw,50px);margin-top:70px;text-align:center}
+    .countdown__value{display:block;font-family:var(--serif);font-size:clamp(2.8rem,10vw,7.2rem);font-weight:300;line-height:1}
+    .countdown__label{display:block;margin-top:22px;font-size:.63rem;font-weight:600;line-height:1.35;letter-spacing:.14em;text-transform:uppercase}
+    .details{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:currentColor;border:1px solid currentColor;margin-top:65px}
+    .detail{background:var(--paper);padding:clamp(30px,6vw,64px);text-align:center}
+    .detail small{display:block;font-size:.66rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase}
+    .detail strong{display:block;margin:17px 0 8px;font-family:var(--serif);font-size:clamp(2.1rem,6vw,4rem);font-weight:400;line-height:1}
+    .detail p{margin:0;font-size:.85rem;line-height:1.65}
+    .panel--compact{min-height:auto;padding-top:clamp(38px,6vh,62px);padding-bottom:clamp(38px,6vh,62px)}
+    .panel--quote{min-height:auto;padding-top:clamp(62px,10vh,105px);padding-bottom:clamp(62px,10vh,105px)}
+    .panel--quote .statement p{margin-top:0;font-family:var(--serif);font-size:clamp(2rem,6vw,4.2rem);font-style:italic;line-height:1.18}
+    .dress{text-align:center}
+    .dress .section-title{font-size:clamp(2.8rem,7vw,5.2rem);line-height:.9}
+    .dress .eyebrow{margin-bottom:18px}
+    .dress__value{margin:24px 0 12px;font-family:var(--serif);font-size:clamp(2.5rem,6vw,4.6rem);font-weight:300;font-style:italic;line-height:.95}
+    .dress__note{margin:0 auto;width:min(100%,520px);line-height:1.8}
+    .gift-copy{text-align:center}
+    .gift-copy p{width:min(100%,540px);margin:46px auto 34px;font-size:1.05rem;line-height:1.8}
+    .btn{min-height:52px;padding:14px 25px;border:1px solid currentColor;border-radius:0;background:transparent;font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:background .25s,color .25s,transform .25s}
+    .btn:hover{transform:translateY(-2px)}
+    .btn--dark:hover,.btn--dark.is-copied{background:var(--ink);color:var(--paper)}
+    .rsvp-head{text-align:center}
+    .rsvp-head .section-title{max-width:920px;margin-inline:auto;font-size:clamp(3.7rem,11vw,7.5rem);line-height:.83}
+    .rsvp-head p{margin:48px auto 0;max-width:580px;line-height:1.8}
+    .rsvp-form{width:min(100%,680px);margin:58px auto 0}
+    .guest{margin:0 0 18px;padding:clamp(24px,5vw,38px);border:1px solid currentColor}
+    .guest:last-of-type{border-bottom:1px solid currentColor}
+    .guest__name{margin:0 0 24px;font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.5rem);font-weight:400}
+    .choice-row{display:flex;flex-wrap:wrap;gap:10px}
+    .choice{position:relative}
+    .choice input{position:absolute;opacity:0;pointer-events:none}
+    .choice span{display:block;padding:11px 16px;border:1px solid currentColor;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:.2s}
+    .choice input:checked+span{background:var(--paper);color:var(--ink)}
+    .dietary{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+    .field{display:flex;flex-direction:column;gap:9px}
+    .field--full{grid-column:1/-1}
+    .field label{font-size:.65rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
+    .field input,.field textarea,.field select{width:100%;border:1px solid currentColor;border-radius:0;padding:14px;background:transparent;color:inherit;outline:none}
+    .field input:focus,.field textarea:focus,.field select:focus{box-shadow:0 0 0 2px currentColor}
+    .field textarea{min-height:90px;resize:vertical}
+    .rsvp-submit{width:100%;margin-top:30px;background:var(--paper);color:var(--ink)}
+    .rsvp-status{min-height:24px;margin:18px 0 0;text-align:center;font-size:.85rem}
+    .footer{min-height:44svh;text-align:center}
+    .footer__names{font-family:var(--serif);font-size:clamp(3.8rem,14vw,8rem);font-weight:300;letter-spacing:-.05em}
+    .footer__brand{margin-top:70px;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+    .modal{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:#000b}
+    .modal__dialog{width:min(100%,520px);max-height:calc(100svh - 40px);overflow:auto;background:var(--paper);color:var(--ink);padding:clamp(28px,7vw,56px);position:relative}
+    .modal__close{position:absolute;right:14px;top:10px;border:0;background:none;font-family:var(--serif);font-size:2.2rem;cursor:pointer}
+    .modal h2{margin:0 0 26px;font-family:var(--serif);font-size:3.4rem;font-weight:300;line-height:.9}
+    .bank-line{padding:16px 0;border-top:1px solid #0003}
+    .bank-line small{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase}
+    .bank-line strong{font-weight:400}
+    [data-reveal]{opacity:0;transform:translateY(46px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+    [data-reveal="left"]{transform:translateX(-50px)}
+    [data-reveal="right"]{transform:translateX(50px)}
+    [data-reveal].is-visible{opacity:1;transform:none}
+    @media (max-width:620px){
+      .panel{padding-left:24px;padding-right:24px}
+      .countdown{grid-template-columns:repeat(2,1fr);gap:42px 14px;margin-top:52px}
+      .countdown__value{font-size:clamp(3.6rem,18vw,5.2rem)}
+      .countdown__label{margin-top:10px;font-size:.55rem;letter-spacing:.12em}
+      .details{grid-template-columns:1fr}
+      .dietary{grid-template-columns:1fr}
+      .hero__names{font-size:clamp(5rem,24vw,7rem)}
+      .rsvp-head .section-title{font-size:clamp(3.5rem,16vw,5.5rem);line-height:.84}
+      .rsvp-head p{margin-top:34px}
+    }
+    @media (prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}[data-reveal]{opacity:1;transform:none}}
+  </style>
+  <script>
+    (() => {
+      const palettes = {
+        negro: "#10100f",
+        rosa: "#c492a7",
+        frambuesa: "#a15a77",
+        cielo: "#85acb0",
+        petroleo: "#556e80",
+        tinta: "#3a3957"
+      };
+      const selected = new URLSearchParams(location.search).get("palette") || "negro";
+      document.documentElement.style.setProperty("--ink", palettes[selected] || palettes.negro);
+    })();
+  </script>
+</head>
+<body>
+  <div class="loader" id="loader" aria-hidden="true"><div class="loader__mark">C&T</div></div>
+
+  <button class="music-control" id="music-control" type="button" aria-label="Música no configurada" disabled>
+    <img src="assets/music.svg" alt="">
+  </button>
+  <audio id="music" loop preload="none"></audio>
+
+  <main>
+    <section class="panel panel--ink hero">
+      <div class="panel__inner">
+        <p class="eyebrow" data-i18n="heroEyebrow" data-reveal>Nos casamos</p>
+        <h1 class="hero__names" data-reveal>
+          <span>Clara</span><i class="hero__and">y</i><span>Tomás</span>
+        </h1>
+        <p class="hero__message" data-i18n="heroMessage" data-reveal>Nos encantaría que nos acompañaras a celebrar nuestro casamiento</p>
+        <p class="hero__date" data-reveal>12 · 12 · 2026</p>
+        <p class="hero__place" data-reveal><span data-i18n="timePrefix">A las</span> 19:30<br>Casa del Lago · Camino de los Aromos 2150</p>
+      </div>
+      <span class="scroll-cue" data-i18n="discover">Descubrí la invitación</span>
+    </section>
+
+    <section class="panel panel--paper panel--quote">
+      <div class="panel__inner statement">
+        <p data-i18n="dateText" data-reveal>Una noche, una promesa y todas las personas que queremos en un mismo lugar.</p>
+      </div>
+    </section>
+
+    <section class="panel panel--ink">
+      <div class="panel__inner">
+        <p class="eyebrow" data-i18n="countdownEyebrow" data-reveal>Falta muy poco</p>
+        <h2 class="section-title" data-i18n="countdown" data-reveal>Cuenta regresiva</h2>
+        <div class="countdown" id="countdown" data-reveal>
+          <div><span class="countdown__value" data-unit="days">00</span><span class="countdown__label" data-i18n="days">Días</span></div>
+          <div><span class="countdown__value" data-unit="hours">00</span><span class="countdown__label" data-i18n="hours">Horas</span></div>
+          <div><span class="countdown__value" data-unit="minutes">00</span><span class="countdown__label" data-i18n="minutes">Minutos</span></div>
+          <div><span class="countdown__value" data-unit="seconds">00</span><span class="countdown__label" data-i18n="seconds">Segundos</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel panel--paper">
+      <div class="panel__inner">
+        <p class="eyebrow" data-i18n="detailsEyebrow" data-reveal>Los detalles</p>
+        <h2 class="section-title" data-i18n="whenWhere" data-reveal>Cuándo & dónde</h2>
+        <div class="details">
+          <article class="detail" data-reveal="left"><small data-i18n="dateLabel">Fecha</small><strong>12.12.2026</strong><p data-i18n="saturday">Sábado · 19:30</p></article>
+          <article class="detail" data-reveal="right"><small data-i18n="placeLabel">Lugar</small><strong>Casa del Lago</strong><p>Camino de los Aromos 2150<br>Montevideo</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel panel--ink panel--compact">
+      <div class="panel__inner dress">
+        <p class="eyebrow" data-i18n="dressEyebrow" data-reveal>Para esta noche</p>
+        <h2 class="section-title" data-i18n="dressTitle" data-reveal>Dress code</h2>
+        <p class="dress__value" data-i18n="dressValue" data-reveal>Elegante</p>
+        <p class="dress__note" data-i18n="dressNote" data-reveal>Queremos que te sientas increíble. El blanco queda reservado para la novia.</p>
+      </div>
+    </section>
+
+    <section class="panel panel--paper">
+      <div class="panel__inner gift-copy">
+        <p class="eyebrow" data-i18n="giftEyebrow" data-reveal>Un detalle</p>
+        <h2 class="section-title" data-i18n="gifts" data-reveal>Regalos</h2>
+        <p data-i18n="giftText" data-reveal>Tu presencia es lo más importante. Si además querés hacernos un regalo, dejamos aquí nuestros datos.</p>
+        <button class="btn btn--dark" type="button" id="open-gifts" data-i18n="giftButton" data-reveal>Ver datos</button>
+      </div>
+    </section>
+
+    <section class="panel panel--ink">
+      <div class="panel__inner">
+        <div class="rsvp-head">
+          <p class="eyebrow" data-i18n="rsvpEyebrow" data-reveal>Queremos contar contigo</p>
+          <h2 class="section-title" data-i18n="rsvpTitle" data-reveal>Confirmá tu asistencia</h2>
+          <p data-i18n="rsvpText" data-reveal>Respondé por cada integrante de la invitación. La confirmación se registra directamente en nuestra lista.</p>
+        </div>
+        <form class="rsvp-form" id="rsvp-form" data-reveal>
+          <div id="guest-list"></div>
+          <div class="field field--full">
+            <label for="comment" data-i18n="comment">Comentario opcional</label>
+            <textarea id="comment" name="comment"></textarea>
+          </div>
+          <button class="btn rsvp-submit" type="submit" data-i18n="saveRsvp">Guardar confirmación</button>
+          <p class="rsvp-status" id="rsvp-status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <footer class="panel panel--paper footer">
+      <div class="panel__inner">
+        <div class="footer__names" data-reveal>Clara & Tomás</div>
+        <p data-i18n="closing" data-reveal>Gracias por ser parte de nuestra historia.</p>
+        <div class="footer__brand">Save Your Date</div>
+      </div>
+    </footer>
+  </main>
+
+  <div class="modal" id="gift-modal" hidden aria-hidden="true">
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="gift-title">
+      <button class="modal__close" type="button" data-close aria-label="Cerrar">×</button>
+      <h2 id="gift-title" data-i18n="gifts">Regalos</h2>
+      <p data-i18n="bankIntro">Podés copiar todos los datos bancarios con un solo botón.</p>
+      <div class="bank-line"><small data-i18n="bank">Banco</small><strong>Nombre del banco</strong></div>
+      <div class="bank-line"><small data-i18n="holder">Titular</small><strong>Clara y Tomás</strong></div>
+      <div class="bank-line"><small data-i18n="account">Cuenta</small><strong>000000000</strong></div>
+      <div class="bank-line"><small>Alias</small><strong>CLARA.TOMAS.BODA</strong></div>
+      <button class="btn btn--dark" id="copy-bank" type="button" data-i18n="copyBank">Copiar datos bancarios</button>
+    </div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      date: "2026-12-12T19:30:00-03:00",
+      musicUrl: "",
+      googleScriptUrl: "",
+      groupParam: "grupo",
+      guests: [
+        { id: "1", name: "Valentina Pérez" },
+        { id: "2", name: "Santiago Pérez" }
+      ]
+    };
+
+    const COPY = {
+      es: {
+        heroEyebrow:"Nos casamos",heroMessage:"Nos encantaría que nos acompañaras a celebrar nuestro casamiento",timePrefix:"A las",discover:"Descubrí la invitación",
+        saveThe:"guardá la",date:"fecha",dateText:"Una noche, una promesa y todas las personas que queremos en un mismo lugar.",
+        countdownEyebrow:"Falta muy poco",countdown:"Cuenta regresiva",days:"Días",hours:"Horas",minutes:"Minutos",seconds:"Segundos",
+        detailsEyebrow:"Los detalles",whenWhere:"Cuándo & dónde",dateLabel:"Fecha",saturday:"Sábado · 19:30",placeLabel:"Lugar",
+        dressEyebrow:"Para esta noche",dressTitle:"Dress code",dressValue:"Elegante",dressNote:"Queremos que te sientas increíble. El blanco queda reservado para la novia.",
+        giftEyebrow:"Un detalle",gifts:"Regalos",giftText:"Tu presencia es lo más importante. Si además querés hacernos un regalo, dejamos aquí nuestros datos.",giftButton:"Ver datos",
+        rsvpEyebrow:"Queremos contar contigo",rsvpTitle:"Confirmá tu asistencia",rsvpText:"Respondé por cada integrante de la invitación. La confirmación se registra directamente en nuestra lista.",
+        comment:"Comentario opcional",saveRsvp:"Guardar confirmación",closing:"Gracias por ser parte de nuestra historia.",bankIntro:"Podés copiar todos los datos bancarios con un solo botón.",
+        bank:"Banco",holder:"Titular",account:"Cuenta",copyBank:"Copiar datos bancarios",attends:"Asiste",declines:"No asiste",dietary:"Restricción alimentaria",none:"Sin restricciones",vegetarian:"Vegano / vegetariano",celiac:"Celíaco / sin TACC",other:"Otra",detail:"Detalle de la restricción",sending:"Guardando…",saved:"¡Gracias! Tu confirmación quedó registrada.",notConfigured:"Modo muestra: la planilla todavía no está configurada.",copyDone:"Datos copiados"
+      },
+      en: {
+        heroEyebrow:"We're getting married",heroMessage:"We would be delighted if you joined us to celebrate our wedding",timePrefix:"At",discover:"Discover the invitation",
+        saveThe:"save the",date:"date",dateText:"One night, one promise and everyone we love in the same place.",
+        countdownEyebrow:"Almost there",countdown:"Countdown",days:"Days",hours:"Hours",minutes:"Minutes",seconds:"Seconds",
+        detailsEyebrow:"The details",whenWhere:"When & where",dateLabel:"Date",saturday:"Saturday · 7:30 pm",placeLabel:"Venue",
+        dressEyebrow:"For this evening",dressTitle:"Dress code",dressValue:"Formal",dressNote:"We want you to feel amazing. White is reserved for the bride.",
+        giftEyebrow:"A little something",gifts:"Gifts",giftText:"Your presence matters most. If you would also like to give us a gift, our details are here.",giftButton:"View details",
+        rsvpEyebrow:"We hope you can join us",rsvpTitle:"Please RSVP",rsvpText:"Reply for each person included in the invitation. Your response is saved directly to our guest list.",
+        comment:"Optional comment",saveRsvp:"Save response",closing:"Thank you for being part of our story.",bankIntro:"Copy all bank details with a single button.",
+        bank:"Bank",holder:"Account holder",account:"Account",copyBank:"Copy bank details",attends:"Attending",declines:"Not attending",dietary:"Dietary requirement",none:"No restrictions",vegetarian:"Vegan / vegetarian",celiac:"Gluten-free",other:"Other",detail:"Restriction details",sending:"Saving…",saved:"Thank you! Your RSVP was saved.",notConfigured:"Demo mode: the spreadsheet has not been configured yet.",copyDone:"Details copied"
+      },
+      pt: {
+        heroEyebrow:"Vamos nos casar",heroMessage:"Ficaríamos muito felizes se você celebrasse nosso casamento conosco",timePrefix:"Às",discover:"Descubra o convite",
+        saveThe:"reserve a",date:"data",dateText:"Uma noite, uma promessa e todas as pessoas que amamos no mesmo lugar.",
+        countdownEyebrow:"Falta muito pouco",countdown:"Contagem regressiva",days:"Dias",hours:"Horas",minutes:"Minutos",seconds:"Segundos",
+        detailsEyebrow:"Os detalhes",whenWhere:"Quando & onde",dateLabel:"Data",saturday:"Sábado · 19:30",placeLabel:"Local",
+        dressEyebrow:"Para esta noite",dressTitle:"Código de vestimenta",dressValue:"Elegante",dressNote:"Queremos que você se sinta incrível. O branco é reservado para a noiva.",
+        giftEyebrow:"Um detalhe",gifts:"Presentes",giftText:"Sua presença é o mais importante. Se também quiser nos presentear, deixamos aqui nossos dados.",giftButton:"Ver dados",
+        rsvpEyebrow:"Queremos contar com você",rsvpTitle:"Confirme sua presença",rsvpText:"Responda por cada pessoa incluída no convite. A confirmação é registrada diretamente na nossa lista.",
+        comment:"Comentário opcional",saveRsvp:"Salvar confirmação",closing:"Obrigado por fazer parte da nossa história.",bankIntro:"Copie todos os dados bancários com um só botão.",
+        bank:"Banco",holder:"Titular",account:"Conta",copyBank:"Copiar dados bancários",attends:"Comparece",declines:"Não comparece",dietary:"Restrição alimentar",none:"Sem restrições",vegetarian:"Vegano / vegetariano",celiac:"Celíaco / sem glúten",other:"Outra",detail:"Detalhe da restrição",sending:"Salvando…",saved:"Obrigado! Sua confirmação foi registrada.",notConfigured:"Modo de demonstração: a planilha ainda não foi configurada.",copyDone:"Dados copiados"
+      }
+    };
+
+    const params = new URLSearchParams(location.search);
+    const lang = ["es","en","pt"].includes(params.get("lang")) ? params.get("lang") : "es";
+    const t = COPY[lang];
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(el => { const key=el.dataset.i18n;if(t[key]) el.textContent=t[key]; });
+
+    window.addEventListener("load",()=>setTimeout(()=>document.getElementById("loader").classList.add("is-done"),650));
+
+    const revealObserver = new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(entry.isIntersecting){entry.target.classList.add("is-visible");revealObserver.unobserve(entry.target);}
+    }),{threshold:.16,rootMargin:"0px 0px -8% 0px"});
+    document.querySelectorAll("[data-reveal]").forEach(el=>revealObserver.observe(el));
+
+    const countdown=()=>{
+      const distance=Math.max(0,new Date(CONFIG.date).getTime()-Date.now());
+      const values={days:Math.floor(distance/86400000),hours:Math.floor(distance/3600000)%24,minutes:Math.floor(distance/60000)%60,seconds:Math.floor(distance/1000)%60};
+      Object.entries(values).forEach(([unit,value])=>{document.querySelector(`[data-unit="${unit}"]`).textContent=String(value).padStart(2,"0");});
+    };
+    countdown();setInterval(countdown,1000);
+
+    const music=document.getElementById("music"),musicButton=document.getElementById("music-control");
+    if(CONFIG.musicUrl){music.src=CONFIG.musicUrl;musicButton.disabled=false;musicButton.setAttribute("aria-label","Play / pause music");}
+    musicButton.addEventListener("click",async()=>{if(!CONFIG.musicUrl)return;if(music.paused){await music.play();musicButton.classList.add("is-playing");}else{music.pause();musicButton.classList.remove("is-playing");}});
+
+    const giftModal=document.getElementById("gift-modal");
+    const setModal=open=>{giftModal.hidden=!open;giftModal.setAttribute("aria-hidden",String(!open));document.body.style.overflow=open?"hidden":"";};
+    document.getElementById("open-gifts").addEventListener("click",()=>setModal(true));
+    giftModal.addEventListener("click",e=>{if(e.target===giftModal||e.target.closest("[data-close]"))setModal(false);});
+    document.addEventListener("keydown",e=>{if(e.key==="Escape")setModal(false);});
+    document.getElementById("copy-bank").addEventListener("click",async e=>{await navigator.clipboard.writeText("Banco: Nombre del banco\nTitular: Clara y Tomás\nCuenta: 000000000\nAlias: CLARA.TOMAS.BODA");e.currentTarget.textContent=t.copyDone;e.currentTarget.classList.add("is-copied");});
+
+    const guestList=document.getElementById("guest-list");
+    const guestMarkup=guest=>`
+      <article class="guest" data-id="${guest.id}">
+        <h3 class="guest__name">${guest.name}</h3>
+        <div class="choice-row">
+          <label class="choice"><input type="radio" name="attendance-${guest.id}" value="Asiste" required><span>${t.attends}</span></label>
+          <label class="choice"><input type="radio" name="attendance-${guest.id}" value="No asiste"><span>${t.declines}</span></label>
+        </div>
+        <div class="dietary">
+          <div class="field">
+            <label for="diet-${guest.id}">${t.dietary}</label>
+            <select id="diet-${guest.id}" data-diet>
+              <option value="none">${t.none}</option><option value="vegetarian">${t.vegetarian}</option><option value="celiac">${t.celiac}</option><option value="other">${t.other}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="detail-${guest.id}">${t.detail}</label>
+            <input id="detail-${guest.id}" data-detail type="text">
+          </div>
+        </div>
+      </article>`;
+    const renderGuests=guests=>guestList.innerHTML=guests.map(guestMarkup).join("");
+    renderGuests(CONFIG.guests);
+
+    const jsonp=(url,data)=>new Promise((resolve,reject)=>{
+      const callback="syd_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+      const script=document.createElement("script");
+      const timer=setTimeout(()=>{delete window[callback];script.remove();reject(new Error("timeout"));},12000);
+      window[callback]=response=>{clearTimeout(timer);delete window[callback];script.remove();resolve(response);};
+      const query=new URLSearchParams({...data,callback});
+      script.src=url+(url.includes("?")?"&":"?")+query;
+      script.onerror=()=>{clearTimeout(timer);delete window[callback];script.remove();reject(new Error("network"));};
+      document.body.appendChild(script);
+    });
+
+    const group=params.get(CONFIG.groupParam)||"demo";
+    if(CONFIG.googleScriptUrl&&group!=="demo"){
+      jsonp(CONFIG.googleScriptUrl,{accion:"invitados",grupo:group}).then(response=>{
+        const guests=response.invitados||response.guests||response.data;
+        if(Array.isArray(guests)&&guests.length)renderGuests(guests.map((g,i)=>({id:g.id||g.fila||i+1,name:g.nombre||g.name||`Invitado ${i+1}`})));
+      }).catch(()=>{});
+    }
+
+    document.getElementById("rsvp-form").addEventListener("submit",async event=>{
+      event.preventDefault();
+      const status=document.getElementById("rsvp-status");
+      const submit=event.currentTarget.querySelector("button[type=submit]");
+      const responses=[...document.querySelectorAll(".guest")].map(card=>({
+        id:card.dataset.id,
+        name:card.querySelector(".guest__name").textContent,
+        attendance:card.querySelector("input[type=radio]:checked")?.value||"",
+        dietary:card.querySelector("[data-diet]").value,
+        dietaryDetail:card.querySelector("[data-detail]").value
+      }));
+      submit.disabled=true;status.textContent=t.sending;
+      if(!CONFIG.googleScriptUrl){setTimeout(()=>{status.textContent=t.notConfigured;submit.disabled=false;},500);return;}
+      try{
+        await jsonp(CONFIG.googleScriptUrl,{accion:"confirmar",grupo:group,respuestas:JSON.stringify(responses),comentario:document.getElementById("comment").value});
+        status.textContent=t.saved;
+      }catch(error){status.textContent="Error · "+error.message;}
+      finally{submit.disabled=false;}
+    });
+  </script>
+</body>
+</html>
