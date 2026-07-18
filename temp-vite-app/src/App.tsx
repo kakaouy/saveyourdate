@@ -131,8 +131,10 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     eucalipto: 'Eucalyptus',
     azul: 'Blue',
     negro: 'Black',
-    borgona: 'Burgundy',
-    bosque: 'Forest green'
+    frambuesa: 'Raspberry',
+    cielo: 'Dusty sky blue',
+    petroleo: 'Petrol blue',
+    tinta: 'Ink blue'
   },
   pt: {
     rosa: 'Rosa',
@@ -143,8 +145,10 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     eucalipto: 'Eucalipto',
     azul: 'Azul',
     negro: 'Preto',
-    borgona: 'Bordô',
-    bosque: 'Verde floresta'
+    frambuesa: 'Framboesa',
+    cielo: 'Azul celeste acinzentado',
+    petroleo: 'Azul petróleo',
+    tinta: 'Azul tinta'
   }
 };
 
