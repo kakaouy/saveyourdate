@@ -228,6 +228,16 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
     event.preventDefault();
     if (photoCount > photoLimit) return;
     const form = new FormData(event.currentTarget);
+    const fileFieldNames = ['coverImage', 'featuredPhoto', 'galleryPhotos'];
+    const attachments = fileFieldNames.flatMap((fieldName) =>
+      form.getAll(fieldName).filter((value): value is File => value instanceof File && value.size > 0)
+    );
+    fileFieldNames.forEach((fieldName) => form.delete(fieldName));
+    attachments.forEach((file, index) => {
+      form.append(index === 0 ? 'attachment' : `attachment${index + 1}`, file, file.name);
+    });
+    form.append('Archivos adjuntos', attachments.length ? attachments.map((file) => file.name).join(', ') : 'Sin archivos');
+    const attachmentSize = attachments.reduce((total, file) => total + file.size, 0);
     const paymentOperation = String(form.get('paymentOperation') || prepayment.operation || '');
     form.set('paymentOperation', paymentOperation);
     const orderNumber = createOrderNumber();
@@ -251,6 +261,9 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
     setSubmitError('');
     setSending(true);
     try {
+      if (attachmentSize > 10 * 1024 * 1024) {
+        throw new Error(l('Las imágenes superan el máximo total de 10 MB.', 'The images exceed the 10 MB total limit.', 'As imagens excedem o limite total de 10 MB.'));
+      }
       await sendFormData(form);
       setSubmittedOrder(orderNumber);
     } catch (error) {
@@ -368,7 +381,7 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
             <button className="btn-secondary" onClick={() => { setActiveTab('payment'); setPaymentUpdated(false); }}>{l('Informar un pago', 'Report a payment', 'Informar um pagamento')}</button>
           </div>
         ) : (
-          <form className="order-form" onSubmit={submitOrder}>
+          <form className="order-form" onSubmit={submitOrder} encType="multipart/form-data">
             <div className="order-form-block">
               <div className="order-block-title"><span>1</span><div><h3>{l('Elegí tu plan', 'Choose your plan', 'Escolha seu plano')}</h3><p>{l('La portada está incluida y no cuenta como sección.', 'The cover is included and does not count as a section.', 'A capa está incluída e não conta como seção.')}</p></div></div>
               <div className="order-plan-grid">
