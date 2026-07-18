@@ -34,6 +34,70 @@
 [data-reveal]{opacity:0;transform:translateY(38px);transition:opacity .85s ease,transform .85s cubic-bezier(.2,.7,.2,1)}[data-reveal].visible{opacity:1;transform:none}
 @media(max-width:620px){.modal__box{padding:24px 18px}.modal__box .title{font-size:3.1rem}.event-grid{grid-template-columns:1fr}.gallery img,.gallery button:first-child img{height:290px}.fields{grid-template-columns:1fr}.moment{padding-left:24px;padding-right:24px}.section{padding-left:20px;padding-right:20px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}[data-reveal]{opacity:1;transform:none}}
+
+/* Secuencia orgánica de ramitas */
+.section:not(.hero):after{
+  opacity:0;
+  animation:scatteredBranch 31s cubic-bezier(.25,.7,.2,1) infinite;
+  will-change:clip-path,opacity;
+}
+.section:nth-of-type(1):after{animation-delay:-1.2s}
+.section:nth-of-type(2):after{animation-delay:-4.9s}
+.section:nth-of-type(3):after{animation-delay:-9.1s}
+.section:nth-of-type(4):after{animation-delay:-12.4s}
+.section:nth-of-type(5):after{animation-delay:-16.8s}
+.section:nth-of-type(6):after{animation-delay:-20.1s}
+.section:nth-of-type(7):after{animation-delay:-23.9s}
+.section:nth-of-type(8):after{animation-delay:-27.5s}
+.section:nth-of-type(9):after{animation-delay:-30.2s}
+.section:nth-of-type(odd):not(.hero):after{
+  right:-34px;
+  left:auto;
+  transform:scaleX(-1) rotate(8deg);
+  transform-origin:center;
+}
+.section:nth-of-type(3n):not(.hero):after{
+  right:-22px;
+  left:auto;
+  transform:scaleX(-1) rotate(-18deg) scale(.82);
+}
+.section:nth-of-type(even):not(.hero):after{
+  left:-28px;
+  right:auto;
+  transform:rotate(172deg);
+}
+.section:nth-of-type(4n):not(.hero):after{
+  left:-46px;
+  transform:rotate(198deg) scale(.72);
+}
+@keyframes scatteredBranch{
+  0%,4%{clip-path:inset(100% 0 0 0);opacity:0}
+  7%{opacity:.08}
+  13%{clip-path:inset(0 0 0 0);opacity:var(--branch-opacity,.18)}
+  18%{clip-path:inset(0 0 0 0);opacity:var(--branch-opacity,.18)}
+  23%{clip-path:inset(0 0 100% 0);opacity:0}
+  24%,100%{clip-path:inset(0 0 100% 0);opacity:0}
+}
+.section.section--olive:after{--branch-opacity:.32}
+.section:not(.section--olive):after{--branch-opacity:.11}
+.hero:before,.hero:after{
+  filter:brightness(0) saturate(100%) invert(65%) sepia(15%) saturate(690%) hue-rotate(24deg) brightness(88%) contrast(88%);
+  mix-blend-mode:multiply;
+  animation-duration:13.7s;
+  animation-timing-function:cubic-bezier(.25,.72,.2,1);
+}
+.hero:before{opacity:0;animation-delay:-1.8s}
+.hero:after{opacity:0;animation-delay:-7.6s;transform:scaleX(-1) rotate(8deg) scale(.82)}
+@keyframes branchReveal{
+  0%,8%{clip-path:inset(100% 0 0 0);opacity:0}
+  18%{opacity:.24}
+  42%{clip-path:inset(0 0 0 0);opacity:.24}
+  57%{clip-path:inset(0 0 0 0);opacity:.2}
+  72%{clip-path:inset(0 0 100% 0);opacity:0}
+  73%,100%{opacity:0}
+}
+.footer.section--olive > img{filter:invert(1);position:relative;z-index:2}
+
 </style>
 </head>
 <body>
