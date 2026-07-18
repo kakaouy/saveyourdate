@@ -24,16 +24,55 @@ const EVENT_CONFIG = {
 
     countdown: false,
     event: false,
-    location: false,
+    location: true,
     dressCode: false,
     gallery: false,
 
+    fullPhoto: true,
     gifts: true,
     playlist: false,
     rsvp: true,
 
     closing: false,
     footer: true
+  },
+
+  theme: {
+    defaultPalette: "marfil",
+    palettes: {
+      marfil: {
+        primary: "#273127",
+        background: "#f5f0e7",
+        secondary: "#d9cdbd",
+        accent: "#b79a6b",
+        text: "#273127",
+        textSoft: "#6f7069"
+      },
+      rosa: {
+        primary: "#513943",
+        background: "#f8eeee",
+        secondary: "#d8b7bd",
+        accent: "#b97986",
+        text: "#3e3036",
+        textSoft: "#7f6970"
+      },
+      eucalipto: {
+        primary: "#34483d",
+        background: "#f0f3ee",
+        secondary: "#b8c5b9",
+        accent: "#859a87",
+        text: "#2d3a32",
+        textSoft: "#68756c"
+      },
+      azul: {
+        primary: "#273846",
+        background: "#eef3f5",
+        secondary: "#b8cad2",
+        accent: "#819ead",
+        text: "#273846",
+        textSoft: "#667985"
+      }
+    }
   },
 
   welcome: {
@@ -178,6 +217,12 @@ const EVENT_CONFIG = {
     ]
   },
 
+  fullPhoto: {
+    image: "assets/images/galeria/foto-06.jpg",
+    alt: "Ana y Juan",
+    objectPosition: "center center"
+  },
+
   gifts: {
     eyebrow: "Un detalle",
     title: "Regalos",
@@ -199,19 +244,21 @@ const EVENT_CONFIG = {
       {
         label: "Titular",
         value: "Ana y Juan",
-        copyable: true
+        copyable: false
       },
       {
         label: "Cuenta",
         value: "000000000",
-        copyable: true
+        copyable: false
       },
       {
         label: "Alias",
         value: "ANA.JUAN.BODA",
-        copyable: true
+        copyable: false
       }
-    ]
+    ],
+    copyButtonText: "Copiar datos bancarios",
+    copyValue: "Banco: Nombre del banco\nTitular: Ana y Juan\nCuenta: 000000000\nAlias: ANA.JUAN.BODA"
   },
 
   playlist: {
@@ -300,7 +347,7 @@ const EVENT_CONFIG = {
     volume: 0.45,
     file: "assets/audio/musica.mp3",
     iconPlaying: "assets/icons/music.svg",
-    iconPaused: "assets/icons/music-off.svg"
+    iconPaused: "assets/icons/music.svg"
   },
 
   behavior: {

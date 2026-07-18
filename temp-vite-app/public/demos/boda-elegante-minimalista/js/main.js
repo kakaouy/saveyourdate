@@ -9,6 +9,7 @@ document.addEventListener(
     initializeWelcomeState();
     initializeSmoothScroll();
     initializeRevealAnimations();
+    initializePhotoWindowReveal();
     initializeImageErrors();
   }
 );
@@ -153,15 +154,18 @@ function initializeRevealAnimations() {
         ".polaroid-section",
         ".editorial-quote__text",
         ".editorial-quote__author",
-        ".schedule-section .section-heading",
+        ".section-heading",
+        ".schedule__date",
         ".schedule__item",
-        ".section--countdown .section-heading",
+        ".countdown",
         ".event-card",
         ".location-card",
         ".dresscode-card",
         ".gallery__item",
-        ".section--editorial .editorial-content",
-        ".closing"
+        ".section--editorial .editorial-content > p",
+        ".section--editorial .editorial-content > .btn",
+        ".section--closing .closing",
+        ".footer__content"
       ].join(",")
     );
 
@@ -256,5 +260,91 @@ function initializeImageErrors() {
       );
     },
     true
+  );
+}
+
+/* =========================================================
+   REVELADO PROGRESIVO DE LA FOTO IMPORTANTE
+========================================================= */
+
+function initializePhotoWindowReveal() {
+  const section =
+    document.getElementById(
+      "full-photo-section"
+    );
+
+  const image =
+    document.getElementById(
+      "full-photo-image"
+    );
+
+  if (!section || !image) {
+    return;
+  }
+
+  let ticking = false;
+
+  const update = () => {
+    const rect =
+      section.getBoundingClientRect();
+
+    const viewportHeight =
+      window.innerHeight || 1;
+
+    const totalTravel =
+      viewportHeight + rect.height;
+
+    const progress =
+      Math.min(
+        1,
+        Math.max(
+          0,
+          (
+            viewportHeight - rect.top
+          ) / totalTravel
+        )
+      );
+
+    /*
+      La foto se mueve bastante menos que la página:
+      comienza más arriba y termina más abajo.
+      Los bordes de la sección actúan como ventana.
+    */
+    const movement =
+      -110 + (progress * 220);
+
+    image.style.setProperty(
+      "--photo-parallax-y",
+      `${movement.toFixed(1)}px`
+    );
+
+    ticking = false;
+  };
+
+  const requestUpdate = () => {
+    if (ticking) {
+      return;
+    }
+
+    ticking = true;
+
+    window.requestAnimationFrame(
+      update
+    );
+  };
+
+  update();
+
+  window.addEventListener(
+    "scroll",
+    requestUpdate,
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "resize",
+    requestUpdate
   );
 }
