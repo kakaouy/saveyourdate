@@ -4186,3 +4186,21 @@ html {
   background: #f5f0e7;
   pointer-events: none;
 }
+
+
+/* Encuadre de Editorial Marfil como viewport móvil real. */
+.model-phone-screen:has(.model-real-preview-frame) {
+  position: relative;
+  overflow: hidden;
+}
+
+.model-real-preview-frame {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 390px;
+  height: 900px;
+  max-width: none;
+  transform: translateX(-50%) scale(0.73);
+  transform-origin: top center;
+}
