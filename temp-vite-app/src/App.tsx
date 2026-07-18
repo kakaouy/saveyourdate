@@ -1130,6 +1130,8 @@ function App() {
   const [wizardStep, setWizardStep] = useState(1);
   const [wizardModel, setWizardModel] = useState('boda-marfil');
   const [wizardSubmitted, setWizardSubmitted] = useState(false);
+  const [wizardSubmitting, setWizardSubmitting] = useState(false);
+  const [wizardSubmitError, setWizardSubmitError] = useState('');
 
   // Dynamic Form Field Values (State)
   const [weddingData, setWeddingData] = useState({
@@ -1355,16 +1357,57 @@ function App() {
     }
   };
 
-  // Handle Wizard Submit (Simulation)
-  const handleWizardSubmit = (e: React.FormEvent) => {
+  // Send the complete order to the Save Your Date inbox.
+  const handleWizardSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setWizardSubmitted(true);
-    setTimeout(() => {
-      setWizardSubmitted(false);
-      setWizardStep(1);
-      setIsCodeValid(null);
-      setValidationCode('');
-    }, 10000);
+    setWizardSubmitting(true);
+    setWizardSubmitError('');
+
+    const selectedModel = INVITATION_MODELS.find((model) => model.id === wizardModel);
+    const categoryData = wizardCategory === 'wedding'
+      ? weddingData
+      : wizardCategory === '15years'
+        ? quinceData
+        : otherEventData;
+
+    const submission = new FormData();
+    submission.append('_subject', `Nuevo pedido ${selectedModel?.title || wizardModel} - Save Your Date`);
+    submission.append('_template', 'table');
+    submission.append('_captcha', 'false');
+    submission.append('Código de validación', validationCode);
+    submission.append('Categoría', wizardCategory);
+    submission.append('Modelo', selectedModel?.title || wizardModel);
+    submission.append('Idioma', lang);
+
+    Object.entries(categoryData).forEach(([field, value]) => {
+      submission.append(field, String(value || ''));
+    });
+
+    const uploadedFiles = e.currentTarget.querySelector<HTMLInputElement>('input[type="file"]')?.files;
+    Array.from(uploadedFiles || []).forEach((file) => submission.append('attachment', file));
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/saveyourdate.invite@gmail.com', {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: submission
+      });
+
+      if (!response.ok) throw new Error(`FormSubmit respondió ${response.status}`);
+      setWizardSubmitted(true);
+      setWizardStep(4);
+    } catch (error) {
+      console.error('Error sending order form:', error);
+      setWizardSubmitError(
+        lang === 'es'
+          ? 'No pudimos enviar el pedido. Por favor, intentá nuevamente.'
+          : lang === 'pt'
+            ? 'Não foi possível enviar o pedido. Tente novamente.'
+            : 'We could not send the order. Please try again.'
+      );
+    } finally {
+      setWizardSubmitting(false);
+    }
   };
 
   // Handle Simple Contact Form Submit (Real Email Delivery via FormSubmit)
@@ -2730,7 +2773,16 @@ function App() {
                       </div>
                     )}
 
-                    <button className="btn-form-submit" style={{ marginTop: '24px' }} type="submit">{t.portal.btnGenerate}</button>
+                    {wizardSubmitError && (
+                      <p role="alert" style={{ color: '#a33', textAlign: 'center', margin: '16px 0 0' }}>
+                        {wizardSubmitError}
+                      </p>
+                    )}
+                    <button className="btn-form-submit" style={{ marginTop: '24px' }} type="submit" disabled={wizardSubmitting}>
+                      {wizardSubmitting
+                        ? (lang === 'es' ? 'Enviando pedido…' : lang === 'pt' ? 'Enviando pedido…' : 'Sending order…')
+                        : t.portal.btnGenerate}
+                    </button>
                   </form>
                 )}
               </div>
