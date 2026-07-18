@@ -792,3 +792,94 @@
     transform: translate3d(0, var(--photo-parallax-y, -100px), 0) scale(1.02);
   }
 }
+
+
+/* =========================================================
+   VALIDACIÓN FINAL: POLAROIDS Y RSVP ANGOSTO
+========================================================= */
+
+@media (max-width: 560px) {
+  .hero-polaroids {
+    min-height: 410px;
+  }
+
+  .polaroid-gallery--hero {
+    height: 410px;
+  }
+
+  .polaroid--1 {
+    top: 4%;
+  }
+
+  .polaroid--2 {
+    top: 2%;
+  }
+
+  .polaroid--3 {
+    bottom: 3%;
+  }
+
+  .polaroid--4 {
+    bottom: 2%;
+  }
+
+  #rsvp-modal {
+    align-items: center;
+    padding: 10px;
+  }
+
+  #rsvp-modal .modal__dialog {
+    width: calc(100% - 8px);
+    max-height: 88svh;
+    padding: 3rem 1rem 1.1rem;
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+  }
+
+  #rsvp-modal .modal__close {
+    width: 34px;
+    height: 34px;
+  }
+
+  #rsvp-modal .modal__title {
+    margin-bottom: 0.65rem;
+    font-size: clamp(2rem, 9vw, 2.65rem);
+    line-height: 0.95;
+  }
+
+  #rsvp-modal .modal__text {
+    margin-bottom: 0.85rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  #rsvp-modal .guest-list {
+    margin-bottom: 0.75rem;
+  }
+
+  #rsvp-modal .guest-list__empty {
+    margin-block: 0.5rem 0.8rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  #rsvp-modal .rsvp-extra-fields {
+    margin-top: 0.55rem;
+  }
+
+  #rsvp-modal .form__group {
+    gap: 0.35rem;
+  }
+
+  #rsvp-modal .form__textarea {
+    min-height: 72px;
+    height: 72px;
+    padding: 0.7rem 0.8rem;
+  }
+
+  #rsvp-modal .rsvp-submit-button {
+    min-height: 44px;
+    margin-top: 0.8rem;
+    padding-block: 0.65rem;
+  }
+}
