@@ -883,3 +883,15 @@
     padding-block: 0.65rem;
   }
 }
+
+
+/* Acercar exclusivamente la pareja inferior dentro del celular demo. */
+@media (max-width: 560px) {
+  .polaroid--3 {
+    bottom: 15%;
+  }
+
+  .polaroid--4 {
+    bottom: 14%;
+  }
+}
