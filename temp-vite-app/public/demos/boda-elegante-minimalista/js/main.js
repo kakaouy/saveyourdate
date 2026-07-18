@@ -311,11 +311,11 @@ function initializePhotoWindowReveal() {
       Los bordes de la sección actúan como ventana.
     */
     const movement =
-      -7 + (progress * 14);
+      -110 + (progress * 220);
 
     image.style.setProperty(
       "--photo-parallax-y",
-      `${movement.toFixed(3)}%`
+      `${movement.toFixed(1)}px`
     );
 
     ticking = false;
