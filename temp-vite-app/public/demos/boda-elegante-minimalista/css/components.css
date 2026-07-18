@@ -1447,18 +1447,18 @@
 
 .photo-window__image {
   position: absolute;
-  top: -12%;
+  top: -25%;
   right: 0;
-  bottom: -12%;
+  bottom: -25%;
   left: 0;
   width: 100%;
-  height: 124%;
+  height: 150%;
   min-height: 0;
   background-repeat: no-repeat;
   background-position: var(--full-photo-position, center center);
   background-size: cover;
   clip-path: none;
-  transform: translate3d(0, var(--photo-parallax-y, -7%), 0) scale(1.035);
+  transform: translate3d(0, var(--photo-parallax-y, -110px), 0) scale(1.025);
   transition: none;
   will-change: transform;
   backface-visibility: hidden;
