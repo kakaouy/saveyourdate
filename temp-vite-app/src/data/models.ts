@@ -98,18 +98,33 @@ export const INVITATION_MODELS: InvitationModel[] = [
   },
   {
     id: 'boda-boho',
-    title: 'Rústico Boho',
+    title: 'Olivia Silvestre',
     category: 'wedding',
-    description: 'Tonos tierra cálidos, detalles de hojas de eucalipto secas y un estilo relajado pero refinado para parejas amantes de la naturaleza.',
+    description: 'Una propuesta orgánica y elegante, con ramas ilustradas, movimiento suave y una estética natural que acompaña cada sección.',
     badge: 'Tendencia',
-    demoName1: 'Facundo & Camila',
-    date: '05 de Diciembre, 2026',
-    features: ['Cuenta Regresiva', 'Regalos / CBU', 'Confirmación RSVP', 'Google Maps'],
+    demoName1: 'Antonio & Ester',
+    date: '18 de Octubre, 2026',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Agenda',
+      'Ubicación',
+      'Confirmación RSVP',
+      'Regalos / CBU',
+      'Código de Vestimenta',
+      'Cronograma',
+      'Galería de fotos',
+      'Álbum colaborativo'
+    ],
     themeClass: 'mock-theme-wedding',
     illustrationType: 'rings',
-    musicTitle: 'A Thousand Years',
-    musicArtist: 'Christina Perri',
-    location: 'Salón El Bosque, Tigre, Buenos Aires'
+    location: 'Ceremonia y recepción',
+    palettes: [
+      { id: 'olive', name: 'Oliva', color: '#A6AA78' },
+      { id: 'terracotta', name: 'Terracota', color: '#B86F52' },
+      { id: 'blue', name: 'Azul niebla', color: '#718A96' },
+      { id: 'mauve', name: 'Malva', color: '#9A7889' }
+    ]
   },
   {
     id: '15-glamour',
