@@ -3155,6 +3155,12 @@ function App() {
                       )}&lang=${lang}`}
                       title="Demo interactiva Olivia Silvestre"
                     />
+                  ) : demoModel.id === 'boda-eucalipto' ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src="/desarrollo/boda/invite_004/index.html?preview=1"
+                      title="Demo interactiva Martín y Sofía"
+                    />
                   ) : (
                   <div className="demo-invitation-scroll">
                     <div className="sim-cover demo-cover" style={{
