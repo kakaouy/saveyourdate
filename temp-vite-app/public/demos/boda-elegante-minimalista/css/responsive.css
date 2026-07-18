@@ -680,3 +680,100 @@
     background-size: cover;
   }
 }
+
+/* =========================================================
+   AJUSTES PARA DEMO ANGOSTA / INVITE 001
+========================================================= */
+
+@media (max-width: 560px) {
+  .hero-polaroids {
+    min-height: 475px;
+  }
+
+  .polaroid-gallery--hero {
+    height: 475px;
+    max-width: 390px;
+    margin-inline: auto;
+  }
+
+  .polaroid {
+    width: clamp(116px, 34vw, 145px);
+    padding: 6px 6px 20px;
+  }
+
+  .polaroid--1 {
+    top: 5%;
+    left: 3%;
+  }
+
+  .polaroid--2 {
+    top: 3%;
+    right: 3%;
+  }
+
+  .polaroid--3 {
+    bottom: 4%;
+    left: 5%;
+  }
+
+  .polaroid--4 {
+    right: 5%;
+    bottom: 3%;
+  }
+
+  .editorial-quote__text {
+    max-width: 330px;
+    margin-inline: auto;
+    font-size: clamp(1.75rem, 8vw, 2.65rem);
+    line-height: 1.08;
+  }
+
+  .modal__dialog--gifts {
+    width: calc(100% - 24px);
+    max-height: 86svh;
+    margin: 12px;
+    padding: 3rem 1rem 1.25rem;
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+  }
+
+  .modal__dialog--gifts .modal__title {
+    margin-bottom: 0.7rem;
+    font-size: clamp(2rem, 9vw, 2.7rem);
+  }
+
+  .modal__dialog--gifts .modal__text {
+    margin-bottom: 0.85rem;
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  .modal__dialog--gifts .gifts-details {
+    margin-block: 0.5rem;
+  }
+
+  .modal__dialog--gifts .gifts-details__item {
+    padding-block: 0.55rem;
+  }
+
+  .rsvp-submit-button {
+    width: 100%;
+    margin-top: 1.15rem;
+  }
+
+  .photo-window {
+    height: 125svh;
+    min-height: 650px;
+  }
+
+  .photo-window__image {
+    height: 100svh;
+    min-height: 480px;
+    background-attachment: scroll;
+  }
+
+  .page-loader__heart {
+    width: 72px;
+    height: 72px;
+  }
+}
