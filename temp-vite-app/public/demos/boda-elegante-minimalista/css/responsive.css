@@ -777,3 +777,18 @@
     height: 72px;
   }
 }
+
+
+@media (max-width: 600px) {
+  .photo-window {
+    height: 76svh;
+    min-height: 520px;
+  }
+
+  .photo-window__image {
+    top: -10%;
+    bottom: -10%;
+    height: 120%;
+    transform: translate3d(0, var(--photo-parallax-y, -6%), 0) scale(1.025);
+  }
+}
