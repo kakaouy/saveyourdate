@@ -1955,6 +1955,16 @@ function App() {
                       <div
                         className="model-phone-frame"
                         style={{ '--model-color': selectedColor } as React.CSSProperties}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${t.catalog.verDemo}: ${model.title}`}
+                        onClick={() => handleOpenDemo(model)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            handleOpenDemo(model);
+                          }
+                        }}
                       >
                         <div className="model-phone-speaker"></div>
                         <div className="model-phone-screen">
