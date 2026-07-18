@@ -2906,7 +2906,7 @@ function App() {
                   {demoModel.id === 'boda-marfil' ? (
                     <iframe
                       className="demo-real-invitation-frame"
-                      src="/demos/boda-elegante-minimalista/index.html?preview=1"
+                      src="/demos/boda-elegante-minimalista/index.html?preview=2&deploy=20260717"
                       title="Demo interactiva Boda elegante minimalista"
                     />
                   ) : (
