@@ -16,16 +16,18 @@
     .section{background:#fbfbf8}
     .section.soft{background:#e7eee8}
     .botanical:not(.top){display:none}
-    .hero{min-height:100svh;justify-content:flex-start;padding-top:min(82vw,425px);background:#fbfbf8 url('assets/eucalip.png') top left/100% auto no-repeat}
+    .hero{min-height:720px;height:min(820px,100svh);justify-content:center;padding:170px 32px 58px;background:#fbfbf8}
     .hero .top{display:none}
     .hero .bottom{display:none}
+    .hero-botanica{position:absolute;left:50%;width:100%;max-width:none;height:auto;z-index:1;pointer-events:none;user-select:none}
+    .hero-botanica--top{top:0;transform:translateX(-50%)}
+    .hero>:not(.hero-botanica){position:relative;z-index:5}
   </style>
 </head>
 <body>
   <main class="invite">
     <section class="section hero">
-      <img class="botanical top" src="assets/eucalip.png" alt="">
-      <img class="botanical bottom" src="assets/eucalip_3.png" alt="">
+      <img class="hero-botanica hero-botanica--top" src="assets/eucalip.png" alt="">
       <p class="eyebrow" data-reveal>¡Nos casamos!</p>
       <h1 class="names" data-reveal><span>Martín</span><i class="amp">&</i><span>Sofía</span></h1>
       <p class="hero-copy" data-reveal>Junto a nuestras familias tenemos la alegría de invitarte a celebrar nuestro matrimonio</p>
@@ -33,8 +35,6 @@
     </section>
 
     <section class="section date-section soft">
-      <img class="botanical leaf-left" src="assets/eucalip_4.png" alt="">
-      <img class="botanical leaf-right" src="assets/eucalip_4.png" alt="">
       <div data-reveal>
         <p class="weekday">Sábado</p><p class="day">14</p><p class="month">noviembre</p><p class="year">2026</p>
         <p class="time-label">A las</p><p class="time">18:30 <small>hs</small></p>
@@ -45,7 +45,6 @@
     </section>
 
     <section class="section event">
-      <img class="botanical corner" src="assets/eucalip_5.png" alt="">
       <img class="icon" src="assets/icon-church-gd.png" alt="" data-reveal>
       <p class="eyebrow" data-reveal>Ceremonia</p><h2 class="title" data-reveal>Basílica Nuestra Señora<br>del Pilar</h2>
       <p class="address" data-reveal>Junín 1904, Recoleta<br>Ciudad Autónoma de Buenos Aires · 18:30 hs</p>
@@ -60,7 +59,6 @@
     <section class="section photo"><img class="main" src="assets/pareja.jpg" alt="Martín y Sofía"><p class="caption">Nuestro lugar favorito es juntos</p></section>
 
     <section class="section details soft">
-      <img class="botanical sprig" src="assets/eucalip_2.png" alt=""><img class="botanical sprig2" src="assets/eucalip_4.png" alt="">
       <p class="eyebrow" data-reveal>Detalles de la celebración</p><h2 class="title" data-reveal>Todo lo que necesitás saber</h2>
       <div class="detail-grid">
         <article class="detail-card" data-reveal><img class="icon" src="assets/icon-dress-gd.png" alt=""><h3>Dress code</h3><p>Formal elegante<br>Tonos libres</p></article>
@@ -71,20 +69,19 @@
     </section>
 
     <section class="section menu">
-      <img class="botanical top-right" src="assets/eucalip_3.png" alt=""><img class="botanical bottom-left" src="assets/eucalip_2.png" alt="">
       <img class="icon" src="assets/icon-cake-gd.png" alt="" data-reveal><p class="eyebrow" data-reveal>Nuestro menú</p><h2 class="title" data-reveal>Una noche para disfrutar</h2>
       <ul class="menu-list" data-reveal><li><strong>Recepción</strong><span>Bocados de estación y espumante</span></li><li><strong>Principal</strong><span>Lomo braseado con vegetales de huerta</span></li><li><strong>Postre</strong><span>Texturas de chocolate y frutos rojos</span></li></ul>
       <p class="copy" data-reveal>Si tenés alguna restricción alimentaria, podés indicarla al confirmar tu asistencia.</p>
     </section>
 
     <section class="section rsvp soft">
-      <img class="botanical left" src="assets/eucalip_5.png" alt=""><img class="icon" src="assets/icon-rsvp-gd.png" alt="" data-reveal><p class="eyebrow" data-reveal>Queremos que nos acompañes</p><h2 class="title" data-reveal>Confirmá tu asistencia</h2><p class="copy" data-reveal>Por favor, respondé antes del 14 de octubre de 2026.</p>
+      <img class="icon" src="assets/icon-rsvp-gd.png" alt="" data-reveal><p class="eyebrow" data-reveal>Queremos que nos acompañes</p><h2 class="title" data-reveal>Confirmá tu asistencia</h2><p class="copy" data-reveal>Por favor, respondé antes del 14 de octubre de 2026.</p>
       <form class="rsvp-form" id="rsvpForm" data-reveal><input class="field" name="name" placeholder="Nombre y apellido" required><select class="field" name="attendance" required><option value="">¿Vas a asistir?</option><option>Sí, confirmo mi asistencia</option><option>No podré asistir</option></select><select class="field" name="food"><option>Sin restricciones alimentarias</option><option>Vegetariano/a</option><option>Vegano/a</option><option>Celíaco/a - sin TACC</option><option>Otra restricción</option></select><textarea class="field" name="message" rows="3" placeholder="Mensaje para los novios (opcional)"></textarea><button class="btn" type="submit">Enviar confirmación</button></form>
       <div class="success" id="success">¡Gracias por confirmar!<br><small>Tu respuesta quedó registrada para la muestra.</small></div>
     </section>
 
     <section class="section closing">
-      <img class="botanical frame" src="assets/eucalip.png" alt=""><img class="heart" src="assets/icon-heart-gd.png" alt="" data-reveal><h2 data-reveal>Martín & Sofía</h2><p data-reveal>Gracias por ser parte de nuestra historia.<br>¡Te esperamos!</p>
+      <img class="heart" src="assets/icon-heart-gd.png" alt="" data-reveal><h2 data-reveal>Martín & Sofía</h2><p data-reveal>Gracias por ser parte de nuestra historia.<br>¡Te esperamos!</p>
     </section>
   </main>
 
