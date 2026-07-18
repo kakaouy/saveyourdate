@@ -129,7 +129,10 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     verde: 'Green',
     marfil: 'Ivory',
     eucalipto: 'Eucalyptus',
-    azul: 'Blue'
+    azul: 'Blue',
+    negro: 'Black',
+    borgona: 'Burgundy',
+    bosque: 'Forest green'
   },
   pt: {
     rosa: 'Rosa',
@@ -138,7 +141,10 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     verde: 'Verde',
     marfil: 'Marfim',
     eucalipto: 'Eucalipto',
-    azul: 'Azul'
+    azul: 'Azul',
+    negro: 'Preto',
+    borgona: 'Bordô',
+    bosque: 'Verde floresta'
   }
 };
 
@@ -3058,6 +3064,15 @@ function App() {
                         selectedModelColors[demoModel.id]
                       )}&lang=${lang}`}
                       title="Demo interactiva Editorial Marfil"
+                    />
+                  ) : demoModel.id === 'boda-pleno' ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src={`/desarrollo/boda/invite_002/index.html?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}&lang=${lang}`}
+                      title="Demo interactiva Editorial Pleno"
                     />
                   ) : (
                   <div className="demo-invitation-scroll">
