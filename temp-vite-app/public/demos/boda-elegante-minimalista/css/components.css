@@ -1384,8 +1384,8 @@
   background-repeat: no-repeat;
   background-position: var(--full-photo-position, center center);
   background-size: cover;
-  clip-path: inset(var(--photo-reveal-inset, 18%) 0);
-  transform: scale(var(--photo-reveal-scale, 1.06));
+  clip-path: inset(var(--photo-reveal-inset, 36%) 0);
+  transform: scale(var(--photo-reveal-scale, 1.14));
   transition: clip-path 80ms linear, transform 80ms linear;
   will-change: clip-path, transform;
 }
@@ -1417,6 +1417,14 @@
 }
 
 [data-animation="fade-up"] {
-  transition-duration: 0.75s;
+  opacity: 0;
+  transform: translateY(52px) scale(0.985);
+  transition-duration: 0.95s;
   transition-timing-function: cubic-bezier(.22, .61, .36, 1);
+}
+
+
+[data-animation="fade-up"].is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
