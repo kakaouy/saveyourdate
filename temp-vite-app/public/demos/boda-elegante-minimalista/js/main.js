@@ -268,48 +268,83 @@ function initializeImageErrors() {
 ========================================================= */
 
 function initializePhotoWindowReveal() {
-  const section = document.getElementById("full-photo-section");
-  if (!section) return;
+  const section =
+    document.getElementById(
+      "full-photo-section"
+    );
+
+  const image =
+    document.getElementById(
+      "full-photo-image"
+    );
+
+  if (!section || !image) {
+    return;
+  }
 
   let ticking = false;
 
   const update = () => {
-    const rect = section.getBoundingClientRect();
-    const viewportHeight = window.innerHeight || 1;
-    const travel = Math.max(rect.height - viewportHeight, 1);
-    const progress = Math.min(
-      1,
-      Math.max(0, -rect.top / travel)
-    );
+    const rect =
+      section.getBoundingClientRect();
 
-    const inset =
-      36 * (1 - progress);
-    const scale =
-      1.14 - (0.14 * progress);
+    const viewportHeight =
+      window.innerHeight || 1;
 
-    section.style.setProperty(
-      "--photo-reveal-progress",
-      progress.toFixed(3)
-    );
-    section.style.setProperty(
-      "--photo-reveal-inset",
-      `${inset.toFixed(2)}%`
-    );
-    section.style.setProperty(
-      "--photo-reveal-scale",
-      scale.toFixed(3)
+    const totalTravel =
+      viewportHeight + rect.height;
+
+    const progress =
+      Math.min(
+        1,
+        Math.max(
+          0,
+          (
+            viewportHeight - rect.top
+          ) / totalTravel
+        )
+      );
+
+    /*
+      La foto se mueve bastante menos que la página:
+      comienza más arriba y termina más abajo.
+      Los bordes de la sección actúan como ventana.
+    */
+    const movement =
+      -7 + (progress * 14);
+
+    image.style.setProperty(
+      "--photo-parallax-y",
+      `${movement.toFixed(3)}%`
     );
 
     ticking = false;
   };
 
   const requestUpdate = () => {
-    if (ticking) return;
+    if (ticking) {
+      return;
+    }
+
     ticking = true;
-    window.requestAnimationFrame(update);
+
+    window.requestAnimationFrame(
+      update
+    );
   };
 
   update();
-  window.addEventListener("scroll", requestUpdate, { passive: true });
-  window.addEventListener("resize", requestUpdate);
+
+  window.addEventListener(
+    "scroll",
+    requestUpdate,
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "resize",
+    requestUpdate
+  );
 }
