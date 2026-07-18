@@ -844,6 +844,22 @@ function renderGifts() {
       details.appendChild(item);
     }
   );
+
+  if (config.copyValue) {
+    const copyButton =
+      document.createElement("button");
+
+    copyButton.type = "button";
+    copyButton.className =
+      "copy-button copy-button--account";
+    copyButton.textContent =
+      config.copyButtonText ||
+      "Copiar datos bancarios";
+    copyButton.dataset.copy =
+      config.copyValue;
+
+    details.appendChild(copyButton);
+  }
 }
 
 
@@ -1186,10 +1202,14 @@ function renderFullPhoto() {
   if (!config || !section || !image) return;
 
   if (config.image) {
-    image.style.setProperty(
-      "--full-photo-image",
-      `url("${config.image}")`
-    );
+    const imageUrl =
+      new URL(
+        config.image,
+        window.location.href
+      ).href;
+
+    image.style.backgroundImage =
+      `url("${imageUrl}")`;
   }
 
   image.style.setProperty(
