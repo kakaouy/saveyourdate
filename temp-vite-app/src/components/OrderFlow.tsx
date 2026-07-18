@@ -227,49 +227,59 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   const submitOrder = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (photoCount > photoLimit) return;
-    const form = new FormData(event.currentTarget);
-    const fileFieldNames = ['coverImage', 'featuredPhoto', 'galleryPhotos'];
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const fileFieldNames = ['attachment', 'attachment2', 'attachment3'];
     const attachments = fileFieldNames.flatMap((fieldName) =>
       form.getAll(fieldName).filter((value): value is File => value instanceof File && value.size > 0)
     );
-    fileFieldNames.forEach((fieldName) => form.delete(fieldName));
-    attachments.forEach((file, index) => {
-      form.append(index === 0 ? 'attachment' : `attachment${index + 1}`, file, file.name);
-    });
-    form.append('Archivos adjuntos', attachments.length ? attachments.map((file) => file.name).join(', ') : 'Sin archivos');
     const attachmentSize = attachments.reduce((total, file) => total + file.size, 0);
     const paymentOperation = String(form.get('paymentOperation') || prepayment.operation || '');
-    form.set('paymentOperation', paymentOperation);
     const orderNumber = createOrderNumber();
-    form.append('_subject', `Nuevo pedido ${orderNumber} - Save Your Date`);
-    form.append('Número de pedido', orderNumber);
-    form.append(
-      'Idioma de la invitación',
-      lang === 'es' ? 'Español' : lang === 'en' ? 'English' : 'Português'
-    );
-    form.append('Código de idioma', lang);
-    form.append('Plan', plan === 'basic' ? 'Básico' : 'Premium');
-    form.append('Tipo de evento', eventCategory === 'wedding' ? 'Boda' : eventCategory === '15years' ? '15 Años' : 'Otros eventos');
-    form.append('Modelo', selectedModel?.title || modelId);
-    form.append('Color elegido', selectedColor);
-    form.append('Secciones', Array.from(activeSections).map((id) => sectionOptions.find((item) => item.id === id)?.title || id).filter(Boolean).join(', '));
-    form.append('Música de fondo', hasMusic ? String(form.get('music') || 'Sí, a definir') : 'No');
-    form.append('Estado del pago', paymentOperation ? 'Pago informado - pendiente de validación' : 'Pago pendiente');
-    form.append('_template', 'table');
-    form.append('_captcha', 'false');
-    form.append('_replyto', String(form.get('email') || ''));
     setSubmitError('');
     setSending(true);
     try {
       if (attachmentSize > 10 * 1024 * 1024) {
         throw new Error(l('Las imágenes superan el máximo total de 10 MB.', 'The images exceed the 10 MB total limit.', 'As imagens excedem o limite total de 10 MB.'));
       }
-      await sendFormData(form);
-      setSubmittedOrder(orderNumber);
+      formElement.querySelectorAll('[data-order-generated="true"]').forEach((field) => field.remove());
+      const generatedFields: Record<string, string> = {
+        _subject: `Nuevo pedido ${orderNumber} - Save Your Date`,
+        _template: 'table',
+        _captcha: 'false',
+        _replyto: String(form.get('email') || ''),
+        'Número de pedido': orderNumber,
+        'Idioma de la invitación': lang === 'es' ? 'Español' : lang === 'en' ? 'English' : 'Português',
+        'Código de idioma': lang,
+        Plan: plan === 'basic' ? 'Básico' : 'Premium',
+        'Tipo de evento': eventCategory === 'wedding' ? 'Boda' : eventCategory === '15years' ? '15 Años' : 'Otros eventos',
+        Modelo: selectedModel?.title || modelId,
+        'Color elegido': selectedColor,
+        Secciones: Array.from(activeSections).map((id) => sectionOptions.find((item) => item.id === id)?.title || id).filter(Boolean).join(', '),
+        'Música de fondo': hasMusic ? String(form.get('music') || 'Sí, a definir') : 'No',
+        'Estado del pago': paymentOperation ? 'Pago informado - pendiente de validación' : 'Pago pendiente',
+        'Archivos adjuntos': attachments.length ? attachments.map((file) => file.name).join(', ') : 'Sin archivos'
+      };
+      Object.entries(generatedFields).forEach(([name, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        input.dataset.orderGenerated = 'true';
+        formElement.appendChild(input);
+      });
+      formElement.action = 'https://formsubmit.co/saveyourdate.invite@gmail.com';
+      formElement.method = 'POST';
+      formElement.target = 'order-submit-frame';
+      formElement.enctype = 'multipart/form-data';
+      HTMLFormElement.prototype.submit.call(formElement);
+      window.setTimeout(() => {
+        setSubmittedOrder(orderNumber);
+        setSending(false);
+      }, 1200);
     } catch (error) {
       const detail = error instanceof Error ? error.message : '';
       setSubmitError(`${l('No pudimos enviar el pedido. Revisá el tamaño de las imágenes e intentá nuevamente.', 'We could not send the order. Check the image sizes and try again.', 'Não foi possível enviar o pedido. Verifique o tamanho das imagens e tente novamente.')} ${detail}`.trim());
-    } finally {
       setSending(false);
     }
   };
@@ -327,6 +337,7 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
 
   return (
     <section id="crear" className="order-flow-section">
+      <iframe name="order-submit-frame" title="Envío del pedido" style={{ display: 'none' }} />
       <div className="container">
         <div className="section-header order-flow-heading">
           <span className="section-subtitle">{l('Tu invitación, a tu manera', 'Your invitation, your way', 'Seu convite, do seu jeito')}</span>
@@ -465,10 +476,10 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
                 <div className="form-group"><label className="form-label">{l('Fecha principal del evento', 'Main event date', 'Data principal do evento')}</label><input name="eventDate" className="form-input" type="date" required /></div>
                 <div className="form-group"><label className="form-label">{l('Hora principal', 'Main time', 'Horário principal')}</label><input name="eventTime" className="form-input" type="time" required /></div>
               </div>
-              <div className="form-group"><label className="form-label">{l('Foto principal o imagen de portada', 'Main photo or cover image', 'Foto principal ou imagem de capa')}</label><input name="coverImage" className="form-input" type="file" accept="image/*" /><small>{l('Podés subirla ahora o dejarla pendiente si el modelo no lleva fotografía.', 'You can upload it now or leave it pending if the model has no photo.', 'Você pode enviar agora ou deixar pendente se o modelo não usar foto.')}</small></div>
+              <div className="form-group"><label className="form-label">{l('Foto principal o imagen de portada', 'Main photo or cover image', 'Foto principal ou imagem de capa')}</label><input name="attachment" className="form-input" type="file" accept="image/*" /><small>{l('Podés subirla ahora o dejarla pendiente si el modelo no lleva fotografía.', 'You can upload it now or leave it pending if the model has no photo.', 'Você pode enviar agora ou deixar pendente se o modelo não usar foto.')}</small></div>
 
               {activeSections.has('quote') && <div className="dynamic-section-fields"><h4>{l('Frase destacada', 'Highlighted quote', 'Frase destacada')}</h4><div className="form-group"><label className="form-label">{l('Texto de la frase', 'Quote text', 'Texto da frase')}</label><textarea name="quoteText" className="form-textarea" required /></div><div className="form-group"><label className="form-label">{l('Autor (opcional)', 'Author (optional)', 'Autor (opcional)')}</label><input name="quoteAuthor" className="form-input" /></div></div>}
-              {activeSections.has('featuredPhoto') && <div className="dynamic-section-fields"><h4>{l('Foto destacada con efecto parallax', 'Featured parallax photo', 'Foto destacada com efeito parallax')}</h4><div className="form-group"><label className="form-label">{l('Imagen destacada', 'Featured image', 'Imagem destacada')}</label><input name="featuredPhoto" className="form-input" type="file" accept="image/*" required /></div><div className="form-group"><label className="form-label">{l('Encuadre o indicaciones', 'Framing or instructions', 'Enquadramento ou instruções')}</label><input name="featuredPhotoNotes" className="form-input" /></div></div>}
+              {activeSections.has('featuredPhoto') && <div className="dynamic-section-fields"><h4>{l('Foto destacada con efecto parallax', 'Featured parallax photo', 'Foto destacada com efeito parallax')}</h4><div className="form-group"><label className="form-label">{l('Imagen destacada', 'Featured image', 'Imagem destacada')}</label><input name="attachment2" className="form-input" type="file" accept="image/*" required /></div><div className="form-group"><label className="form-label">{l('Encuadre o indicaciones', 'Framing or instructions', 'Enquadramento ou instruções')}</label><input name="featuredPhotoNotes" className="form-input" /></div></div>}
               {activeSections.has('countdown') && <div className="dynamic-section-fields"><h4>{l('Cuenta regresiva', 'Countdown', 'Contagem regressiva')}</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha objetivo', 'Target date', 'Data de destino')}</label><input name="countdownDate" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Hora objetivo', 'Target time', 'Horário de destino')}</label><input name="countdownTime" className="form-input" type="time" required /></div></div><div className="form-group"><label className="form-label">{l('Título del contador', 'Countdown title', 'Título do contador')}</label><input name="countdownTitle" className="form-input" required placeholder={l('Ej. Falta muy poco', 'E.g. Almost there', 'Ex. Falta muito pouco')} /></div></div>}
 
               {activeSections.has('agenda') && <div className="dynamic-section-fields"><h4>{l('Agenda o itinerario', 'Schedule or itinerary', 'Agenda ou itinerário')}</h4><p>{l('Indicá cada momento con hora, título, lugar y una breve descripción.', 'Add each moment with its time, title and venue.', 'Informe cada momento com horário, título e local.')}</p>{[1, 2, 3].map((item) => <div className="agenda-row" key={item}><input name={`agenda${item}Time`} className="form-input" type="time" required={item === 1} /><input name={`agenda${item}Title`} className="form-input" required={item === 1} placeholder={`${l('Momento', 'Moment', 'Momento')} ${item}${item > 1 ? ` (${l('opcional', 'optional', 'opcional')})` : ''}`} /><input name={`agenda${item}Place`} className="form-input" required={item === 1} placeholder={l('Lugar', 'Venue', 'Local')} /></div>)}</div>}
@@ -493,7 +504,7 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
               </label>
               {hasMusic && <div className="form-group order-reveal"><label className="form-label">{l('Canción o enlace', 'Song or link', 'Música ou link')}</label><input name="music" className="form-input" required placeholder={l('Spotify, YouTube o nombre de la canción', 'Spotify, YouTube or song name', 'Spotify, YouTube ou nome da música')} /></div>}
 
-              {gallerySelected && <div className="form-group order-reveal"><label className="form-label">{l('Fotos para la galería', 'Gallery photos', 'Fotos para a galeria')} ({l('máximo', 'maximum', 'máximo')} {photoLimit})</label><input name="galleryPhotos" className="form-input" type="file" multiple accept="image/*" required onChange={(event) => handlePhotos(event.target.files)} /><small>{photoCount} {l('foto(s) seleccionada(s).', 'photo(s) selected.', 'foto(s) selecionada(s).')}</small>{photoError && <p className="order-error">{photoError}</p>}</div>}
+              {gallerySelected && <div className="form-group order-reveal"><label className="form-label">{l('Fotos para la galería', 'Gallery photos', 'Fotos para a galeria')} ({l('máximo', 'maximum', 'máximo')} {photoLimit})</label><input name="attachment3" className="form-input" type="file" multiple accept="image/*" required onChange={(event) => handlePhotos(event.target.files)} /><small>{photoCount} {l('foto(s) seleccionada(s).', 'photo(s) selected.', 'foto(s) selecionada(s).')}</small>{photoError && <p className="order-error">{photoError}</p>}</div>}
             </div>
 
             <div className="order-form-block order-payment-choice">
