@@ -2942,7 +2942,7 @@ function App() {
                       src={`/demos/boda-elegante-minimalista/index.html?preview=1&palette=${getPaletteIdFromColor(
                         demoModel,
                         selectedModelColors[demoModel.id]
-                      )}`}
+                      )}&lang=${lang}`}
                       title="Demo interactiva Editorial Marfil"
                     />
                   ) : (
