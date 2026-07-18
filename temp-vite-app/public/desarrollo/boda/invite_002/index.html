@@ -58,13 +58,16 @@
     .statement h2,.section-title{margin:0;font-family:var(--serif);font-size:clamp(4.2rem,16vw,10rem);font-weight:300;line-height:.78;letter-spacing:-.055em;text-align:center}
     .statement p{width:min(100%,560px);margin:48px auto 0;font-size:clamp(1rem,3.5vw,1.25rem);line-height:1.8}
     .countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,4vw,50px);margin-top:70px;text-align:center}
-    .countdown__value{display:block;font-family:var(--serif);font-size:clamp(3.2rem,13vw,8rem);font-weight:300;line-height:.8}
-    .countdown__label{display:block;margin-top:18px;font-size:.63rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+    .countdown__value{display:block;font-family:var(--serif);font-size:clamp(2.8rem,10vw,7.2rem);font-weight:300;line-height:1}
+    .countdown__label{display:block;margin-top:22px;font-size:.63rem;font-weight:600;line-height:1.35;letter-spacing:.14em;text-transform:uppercase}
     .details{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:currentColor;border:1px solid currentColor;margin-top:65px}
     .detail{background:var(--paper);padding:clamp(30px,6vw,64px);text-align:center}
     .detail small{display:block;font-size:.66rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase}
     .detail strong{display:block;margin:17px 0 8px;font-family:var(--serif);font-size:clamp(2.1rem,6vw,4rem);font-weight:400;line-height:1}
     .detail p{margin:0;font-size:.85rem;line-height:1.65}
+    .panel--compact{min-height:auto;padding-top:clamp(58px,9vh,92px);padding-bottom:clamp(58px,9vh,92px)}
+    .panel--quote{min-height:auto;padding-top:clamp(62px,10vh,105px);padding-bottom:clamp(62px,10vh,105px)}
+    .panel--quote .statement p{margin-top:0;font-family:var(--serif);font-size:clamp(2rem,6vw,4.2rem);font-style:italic;line-height:1.18}
     .dress{text-align:center}
     .dress__value{margin:50px 0 16px;font-family:var(--serif);font-size:clamp(3.4rem,12vw,7.2rem);font-weight:300;font-style:italic;line-height:.9}
     .dress__note{margin:0 auto;width:min(100%,520px);line-height:1.8}
@@ -109,8 +112,9 @@
     [data-reveal].is-visible{opacity:1;transform:none}
     @media (max-width:620px){
       .panel{padding-left:24px;padding-right:24px}
-      .countdown{gap:7px}
-      .countdown__label{font-size:.52rem;letter-spacing:.1em}
+      .countdown{grid-template-columns:repeat(2,1fr);gap:42px 14px;margin-top:52px}
+      .countdown__value{font-size:clamp(3.6rem,18vw,5.2rem)}
+      .countdown__label{margin-top:10px;font-size:.55rem;letter-spacing:.12em}
       .details{grid-template-columns:1fr}
       .dietary{grid-template-columns:1fr}
       .hero__names{font-size:clamp(5rem,24vw,7rem)}
@@ -140,15 +144,13 @@
       <span class="scroll-cue" data-i18n="discover">Descubrí la invitación</span>
     </section>
 
-    <section class="panel panel--paper">
+    <section class="panel panel--paper panel--quote">
       <div class="panel__inner statement">
-        <span class="statement__script" data-i18n="saveThe">guardá la</span>
-        <h2 data-i18n="date">fecha</h2>
         <p data-i18n="dateText" data-reveal>Una noche, una promesa y todas las personas que queremos en un mismo lugar.</p>
       </div>
     </section>
 
-    <section class="panel panel--accent">
+    <section class="panel panel--ink">
       <div class="panel__inner">
         <p class="eyebrow" data-i18n="countdownEyebrow" data-reveal>Falta muy poco</p>
         <h2 class="section-title" data-i18n="countdown" data-reveal>Cuenta regresiva</h2>
@@ -172,7 +174,7 @@
       </div>
     </section>
 
-    <section class="panel panel--blue">
+    <section class="panel panel--ink panel--compact">
       <div class="panel__inner dress">
         <p class="eyebrow" data-i18n="dressEyebrow" data-reveal>Para esta noche</p>
         <h2 class="section-title" data-i18n="dressTitle" data-reveal>Dress code</h2>
@@ -181,7 +183,7 @@
       </div>
     </section>
 
-    <section class="panel panel--soft">
+    <section class="panel panel--paper">
       <div class="panel__inner gift-copy">
         <p class="eyebrow" data-i18n="giftEyebrow" data-reveal>Un detalle</p>
         <h2 class="section-title" data-i18n="gifts" data-reveal>Regalos</h2>
