@@ -781,8 +781,8 @@
 
 @media (max-width: 600px) {
   .photo-window {
-    height: 76svh;
-    min-height: 520px;
+    height: 51svh;
+    min-height: 360px;
   }
 
   .photo-window__image {
