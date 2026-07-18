@@ -1463,3 +1463,9 @@
   will-change: transform;
   backface-visibility: hidden;
 }
+
+
+/* Modal RSVP más compacto sin perder espacio para invitados dinámicos. */
+#rsvp-modal .form__textarea {
+  min-height: 84px;
+}
