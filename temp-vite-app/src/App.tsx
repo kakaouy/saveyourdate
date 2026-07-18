@@ -6,11 +6,27 @@ import OrderFlow from './components/OrderFlow';
 
 
 const MODEL_COLOR_OPTIONS = [
-  { name: 'Rosa', color: '#ff6f91' },
-  { name: 'Coral', color: '#ff9671' },
-  { name: 'Amarillo', color: '#ffc75f' },
-  { name: 'Verde', color: '#73c6b6' }
+  { id: 'rosa', name: 'Rosa', color: '#ff6f91' },
+  { id: 'coral', name: 'Coral', color: '#ff9671' },
+  { id: 'amarillo', name: 'Amarillo', color: '#ffc75f' },
+  { id: 'verde', name: 'Verde', color: '#73c6b6' }
 ];
+
+const getModelPaletteOptions = (model?: InvitationModel | null) =>
+  model?.palettes?.length
+    ? model.palettes
+    : MODEL_COLOR_OPTIONS;
+
+const getPaletteIdFromColor = (
+  model: InvitationModel,
+  selectedColor?: string
+) => {
+  const options = getModelPaletteOptions(model);
+  return (
+    options.find((option) => option.color === selectedColor)?.id ||
+    options[0].id
+  );
+};
 
 // ==========================================
 // TRANSLATION DICTIONARY (ES, EN, PT)
@@ -1910,7 +1926,8 @@ function App() {
           <div className="models-carousel-wrapper">
             <div ref={carouselRef} className="models-swimlane-container">
               {filteredModels.map((model) => {
-                const selectedColor = selectedModelColors[model.id] || MODEL_COLOR_OPTIONS[0].color;
+                const modelPaletteOptions = getModelPaletteOptions(model);
+                const selectedColor = selectedModelColors[model.id] || modelPaletteOptions[0].color;
 
                 return (
                   <article className="model-card model-phone-card" key={model.id}>
@@ -1964,7 +1981,7 @@ function App() {
                       <h3 className="card-title">{model.title}</h3>
 
                       <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
-                        {MODEL_COLOR_OPTIONS.map((option) => (
+                        {modelPaletteOptions.map((option) => (
                           <button
                             key={option.color}
                             type="button"
@@ -1977,9 +1994,7 @@ function App() {
                         ))}
                       </div>
 
-                      <p className="card-desc">{model.description}</p>
-
-                      <div className="card-footer">
+                       <div className="card-footer">
                         <button className="btn-card-demo" onClick={() => handleOpenDemo(model)}>
                           {t.catalog.verDemo}
                         </button>
@@ -2906,8 +2921,11 @@ function App() {
                   {demoModel.id === 'boda-marfil' ? (
                     <iframe
                       className="demo-real-invitation-frame"
-                      src="/demos/boda-elegante-minimalista/index.html?preview=2&deploy=20260717"
-                      title="Demo interactiva Boda elegante minimalista"
+                      src={`/demos/boda-elegante-minimalista/index.html?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}`}
+                      title="Demo interactiva Editorial Marfil"
                     />
                   ) : (
                   <div className="demo-invitation-scroll">
@@ -3007,9 +3025,7 @@ function App() {
             <aside className="demo-info-panel">
               <span className="demo-eyebrow">{demoModel.category === 'wedding' ? 'Casamiento' : demoModel.category === '15years' ? '15 años' : 'Evento especial'}</span>
               <h2>{demoModel.title}</h2>
-              <p className="demo-description">{demoModel.description}</p>
-
-              <div className="demo-info-block">
+               <div className="demo-info-block">
                 <h3>Esta invitación incluye</h3>
                 <ul className="demo-feature-list">
                   {demoModel.features.map((feature) => (
@@ -3021,8 +3037,10 @@ function App() {
               <div className="demo-info-block">
                 <h3>Probá otra paleta</h3>
                 <div className="demo-palette-list">
-                  {MODEL_COLOR_OPTIONS.map((option) => {
-                    const activeColor = selectedModelColors[demoModel.id] || MODEL_COLOR_OPTIONS[0].color;
+                  {getModelPaletteOptions(demoModel).map((option) => {
+                    const activeColor =
+                      selectedModelColors[demoModel.id] ||
+                      getModelPaletteOptions(demoModel)[0].color;
                     return (
                       <button
                         key={option.color}
