@@ -244,19 +244,21 @@ const EVENT_CONFIG = {
       {
         label: "Titular",
         value: "Ana y Juan",
-        copyable: true
+        copyable: false
       },
       {
         label: "Cuenta",
         value: "000000000",
-        copyable: true
+        copyable: false
       },
       {
         label: "Alias",
         value: "ANA.JUAN.BODA",
-        copyable: true
+        copyable: false
       }
-    ]
+    ],
+    copyButtonText: "Copiar datos bancarios",
+    copyValue: "Banco: Nombre del banco\nTitular: Ana y Juan\nCuenta: 000000000\nAlias: ANA.JUAN.BODA"
   },
 
   playlist: {
