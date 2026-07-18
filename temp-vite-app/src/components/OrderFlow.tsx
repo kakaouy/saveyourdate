@@ -204,12 +204,21 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   };
 
   const sendForm = async (payload: Record<string, string>) => {
+    const form = new FormData();
+    Object.entries(payload).forEach(([key, value]) => form.append(key, value));
+    form.append('_template', 'table');
+    form.append('_captcha', 'false');
+    if (payload.Email) form.append('_replyto', payload.Email);
+
     const response = await fetch('https://formsubmit.co/ajax/saveyourdate.invite@gmail.com', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify(payload)
+      headers: { Accept: 'application/json' },
+      body: form
     });
-    if (!response.ok) throw new Error('No se pudo enviar el formulario.');
+    const result = await response.json().catch(() => null) as { success?: boolean | string } | null;
+    if (!response.ok || !result || (result.success !== true && result.success !== 'true')) {
+      throw new Error('No se pudo enviar el formulario.');
+    }
   };
 
   const submitOrder = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -283,6 +292,7 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   const submitPaymentUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    setSubmitError('');
     setSending(true);
     try {
       await sendForm({
@@ -293,6 +303,8 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
         Estado: 'Pago informado - pendiente de validación interna'
       });
       setPaymentUpdated(true);
+    } catch {
+      setSubmitError(l('No pudimos informar el pago. Revisá tu conexión e intentá nuevamente.', 'We could not report the payment. Check your connection and try again.', 'Não foi possível informar o pagamento. Verifique sua conexão e tente novamente.'));
     } finally {
       setSending(false);
     }
@@ -491,6 +503,7 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
               <div className="form-group"><label className="form-label">{l('Número de pedido', 'Order number', 'Número do pedido')}</label><input name="orderNumber" className="form-input" required placeholder="SYD-123456" pattern="SYD-[0-9]{6}" /></div>
               <div className="form-group"><label className="form-label">{l('Número de operación de Mercado Pago', 'Mercado Pago transaction number', 'Número da operação do Mercado Pago')}</label><input name="paymentOperation" className="form-input" required /></div>
               <div className="form-group"><label className="form-label">{l('Email o WhatsApp usado en el pedido', 'Email or WhatsApp used for the order', 'E-mail ou WhatsApp usado no pedido')}</label><input name="contact" className="form-input" required /></div>
+              {submitError && <p className="order-error" role="alert">{submitError}</p>}
               <button className="btn-form-submit" type="submit" disabled={sending}>{sending ? l('Enviando…', 'Sending…', 'Enviando…') : l('Enviar número de operación', 'Send transaction number', 'Enviar número da operação')}</button>
             </div>
           </form>
