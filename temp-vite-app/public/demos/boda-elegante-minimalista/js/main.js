@@ -154,15 +154,18 @@ function initializeRevealAnimations() {
         ".polaroid-section",
         ".editorial-quote__text",
         ".editorial-quote__author",
-        ".schedule-section .section-heading",
+        ".section-heading",
+        ".schedule__date",
         ".schedule__item",
-        ".section--countdown .section-heading",
+        ".countdown",
         ".event-card",
         ".location-card",
         ".dresscode-card",
         ".gallery__item",
-        ".section--editorial .editorial-content",
-        ".closing"
+        ".section--editorial .editorial-content > p",
+        ".section--editorial .editorial-content > .btn",
+        ".section--closing .closing",
+        ".footer__content"
       ].join(",")
     );
 
@@ -279,9 +282,22 @@ function initializePhotoWindowReveal() {
       Math.max(0, -rect.top / travel)
     );
 
+    const inset =
+      18 * (1 - progress);
+    const scale =
+      1.06 - (0.06 * progress);
+
     section.style.setProperty(
       "--photo-reveal-progress",
       progress.toFixed(3)
+    );
+    section.style.setProperty(
+      "--photo-reveal-inset",
+      `${inset.toFixed(2)}%`
+    );
+    section.style.setProperty(
+      "--photo-reveal-scale",
+      scale.toFixed(3)
     );
 
     ticking = false;
