@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   renderPageConfig();
+  renderTheme();
   renderSections();
   renderWelcome();
   renderHero();
@@ -13,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderLocation();
   renderDressCode();
   renderGallery();
+  renderFullPhoto();
   renderGifts();
   renderPlaylist();
   renderRsvp();
@@ -162,6 +164,7 @@ function renderSections() {
     dressCode: "dresscode-section",
     gallery: "gallery-section",
 
+    fullPhoto: "full-photo-section",
     gifts: "gifts-section",
     playlist: "playlist-section",
     rsvp: "rsvp-section",
@@ -1112,4 +1115,89 @@ function renderMusic() {
 
     audio.load();
   }
+}
+
+/* =========================================================
+   PALETA PARAMETRIZABLE
+========================================================= */
+
+function renderTheme() {
+  const theme = EVENT_CONFIG.theme;
+  if (!theme?.palettes) return;
+
+  const requestedPalette =
+    new URLSearchParams(window.location.search).get("palette");
+  const paletteName =
+    requestedPalette && theme.palettes[requestedPalette]
+      ? requestedPalette
+      : theme.defaultPalette;
+  const palette = theme.palettes[paletteName];
+
+  if (!palette) return;
+
+  const root = document.documentElement;
+  const variables = {
+    primary: "--color-primary",
+    background: "--color-background",
+    secondary: "--color-secondary",
+    accent: "--color-accent",
+    text: "--color-text",
+    textSoft: "--color-text-soft"
+  };
+
+  Object.entries(variables).forEach(([key, variable]) => {
+    if (palette[key]) root.style.setProperty(variable, palette[key]);
+  });
+
+  root.dataset.palette = paletteName;
+}
+
+window.addEventListener("message", (event) => {
+  const paletteName = event.data?.sydPalette;
+  const palette = EVENT_CONFIG.theme?.palettes?.[paletteName];
+  if (!palette) return;
+
+  const root = document.documentElement;
+  const variables = {
+    primary: "--color-primary",
+    background: "--color-background",
+    secondary: "--color-secondary",
+    accent: "--color-accent",
+    text: "--color-text",
+    textSoft: "--color-text-soft"
+  };
+
+  Object.entries(variables).forEach(([key, variable]) => {
+    if (palette[key]) root.style.setProperty(variable, palette[key]);
+  });
+
+  root.dataset.palette = paletteName;
+});
+
+/* =========================================================
+   FOTO IMPORTANTE PARAMETRIZABLE
+========================================================= */
+
+function renderFullPhoto() {
+  const config = EVENT_CONFIG.fullPhoto;
+  const section = getElement("full-photo-section");
+  const image = getElement("full-photo-image");
+
+  if (!config || !section || !image) return;
+
+  if (config.image) {
+    image.style.setProperty(
+      "--full-photo-image",
+      `url("${config.image}")`
+    );
+  }
+
+  image.style.setProperty(
+    "--full-photo-position",
+    config.objectPosition || "center center"
+  );
+
+  const alternativeText = config.alt || "";
+  section.setAttribute("aria-label", alternativeText);
+  image.setAttribute("aria-label", alternativeText);
 }
