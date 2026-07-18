@@ -211,6 +211,11 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
     const orderNumber = createOrderNumber();
     form.append('_subject', `Nuevo pedido ${orderNumber} - Save Your Date`);
     form.append('Número de pedido', orderNumber);
+    form.append(
+      'Idioma de la invitación',
+      lang === 'es' ? 'Español' : lang === 'en' ? 'English' : 'Português'
+    );
+    form.append('Código de idioma', lang);
     form.append('Plan', plan === 'basic' ? 'Básico' : 'Premium');
     form.append('Tipo de evento', eventCategory === 'wedding' ? 'Boda' : eventCategory === '15years' ? '15 Años' : 'Otros eventos');
     form.append('Modelo', selectedModel?.title || modelId);
