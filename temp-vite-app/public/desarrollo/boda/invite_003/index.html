@@ -170,6 +170,30 @@
 .section:nth-of-type(8):after{width:clamp(175px,33vw,285px);--branch-opacity:.08}
 .section:nth-of-type(9):after{width:clamp(115px,24vw,200px);--branch-opacity:.14}
 
+
+/* Ajuste visual: ampersand con el color elegido y ramas izquierdas visibles */
+.hero__script{color:var(--olive-dark)}
+.section:nth-of-type(2):not(.hero):after,
+.section:nth-of-type(6):not(.hero):after,
+.section:nth-of-type(10):not(.hero):after{
+  left:-12px!important;
+  right:auto!important;
+  top:-54px!important;
+  width:clamp(155px,31vw,270px)!important;
+  --branch-opacity:.19;
+  transform:scaleX(-1) rotate(-4deg)!important;
+  transform-origin:left bottom!important;
+}
+.section:nth-of-type(4):not(.hero):after,
+.section:nth-of-type(8):not(.hero):after{
+  left:-10px!important;
+  right:auto!important;
+  top:-30px!important;
+  width:clamp(120px,25vw,220px)!important;
+  --branch-opacity:.16;
+  transform:scaleX(-1) scaleY(-1) rotate(5deg)!important;
+  transform-origin:left top!important;
+}
 </style>
 </head>
 <body>
