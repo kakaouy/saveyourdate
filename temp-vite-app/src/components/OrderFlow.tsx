@@ -2,13 +2,18 @@ import { useEffect, useMemo, useState } from 'react';
 import type { InvitationModel } from '../data/models';
 
 type Plan = 'basic' | 'premium';
-type FlowTab = 'new' | 'payment';
+type FlowTab = 'new' | 'pay-first' | 'payment';
 type EventCategory = InvitationModel['category'];
 type Language = 'es' | 'en' | 'pt';
 
 const PAYMENT_LINKS: Record<Plan, string> = {
-  basic: '',
-  premium: ''
+  basic: 'https://mpago.la/1gRs45Z',
+  premium: 'https://mpago.la/1de2PiW'
+};
+
+const PLAN_PRICES: Record<Plan, string> = {
+  basic: '$ 2.000 UYU',
+  premium: '$ 3.000 UYU'
 };
 
 const SECTION_OPTIONS = [
@@ -48,6 +53,8 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   const [submittedOrder, setSubmittedOrder] = useState('');
   const [paymentUpdated, setPaymentUpdated] = useState(false);
   const [sending, setSending] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [prepayment, setPrepayment] = useState({ name: '', email: '', whatsapp: '', operation: '' });
   const [selectedColor, setSelectedColor] = useState('#ff6f91');
 
   const sectionLimit = plan === 'basic' ? 5 : 8;
@@ -197,17 +204,20 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   };
 
   const sendForm = async (payload: Record<string, string>) => {
-    await fetch('https://formsubmit.co/ajax/saveyourdate.invite@gmail.com', {
+    const response = await fetch('https://formsubmit.co/ajax/saveyourdate.invite@gmail.com', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(payload)
     });
+    if (!response.ok) throw new Error('No se pudo enviar el formulario.');
   };
 
   const submitOrder = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (photoCount > photoLimit) return;
     const form = new FormData(event.currentTarget);
+    const paymentOperation = String(form.get('paymentOperation') || prepayment.operation || '');
+    form.set('paymentOperation', paymentOperation);
     const orderNumber = createOrderNumber();
     form.append('_subject', `Nuevo pedido ${orderNumber} - Save Your Date`);
     form.append('Número de pedido', orderNumber);
@@ -222,15 +232,49 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
     form.append('Color elegido', selectedColor);
     form.append('Secciones', Array.from(activeSections).map((id) => sectionOptions.find((item) => item.id === id)?.title || id).filter(Boolean).join(', '));
     form.append('Música de fondo', hasMusic ? String(form.get('music') || 'Sí, a definir') : 'No');
-    form.append('Estado del pago', form.get('paymentOperation') ? 'Pago informado' : 'Pago pendiente');
+    form.append('Estado del pago', paymentOperation ? 'Pago informado - pendiente de validación' : 'Pago pendiente');
+    setSubmitError('');
     setSending(true);
     try {
-      await fetch('https://formsubmit.co/ajax/saveyourdate.invite@gmail.com', {
+      const response = await fetch('https://formsubmit.co/ajax/saveyourdate.invite@gmail.com', {
         method: 'POST',
         headers: { Accept: 'application/json' },
         body: form
       });
+      if (!response.ok) throw new Error('No se pudo enviar el pedido.');
       setSubmittedOrder(orderNumber);
+    } catch {
+      setSubmitError(l('No pudimos enviar el pedido. Revisá tu conexión e intentá nuevamente.', 'We could not send the order. Check your connection and try again.', 'Não foi possível enviar o pedido. Verifique sua conexão e tente novamente.'));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const submitPrepayment = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const details = {
+      name: String(form.get('name') || ''),
+      email: String(form.get('email') || ''),
+      whatsapp: String(form.get('whatsapp') || ''),
+      operation: String(form.get('paymentOperation') || '')
+    };
+    setSubmitError('');
+    setSending(true);
+    try {
+      await sendForm({
+        _subject: `Pago previo informado - ${details.name}`,
+        Nombre: details.name,
+        Email: details.email,
+        WhatsApp: details.whatsapp,
+        Plan: plan === 'basic' ? `Básico - ${PLAN_PRICES.basic}` : `Premium - ${PLAN_PRICES.premium}`,
+        'Número de operación Mercado Pago': details.operation,
+        Estado: 'Pago informado antes de completar el pedido - pendiente de validación'
+      });
+      setPrepayment(details);
+      setActiveTab('new');
+    } catch {
+      setSubmitError(l('No pudimos registrar el pago. Revisá tu conexión e intentá nuevamente.', 'We could not register the payment. Check your connection and try again.', 'Não foi possível registrar o pagamento. Verifique sua conexão e tente novamente.'));
     } finally {
       setSending(false);
     }
@@ -268,15 +312,37 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
             <h3>{l('¿Qué querés hacer?', 'What would you like to do?', 'O que você quer fazer?')}</h3>
             <p>{l('El formulario aparece únicamente cuando iniciás un pedido o necesitás informar el pago de uno existente.', 'The form appears only when you start an order or report payment for an existing one.', 'O formulário aparece somente quando você inicia um pedido ou informa o pagamento de um pedido existente.')}</p>
             <div className="order-start-actions">
-              <button className="btn-primary" onClick={() => { setStarted(true); setActiveTab('new'); }}>{l('Iniciar mi pedido', 'Start my order', 'Iniciar meu pedido')}</button>
-              <button className="btn-secondary" onClick={() => { setStarted(true); setActiveTab('payment'); }}>{l('Ya creé mi invite', 'I already created my invite', 'Já criei meu convite')}</button>
+              <button className="btn-primary" onClick={() => { setStarted(true); setActiveTab('new'); }}>{l('Hacer el pedido y pagar después', 'Order now and pay later', 'Fazer o pedido e pagar depois')}</button>
+              <button className="btn-secondary" onClick={() => { setStarted(true); setActiveTab('pay-first'); }}>{l('Pagar primero', 'Pay first', 'Pagar primeiro')}</button>
+              <button className="btn-secondary" onClick={() => { setStarted(true); setActiveTab('payment'); }}>{l('Ya hice un pedido', 'I already placed an order', 'Já fiz um pedido')}</button>
             </div>
           </div>
         ) : <>
         <div className="order-flow-tabs" role="tablist">
           <button className={activeTab === 'new' ? 'active' : ''} onClick={() => setActiveTab('new')}>{l('Creá tu invite', 'Create your invite', 'Crie seu convite')}</button>
+          <button className={activeTab === 'pay-first' ? 'active' : ''} onClick={() => setActiveTab('pay-first')}>{l('Pagar primero', 'Pay first', 'Pagar primeiro')}</button>
           <button className={activeTab === 'payment' ? 'active' : ''} onClick={() => setActiveTab('payment')}>{l('Ya creaste tu invite', 'Already created yours?', 'Já criou seu convite?')}</button>
         </div>
+
+        {activeTab === 'pay-first' && (
+          <form className="order-form payment-update-form" onSubmit={submitPrepayment}>
+            <div className="order-form-block">
+              <div className="order-block-title"><span>1</span><div><h3>{l('Elegí el plan y pagá', 'Choose a plan and pay', 'Escolha o plano e pague')}</h3><p>{l('Primero dejanos tus datos para poder identificar el pago. Después de informarlo vas a completar el pedido.', 'First leave your details so we can identify the payment. After reporting it, you will complete the order.', 'Primeiro deixe seus dados para identificarmos o pagamento. Depois, você completará o pedido.')}</p></div></div>
+              <div className="order-plan-grid">
+                {(['basic', 'premium'] as Plan[]).map((item) => <button type="button" key={item} className={`order-plan-card ${plan === item ? 'active' : ''}`} onClick={() => setPlan(item)}><small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{item === 'basic' ? l('Básico', 'Basic', 'Básico') : 'Premium'}</h4><strong>{PLAN_PRICES[item]}</strong><p>{item === 'basic' ? l('Hasta 5 secciones.', 'Up to 5 sections.', 'Até 5 seções.') : l('Hasta 8 secciones.', 'Up to 8 sections.', 'Até 8 seções.')}</p></button>)}
+              </div>
+              <div className="form-row-2col">
+                <div className="form-group"><label className="form-label">{l('Nombre y apellido', 'Full name', 'Nome e sobrenome')}</label><input name="name" className="form-input" required /></div>
+                <div className="form-group"><label className="form-label">WhatsApp</label><input name="whatsapp" className="form-input" type="tel" required /></div>
+              </div>
+              <div className="form-group"><label className="form-label">Email</label><input name="email" className="form-input" type="email" required /></div>
+              <a href={PAYMENT_LINKS[plan]} target="_blank" rel="noopener noreferrer" className="mercado-pago-link">{l(`Pagar ${PLAN_PRICES[plan]} con Mercado Pago ↗`, `Pay ${PLAN_PRICES[plan]} with Mercado Pago ↗`, `Pagar ${PLAN_PRICES[plan]} com Mercado Pago ↗`)}</a>
+              <div className="form-group"><label className="form-label">{l('Después de pagar, ingresá el número de operación', 'After paying, enter the transaction number', 'Depois de pagar, informe o número da operação')}</label><input name="paymentOperation" className="form-input" required /></div>
+              {submitError && <p className="order-error" role="alert">{submitError}</p>}
+              <button className="btn-form-submit" type="submit" disabled={sending}>{sending ? l('Registrando…', 'Registering…', 'Registrando…') : l('Registrar pago y completar mi pedido', 'Register payment and complete my order', 'Registrar pagamento e completar meu pedido')}</button>
+            </div>
+          </form>
+        )}
 
         {activeTab === 'new' && (submittedOrder ? (
           <div className="order-success-card">
@@ -293,10 +359,10 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
               <div className="order-block-title"><span>1</span><div><h3>{l('Elegí tu plan', 'Choose your plan', 'Escolha seu plano')}</h3><p>{l('La portada está incluida y no cuenta como sección.', 'The cover is included and does not count as a section.', 'A capa está incluída e não conta como seção.')}</p></div></div>
               <div className="order-plan-grid">
                 <button type="button" className={`order-plan-card ${plan === 'basic' ? 'active' : ''}`} onClick={() => setPlan('basic')}>
-                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{l('Básico', 'Basic', 'Básico')}</h4><strong>{l('Hasta 5 secciones', 'Up to 5 sections', 'Até 5 seções')}</strong><p>{l('Galería de hasta 5 fotos cuando el diseño la incluye.', 'Gallery with up to 5 photos when included in the design.', 'Galeria de até 5 fotos quando incluída no design.')}</p>
+                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{l('Básico', 'Basic', 'Básico')}</h4><strong>{PLAN_PRICES.basic}</strong><p>{l('Hasta 5 secciones. Galería de hasta 5 fotos cuando el diseño la incluye.', 'Up to 5 sections. Gallery with up to 5 photos when included in the design.', 'Até 5 seções. Galeria de até 5 fotos quando incluída no design.')}</p>
                 </button>
                 <button type="button" className={`order-plan-card ${plan === 'premium' ? 'active' : ''}`} onClick={() => setPlan('premium')}>
-                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>Premium</h4><strong>{l('Hasta 8 secciones', 'Up to 8 sections', 'Até 8 seções')}</strong><p>{l('Galería de hasta 8 fotos si la elegís.', 'Gallery with up to 8 photos if selected.', 'Galeria de até 8 fotos, se escolhida.')}</p>
+                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>Premium</h4><strong>{PLAN_PRICES.premium}</strong><p>{l('Hasta 8 secciones. Galería de hasta 8 fotos si la elegís.', 'Up to 8 sections. Gallery with up to 8 photos if selected.', 'Até 8 seções. Galeria de até 8 fotos, se escolhida.')}</p>
                 </button>
               </div>
             </div>
@@ -361,11 +427,11 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
             <div className="order-form-block">
               <div className="order-block-title"><span>3</span><div><h3>{l('Completá todos los datos', 'Complete all the details', 'Preencha todos os dados')}</h3><p>{l('Los campos cambian según las secciones que elegiste.', 'Fields change according to the sections you selected.', 'Os campos mudam conforme as seções escolhidas.')}</p></div></div>
               <div className="form-row-2col">
-                <div className="form-group"><label className="form-label">{l('Nombre y apellido', 'Full name', 'Nome e sobrenome')}</label><input name="name" className="form-input" required /></div>
-                <div className="form-group"><label className="form-label">WhatsApp</label><input name="whatsapp" className="form-input" type="tel" required /></div>
+                <div className="form-group"><label className="form-label">{l('Nombre y apellido', 'Full name', 'Nome e sobrenome')}</label><input name="name" className="form-input" required defaultValue={prepayment.name} /></div>
+                <div className="form-group"><label className="form-label">WhatsApp</label><input name="whatsapp" className="form-input" type="tel" required defaultValue={prepayment.whatsapp} /></div>
               </div>
               <div className="form-row-2col">
-                <div className="form-group"><label className="form-label">Email</label><input name="email" className="form-input" type="email" required /></div>
+                <div className="form-group"><label className="form-label">Email</label><input name="email" className="form-input" type="email" required defaultValue={prepayment.email} /></div>
                 <div className="form-group"><label className="form-label">{l('Título o protagonistas', 'Title or hosts', 'Título ou protagonistas')}</label><input name="eventTitle" className="form-input" required placeholder={l('Ej. Ana & Juan', 'E.g. Ana & Juan', 'Ex. Ana & Juan')} /></div>
               </div>
               <div className="form-row-2col">
@@ -406,15 +472,12 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
             <div className="order-form-block order-payment-choice">
               <div className="order-block-title"><span>4</span><div><h3>{l('Pago, ahora o después', 'Payment, now or later', 'Pagamento, agora ou depois')}</h3><p>{l('No necesitás pagar para enviar el pedido.', 'You do not need to pay to submit the order.', 'Você não precisa pagar para enviar o pedido.')}</p></div></div>
               <div className="order-payment-actions">
-                {PAYMENT_LINKS[plan] ? (
-                  <a href={PAYMENT_LINKS[plan]} target="_blank" rel="noopener noreferrer" className="mercado-pago-link">Pagar Plan {plan === 'basic' ? 'Básico' : 'Premium'} con Mercado Pago ↗</a>
-                ) : (
-                  <div className="mercado-pago-link payment-link-pending">Link de pago del Plan {plan === 'basic' ? 'Básico' : 'Premium'} pendiente de configurar</div>
-                )}
-                <div className="form-group"><label className="form-label">{l('Si ya pagaste, pegá el número de operación', 'If you already paid, enter the transaction number', 'Se já pagou, informe o número da operação')}</label><input name="paymentOperation" className="form-input" placeholder={l('Ej. 12345678901 (opcional)', 'E.g. 12345678901 (optional)', 'Ex. 12345678901 (opcional)')} /></div>
+                <a href={PAYMENT_LINKS[plan]} target="_blank" rel="noopener noreferrer" className="mercado-pago-link">Pagar Plan {plan === 'basic' ? 'Básico' : 'Premium'} ({PLAN_PRICES[plan]}) con Mercado Pago ↗</a>
+                <div className="form-group"><label className="form-label">{l('Si ya pagaste, pegá el número de operación', 'If you already paid, enter the transaction number', 'Se já pagou, informe o número da operação')}</label><input name="paymentOperation" className="form-input" defaultValue={prepayment.operation} placeholder={l('Ej. 12345678901 (opcional)', 'E.g. 12345678901 (optional)', 'Ex. 12345678901 (opcional)')} /></div>
               </div>
             </div>
 
+            {submitError && <p className="order-error" role="alert">{submitError}</p>}
             <button className="btn-form-submit order-submit" type="submit" disabled={sending || activeSections.size === 0 || usedSectionCount > sectionLimit || !!photoError}>{sending ? l('Enviando pedido…', 'Sending order…', 'Enviando pedido…') : l('Enviar mi pedido', 'Send my order', 'Enviar meu pedido')}</button>
           </form>
         ))}
