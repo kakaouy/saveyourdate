@@ -283,9 +283,9 @@ function initializePhotoWindowReveal() {
     );
 
     const inset =
-      18 * (1 - progress);
+      36 * (1 - progress);
     const scale =
-      1.06 - (0.06 * progress);
+      1.14 - (0.14 * progress);
 
     section.style.setProperty(
       "--photo-reveal-progress",
