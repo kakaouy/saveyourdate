@@ -89,9 +89,11 @@ export const INVITATION_MODELS: InvitationModel[] = [
     ],
     palettes: [
       { id: 'negro', name: 'Negro', color: '#10100f' },
-      { id: 'borgona', name: 'Borgoña', color: '#671f2c' },
-      { id: 'azul', name: 'Azul noche', color: '#23324c' },
-      { id: 'bosque', name: 'Verde bosque', color: '#263a30' }
+      { id: 'rosa', name: 'Rosa empolvado', color: '#c492a7' },
+      { id: 'frambuesa', name: 'Frambuesa', color: '#a15a77' },
+      { id: 'cielo', name: 'Celeste grisáceo', color: '#85acb0' },
+      { id: 'petroleo', name: 'Azul petróleo', color: '#556e80' },
+      { id: 'tinta', name: 'Azul tinta', color: '#3a3957' }
     ]
   },
   {
