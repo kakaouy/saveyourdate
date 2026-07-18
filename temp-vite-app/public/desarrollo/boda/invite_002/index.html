@@ -126,6 +126,18 @@
     }
     @media (prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}[data-reveal]{opacity:1;transform:none}}
   </style>
+  <script>
+    (() => {
+      const palettes = {
+        negro: "#10100f",
+        borgona: "#671f2c",
+        azul: "#23324c",
+        bosque: "#263a30"
+      };
+      const selected = new URLSearchParams(location.search).get("palette") || "negro";
+      document.documentElement.style.setProperty("--ink", palettes[selected] || palettes.negro);
+    })();
+  </script>
 </head>
 <body>
   <div class="loader" id="loader" aria-hidden="true"><div class="loader__mark">C&T</div></div>
