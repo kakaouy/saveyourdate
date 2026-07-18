@@ -210,6 +210,11 @@ function updateMusicButton(
       "aria-pressed",
       String(isPlaying)
     );
+
+    button.classList.toggle(
+      "is-playing",
+      isPlaying
+    );
   }
 
   if (!icon) {
