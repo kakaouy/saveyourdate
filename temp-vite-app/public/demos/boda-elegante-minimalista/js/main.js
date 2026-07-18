@@ -9,6 +9,7 @@ document.addEventListener(
     initializeWelcomeState();
     initializeSmoothScroll();
     initializeRevealAnimations();
+    initializePhotoWindowReveal();
     initializeImageErrors();
   }
 );
@@ -257,4 +258,42 @@ function initializeImageErrors() {
     },
     true
   );
+}
+
+/* =========================================================
+   REVELADO PROGRESIVO DE LA FOTO IMPORTANTE
+========================================================= */
+
+function initializePhotoWindowReveal() {
+  const section = document.getElementById("full-photo-section");
+  if (!section) return;
+
+  let ticking = false;
+
+  const update = () => {
+    const rect = section.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || 1;
+    const travel = Math.max(rect.height - viewportHeight, 1);
+    const progress = Math.min(
+      1,
+      Math.max(0, -rect.top / travel)
+    );
+
+    section.style.setProperty(
+      "--photo-reveal-progress",
+      progress.toFixed(3)
+    );
+
+    ticking = false;
+  };
+
+  const requestUpdate = () => {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(update);
+  };
+
+  update();
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
 }
