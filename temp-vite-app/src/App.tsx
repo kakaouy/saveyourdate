@@ -1169,14 +1169,20 @@ function App() {
 
   // Regional Currency and Payment Data (Rounded locally)
   const CURRENCY_DATA = {
-    USD: { symbol: '$', suffix: 'USD', bronze: 50, silver: 70, gold: 100, label: 'Dólar (Internacional)', bank: 'PayPal / Stripe (USD)', bankDetails: 'Email de pago: saveyourdate.invite@gmail.com' },
-    ARS: { symbol: '$', suffix: 'ARS', bronze: 50000, silver: 70000, gold: 100000, label: 'Peso Argentino', bank: 'Mercado Pago / Transferencia', bankDetails: 'ALIAS: saveyourdate.mp | CBU: 0000003100099999987654' },
-    MXN: { symbol: '$', suffix: 'MXN', bronze: 900, silver: 1250, gold: 1800, label: 'Peso Mexicano', bank: 'Mercado Pago México / SPEI', bankDetails: 'CLABE SPEI: 012180009999999888 | BANCO: BBVA México' },
-    CLP: { symbol: '$', suffix: 'CLP', bronze: 48000, silver: 68000, gold: 95000, label: 'Peso Chileno', bank: 'Mercado Pago Chile / Transferencia', bankDetails: 'Banco de Chile - Cuenta Corriente: 123-45678-90 | RUT: 77.777.777-7' },
-    COP: { symbol: '$', suffix: 'COP', bronze: 200000, silver: 280000, gold: 400000, label: 'Peso Colombiano', bank: 'Mercado Pago / PSE / Nequi', bankDetails: 'Nequi / Daviplata: 310 000 0000 | Convenio PSE: Save Your Date' },
-    PEN: { symbol: 'S/. ', suffix: 'PEN', bronze: 190, silver: 260, gold: 370, label: 'Sol Peruano', bank: 'Mercado Pago Perú / Yape / Plin', bankDetails: 'Yape / Plin: 999 999 999 | BCP Cuenta Corriente: 191-9999999-0-99' },
-    UYU: { symbol: '$', suffix: 'UYU', bronze: 2000, silver: 2800, gold: 4000, label: 'Peso Uruguayo', bank: 'Mercado Pago Uruguay / Transferencia', bankDetails: 'BROU (Banco República) - Caja de Ahorros: 0015-1234567' },
-    BRL: { symbol: 'R$ ', suffix: 'BRL', bronze: 275, silver: 385, gold: 550, label: 'Real Brasileño', bank: 'Mercado Pago Brasil / PIX', bankDetails: 'Chave PIX (E-mail): pix@saveyourdate.com.br' }
+    USD: { symbol: '$', suffix: 'USD', bronze: 50, silver: 75, gold: 100, label: 'Dólar (Internacional)', bank: 'PayPal / Stripe (USD)', bankDetails: 'Email de pago: saveyourdate.invite@gmail.com' },
+    ARS: { symbol: '$', suffix: 'ARS', bronze: 50000, silver: 75000, gold: 100000, label: 'Peso Argentino', bank: 'Mercado Pago / Transferencia', bankDetails: 'ALIAS: saveyourdate.mp | CBU: 0000003100099999987654' },
+    MXN: { symbol: '$', suffix: 'MXN', bronze: 900, silver: 1350, gold: 1800, label: 'Peso Mexicano', bank: 'Mercado Pago México / SPEI', bankDetails: 'CLABE SPEI: 012180009999999888 | BANCO: BBVA México' },
+    CLP: { symbol: '$', suffix: 'CLP', bronze: 48000, silver: 72000, gold: 95000, label: 'Peso Chileno', bank: 'Mercado Pago Chile / Transferencia', bankDetails: 'Banco de Chile - Cuenta Corriente: 123-45678-90 | RUT: 77.777.777-7' },
+    COP: { symbol: '$', suffix: 'COP', bronze: 200000, silver: 300000, gold: 400000, label: 'Peso Colombiano', bank: 'Mercado Pago / PSE / Nequi', bankDetails: 'Nequi / Daviplata: 310 000 0000 | Convenio PSE: Save Your Date' },
+    PEN: { symbol: 'S/. ', suffix: 'PEN', bronze: 190, silver: 285, gold: 370, label: 'Sol Peruano', bank: 'Mercado Pago Perú / Yape / Plin', bankDetails: 'Yape / Plin: 999 999 999 | BCP Cuenta Corriente: 191-9999999-0-99' },
+    UYU: { symbol: '$', suffix: 'UYU', bronze: 2000, silver: 3000, gold: 4000, label: 'Peso Uruguayo', bank: 'Mercado Pago Uruguay / Transferencia', bankDetails: 'BROU (Banco República) - Caja de Ahorros: 0015-1234567' },
+    BRL: { symbol: 'R$ ', suffix: 'BRL', bronze: 255, silver: 380, gold: 550, label: 'Real Brasileño', bank: 'Mercado Pago Brasil / PIX', bankDetails: 'Chave PIX (E-mail): pix@saveyourdate.com.br' }
+  };
+
+  const PAYMENT_LINKS = {
+    bronze: 'https://mpago.la/1gRs45Z',
+    silver: 'https://mpago.la/1de2PiW',
+    gold: 'https://mpago.la/1W6btGs'
   };
 
   // Valid pre-approved mock codes for testing!
@@ -2946,14 +2952,12 @@ function App() {
                     <p style={{ margin: '0 0 8px 0', fontSize: '11px' }}>
                       {t.payment.gatewayInstruct} {selectedCurrency !== 'USD' ? selectedCurrency : 'USD (International)'}.
                     </p>
-                    {paymentPlan === 'gold' && (
-                      <div style={{ marginTop: '10px', borderTop: '1px dashed var(--color-border)', paddingTop: '8px' }}>
-                        <strong>Enlace de Pago Oficial:</strong> <br />
-                        <a href="https://mpago.la/1W6btGs" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '4px', backgroundColor: '#009EE3', color: 'white', fontWeight: 'bold', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontSize: '11px' }}>
-                          Pagar con Mercado Pago ↗
-                        </a>
-                      </div>
-                    )}
+                    <div style={{ marginTop: '10px', borderTop: '1px dashed var(--color-border)', paddingTop: '8px' }}>
+                      <strong>Enlace de Pago Oficial:</strong> <br />
+                      <a href={PAYMENT_LINKS[paymentPlan]} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '4px', backgroundColor: '#009EE3', color: 'white', fontWeight: 'bold', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontSize: '11px' }}>
+                        Pagar con Mercado Pago ↗
+                      </a>
+                    </div>
                   </div>
 
                   <button className="btn-form-submit" type="submit" disabled={isPaying}>
