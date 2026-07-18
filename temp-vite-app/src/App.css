@@ -2491,20 +2491,37 @@ html, body, .app-wrapper {
 }
 .order-start-card h3 { margin: 0 0 8px; font: 700 28px/1.1 var(--font-serif); }
 .order-start-card p { margin: 0 auto 24px; max-width: 520px; color: #6d6370; font-size: 14px; }
-.order-start-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.order-start-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+.order-start-actions button {
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+}
 
 .order-flow-tabs {
   width: min(620px, 100%);
   margin: 0 auto 28px;
   padding: 5px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 5px;
   border-radius: 999px;
   background: #ece9ed;
 }
 
 .order-flow-tabs button {
+  min-width: 0;
+  min-height: 46px;
   padding: 12px 16px;
   border: 0;
   border-radius: 999px;
@@ -2689,7 +2706,7 @@ html, body, .app-wrapper {
   .order-plan-grid, .order-sections-grid, .order-payment-actions { grid-template-columns: 1fr; }
   .agenda-row, .gift-row { grid-template-columns: 1fr; padding-bottom: 12px; border-bottom: 1px dashed rgba(57,46,59,.13); }
   .order-start-card { padding: 28px 18px; }
-  .order-start-actions { flex-direction: column; }
+  .order-start-actions { grid-template-columns: 1fr; }
   .order-flow-tabs { border-radius: 18px; }
   .order-flow-tabs button { border-radius: 14px; font-size: 12px; }
 }
