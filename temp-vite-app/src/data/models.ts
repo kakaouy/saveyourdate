@@ -13,23 +13,43 @@ export interface InvitationModel {
   musicTitle?: string;
   musicArtist?: string;
   location?: string;
+  palettes?: Array<{
+    id: string;
+    name: string;
+    color: string;
+  }>;
 }
 
 export const INVITATION_MODELS: InvitationModel[] = [
   {
     id: 'boda-marfil',
-    title: 'Clásico Marfil',
+    title: 'Editorial Marfil',
     category: 'wedding',
-    description: 'Elegancia pura con texturas florales sutiles y tipografía serif sofisticada. Ideal para bodas tradicionales y distinguidas.',
+    description: '',
     badge: 'Más Elegido',
     demoName1: 'Matias & Sofía',
     date: '14 de Noviembre, 2026',
-    features: ['Cuenta Regresiva', 'Música', 'Confirmación RSVP', 'Google Maps'],
+    features: [
+      'Galería de fotos',
+      'Música',
+      'Frase',
+      'Cronograma',
+      'Ubicación',
+      'Regalos',
+      'Foto destacada con efecto parallax',
+      'Confirmación RSVP'
+    ],
     themeClass: 'mock-theme-wedding',
     illustrationType: 'rings',
     musicTitle: 'Perfect',
     musicArtist: 'Ed Sheeran',
-    location: 'Estancia La Linda, Pilar, Buenos Aires'
+    location: 'Estancia La Linda, Pilar, Buenos Aires',
+    palettes: [
+      { id: 'marfil', name: 'Marfil', color: '#d9cdbd' },
+      { id: 'rosa', name: 'Rosa', color: '#d8b7bd' },
+      { id: 'eucalipto', name: 'Eucalipto', color: '#859a87' },
+      { id: 'azul', name: 'Azul', color: '#819ead' }
+    ]
   },
   {
     id: 'boda-boho',
