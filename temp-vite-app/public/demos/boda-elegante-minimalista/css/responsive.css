@@ -762,8 +762,8 @@
   }
 
   .photo-window {
-    height: 125svh;
-    min-height: 650px;
+    height: 155svh;
+    min-height: 820px;
   }
 
   .photo-window__image {
