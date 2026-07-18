@@ -16,14 +16,17 @@
     .section{background:#fbfbf8}
     .section.soft{background:#e7eee8}
     .botanical:not(.top){display:none}
-    .hero{min-height:100svh;justify-content:flex-start;padding-top:min(82vw,425px);background:#fbfbf8}
+    .hero{min-height:720px;height:min(820px,100svh);justify-content:center;padding:170px 32px 58px;background:#fbfbf8}
     .hero .top{display:none}
     .hero .bottom{display:none}
+    .hero-decoration{position:absolute;z-index:3;top:0;left:0;width:100%;height:auto;max-width:none;margin:0;object-fit:contain;pointer-events:none;user-select:none}
+    .hero>:not(.hero-decoration){position:relative;z-index:5}
   </style>
 </head>
 <body>
   <main class="invite">
     <section class="section hero">
+      <img class="hero-decoration" src="assets/eucalip.png" alt="">
       <p class="eyebrow" data-reveal>¡Nos casamos!</p>
       <h1 class="names" data-reveal><span>Martín</span><i class="amp">&</i><span>Sofía</span></h1>
       <p class="hero-copy" data-reveal>Junto a nuestras familias tenemos la alegría de invitarte a celebrar nuestro matrimonio</p>
