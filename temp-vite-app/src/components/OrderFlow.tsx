@@ -13,6 +13,8 @@ const PAYMENT_LINKS: Record<Plan, string> = {
 
 const SECTION_OPTIONS = [
   { id: 'countdown', title: 'Cuenta regresiva', description: 'Contador dinámico hasta el día del evento.' },
+  { id: 'quote', title: 'Frase', description: 'Frase o texto destacado dentro de la invitación.' },
+  { id: 'featuredPhoto', title: 'Foto destacada', description: 'Imagen importante con efecto parallax.' },
   { id: 'agenda', title: 'Agenda o itinerario', description: 'Horarios y momentos importantes del evento.' },
   { id: 'location', title: 'Ubicación y mapa', description: 'Dirección, Google Maps o Waze.' },
   { id: 'rsvp', title: 'Confirmación de asistencia', description: 'Incluye Google Sheets, link de envío, restricciones alimentarias y cédula para control de ingreso.' },
@@ -50,10 +52,18 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
 
   const sectionLimit = plan === 'basic' ? 5 : 8;
   const photoLimit = plan === 'basic' ? 5 : 8;
-  const gallerySelected = sections.includes('gallery');
-  const rsvpSelected = sections.includes('rsvp');
+  const selectedModel = useMemo(() => models.find((model) => model.id === modelId), [models, modelId]);
+  const includedSections = selectedModel?.includedSections || [];
+  const activeSections = useMemo(
+    () => new Set([...includedSections, ...sections]),
+    [includedSections, sections]
+  );
+  const gallerySelected = activeSections.has('gallery');
+  const rsvpSelected = activeSections.has('rsvp');
   const sectionOptions = useMemo(() => SECTION_OPTIONS.map((section) => {
     const translations: Record<string, [string, string, string, string, string, string]> = {
+      quote: ['Frase', 'Quote', 'Frase', 'Frase o texto destacado dentro de la invitación.', 'Highlighted quote or text inside the invitation.', 'Frase ou texto destacado dentro do convite.'],
+      featuredPhoto: ['Foto destacada', 'Featured photo', 'Foto destacada', 'Imagen importante con efecto parallax.', 'Important image with a parallax effect.', 'Imagem importante com efeito parallax.'],
       countdown: ['Cuenta regresiva', 'Countdown', 'Contagem regressiva', 'Contador dinámico hasta el día del evento.', 'Dynamic countdown to the event date.', 'Contador dinâmico até o dia do evento.'],
       agenda: ['Agenda o itinerario', 'Schedule or itinerary', 'Agenda ou itinerário', 'Horarios y momentos importantes del evento.', 'Times and important moments of the event.', 'Horários e momentos importantes do evento.'],
       location: ['Ubicación y mapa', 'Location and map', 'Localização e mapa', 'Dirección, Google Maps o Waze.', 'Address, Google Maps or Waze.', 'Endereço, Google Maps ou Waze.'],
@@ -95,7 +105,25 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   }, [plan, sectionLimit, photoCount, photoLimit, sections.length]);
 
   const filteredModels = useMemo(() => models.filter((model) => model.category === eventCategory), [models, eventCategory]);
-  const selectedModel = useMemo(() => models.find((model) => model.id === modelId), [models, modelId]);
+  const availableColors = useMemo(
+    () => selectedModel?.palettes?.length
+      ? selectedModel.palettes
+      : [
+          { id: 'rosa', name: 'Rosa', color: '#ff6f91' },
+          { id: 'coral', name: 'Coral', color: '#ff9671' },
+          { id: 'amarillo', name: 'Amarillo', color: '#ffc75f' },
+          { id: 'verde', name: 'Verde', color: '#73c6b6' },
+          { id: 'azul-noche', name: 'Azul noche', color: '#1e2733' },
+          { id: 'arena', name: 'Arena', color: '#b9a38f' }
+        ],
+    [selectedModel]
+  );
+
+  useEffect(() => {
+    if (availableColors.length) {
+      setSelectedColor(availableColors[0].color);
+    }
+  }, [modelId, availableColors]);
 
   const selectEventCategory = (category: EventCategory) => {
     setEventCategory(category);
@@ -104,6 +132,8 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
   };
 
   const toggleSection = (sectionId: string) => {
+    if (includedSections.includes(sectionId)) return;
+
     setSections((current) => {
       if (current.includes(sectionId)) return current.filter((id) => id !== sectionId);
       if (current.length >= sectionLimit) return current;
@@ -245,24 +275,22 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
                 <span className="form-label">{l('Color principal de la invitación', 'Main invitation color', 'Cor principal do convite')}</span>
                 <p>{l('Elegilo cuando el modelo admita cambio de paleta. Lo confirmaremos al revisar el pedido.', 'Choose it when the model supports palette changes. We will confirm it when reviewing the order.', 'Escolha quando o modelo permitir mudança de paleta. Confirmaremos ao revisar o pedido.')}</p>
                 <div className="order-color-options">
-                  {[
-                    ['#ff6f91', 'Rosa'], ['#ff9671', 'Coral'], ['#ffc75f', 'Amarillo'],
-                    ['#73c6b6', 'Verde'], ['#1e2733', 'Azul noche'], ['#b9a38f', 'Arena']
-                  ].map(([color, label]) => (
-                    <button type="button" key={color} className={selectedColor === color ? 'active' : ''} onClick={() => setSelectedColor(color)} aria-label={`Elegir ${label}`}>
-                      <span style={{ background: color }}></span>{label}
+                  {availableColors.map((option) => (
+                    <button type="button" key={option.id} className={selectedColor === option.color ? 'active' : ''} onClick={() => setSelectedColor(option.color)} aria-label={`Elegir ${option.name}`}>
+                      <span style={{ background: option.color }}></span>{option.name}
                     </button>
                   ))}
                 </div>
               </div>
               <div className="order-sections-grid">
                 {sectionOptions.map((section) => {
-                  const selected = sections.includes(section.id);
-                  const disabled = !selected && sections.length >= sectionLimit;
+                  const included = includedSections.includes(section.id);
+                  const selected = included || sections.includes(section.id);
+                  const disabled = included || (!selected && sections.length >= sectionLimit);
                   return (
-                    <button type="button" key={section.id} disabled={disabled} className={`order-section-option ${selected ? 'active' : ''}`} onClick={() => toggleSection(section.id)}>
+                    <button type="button" key={section.id} disabled={disabled} className={`order-section-option ${selected ? 'active' : ''} ${included ? 'included' : ''}`} onClick={() => toggleSection(section.id)}>
                       <span className="order-section-check">{selected ? '✓' : '+'}</span>
-                      <span><strong>{section.title}</strong><small>{section.description}</small></span>
+                      <span><strong>{section.title}</strong><small>{included ? l('Incluida en este modelo · ', 'Included in this model · ', 'Incluída neste modelo · ') : ''}{section.description}</small></span>
                     </button>
                   );
                 })}
@@ -286,23 +314,23 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
               </div>
               <div className="form-group"><label className="form-label">{l('Foto principal o imagen de portada', 'Main photo or cover image', 'Foto principal ou imagem de capa')}</label><input name="coverImage" className="form-input" type="file" accept="image/*" /><small>{l('Podés subirla ahora o dejarla pendiente si el modelo no lleva fotografía.', 'You can upload it now or leave it pending if the model has no photo.', 'Você pode enviar agora ou deixar pendente se o modelo não usar foto.')}</small></div>
 
-              {sections.includes('countdown') && <div className="dynamic-section-fields"><h4>{l('Cuenta regresiva', 'Countdown', 'Contagem regressiva')}</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha objetivo', 'Target date', 'Data de destino')}</label><input name="countdownDate" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Hora objetivo', 'Target time', 'Horário de destino')}</label><input name="countdownTime" className="form-input" type="time" required /></div></div><div className="form-group"><label className="form-label">{l('Título del contador', 'Countdown title', 'Título do contador')}</label><input name="countdownTitle" className="form-input" required placeholder={l('Ej. Falta muy poco', 'E.g. Almost there', 'Ex. Falta muito pouco')} /></div></div>}
+              {activeSections.has('countdown) && <div className="dynamic-section-fields"><h4>{l('Cuenta regresiva', 'Countdown', 'Contagem regressiva')}</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha objetivo', 'Target date', 'Data de destino')}</label><input name="countdownDate" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Hora objetivo', 'Target time', 'Horário de destino')}</label><input name="countdownTime" className="form-input" type="time" required /></div></div><div className="form-group"><label className="form-label">{l('Título del contador', 'Countdown title', 'Título do contador')}</label><input name="countdownTitle" className="form-input" required placeholder={l('Ej. Falta muy poco', 'E.g. Almost there', 'Ex. Falta muito pouco')} /></div></div>}
 
-              {sections.includes('agenda') && <div className="dynamic-section-fields"><h4>{l('Agenda o itinerario', 'Schedule or itinerary', 'Agenda ou itinerário')}</h4><p>{l('Indicá cada momento con hora, título, lugar y una breve descripción.', 'Add each moment with its time, title and venue.', 'Informe cada momento com horário, título e local.')}</p>{[1, 2, 3].map((item) => <div className="agenda-row" key={item}><input name={`agenda${item}Time`} className="form-input" type="time" required={item === 1} /><input name={`agenda${item}Title`} className="form-input" required={item === 1} placeholder={`${l('Momento', 'Moment', 'Momento')} ${item}${item > 1 ? ` (${l('opcional', 'optional', 'opcional')})` : ''}`} /><input name={`agenda${item}Place`} className="form-input" required={item === 1} placeholder={l('Lugar', 'Venue', 'Local')} /></div>)}</div>}
+              {activeSections.has('agenda) && <div className="dynamic-section-fields"><h4>{l('Agenda o itinerario', 'Schedule or itinerary', 'Agenda ou itinerário')}</h4><p>{l('Indicá cada momento con hora, título, lugar y una breve descripción.', 'Add each moment with its time, title and venue.', 'Informe cada momento com horário, título e local.')}</p>{[1, 2, 3].map((item) => <div className="agenda-row" key={item}><input name={`agenda${item}Time`} className="form-input" type="time" required={item === 1} /><input name={`agenda${item}Title`} className="form-input" required={item === 1} placeholder={`${l('Momento', 'Moment', 'Momento')} ${item}${item > 1 ? ` (${l('opcional', 'optional', 'opcional')})` : ''}`} /><input name={`agenda${item}Place`} className="form-input" required={item === 1} placeholder={l('Lugar', 'Venue', 'Local')} /></div>)}</div>}
 
-              {sections.includes('location') && <div className="dynamic-section-fields"><h4>{l('Ubicación y mapa', 'Location and map', 'Localização e mapa')}</h4><div className="form-group"><label className="form-label">{l('Nombre del lugar', 'Venue name', 'Nome do local')}</label><input name="locationName" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Dirección completa', 'Full address', 'Endereço completo')}</label><input name="locationAddress" className="form-input" required /></div><div className="form-group"><label className="form-label">Google Maps / Waze</label><input name="locationMap" className="form-input" type="url" required placeholder="https://..." /></div></div>}
+              {activeSections.has('location) && <div className="dynamic-section-fields"><h4>{l('Ubicación y mapa', 'Location and map', 'Localização e mapa')}</h4><div className="form-group"><label className="form-label">{l('Nombre del lugar', 'Venue name', 'Nome do local')}</label><input name="locationName" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Dirección completa', 'Full address', 'Endereço completo')}</label><input name="locationAddress" className="form-input" required /></div><div className="form-group"><label className="form-label">Google Maps / Waze</label><input name="locationMap" className="form-input" type="url" required placeholder="https://..." /></div></div>}
 
-              {sections.includes('rsvp') && <div className="dynamic-section-fields"><h4>RSVP</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha límite para confirmar', 'RSVP deadline', 'Prazo para confirmação')}</label><input name="rsvpDeadline" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Cantidad máxima por invitación', 'Maximum guests per invitation', 'Máximo de convidados por convite')}</label><input name="rsvpMaxGuests" className="form-input" type="number" min="1" required /></div></div><div className="form-group"><label className="form-label">{l('Texto o indicaciones para confirmar', 'RSVP instructions', 'Instruções para confirmação')}</label><textarea name="rsvpInstructions" className="form-textarea" required /></div><p className="dynamic-help">{l('La planilla incluirá nombre, asistencia, acompañantes, restricciones alimentarias y cédula de identidad.', 'The spreadsheet will include name, attendance, guests, dietary restrictions and ID.', 'A planilha incluirá nome, presença, acompanhantes, restrições alimentares e documento.')}</p></div>}
+              {activeSections.has('rsvp) && <div className="dynamic-section-fields"><h4>RSVP</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha límite para confirmar', 'RSVP deadline', 'Prazo para confirmação')}</label><input name="rsvpDeadline" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Cantidad máxima por invitación', 'Maximum guests per invitation', 'Máximo de convidados por convite')}</label><input name="rsvpMaxGuests" className="form-input" type="number" min="1" required /></div></div><div className="form-group"><label className="form-label">{l('Texto o indicaciones para confirmar', 'RSVP instructions', 'Instruções para confirmação')}</label><textarea name="rsvpInstructions" className="form-textarea" required /></div><p className="dynamic-help">{l('La planilla incluirá nombre, asistencia, acompañantes, restricciones alimentarias y cédula de identidad.', 'The spreadsheet will include name, attendance, guests, dietary restrictions and ID.', 'A planilha incluirá nome, presença, acompanhantes, restrições alimentares e documento.')}</p></div>}
 
-              {sections.includes('gifts') && <div className="dynamic-section-fields"><h4>Regalos</h4><p>Podés agregar hasta 3 cuentas bancarias, listas o lugares de compra.</p>{[1, 2, 3].map((item) => <div className="gift-row" key={item}><select name={`gift${item}Type`} className="form-select" required={item === 1}><option value="">Tipo {item}</option><option>Cuenta bancaria</option><option>Link de compra</option><option>Lista de regalos</option><option>Otro</option></select><input name={`gift${item}Label`} className="form-input" required={item === 1} placeholder={`Banco, tienda o título${item > 1 ? ' (opcional)' : ''}`} /><input name={`gift${item}Detail`} className="form-input" required={item === 1} placeholder="Alias, número de cuenta o link" /></div>)}</div>}
+              {activeSections.has('gifts) && <div className="dynamic-section-fields"><h4>Regalos</h4><p>Podés agregar hasta 3 cuentas bancarias, listas o lugares de compra.</p>{[1, 2, 3].map((item) => <div className="gift-row" key={item}><select name={`gift${item}Type`} className="form-select" required={item === 1}><option value="">Tipo {item}</option><option>Cuenta bancaria</option><option>Link de compra</option><option>Lista de regalos</option><option>Otro</option></select><input name={`gift${item}Label`} className="form-input" required={item === 1} placeholder={`Banco, tienda o título${item > 1 ? ' (opcional)' : ''}`} /><input name={`gift${item}Detail`} className="form-input" required={item === 1} placeholder="Alias, número de cuenta o link" /></div>)}</div>}
 
-              {sections.includes('dresscode') && <div className="dynamic-section-fields"><h4>{l('Código de vestimenta', 'Dress code', 'Código de vestimenta')}</h4><div className="form-group"><label className="form-label">{l('Tipo de vestimenta', 'Attire', 'Tipo de traje')}</label><input name="dressCode" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Aclaraciones', 'Additional details', 'Observações')}</label><textarea name="dressCodeDetails" className="form-textarea" required /></div></div>}
+              {activeSections.has('dresscode) && <div className="dynamic-section-fields"><h4>{l('Código de vestimenta', 'Dress code', 'Código de vestimenta')}</h4><div className="form-group"><label className="form-label">{l('Tipo de vestimenta', 'Attire', 'Tipo de traje')}</label><input name="dressCode" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Aclaraciones', 'Additional details', 'Observações')}</label><textarea name="dressCodeDetails" className="form-textarea" required /></div></div>}
 
-              {sections.includes('playlist') && <div className="dynamic-section-fields"><h4>Playlist</h4><div className="form-group"><label className="form-label">{l('Link de Spotify o plataforma', 'Spotify or platform link', 'Link do Spotify ou plataforma')}</label><input name="playlistLink" className="form-input" type="url" required /></div><div className="form-group"><label className="form-label">{l('Texto para pedir canciones', 'Song request text', 'Texto para pedir músicas')}</label><input name="playlistPrompt" className="form-input" required /></div></div>}
+              {activeSections.has('playlist) && <div className="dynamic-section-fields"><h4>Playlist</h4><div className="form-group"><label className="form-label">{l('Link de Spotify o plataforma', 'Spotify or platform link', 'Link do Spotify ou plataforma')}</label><input name="playlistLink" className="form-input" type="url" required /></div><div className="form-group"><label className="form-label">{l('Texto para pedir canciones', 'Song request text', 'Texto para pedir músicas')}</label><input name="playlistPrompt" className="form-input" required /></div></div>}
 
-              {sections.includes('instagram') && <div className="dynamic-section-fields"><h4>{l('Instagram y hashtag', 'Instagram and hashtag', 'Instagram e hashtag')}</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">Instagram</label><input name="instagramUser" className="form-input" required placeholder="@user" /></div><div className="form-group"><label className="form-label">Hashtag</label><input name="instagramHashtag" className="form-input" required placeholder="#OurEvent" /></div></div></div>}
+              {activeSections.has('instagram) && <div className="dynamic-section-fields"><h4>{l('Instagram y hashtag', 'Instagram and hashtag', 'Instagram e hashtag')}</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">Instagram</label><input name="instagramUser" className="form-input" required placeholder="@user" /></div><div className="form-group"><label className="form-label">Hashtag</label><input name="instagramHashtag" className="form-input" required placeholder="#OurEvent" /></div></div></div>}
 
-              {sections.includes('messages') && <div className="dynamic-section-fields"><h4>{l('Muro de saludos', 'Message wall', 'Mural de mensagens')}</h4><div className="form-group"><label className="form-label">{l('Título de la sección', 'Section title', 'Título da seção')}</label><input name="messagesTitle" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Consigna para los invitados', 'Prompt for guests', 'Instrução para os convidados')}</label><textarea name="messagesPrompt" className="form-textarea" required /></div></div>}
+              {activeSections.has('messages) && <div className="dynamic-section-fields"><h4>{l('Muro de saludos', 'Message wall', 'Mural de mensagens')}</h4><div className="form-group"><label className="form-label">{l('Título de la sección', 'Section title', 'Título da seção')}</label><input name="messagesTitle" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Consigna para los invitados', 'Prompt for guests', 'Instrução para os convidados')}</label><textarea name="messagesPrompt" className="form-textarea" required /></div></div>}
 
               <label className="order-toggle-row">
                 <input type="checkbox" checked={hasMusic} onChange={(event) => setHasMusic(event.target.checked)} />
