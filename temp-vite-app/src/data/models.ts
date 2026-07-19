@@ -7,6 +7,7 @@ export interface InvitationModel {
   demoName1: string;
   demoName2?: string;
   date: string;
+  previewImage?: string;
   features: string[];
   themeClass: string;
   illustrationType: 'rings' | 'crown' | 'balloon';
@@ -187,6 +188,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
   },
   {
     id: 'boda-eucalipto',
+    previewImage: '/previews/minimalista-eucalipto.webp',
     title: 'Minimalista Eucalipto',
     category: 'wedding',
     description: 'Menos es más. Tipografías modernas sans-serif combinadas con sutiles ramas de eucalipto sobre fondos blancos y limpios. Ideal para bodas contemporáneas e íntimas.',
@@ -226,6 +228,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
   },
   {
     id: 'boda-vinculo-noir',
+    previewImage: '/previews/vinculo-noir.webp',
     title: 'Vínculo Noir',
     category: 'wedding',
     description: 'Fotografía en blanco y negro, composición editorial y acentos profundos para una boda moderna y sofisticada.',
@@ -257,6 +260,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
   },
   {
     id: 'boda-flores-papel',
+    previewImage: '/previews/flores-papel.webp',
     title: 'Flores de Papel',
     category: 'wedding',
     description: 'Textura de papel, flores de acuarela y una estética delicada que alterna ornamentos entre cada sección.',
