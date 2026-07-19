@@ -28,7 +28,7 @@
     .hero{isolation:isolate;min-height:100svh;padding:0;background:#111;color:#fff}
     .hero-photo{position:absolute;inset:-6%;width:112%;height:112%;object-fit:cover;object-position:center 38%;filter:grayscale(1) contrast(1.06);transform:scale(1.03);animation:heroZoom 16s ease-in-out infinite alternate}
     .hero::after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.18) 42%,rgba(0,0,0,.72))}
-    .hero .content{display:flex;min-height:100svh;padding:80px 24px 72px;flex-direction:column;align-items:center;justify-content:flex-end}
+    .hero .content{display:flex;min-height:100svh;padding:80px 24px clamp(145px,18vh,210px);flex-direction:column;align-items:center;justify-content:flex-end}
     .hero .eyebrow{margin-bottom:18px}
     .names{margin:0;font:500 clamp(62px,12vw,144px)/.82 var(--serif);letter-spacing:.04em;text-transform:uppercase;text-shadow:0 3px 24px rgba(0,0,0,.35)}
     .names span{display:block}.names i{display:block;margin:14px 0;color:var(--gold);font:400 clamp(34px,5vw,56px)/1 var(--script);text-transform:none}
@@ -70,7 +70,8 @@
     .closing{min-height:560px}.closing h2{margin:0;font:500 clamp(58px,10vw,112px)/.82 var(--serif);text-transform:uppercase}.closing h2 i{display:block;margin:20px 0;color:var(--gold);font:400 42px var(--script);text-transform:none}.footer{padding:36px 24px;background:#0d0d0d;color:#fff;text-align:center}.footer strong{font:500 28px var(--serif)}.footer p{margin:10px 0 0;font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.7}
     .shared-boundary{overflow:visible;z-index:4}
     .shared-branch{z-index:9;pointer-events:none;will-change:transform,opacity,clip-path}
-    .branch-hero-countdown{top:-43%;right:-7vw;bottom:auto;width:clamp(270px,40vw,560px);filter:brightness(.55);opacity:0}
+    .countdown-section{min-height:420px;padding-top:68px;padding-bottom:68px}
+    .branch-hero-countdown{top:-48%;right:-7vw;bottom:auto;width:clamp(270px,40vw,560px);filter:none;opacity:0}
     .branch-details-story{top:-40%;left:-9vw;bottom:auto;width:clamp(250px,37vw,520px);filter:brightness(.52);opacity:0;transform:scaleX(-1);transform-origin:center}
     .branch-menu-rsvp{top:-42%;right:-7vw;bottom:auto;width:clamp(250px,38vw,520px);filter:brightness(.5);opacity:0;transform-origin:center}
     .branch-rsvp-closing{top:-34%;left:-5vw;bottom:auto;width:clamp(175px,23vw,310px);filter:brightness(0) saturate(100%) invert(59%) sepia(34%) saturate(677%) hue-rotate(358deg) brightness(91%) contrast(87%);opacity:0;transform:scaleX(-1);transform-origin:center}
@@ -90,7 +91,7 @@
     @keyframes iconEnter{from{opacity:0;transform:translateY(18px) scale(.9)}to{opacity:1;transform:none}}
     @keyframes iconPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.075)}}
     .music{position:fixed;z-index:30;right:20px;bottom:20px;display:grid;width:58px;height:58px;place-items:center;border:1px solid var(--gold);border-radius:50%;background:rgba(251,250,247,.92);color:var(--gold);font-size:21px}
-    @media(max-width:760px){.section{min-height:580px;padding:82px 24px}.hero .content{padding-inline:24px}.date-grid{grid-template-columns:1fr;gap:24px}.events{grid-template-columns:1fr}.event+.event{border-top:1px solid rgba(23,23,23,.16);border-left:0}.detail-grid{grid-template-columns:1fr}.gallery{grid-template-columns:1fr 1fr;grid-template-rows:330px 220px}.gallery img:first-child{grid-column:1/3;grid-row:auto}.branch{width:65vw}.branch.right{right:-22vw}.branch.left{left:-22vw}}
+    @media(max-width:760px){.section{min-height:580px;padding:82px 24px}.countdown-section{min-height:400px;padding-top:62px;padding-bottom:62px}.hero .content{padding-inline:24px}.date-grid{grid-template-columns:1fr;gap:24px}.events{grid-template-columns:1fr}.event+.event{border-top:1px solid rgba(23,23,23,.16);border-left:0}.detail-grid{grid-template-columns:1fr}.gallery{grid-template-columns:1fr 1fr;grid-template-rows:330px 220px}.gallery img:first-child{grid-column:1/3;grid-row:auto}.branch{width:65vw}.branch.right{right:-22vw}.branch.left{left:-22vw}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.section,[data-reveal]{opacity:1!important;transform:none!important}.photo-break img{transform:scale(1.02)}}
   </style>
 </head>
