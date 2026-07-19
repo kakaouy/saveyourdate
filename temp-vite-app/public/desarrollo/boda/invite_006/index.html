@@ -9,7 +9,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@300;400;500&family=Parisienne&display=swap" rel="stylesheet">
   <style>
-    :root{--ink:#263340;--blue:#7896af;--blue-dark:#536f88;--ice:#e9f0f5;--paper:#fbfbfa;--white:#fff;--serif:'Cormorant Garamond',serif;--sans:'Montserrat',sans-serif;--script:'Parisienne',cursive}
+    :root{--ink:#263340;--blue:#7896af;--blue-dark:#536f88;--ice:#e9f0f5;--tint:rgba(218,231,240,.62);--floral-filter:none;--paper:#fbfbfa;--white:#fff;--serif:'Cormorant Garamond',serif;--sans:'Montserrat',sans-serif;--script:'Parisienne',cursive}
+    body[data-palette="azul-hielo"]{--blue:#7896af;--blue-dark:#536f88;--ice:#e9f0f5;--tint:rgba(218,231,240,.62);--floral-filter:none}
+    body[data-palette="rosa-antiguo"]{--blue:#ad8292;--blue-dark:#936779;--ice:#f2e9ec;--tint:rgba(238,218,225,.66);--floral-filter:hue-rotate(118deg) saturate(.72) brightness(.98)}
+    body[data-palette="salvia"]{--blue:#84998d;--blue-dark:#64796d;--ice:#e9efeb;--tint:rgba(220,232,224,.66);--floral-filter:hue-rotate(285deg) saturate(.58) brightness(.96)}
+    body[data-palette="lavanda"]{--blue:#918aa6;--blue-dark:#716985;--ice:#eeebf2;--tint:rgba(229,222,237,.66);--floral-filter:hue-rotate(38deg) saturate(.68) brightness(.97)}
     *,*::before,*::after{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{margin:0;overflow-x:hidden;background:var(--paper) url('assets/paper-texture.webp') repeat;color:var(--ink);font-family:var(--sans);font-weight:300}
@@ -17,8 +21,8 @@
     .invite{width:100%;overflow:hidden}
     .section{position:relative;display:flex;min-height:620px;padding:100px clamp(24px,7vw,100px);align-items:center;justify-content:center;text-align:center;overflow:visible}
     .section::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none}
-    .tint::before{background:rgba(218,231,240,.62)}
-    .blue{background:rgba(83,111,136,.94);color:#fff}
+    .tint::before{background:var(--tint)}
+    .blue{background:var(--blue-dark);color:#fff}
     .content{position:relative;z-index:5;width:min(100%,980px);margin:auto}
     .eyebrow{margin:0 0 22px;font-size:10px;font-weight:500;letter-spacing:.34em;text-transform:uppercase}
     .title{margin:0;font:500 clamp(44px,7vw,80px)/.95 var(--serif);letter-spacing:.035em}
@@ -29,6 +33,7 @@
     .blue .btn{border-color:#fff;background:#fff;color:var(--blue-dark)}.blue .btn:hover{background:transparent;color:#fff}
     .hero{isolation:isolate;min-height:100svh;padding:0;overflow:hidden}
     .hero-corner{position:absolute;z-index:2;top:-2px;left:-2px;width:min(73vw,680px);height:auto;pointer-events:none;transform-origin:top left;animation:cornerEnter 1.5s ease-out both,cornerPulse 7s ease-in-out 1.5s infinite}
+    .hero-corner,.ornament{filter:var(--floral-filter)}
     .hero .content{display:flex;min-height:100svh;padding:120px 24px 82px;flex-direction:column;align-items:center;justify-content:center}
     .hero .eyebrow{margin-top:clamp(150px,22vw,230px)}
     .names{margin:0;font:500 clamp(70px,13vw,148px)/.78 var(--serif);letter-spacing:.025em}
@@ -71,7 +76,7 @@
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.section,[data-reveal]{opacity:1!important;transform:none!important}.parallax img{transform:scale(1.04)}}
   </style>
 </head>
-<body>
+<body data-palette="azul-hielo">
 <main class="invite">
   <section class="section hero">
     <img class="hero-corner" src="assets/floral-corner.webp" alt="">
@@ -88,13 +93,36 @@
 </main>
 <button class="music" type="button" aria-label="Música">♫</button>
 <script>
+  const params=new URLSearchParams(location.search);
+  const supportedPalettes=['azul-hielo','rosa-antiguo','salvia','lavanda'];
+  const selectedPalette=supportedPalettes.includes(params.get('palette')||'')?params.get('palette'):'azul-hielo';
+  const selectedLanguage=['es','en','pt'].includes(params.get('lang')||'')?params.get('lang'):'pt';
+  document.body.dataset.palette=selectedPalette;
+  document.documentElement.lang=selectedLanguage==='pt'?'pt-BR':selectedLanguage;
+  const COPY={
+    pt:{hero:'Vamos nos casar',scroll:'Deslize para descobrir ↓',less:'Falta cada vez menos',yes:'Para o nosso sim',units:['Dias','Horas','Minutos','Segundos'],eventLabels:['Cerimônia','Celebração'],eventTitles:['Igreja Nossa Senhora<br>do Brasil','Casa Petra'],eventAddresses:['Praça Nossa Senhora do Brasil<br>Jardim América · 17h','Av. Aratãs, 1010 · Moema<br>A partir das 19h30'],map:'Como chegar',quote:'Onde houver amor, ali estaremos',detailsEye:'Detalhes do grande dia',detailsTitle:'Preparamos tudo com carinho',detailTitles:['Dress code','Presentes','Recado'],detailTexts:['Traje social completo<br>Tons claros são bem-vindos','Sua presença é o nosso maior presente.','Deixe uma mensagem para guardarmos deste dia.'],detailButtons:['Ver opções','Escrever'],menuEye:'Menu',menuTitle:'Uma noite para celebrar',courses:[['Boas-vindas','Canapés artesanais e espumante'],['Jantar','Sabores contemporâneos com ingredientes brasileiros'],['Doces & bolo','Seleção especial para brindar o amor']],food:'Restrições alimentares podem ser informadas na confirmação.',rsvpEye:'Esperamos por você',rsvpTitle:'Confirme sua presença',rsvpCopy:'Por favor, responda até 20 de fevereiro de 2027.',name:'Nome e sobrenome',attendance:['Você estará presente?','Sim, confirmo minha presença','Não poderei comparecer'],restrictions:['Sem restrições alimentares','Vegetariano/a','Vegano/a','Celíaco/a · sem glúten','Outra restrição'],message:'Mensagem para os noivos (opcional)',send:'Enviar confirmação',thanks:'Presença confirmada. Obrigado!',closingEye:'Obrigado por fazer parte',closingCopy:'Mal podemos esperar para viver este momento com vocês.',footer:'Convites digitais para momentos inesquecíveis · © 2026'},
+    es:{hero:'Nos casamos',scroll:'Deslizá para descubrir ↓',less:'Falta cada vez menos',yes:'Para nuestro sí',units:['Días','Horas','Minutos','Segundos'],eventLabels:['Ceremonia','Celebración'],eventTitles:['Iglesia Nossa Senhora<br>do Brasil','Casa Petra'],eventAddresses:['Praça Nossa Senhora do Brasil<br>Jardim América · 17 h','Av. Aratãs, 1010 · Moema<br>Desde las 19:30 h'],map:'Cómo llegar',quote:'Donde haya amor, allí estaremos',detailsEye:'Detalles del gran día',detailsTitle:'Preparamos todo con mucho cariño',detailTitles:['Dress code','Regalos','Mensaje'],detailTexts:['Elegante<br>Los tonos claros son bienvenidos','Tu presencia es nuestro mejor regalo.','Dejanos un mensaje para conservar de este día.'],detailButtons:['Ver opciones','Escribir'],menuEye:'Menú',menuTitle:'Una noche para celebrar',courses:[['Bienvenida','Canapés artesanales y espumante'],['Cena','Sabores contemporáneos con ingredientes brasileños'],['Dulces y torta','Selección especial para brindar por el amor']],food:'Podés indicar tus restricciones alimentarias al confirmar.',rsvpEye:'Te esperamos',rsvpTitle:'Confirmá tu asistencia',rsvpCopy:'Por favor, respondé antes del 20 de febrero de 2027.',name:'Nombre y apellido',attendance:['¿Vas a asistir?','Sí, confirmo mi asistencia','No podré asistir'],restrictions:['Sin restricciones alimentarias','Vegetariano/a','Vegano/a','Celíaco/a · sin gluten','Otra restricción'],message:'Mensaje para los novios (opcional)',send:'Enviar confirmación',thanks:'¡Asistencia confirmada! Gracias.',closingEye:'Gracias por ser parte',closingCopy:'Estamos felices de compartir este momento con ustedes.',footer:'Invitaciones digitales para momentos inolvidables · © 2026'},
+    en:{hero:'We are getting married',scroll:'Scroll to discover ↓',less:'The wait is getting shorter',yes:'Until we say I do',units:['Days','Hours','Minutes','Seconds'],eventLabels:['Ceremony','Celebration'],eventTitles:['Nossa Senhora do Brasil<br>Church','Casa Petra'],eventAddresses:['Praça Nossa Senhora do Brasil<br>Jardim América · 5 PM','Av. Aratãs, 1010 · Moema<br>From 7:30 PM'],map:'Get directions',quote:'Where there is love, there we will be',detailsEye:'Details of our day',detailsTitle:'Everything prepared with love',detailTitles:['Dress code','Gifts','Message'],detailTexts:['Formal attire<br>Light colors are welcome','Your presence is our greatest gift.','Leave us a message to remember this day.'],detailButtons:['View options','Write'],menuEye:'Menu',menuTitle:'A night to celebrate',courses:[['Welcome','Handcrafted canapés and sparkling wine'],['Dinner','Contemporary flavors with Brazilian ingredients'],['Sweets & cake','A special selection to toast to love']],food:'Please share any dietary restrictions when confirming.',rsvpEye:'We hope you can join us',rsvpTitle:'Confirm your attendance',rsvpCopy:'Please reply by February 20, 2027.',name:'Full name',attendance:['Will you attend?','Yes, I will attend','I will not be able to attend'],restrictions:['No dietary restrictions','Vegetarian','Vegan','Gluten-free','Other restriction'],message:'Message for the couple (optional)',send:'Send confirmation',thanks:'Attendance confirmed. Thank you!',closingEye:'Thank you for being part of our story',closingCopy:'We cannot wait to share this moment with you.',footer:'Digital invitations for unforgettable moments · © 2026'}
+  };
+  const t=COPY[selectedLanguage];
+  const set=(selector,value,index=0,html=false)=>{const el=document.querySelectorAll(selector)[index];if(el)el[html?'innerHTML':'textContent']=value};
+  set('.hero .eyebrow',t.hero);set('.scroll',t.scroll);set('.countdown-section .eyebrow',t.less);set('.countdown-section .title',t.yes);
+  document.querySelectorAll('.countdown span').forEach((el,i)=>el.textContent=t.units[i]);
+  document.querySelectorAll('.event').forEach((el,i)=>{el.querySelector('.eyebrow').textContent=t.eventLabels[i];el.querySelector('h3').innerHTML=t.eventTitles[i];el.querySelector('p:not(.eyebrow)').innerHTML=t.eventAddresses[i];el.querySelector('.btn').textContent=t.map});
+  set('.quote',t.quote);set('.section:has(.details) .eyebrow',t.detailsEye);set('.section:has(.details) .title',t.detailsTitle);
+  document.querySelectorAll('.detail').forEach((el,i)=>{el.querySelector('h3').textContent=t.detailTitles[i];el.querySelector('p').innerHTML=t.detailTexts[i];const button=el.querySelector('.btn');if(button)button.textContent=t.detailButtons[i-1]});
+  set('.section.blue:nth-of-type(6) .eyebrow',t.menuEye);set('.section.blue:nth-of-type(6) .title',t.menuTitle);
+  document.querySelectorAll('.course').forEach((el,i)=>{el.querySelector('strong').textContent=t.courses[i][0];el.querySelector('span').textContent=t.courses[i][1]});set('.section.blue:nth-of-type(6) .copy',t.food);
+  set('.section:has(#rsvp) .eyebrow',t.rsvpEye);set('.section:has(#rsvp) .title',t.rsvpTitle);set('.section:has(#rsvp) .copy',t.rsvpCopy);
+  const form=document.getElementById('rsvp');form.elements.name.placeholder=t.name;form.querySelectorAll('select')[0].querySelectorAll('option').forEach((el,i)=>el.textContent=t.attendance[i]);form.querySelectorAll('select')[1].querySelectorAll('option').forEach((el,i)=>el.textContent=t.restrictions[i]);form.querySelector('textarea').placeholder=t.message;form.querySelector('button').textContent=t.send;
+  set('.closing .eyebrow',t.closingEye);set('.closing .copy',t.closingCopy);set('.footer p',t.footer);
   const target=new Date('2027-03-20T17:00:00-03:00').getTime();
   function tick(){const gap=Math.max(0,target-Date.now()),values=[Math.floor(gap/86400000),Math.floor(gap/3600000)%24,Math.floor(gap/60000)%60,Math.floor(gap/1000)%60];['days','hours','minutes','seconds'].forEach((id,index)=>document.getElementById(id).textContent=String(values[index]).padStart(2,'0'))}tick();setInterval(tick,1000);
   document.body.classList.add('motion');document.querySelectorAll('.section .eyebrow,.section .title,.section .copy,.section .event,.section .detail,.section .menu,.section .rsvp,.section .names,.section .hero-date,.section .hero-place,.section .quote').forEach((el,index)=>{el.setAttribute('data-reveal','');el.style.setProperty('--delay',(index%4)*65+'ms')});
   const sectionObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('visible',entry.isIntersecting)),{threshold:.07});document.querySelectorAll('.section:not(.hero)').forEach(section=>sectionObserver.observe(section));
   const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('show',entry.isIntersecting)),{threshold:.12});document.querySelectorAll('[data-reveal]').forEach(element=>revealObserver.observe(element));
   const photo=document.querySelector('.parallax img');let ticking=false;function parallax(){const rect=photo.parentElement.getBoundingClientRect(),progress=(rect.top+rect.height/2-innerHeight/2)/(innerHeight+rect.height),offset=Math.max(-95,Math.min(95,progress*-190));photo.style.setProperty('--parallax',offset+'px');ticking=false}addEventListener('scroll',()=>{if(!ticking&&!matchMedia('(prefers-reduced-motion: reduce)').matches){requestAnimationFrame(parallax);ticking=true}},{passive:true});parallax();
-  document.getElementById('rsvp').addEventListener('submit',event=>{event.preventDefault();event.currentTarget.innerHTML='<p style="text-align:center;font:500 38px var(--serif)">Presença confirmada. Obrigado!</p>'});
+  document.getElementById('rsvp').addEventListener('submit',event=>{event.preventDefault();event.currentTarget.innerHTML='<p style="text-align:center;font:500 38px var(--serif)">'+t.thanks+'</p>'});
 </script>
 </body>
 </html>
