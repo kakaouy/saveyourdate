@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Marina & Rafael</title>
+  <meta name="description" content="Convite de casamento de Marina e Rafael em São Paulo">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@300;400;500&family=Parisienne&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#263340;--blue:#7896af;--blue-dark:#536f88;--ice:#e9f0f5;--paper:#fbfbfa;--white:#fff;--serif:'Cormorant Garamond',serif;--sans:'Montserrat',sans-serif;--script:'Parisienne',cursive}
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;overflow-x:hidden;background:var(--paper) url('assets/paper-texture.webp') repeat;color:var(--ink);font-family:var(--sans);font-weight:300}
+    button,a,input,select,textarea{font:inherit}
+    .invite{width:100%;overflow:hidden}
+    .section{position:relative;display:flex;min-height:620px;padding:100px clamp(24px,7vw,100px);align-items:center;justify-content:center;text-align:center;overflow:visible}
+    .section::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none}
+    .tint::before{background:rgba(218,231,240,.62)}
+    .blue{background:rgba(83,111,136,.94);color:#fff}
+    .content{position:relative;z-index:5;width:min(100%,980px);margin:auto}
+    .eyebrow{margin:0 0 22px;font-size:10px;font-weight:500;letter-spacing:.34em;text-transform:uppercase}
+    .title{margin:0;font:500 clamp(44px,7vw,80px)/.95 var(--serif);letter-spacing:.035em}
+    .copy{width:min(100%,610px);margin:26px auto 0;font-size:12px;line-height:2;letter-spacing:.07em}
+    .small-icon{display:block;width:92px;height:96px;margin:0 auto 24px;object-fit:contain;animation:iconPulse 3.4s ease-in-out infinite}.blue .small-icon{filter:invert(1)}
+    .btn{display:inline-flex;min-width:205px;min-height:47px;margin-top:28px;padding:13px 24px;align-items:center;justify-content:center;border:1px solid var(--blue-dark);border-radius:999px;background:var(--blue-dark);color:#fff;font-size:9px;font-weight:500;letter-spacing:.2em;text-decoration:none;text-transform:uppercase;cursor:pointer;transition:.3s}
+    .btn:hover{background:transparent;color:var(--blue-dark)}
+    .blue .btn{border-color:#fff;background:#fff;color:var(--blue-dark)}.blue .btn:hover{background:transparent;color:#fff}
+    .hero{isolation:isolate;min-height:100svh;padding:0;overflow:hidden}
+    .hero-corner{position:absolute;z-index:2;top:-2px;left:-2px;width:min(73vw,680px);height:auto;pointer-events:none;transform-origin:top left;animation:cornerEnter 1.5s ease-out both,cornerPulse 7s ease-in-out 1.5s infinite}
+    .hero .content{display:flex;min-height:100svh;padding:120px 24px 82px;flex-direction:column;align-items:center;justify-content:center}
+    .hero .eyebrow{margin-top:clamp(150px,22vw,230px)}
+    .names{margin:0;font:500 clamp(70px,13vw,148px)/.78 var(--serif);letter-spacing:.025em}
+    .names span{display:block}.names i{display:block;margin:18px 0;color:var(--blue-dark);font:400 clamp(38px,6vw,62px)/1 var(--script)}
+    .hero-date{margin:34px 0 0;font-size:11px;letter-spacing:.34em;text-transform:uppercase}
+    .hero-place{margin:13px 0 0;font:italic 400 25px var(--serif)}
+    .scroll{position:absolute;z-index:6;right:0;bottom:25px;left:0;font-size:8px;letter-spacing:.26em;text-transform:uppercase}
+    .ornament{position:absolute;z-index:8;top:-250px;width:clamp(220px,30vw,430px);height:auto;opacity:.82;pointer-events:none;transform-origin:center}
+    .ornament.left{left:-8vw}.ornament.right{right:-8vw;transform:scaleX(-1)}
+    .section.visible .ornament.left{animation:ornamentLeft 1.25s ease-out both,ornamentPulseLeft 6s ease-in-out 1.25s infinite}
+    .section.visible .ornament.right{animation:ornamentRight 1.25s ease-out both,ornamentPulseRight 6s ease-in-out 1.25s infinite}
+    .countdown-section{min-height:500px}
+    .countdown{display:flex;justify-content:center;gap:clamp(13px,5vw,52px);margin-top:46px}
+    .countdown strong{display:block;font:500 clamp(39px,6vw,58px)/1 var(--serif)}
+    .countdown span{display:block;margin-top:9px;font-size:8px;letter-spacing:.18em;text-transform:uppercase}
+    .events{display:grid;grid-template-columns:1fr 1fr;width:min(100%,1040px);margin:auto;border:1px solid rgba(38,51,64,.18);background:rgba(255,255,255,.34);backdrop-filter:blur(2px)}
+    .event{padding:65px clamp(25px,5vw,65px)}.event+.event{border-left:1px solid rgba(38,51,64,.18)}
+    .event h3{margin:0;font:500 clamp(34px,5vw,52px)/1 var(--serif)}.event p{font-size:11px;line-height:1.9;letter-spacing:.06em}
+    .parallax{min-height:42svh;max-height:440px;padding:0;overflow:hidden;background:#53606a}
+    .parallax img{position:absolute;top:-30%;left:0;width:100%;height:160%;object-fit:cover;object-position:center 47%;transform:translate3d(0,var(--parallax,0px),0) scale(1.04);will-change:transform}
+    .parallax::after{content:'';position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(24,34,42,.08),rgba(24,34,42,.48))}
+    .quote{position:relative;z-index:3;align-self:flex-end;margin:0 0 45px;color:#fff;font:400 clamp(38px,7vw,72px)/1 var(--script);text-shadow:0 2px 18px rgba(0,0,0,.28)}
+    .details{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+    .detail{padding:42px 24px;border:1px solid rgba(38,51,64,.17);background:rgba(255,255,255,.3)}
+    .detail h3{margin:0;font:500 31px var(--serif)}.detail p{font-size:10px;line-height:1.9;letter-spacing:.06em}
+    .menu{width:min(100%,720px);margin:42px auto 0}.course{padding:24px 0;border-bottom:1px solid rgba(255,255,255,.24)}.course:last-child{border:0}.course strong{display:block;font:500 28px var(--serif)}.course span{font-size:10px;letter-spacing:.09em}
+    .rsvp{width:min(100%,560px);margin:38px auto 0;text-align:left}.field{width:100%;margin-bottom:14px;padding:16px 13px;border:0;border-bottom:1px solid rgba(38,51,64,.3);background:rgba(255,255,255,.4);color:var(--ink);font-size:11px;outline:none}.rsvp .btn{display:flex;margin-inline:auto}
+    .closing{min-height:560px}.closing .names{font-size:clamp(62px,10vw,110px)}
+    .footer{position:relative;z-index:10;padding:34px 24px;background:var(--ink);color:#fff;text-align:center}.footer strong{font:500 28px var(--serif)}.footer p{margin:8px 0 0;font-size:8px;letter-spacing:.18em;text-transform:uppercase;opacity:.72}
+    .section{opacity:1}.section.visible{opacity:1}
+    [data-reveal]{opacity:0;transform:translateY(20px);transition:opacity .75s ease var(--delay,0ms),transform .75s cubic-bezier(.22,.61,.36,1) var(--delay,0ms)}[data-reveal].show{opacity:1;transform:none}
+    .music{position:fixed;z-index:30;right:18px;bottom:18px;display:grid;width:58px;height:58px;place-items:center;border:1px solid var(--blue-dark);border-radius:50%;background:rgba(251,251,250,.9);color:var(--blue-dark);font-size:20px;box-shadow:0 8px 28px rgba(38,51,64,.14)}
+    @keyframes cornerEnter{from{opacity:0;clip-path:inset(0 100% 100% 0);transform:scale(.96)}to{opacity:1;clip-path:inset(0);transform:none}}
+    @keyframes cornerPulse{50%{transform:scale(1.018)}}
+    @keyframes ornamentLeft{from{opacity:0;clip-path:inset(0 100% 0 0);transform:translateX(-30px)}to{opacity:.82;clip-path:inset(0);transform:none}}
+    @keyframes ornamentRight{from{opacity:0;clip-path:inset(0 0 0 100%);transform:scaleX(-1) translateX(-30px)}to{opacity:.82;clip-path:inset(0);transform:scaleX(-1)}}
+    @keyframes ornamentPulseLeft{50%{opacity:.95;transform:scale(1.025)}}@keyframes ornamentPulseRight{50%{opacity:.95;transform:scaleX(-1) scale(1.025)}}
+    @keyframes iconPulse{50%{transform:scale(1.065)}}
+    @media(max-width:760px){.section{min-height:570px;padding:80px 23px}.hero-corner{width:92vw}.hero .content{padding-bottom:75px}.hero .eyebrow{margin-top:clamp(180px,48vw,250px)}.countdown-section{min-height:450px}.countdown{gap:13px}.countdown strong{font-size:35px}.events,.details{grid-template-columns:1fr}.event+.event{border-top:1px solid rgba(38,51,64,.18);border-left:0}.ornament{top:-170px;width:245px}.ornament.left{left:-94px}.ornament.right{right:-94px}.parallax{min-height:330px}.parallax img{object-position:52% center}.quote{margin:0 20px 35px}.small-icon{width:80px;height:84px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.section,[data-reveal]{opacity:1!important;transform:none!important}.parallax img{transform:scale(1.04)}}
+  </style>
+</head>
+<body>
+<main class="invite">
+  <section class="section hero">
+    <img class="hero-corner" src="assets/floral-corner.webp" alt="">
+    <div class="content"><p class="eyebrow" data-reveal>Vamos nos casar</p><h1 class="names" data-reveal><span>Marina</span><i>&</i><span>Rafael</span></h1><p class="hero-date" data-reveal>20 · 03 · 2027</p><p class="hero-place" data-reveal>São Paulo</p></div><span class="scroll">Deslize para descobrir ↓</span>
+  </section>
+  <section class="section blue countdown-section"><img class="ornament right" src="assets/floral-side.webp" alt=""><div class="content"><img class="small-icon" src="assets/icon-rings.webp" alt=""><p class="eyebrow" data-reveal>Falta cada vez menos</p><h2 class="title" data-reveal>Para o nosso sim</h2><div class="countdown" data-reveal><div><strong id="days">00</strong><span>Dias</span></div><div><strong id="hours">00</strong><span>Horas</span></div><div><strong id="minutes">00</strong><span>Minutos</span></div><div><strong id="seconds">00</strong><span>Segundos</span></div></div></div></section>
+  <section class="section tint"><img class="ornament left" src="assets/floral-side.webp" alt=""><div class="events"><article class="event" data-reveal><img class="small-icon" src="assets/icon-church.webp" alt=""><p class="eyebrow">Cerimônia</p><h3>Igreja Nossa Senhora<br>do Brasil</h3><p>Praça Nossa Senhora do Brasil<br>Jardim América · 17h</p><a class="btn" href="https://maps.google.com/?q=Igreja+Nossa+Senhora+do+Brasil+Sao+Paulo" target="_blank" rel="noopener">Como chegar</a></article><article class="event" data-reveal><img class="small-icon" src="assets/icon-cake.webp" alt=""><p class="eyebrow">Celebração</p><h3>Casa Petra</h3><p>Av. Aratãs, 1010 · Moema<br>A partir das 19h30</p><a class="btn" href="https://maps.google.com/?q=Casa+Petra+Sao+Paulo" target="_blank" rel="noopener">Como chegar</a></article></div></section>
+  <section class="section parallax"><img src="assets/couple.webp" alt="Casal sorrindo"><p class="quote" data-reveal>Onde houver amor, ali estaremos</p></section>
+  <section class="section"><img class="ornament right" src="assets/floral-side.webp" alt=""><div class="content"><p class="eyebrow" data-reveal>Detalhes do grande dia</p><h2 class="title" data-reveal>Preparamos tudo com carinho</h2><div class="details"><article class="detail" data-reveal><img class="small-icon" src="assets/icon-camera.webp" alt=""><h3>Dress code</h3><p>Traje social completo<br>Tons claros são bem-vindos</p></article><article class="detail" data-reveal><img class="small-icon" src="assets/icon-gift.webp" alt=""><h3>Presentes</h3><p>Sua presença é o nosso maior presente.</p><button class="btn" type="button" onclick="alert('Chave PIX: marina.rafael@exemplo.com')">Ver opções</button></article><article class="detail" data-reveal><img class="small-icon" src="assets/icon-envelope.webp" alt=""><h3>Recado</h3><p>Deixe uma mensagem para guardarmos deste dia.</p><button class="btn" type="button" onclick="document.getElementById('message').focus()">Escrever</button></article></div></div></section>
+  <section class="section blue"><img class="ornament left" src="assets/floral-side.webp" alt=""><div class="content"><img class="small-icon" src="assets/icon-cake.webp" alt=""><p class="eyebrow" data-reveal>Menu</p><h2 class="title" data-reveal>Uma noite para celebrar</h2><div class="menu" data-reveal><div class="course"><strong>Boas-vindas</strong><span>Canapés artesanais e espumante</span></div><div class="course"><strong>Jantar</strong><span>Sabores contemporâneos com ingredientes brasileiros</span></div><div class="course"><strong>Doces & bolo</strong><span>Seleção especial para brindar o amor</span></div></div><p class="copy" data-reveal>Restrições alimentares podem ser informadas na confirmação.</p></div></section>
+  <section class="section tint"><img class="ornament right" src="assets/floral-side.webp" alt=""><div class="content"><img class="small-icon" src="assets/icon-envelope.webp" alt=""><p class="eyebrow" data-reveal>Esperamos por você</p><h2 class="title" data-reveal>Confirme sua presença</h2><p class="copy" data-reveal>Por favor, responda até 20 de fevereiro de 2027.</p><form class="rsvp" id="rsvp" data-reveal><input class="field" name="name" placeholder="Nome e sobrenome" required><select class="field" required><option value="">Você estará presente?</option><option>Sim, confirmo minha presença</option><option>Não poderei comparecer</option></select><select class="field"><option>Sem restrições alimentares</option><option>Vegetariano/a</option><option>Vegano/a</option><option>Celíaco/a · sem glúten</option><option>Outra restrição</option></select><textarea class="field" id="message" rows="3" placeholder="Mensagem para os noivos (opcional)"></textarea><button class="btn" type="submit">Enviar confirmação</button></form></div></section>
+  <section class="section closing"><img class="ornament left" src="assets/floral-side.webp" alt=""><div class="content"><p class="eyebrow" data-reveal>Obrigado por fazer parte</p><h2 class="names" data-reveal><span>Marina</span><i>&</i><span>Rafael</span></h2><p class="copy" data-reveal>Mal podemos esperar para viver este momento com vocês.</p></div></section>
+  <footer class="footer"><strong>Save Your Date</strong><p>Convites digitais para momentos inesquecíveis · © 2026</p></footer>
+</main>
+<button class="music" type="button" aria-label="Música">♫</button>
+<script>
+  const target=new Date('2027-03-20T17:00:00-03:00').getTime();
+  function tick(){const gap=Math.max(0,target-Date.now()),values=[Math.floor(gap/86400000),Math.floor(gap/3600000)%24,Math.floor(gap/60000)%60,Math.floor(gap/1000)%60];['days','hours','minutes','seconds'].forEach((id,index)=>document.getElementById(id).textContent=String(values[index]).padStart(2,'0'))}tick();setInterval(tick,1000);
+  document.body.classList.add('motion');document.querySelectorAll('.section .eyebrow,.section .title,.section .copy,.section .event,.section .detail,.section .menu,.section .rsvp,.section .names,.section .hero-date,.section .hero-place,.section .quote').forEach((el,index)=>{el.setAttribute('data-reveal','');el.style.setProperty('--delay',(index%4)*65+'ms')});
+  const sectionObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('visible',entry.isIntersecting)),{threshold:.07});document.querySelectorAll('.section:not(.hero)').forEach(section=>sectionObserver.observe(section));
+  const revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('show',entry.isIntersecting)),{threshold:.12});document.querySelectorAll('[data-reveal]').forEach(element=>revealObserver.observe(element));
+  const photo=document.querySelector('.parallax img');let ticking=false;function parallax(){const rect=photo.parentElement.getBoundingClientRect(),progress=(rect.top+rect.height/2-innerHeight/2)/(innerHeight+rect.height),offset=Math.max(-95,Math.min(95,progress*-190));photo.style.setProperty('--parallax',offset+'px');ticking=false}addEventListener('scroll',()=>{if(!ticking&&!matchMedia('(prefers-reduced-motion: reduce)').matches){requestAnimationFrame(parallax);ticking=true}},{passive:true});parallax();
+  document.getElementById('rsvp').addEventListener('submit',event=>{event.preventDefault();event.currentTarget.innerHTML='<p style="text-align:center;font:500 38px var(--serif)">Presença confirmada. Obrigado!</p>'});
+</script>
+</body>
+</html>
