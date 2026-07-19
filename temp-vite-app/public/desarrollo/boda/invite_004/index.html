@@ -429,8 +429,18 @@
     }),{threshold:.1});
     document.querySelectorAll('.section:not(.hero)').forEach(section=>sectionObserver.observe(section));
 
-    const boundaryObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('boundary-visible',entry.isIntersecting)),{rootMargin:'20% 0px 20% 0px',threshold:.01});
-    document.querySelectorAll('.boundary-decoration').forEach(boundary=>boundaryObserver.observe(boundary));
+    const boundaryDecorations=[...document.querySelectorAll('.boundary-decoration')];
+    function updateBoundaryDecorations(){
+      boundaryDecorations.forEach(boundary=>{
+        const rect=boundary.getBoundingClientRect();
+        const isNear=rect.top<window.innerHeight*1.12&&rect.bottom>-window.innerHeight*.12;
+        boundary.classList.toggle('boundary-visible',isNear);
+      });
+    }
+    updateBoundaryDecorations();
+    addEventListener('scroll',updateBoundaryDecorations,{passive:true});
+    addEventListener('resize',updateBoundaryDecorations,{passive:true});
+    setTimeout(updateBoundaryDecorations,250);
 
     const animatedElements=document.querySelectorAll(
       '.section:not(.hero) .icon, .section:not(.hero) .eyebrow, .section:not(.hero) .title, '+
