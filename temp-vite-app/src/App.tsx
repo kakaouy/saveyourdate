@@ -134,7 +134,8 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     frambuesa: 'Raspberry',
     cielo: 'Dusty sky blue',
     petroleo: 'Petrol blue',
-    tinta: 'Ink blue'
+    tinta: 'Ink blue',
+    oliva: 'Olive & champagne'
   },
   pt: {
     rosa: 'Rosa',
@@ -148,7 +149,8 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     frambuesa: 'Framboesa',
     cielo: 'Azul celeste acinzentado',
     petroleo: 'Azul petróleo',
-    tinta: 'Azul tinta'
+    tinta: 'Azul tinta',
+    oliva: 'Oliva e champanhe'
   }
 };
 
@@ -2369,7 +2371,12 @@ function App() {
         </div>
       </section>
 
-      <OrderFlow models={INVITATION_MODELS} initialModelId={wizardModel} lang={lang} />
+      <OrderFlow
+        models={INVITATION_MODELS}
+        initialModelId={wizardModel}
+        initialPaletteColor={selectedModelColors[wizardModel]}
+        lang={lang}
+      />
 
       {/* LEGACY ORDER FLOW: kept temporarily for reference, hidden from customers */}
       <section id="crear-anterior" className="features-section legacy-order-flow" style={{ background: 'var(--color-primary)', borderBottom: '1px solid var(--color-border)' }}>
@@ -3158,7 +3165,10 @@ function App() {
                   ) : demoModel.id === 'boda-eucalipto' ? (
                     <iframe
                       className="demo-real-invitation-frame"
-                      src="/desarrollo/boda/invite_004/index.html?preview=1"
+                      src={`/desarrollo/boda/invite_004/index.html?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}&lang=${lang}`}
                       title="Demo interactiva Martín y Sofía"
                     />
                   ) : (
