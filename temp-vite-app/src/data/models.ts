@@ -292,6 +292,38 @@ export const INVITATION_MODELS: InvitationModel[] = [
     ]
   },
   {
+    id: 'boda-brindis-papel',
+    previewImage: '/previews/brindis-papel.webp',
+    title: 'Brindis de Papel',
+    category: 'wedding',
+    description: 'Trazos de manos alzadas, textura de papel y bloques de color para una boda alegre, artística y contemporánea.',
+    badge: 'Nuevo',
+    demoName1: 'Valentina & Matías',
+    date: '14 de Febrero, 2027',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Ceremonia y celebración en una ubicación',
+      'Foto destacada con efecto parallax',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Mensajes',
+      'Menú',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    musicTitle: 'Brillas',
+    musicArtist: 'León Larregui',
+    location: 'Estancia Villa María, Buenos Aires',
+    includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','messages','menu','rsvp'],
+    palettes: [
+      { id: 'azul', name: 'Azul vivo', color: '#2f7cf4' },
+      { id: 'coral', name: 'Coral terracota', color: '#df735f' },
+      { id: 'verde', name: 'Verde jardín', color: '#5f8f6d' }
+    ]
+  },
+  {
     id: '15-neon',
     title: 'Neon Party',
     category: '15years',
