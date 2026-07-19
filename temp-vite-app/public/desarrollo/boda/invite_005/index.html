@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Renata & Nicolás</title>
+  <title>Vínculo Noir · Renata & Nicolás</title>
   <meta name="description" content="Invitación de boda de Renata y Nicolás">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@300;400;500;600&family=Parisienne&display=swap" rel="stylesheet">
   <style>
     :root{--ink:#171717;--smoke:#718f86;--smoke-dark:#58756c;--paper:#fbfaf7;--gold:#ae8b52;--white:#fff;--serif:'Cormorant Garamond',serif;--sans:'Montserrat',sans-serif;--script:'Parisienne',cursive}
-    *,*::before,*::after{box-sizing:border-box}
+    body[data-theme="oro"]{--gold:#ae8b52}\n    body[data-theme="borgona"]{--gold:#782f40}\n    body[data-theme="noche"]{--gold:#26364f}\n    *,*::before,*::after{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{margin:0;overflow-x:hidden;background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300}
     button,a,input,select,textarea{font:inherit}
@@ -65,7 +65,7 @@
     .event h3{margin:0;font:500 clamp(34px,5vw,56px)/1 var(--serif);letter-spacing:.06em}.event p{font-size:11px;line-height:1.9;letter-spacing:.08em}
     .photo-break{min-height:58svh;padding:0}.photo-break img{position:absolute;top:-20%;left:0;width:100%;height:140%;object-fit:cover;object-position:center;filter:grayscale(1) contrast(1.05);transform:translateY(var(--parallax,0px)) scale(1.02);will-change:transform}.photo-break::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.58))}.photo-quote{position:relative;z-index:3;align-self:flex-end;margin:0 0 60px;color:#fff;font:400 clamp(38px,7vw,78px)/1.05 var(--script)}
     .detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:54px}.detail{padding:42px 24px;border:1px solid rgba(255,255,255,.25)}.detail h3{margin:0;font:500 30px/1.1 var(--serif)}.detail p{margin:14px 0 0;font-size:9px;line-height:1.8;letter-spacing:.12em;text-transform:uppercase}
-    .gallery{display:grid;grid-template-columns:1.15fr .85fr;grid-template-rows:340px 340px;gap:12px;margin-top:50px}.gallery img{width:100%;height:100%;object-fit:cover;filter:grayscale(1);transition:.5s}.gallery img:first-child{grid-row:1/3;object-position:center top}.gallery img:hover{filter:grayscale(0);transform:scale(1.01)}
+    .gallery{display:grid;grid-template-columns:1.15fr .85fr;grid-template-rows:340px 340px;gap:12px;margin-top:50px}.gallery img{width:100%;height:100%;object-fit:cover;filter:grayscale(1);transition:.5s}.gallery img:first-child{grid-row:1/3;object-position:center 28%}.gallery img:hover{filter:grayscale(0);transform:scale(1.01)}
     .rsvp{width:min(100%,540px);margin:38px auto 0;text-align:left}.field{width:100%;margin-bottom:14px;padding:16px;border:0;border-bottom:1px solid rgba(23,23,23,.3);background:rgba(255,255,255,.55);font-size:11px;outline:none}.rsvp .btn{display:flex;margin-inline:auto}
     .closing{min-height:560px}.closing h2{margin:0;font:500 clamp(58px,10vw,112px)/.82 var(--serif);text-transform:uppercase}.closing h2 i{display:block;margin:20px 0;color:var(--gold);font:400 42px var(--script);text-transform:none}.footer{padding:36px 24px;background:#0d0d0d;color:#fff;text-align:center}.footer strong{font:500 28px var(--serif)}.footer p{margin:10px 0 0;font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.7}
     .shared-boundary{overflow:visible;z-index:4}
@@ -90,12 +90,16 @@
     .line-icon.show{animation:iconEnter .75s cubic-bezier(.22,.61,.36,1) both,iconPulse 3s ease-in-out .75s infinite}
     @keyframes iconEnter{from{opacity:0;transform:translateY(18px) scale(.9)}to{opacity:1;transform:none}}
     @keyframes iconPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.075)}}
+    .palette-switcher{position:fixed;z-index:31;top:16px;left:16px;display:flex;gap:7px;padding:8px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(17,17,17,.72);box-shadow:0 8px 28px rgba(0,0,0,.18);backdrop-filter:blur(10px)}
+    .palette-switcher button{width:28px;height:28px;padding:0;border:2px solid rgba(255,255,255,.65);border-radius:50%;cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
+    .palette-switcher button[aria-pressed="true"]{outline:2px solid #fff;outline-offset:2px}
+    .palette-switcher .oro{background:#ae8b52}.palette-switcher .borgona{background:#782f40}.palette-switcher .noche{background:#26364f}
     .music{position:fixed;z-index:30;right:20px;bottom:20px;display:grid;width:58px;height:58px;place-items:center;border:1px solid var(--gold);border-radius:50%;background:rgba(251,250,247,.92);color:var(--gold);font-size:21px}
     @media(max-width:760px){.section{min-height:580px;padding:82px 24px}.countdown-section{min-height:400px;padding-top:62px;padding-bottom:62px}.hero .content{padding-inline:24px}.date-grid{grid-template-columns:1fr;gap:24px}.events{grid-template-columns:1fr}.event+.event{border-top:1px solid rgba(23,23,23,.16);border-left:0}.detail-grid{grid-template-columns:1fr}.gallery{grid-template-columns:1fr 1fr;grid-template-rows:330px 220px}.gallery img:first-child{grid-column:1/3;grid-row:auto}.branch{width:65vw}.branch.right{right:-22vw}.branch.left{left:-22vw}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.section,[data-reveal]{opacity:1!important;transform:none!important}.photo-break img{transform:scale(1.02)}}
   </style>
 </head>
-<body>
+<body data-theme="oro">
 <main class="invite">
   <section class="section hero">
     <img class="hero-photo" src="assets/photo-01.jpg" alt="Renata y Nicolás">
@@ -111,8 +115,15 @@
   <section class="section closing dark shared-boundary"><img class="branch shared-branch branch-rsvp-closing" src="assets/branch-white.png" alt=""><div class="content"><p class="eyebrow" data-reveal>Gracias por ser parte de nuestra historia</p><h2 data-reveal><span>Renata</span><i>&</i><span>Nicolás</span></h2><p class="copy" data-reveal>Nos emociona compartir este día con ustedes.</p></div></section>
   <footer class="footer"><strong>Save Your Date</strong><p>Invitaciones digitales para momentos inolvidables · © 2026</p></footer>
 </main>
+<div class="palette-switcher" aria-label="Paletas de Vínculo Noir">
+  <button class="oro" type="button" data-theme="oro" aria-label="Oro antiguo" title="Oro antiguo" aria-pressed="true"></button>
+  <button class="borgona" type="button" data-theme="borgona" aria-label="Borgoña" title="Borgoña" aria-pressed="false"></button>
+  <button class="noche" type="button" data-theme="noche" aria-label="Azul noche" title="Azul noche" aria-pressed="false"></button>
+</div>
 <button class="music" type="button" aria-label="Música">♫</button>
 <script>
+  const paletteButtons=document.querySelectorAll('.palette-switcher button');
+  paletteButtons.forEach(button=>button.addEventListener('click',()=>{document.body.dataset.theme=button.dataset.theme;paletteButtons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)))}));
   const target=new Date('2026-10-10T18:30:00-03:00').getTime();function tick(){const g=Math.max(0,target-Date.now()),v=[Math.floor(g/86400000),Math.floor(g/3600000)%24,Math.floor(g/60000)%60,Math.floor(g/1000)%60];['days','hours','minutes','seconds'].forEach((id,i)=>document.getElementById(id).textContent=String(v[i]).padStart(2,'0'))}tick();setInterval(tick,1000);
   document.body.classList.add('motion');
   const revealSelector='.section .eyebrow,.section .title,.section .copy,.section .line-icon,.section .event,.section .detail,.section .gallery img,.section .field,.section .btn,.section .countdown>div,.section .names,.section .hero-date,.section .photo-quote,.section .closing h2';
