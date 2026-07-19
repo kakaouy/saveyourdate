@@ -93,6 +93,11 @@
       0%,100%{opacity:.72;transform:translate3d(0,-50%,0) scale(1) scaleX(-1)}
       50%{opacity:.82;transform:translate3d(0,-50%,0) scale(1.035) scaleX(-1)}
     }
+    .boundary-decoration{position:relative;z-index:9;width:100%;height:1px;overflow:visible;pointer-events:none}
+    .boundary-decoration img{position:absolute;top:0;right:-4vw;display:block;width:clamp(210px,27vw,390px);height:auto;opacity:0;transform:translate3d(70px,-50%,0) scale(.96) scaleX(-1);transform-origin:center right;will-change:transform,opacity}
+    .boundary-decoration.boundary-visible img{animation:boundaryRightEnter .9s cubic-bezier(.22,.61,.36,1) forwards,boundaryRightPulse 5.8s ease-in-out .9s infinite}
+    @keyframes boundaryRightEnter{from{opacity:0;transform:translate3d(70px,-50%,0) scale(.96) scaleX(-1)}to{opacity:.78;transform:translate3d(0,-50%,0) scale(1) scaleX(-1)}}
+    @keyframes boundaryRightPulse{0%,100%{opacity:.78;transform:translate3d(0,-50%,0) scale(1) scaleX(-1)}50%{opacity:.88;transform:translate3d(0,-50%,0) scale(1.04) scaleX(-1)}}
     .left-decoration{
       position:absolute;
       z-index:3;
@@ -204,6 +209,7 @@
       .event-card{padding:58px 24px}
       .photo{min-height:50svh}
       .side-decoration{right:-14vw;width:clamp(190px,50vw,270px);opacity:0}
+      .boundary-decoration img{right:-14vw;width:clamp(190px,50vw,270px)}
       .left-decoration{left:-16vw;width:clamp(220px,58vw,310px)}
     }
     @media(prefers-reduced-motion:reduce){
@@ -211,6 +217,7 @@
       [data-reveal]{opacity:1;transform:none;transition:none}
       .hero-decoration{animation:none}
       .has-side-decoration.section-visible .side-decoration{opacity:.72;transform:translate3d(0,-50%,0) scale(1) scaleX(-1);animation:none}
+      .boundary-decoration.boundary-visible img{opacity:.78;transform:translate3d(0,-50%,0) scale(1) scaleX(-1);animation:none}
       .section-visible .left-decoration{opacity:.74;clip-path:inset(0);transform:translate3d(0,50%,0) scale(1);animation:none}
       .photo img{transform:scale(1.025)}
     }
@@ -244,8 +251,8 @@
       </div>
     </section>
 
-    <section class="section section--cream has-side-decoration">
-      <img class="side-decoration" src="assets/ornamento-derecha.png" alt="">
+        <div class="boundary-decoration"><img src="assets/ornamento-derecha.png" alt=""></div>
+<section class="section section--cream has-side-decoration">
       <img class="left-decoration" src="assets/ornamento-izquierda.png" alt="">
       <div class="event-grid">
         <article class="event-card" data-reveal>
@@ -270,8 +277,8 @@
       <p class="photo-caption">Nuestro lugar favorito es juntos</p>
     </section>
 
-    <section class="section section--sage has-side-decoration">
-      <img class="side-decoration" src="assets/ornamento-derecha.png" alt="">
+        <div class="boundary-decoration"><img src="assets/ornamento-derecha.png" alt=""></div>
+<section class="section section--sage has-side-decoration">
       <img class="left-decoration" src="assets/ornamento-izquierda.png" alt="">
       <div class="content">
         <p class="eyebrow" data-reveal>Detalles de la celebración</p>
@@ -300,8 +307,8 @@
       </div>
     </section>
 
-    <section class="section section--cream has-side-decoration">
-      <img class="side-decoration" src="assets/ornamento-derecha.png" alt="">
+        <div class="boundary-decoration"><img src="assets/ornamento-derecha.png" alt=""></div>
+<section class="section section--cream has-side-decoration">
       <div class="content">
         <img class="icon" src="assets/icon-rsvp-gd.png" alt="" data-reveal>
         <p class="eyebrow" data-reveal>Queremos que nos acompañes</p>
@@ -362,6 +369,9 @@
       entry.target.classList.toggle('section-visible',entry.isIntersecting);
     }),{threshold:.1});
     document.querySelectorAll('.section:not(.hero)').forEach(section=>sectionObserver.observe(section));
+
+    const boundaryObserver=new IntersectionObserver(entries=>entries.forEach(entry=>entry.target.classList.toggle('boundary-visible',entry.isIntersecting)),{rootMargin:'35% 0px 35% 0px',threshold:0});
+    document.querySelectorAll('.boundary-decoration').forEach(boundary=>boundaryObserver.observe(boundary));
 
     const animatedElements=document.querySelectorAll(
       '.section:not(.hero) .icon, .section:not(.hero) .eyebrow, .section:not(.hero) .title, '+
