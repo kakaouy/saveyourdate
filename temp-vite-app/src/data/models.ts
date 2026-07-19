@@ -254,8 +254,8 @@ export const INVITATION_MODELS: InvitationModel[] = [
     includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','gallery','rsvp'],
     palettes: [
       { id: 'oro', name: 'Oro antiguo', color: '#ae8b52' },
-      { id: 'borgona', name: 'Borgoña', color: '#782f40' },
-      { id: 'noche', name: 'Azul noche', color: '#26364f' }
+      { id: 'rosa', name: 'Rosa empolvado', color: '#b7838f' },
+      { id: 'verde', name: 'Verde inglés', color: '#6f8b75' }
     ]
   },
   {
