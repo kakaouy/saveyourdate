@@ -22,7 +22,10 @@
     }
     *,*::before,*::after{box-sizing:border-box}
     html{scroll-behavior:smooth}
-    body{margin:0;overflow-x:hidden;background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:300}
+    body{margin:0;overflow-x:hidden;background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:300;--botanical-filter:none}
+    body[data-palette="oliva"]{--ink:#303426;--green:#66704c;--sage:#e4e2cf;--cream:#f8f4e8;--gold:#9b7a48;--botanical-filter:hue-rotate(-25deg) saturate(.82) brightness(.96)}
+    body[data-palette="petroleo"]{--ink:#203437;--green:#365d63;--sage:#d9e4e3;--cream:#f6f3eb;--gold:#b69461;--botanical-filter:hue-rotate(35deg) saturate(.68) brightness(.94)}
+    .hero-decoration,.boundary-decoration img,.left-decoration{filter:var(--botanical-filter);transition:filter .45s ease}
     button,a,input,select,textarea{font:inherit}
     .invite{width:100%;max-width:none;margin:0;overflow:visible;background:var(--cream);box-shadow:none}
     .section{position:relative;display:flex;width:100%;min-height:620px;padding:100px clamp(24px,6vw,88px);align-items:center;justify-content:center;overflow:hidden;text-align:center}
@@ -352,6 +355,62 @@
   <button class="music" type="button" disabled aria-label="Música deshabilitada para la muestra"><img src="assets/music.svg" alt=""></button>
 
   <script>
+    const params=new URLSearchParams(location.search);
+    const palette=['eucalipto','oliva','petroleo'].includes(params.get('palette'))?params.get('palette'):'eucalipto';
+    const language=['es','en','pt'].includes(params.get('lang'))?params.get('lang'):'es';
+    document.body.dataset.palette=palette;
+    document.documentElement.lang=language;
+
+    const localeCopy={
+      en:{
+        heroEyebrow:'We are getting married!',heroCopy:'Together with our families, we are delighted to invite you to celebrate our wedding',scroll:'Scroll to discover ↓',
+        weekday:'Saturday',month:'November',at:'At',hoursWord:'hours',days:'Days',hours:'Hours',minutes:'Minutes',seconds:'Seconds',
+        ceremony:'Ceremony',reception:'Reception',directions:'Get directions',photo:'Our favorite place is together',
+        detailsEyebrow:'Celebration details',detailsTitle:'Everything you need to know',
+        dress:'Dress code',dressText:'Formal attire · Any colors',gifts:'Gifts',giftsText:'Your presence is our best gift',giftButton:'View details',
+        photos:'Photos',photosText:'Share your memories · #MartinySofia',calendar:'Save the date',calendarText:'November 14 · 2026',calendarButton:'Add to calendar',
+        menuEyebrow:'Our menu',menuTitle:'An evening to enjoy',starter:'Reception',starterText:'Seasonal bites and sparkling wine',main:'Main course',mainText:'Braised tenderloin with garden vegetables',dessert:'Dessert',dessertText:'Chocolate textures and red berries',foodCopy:'If you have dietary restrictions, let us know when confirming attendance.',
+        rsvpEyebrow:'We would love you to join us',rsvpTitle:'Confirm your attendance',rsvpCopy:'Please reply before October 14, 2026.',namePlaceholder:'Full name',attendance:'Will you attend?',yes:'Yes, I will attend',no:'I will not be able to attend',none:'No dietary restrictions',vegetarian:'Vegetarian',vegan:'Vegan',celiac:'Gluten-free',other:'Other restriction',message:'Message for the couple (optional)',submit:'Send confirmation',
+        closing:'Thank you for being part of our story. · We look forward to seeing you!',tagline:'Digital invitations for unforgettable moments',legal:'© 2026 Save Your Date · All rights reserved',
+        giftTitle:'Gift registry',giftIntro:'If you would like to give us a gift, you can contribute to our honeymoon.',copyAlias:'Copy alias'
+      },
+      pt:{
+        heroEyebrow:'Vamos nos casar!',heroCopy:'Junto com nossas famílias, temos a alegria de convidar você para celebrar nosso casamento',scroll:'Deslize para descobrir ↓',
+        weekday:'Sábado',month:'novembro',at:'Às',hoursWord:'horas',days:'Dias',hours:'Horas',minutes:'Minutos',seconds:'Segundos',
+        ceremony:'Cerimônia',reception:'Recepção',directions:'Como chegar',photo:'Nosso lugar favorito é juntos',
+        detailsEyebrow:'Detalhes da celebração',detailsTitle:'Tudo o que você precisa saber',
+        dress:'Traje',dressText:'Formal elegante · Cores livres',gifts:'Presentes',giftsText:'Sua presença é o nosso melhor presente',giftButton:'Ver dados',
+        photos:'Fotos',photosText:'Compartilhe suas lembranças · #MartinySofia',calendar:'Agende',calendarText:'14 de novembro · de 2026',calendarButton:'Adicionar',
+        menuEyebrow:'Nosso menu',menuTitle:'Uma noite para aproveitar',starter:'Recepção',starterText:'Petiscos da estação e espumante',main:'Prato principal',mainText:'Filé braseado com legumes da horta',dessert:'Sobremesa',dessertText:'Texturas de chocolate e frutas vermelhas',foodCopy:'Se você tiver alguma restrição alimentar, informe ao confirmar sua presença.',
+        rsvpEyebrow:'Queremos você conosco',rsvpTitle:'Confirme sua presença',rsvpCopy:'Por favor, responda antes de 14 de outubro de 2026.',namePlaceholder:'Nome e sobrenome',attendance:'Você vai comparecer?',yes:'Sim, confirmo minha presença',no:'Não poderei comparecer',none:'Sem restrições alimentares',vegetarian:'Vegetariano/a',vegan:'Vegano/a',celiac:'Celíaco/a - sem glúten',other:'Outra restrição',message:'Mensagem para os noivos (opcional)',submit:'Enviar confirmação',
+        closing:'Obrigado por fazer parte da nossa história. · Esperamos você!',tagline:'Convites digitais para momentos inesquecíveis',legal:'© 2026 Save Your Date · Todos os direitos reservados',
+        giftTitle:'Lista de presentes',giftIntro:'Se quiser nos presentear, você pode colaborar com nossa lua de mel.',copyAlias:'Copiar chave'
+      }
+    };
+    function applyLocale(){
+      if(language==='es')return;
+      const t=localeCopy[language];
+      const one=(selector,value)=>{const el=document.querySelector(selector);if(el&&value)el.textContent=value};
+      const many=(selector,values)=>document.querySelectorAll(selector).forEach((el,index)=>{if(values[index])el.textContent=values[index]});
+      one('.hero .eyebrow',t.heroEyebrow);one('.hero-copy',t.heroCopy);one('.scroll',t.scroll);
+      one('.weekday',t.weekday);one('.month',t.month);one('.time-label',t.at);one('.date-meta:last-child .year',t.hoursWord);
+      many('.countdown span',[t.days,t.hours,t.minutes,t.seconds]);
+      many('.event-card .eyebrow',[t.ceremony,t.reception]);many('.event-card .btn',[t.directions,t.directions]);one('.photo-caption',t.photo);
+      const detailSection=document.querySelectorAll('.section--sage')[1];if(detailSection){one('.section--sage:nth-of-type(999)',null);const e=detailSection.querySelector('.eyebrow');const h=detailSection.querySelector('.title');if(e)e.textContent=t.detailsEyebrow;if(h)h.textContent=t.detailsTitle}
+      many('.detail-card h3',[t.dress,t.gifts,t.photos,t.calendar]);many('.detail-card p',[t.dressText,t.giftsText,t.photosText,t.calendarText]);many('.detail-card .btn',[t.giftButton,t.calendarButton]);
+      const menu=document.querySelector('.section--green');if(menu){const e=menu.querySelector('.eyebrow');const h=menu.querySelector('.title');const p=menu.querySelector('.copy');if(e)e.textContent=t.menuEyebrow;if(h)h.textContent=t.menuTitle;if(p)p.textContent=t.foodCopy}
+      many('.menu-list strong',[t.starter,t.main,t.dessert]);many('.menu-list span',[t.starterText,t.mainText,t.dessertText]);
+      const rsvp=document.querySelector('#rsvpForm')?.closest('.section');if(rsvp){const e=rsvp.querySelector('.eyebrow');const h=rsvp.querySelector('.title');const p=rsvp.querySelector('.copy');if(e)e.textContent=t.rsvpEyebrow;if(h)h.textContent=t.rsvpTitle;if(p)p.textContent=t.rsvpCopy}
+      const name=document.querySelector('input[name="name"]');if(name)name.placeholder=t.namePlaceholder;
+      const attendance=document.querySelector('select[name="attendance"]');if(attendance)many('select[name="attendance"] option',[t.attendance,t.yes,t.no]);
+      many('select[name="food"] option',[t.none,t.vegetarian,t.vegan,t.celiac,t.other]);
+      const message=document.querySelector('textarea[name="message"]');if(message)message.placeholder=t.message;one('#rsvpForm .btn',t.submit);
+      const closing=document.querySelector('.closing p');if(closing)closing.innerHTML=t.closing.replace(' · ','<br>');
+      one('.invite-footer__tagline',t.tagline);one('.invite-footer__legal',t.legal);
+      one('#gift h2',t.giftTitle);one('#gift h2 + p',t.giftIntro);one('#gift .btn',t.copyAlias);
+    }
+    applyLocale();
+
     const target=new Date('2026-11-14T18:30:00-03:00').getTime();
     function tick(){
       const gap=Math.max(0,target-Date.now());
