@@ -3216,6 +3216,15 @@ function App() {
                       )}&lang=${lang}`}
                       title="Demo interactiva Flores de Papel"
                     />
+                  ) : demoModel.id === 'boda-brindis-papel' ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src={`/desarrollo/boda/invite_007/index.html?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}&lang=${lang}`}
+                      title="Demo interactiva Brindis de Papel"
+                    />
                   ) : (
                   <div className="demo-invitation-scroll">
                     <div className="sim-cover demo-cover" style={{
