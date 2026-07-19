@@ -36,10 +36,11 @@ const createOrderNumber = () => `SYD-${Date.now().toString().slice(-6)}`;
 interface OrderFlowProps {
   models: InvitationModel[];
   initialModelId: string;
+  initialPaletteColor?: string;
   lang: Language;
 }
 
-export default function OrderFlow({ models, initialModelId, lang }: OrderFlowProps) {
+export default function OrderFlow({ models, initialModelId, initialPaletteColor, lang }: OrderFlowProps) {
   const l = (es: string, en: string, pt: string) => lang === 'es' ? es : lang === 'en' ? en : pt;
   const [started, setStarted] = useState(false);
   const [activeTab, setActiveTab] = useState<FlowTab>('new');
@@ -140,6 +141,16 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
     [selectedModel]
   );
 
+  const paletteName = (option: { id: string; name: string }) => {
+    const names: Record<string, [string, string, string]> = {
+      eucalipto: ['Eucalipto y dorado', 'Eucalyptus & gold', 'Eucalipto e dourado'],
+      oliva: ['Oliva y champagne', 'Olive & champagne', 'Oliva e champanhe'],
+      petroleo: ['Petróleo y arena', 'Petrol blue & sand', 'Azul petróleo e areia']
+    };
+    const translated = names[option.id];
+    return translated ? l(translated[0], translated[1], translated[2]) : option.name;
+  };
+
   useEffect(() => {
     const defaults =
       (selectedModel?.includedSections || [])
@@ -169,9 +180,10 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
 
   useEffect(() => {
     if (availableColors.length) {
-      setSelectedColor(availableColors[0].color);
+      const requestedColor = availableColors.find((option) => option.color === initialPaletteColor)?.color;
+      setSelectedColor(requestedColor || availableColors[0].color);
     }
-  }, [modelId, availableColors]);
+  }, [modelId, availableColors, initialPaletteColor]);
 
   const selectEventCategory = (category: EventCategory) => {
     setEventCategory(category);
@@ -255,6 +267,7 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
         'Tipo de evento': eventCategory === 'wedding' ? 'Boda' : eventCategory === '15years' ? '15 Años' : 'Otros eventos',
         Modelo: selectedModel?.title || modelId,
         'Color elegido': selectedColor,
+        'Paleta elegida': paletteName(availableColors.find((option) => option.color === selectedColor) || { id: '', name: selectedColor }),
         Secciones: Array.from(activeSections).map((id) => sectionOptions.find((item) => item.id === id)?.title || id).filter(Boolean).join(', '),
         'Música de fondo': hasMusic ? String(form.get('music') || 'Sí, a definir') : 'No',
         'Estado del pago': paymentOperation ? 'Pago informado - pendiente de validación' : 'Pago pendiente',
@@ -434,8 +447,8 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
                 <p>{l('Elegilo cuando el modelo admita cambio de paleta. Lo confirmaremos al revisar el pedido.', 'Choose it when the model supports palette changes. We will confirm it when reviewing the order.', 'Escolha quando o modelo permitir mudança de paleta. Confirmaremos ao revisar o pedido.')}</p>
                 <div className="order-color-options">
                   {availableColors.map((option) => (
-                    <button type="button" key={option.id} className={selectedColor === option.color ? 'active' : ''} onClick={() => setSelectedColor(option.color)} aria-label={`Elegir ${option.name}`}>
-                      <span style={{ background: option.color }}></span>{option.name}
+                    <button type="button" key={option.id} className={selectedColor === option.color ? 'active' : ''} onClick={() => setSelectedColor(option.color)} aria-label={l(`Elegir ${paletteName(option)}`, `Choose ${paletteName(option)}`, `Escolher ${paletteName(option)}`)}>
+                      <span style={{ background: option.color }}></span>{paletteName(option)}
                     </button>
                   ))}
                 </div>

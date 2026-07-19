@@ -193,12 +193,36 @@ export const INVITATION_MODELS: InvitationModel[] = [
     badge: 'Nuevo',
     demoName1: 'Tomás & Sofía',
     date: '16 de Enero, 2027',
-    features: ['Cuenta Regresiva', 'Música', 'Confirmación RSVP', 'Código de Vestimenta'],
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Agenda',
+      'Ubicación',
+      'Foto destacada con efecto parallax',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Confirmación RSVP'
+    ],
     themeClass: 'mock-theme-wedding',
     illustrationType: 'rings',
     musicTitle: 'L-O-V-E',
     musicArtist: 'Nat King Cole',
-    location: 'Salón Quinta de Olivos, Buenos Aires'
+    location: 'Salón Quinta de Olivos, Buenos Aires',
+    includedSections: [
+      'music',
+      'countdown',
+      'agenda',
+      'location',
+      'featuredPhoto',
+      'dresscode',
+      'gifts',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'eucalipto', name: 'Eucalipto y dorado', color: '#496257' },
+      { id: 'oliva', name: 'Oliva y champagne', color: '#66704c' },
+      { id: 'petroleo', name: 'Petróleo y arena', color: '#365d63' }
+    ]
   },
   {
     id: '15-neon',
