@@ -36,10 +36,11 @@ const createOrderNumber = () => `SYD-${Date.now().toString().slice(-6)}`;
 interface OrderFlowProps {
   models: InvitationModel[];
   initialModelId: string;
+  initialPaletteColor?: string;
   lang: Language;
 }
 
-export default function OrderFlow({ models, initialModelId, lang }: OrderFlowProps) {
+export default function OrderFlow({ models, initialModelId, initialPaletteColor, lang }: OrderFlowProps) {
   const l = (es: string, en: string, pt: string) => lang === 'es' ? es : lang === 'en' ? en : pt;
   const [started, setStarted] = useState(false);
   const [activeTab, setActiveTab] = useState<FlowTab>('new');
@@ -169,9 +170,10 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
 
   useEffect(() => {
     if (availableColors.length) {
-      setSelectedColor(availableColors[0].color);
+      const requestedColor = availableColors.find((option) => option.color === initialPaletteColor)?.color;
+      setSelectedColor(requestedColor || availableColors[0].color);
     }
-  }, [modelId, availableColors]);
+  }, [modelId, availableColors, initialPaletteColor]);
 
   const selectEventCategory = (category: EventCategory) => {
     setEventCategory(category);
@@ -255,6 +257,7 @@ export default function OrderFlow({ models, initialModelId, lang }: OrderFlowPro
         'Tipo de evento': eventCategory === 'wedding' ? 'Boda' : eventCategory === '15years' ? '15 Años' : 'Otros eventos',
         Modelo: selectedModel?.title || modelId,
         'Color elegido': selectedColor,
+        'Paleta elegida': availableColors.find((option) => option.color === selectedColor)?.name || selectedColor,
         Secciones: Array.from(activeSections).map((id) => sectionOptions.find((item) => item.id === id)?.title || id).filter(Boolean).join(', '),
         'Música de fondo': hasMusic ? String(form.get('music') || 'Sí, a definir') : 'No',
         'Estado del pago': paymentOperation ? 'Pago informado - pendiente de validación' : 'Pago pendiente',
