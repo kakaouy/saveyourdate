@@ -100,7 +100,8 @@ const FEATURE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'Sugerencias de Regalo': 'Gift suggestions',
     'Organizador': 'Organizer',
     'Agenda': 'Schedule',
-    'Código de Vestimenta': 'Dress code'
+    'Código de Vestimenta': 'Dress code',
+    'Menú': 'Menu'
   },
   pt: {
     'Galería de fotos': 'Galeria de fotos',
@@ -120,7 +121,8 @@ const FEATURE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'Sugerencias de Regalo': 'Sugestões de presentes',
     'Organizador': 'Organizador',
     'Agenda': 'Agenda',
-    'Código de Vestimenta': 'Código de vestimenta'
+    'Código de Vestimenta': 'Código de vestimenta',
+    'Menú': 'Menu'
   }
 };
 
