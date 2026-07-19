@@ -10,7 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@300;400;500;600&family=Parisienne&display=swap" rel="stylesheet">
   <style>
     :root{--ink:#171717;--smoke:#718f86;--smoke-dark:#58756c;--paper:#fbfaf7;--gold:#ae8b52;--white:#fff;--serif:'Cormorant Garamond',serif;--sans:'Montserrat',sans-serif;--script:'Parisienne',cursive}
-    body[data-theme="oro"]{--gold:#ae8b52}\n    body[data-theme="borgona"]{--gold:#782f40}\n    body[data-theme="noche"]{--gold:#26364f}\n    *,*::before,*::after{box-sizing:border-box}
+    body[data-theme="oro"]{--gold:#ae8b52}
+    body[data-theme="rosa"]{--gold:#b7838f}
+    body[data-theme="verde"]{--gold:#6f8b75}\n    *,*::before,*::after{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{margin:0;overflow-x:hidden;background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300}
     button,a,input,select,textarea{font:inherit}
@@ -31,7 +33,7 @@
     .hero .content{display:flex;min-height:100svh;padding:70px 24px clamp(320px,38vh,430px);flex-direction:column;align-items:center;justify-content:flex-end;top:-145px}
     .hero .eyebrow{margin-bottom:18px}
     .names{margin:0;font:500 clamp(62px,12vw,144px)/.82 var(--serif);letter-spacing:.04em;text-transform:uppercase;text-shadow:0 3px 24px rgba(0,0,0,.35)}
-    .names span{display:block}.names i{display:block;margin:14px 0;color:var(--gold);font:400 clamp(34px,5vw,56px)/1 var(--script);text-transform:none}
+    .names span{display:block}.names i{display:block;margin:14px 0;color:var(--gold);font:600 clamp(50px,6.5vw,76px)/1 var(--script);text-shadow:0 1px 0 currentColor,0 0 14px rgba(0,0,0,.2);text-transform:none}
     .hero-date{margin:30px 0 0;font-size:11px;letter-spacing:.35em;text-transform:uppercase}
     .scroll{position:absolute;z-index:4;right:0;bottom:20px;left:0;font-size:8px;letter-spacing:.25em;text-transform:uppercase}
     @keyframes heroZoom{to{transform:scale(1.09) translateY(-1.5%)}}
@@ -94,9 +96,62 @@
     .palette-switcher{position:fixed;z-index:31;top:16px;left:16px;display:flex;gap:7px;padding:8px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(17,17,17,.72);box-shadow:0 8px 28px rgba(0,0,0,.18);backdrop-filter:blur(10px)}
     .palette-switcher button{width:28px;height:28px;padding:0;border:2px solid rgba(255,255,255,.65);border-radius:50%;cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
     .palette-switcher button[aria-pressed="true"]{outline:2px solid #fff;outline-offset:2px}
-    .palette-switcher .oro{background:#ae8b52}.palette-switcher .borgona{background:#782f40}.palette-switcher .noche{background:#26364f}
+    .palette-switcher .oro{background:#ae8b52}.palette-switcher .rosa{background:#b7838f}.palette-switcher .verde{background:#6f8b75}
     .music{position:fixed;z-index:30;right:20px;bottom:20px;display:grid;width:58px;height:58px;place-items:center;border:1px solid var(--gold);border-radius:50%;background:rgba(251,250,247,.92);color:var(--gold);font-size:21px}
+
+    .detail .btn{
+      display:flex;
+      width:min(240px,calc(100% - 48px));
+      max-width:calc(100% - 48px);
+      margin-left:auto;
+      margin-right:auto;
+      padding-left:18px;
+      padding-right:18px;
+    }
     @media(max-width:760px){.section{min-height:580px;padding:82px 18px}.countdown-section{min-height:400px;padding-top:62px;padding-bottom:62px}.hero .content{padding:62px 18px 330px;top:-190px}.hero .names{width:100%;font-size:clamp(50px,10.5vw,68px);letter-spacing:.02em}.date-grid{grid-template-columns:1fr;gap:24px}.events{grid-template-columns:minmax(0,1fr)}.event{padding:56px 18px}.event+.event{border-top:1px solid rgba(23,23,23,.16);border-left:0}.detail-grid{grid-template-columns:minmax(0,1fr)}.detail{padding:38px 16px}.btn{width:min(100%,240px);padding-inline:16px;white-space:normal}.gallery{grid-template-columns:1fr 1fr;grid-template-rows:330px 220px}.gallery img:first-child{grid-column:1/3;grid-row:auto}.branch{width:65vw}.branch.right{right:-22vw}.branch.left{left:-22vw}body.preview .music{right:9px;bottom:9px;width:48px;height:48px}}
+
+    @media(max-width:760px){
+      .event .btn,
+      .detail .btn,
+      .rsvp .btn{
+        display:flex;
+        width:calc(100% - 56px);
+        max-width:210px;
+        margin-left:auto;
+        margin-right:auto;
+        padding-left:14px;
+        padding-right:14px;
+      }
+      .events,
+      .detail-grid{width:100%;max-width:100%}
+    }
+
+    .event,
+    .detail{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+    .event .btn,
+    .detail .btn{
+      box-sizing:border-box;
+      flex:0 0 64px;
+      inline-size:240px !important;
+      width:240px !important;
+      min-width:240px;
+      max-width:min(240px,calc(100% - 48px)) !important;
+      min-height:64px;
+      height:64px;
+      max-height:64px;
+      margin-top:auto;
+      margin-left:auto;
+      margin-right:auto;
+      padding:0 18px;
+      appearance:none;
+      -webkit-appearance:none;
+    }
+    .event p,
+    .detail p{margin-bottom:32px}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.section,[data-reveal]{opacity:1!important;transform:none!important}.photo-break img{transform:scale(1.02)}}
   </style>
 </head>
@@ -118,13 +173,13 @@
 </main>
 <div class="palette-switcher" aria-label="Paletas de Vínculo Noir">
   <button class="oro" type="button" data-theme="oro" aria-label="Oro antiguo" title="Oro antiguo" aria-pressed="true"></button>
-  <button class="borgona" type="button" data-theme="borgona" aria-label="Borgoña" title="Borgoña" aria-pressed="false"></button>
-  <button class="noche" type="button" data-theme="noche" aria-label="Azul noche" title="Azul noche" aria-pressed="false"></button>
+  <button class="rosa" type="button" data-theme="rosa" aria-label="Rosa empolvado" title="Rosa empolvado" aria-pressed="false"></button>
+  <button class="verde" type="button" data-theme="verde" aria-label="Verde inglés" title="Verde inglés" aria-pressed="false"></button>
 </div>
 <button class="music" type="button" aria-label="Música">♫</button>
 <script>
   const params=new URLSearchParams(location.search);
-  const supportedThemes=['oro','borgona','noche'];
+  const supportedThemes=['oro','rosa','verde'];
   const selectedTheme=supportedThemes.includes(params.get('palette')||'')?params.get('palette'):'oro';
   const selectedLanguage=['es','en','pt'].includes(params.get('lang')||'')?params.get('lang'):'es';
   document.body.dataset.theme=selectedTheme;

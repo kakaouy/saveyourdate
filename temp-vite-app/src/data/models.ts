@@ -254,8 +254,8 @@ export const INVITATION_MODELS: InvitationModel[] = [
     includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','gallery','rsvp'],
     palettes: [
       { id: 'oro', name: 'Oro antiguo', color: '#ae8b52' },
-      { id: 'borgona', name: 'Borgoña', color: '#782f40' },
-      { id: 'noche', name: 'Azul noche', color: '#26364f' }
+      { id: 'rosa', name: 'Rosa empolvado', color: '#b7838f' },
+      { id: 'verde', name: 'Verde inglés', color: '#6f8b75' }
     ]
   },
   {
@@ -289,6 +289,38 @@ export const INVITATION_MODELS: InvitationModel[] = [
       { id: 'rosa-antiguo', name: 'Rosa antiguo', color: '#936779' },
       { id: 'salvia', name: 'Verde salvia', color: '#64796d' },
       { id: 'lavanda', name: 'Lavanda', color: '#716985' }
+    ]
+  },
+  {
+    id: 'boda-brindis-papel',
+    previewImage: '/previews/brindis-papel.webp',
+    title: 'Brindis de Papel',
+    category: 'wedding',
+    description: 'Trazos de manos alzadas, textura de papel y bloques de color para una boda alegre, artística y contemporánea.',
+    badge: 'Nuevo',
+    demoName1: 'Valentina & Matías',
+    date: '14 de Febrero, 2027',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Ceremonia y celebración en una ubicación',
+      'Foto destacada con efecto parallax',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Mensajes',
+      'Menú',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    musicTitle: 'Brillas',
+    musicArtist: 'León Larregui',
+    location: 'Estancia Villa María, Buenos Aires',
+    includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','messages','menu','rsvp'],
+    palettes: [
+      { id: 'azul', name: 'Azul vivo', color: '#2f7cf4' },
+      { id: 'coral', name: 'Coral terracota', color: '#df735f' },
+      { id: 'verde', name: 'Verde jardín', color: '#5f8f6d' }
     ]
   },
   {
