@@ -225,6 +225,69 @@ export const INVITATION_MODELS: InvitationModel[] = [
     ]
   },
   {
+    id: 'boda-vinculo-noir',
+    title: 'Vínculo Noir',
+    category: 'wedding',
+    description: 'Fotografía en blanco y negro, composición editorial y acentos profundos para una boda moderna y sofisticada.',
+    badge: 'Nuevo',
+    demoName1: 'Renata & Nicolás',
+    date: '10 de Octubre, 2026',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Agenda',
+      'Ubicación',
+      'Foto destacada con efecto parallax',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Galería de fotos',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    musicTitle: 'The Look of Love',
+    musicArtist: 'Diana Krall',
+    location: 'Palacio Sans Souci, Buenos Aires',
+    includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','gallery','rsvp'],
+    palettes: [
+      { id: 'oro', name: 'Oro antiguo', color: '#ae8b52' },
+      { id: 'borgona', name: 'Borgoña', color: '#782f40' },
+      { id: 'noche', name: 'Azul noche', color: '#26364f' }
+    ]
+  },
+  {
+    id: 'boda-flores-papel',
+    title: 'Flores de Papel',
+    category: 'wedding',
+    description: 'Textura de papel, flores de acuarela y una estética delicada que alterna ornamentos entre cada sección.',
+    badge: 'Nuevo',
+    demoName1: 'Marina & Rafael',
+    date: '20 de Marzo, 2027',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Agenda',
+      'Ubicación',
+      'Foto destacada con efecto parallax',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Menú',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    musicTitle: 'Trevo',
+    musicArtist: 'ANAVITÓRIA',
+    location: 'Casa Petra, São Paulo',
+    includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','menu','rsvp'],
+    palettes: [
+      { id: 'azul-hielo', name: 'Azul hielo', color: '#536f88' },
+      { id: 'rosa-antiguo', name: 'Rosa antiguo', color: '#936779' },
+      { id: 'salvia', name: 'Verde salvia', color: '#64796d' },
+      { id: 'lavanda', name: 'Lavanda', color: '#716985' }
+    ]
+  },
+  {
     id: '15-neon',
     title: 'Neon Party',
     category: '15years',
