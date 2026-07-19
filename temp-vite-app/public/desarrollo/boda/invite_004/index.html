@@ -80,7 +80,7 @@
       user-select:none;
       will-change:transform,opacity;
     }
-    .has-side-decoration > *:not(.side-decoration){position:relative;z-index:2}
+    .has-side-decoration > *:not(.side-decoration):not(.left-decoration){position:relative;z-index:2}
     .has-side-decoration.section-visible .side-decoration{
       animation:sideDecorationEnter .9s cubic-bezier(.22,.61,.36,1) forwards,
                 sideDecorationPulse 5.8s ease-in-out .9s infinite;
@@ -92,6 +92,34 @@
     @keyframes sideDecorationPulse{
       0%,100%{opacity:.72;transform:translate3d(0,-50%,0) scale(1)}
       50%{opacity:.82;transform:translate3d(0,-50%,0) scale(1.035)}
+    }
+    .left-decoration{
+      position:absolute;
+      z-index:3;
+      bottom:0;
+      left:-5vw;
+      display:block;
+      width:clamp(240px,32vw,460px);
+      height:auto;
+      opacity:0;
+      clip-path:inset(100% 100% 0 0);
+      transform:translate3d(-45px,50%,0) scale(.97);
+      transform-origin:left bottom;
+      pointer-events:none;
+      user-select:none;
+      will-change:transform,opacity,clip-path;
+    }
+    .section-visible .left-decoration{
+      animation:leftDecorationDraw 1.25s cubic-bezier(.22,.61,.36,1) forwards,
+                leftDecorationPulse 5.8s ease-in-out 1.25s infinite;
+    }
+    @keyframes leftDecorationDraw{
+      from{opacity:0;clip-path:inset(100% 100% 0 0);transform:translate3d(-45px,50%,0) scale(.97)}
+      to{opacity:.74;clip-path:inset(0 0 0 0);transform:translate3d(0,50%,0) scale(1)}
+    }
+    @keyframes leftDecorationPulse{
+      0%,100%{opacity:.74;clip-path:inset(0);transform:translate3d(0,50%,0) scale(1)}
+      50%{opacity:.84;clip-path:inset(0);transform:translate3d(0,50%,0) scale(1.035)}
     }
     .hero .content{display:flex;min-height:calc(100svh - 180px);flex-direction:column;align-items:center;justify-content:center}
     .hero .eyebrow{margin-bottom:30px}
@@ -163,12 +191,14 @@
       .event-card{padding:58px 24px}
       .photo{min-height:50svh}
       .side-decoration{right:-14vw;width:clamp(190px,50vw,270px);opacity:0}
+      .left-decoration{left:-16vw;width:clamp(220px,58vw,310px)}
     }
     @media(prefers-reduced-motion:reduce){
       body.motion-ready .section:not(.hero){opacity:1;transform:none;transition:none}
       [data-reveal]{opacity:1;transform:none;transition:none}
       .hero-decoration{animation:none}
       .has-side-decoration.section-visible .side-decoration{opacity:.72;transform:translate3d(0,-50%,0) scale(1);animation:none}
+      .section-visible .left-decoration{opacity:.74;clip-path:inset(0);transform:translate3d(0,50%,0) scale(1);animation:none}
       .photo img{transform:scale(1.025)}
     }
   </style>
@@ -203,6 +233,7 @@
 
     <section class="section section--cream has-side-decoration">
       <img class="side-decoration" src="assets/ornamento-derecha.png" alt="">
+      <img class="left-decoration" src="assets/ornamento-izquierda.png" alt="">
       <div class="event-grid">
         <article class="event-card" data-reveal>
           <img class="icon" src="assets/icon-church-gd.png" alt="">
@@ -228,6 +259,7 @@
 
     <section class="section section--sage has-side-decoration">
       <img class="side-decoration" src="assets/ornamento-derecha.png" alt="">
+      <img class="left-decoration" src="assets/ornamento-izquierda.png" alt="">
       <div class="content">
         <p class="eyebrow" data-reveal>Detalles de la celebración</p>
         <h2 class="title" data-reveal>Todo lo que necesitás saber</h2>
