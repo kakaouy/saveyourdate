@@ -74,7 +74,7 @@
       width:clamp(210px,27vw,390px);
       height:auto;
       opacity:0;
-      transform:translate3d(70px,-50%,0) scale(.96);
+      transform:translate3d(70px,-50%,0) scale(.96) scaleX(-1);
       transform-origin:center right;
       pointer-events:none;
       user-select:none;
@@ -86,12 +86,12 @@
                 sideDecorationPulse 5.8s ease-in-out .9s infinite;
     }
     @keyframes sideDecorationEnter{
-      from{opacity:0;transform:translate3d(70px,-50%,0) scale(.96)}
-      to{opacity:.72;transform:translate3d(0,-50%,0) scale(1)}
+      from{opacity:0;transform:translate3d(70px,-50%,0) scale(.96) scaleX(-1)}
+      to{opacity:.72;transform:translate3d(0,-50%,0) scale(1) scaleX(-1)}
     }
     @keyframes sideDecorationPulse{
-      0%,100%{opacity:.72;transform:translate3d(0,-50%,0) scale(1)}
-      50%{opacity:.82;transform:translate3d(0,-50%,0) scale(1.035)}
+      0%,100%{opacity:.72;transform:translate3d(0,-50%,0) scale(1) scaleX(-1)}
+      50%{opacity:.82;transform:translate3d(0,-50%,0) scale(1.035) scaleX(-1)}
     }
     .left-decoration{
       position:absolute;
@@ -163,6 +163,19 @@
     .closing{min-height:520px}
     .closing h2{margin:0;color:var(--green);font:400 clamp(58px,9vw,100px)/.9 var(--script)}
     .closing p{margin-top:28px;font:400 14px/1.8 var(--serif);letter-spacing:.08em}
+    .invite-footer{
+      position:relative;
+      z-index:4;
+      width:100%;
+      padding:34px clamp(24px,6vw,88px);
+      border-top:1px solid rgba(255,255,255,.2);
+      background:var(--ink);
+      color:rgba(255,255,255,.82);
+      text-align:center;
+    }
+    .invite-footer__brand{margin:0;color:#fff;font:400 clamp(24px,4vw,36px)/1 var(--serif);letter-spacing:.08em}
+    .invite-footer__tagline{margin:10px 0 0;font-size:8px;letter-spacing:.25em;text-transform:uppercase}
+    .invite-footer__legal{margin:20px 0 0;font-size:8px;letter-spacing:.1em;opacity:.62}
     .music{position:fixed;z-index:20;right:20px;bottom:20px;display:grid;width:58px;height:58px;place-items:center;border:1px solid rgba(154,117,64,.55);border-radius:50%;background:rgba(247,244,237,.92);box-shadow:0 6px 22px rgba(36,48,43,.18)}
     .music img{width:26px;height:26px;opacity:.62}
     body.motion-ready .section:not(.hero){opacity:.25;transform:translateY(24px);transition:opacity .9s ease,transform .9s cubic-bezier(.22,.61,.36,1)}
@@ -197,7 +210,7 @@
       body.motion-ready .section:not(.hero){opacity:1;transform:none;transition:none}
       [data-reveal]{opacity:1;transform:none;transition:none}
       .hero-decoration{animation:none}
-      .has-side-decoration.section-visible .side-decoration{opacity:.72;transform:translate3d(0,-50%,0) scale(1);animation:none}
+      .has-side-decoration.section-visible .side-decoration{opacity:.72;transform:translate3d(0,-50%,0) scale(1) scaleX(-1);animation:none}
       .section-visible .left-decoration{opacity:.74;clip-path:inset(0);transform:translate3d(0,50%,0) scale(1);animation:none}
       .photo img{transform:scale(1.025)}
     }
@@ -272,7 +285,8 @@
       </div>
     </section>
 
-    <section class="section section--green">
+    <section class="section section--green has-side-decoration">
+      <img class="left-decoration" src="assets/ornamento-izquierda.png" alt="">
       <div class="content">
         <img class="icon" src="assets/icon-cake-gd.png" alt="" data-reveal>
         <p class="eyebrow" data-reveal>Nuestro menú</p>
@@ -311,6 +325,12 @@
         <p data-reveal>Gracias por ser parte de nuestra historia.<br>¡Te esperamos!</p>
       </div>
     </section>
+
+    <footer class="invite-footer">
+      <p class="invite-footer__brand" data-reveal>Save Your Date</p>
+      <p class="invite-footer__tagline" data-reveal>Invitaciones digitales para momentos inolvidables</p>
+      <p class="invite-footer__legal" data-reveal>© 2026 Save Your Date · Todos los derechos reservados</p>
+    </footer>
   </main>
 
   <dialog id="gift">
