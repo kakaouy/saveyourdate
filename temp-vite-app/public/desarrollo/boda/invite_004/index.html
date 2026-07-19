@@ -78,7 +78,7 @@
       height:auto;
       opacity:0;
       transform:translate3d(70px,-50%,0) scale(.96) scaleX(-1);
-      transform-origin:center right;
+      transform-origin:center center;
       pointer-events:none;
       user-select:none;
       will-change:transform,opacity;
@@ -97,7 +97,7 @@
       50%{opacity:.82;transform:translate3d(0,-50%,0) scale(1.035) scaleX(-1)}
     }
     .boundary-decoration{position:relative;z-index:9;width:100%;height:120px;margin:-60px 0;overflow:visible;pointer-events:none}
-    .boundary-decoration img{position:absolute;top:0;right:-4vw;display:block;width:clamp(210px,27vw,390px);height:auto;opacity:0;transform:translate3d(70px,-50%,0) scale(.96) scaleX(-1);transform-origin:center right;will-change:transform,opacity}
+    .boundary-decoration img{position:absolute;top:0;right:-4vw;display:block;width:clamp(210px,27vw,390px);height:auto;opacity:0;transform:translate3d(70px,-50%,0) scale(.96) scaleX(-1);transform-origin:center center;will-change:transform,opacity}
     .boundary-decoration.boundary-visible img{animation:boundaryRightEnter .9s cubic-bezier(.22,.61,.36,1) forwards,boundaryRightPulse 5.8s ease-in-out .9s infinite}
     @keyframes boundaryRightEnter{from{opacity:0;transform:translate3d(70px,-50%,0) scale(.96) scaleX(-1)}to{opacity:.78;transform:translate3d(0,-50%,0) scale(1) scaleX(-1)}}
     @keyframes boundaryRightPulse{0%,100%{opacity:.78;transform:translate3d(0,-50%,0) scale(1) scaleX(-1)}50%{opacity:.88;transform:translate3d(0,-50%,0) scale(1.04) scaleX(-1)}}
