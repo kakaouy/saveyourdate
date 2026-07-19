@@ -98,7 +98,9 @@ const FEATURE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'Dress Code': 'Dress code',
     'Libro de Firmas': 'Guest book',
     'Sugerencias de Regalo': 'Gift suggestions',
-    'Organizador': 'Organizer'
+    'Organizador': 'Organizer',
+    'Agenda': 'Schedule',
+    'Código de Vestimenta': 'Dress code'
   },
   pt: {
     'Galería de fotos': 'Galeria de fotos',
@@ -116,7 +118,9 @@ const FEATURE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'Dress Code': 'Código de vestimenta',
     'Libro de Firmas': 'Livro de visitas',
     'Sugerencias de Regalo': 'Sugestões de presentes',
-    'Organizador': 'Organizador'
+    'Organizador': 'Organizador',
+    'Agenda': 'Agenda',
+    'Código de Vestimenta': 'Código de vestimenta'
   }
 };
 
