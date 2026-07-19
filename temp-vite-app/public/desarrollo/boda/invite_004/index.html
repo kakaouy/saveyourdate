@@ -56,6 +56,13 @@
       object-position:top left;
       pointer-events:none;
       user-select:none;
+      transform-origin:top left;
+      animation:botanicalPulse 7s ease-in-out infinite;
+      will-change:transform;
+    }
+    @keyframes botanicalPulse{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.014)}
     }
     .hero .content{display:flex;min-height:calc(100svh - 180px);flex-direction:column;align-items:center;justify-content:center}
     .hero .eyebrow{margin-bottom:30px}
@@ -79,7 +86,7 @@
     .event-card .title{font-size:clamp(30px,4vw,48px)}
     .address{margin:18px auto 0;font-size:11px;line-height:1.8}
     .photo{min-height:78svh;padding:0;background:#53675d}
-    .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;filter:saturate(.78) contrast(.95)}
+    .photo img{position:absolute;top:-10%;right:0;bottom:auto;left:0;width:100%;height:120%;object-fit:cover;object-position:center;filter:saturate(.78) contrast(.95);transform:translate3d(0,var(--parallax-y,0px),0) scale(1.025);will-change:transform}
     .photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(23,37,30,.68))}
     .photo-caption{position:relative;z-index:2;align-self:flex-end;margin:0 0 54px;color:#fff;font:400 clamp(38px,6vw,72px)/1 var(--script)}
     .detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:54px}
@@ -101,6 +108,8 @@
     .closing p{margin-top:28px;font:400 14px/1.8 var(--serif);letter-spacing:.08em}
     .music{position:fixed;z-index:20;right:20px;bottom:20px;display:grid;width:58px;height:58px;place-items:center;border:1px solid rgba(154,117,64,.55);border-radius:50%;background:rgba(247,244,237,.92);box-shadow:0 6px 22px rgba(36,48,43,.18)}
     .music img{width:26px;height:26px;opacity:.62}
+    body.motion-ready .section:not(.hero){opacity:.25;transform:translateY(24px);transition:opacity .9s ease,transform .9s cubic-bezier(.22,.61,.36,1)}
+    body.motion-ready .section:not(.hero).section-visible{opacity:1;transform:none}
     [data-reveal]{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .8s ease}
     [data-reveal].visible{opacity:1;transform:none}
     dialog{border:0;border-radius:18px;padding:34px;max-width:340px;text-align:center;color:var(--ink);background:var(--cream)}
@@ -125,7 +134,12 @@
       .event-card{padding:58px 24px}
       .photo{min-height:68svh}
     }
-    @media(prefers-reduced-motion:reduce){[data-reveal]{opacity:1;transform:none;transition:none}}
+    @media(prefers-reduced-motion:reduce){
+      body.motion-ready .section:not(.hero){opacity:1;transform:none;transition:none}
+      [data-reveal]{opacity:1;transform:none;transition:none}
+      .hero-decoration{animation:none}
+      .photo img{transform:scale(1.025)}
+    }
   </style>
 </head>
 <body>
@@ -256,10 +270,40 @@
     }
     tick();
     setInterval(tick,1000);
+    document.body.classList.add('motion-ready');
+
+    const sectionObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('section-visible');
+        sectionObserver.unobserve(entry.target);
+      }
+    }),{threshold:.12});
+    document.querySelectorAll('.section:not(.hero)').forEach(section=>sectionObserver.observe(section));
+
     const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
       if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}
     }),{threshold:.12});
     document.querySelectorAll('[data-reveal]').forEach(el=>observer.observe(el));
+
+    const parallaxImage=document.querySelector('.photo img');
+    const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+    let parallaxTicking=false;
+    function updateParallax(){
+      if(!parallaxImage || reduceMotion.matches){parallaxTicking=false;return}
+      const photo=parallaxImage.closest('.photo');
+      const rect=photo.getBoundingClientRect();
+      const progress=(rect.top+rect.height/2-window.innerHeight/2)/(window.innerHeight+rect.height);
+      const offset=Math.max(-42,Math.min(42,progress*-84));
+      parallaxImage.style.setProperty('--parallax-y',offset.toFixed(2)+'px');
+      parallaxTicking=false;
+    }
+    function requestParallax(){
+      if(!parallaxTicking){requestAnimationFrame(updateParallax);parallaxTicking=true}
+    }
+    updateParallax();
+    addEventListener('scroll',requestParallax,{passive:true});
+    addEventListener('resize',requestParallax,{passive:true});
+
     document.getElementById('rsvpForm').addEventListener('submit',event=>{
       event.preventDefault();
       event.currentTarget.style.display='none';
