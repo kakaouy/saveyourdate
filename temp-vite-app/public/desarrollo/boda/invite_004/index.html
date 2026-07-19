@@ -64,6 +64,34 @@
       0%,100%{transform:scale(1)}
       50%{transform:scale(1.028)}
     }
+    .side-decoration{
+      position:absolute;
+      z-index:1;
+      top:50%;
+      right:-4vw;
+      display:block;
+      width:clamp(210px,27vw,390px);
+      height:auto;
+      opacity:0;
+      transform:translate3d(70px,-50%,0) scale(.96);
+      transform-origin:center right;
+      pointer-events:none;
+      user-select:none;
+      will-change:transform,opacity;
+    }
+    .has-side-decoration > *:not(.side-decoration){position:relative;z-index:2}
+    .has-side-decoration.section-visible .side-decoration{
+      animation:sideDecorationEnter .9s cubic-bezier(.22,.61,.36,1) forwards,
+                sideDecorationPulse 5.8s ease-in-out .9s infinite;
+    }
+    @keyframes sideDecorationEnter{
+      from{opacity:0;transform:translate3d(70px,-50%,0) scale(.96)}
+      to{opacity:.72;transform:translate3d(0,-50%,0) scale(1)}
+    }
+    @keyframes sideDecorationPulse{
+      0%,100%{opacity:.72;transform:translate3d(0,-50%,0) scale(1)}
+      50%{opacity:.82;transform:translate3d(0,-50%,0) scale(1.035)}
+    }
     .hero .content{display:flex;min-height:calc(100svh - 180px);flex-direction:column;align-items:center;justify-content:center}
     .hero .eyebrow{margin-bottom:30px}
     .names{margin:0;color:var(--ink);font:400 clamp(72px,13vw,150px)/.72 var(--script)}
@@ -133,11 +161,13 @@
       .detail-grid{grid-template-columns:1fr}
       .event-card{padding:58px 24px}
       .photo{min-height:50svh}
+      .side-decoration{right:-14vw;width:clamp(190px,50vw,270px);opacity:0}
     }
     @media(prefers-reduced-motion:reduce){
       body.motion-ready .section:not(.hero){opacity:1;transform:none;transition:none}
       [data-reveal]{opacity:1;transform:none;transition:none}
       .hero-decoration{animation:none}
+      .has-side-decoration.section-visible .side-decoration{opacity:.72;transform:translate3d(0,-50%,0) scale(1);animation:none}
       .photo img{transform:scale(1.025)}
     }
   </style>
@@ -170,7 +200,8 @@
       </div>
     </section>
 
-    <section class="section section--cream">
+    <section class="section section--cream has-side-decoration">
+      <img class="side-decoration" src="assets/ornamento-derecha.png" alt="">
       <div class="event-grid">
         <article class="event-card" data-reveal>
           <img class="icon" src="assets/icon-church-gd.png" alt="">
@@ -194,7 +225,8 @@
       <p class="photo-caption">Nuestro lugar favorito es juntos</p>
     </section>
 
-    <section class="section section--sage">
+    <section class="section section--sage has-side-decoration">
+      <img class="side-decoration" src="assets/ornamento-derecha.png" alt="">
       <div class="content">
         <p class="eyebrow" data-reveal>Detalles de la celebración</p>
         <h2 class="title" data-reveal>Todo lo que necesitás saber</h2>
@@ -221,7 +253,8 @@
       </div>
     </section>
 
-    <section class="section section--cream">
+    <section class="section section--cream has-side-decoration">
+      <img class="side-decoration" src="assets/ornamento-derecha.png" alt="">
       <div class="content">
         <img class="icon" src="assets/icon-rsvp-gd.png" alt="" data-reveal>
         <p class="eyebrow" data-reveal>Queremos que nos acompañes</p>
