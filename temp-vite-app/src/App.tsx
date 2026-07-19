@@ -139,7 +139,14 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     cielo: 'Dusty sky blue',
     petroleo: 'Petrol blue',
     tinta: 'Ink blue',
-    oliva: 'Olive & champagne'
+    oliva: 'Olive & champagne',
+    oro: 'Antique gold',
+    borgona: 'Burgundy',
+    noche: 'Midnight blue',
+    'azul-hielo': 'Ice blue',
+    'rosa-antiguo': 'Antique rose',
+    salvia: 'Sage green',
+    lavanda: 'Lavender'
   },
   pt: {
     rosa: 'Rosa',
@@ -154,7 +161,14 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     cielo: 'Azul celeste acinzentado',
     petroleo: 'Azul petróleo',
     tinta: 'Azul tinta',
-    oliva: 'Oliva e champanhe'
+    oliva: 'Oliva e champanhe',
+    oro: 'Ouro antigo',
+    borgona: 'Bordô',
+    noche: 'Azul noite',
+    'azul-hielo': 'Azul gelo',
+    'rosa-antiguo': 'Rosa antigo',
+    salvia: 'Verde sálvia',
+    lavanda: 'Lavanda'
   }
 };
 
@@ -3174,6 +3188,24 @@ function App() {
                         selectedModelColors[demoModel.id]
                       )}&lang=${lang}`}
                       title="Demo interactiva Martín y Sofía"
+                    />
+                  ) : demoModel.id === 'boda-vinculo-noir' ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src={`/desarrollo/boda/invite_005/index.html?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}&lang=${lang}`}
+                      title="Demo interactiva Vínculo Noir"
+                    />
+                  ) : demoModel.id === 'boda-flores-papel' ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src={`/desarrollo/boda/invite_006/index.html?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}&lang=${lang}`}
+                      title="Demo interactiva Flores de Papel"
                     />
                   ) : (
                   <div className="demo-invitation-scroll">
