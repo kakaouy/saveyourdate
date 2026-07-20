@@ -64,7 +64,12 @@ window.INVITATION_CONFIG = {
   },
   gallery: {
     enabled: true,
-    photos: []
+    photos: [
+      "./assets/juanita-galeria-01.jpg",
+      "./assets/juanita-galeria-02.jpg",
+      "./assets/juanita-galeria-03.jpg",
+      "./assets/juanita-galeria-04.jpg"
+    ]
   },
   integrations: {
     /* Se completa al crear el pedido real. Vacío = modo demostración sin enviar datos. */
@@ -83,10 +88,9 @@ window.INVITATION_CONFIG = {
     dietaryRestrictions: true
   },
   assets: {
-    cover: "",
-    parallax: "",
+    cover: "./assets/juanita-portada-blur.png",
+    parallax: "./assets/juanita-portada-blur.png",
     music: "",
     floralSide: ""
   }
 };
-
