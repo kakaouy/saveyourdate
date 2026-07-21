@@ -1,0 +1,57 @@
+window.INVITATION_I18N = {
+  es: {
+    invitationOf: "Bienvenidos a la invitación de", musicExperience: "La música de fondo es parte de la experiencia",
+    enterMusic: "Ingresar con música", enterSilent: "Ingresar sin música", myFifteen: "Mis 15 años",
+    heroPhrase: "Llegó esta gran noche y quiero compartirla con vos.", discover: "Ver invitación",
+    missing: "Falta cada vez menos", days: "Días", hours: "Horas", minutes: "Minutos", seconds: "Segundos",
+    photoJourney: "Un recorrido por estos 15 años", photoPending: "Las fotos se agregarán en la próxima etapa.",
+    epicParty: "Hagamos juntos una fiesta épica", location: "Ubicación", howToGet: "Cómo llegar",
+    dressCode: "Dress code", dressHelp: "Orientación para tu vestuario", reservedWhite: "Reservamos el blanco para la cumpleañera.",
+    instagramTitle: "Una gran fiesta junto a vos", instagramCopy: "Subí tus fotos y etiquetame en Instagram.", goInstagram: "Ir a Instagram",
+    playlistTitle: "La playlist de mi fiesta", playlistQuestion: "¿Qué canción no puede faltar?", suggestSong: "Sugerir canción",
+    gifts: "Regalos", giftsCopy: "El mejor regalo es que vengas, pero si deseás regalarme algo más que tu presencia… ¡muchas gracias!",
+    viewGift: "Ver datos", rsvp: "Confirmación de asistencia", rsvpBefore: "Por favor, respondé antes del",
+    confirm: "Confirmar asistencia", name: "Nombre y apellido", attending: "¿Vas a asistir?", yes: "Sí, voy a estar", no: "No voy a poder asistir",
+    dietary: "Restricción alimentaria", none: "Sin restricciones", vegan: "Vegano/a", celiac: "Celíaco/a", other: "Otra",
+    message: "Mensaje o aclaración", send: "Enviar confirmación", thankYou: "¡Gracias! Tu respuesta quedó registrada.",
+    songName: "Tu nombre", songTitle: "Canción y artista", songLink: "Link opcional", sendSuggestion: "Enviar sugerencia",
+    copyAlias: "Copiar alias", copied: "Alias copiado", thanksPart: "Gracias por ser parte"
+  },
+  pt: {
+    invitationOf: "Bem-vindos ao convite de", musicExperience: "A música de fundo faz parte da experiência",
+    enterMusic: "Entrar com música", enterSilent: "Entrar sem música", myFifteen: "Meus 15 anos",
+    heroPhrase: "Chegou a grande noite e quero compartilhá-la com você.", discover: "Ver convite",
+    missing: "Falta cada vez menos", days: "Dias", hours: "Horas", minutes: "Minutos", seconds: "Segundos",
+    photoJourney: "Uma viagem por estes 15 anos", photoPending: "As fotos serão adicionadas na próxima etapa.",
+    epicParty: "Vamos fazer uma festa épica", location: "Local", howToGet: "Como chegar",
+    dressCode: "Traje", dressHelp: "Orientação para o seu look", reservedWhite: "Reservamos o branco para a aniversariante.",
+    instagramTitle: "Uma grande festa com você", instagramCopy: "Publique suas fotos e me marque no Instagram.", goInstagram: "Ir ao Instagram",
+    playlistTitle: "A playlist da minha festa", playlistQuestion: "Qual música não pode faltar?", suggestSong: "Sugerir música",
+    gifts: "Presentes", giftsCopy: "O melhor presente é a sua presença. Se quiser me presentear com algo mais, muito obrigada!",
+    viewGift: "Ver dados", rsvp: "Confirmação de presença", rsvpBefore: "Por favor, responda antes de",
+    confirm: "Confirmar presença", name: "Nome e sobrenome", attending: "Você vai participar?", yes: "Sim, estarei lá", no: "Não poderei participar",
+    dietary: "Restrição alimentar", none: "Sem restrições", vegan: "Vegano/a", celiac: "Celíaco/a", other: "Outra",
+    message: "Mensagem ou observação", send: "Enviar confirmação", thankYou: "Obrigada! Sua resposta foi registrada.",
+    songName: "Seu nome", songTitle: "Música e artista", songLink: "Link opcional", sendSuggestion: "Enviar sugestão",
+    copyAlias: "Copiar alias", copied: "Alias copiado", thanksPart: "Obrigada por fazer parte"
+  },
+  en: {
+    invitationOf: "Welcome to the invitation of", musicExperience: "Background music is part of the experience",
+    enterMusic: "Enter with music", enterSilent: "Enter without music", myFifteen: "My 15th birthday",
+    heroPhrase: "The big night has arrived and I want to share it with you.", discover: "View invitation",
+    missing: "The wait is almost over", days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds",
+    photoJourney: "A journey through these 15 years", photoPending: "Photos will be added in the next stage.",
+    epicParty: "Let's make it an epic celebration", location: "Location", howToGet: "Directions",
+    dressCode: "Dress code", dressHelp: "A guide for your outfit", reservedWhite: "White is reserved for the birthday girl.",
+    instagramTitle: "A great party with you", instagramCopy: "Share your photos and tag me on Instagram.", goInstagram: "Open Instagram",
+    playlistTitle: "My party playlist", playlistQuestion: "Which song must be played?", suggestSong: "Suggest a song",
+    gifts: "Gifts", giftsCopy: "Your presence is the best gift. If you would like to give me something more, thank you!",
+    viewGift: "View details", rsvp: "RSVP", rsvpBefore: "Please reply before",
+    confirm: "Confirm attendance", name: "Full name", attending: "Will you attend?", yes: "Yes, I'll be there", no: "I won't be able to attend",
+    dietary: "Dietary restriction", none: "No restrictions", vegan: "Vegan", celiac: "Gluten-free", other: "Other",
+    message: "Message or note", send: "Send confirmation", thankYou: "Thank you! Your reply has been recorded.",
+    songName: "Your name", songTitle: "Song and artist", songLink: "Optional link", sendSuggestion: "Send suggestion",
+    copyAlias: "Copy alias", copied: "Alias copied", thanksPart: "Thank you for being part of it"
+  }
+};
+
