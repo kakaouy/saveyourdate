@@ -96,6 +96,7 @@
     config.gallery.photos.forEach((src, index) => {
       const image = document.createElement("img"); image.src = src; image.alt = `${config.celebrant.name} ${index + 1}`; if (!index) image.className = "active"; carousel.appendChild(image);
     });
+    if (typeof window.reiniciarCarrusel === "function") window.reiniciarCarrusel();
   }
 
   function applyAssets() {
@@ -141,4 +142,3 @@
   applyData();
   applyModules();
 })();
-

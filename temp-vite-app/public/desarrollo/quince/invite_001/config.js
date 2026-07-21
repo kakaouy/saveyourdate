@@ -6,7 +6,7 @@
 window.INVITATION_CONFIG = {
   model: {
     id: "quince-001",
-    name: "Sueño Rosa",
+    name: "Sweet Jane",
     eventType: "quince",
     version: 1
   },
@@ -35,9 +35,9 @@ window.INVITATION_CONFIG = {
     }
   },
   celebrant: {
-    name: "Juanita",
+    name: "Emma",
     age: 15,
-    instagram: "@juanita.15",
+    instagram: "@emma.15",
     instagramUrl: "https://www.instagram.com/"
   },
   event: {
@@ -53,7 +53,7 @@ window.INVITATION_CONFIG = {
   gifts: {
     enabled: true,
     accounts: [
-      { bank: "BROU", holder: "Juanita Demo", account: "000000-00001", currency: "Pesos uruguayos", alias: "JUANITA.15" }
+      { bank: "BROU", holder: "Emma Demo", account: "000000-00001", currency: "Pesos uruguayos", alias: "EMMA.15" }
     ]
   },
   music: {
@@ -68,7 +68,11 @@ window.INVITATION_CONFIG = {
       "./assets/juanita-galeria-01.jpg",
       "./assets/juanita-galeria-02.jpg",
       "./assets/juanita-galeria-03.jpg",
-      "./assets/juanita-galeria-04.jpg"
+      "./assets/juanita-galeria-04.jpg",
+      "./assets/juanita-galeria-05.jpg",
+      "./assets/juanita-galeria-06.jpg",
+      "./assets/juanita-galeria-07.jpg",
+      "./assets/juanita-galeria-08.jpg"
     ]
   },
   integrations: {
@@ -88,8 +92,8 @@ window.INVITATION_CONFIG = {
     dietaryRestrictions: true
   },
   assets: {
-    cover: "./assets/juanita-portada-blur.png",
-    parallax: "./assets/juanita-portada-blur.png",
+    cover: "./assets/juanita-portada.png",
+    parallax: "./assets/juanita-portada.png",
     music: "",
     floralSide: ""
   }
