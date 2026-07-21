@@ -2539,6 +2539,7 @@ function App() {
                         {wizardCategory === '15years' && (
                           <>
                             <option value="15-glamour">Glamour Rosa</option>
+                            <option value="15-sweet-jane">Sweet Jane</option>
                             <option value="15-estrellas">Noche de Estrellas</option>
                             <option value="15-neon">Neón Party</option>
                           </>
@@ -3224,6 +3225,15 @@ function App() {
                         selectedModelColors[demoModel.id]
                       )}&lang=${lang}`}
                       title="Demo interactiva Brindis de Papel"
+                    />
+                  ) : demoModel.id === '15-sweet-jane' ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src={`/desarrollo/quince/invite_001/index.html?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}&lang=${lang}`}
+                      title="Demo interactiva Sweet Jane"
                     />
                   ) : (
                   <div className="demo-invitation-scroll">
