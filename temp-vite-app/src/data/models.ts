@@ -143,6 +143,48 @@ export const INVITATION_MODELS: InvitationModel[] = [
     location: 'Palacio Cristal, San Isidro'
   },
   {
+    id: '15-sweet-jane',
+    title: 'Sweet Jane',
+    category: '15years',
+    description: 'Una invitación fresca y romántica, con fotografía protagonista, tonos suaves y detalles pensados para celebrar los 15 con un estilo único.',
+    badge: 'Nuevo',
+    demoName1: 'Emma',
+    date: '12 de Diciembre, 2026',
+    previewImage: '/previews/sweet-jane.jpg',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Galería de fotos',
+      'Ubicación',
+      'Código de Vestimenta',
+      'Instagram',
+      'Playlist Spotify',
+      'Regalos / CBU',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-15years',
+    illustrationType: 'crown',
+    musicTitle: 'Rockstar',
+    musicArtist: 'Duki',
+    location: 'Salón Magnolia, Montevideo',
+    includedSections: [
+      'music',
+      'countdown',
+      'gallery',
+      'location',
+      'dresscode',
+      'instagram',
+      'playlist',
+      'gifts',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'rose', name: 'Rosa antiguo', color: '#b9989a' },
+      { id: 'blue', name: 'Azul bruma', color: '#8295ad' },
+      { id: 'sage', name: 'Verde salvia', color: '#91a087' }
+    ]
+  },
+  {
     id: '15-estrellas',
     title: 'Noche de Estrellas',
     category: '15years',
