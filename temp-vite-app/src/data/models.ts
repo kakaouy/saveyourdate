@@ -8,6 +8,9 @@ export interface InvitationModel {
   demoName2?: string;
   date: string;
   previewImage?: string;
+  demoPath?: string;
+  active?: boolean;
+  order?: number;
   features: string[];
   themeClass: string;
   illustrationType: 'rings' | 'crown' | 'balloon';
@@ -182,6 +185,46 @@ export const INVITATION_MODELS: InvitationModel[] = [
       { id: 'rose', name: 'Rosa antiguo', color: '#b9989a' },
       { id: 'blue', name: 'Azul bruma', color: '#8295ad' },
       { id: 'sage', name: 'Verde salvia', color: '#91a087' }
+    ]
+  },
+  {
+    id: '15-jardin-floral',
+    title: 'Jardín Floral',
+    category: '15years',
+    description: 'Flores ilustradas, tonos frescos y una composición juvenil que combina información, galería y detalles del evento con aire artesanal.',
+    badge: 'Nuevo',
+    demoName1: 'Maite',
+    date: '15 de Junio, 2027',
+    previewImage: '/previews/jardin-floral.jpg',
+    demoPath: '/desarrollo/quince/invite_002/index.html',
+    active: true,
+    order: 22,
+    features: [
+      'Cuenta Regresiva',
+      'Ubicación',
+      'Agregar al calendario',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Playlist Spotify',
+      'Galería de fotos',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-15years',
+    illustrationType: 'crown',
+    location: 'Casa Azul, Avenida Suarez 5445',
+    includedSections: [
+      'countdown',
+      'location',
+      'dresscode',
+      'gifts',
+      'playlist',
+      'gallery',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'original', name: 'Original floral', color: '#9ed1aa' },
+      { id: 'night', name: 'Noche coral', color: '#183b59' },
+      { id: 'soft', name: 'Rosa suave', color: '#b9d4b4' }
     ]
   },
   {

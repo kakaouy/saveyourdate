@@ -28,6 +28,10 @@ const getPaletteIdFromColor = (
   );
 };
 
+const CATALOG_MODELS = INVITATION_MODELS.filter((model) => model.active !== false);
+const firstModelIdFor = (category: InvitationModel['category']) =>
+  CATALOG_MODELS.find((model) => model.category === category)?.id || '';
+
 type SiteLanguage = 'es' | 'en' | 'pt';
 
 const DEMO_COPY: Record<SiteLanguage, {
@@ -1263,8 +1267,8 @@ function App() {
 
   // Filtered Models for catalog
   const filteredModels = selectedCategory === 'all' 
-    ? INVITATION_MODELS 
-    : INVITATION_MODELS.filter(m => m.category === selectedCategory);
+    ? CATALOG_MODELS
+    : CATALOG_MODELS.filter(m => m.category === selectedCategory);
 
   // Handler for Sidebar Toggling
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -1404,7 +1408,11 @@ function App() {
     submission.append('_captcha', 'false');
     submission.append('Código de validación', validationCode);
     submission.append('Categoría', wizardCategory);
+    submission.append('ID del modelo', wizardModel);
     submission.append('Modelo', selectedModel?.title || wizardModel);
+    if (selectedModel) {
+      submission.append('Paleta', getPaletteIdFromColor(selectedModel, selectedModelColors[wizardModel]));
+    }
     submission.append('Idioma', lang);
 
     Object.entries(categoryData).forEach(([field, value]) => {
@@ -2399,7 +2407,7 @@ function App() {
       </section>
 
       <OrderFlow
-        models={INVITATION_MODELS}
+        models={CATALOG_MODELS}
         initialModelId={wizardModel}
         initialPaletteColor={selectedModelColors[wizardModel]}
         lang={lang}
@@ -2497,7 +2505,7 @@ function App() {
                     <div className="category-select-grid">
                       <button 
                         className={`filter-btn ${wizardCategory === 'wedding' ? 'active' : ''}`}
-                        onClick={() => { setWizardCategory('wedding'); setWizardModel('boda-marfil'); }}
+                        onClick={() => { setWizardCategory('wedding'); setWizardModel(firstModelIdFor('wedding')); }}
                         style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}
                       >
                         <span style={{ fontSize: '24px' }}>💍</span>
@@ -2505,7 +2513,7 @@ function App() {
                       </button>
                       <button 
                         className={`filter-btn ${wizardCategory === '15years' ? 'active' : ''}`}
-                        onClick={() => { setWizardCategory('15years'); setWizardModel('15-glamour'); }}
+                        onClick={() => { setWizardCategory('15years'); setWizardModel(firstModelIdFor('15years')); }}
                         style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}
                       >
                         <span style={{ fontSize: '24px' }}>👑</span>
@@ -2513,7 +2521,7 @@ function App() {
                       </button>
                       <button 
                         className={`filter-btn ${wizardCategory === 'other' ? 'active' : ''}`}
-                        onClick={() => { setWizardCategory('other'); setWizardModel('otros-baby'); }}
+                        onClick={() => { setWizardCategory('other'); setWizardModel(firstModelIdFor('other')); }}
                         style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}
                       >
                         <span style={{ fontSize: '24px' }}>🎈</span>
@@ -2529,28 +2537,9 @@ function App() {
                         value={wizardModel}
                         onChange={(e) => setWizardModel(e.target.value)}
                       >
-                        {wizardCategory === 'wedding' && (
-                          <>
-                            <option value="boda-marfil">Clásico Marfil</option>
-                            <option value="boda-boho">Rústico Boho</option>
-                            <option value="boda-eucalipto">Eucalipto Elegante</option>
-                          </>
-                        )}
-                        {wizardCategory === '15years' && (
-                          <>
-                            <option value="15-glamour">Glamour Rosa</option>
-                            <option value="15-sweet-jane">Sweet Jane</option>
-                            <option value="15-estrellas">Noche de Estrellas</option>
-                            <option value="15-neon">Neón Party</option>
-                          </>
-                        )}
-                        {wizardCategory === 'other' && (
-                          <>
-                            <option value="otros-baby">Baby Shower Especial</option>
-                            <option value="otros-aniversario">Aniversario de Oro</option>
-                            <option value="otros-graduacion">Graduación Premium</option>
-                          </>
-                        )}
+                        {CATALOG_MODELS.filter((model) => model.category === wizardCategory).map((model) => (
+                          <option key={model.id} value={model.id}>{model.title}</option>
+                        ))}
                       </select>
                     </div>
 
@@ -3163,7 +3152,16 @@ function App() {
               >
                 <div className="demo-phone-speaker"></div>
                 <div className="demo-phone-screen">
-                  {demoModel.id === 'boda-marfil' ? (
+                  {demoModel.demoPath ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src={`${demoModel.demoPath}?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}&lang=${lang}`}
+                      title={`Demo interactiva ${demoModel.title}`}
+                    />
+                  ) : demoModel.id === 'boda-marfil' ? (
                     <iframe
                       className="demo-real-invitation-frame"
                       src={`/demos/boda-elegante-minimalista/index.html?preview=1&palette=${getPaletteIdFromColor(

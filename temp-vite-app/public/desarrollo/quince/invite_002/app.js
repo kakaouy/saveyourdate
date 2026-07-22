@@ -1,0 +1,239 @@
+(() => {
+  "use strict";
+  const config = window.INVITATION_CONFIG;
+  const dictionaries = window.INVITATION_I18N;
+  if (!config || !dictionaries) return;
+
+  const params = new URLSearchParams(location.search);
+  let language = config.locale.enabled.includes(params.get("lang")) ? params.get("lang") : config.locale.default;
+  let paletteKey = config.theme.palettes[params.get("palette")] ? params.get("palette") : config.theme.defaultPalette;
+  let activeModal = null;
+  let previousFocus = null;
+  let lightboxIndex = 0;
+  const t = (key) => dictionaries[language]?.[key] || dictionaries.es[key] || key;
+  const q = (selector, root = document) => root.querySelector(selector);
+  const qa = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const locale = () => language === "pt" ? "pt-BR" : language === "en" ? "en-US" : "es-UY";
+  const eventStart = new Date(config.event.startsAt);
+  const eventEnd = new Date(config.event.endsAt);
+  const rsvpDeadline = new Date(config.event.rsvpDeadline);
+
+  function applyPalette(key, updateUrl = false) {
+    const palette = config.theme.palettes[key] || config.theme.palettes[config.theme.defaultPalette];
+    paletteKey = key;
+    const root = document.documentElement.style;
+    Object.entries(palette).forEach(([token, value]) => {
+      if (typeof value === "string") root.setProperty(`--${token.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)}`, value);
+    });
+    qa("[data-palette]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.palette === key)));
+    q('meta[name="theme-color"]')?.setAttribute("content", palette.accent);
+    if (updateUrl) {
+      const next = new URL(location.href);
+      next.searchParams.set("palette", key);
+      history.replaceState({}, "", next);
+    }
+  }
+
+  function renderControls() {
+    const paletteHost = q("[data-palette-controls]");
+    Object.entries(config.theme.palettes).forEach(([key, palette]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "palette-button";
+      button.dataset.palette = key;
+      button.style.setProperty("--swatch", palette.accent);
+      button.title = palette.label[language] || palette.label.es;
+      button.setAttribute("aria-label", button.title);
+      button.addEventListener("click", () => applyPalette(key, true));
+      paletteHost.append(button);
+    });
+    const languageHost = q("[data-language-controls]");
+    config.locale.enabled.forEach(code => {
+      const link = document.createElement("a");
+      const next = new URL(location.href);
+      next.searchParams.set("lang", code);
+      link.href = next;
+      link.textContent = code.toUpperCase();
+      if (code === language) link.setAttribute("aria-current", "page");
+      languageHost.append(link);
+    });
+  }
+
+  function translate() {
+    document.documentElement.lang = language;
+    qa("[data-i18n]").forEach(node => { node.textContent = t(node.dataset.i18n); });
+    const deadlineText = new Intl.DateTimeFormat(locale(), { day: "numeric", month: "long" }).format(rsvpDeadline);
+    q("[data-rsvp-intro]").textContent = t("rsvpBefore").replace("{date}", deadlineText);
+    qa("[data-close-modal]").forEach(node => node.setAttribute("aria-label", t("close")));
+    q("[data-lightbox-close]")?.setAttribute("aria-label", t("close"));
+    q("[data-lightbox-prev]")?.setAttribute("aria-label", t("previous"));
+    q("[data-lightbox-next]")?.setAttribute("aria-label", t("next"));
+  }
+
+  function formatDate(options) {
+    return new Intl.DateTimeFormat(locale(), options).format(eventStart);
+  }
+
+  function bindEventData() {
+    const data = {
+      honoree: config.event.honoree,
+      intro: typeof config.event.intro === "object" ? (config.event.intro[language] || config.event.intro.es) : config.event.intro,
+      shortDate: formatDate({ day: "2-digit", month: "2-digit", year: "numeric" }).replaceAll("/", " | "),
+      longDateTime: `${formatDate({ weekday: "long", day: "numeric", month: "long" })} · ${formatDate({ hour: "2-digit", minute: "2-digit", hour12: false })}h`,
+      venue: config.event.venue,
+      address: config.event.address,
+      dressCode: config.event.dressCode,
+      instagram: config.event.instagram
+    };
+    qa("[data-event]").forEach(node => { node.textContent = data[node.dataset.event] || ""; });
+    qa("[data-bank]").forEach(node => { node.textContent = config.event.bank[node.dataset.bank] || ""; });
+    q("[data-maps]")?.setAttribute("href", config.event.mapsUrl);
+    q("[data-waze]")?.setAttribute("href", config.event.wazeUrl);
+  }
+
+  function bindMedia() {
+    const cover = q("[data-cover-image]");
+    cover.src = config.media.cover.src;
+    cover.alt = config.media.cover.alt;
+    cover.style.objectPosition = config.media.cover.position;
+    q(".cover-photo-frame").hidden = !config.media.cover.enabled;
+    qa("[data-ornament]").forEach(image => {
+      const source = config.media.ornaments[image.dataset.ornament];
+      image.src = source || "";
+      image.hidden = !config.media.ornaments.enabled || !source;
+    });
+    const icon = q("[data-calendar-icon]");
+    icon.src = config.media.calendarIcon;
+    const audioConfig = config.media.music;
+    if (audioConfig?.enabled && audioConfig.src) {
+      const audio = new Audio(audioConfig.src);
+      const control = q("[data-music-control]");
+      control.hidden = false;
+      control.addEventListener("click", async () => {
+        if (audio.paused) await audio.play(); else audio.pause();
+        q("[data-i18n]", control).textContent = audio.paused ? t("play") : t("pause");
+      });
+    }
+  }
+
+  function applySections() {
+    qa("[data-section]").forEach(node => {
+      const key = node.dataset.section;
+      if (key in config.sections) node.hidden = !config.sections[key];
+    });
+  }
+
+  function updateCountdown() {
+    const remaining = eventStart.getTime() - Date.now();
+    if (remaining <= 0) {
+      q("[data-countdown]").hidden = true;
+      q("[data-event-passed]").hidden = false;
+      return;
+    }
+    const units = {
+      days: Math.floor(remaining / 86400000),
+      hours: Math.floor((remaining / 3600000) % 24),
+      minutes: Math.floor((remaining / 60000) % 60),
+      seconds: Math.floor((remaining / 1000) % 60)
+    };
+    Object.entries(units).forEach(([key, value]) => { q(`[data-unit="${key}"]`).textContent = String(value).padStart(2, "0"); });
+  }
+
+  function escapeIcs(value) {
+    return String(value).replace(/[\\;,]/g, match => `\\${match}`).replace(/\n/g, "\\n");
+  }
+  function utcStamp(date) { return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, ""); }
+  function downloadCalendar() {
+    const content = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Save Your Date//Jardin Floral//ES", "BEGIN:VEVENT", `UID:${config.event.id}@saveyourdate`, `DTSTAMP:${utcStamp(new Date())}`, `DTSTART:${utcStamp(eventStart)}`, `DTEND:${utcStamp(eventEnd)}`, `SUMMARY:${escapeIcs(`${t("party")} · ${config.event.honoree}`)}`, `LOCATION:${escapeIcs(`${config.event.venue}, ${config.event.address}`)}`, `DESCRIPTION:${escapeIcs(typeof config.event.intro === "object" ? config.event.intro[language] : config.event.intro)}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    const url = URL.createObjectURL(new Blob([content], { type: "text/calendar;charset=utf-8" }));
+    const link = Object.assign(document.createElement("a"), { href: url, download: `${config.event.id}.ics` });
+    link.click(); URL.revokeObjectURL(url);
+  }
+
+  function renderGallery() {
+    const host = q("[data-gallery]");
+    const dots = q("[data-gallery-dots]");
+    config.media.gallery.forEach((photo, index) => {
+      const button = document.createElement("button");
+      button.type = "button"; button.className = "gallery-item"; button.setAttribute("aria-label", `${t("galleryOpen")} ${index + 1}`);
+      const image = new Image(); image.src = photo.src; image.alt = photo.alt; image.loading = "lazy"; image.decoding = "async"; image.style.objectPosition = photo.position || "center";
+      button.append(image); button.addEventListener("click", () => openLightbox(index)); host.append(button);
+      dots.append(document.createElement("span"));
+    });
+  }
+
+  function openLightbox(index) {
+    lightboxIndex = (index + config.media.gallery.length) % config.media.gallery.length;
+    const photo = config.media.gallery[lightboxIndex];
+    const lightbox = q("[data-lightbox]"); const image = q("[data-lightbox-image]");
+    image.src = photo.src; image.alt = photo.alt; lightbox.hidden = false; previousFocus = document.activeElement; document.body.classList.add("modal-open"); q("[data-lightbox-close]").focus();
+  }
+  function closeLightbox() { q("[data-lightbox]").hidden = true; document.body.classList.remove("modal-open"); previousFocus?.focus(); }
+
+  function getFocusable(root) { return qa('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])', root).filter(node => !node.hidden); }
+  function openModal(name) {
+    const modal = q(`[data-modal="${name}"]`); if (!modal) return;
+    activeModal = modal; previousFocus = document.activeElement; modal.hidden = false; document.body.classList.add("modal-open"); getFocusable(modal)[0]?.focus();
+  }
+  function closeModal() { if (!activeModal) return; activeModal.hidden = true; activeModal = null; document.body.classList.remove("modal-open"); previousFocus?.focus(); }
+  function trapModalFocus(event) {
+    if (event.key === "Escape") { if (!q("[data-lightbox]").hidden) closeLightbox(); else closeModal(); return; }
+    const root = !q("[data-lightbox]").hidden ? q("[data-lightbox]") : activeModal;
+    if (event.key !== "Tab" || !root) return;
+    const items = getFocusable(root); if (!items.length) return;
+    const first = items[0], last = items.at(-1);
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  }
+
+  async function copyBank() {
+    const bank = config.event.bank;
+    const text = `${t("bank")}: ${bank.bankName}\n${t("account")}: ${bank.account}\n${t("alias")}: ${bank.alias}`;
+    try { await navigator.clipboard.writeText(text); q("[data-copy-status]").textContent = t("copied"); }
+    catch { q("[data-copy-status]").textContent = text; }
+  }
+
+  async function submitService(type, payload) {
+    const endpoint = type === "playlist" ? config.integrations.playlistEndpoint : config.integrations.rsvpEndpoint;
+    if (!endpoint) { await new Promise(resolve => setTimeout(resolve, 450)); return { demo: true }; }
+    const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ formId: config.integrations.formId, eventId: config.event.id, language, ...payload }) });
+    if (!response.ok) throw new Error("request_failed");
+    return response.json().catch(() => ({}));
+  }
+
+  function bindForm(form) {
+    form.addEventListener("submit", async event => {
+      event.preventDefault(); const status = q(".form-status", form); const submit = q('[type="submit"]', form);
+      if (!form.checkValidity()) { form.reportValidity(); status.textContent = t("required"); return; }
+      status.textContent = t("sending"); submit.disabled = true;
+      try { await submitService(form.dataset.form, Object.fromEntries(new FormData(form))); status.textContent = t(form.dataset.form === "playlist" ? "playlistSuccess" : "rsvpSuccess"); form.reset(); }
+      catch { status.textContent = t("submitError"); }
+      finally { submit.disabled = false; }
+    });
+  }
+
+  function bindInteractions() {
+    q("[data-calendar]").addEventListener("click", downloadCalendar);
+    qa("[data-open-modal]").forEach(button => button.addEventListener("click", () => openModal(button.dataset.openModal)));
+    qa("[data-close-modal]").forEach(button => button.addEventListener("click", closeModal));
+    qa(".modal").forEach(modal => modal.addEventListener("mousedown", event => { if (event.target === modal) closeModal(); }));
+    q("[data-copy-bank]").addEventListener("click", copyBank);
+    qa("[data-form]").forEach(bindForm);
+    q('[name="attendance"][value="yes"]').addEventListener("change", () => { q("[data-guest-count]").hidden = false; });
+    q('[name="attendance"][value="no"]').addEventListener("change", () => { q("[data-guest-count]").hidden = true; });
+    q('[name="dietary"]').addEventListener("change", event => { q("[data-dietary-detail]").hidden = event.target.value !== "other"; });
+    q("[data-lightbox-close]").addEventListener("click", closeLightbox);
+    q("[data-lightbox-prev]").addEventListener("click", () => openLightbox(lightboxIndex - 1));
+    q("[data-lightbox-next]").addEventListener("click", () => openLightbox(lightboxIndex + 1));
+    document.addEventListener("keydown", trapModalFocus);
+  }
+
+  function observeReveals() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) { qa(".reveal").forEach(node => node.classList.add("is-visible")); return; }
+    document.documentElement.classList.add("reveal-ready");
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("is-visible"); observer.unobserve(entry.target); } }), { threshold: .12 });
+    qa(".reveal").forEach(node => observer.observe(node));
+  }
+
+  renderControls(); applyPalette(paletteKey); translate(); bindEventData(); bindMedia(); applySections(); renderGallery(); bindInteractions(); observeReveals(); updateCountdown(); setInterval(updateCountdown, 1000);
+})();

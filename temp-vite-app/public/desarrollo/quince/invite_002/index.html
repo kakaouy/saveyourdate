@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#9ed1aa">
+  <meta name="description" content="Invitación de quince años">
+  <title>Invitación de quince años · Save Your Date</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./config.js"></script>
+  <script src="./i18n.js"></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content" data-i18n="skip"></a>
+  <div class="invitation-shell">
+    <header class="utility-bar" aria-label="Personalización de la invitación">
+      <div class="palette-controls" data-palette-controls></div>
+      <nav class="language-controls" data-language-controls aria-label="Idioma"></nav>
+      <button class="music-control" type="button" data-music-control hidden><span aria-hidden="true">♫</span><span data-i18n="play"></span></button>
+    </header>
+
+    <main id="main-content">
+      <section class="cover section-white" data-section="cover">
+        <img class="ornament ornament-top" data-ornament="top" alt="">
+        <div class="cover-copy reveal">
+          <div class="cover-identity">
+            <h1 data-event="honoree"></h1>
+            <p class="cover-date" data-event="shortDate"></p>
+            <p class="cover-milestone" data-i18n="milestone"></p>
+          </div>
+          <p class="cover-intro" data-event="intro"></p>
+        </div>
+        <div class="cover-photo-frame reveal" aria-hidden="true">
+          <img data-cover-image alt="">
+        </div>
+        <img class="ornament ornament-bottom" data-ornament="bottom" alt="">
+      </section>
+
+      <section class="countdown color-panel" data-section="countdown">
+        <img class="calendar-icon" data-calendar-icon alt="">
+        <h2 data-i18n="countdown"></h2>
+        <div class="countdown-grid" data-countdown aria-live="polite">
+          <div><strong data-unit="days">00</strong><span data-i18n="days"></span></div>
+          <div><strong data-unit="hours">00</strong><span data-i18n="hours"></span></div>
+          <div><strong data-unit="minutes">00</strong><span data-i18n="minutes"></span></div>
+          <div><strong data-unit="seconds">00</strong><span data-i18n="seconds"></span></div>
+        </div>
+        <p class="event-passed" data-event-passed data-i18n="eventPassed" hidden></p>
+      </section>
+
+      <div class="floral-bridge section-white" aria-hidden="true"><img class="ornament" data-ornament="divider" alt=""></div>
+
+      <section class="event-details section-white reveal" data-section="party">
+        <div class="detail-block">
+          <h2 data-i18n="party"></h2>
+          <p data-event="longDateTime"></p>
+          <button class="btn btn-accent" type="button" data-calendar><span data-i18n="addCalendar"></span></button>
+        </div>
+        <div class="detail-block" data-section="location">
+          <h2 data-i18n="location"></h2>
+          <p><span data-event="venue"></span><br><span data-event="address"></span></p>
+          <button class="btn btn-accent" type="button" data-open-modal="directions"><span data-i18n="howToGet"></span></button>
+        </div>
+      </section>
+
+      <section class="rsvp-banner color-panel reveal" data-section="rsvp">
+        <span class="leaf-shadow leaf-shadow-top" aria-hidden="true"></span>
+        <h2 data-i18n="rsvp"></h2>
+        <p data-rsvp-intro></p>
+        <button class="btn btn-dark" type="button" data-open-modal="rsvp"><span data-i18n="confirm"></span></button>
+      </section>
+
+      <section class="quick-actions section-white" aria-label="Información adicional">
+        <article class="info-card reveal" data-section="playlist">
+          <h3 data-i18n="music"></h3><p data-i18n="musicHint"></p>
+          <button class="btn btn-dark" type="button" data-open-modal="playlist"><span data-i18n="suggest"></span></button>
+        </article>
+        <article class="info-card reveal" data-section="dressCode">
+          <h3 data-i18n="dressCode"></h3><p data-event="dressCode"></p>
+          <button class="btn btn-dark" type="button" data-open-modal="dresscode"><span data-i18n="seeMore"></span></button>
+        </article>
+        <article class="info-card reveal">
+          <h3 data-i18n="extra"></h3><p data-i18n="extraHint"></p>
+          <button class="btn btn-dark" type="button" data-open-modal="tips"><span data-i18n="seeMore"></span></button>
+        </article>
+      </section>
+
+      <section class="gallery-section section-white reveal" data-section="gallery">
+        <h2 data-i18n="journey"></h2>
+        <div class="gallery-grid" data-gallery></div>
+        <div class="gallery-dots" data-gallery-dots aria-hidden="true"></div>
+        <p class="social-line"><span data-i18n="follow"></span> <strong data-event="instagram"></strong> <span data-i18n="tagPhotos"></span></p>
+      </section>
+
+      <section class="gifts color-panel reveal" data-section="gifts">
+        <span class="leaf-shadow leaf-shadow-bottom" aria-hidden="true"></span>
+        <h2 data-i18n="gifts"></h2>
+        <p data-i18n="giftIntro"></p>
+        <button class="btn btn-dark" type="button" data-open-modal="gifts"><span data-i18n="makeGift"></span></button>
+      </section>
+
+      <footer class="footer section-white" data-section="footer">
+        <strong class="footer-name" data-event="honoree"></strong>
+        <span data-i18n="footerThanks"></span>
+        <small data-i18n="footerBrand"></small>
+      </footer>
+    </main>
+  </div>
+
+  <div class="modal" data-modal="directions" role="dialog" aria-modal="true" aria-labelledby="directions-title" hidden>
+    <div class="modal-card"><button class="modal-close" type="button" data-close-modal aria-label="Cerrar">×</button>
+      <h2 id="directions-title" data-i18n="howToGet"></h2><p><strong data-event="venue"></strong><br><span data-event="address"></span></p>
+      <div class="modal-actions"><a class="btn btn-accent" data-maps target="_blank" rel="noopener" data-i18n="maps"></a><a class="btn btn-accent" data-waze target="_blank" rel="noopener" data-i18n="waze"></a></div>
+    </div>
+  </div>
+
+  <div class="modal" data-modal="gifts" role="dialog" aria-modal="true" aria-labelledby="gifts-title" hidden>
+    <div class="modal-card"><button class="modal-close" type="button" data-close-modal aria-label="Cerrar">×</button>
+      <h2 id="gifts-title" data-i18n="gifts"></h2><dl class="bank-data"><div><dt data-i18n="bank"></dt><dd data-bank="bankName"></dd></div><div><dt data-i18n="account"></dt><dd data-bank="account"></dd></div><div><dt data-i18n="alias"></dt><dd data-bank="alias"></dd></div></dl>
+      <button class="btn btn-accent" type="button" data-copy-bank><span data-i18n="copyData"></span></button><p class="form-status" data-copy-status aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="modal" data-modal="playlist" role="dialog" aria-modal="true" aria-labelledby="playlist-title" hidden>
+    <div class="modal-card"><button class="modal-close" type="button" data-close-modal aria-label="Cerrar">×</button><h2 id="playlist-title" data-i18n="playlist"></h2>
+      <form data-form="playlist" novalidate><label><span data-i18n="guestName"></span><input name="name" required autocomplete="name"></label><label><span data-i18n="song"></span><input name="song" required></label><label><span data-i18n="optionalLink"></span><input name="link" type="url" inputmode="url"></label><button class="btn btn-accent" type="submit"><span data-i18n="send"></span></button><p class="form-status" aria-live="polite"></p></form>
+    </div>
+  </div>
+
+  <div class="modal" data-modal="rsvp" role="dialog" aria-modal="true" aria-labelledby="rsvp-title" hidden>
+    <div class="modal-card"><button class="modal-close" type="button" data-close-modal aria-label="Cerrar">×</button><h2 id="rsvp-title" data-i18n="rsvp"></h2>
+      <form data-form="rsvp" novalidate><label><span data-i18n="guestName"></span><input name="name" required autocomplete="name"></label><fieldset><legend data-i18n="attendance"></legend><label class="radio"><input type="radio" name="attendance" value="yes" required><span data-i18n="attending"></span></label><label class="radio"><input type="radio" name="attendance" value="no" required><span data-i18n="notAttending"></span></label></fieldset><label data-guest-count><span data-i18n="guestCount"></span><input name="guestCount" type="number" min="1" max="12" value="1"></label><label><span data-i18n="dietary"></span><select name="dietary"><option value="none" data-i18n="none"></option><option value="vegetarian" data-i18n="vegetarian"></option><option value="vegan" data-i18n="vegan"></option><option value="celiac" data-i18n="celiac"></option><option value="other" data-i18n="other"></option></select></label><label data-dietary-detail hidden><span data-i18n="detail"></span><input name="dietaryDetail"></label><label><span data-i18n="notes"></span><textarea name="notes" rows="3"></textarea></label><button class="btn btn-accent" type="submit"><span data-i18n="send"></span></button><p class="form-status" aria-live="polite"></p></form>
+    </div>
+  </div>
+
+  <div class="modal" data-modal="dresscode" role="dialog" aria-modal="true" aria-labelledby="dress-title" hidden><div class="modal-card"><button class="modal-close" type="button" data-close-modal aria-label="Cerrar">×</button><h2 id="dress-title" data-i18n="dressCode"></h2><p data-event="dressCode"></p></div></div>
+  <div class="modal" data-modal="tips" role="dialog" aria-modal="true" aria-labelledby="tips-title" hidden><div class="modal-card"><button class="modal-close" type="button" data-close-modal aria-label="Cerrar">×</button><h2 id="tips-title" data-i18n="extra"></h2><p data-i18n="extraHint"></p></div></div>
+
+  <div class="lightbox" data-lightbox role="dialog" aria-modal="true" aria-label="Galería" hidden><button class="lightbox-close" type="button" data-lightbox-close aria-label="Cerrar">×</button><button class="lightbox-nav prev" type="button" data-lightbox-prev aria-label="Anterior">‹</button><img data-lightbox-image alt=""><button class="lightbox-nav next" type="button" data-lightbox-next aria-label="Siguiente">›</button></div>
+</body>
+</html>
