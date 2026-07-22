@@ -113,19 +113,13 @@
     root.setProperty("--rosa-oscuro", palette.accentDeep); root.setProperty("--texto", palette.ink); root.setProperty("--oscuro", palette.ink);
     root.setProperty("--azul-claro", palette.surface); root.setProperty("--azul", palette.accent); root.setProperty("--azul-oscuro", palette.accentDeep);
     root.setProperty("--azul-footer", palette.accentDeep); root.setProperty("--azul-suave", palette.accent);
-    q("#model-theme-overrides").textContent = `.rosa,#info{background:${palette.surface}!important}.light{background:${palette.background}!important}.btn{background:${palette.accentDeep}!important}.footer-invitacion{background:linear-gradient(135deg,${palette.accentDeep},${palette.accent})!important}`;
-    qa("[data-palette]").forEach(button => button.classList.toggle("selected", button.dataset.palette === key));
-  }
-
-  function renderControls() {
-    const style = document.createElement("style"); style.id = "model-theme-overrides"; document.head.appendChild(style);
-    const controls = document.createElement("aside"); controls.className = "model-controls";
-    controls.innerHTML = `<div class="model-palettes"></div><div class="model-languages"></div>`;
-    Object.entries(config.theme.palettes).forEach(([key, palette]) => {
-      const button = document.createElement("button"); button.type = "button"; button.dataset.palette = key; button.style.background = palette.accent; button.title = palette.label[lang] || palette.label.es; button.addEventListener("click", () => applyPalette(key)); controls.firstElementChild.appendChild(button);
-    });
-    config.locale.enabled.forEach(code => { const link = document.createElement("a"), url = new URL(location.href); url.searchParams.set("lang", code); link.href = url; link.textContent = code.toUpperCase(); if (code === lang) link.className = "selected"; controls.lastElementChild.appendChild(link); });
-    document.body.appendChild(controls);
+    let themeOverrides = q("#model-theme-overrides");
+    if (!themeOverrides) {
+      themeOverrides = document.createElement("style");
+      themeOverrides.id = "model-theme-overrides";
+      document.head.appendChild(themeOverrides);
+    }
+    themeOverrides.textContent = `.rosa,#info{background:${palette.surface}!important}.light{background:${palette.background}!important}.btn{background:${palette.accentDeep}!important}.footer-invitacion{background:linear-gradient(135deg,${palette.accentDeep},${palette.accent})!important}`;
   }
 
   function applyModules() {
@@ -137,7 +131,6 @@
     Object.entries(map).forEach(([module, selector]) => { if (config.modules[module] === false) q(selector)?.remove(); });
   }
 
-  renderControls();
   applyPalette(config.theme.palettes[params.get("palette")] ? params.get("palette") : config.theme.defaultPalette);
   applyData();
   applyModules();
