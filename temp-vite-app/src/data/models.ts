@@ -13,6 +13,7 @@ export interface InvitationModel {
   musicTitle?: string;
   musicArtist?: string;
   location?: string;
+  palettePresets?: Array<'coral' | 'botanica' | 'blush'>;
 }
 
 export const INVITATION_MODELS: InvitationModel[] = [
@@ -74,6 +75,20 @@ export const INVITATION_MODELS: InvitationModel[] = [
     musicTitle: 'Sky Full of Stars',
     musicArtist: 'Coldplay',
     location: 'Salón Terrazas, Palermo, CABA'
+  },
+  {
+    id: '15-verona',
+    title: 'Verona',
+    category: '15years',
+    description: 'Fotografía protagonista, flores en acuarela y una experiencia cálida y contemporánea para celebrar tus 15 años.',
+    badge: 'Nuevo',
+    demoName1: 'Leticia',
+    date: '15 de Noviembre, 2031',
+    features: ['Cuenta Regresiva', 'Galería y Lightbox', 'Confirmación RSVP', 'Cronograma'],
+    themeClass: 'mock-theme-verona',
+    illustrationType: 'crown',
+    location: 'Salón Eventos Premium, Montevideo',
+    palettePresets: ['coral', 'botanica', 'blush']
   },
   {
     id: 'otros-baby',

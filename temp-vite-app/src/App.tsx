@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { INVITATION_MODELS } from './data/models';
 import type { InvitationModel } from './data/models';
+import { VeronaInvitation } from './components/verona/VeronaInvitation';
+import type { VeronaPalette } from './components/verona/config';
 
 // ==========================================
 // TRANSLATION DICTIONARY (ES, EN, PT)
@@ -951,6 +953,7 @@ function App() {
   
   // Interactive Simulator Modal States
   const [demoModel, setDemoModel] = useState<InvitationModel | null>(null);
+  const [veronaPalette, setVeronaPalette] = useState<VeronaPalette>('coral');
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const [selectedRsvpOption, setSelectedRsvpOption] = useState('');
   const [guestCount, setGuestCount] = useState('1');
@@ -977,6 +980,7 @@ function App() {
   const [wizardCategory, setWizardCategory] = useState<'wedding' | '15years' | 'other'>('wedding');
   const [wizardStep, setWizardStep] = useState(1);
   const [wizardModel, setWizardModel] = useState('boda-marfil');
+  const [wizardPalette, setWizardPalette] = useState<VeronaPalette>('coral');
   const [wizardSubmitted, setWizardSubmitted] = useState(false);
 
   // Dynamic Form Field Values (State)
@@ -1121,6 +1125,7 @@ function App() {
     setSelectedRsvpOption('');
     setGuestCount('1');
     setRsvpSuccess(false);
+    if (model.id === '15-verona') setVeronaPalette(wizardPalette);
   };
 
   // Toggle FAQ Accordion Index
@@ -1176,8 +1181,16 @@ function App() {
   };
 
   // Handle Wizard Submit (Simulation)
-  const handleWizardSubmit = (e: React.FormEvent) => {
+  const handleWizardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const categoryData = wizardCategory === 'wedding' ? weddingData : wizardCategory === '15years' ? quinceData : otherEventData;
+    const orderPayload = { model: wizardModel, palette: wizardModel === '15-verona' ? wizardPalette : null, locale: lang, category: wizardCategory, event: categoryData };
+    sessionStorage.setItem('saveyourdate:last-order', JSON.stringify(orderPayload));
+    const orderEndpoint = import.meta.env.VITE_ORDER_ENDPOINT;
+    if (orderEndpoint) {
+      const response = await fetch(orderEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(orderPayload) });
+      if (!response.ok) throw new Error('No se pudo enviar el pedido');
+    }
     setWizardSubmitted(true);
     setTimeout(() => {
       setWizardSubmitted(false);
@@ -2158,6 +2171,7 @@ function App() {
                             <option value="15-glamour">Glamour Rosa</option>
                             <option value="15-estrellas">Noche de Estrellas</option>
                             <option value="15-neon">Neón Party</option>
+                            <option value="15-verona">Verona</option>
                           </>
                         )}
                         {wizardCategory === 'other' && (
@@ -2169,6 +2183,19 @@ function App() {
                         )}
                       </select>
                     </div>
+
+                    {wizardModel === '15-verona' && (
+                      <div className="form-group" style={{ marginBottom: '24px' }}>
+                        <label className="form-label" htmlFor="verona-palette">
+                          {lang === 'es' ? 'Paleta Verona' : lang === 'pt' ? 'Paleta Verona' : 'Verona palette'}
+                        </label>
+                        <select id="verona-palette" className="form-select" value={wizardPalette} onChange={(e) => setWizardPalette(e.target.value as VeronaPalette)}>
+                          <option value="coral">Coral</option>
+                          <option value="botanica">Botanica</option>
+                          <option value="blush">Blush</option>
+                        </select>
+                      </div>
+                    )}
 
                     <button className="btn-primary" onClick={() => setWizardStep(3)} style={{ width: '100%' }}>{t.portal.btnContinue}</button>
                   </div>
@@ -2327,10 +2354,12 @@ function App() {
                               <input className="form-input" type="text" placeholder="Ej. 0000021000..." value={quinceData.giftCbu} onChange={e => setQuinceData({...quinceData, giftCbu: e.target.value})} />
                             </div>
                           </div>
-                          <div className="form-group" style={{ marginBottom: '12px' }}>
-                            <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.music}</label>
-                            <input className="form-input" type="text" placeholder="Ej. Don't Start Now - Dua Lipa" value={quinceData.musicPreference} onChange={e => setQuinceData({...quinceData, musicPreference: e.target.value})} />
-                          </div>
+                          {wizardModel !== '15-verona' && (
+                            <div className="form-group" style={{ marginBottom: '12px' }}>
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.music}</label>
+                              <input className="form-input" type="text" placeholder="Ej. Don't Start Now - Dua Lipa" value={quinceData.musicPreference} onChange={e => setQuinceData({...quinceData, musicPreference: e.target.value})} />
+                            </div>
+                          )}
                           <div className="form-group" style={{ marginBottom: '12px' }}>
                             <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.dress}</label>
                             <input className="form-input" type="text" placeholder="Ej. Formal con toque flúor" value={quinceData.quinceDressCode} onChange={e => setQuinceData({...quinceData, quinceDressCode: e.target.value})} />
@@ -2747,8 +2776,12 @@ function App() {
       )}
 
       {/* INTERACTIVE INVITATION SIMULATOR MODAL */}
+      {demoModel?.id === '15-verona' && (
+        <VeronaInvitation locale={lang} palette={veronaPalette} onPaletteChange={setVeronaPalette} onClose={() => setDemoModel(null)} />
+      )}
+
       {demoModel && (
-        <div className="modal-overlay" onClick={() => setDemoModel(null)}>
+        demoModel.id !== '15-verona' && <div className="modal-overlay" onClick={() => setDemoModel(null)}>
           <div className="modal-container" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={() => setDemoModel(null)} aria-label="Cerrar">×</button>
             
