@@ -7,45 +7,128 @@ export interface InvitationModel {
   demoName1: string;
   demoName2?: string;
   date: string;
+  previewImage?: string;
+  demoPath?: string;
+  active?: boolean;
+  order?: number;
   features: string[];
   themeClass: string;
   illustrationType: 'rings' | 'crown' | 'balloon';
   musicTitle?: string;
   musicArtist?: string;
   location?: string;
-  palettePresets?: Array<'coral' | 'botanica' | 'blush'>;
+  includedSections?: string[];
+  palettes?: Array<{
+    id: string;
+    name: string;
+    color: string;
+  }>;
 }
 
 export const INVITATION_MODELS: InvitationModel[] = [
   {
     id: 'boda-marfil',
-    title: 'Clásico Marfil',
+    title: 'Editorial Marfil',
     category: 'wedding',
-    description: 'Elegancia pura con texturas florales sutiles y tipografía serif sofisticada. Ideal para bodas tradicionales y distinguidas.',
+    description: '',
     badge: 'Más Elegido',
     demoName1: 'Matias & Sofía',
     date: '14 de Noviembre, 2026',
-    features: ['Cuenta Regresiva', 'Música', 'Confirmación RSVP', 'Google Maps'],
+    features: [
+      'Galería de fotos',
+      'Música',
+      'Frase',
+      'Cronograma',
+      'Ubicación',
+      'Regalos',
+      'Foto destacada con efecto parallax',
+      'Confirmación RSVP'
+    ],
     themeClass: 'mock-theme-wedding',
     illustrationType: 'rings',
     musicTitle: 'Perfect',
     musicArtist: 'Ed Sheeran',
-    location: 'Estancia La Linda, Pilar, Buenos Aires'
+    location: 'Estancia La Linda, Pilar, Buenos Aires',
+    includedSections: [
+      'gallery',
+      'music',
+      'quote',
+      'agenda',
+      'location',
+      'gifts',
+      'featuredPhoto',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'marfil', name: 'Marfil', color: '#d9cdbd' },
+      { id: 'rosa', name: 'Rosa', color: '#d8b7bd' },
+      { id: 'eucalipto', name: 'Eucalipto', color: '#859a87' },
+      { id: 'azul', name: 'Azul', color: '#819ead' }
+    ]
+  },
+  {
+    id: 'boda-pleno',
+    title: 'Voto Editorial',
+    category: 'wedding',
+    description: '',
+    badge: 'Nuevo',
+    demoName1: 'Clara & Tomás',
+    date: '12 de Diciembre, 2026',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Código de Vestimenta',
+      'Regalos',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    location: 'Casa del Lago, Montevideo',
+    includedSections: [
+      'music',
+      'countdown',
+      'dresscode',
+      'gifts',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'negro', name: 'Negro', color: '#10100f' },
+      { id: 'rosa', name: 'Rosa empolvado', color: '#c492a7' },
+      { id: 'frambuesa', name: 'Frambuesa', color: '#a15a77' },
+      { id: 'cielo', name: 'Celeste grisáceo', color: '#85acb0' },
+      { id: 'petroleo', name: 'Azul petróleo', color: '#556e80' },
+      { id: 'tinta', name: 'Azul tinta', color: '#3a3957' }
+    ]
   },
   {
     id: 'boda-boho',
-    title: 'Rústico Boho',
+    title: 'Olivia Silvestre',
     category: 'wedding',
-    description: 'Tonos tierra cálidos, detalles de hojas de eucalipto secas y un estilo relajado pero refinado para parejas amantes de la naturaleza.',
+    description: 'Una propuesta orgánica y elegante, con ramas ilustradas, movimiento suave y una estética natural que acompaña cada sección.',
     badge: 'Tendencia',
-    demoName1: 'Facundo & Camila',
-    date: '05 de Diciembre, 2026',
-    features: ['Cuenta Regresiva', 'Regalos / CBU', 'Confirmación RSVP', 'Google Maps'],
+    demoName1: 'Antonio & Ester',
+    date: '18 de Octubre, 2026',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Agenda',
+      'Ubicación',
+      'Confirmación RSVP',
+      'Regalos / CBU',
+      'Código de Vestimenta',
+      'Cronograma',
+      'Galería de fotos',
+      'Álbum colaborativo'
+    ],
     themeClass: 'mock-theme-wedding',
     illustrationType: 'rings',
-    musicTitle: 'A Thousand Years',
-    musicArtist: 'Christina Perri',
-    location: 'Salón El Bosque, Tigre, Buenos Aires'
+    location: 'Ceremonia y recepción',
+    palettes: [
+      { id: 'olive', name: 'Oliva', color: '#A6AA78' },
+      { id: 'terracotta', name: 'Terracota', color: '#B86F52' },
+      { id: 'blue', name: 'Azul niebla', color: '#718A96' },
+      { id: 'mauve', name: 'Malva', color: '#9A7889' }
+    ]
   },
   {
     id: '15-glamour',
@@ -61,6 +144,88 @@ export const INVITATION_MODELS: InvitationModel[] = [
     musicTitle: 'Don’t Start Now',
     musicArtist: 'Dua Lipa',
     location: 'Palacio Cristal, San Isidro'
+  },
+  {
+    id: '15-sweet-jane',
+    title: 'Sweet Jane',
+    category: '15years',
+    description: 'Una invitación fresca y romántica, con fotografía protagonista, tonos suaves y detalles pensados para celebrar los 15 con un estilo único.',
+    badge: 'Nuevo',
+    demoName1: 'Emma',
+    date: '12 de Diciembre, 2026',
+    previewImage: '/previews/sweet-jane.jpg',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Galería de fotos',
+      'Ubicación',
+      'Código de Vestimenta',
+      'Instagram',
+      'Playlist Spotify',
+      'Regalos / CBU',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-15years',
+    illustrationType: 'crown',
+    musicTitle: 'Rockstar',
+    musicArtist: 'Duki',
+    location: 'Salón Magnolia, Montevideo',
+    includedSections: [
+      'music',
+      'countdown',
+      'gallery',
+      'location',
+      'dresscode',
+      'instagram',
+      'playlist',
+      'gifts',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'rose', name: 'Rosa antiguo', color: '#b9989a' },
+      { id: 'blue', name: 'Azul bruma', color: '#8295ad' },
+      { id: 'sage', name: 'Verde salvia', color: '#91a087' }
+    ]
+  },
+  {
+    id: '15-jardin-floral',
+    title: 'Jardín Floral',
+    category: '15years',
+    description: 'Flores ilustradas, tonos frescos y una composición juvenil que combina información, galería y detalles del evento con aire artesanal.',
+    badge: 'Nuevo',
+    demoName1: 'Maite',
+    date: '15 de Junio, 2027',
+    previewImage: '/previews/jardin-floral.png',
+    demoPath: '/desarrollo/quince/invite_002/index.html',
+    active: true,
+    order: 22,
+    features: [
+      'Cuenta Regresiva',
+      'Ubicación',
+      'Agregar al calendario',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Playlist Spotify',
+      'Galería de fotos',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-15years',
+    illustrationType: 'crown',
+    location: 'Casa Azul, Avenida Suarez 5445',
+    includedSections: [
+      'countdown',
+      'location',
+      'dresscode',
+      'gifts',
+      'playlist',
+      'gallery',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'original', name: 'Original floral', color: '#9ed1aa' },
+      { id: 'night', name: 'Noche coral', color: '#183b59' },
+      { id: 'soft', name: 'Rosa suave', color: '#b9d4b4' }
+    ]
   },
   {
     id: '15-estrellas',
@@ -84,11 +249,19 @@ export const INVITATION_MODELS: InvitationModel[] = [
     badge: 'Nuevo',
     demoName1: 'Leticia',
     date: '15 de Noviembre, 2031',
-    features: ['Cuenta Regresiva', 'Galería y Lightbox', 'Confirmación RSVP', 'Cronograma'],
+    previewImage: '/verona/foto-01.png',
+    active: true,
+    order: 23,
+    features: ['Cuenta Regresiva', 'Galería de fotos', 'Cronograma', 'Ubicación', 'Código de Vestimenta', 'Regalos / CBU', 'Confirmación RSVP'],
     themeClass: 'mock-theme-verona',
     illustrationType: 'crown',
     location: 'Salón Eventos Premium, Montevideo',
-    palettePresets: ['coral', 'botanica', 'blush']
+    includedSections: ['countdown', 'gallery', 'schedule', 'location', 'dresscode', 'gifts', 'rsvp'],
+    palettes: [
+      { id: 'coral', name: 'Coral', color: '#a9364b' },
+      { id: 'botanica', name: 'Botanica', color: '#176268' },
+      { id: 'blush', name: 'Blush', color: '#8a3053' }
+    ]
   },
   {
     id: 'otros-baby',
@@ -122,18 +295,140 @@ export const INVITATION_MODELS: InvitationModel[] = [
   },
   {
     id: 'boda-eucalipto',
+    previewImage: '/previews/minimalista-eucalipto.webp',
     title: 'Minimalista Eucalipto',
     category: 'wedding',
     description: 'Menos es más. Tipografías modernas sans-serif combinadas con sutiles ramas de eucalipto sobre fondos blancos y limpios. Ideal para bodas contemporáneas e íntimas.',
     badge: 'Nuevo',
     demoName1: 'Tomás & Sofía',
     date: '16 de Enero, 2027',
-    features: ['Cuenta Regresiva', 'Música', 'Confirmación RSVP', 'Código de Vestimenta'],
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Agenda',
+      'Ubicación',
+      'Foto destacada con efecto parallax',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Confirmación RSVP'
+    ],
     themeClass: 'mock-theme-wedding',
     illustrationType: 'rings',
     musicTitle: 'L-O-V-E',
     musicArtist: 'Nat King Cole',
-    location: 'Salón Quinta de Olivos, Buenos Aires'
+    location: 'Salón Quinta de Olivos, Buenos Aires',
+    includedSections: [
+      'music',
+      'countdown',
+      'agenda',
+      'location',
+      'featuredPhoto',
+      'dresscode',
+      'gifts',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'eucalipto', name: 'Eucalipto y dorado', color: '#496257' },
+      { id: 'oliva', name: 'Oliva y champagne', color: '#66704c' },
+      { id: 'petroleo', name: 'Petróleo y arena', color: '#365d63' }
+    ]
+  },
+  {
+    id: 'boda-vinculo-noir',
+    previewImage: '/previews/vinculo-noir.webp',
+    title: 'Vínculo Noir',
+    category: 'wedding',
+    description: 'Fotografía en blanco y negro, composición editorial y acentos profundos para una boda moderna y sofisticada.',
+    badge: 'Nuevo',
+    demoName1: 'Renata & Nicolás',
+    date: '10 de Octubre, 2026',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Agenda',
+      'Ubicación',
+      'Foto destacada con efecto parallax',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Galería de fotos',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    musicTitle: 'The Look of Love',
+    musicArtist: 'Diana Krall',
+    location: 'Palacio Sans Souci, Buenos Aires',
+    includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','gallery','rsvp'],
+    palettes: [
+      { id: 'oro', name: 'Oro antiguo', color: '#ae8b52' },
+      { id: 'rosa', name: 'Rosa empolvado', color: '#b7838f' },
+      { id: 'verde', name: 'Verde inglés', color: '#6f8b75' }
+    ]
+  },
+  {
+    id: 'boda-flores-papel',
+    previewImage: '/previews/flores-papel.webp',
+    title: 'Flores de Papel',
+    category: 'wedding',
+    description: 'Textura de papel, flores de acuarela y una estética delicada que alterna ornamentos entre cada sección.',
+    badge: 'Nuevo',
+    demoName1: 'Marina & Rafael',
+    date: '20 de Marzo, 2027',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Agenda',
+      'Ubicación',
+      'Foto destacada con efecto parallax',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Menú',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    musicTitle: 'Trevo',
+    musicArtist: 'ANAVITÓRIA',
+    location: 'Casa Petra, São Paulo',
+    includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','menu','rsvp'],
+    palettes: [
+      { id: 'azul-hielo', name: 'Azul hielo', color: '#536f88' },
+      { id: 'rosa-antiguo', name: 'Rosa antiguo', color: '#936779' },
+      { id: 'salvia', name: 'Verde salvia', color: '#64796d' },
+      { id: 'lavanda', name: 'Lavanda', color: '#716985' }
+    ]
+  },
+  {
+    id: 'boda-brindis-papel',
+    previewImage: '/previews/brindis-papel.webp',
+    title: 'Brindis de Papel',
+    category: 'wedding',
+    description: 'Trazos de manos alzadas, textura de papel y bloques de color para una boda alegre, artística y contemporánea.',
+    badge: 'Nuevo',
+    demoName1: 'Valentina & Matías',
+    date: '14 de Febrero, 2027',
+    features: [
+      'Música',
+      'Cuenta Regresiva',
+      'Ceremonia y celebración en una ubicación',
+      'Foto destacada con efecto parallax',
+      'Código de Vestimenta',
+      'Regalos / CBU',
+      'Mensajes',
+      'Menú',
+      'Confirmación RSVP'
+    ],
+    themeClass: 'mock-theme-wedding',
+    illustrationType: 'rings',
+    musicTitle: 'Brillas',
+    musicArtist: 'León Larregui',
+    location: 'Estancia Villa María, Buenos Aires',
+    includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','messages','menu','rsvp'],
+    palettes: [
+      { id: 'azul', name: 'Azul vivo', color: '#2f7cf4' },
+      { id: 'coral', name: 'Coral terracota', color: '#df735f' },
+      { id: 'verde', name: 'Verde jardín', color: '#5f8f6d' }
+    ]
   },
   {
     id: '15-neon',

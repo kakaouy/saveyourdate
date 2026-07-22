@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Vínculo Noir · Renata & Nicolás</title>
+  <meta name="description" content="Invitación de boda de Renata y Nicolás">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@300;400;500;600&family=Parisienne&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#171717;--smoke:#718f86;--smoke-dark:#58756c;--paper:#fbfaf7;--gold:#ae8b52;--white:#fff;--serif:'Cormorant Garamond',serif;--sans:'Montserrat',sans-serif;--script:'Parisienne',cursive}
+    body[data-theme="oro"]{--gold:#ae8b52}
+    body[data-theme="rosa"]{--gold:#b7838f}
+    body[data-theme="verde"]{--gold:#6f8b75}\n    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;overflow-x:hidden;background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300}
+    button,a,input,select,textarea{font:inherit}
+    .invite{width:100%;overflow:hidden}
+    .section{position:relative;display:flex;min-height:620px;padding:100px clamp(24px,7vw,100px);align-items:center;justify-content:center;text-align:center;overflow:hidden}
+    .paper{background:var(--paper)}.smoke{background:var(--smoke);color:#fff}.gold{background:var(--gold);color:#fff}.dark{background:#111;color:#fff}
+    .content{position:relative;z-index:4;width:min(100%,940px);min-width:0;margin:auto}
+    .eyebrow{margin:0 0 24px;font-size:10px;font-weight:500;letter-spacing:.34em;text-transform:uppercase}
+    .title{margin:0;font:500 clamp(42px,7vw,78px)/1 var(--serif);letter-spacing:.05em}
+    .copy{width:min(100%,590px);margin:28px auto 0;font-size:12px;line-height:2;letter-spacing:.08em}
+    .icon{display:block;width:58px;height:58px;margin:0 auto 24px;object-fit:contain}
+    .line-icon{display:grid;width:74px;height:74px;margin:0 auto 26px;place-items:center;border:1px solid currentColor;border-radius:50%;font:400 32px/1 var(--serif)}
+    .btn{display:inline-flex;width:min(100%,240px);max-width:100%;min-width:0;min-height:48px;margin-top:30px;padding:13px 26px;align-items:center;justify-content:center;border:1px solid var(--gold);border-radius:2px;background:var(--gold);color:#fff;font-size:10px;font-weight:600;letter-spacing:.2em;text-decoration:none;text-transform:uppercase;cursor:pointer;transition:.25s}
+    .btn:hover{background:transparent;color:var(--gold)}
+    .hero{isolation:isolate;min-height:100svh;padding:0;background:#111;color:#fff}
+    .hero-photo{position:absolute;inset:-6%;width:112%;height:112%;object-fit:cover;object-position:center 32%;filter:grayscale(1) contrast(1.06);transform:scale(1.03);animation:heroZoom 16s ease-in-out infinite alternate}
+    .hero::after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.18) 42%,rgba(0,0,0,.72))}
+    .hero .content{display:flex;min-height:100svh;padding:70px 24px clamp(320px,38vh,430px);flex-direction:column;align-items:center;justify-content:flex-end;top:-145px}
+    .hero .eyebrow{margin-bottom:18px}
+    .names{margin:0;font:500 clamp(62px,12vw,144px)/.82 var(--serif);letter-spacing:.04em;text-transform:uppercase;text-shadow:0 3px 24px rgba(0,0,0,.35)}
+    .names span{display:block}.names i{display:block;margin:14px 0;color:var(--gold);font:600 clamp(50px,6.5vw,76px)/1 var(--script);text-shadow:0 1px 0 currentColor,0 0 14px rgba(0,0,0,.2);text-transform:none}
+    .hero-date{margin:30px 0 0;font-size:11px;letter-spacing:.35em;text-transform:uppercase}
+    .scroll{position:absolute;z-index:4;right:0;bottom:20px;left:0;font-size:8px;letter-spacing:.25em;text-transform:uppercase}
+    @keyframes heroZoom{to{transform:scale(1.09) translateY(-1.5%)}}
+    .date-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(30px,7vw,90px);align-items:center}
+    .date-number{margin:0;color:var(--gold);font:500 clamp(110px,18vw,200px)/.75 var(--serif)}
+    .date-side p{margin:9px 0}.date-side .script{font:400 clamp(38px,6vw,62px)/1 var(--script)}
+    .date-side .small{font-size:10px;letter-spacing:.3em;text-transform:uppercase}
+    .countdown{display:flex;justify-content:center;gap:clamp(16px,5vw,54px);margin-top:70px}
+    .countdown strong{display:block;font:500 clamp(34px,5vw,52px)/1 var(--serif)}
+    .countdown span{display:block;margin-top:10px;font-size:8px;letter-spacing:.18em;text-transform:uppercase}
+    .branch{position:absolute;z-index:2;width:clamp(260px,42vw,600px);height:auto;opacity:.13;pointer-events:none;filter:drop-shadow(0 0 1px rgba(255,255,255,.3));transform-origin:bottom right}
+    .branch.right{right:-8vw;bottom:-5%;}.branch.left{left:-8vw;bottom:-5%;transform:scaleX(-1)}
+    .hero-branch{z-index:3;right:-7vw;bottom:-9%;width:clamp(260px,38vw,540px);opacity:.24}
+    .hero .hero-branch{animation:branchDraw 1.5s ease-out .35s both,branchPulse 6s ease-in-out 1.85s infinite}
+    .menu-branch{z-index:8!important;top:-42%;right:-7vw!important;bottom:auto!important;width:clamp(250px,38vw,520px);filter:brightness(.48);opacity:.28}
+    .menu-section.visible .menu-branch{animation:menuBranchDraw 1.25s ease-out both,menuBranchPulse 6s ease-in-out 1.25s infinite}
+    @keyframes menuBranchDraw{from{opacity:0;clip-path:inset(100% 100% 0 0);transform:translateY(35px)}to{opacity:.3;clip-path:inset(0);transform:none}}
+    @keyframes menuBranchPulse{50%{opacity:.42;transform:scale(1.035)}}
+    .closing-branch{z-index:3!important;left:-5vw!important;bottom:-12%!important;width:clamp(180px,24vw,330px)!important;filter:brightness(0) saturate(100%) invert(59%) sepia(34%) saturate(677%) hue-rotate(358deg) brightness(91%) contrast(87%);opacity:.23}
+    .closing.visible .closing-branch{animation:closingBranchDraw 1.2s ease-out both,closingBranchPulse 6s ease-in-out 1.2s infinite}
+    @keyframes closingBranchDraw{from{opacity:0;clip-path:inset(100% 0 0 100%);transform:scaleX(-1) translateX(35px)}to{opacity:.25;clip-path:inset(0);transform:scaleX(-1)}}
+    @keyframes closingBranchPulse{50%{opacity:.36;transform:scaleX(-1) scale(1.035)}}
+    .section.visible .branch{animation:branchDraw 1.3s ease-out both,branchPulse 6s ease-in-out 1.3s infinite}
+    @keyframes branchDraw{from{opacity:0;clip-path:inset(100% 100% 0 0)}to{opacity:.18;clip-path:inset(0)}}
+    @keyframes branchPulse{50%{opacity:.27;transform:scale(1.035)} }
+    .branch.left{animation-name:none}.section.visible .branch.left{animation:branchDrawLeft 1.3s ease-out both,branchPulseLeft 6s ease-in-out 1.3s infinite}
+    @keyframes branchDrawLeft{from{opacity:0;clip-path:inset(100% 0 0 100%);transform:scaleX(-1)}to{opacity:.18;clip-path:inset(0);transform:scaleX(-1)}}
+    @keyframes branchPulseLeft{50%{opacity:.27;transform:scaleX(-1) scale(1.035)}}
+    .events{display:grid;grid-template-columns:1fr 1fr;width:min(100%,1100px);min-width:0;margin:auto;border:1px solid rgba(23,23,23,.16)}
+    .event{min-width:0;padding:72px clamp(26px,5vw,68px);overflow:hidden;background:rgba(255,255,255,.55)}.event+ .event{border-left:1px solid rgba(23,23,23,.16)}
+    .event h3{max-width:100%;margin:0;overflow-wrap:anywhere;font:500 clamp(34px,5vw,56px)/1 var(--serif);letter-spacing:.06em}.event p{max-width:100%;font-size:11px;overflow-wrap:anywhere;line-height:1.9;letter-spacing:.08em}
+    .photo-break{min-height:58svh;padding:0}.photo-break img{position:absolute;top:-20%;left:0;width:100%;height:140%;object-fit:cover;object-position:center;filter:grayscale(1) contrast(1.05);transform:translateY(var(--parallax,0px)) scale(1.02);will-change:transform}.photo-break::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.58))}.photo-quote{position:relative;z-index:3;align-self:flex-end;margin:0 0 60px;color:#fff;font:400 clamp(38px,7vw,78px)/1.05 var(--script)}
+    .detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;min-width:0;margin-top:54px}.detail{min-width:0;padding:42px 24px;overflow:hidden;border:1px solid rgba(255,255,255,.25)}.detail h3{margin:0;font:500 30px/1.1 var(--serif)}.detail p{max-width:100%;margin:14px 0 0;overflow-wrap:anywhere;font-size:9px;line-height:1.8;letter-spacing:.12em;text-transform:uppercase}
+    .gallery{display:grid;grid-template-columns:1.15fr .85fr;grid-template-rows:340px 340px;gap:12px;margin-top:50px}.gallery img{width:100%;height:100%;object-fit:cover;filter:grayscale(1);transition:.5s}.gallery img:first-child{grid-row:1/3;object-position:center 28%}.gallery img:hover{filter:grayscale(0);transform:scale(1.01)}
+    .rsvp{width:min(100%,540px);margin:38px auto 0;text-align:left}.field{width:100%;margin-bottom:14px;padding:16px;border:0;border-bottom:1px solid rgba(23,23,23,.3);background:rgba(255,255,255,.55);font-size:11px;outline:none}.rsvp .btn{display:flex;margin-inline:auto}
+    .closing{min-height:560px}.closing h2{margin:0;font:500 clamp(58px,10vw,112px)/.82 var(--serif);text-transform:uppercase}.closing h2 i{display:block;margin:20px 0;color:var(--gold);font:400 42px var(--script);text-transform:none}.footer{padding:36px 24px;background:#0d0d0d;color:#fff;text-align:center}.footer strong{font:500 28px var(--serif)}.footer p{margin:10px 0 0;font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.7}
+    .shared-boundary{overflow:visible;z-index:4}
+    .shared-branch{z-index:9;pointer-events:none;will-change:transform,opacity,clip-path}
+    .countdown-section{min-height:420px;padding-top:68px;padding-bottom:68px}
+    .branch-hero-countdown{top:-48%;right:-7vw;bottom:auto;width:clamp(270px,40vw,560px);filter:none;opacity:0}
+    .branch-details-story{top:-40%;left:-9vw;bottom:auto;width:clamp(250px,37vw,520px);filter:brightness(.52);opacity:0;transform:scaleX(-1);transform-origin:center}
+    .branch-menu-rsvp{top:-42%;right:-7vw;bottom:auto;width:clamp(250px,38vw,520px);filter:brightness(.5);opacity:0;transform-origin:center}
+    .branch-rsvp-closing{top:-34%;left:-5vw;bottom:auto;width:clamp(175px,23vw,310px);filter:brightness(0) saturate(100%) invert(59%) sepia(34%) saturate(677%) hue-rotate(358deg) brightness(91%) contrast(87%);opacity:0;transform:scaleX(-1);transform-origin:center}
+    .shared-boundary.visible .branch-hero-countdown,.shared-boundary.visible .branch-menu-rsvp{animation:sharedRightEnter 1.25s ease-out both,sharedRightPulse 6s ease-in-out 1.25s infinite}
+    .shared-boundary.visible .branch-details-story{animation:sharedLeftEnter 1.25s ease-out both,sharedLeftPulse 6s ease-in-out 1.25s infinite}
+    .shared-boundary.visible .branch-rsvp-closing{animation:sharedGoldEnter 1.15s ease-out both,sharedGoldPulse 6s ease-in-out 1.15s infinite}
+    @keyframes sharedRightEnter{from{opacity:0;clip-path:inset(100% 100% 0 0);transform:translate3d(45px,25px,0) scale(.97)}to{opacity:.28;clip-path:inset(0);transform:none}}
+    @keyframes sharedRightPulse{50%{opacity:.39;transform:scale(1.035)}}
+    @keyframes sharedLeftEnter{from{opacity:0;clip-path:inset(100% 0 0 100%);transform:translate3d(-45px,25px,0) scaleX(-1) scale(.97)}to{opacity:.27;clip-path:inset(0);transform:scaleX(-1)}}
+    @keyframes sharedLeftPulse{50%{opacity:.38;transform:scaleX(-1) scale(1.035)}}
+    @keyframes sharedGoldEnter{from{opacity:0;clip-path:inset(100% 0 0 100%);transform:translate3d(-35px,20px,0) scaleX(-1) scale(.97)}to{opacity:.25;clip-path:inset(0);transform:scaleX(-1)}}
+    @keyframes sharedGoldPulse{50%{opacity:.36;transform:scaleX(-1) scale(1.035)}}
+    body.motion .section:not(.hero){opacity:.2;transform:translateY(28px);transition:opacity .9s,transform .9s cubic-bezier(.22,.61,.36,1)}body.motion .section.visible{opacity:1;transform:none}
+    [data-reveal]{opacity:0;transform:translateY(22px);transition:opacity .75s ease var(--delay,0ms),transform .75s cubic-bezier(.22,.61,.36,1) var(--delay,0ms)}
+    [data-reveal].show{opacity:1;transform:none}
+    .line-icon.show{animation:iconEnter .75s cubic-bezier(.22,.61,.36,1) both,iconPulse 3s ease-in-out .75s infinite}
+    @keyframes iconEnter{from{opacity:0;transform:translateY(18px) scale(.9)}to{opacity:1;transform:none}}
+    @keyframes iconPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.075)}}
+    body.preview .palette-switcher{display:none}
+    .palette-switcher{position:fixed;z-index:31;top:16px;left:16px;display:flex;gap:7px;padding:8px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(17,17,17,.72);box-shadow:0 8px 28px rgba(0,0,0,.18);backdrop-filter:blur(10px)}
+    .palette-switcher button{width:28px;height:28px;padding:0;border:2px solid rgba(255,255,255,.65);border-radius:50%;cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
+    .palette-switcher button[aria-pressed="true"]{outline:2px solid #fff;outline-offset:2px}
+    .palette-switcher .oro{background:#ae8b52}.palette-switcher .rosa{background:#b7838f}.palette-switcher .verde{background:#6f8b75}
+    .music{position:fixed;z-index:30;right:20px;bottom:20px;display:grid;width:58px;height:58px;place-items:center;border:1px solid var(--gold);border-radius:50%;background:rgba(251,250,247,.92);color:var(--gold);font-size:21px}
+
+    .detail .btn{
+      display:flex;
+      width:min(240px,calc(100% - 48px));
+      max-width:calc(100% - 48px);
+      margin-left:auto;
+      margin-right:auto;
+      padding-left:18px;
+      padding-right:18px;
+    }
+    @media(max-width:760px){.section{min-height:580px;padding:82px 18px}.countdown-section{min-height:400px;padding-top:62px;padding-bottom:62px}.hero .content{padding:62px 18px 330px;top:-190px}.hero .names{width:100%;font-size:clamp(50px,10.5vw,68px);letter-spacing:.02em}.date-grid{grid-template-columns:1fr;gap:24px}.events{grid-template-columns:minmax(0,1fr)}.event{padding:56px 18px}.event+.event{border-top:1px solid rgba(23,23,23,.16);border-left:0}.detail-grid{grid-template-columns:minmax(0,1fr)}.detail{padding:38px 16px}.btn{width:min(100%,240px);padding-inline:16px;white-space:normal}.gallery{grid-template-columns:1fr 1fr;grid-template-rows:330px 220px}.gallery img:first-child{grid-column:1/3;grid-row:auto}.branch{width:65vw}.branch.right{right:-22vw}.branch.left{left:-22vw}body.preview .music{right:9px;bottom:9px;width:48px;height:48px}}
+
+    @media(max-width:760px){
+      .event .btn,
+      .detail .btn,
+      .rsvp .btn{
+        display:flex;
+        width:calc(100% - 56px);
+        max-width:210px;
+        margin-left:auto;
+        margin-right:auto;
+        padding-left:14px;
+        padding-right:14px;
+      }
+      .events,
+      .detail-grid{width:100%;max-width:100%}
+    }
+
+    .event,
+    .detail{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+    .event .btn,
+    .detail .btn{
+      box-sizing:border-box;
+      flex:0 0 64px;
+      inline-size:240px !important;
+      width:240px !important;
+      min-width:240px;
+      max-width:min(240px,calc(100% - 48px)) !important;
+      min-height:64px;
+      height:64px;
+      max-height:64px;
+      margin-top:auto;
+      margin-left:auto;
+      margin-right:auto;
+      padding:0 18px;
+      appearance:none;
+      -webkit-appearance:none;
+    }
+    .event p,
+    .detail p{margin-bottom:32px}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.section,[data-reveal]{opacity:1!important;transform:none!important}.photo-break img{transform:scale(1.02)}}
+  </style>
+</head>
+<body data-theme="oro">
+<main class="invite">
+  <section class="section hero">
+    <img class="hero-photo" src="assets/photo-01.jpg" alt="Renata y Nicolás">
+    <div class="content"><p class="eyebrow" data-reveal>Nos casamos</p><h1 class="names" data-reveal><span>Renata</span><i>&</i><span>Nicolás</span></h1><p class="hero-date" data-reveal>10 · 10 · 2026</p></div><span class="scroll">Deslizá para descubrir ↓</span>
+  </section>
+  <section class="section gold countdown-section shared-boundary"><img class="branch shared-branch branch-hero-countdown" src="assets/branch-white.png" alt=""><div class="content"><p class="eyebrow" data-reveal>Falta cada vez menos...</p><h2 class="title" data-reveal>Cuenta regresiva</h2><div class="countdown" data-reveal><div><strong id="days">000</strong><span>Días</span></div><div><strong id="hours">00</strong><span>Horas</span></div><div><strong id="minutes">00</strong><span>Minutos</span></div><div><strong id="seconds">00</strong><span>Segundos</span></div></div></div></section>
+  <section class="section paper"><div class="events"><article class="event" data-reveal><div class="line-icon">◎</div><p class="eyebrow">Ceremonia</p><h3>Basílica del<br>Santísimo Sacramento</h3><p>San Martín 1035, Buenos Aires<br>18:30 horas</p><a class="btn" href="https://maps.google.com" target="_blank" rel="noopener">Cómo llegar</a></article><article class="event" data-reveal><div class="line-icon">♢</div><p class="eyebrow">Celebración</p><h3>Palacio Sans Souci</h3><p>Paz 705, Victoria<br>20:30 horas</p><a class="btn" href="https://maps.google.com" target="_blank" rel="noopener">Cómo llegar</a></article></div></section>
+  <section class="section photo-break"><img src="assets/photo-02.jpg" alt="Los novios"><p class="photo-quote" data-reveal>Elegimos caminar juntos</p></section>
+  <section class="section dark details-section"><div class="content"><p class="eyebrow" data-reveal>Detalles de la celebración</p><h2 class="title" data-reveal>Todo preparado para compartir</h2><div class="detail-grid"><article class="detail" data-reveal><div class="line-icon">◇</div><h3>Dress code</h3><p>Elegante · Black & white</p></article><article class="detail" data-reveal><div class="line-icon">♧</div><h3>Regalos</h3><p>Tu presencia es nuestro mejor regalo</p><button class="btn" type="button" onclick="alert('Alias: RENATA.NICO.2026')">Ver datos</button></article><article class="detail" data-reveal><div class="line-icon">▣</div><h3>Agendalo</h3><p>10 de octubre de 2026</p><a class="btn" href="data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ADTSTART:20261010T213000Z%0ASUMMARY:Boda%20Renata%20y%20Nicol%C3%A1s%0AEND:VEVENT%0AEND:VCALENDAR" download="boda-renata-nicolas.ics">Agendar</a></article></div></div></section>
+  <section class="section paper story-section shared-boundary"><img class="branch shared-branch branch-details-story" src="assets/branch-white.png" alt=""><div class="content"><p class="eyebrow" data-reveal>Nuestra historia</p><h2 class="title" data-reveal>Instantes que elegimos guardar</h2><div class="gallery"><img src="assets/photo-01.jpg" alt=""><img src="assets/photo-03.jpg" alt=""><img src="assets/photo-04.jpg" alt=""></div></div></section>
+  <section class="section gold menu-section"><div class="content"><div class="line-icon" data-reveal>♧</div><p class="eyebrow" data-reveal>Menú</p><h2 class="title" data-reveal>Una noche para disfrutar</h2><p class="copy" data-reveal>Si tenés alguna restricción alimentaria, opción vegetariana, vegana o sin TACC, indicalo al confirmar tu asistencia.</p></div></section>
+  <section class="section paper rsvp-section shared-boundary"><img class="branch shared-branch branch-menu-rsvp" src="assets/branch-white.png" alt=""><div class="content"><div class="line-icon" data-reveal>✉</div><p class="eyebrow" data-reveal>Queremos que nos acompañes</p><h2 class="title" data-reveal>Confirmá tu asistencia</h2><p class="copy" data-reveal>Por favor, respondé antes del 10 de septiembre de 2026.</p><form class="rsvp" id="rsvp" data-reveal><input class="field" name="name" placeholder="Nombre y apellido" required><select class="field" required><option value="">¿Vas a asistir?</option><option>Sí, confirmo mi asistencia</option><option>No podré asistir</option></select><select class="field"><option>Sin restricciones alimentarias</option><option>Vegetariano/a</option><option>Vegano/a</option><option>Celíaco/a - sin TACC</option><option>Otra restricción</option></select><textarea class="field" rows="3" placeholder="Mensaje para los novios (opcional)"></textarea><button class="btn" type="submit">Enviar confirmación</button></form></div></section>
+  <section class="section closing dark shared-boundary"><img class="branch shared-branch branch-rsvp-closing" src="assets/branch-white.png" alt=""><div class="content"><p class="eyebrow" data-reveal>Gracias por ser parte de nuestra historia</p><h2 data-reveal><span>Renata</span><i>&</i><span>Nicolás</span></h2><p class="copy" data-reveal>Nos emociona compartir este día con ustedes.</p></div></section>
+  <footer class="footer"><strong>Save Your Date</strong><p>Invitaciones digitales para momentos inolvidables · © 2026</p></footer>
+</main>
+<div class="palette-switcher" aria-label="Paletas de Vínculo Noir">
+  <button class="oro" type="button" data-theme="oro" aria-label="Oro antiguo" title="Oro antiguo" aria-pressed="true"></button>
+  <button class="rosa" type="button" data-theme="rosa" aria-label="Rosa empolvado" title="Rosa empolvado" aria-pressed="false"></button>
+  <button class="verde" type="button" data-theme="verde" aria-label="Verde inglés" title="Verde inglés" aria-pressed="false"></button>
+</div>
+<button class="music" type="button" aria-label="Música">♫</button>
+<script>
+  const params=new URLSearchParams(location.search);
+  const supportedThemes=['oro','rosa','verde'];
+  const selectedTheme=supportedThemes.includes(params.get('palette')||'')?params.get('palette'):'oro';
+  const selectedLanguage=['es','en','pt'].includes(params.get('lang')||'')?params.get('lang'):'es';
+  document.body.dataset.theme=selectedTheme;
+  document.body.classList.toggle('preview',params.get('preview')==='1');
+  document.documentElement.lang=selectedLanguage;
+  const paletteButtons=document.querySelectorAll('.palette-switcher button');
+  paletteButtons.forEach(button=>{button.setAttribute('aria-pressed',String(button.dataset.theme===selectedTheme));button.addEventListener('click',()=>{document.body.dataset.theme=button.dataset.theme;paletteButtons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)))})});
+  const COPY={
+    es:{hero:'Nos casamos',scroll:'Deslizá para descubrir ↓',less:'Falta cada vez menos...',countTitle:'Cuenta regresiva',units:['Días','Horas','Minutos','Segundos'],eventLabels:['Ceremonia','Celebración'],eventTitles:['Basílica del<br>Santísimo Sacramento','Palacio Sans Souci'],eventTexts:['San Martín 1035, Buenos Aires<br>18:30 horas','Paz 705, Victoria<br>20:30 horas'],map:'Cómo llegar',quote:'Elegimos caminar juntos',detailsEye:'Detalles de la celebración',detailsTitle:'Todo preparado para compartir',detailTitles:['Dress code','Regalos','Agendalo'],detailTexts:['Elegante · Black & white','Tu presencia es nuestro mejor regalo','10 de octubre de 2026'],detailActions:['Ver datos','Agendar'],storyEye:'Nuestra historia',storyTitle:'Instantes que elegimos guardar',menuEye:'Menú',menuTitle:'Una noche para disfrutar',food:'Si tenés alguna restricción alimentaria, opción vegetariana, vegana o sin TACC, indicalo al confirmar tu asistencia.',rsvpEye:'Queremos que nos acompañes',rsvpTitle:'Confirmá tu asistencia',rsvpCopy:'Por favor, respondé antes del 10 de septiembre de 2026.',name:'Nombre y apellido',attendance:['¿Vas a asistir?','Sí, confirmo mi asistencia','No podré asistir'],restrictions:['Sin restricciones alimentarias','Vegetariano/a','Vegano/a','Celíaco/a - sin TACC','Otra restricción'],message:'Mensaje para los novios (opcional)',send:'Enviar confirmación',thanks:'¡Gracias por confirmar!',closingEye:'Gracias por ser parte de nuestra historia',closingCopy:'Nos emociona compartir este día con ustedes.',footer:'Invitaciones digitales para momentos inolvidables · © 2026'},
+    en:{hero:'We are getting married',scroll:'Scroll to discover ↓',less:'The wait is getting shorter...',countTitle:'Countdown',units:['Days','Hours','Minutes','Seconds'],eventLabels:['Ceremony','Celebration'],eventTitles:['Basilica of the<br>Blessed Sacrament','Palacio Sans Souci'],eventTexts:['San Martín 1035, Buenos Aires<br>6:30 PM','Paz 705, Victoria<br>8:30 PM'],map:'Get directions',quote:'We chose to walk through life together',detailsEye:'Celebration details',detailsTitle:'Everything prepared to share',detailTitles:['Dress code','Gifts','Save the date'],detailTexts:['Formal · Black & white','Your presence is our greatest gift','October 10, 2026'],detailActions:['View details','Add to calendar'],storyEye:'Our story',storyTitle:'Moments we chose to keep',menuEye:'Menu',menuTitle:'A night to enjoy',food:'Please share any dietary restrictions, vegetarian, vegan or gluten-free preferences when confirming.',rsvpEye:'We hope you can join us',rsvpTitle:'Confirm your attendance',rsvpCopy:'Please reply by September 10, 2026.',name:'Full name',attendance:['Will you attend?','Yes, I will attend','I will not be able to attend'],restrictions:['No dietary restrictions','Vegetarian','Vegan','Gluten-free','Other restriction'],message:'Message for the couple (optional)',send:'Send confirmation',thanks:'Thank you for confirming!',closingEye:'Thank you for being part of our story',closingCopy:'We are excited to share this day with you.',footer:'Digital invitations for unforgettable moments · © 2026'},
+    pt:{hero:'Vamos nos casar',scroll:'Deslize para descobrir ↓',less:'Falta cada vez menos...',countTitle:'Contagem regressiva',units:['Dias','Horas','Minutos','Segundos'],eventLabels:['Cerimônia','Celebração'],eventTitles:['Basílica do<br>Santíssimo Sacramento','Palacio Sans Souci'],eventTexts:['San Martín 1035, Buenos Aires<br>18h30','Paz 705, Victoria<br>20h30'],map:'Como chegar',quote:'Escolhemos caminhar juntos',detailsEye:'Detalhes da celebração',detailsTitle:'Tudo preparado para compartilhar',detailTitles:['Dress code','Presentes','Reserve a data'],detailTexts:['Elegante · Black & white','Sua presença é o nosso maior presente','10 de outubro de 2026'],detailActions:['Ver dados','Agendar'],storyEye:'Nossa história',storyTitle:'Momentos que escolhemos guardar',menuEye:'Menu',menuTitle:'Uma noite para aproveitar',food:'Informe qualquer restrição alimentar ou preferência vegetariana, vegana ou sem glúten ao confirmar.',rsvpEye:'Queremos você conosco',rsvpTitle:'Confirme sua presença',rsvpCopy:'Por favor, responda até 10 de setembro de 2026.',name:'Nome e sobrenome',attendance:['Você estará presente?','Sim, confirmo minha presença','Não poderei comparecer'],restrictions:['Sem restrições alimentares','Vegetariano/a','Vegano/a','Celíaco/a · sem glúten','Outra restrição'],message:'Mensagem para os noivos (opcional)',send:'Enviar confirmação',thanks:'Obrigado por confirmar!',closingEye:'Obrigado por fazer parte da nossa história',closingCopy:'Estamos felizes em compartilhar este dia com vocês.',footer:'Convites digitais para momentos inesquecíveis · © 2026'}
+  };
+  const t=COPY[selectedLanguage];
+  const set=(selector,value,index=0,html=false)=>{const el=document.querySelectorAll(selector)[index];if(el)el[html?'innerHTML':'textContent']=value};
+  set('.hero .eyebrow',t.hero);set('.scroll',t.scroll);set('.countdown-section .eyebrow',t.less);set('.countdown-section .title',t.countTitle);document.querySelectorAll('.countdown span').forEach((el,i)=>el.textContent=t.units[i]);
+  document.querySelectorAll('.event').forEach((el,i)=>{el.querySelector('.eyebrow').textContent=t.eventLabels[i];el.querySelector('h3').innerHTML=t.eventTitles[i];el.querySelector('p:not(.eyebrow)').innerHTML=t.eventTexts[i];el.querySelector('.btn').textContent=t.map});
+  set('.photo-quote',t.quote);set('.details-section .eyebrow',t.detailsEye);set('.details-section .title',t.detailsTitle);
+  document.querySelectorAll('.detail').forEach((el,i)=>{el.querySelector('h3').textContent=t.detailTitles[i];el.querySelector('p').textContent=t.detailTexts[i];const action=el.querySelector('.btn');if(action)action.textContent=t.detailActions[i-1]});
+  set('.story-section .eyebrow',t.storyEye);set('.story-section .title',t.storyTitle);set('.menu-section .eyebrow',t.menuEye);set('.menu-section .title',t.menuTitle);set('.menu-section .copy',t.food);
+  set('.rsvp-section .eyebrow',t.rsvpEye);set('.rsvp-section .title',t.rsvpTitle);set('.rsvp-section .copy',t.rsvpCopy);
+  const form=document.getElementById('rsvp');form.elements.name.placeholder=t.name;form.querySelectorAll('select')[0].querySelectorAll('option').forEach((el,i)=>el.textContent=t.attendance[i]);form.querySelectorAll('select')[1].querySelectorAll('option').forEach((el,i)=>el.textContent=t.restrictions[i]);form.querySelector('textarea').placeholder=t.message;form.querySelector('button').textContent=t.send;
+  set('.closing .eyebrow',t.closingEye);set('.closing .copy',t.closingCopy);set('.footer p',t.footer);
+  const target=new Date('2026-10-10T18:30:00-03:00').getTime();function tick(){const g=Math.max(0,target-Date.now()),v=[Math.floor(g/86400000),Math.floor(g/3600000)%24,Math.floor(g/60000)%60,Math.floor(g/1000)%60];['days','hours','minutes','seconds'].forEach((id,i)=>document.getElementById(id).textContent=String(v[i]).padStart(2,'0'))}tick();setInterval(tick,1000);
+  document.body.classList.add('motion');
+  const revealSelector='.section .eyebrow,.section .title,.section .copy,.section .line-icon,.section .event,.section .detail,.section .gallery img,.section .field,.section .btn,.section .countdown>div,.section .names,.section .hero-date,.section .photo-quote,.section .closing h2';
+  document.querySelectorAll(revealSelector).forEach((el,index)=>{el.setAttribute('data-reveal','');el.style.setProperty('--delay',(index%4)*70+'ms')});
+  const so=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('visible',e.isIntersecting)),{threshold:.08});document.querySelectorAll('.section:not(.hero)').forEach(e=>so.observe(e));
+  const ro=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('show',e.isIntersecting)),{threshold:.12});document.querySelectorAll('[data-reveal]').forEach(e=>ro.observe(e));
+  const photo=document.querySelector('.photo-break img');let lock=false;function parallax(){if(!photo||matchMedia('(prefers-reduced-motion:reduce)').matches){lock=false;return}const r=photo.parentElement.getBoundingClientRect(),p=(r.top+r.height/2-innerHeight/2)/(innerHeight+r.height);photo.style.setProperty('--parallax',Math.max(-72,Math.min(72,p*-150))+'px');lock=false}addEventListener('scroll',()=>{if(!lock){requestAnimationFrame(parallax);lock=true}},{passive:true});parallax();
+  document.getElementById('rsvp').addEventListener('submit',e=>{e.preventDefault();e.currentTarget.innerHTML='<p style="text-align:center;font:500 34px var(--serif)">'+t.thanks+'</p>'});
+</script>
+</body></html>
