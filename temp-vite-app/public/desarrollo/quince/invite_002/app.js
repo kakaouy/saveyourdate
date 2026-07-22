@@ -10,6 +10,7 @@
   let activeModal = null;
   let previousFocus = null;
   let lightboxIndex = 0;
+  let galleryIndex = 0;
   const t = (key) => dictionaries[language]?.[key] || dictionaries.es[key] || key;
   const q = (selector, root = document) => root.querySelector(selector);
   const qa = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -34,31 +35,6 @@
     }
   }
 
-  function renderControls() {
-    const paletteHost = q("[data-palette-controls]");
-    Object.entries(config.theme.palettes).forEach(([key, palette]) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "palette-button";
-      button.dataset.palette = key;
-      button.style.setProperty("--swatch", palette.accent);
-      button.title = palette.label[language] || palette.label.es;
-      button.setAttribute("aria-label", button.title);
-      button.addEventListener("click", () => applyPalette(key, true));
-      paletteHost.append(button);
-    });
-    const languageHost = q("[data-language-controls]");
-    config.locale.enabled.forEach(code => {
-      const link = document.createElement("a");
-      const next = new URL(location.href);
-      next.searchParams.set("lang", code);
-      link.href = next;
-      link.textContent = code.toUpperCase();
-      if (code === language) link.setAttribute("aria-current", "page");
-      languageHost.append(link);
-    });
-  }
-
   function translate() {
     document.documentElement.lang = language;
     qa("[data-i18n]").forEach(node => { node.textContent = t(node.dataset.i18n); });
@@ -68,6 +44,8 @@
     q("[data-lightbox-close]")?.setAttribute("aria-label", t("close"));
     q("[data-lightbox-prev]")?.setAttribute("aria-label", t("previous"));
     q("[data-lightbox-next]")?.setAttribute("aria-label", t("next"));
+    q("[data-gallery-prev]")?.setAttribute("aria-label", t("previous"));
+    q("[data-gallery-next]")?.setAttribute("aria-label", t("next"));
   }
 
   function formatDate(options) {
@@ -75,11 +53,12 @@
   }
 
   function bindEventData() {
+    const capitalize = value => value ? value.charAt(0).toLocaleUpperCase(locale()) + value.slice(1) : value;
     const data = {
       honoree: config.event.honoree,
       intro: typeof config.event.intro === "object" ? (config.event.intro[language] || config.event.intro.es) : config.event.intro,
       shortDate: formatDate({ day: "2-digit", month: "2-digit", year: "numeric" }).replaceAll("/", " | "),
-      longDateTime: `${formatDate({ weekday: "long", day: "numeric", month: "long" })} · ${formatDate({ hour: "2-digit", minute: "2-digit", hour12: false })}h`,
+      longDateTime: `${capitalize(formatDate({ weekday: "long", day: "numeric", month: "long" }))} · ${formatDate({ hour: "2-digit", minute: "2-digit", hour12: false })}h`,
       venue: config.event.venue,
       address: config.event.address,
       dressCode: config.event.dressCode,
@@ -89,6 +68,9 @@
     qa("[data-bank]").forEach(node => { node.textContent = config.event.bank[node.dataset.bank] || ""; });
     q("[data-maps]")?.setAttribute("href", config.event.mapsUrl);
     q("[data-waze]")?.setAttribute("href", config.event.wazeUrl);
+    const instagram = q("[data-instagram]");
+    instagram.textContent = config.event.instagram;
+    instagram.href = config.event.instagramUrl;
   }
 
   function bindMedia() {
@@ -104,16 +86,6 @@
     });
     const icon = q("[data-calendar-icon]");
     icon.src = config.media.calendarIcon;
-    const audioConfig = config.media.music;
-    if (audioConfig?.enabled && audioConfig.src) {
-      const audio = new Audio(audioConfig.src);
-      const control = q("[data-music-control]");
-      control.hidden = false;
-      control.addEventListener("click", async () => {
-        if (audio.paused) await audio.play(); else audio.pause();
-        q("[data-i18n]", control).textContent = audio.paused ? t("play") : t("pause");
-      });
-    }
   }
 
   function applySections() {
@@ -156,10 +128,51 @@
     config.media.gallery.forEach((photo, index) => {
       const button = document.createElement("button");
       button.type = "button"; button.className = "gallery-item"; button.setAttribute("aria-label", `${t("galleryOpen")} ${index + 1}`);
-      const image = new Image(); image.src = photo.src; image.alt = photo.alt; image.loading = "lazy"; image.decoding = "async"; image.style.objectPosition = photo.position || "center";
+      const image = new Image(); image.src = photo.src; image.alt = photo.alt; image.loading = index === 0 ? "eager" : "lazy"; image.decoding = "async"; image.style.objectPosition = photo.position || "center";
       button.append(image); button.addEventListener("click", () => openLightbox(index)); host.append(button);
-      dots.append(document.createElement("span"));
     });
+    const positions = Math.max(1, config.media.gallery.length - 2);
+    Array.from({ length: positions }, (_, index) => {
+      const dot = document.createElement("button"); dot.type = "button"; dot.setAttribute("aria-label", `${t("galleryOpen")} ${index + 1}`); dot.addEventListener("click", () => scrollGalleryTo(index)); dots.append(dot);
+    });
+    updateGalleryState(0);
+  }
+
+  function updateGalleryState(index) {
+    const total = Math.max(1, config.media.gallery.length - 2);
+    galleryIndex = Math.max(0, Math.min(index, total - 1));
+    qa("[data-gallery-dots] button").forEach((dot, dotIndex) => dot.classList.toggle("active", dotIndex === galleryIndex));
+    q("[data-gallery-prev]").disabled = galleryIndex === 0;
+    q("[data-gallery-next]").disabled = galleryIndex === total - 1;
+  }
+
+  function scrollGalleryTo(index) {
+    const viewport = q("[data-gallery-viewport]");
+    const slides = qa(".gallery-item", viewport);
+    const target = slides[Math.max(0, Math.min(index, slides.length - 1))];
+    if (!target) return;
+    viewport.scrollTo({ left: target.offsetLeft, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    updateGalleryState(slides.indexOf(target));
+  }
+
+  function bindGallery() {
+    const viewport = q("[data-gallery-viewport]");
+    q("[data-gallery-prev]").addEventListener("click", () => scrollGalleryTo(galleryIndex - 1));
+    q("[data-gallery-next]").addEventListener("click", () => scrollGalleryTo(galleryIndex + 1));
+    viewport.addEventListener("keydown", event => {
+      if (event.key === "ArrowLeft") { event.preventDefault(); scrollGalleryTo(galleryIndex - 1); }
+      if (event.key === "ArrowRight") { event.preventDefault(); scrollGalleryTo(galleryIndex + 1); }
+    });
+    let scheduled = false;
+    viewport.addEventListener("scroll", () => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        const slides = qa(".gallery-item", viewport);
+        const closest = slides.reduce((best, slide, index) => Math.abs(slide.offsetLeft - viewport.scrollLeft) < best.distance ? { index, distance: Math.abs(slide.offsetLeft - viewport.scrollLeft) } : best, { index: 0, distance: Infinity });
+        updateGalleryState(closest.index); scheduled = false;
+      });
+    }, { passive: true });
   }
 
   function openLightbox(index) {
@@ -229,11 +242,13 @@
   }
 
   function observeReveals() {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) { qa(".reveal").forEach(node => node.classList.add("is-visible")); return; }
+    qa("main h1,main h2,main h3,main p,main .btn,footer strong,footer span,footer small").forEach(node => node.classList.add("reveal-text"));
+    const revealItems = qa(".reveal,.reveal-text");
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) { revealItems.forEach(node => node.classList.add("is-visible")); return; }
     document.documentElement.classList.add("reveal-ready");
     const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("is-visible"); observer.unobserve(entry.target); } }), { threshold: .12 });
-    qa(".reveal").forEach(node => observer.observe(node));
+    revealItems.forEach(node => observer.observe(node));
   }
 
-  renderControls(); applyPalette(paletteKey); translate(); bindEventData(); bindMedia(); applySections(); renderGallery(); bindInteractions(); observeReveals(); updateCountdown(); setInterval(updateCountdown, 1000);
+  applyPalette(paletteKey); translate(); bindEventData(); bindMedia(); applySections(); renderGallery(); bindGallery(); bindInteractions(); observeReveals(); updateCountdown(); setInterval(updateCountdown, 1000);
 })();

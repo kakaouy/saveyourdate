@@ -14,12 +14,6 @@
 <body>
   <a class="skip-link" href="#main-content" data-i18n="skip"></a>
   <div class="invitation-shell">
-    <header class="utility-bar" aria-label="Personalización de la invitación">
-      <div class="palette-controls" data-palette-controls></div>
-      <nav class="language-controls" data-language-controls aria-label="Idioma"></nav>
-      <button class="music-control" type="button" data-music-control hidden><span aria-hidden="true">♫</span><span data-i18n="play"></span></button>
-    </header>
-
     <main id="main-content">
       <section class="cover section-white" data-section="cover">
         <img class="ornament ornament-top" data-ornament="top" alt="">
@@ -88,9 +82,15 @@
 
       <section class="gallery-section section-white reveal" data-section="gallery">
         <h2 data-i18n="journey"></h2>
-        <div class="gallery-grid" data-gallery></div>
-        <div class="gallery-dots" data-gallery-dots aria-hidden="true"></div>
-        <p class="social-line"><span data-i18n="follow"></span> <strong data-event="instagram"></strong> <span data-i18n="tagPhotos"></span></p>
+        <div class="gallery-carousel">
+          <button class="gallery-nav gallery-prev" type="button" data-gallery-prev aria-label="Anterior">‹</button>
+          <div class="gallery-viewport" data-gallery-viewport tabindex="0">
+            <div class="gallery-grid" data-gallery></div>
+          </div>
+          <button class="gallery-nav gallery-next" type="button" data-gallery-next aria-label="Siguiente">›</button>
+        </div>
+        <div class="gallery-dots" data-gallery-dots aria-label="Posición de la galería"></div>
+        <p class="social-line"><span data-i18n="follow"></span> <a data-instagram target="_blank" rel="noopener noreferrer"></a> <span data-i18n="tagPhotos"></span></p>
       </section>
 
       <section class="gifts color-panel reveal" data-section="gifts">
@@ -101,9 +101,9 @@
       </section>
 
       <footer class="footer section-white" data-section="footer">
-        <strong class="footer-name" data-event="honoree"></strong>
-        <span data-i18n="footerThanks"></span>
-        <small data-i18n="footerBrand"></small>
+        <strong data-i18n="footerBrand"></strong>
+        <span data-i18n="footerTagline"></span>
+        <small data-i18n="footerLegal"></small>
       </footer>
     </main>
   </div>

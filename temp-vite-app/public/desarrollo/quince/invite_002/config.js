@@ -12,12 +12,13 @@ window.INVITATION_CONFIG = {
     wazeUrl: "https://waze.com/ul?q=Avenida%20Suarez%205445&navigate=yes",
     dressCode: "Semi formal",
     intro: {
-      es: "Quiero invitarte a una noche épica, llena de magia y alegría. Falta muy poquito. Es importante que confirmes tu asistencia antes del 01 de junio.",
-      pt: "Quero convidar você para uma noite épica, cheia de magia e alegria. Falta muito pouco. É importante confirmar sua presença antes de 1º de junho.",
-      en: "I want to invite you to an epic night filled with magic and joy. It is almost here. Please confirm your attendance before June 1."
+      es: "Quiero invitarte a una noche épica, llena de magia y alegría.",
+      pt: "Quero convidar você para uma noite épica, cheia de magia e alegria.",
+      en: "I want to invite you to an epic night filled with magic and joy."
     },
     rsvpDeadline: "2027-06-01T23:59:59-03:00",
     instagram: "@maite_XV",
+    instagramUrl: "https://www.instagram.com/maite_xv/",
     bank: {
       account: "000000000",
       bankName: "The Bank",
@@ -26,7 +27,7 @@ window.INVITATION_CONFIG = {
   },
   media: {
     cover: {
-      enabled: false,
+      enabled: true,
       src: "./assets/maite-portrait-mural.jpg",
       alt: "Maite frente a un mural colorido",
       position: "50% 33%"

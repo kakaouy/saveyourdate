@@ -12,7 +12,7 @@ window.INVITATION_I18N = {
     send: "Enviar", close: "Cerrar", attendance: "Asiste", attending: "Sí, asiste", notAttending: "No asiste", guestCount: "Cantidad de asistentes",
     dietary: "Restricciones alimentarias", none: "Ninguna", vegetarian: "Vegetariana", vegan: "Vegana", celiac: "Celíaca", other: "Otra", detail: "Detalle", notes: "Observaciones (opcional)",
     required: "Completá los campos obligatorios.", sending: "Enviando...", playlistSuccess: "¡Gracias! Tu canción quedó sugerida.", rsvpSuccess: "¡Gracias! Registramos tu respuesta.", submitError: "No pudimos enviar los datos. Intentá nuevamente.",
-    footerThanks: "Gracias por ser parte de esta gran noche", footerBrand: "Invitación creada por Save Your Date", play: "Play", pause: "Pausar", galleryOpen: "Abrir fotografía", previous: "Anterior", next: "Siguiente"
+    footerBrand: "Save Your Date", footerTagline: "Invitaciones digitales para momentos inolvidables", footerLegal: "© 2026 Save Your Date · Todos los derechos reservados.", galleryOpen: "Abrir fotografía", previous: "Anterior", next: "Siguiente"
   },
   pt: {
     skip: "Ir para o conteúdo",
@@ -27,7 +27,7 @@ window.INVITATION_I18N = {
     send: "Enviar", close: "Fechar", attendance: "Presença", attending: "Sim, comparece", notAttending: "Não comparece", guestCount: "Quantidade de convidados",
     dietary: "Restrições alimentares", none: "Nenhuma", vegetarian: "Vegetariana", vegan: "Vegana", celiac: "Celíaca", other: "Outra", detail: "Detalhes", notes: "Observações (opcional)",
     required: "Preencha os campos obrigatórios.", sending: "Enviando...", playlistSuccess: "Obrigada! Sua música foi sugerida.", rsvpSuccess: "Obrigada! Registramos sua resposta.", submitError: "Não foi possível enviar os dados. Tente novamente.",
-    footerThanks: "Obrigada por fazer parte desta grande noite", footerBrand: "Convite criado por Save Your Date", play: "Play", pause: "Pausar", galleryOpen: "Abrir fotografia", previous: "Anterior", next: "Próxima"
+    footerBrand: "Save Your Date", footerTagline: "Convites digitais para momentos inesquecíveis", footerLegal: "© 2026 Save Your Date · Todos os direitos reservados.", galleryOpen: "Abrir fotografia", previous: "Anterior", next: "Próxima"
   },
   en: {
     skip: "Skip to content",
@@ -42,6 +42,6 @@ window.INVITATION_I18N = {
     send: "Send", close: "Close", attendance: "Attendance", attending: "Attending", notAttending: "Not attending", guestCount: "Number of guests",
     dietary: "Dietary restrictions", none: "None", vegetarian: "Vegetarian", vegan: "Vegan", celiac: "Gluten-free", other: "Other", detail: "Details", notes: "Notes (optional)",
     required: "Complete the required fields.", sending: "Sending...", playlistSuccess: "Thank you! Your song was suggested.", rsvpSuccess: "Thank you! We recorded your response.", submitError: "We could not send the data. Please try again.",
-    footerThanks: "Thank you for being part of this special night", footerBrand: "Invitation created by Save Your Date", play: "Play", pause: "Pause", galleryOpen: "Open photo", previous: "Previous", next: "Next"
+    footerBrand: "Save Your Date", footerTagline: "Digital invitations for unforgettable moments", footerLegal: "© 2026 Save Your Date · All rights reserved.", galleryOpen: "Open photo", previous: "Previous", next: "Next"
   }
 };
