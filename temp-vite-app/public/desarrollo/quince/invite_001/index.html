@@ -173,7 +173,13 @@ html {
 
   .nombre {
     font-family: "Dantina", cursive;
-    font-size: 4.25rem;
+    width: 100%;
+    max-width: min(100%, 18ch);
+    margin-inline: auto;
+    font-size: clamp(2.5rem, 13vw, 4.25rem);
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+    text-align: center;
   }
 
   .mis {
@@ -1464,7 +1470,7 @@ html {
     }
 
     .nombre {
-      font-size: 3.8rem;
+      font-size: clamp(2.25rem, 13vw, 3.8rem);
       line-height: 1.05;
     }
 
