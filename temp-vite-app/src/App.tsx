@@ -3,6 +3,8 @@ import './App.css';
 import { INVITATION_MODELS } from './data/models';
 import type { InvitationModel } from './data/models';
 import OrderFlow from './components/OrderFlow';
+import { VeronaInvitation } from './components/verona/VeronaInvitation';
+import type { VeronaPalette } from './components/verona/config';
 
 
 const MODEL_COLOR_OPTIONS = [
@@ -2700,10 +2702,12 @@ function App() {
                               <input className="form-input" type="text" placeholder="Ej. 0000021000..." value={quinceData.giftCbu} onChange={e => setQuinceData({...quinceData, giftCbu: e.target.value})} />
                             </div>
                           </div>
-                          <div className="form-group" style={{ marginBottom: '12px' }}>
-                            <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.music}</label>
-                            <input className="form-input" type="text" placeholder="Ej. Don't Start Now - Dua Lipa" value={quinceData.musicPreference} onChange={e => setQuinceData({...quinceData, musicPreference: e.target.value})} />
-                          </div>
+                          {wizardModel !== '15-verona' && (
+                            <div className="form-group" style={{ marginBottom: '12px' }}>
+                              <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.music}</label>
+                              <input className="form-input" type="text" placeholder="Ej. Don't Start Now - Dua Lipa" value={quinceData.musicPreference} onChange={e => setQuinceData({...quinceData, musicPreference: e.target.value})} />
+                            </div>
+                          )}
                           <div className="form-group" style={{ marginBottom: '12px' }}>
                             <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.dress}</label>
                             <input className="form-input" type="text" placeholder="Ej. Formal con toque flúor" value={quinceData.quinceDressCode} onChange={e => setQuinceData({...quinceData, quinceDressCode: e.target.value})} />
@@ -3140,7 +3144,19 @@ function App() {
       )}
 
       {/* FULL SCREEN MODEL DEMO */}
-      {demoModel && (
+      {demoModel?.id === '15-verona' && (
+        <VeronaInvitation
+          locale={lang}
+          palette={getPaletteIdFromColor(demoModel, selectedModelColors[demoModel.id]) as VeronaPalette}
+          onPaletteChange={(palette) => {
+            const option = demoModel.palettes?.find((item) => item.id === palette);
+            if (option) setSelectedModelColors((current) => ({ ...current, [demoModel.id]: option.color }));
+          }}
+          onClose={() => setDemoModel(null)}
+        />
+      )}
+
+      {demoModel && demoModel.id !== '15-verona' && (
         <div className="demo-page" role="dialog" aria-modal="true" aria-label={`${DEMO_COPY[lang].special}: ${demoModel.title}`}>
           <button className="demo-page-close" onClick={() => setDemoModel(null)} aria-label={DEMO_COPY[lang].close}>×</button>
 

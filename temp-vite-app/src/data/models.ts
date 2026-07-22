@@ -242,6 +242,28 @@ export const INVITATION_MODELS: InvitationModel[] = [
     location: 'Salón Terrazas, Palermo, CABA'
   },
   {
+    id: '15-verona',
+    title: 'Verona',
+    category: '15years',
+    description: 'Fotografía protagonista, flores en acuarela y una experiencia cálida y contemporánea para celebrar tus 15 años.',
+    badge: 'Nuevo',
+    demoName1: 'Leticia',
+    date: '15 de Noviembre, 2031',
+    previewImage: '/verona/foto-01.png',
+    active: true,
+    order: 23,
+    features: ['Cuenta Regresiva', 'Galería de fotos', 'Cronograma', 'Ubicación', 'Código de Vestimenta', 'Regalos / CBU', 'Confirmación RSVP'],
+    themeClass: 'mock-theme-verona',
+    illustrationType: 'crown',
+    location: 'Salón Eventos Premium, Montevideo',
+    includedSections: ['countdown', 'gallery', 'schedule', 'location', 'dresscode', 'gifts', 'rsvp'],
+    palettes: [
+      { id: 'coral', name: 'Coral', color: '#a9364b' },
+      { id: 'botanica', name: 'Botanica', color: '#176268' },
+      { id: 'blush', name: 'Blush', color: '#8a3053' }
+    ]
+  },
+  {
     id: 'otros-baby',
     title: 'Baby Shower Especial',
     category: 'other',
