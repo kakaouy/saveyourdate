@@ -27,7 +27,7 @@ window.INVITATION_CONFIG = {
   },
   media: {
     cover: {
-      enabled: true,
+      enabled: false,
       src: "./assets/maite-portrait-mural.jpg",
       alt: "Maite frente a un mural colorido",
       position: "50% 33%"

@@ -195,7 +195,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
     badge: 'Nuevo',
     demoName1: 'Maite',
     date: '15 de Junio, 2027',
-    previewImage: '/previews/jardin-floral.jpg',
+    previewImage: '/previews/jardin-floral.png',
     demoPath: '/desarrollo/quince/invite_002/index.html',
     active: true,
     order: 22,
