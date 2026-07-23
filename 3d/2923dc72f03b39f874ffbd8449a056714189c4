@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "3d2923dc72f03b39f874ffbd8449a056714189c4",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
