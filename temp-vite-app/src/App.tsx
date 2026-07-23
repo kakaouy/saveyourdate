@@ -3,8 +3,6 @@ import './App.css';
 import { INVITATION_MODELS } from './data/models';
 import type { InvitationModel } from './data/models';
 import OrderFlow from './components/OrderFlow';
-import { VeronaInvitation } from './components/verona/VeronaInvitation';
-import type { VeronaPalette } from './components/verona/config';
 
 
 const MODEL_COLOR_OPTIONS = [
@@ -154,7 +152,9 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'azul-hielo': 'Ice blue',
     'rosa-antiguo': 'Antique rose',
     salvia: 'Sage green',
-    lavanda: 'Lavender'
+    lavanda: 'Lavender',
+    'bordo-calida': 'Warm burgundy',
+    'verde-agua': 'Aqua green'
   },
   pt: {
     rosa: 'Rosa',
@@ -176,7 +176,9 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'azul-hielo': 'Azul gelo',
     'rosa-antiguo': 'Rosa antigo',
     salvia: 'Verde sálvia',
-    lavanda: 'Lavanda'
+    lavanda: 'Lavanda',
+    'bordo-calida': 'Bordô quente',
+    'verde-agua': 'Verde água'
   }
 };
 
@@ -2222,7 +2224,7 @@ function App() {
                     <div className="card-info">
                       <h3 className="card-title">{model.title}</h3>
 
-                      <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
+                      {model.id !== '15-verona' && <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
                         {modelPaletteOptions.map((option) => (
                           <button
                             key={option.color}
@@ -2234,7 +2236,7 @@ function App() {
                             onClick={() => setSelectedModelColors((current) => ({ ...current, [model.id]: option.color }))}
                           />
                         ))}
-                      </div>
+                      </div>}
 
                        <div className="card-footer">
                         <button className="btn-card-demo" onClick={() => handleOpenDemo(model)}>
@@ -3143,20 +3145,8 @@ function App() {
         </div>
       )}
 
-      {/* FULL SCREEN MODEL DEMO */}
-      {demoModel?.id === '15-verona' && (
-        <VeronaInvitation
-          locale={lang}
-          palette={getPaletteIdFromColor(demoModel, selectedModelColors[demoModel.id]) as VeronaPalette}
-          onPaletteChange={(palette) => {
-            const option = demoModel.palettes?.find((item) => item.id === palette);
-            if (option) setSelectedModelColors((current) => ({ ...current, [demoModel.id]: option.color }));
-          }}
-          onClose={() => setDemoModel(null)}
-        />
-      )}
-
-      {demoModel && demoModel.id !== '15-verona' && (
+      {/* STANDARD MODEL DEMO */}
+      {demoModel && (
         <div className="demo-page" role="dialog" aria-modal="true" aria-label={`${DEMO_COPY[lang].special}: ${demoModel.title}`}>
           <button className="demo-page-close" onClick={() => setDemoModel(null)} aria-label={DEMO_COPY[lang].close}>×</button>
 
@@ -3168,7 +3158,16 @@ function App() {
               >
                 <div className="demo-phone-speaker"></div>
                 <div className="demo-phone-screen">
-                  {demoModel.demoPath ? (
+                  {demoModel.id === '15-verona' ? (
+                    <iframe
+                      className="demo-real-invitation-frame"
+                      src={`/verona/index.html?preview=1&palette=${getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      )}&lang=${lang}`}
+                      title="Demo interactiva Verona"
+                    />
+                  ) : demoModel.demoPath ? (
                     <iframe
                       className="demo-real-invitation-frame"
                       src={`${demoModel.demoPath}?preview=1&palette=${getPaletteIdFromColor(

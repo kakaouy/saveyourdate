@@ -1,10 +1,14 @@
 export type VeronaLocale = 'es' | 'pt' | 'en';
-export type VeronaPalette = 'coral' | 'botanica' | 'blush';
+export type VeronaPalette = 'bordo-calida' | 'verde-agua';
 
-export const PALETTES: Record<VeronaPalette, Record<string, string>> = {
-  coral: { fondo:'#fff9f6', alterno:'#f3e4d9', titulos:'#a9364b', texto:'#653b3b', botones:'#a9364b', acento:'#9b3f2f', bordes:'#8d5a54', ornamentos:'#c66b55', claro:'#fff', foco:'#702238' },
-  botanica: { fondo:'#f7fbf8', alterno:'#dfece6', titulos:'#1f5f63', texto:'#274843', botones:'#176268', acento:'#285d52', bordes:'#568074', ornamentos:'#d86f5c', claro:'#fff', foco:'#123f43' },
-  blush: { fondo:'#fff8fa', alterno:'#f4e0e7', titulos:'#8a3053', texto:'#573743', botones:'#8a3053', acento:'#6f3650', bordes:'#9f6c7d', ornamentos:'#d46f7d', claro:'#fff', foco:'#552039' }
+export interface VeronaPaletteTokens {
+  fondo:string; alterno:string; titulos:string; secundario:string; acento:string;
+  texto:string; botones:string; bordes:string; ornamentos:string; claro:string; foco:string;
+}
+
+export const PALETTES: Record<VeronaPalette, VeronaPaletteTokens> = {
+  'bordo-calida': { fondo:'#fff9f6', alterno:'#f3e4d9', titulos:'#a72039', secundario:'#fff1dc', acento:'#d1475c', texto:'#653b3b', botones:'#a9364b', bordes:'#8d5a54', ornamentos:'#ffa287', claro:'#ffffff', foco:'#8d0000' },
+  'verde-agua': { fondo:'#dadfd9', alterno:'#c5d3d0', titulos:'#69949b', secundario:'#ebf3e9', acento:'#79a7b0', texto:'#2d5f67', botones:'#285b64', bordes:'#98babe', ornamentos:'#bbccca', claro:'#ffffff', foco:'#3d7078' }
 };
 
 const common = { scheduleTimes: ['21:00', '22:30', '00:00', '03:30'], foodValues: ['none', 'celiac', 'vegetarian', 'vegan', 'other'] };
@@ -41,6 +45,6 @@ export const DEFAULT_CONFIG: VeronaConfig = {
   links:{ maps:'https://maps.google.com/?q=Montevideo', photoUpload:'https://drive.google.com/', instagram:'https://instagram.com/' },
   gifts:{ bank:'Banco de demostración', holder:'Leticia Familia', currency:'UYU', account:'0000000000', alias:'LETICIA.QUINCE', visible:true }, content:{ hashtag:'#Lety15Años' }, qrPass:{ value:'VERONA-DEMO-GUEST' },
   schedule:[{time:'21:00'},{time:'22:30'},{time:'00:00'},{time:'03:30'}], gallery:[1,2,3,4,5].map(n=>({src:`/verona/foto-0${n}.jpg`})), hotels:[],
-  assets:{hero:'/verona/foto-01.png',heroPositionMobile:'center',heroPositionDesktop:'center 24%',heroOverlay:.42,parallax:'/verona/foto-05.jpg',topRight:'/verona/esquina-superior-derecha.png',bottomLeft:'/verona/esquina-inferior-izquierda.png',ornamentLeft:'/verona/ornamento_naranja_izq.png',ornamentRight:'/verona/orna-derecha.png'},
+  assets:{hero:'/verona/foto-01.png',heroPositionMobile:'center',heroPositionDesktop:'center 24%',heroOverlay:.16,parallax:'/verona/foto-05.jpg',topRight:'/verona/esquina-superior-derecha.png',bottomLeft:'/verona/esquina-inferior-izquierda.png',ornamentLeft:'/verona/ornamento_naranja_izq.png',ornamentRight:'/verona/orna-derecha.png'},
   theme:{titleFont:'Great Vibes',bodyFont:'Montserrat',signatureFont:'Great Vibes'}, sections:{hero:true,countdown:true,location:true,quote:true,dressCode:true,schedule:true,parallax:true,gallery:true,hotels:true,gifts:true,photoUpload:true,social:true,qrPass:true,rsvp:true}, metadata:{private:true}
 };

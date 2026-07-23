@@ -258,9 +258,8 @@ export const INVITATION_MODELS: InvitationModel[] = [
     location: 'Salón Eventos Premium, Montevideo',
     includedSections: ['countdown', 'gallery', 'schedule', 'location', 'dresscode', 'gifts', 'rsvp'],
     palettes: [
-      { id: 'coral', name: 'Coral', color: '#a9364b' },
-      { id: 'botanica', name: 'Botanica', color: '#176268' },
-      { id: 'blush', name: 'Blush', color: '#8a3053' }
+      { id: 'bordo-calida', name: 'Bordó cálida', color: '#a72039' },
+      { id: 'verde-agua', name: 'Verde agua', color: '#69949b' }
     ]
   },
   {
