@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Invitación a los 15 años de Leticia">
+  <meta name="theme-color" content="#c94f5d">
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:title" content="Mis 15 años de Leticia">
+  <meta property="og:description" content="Te espero para compartir una noche inolvidable">
+  <meta property="og:image" content="images/foto-01.jpg">
+  <title>Mis 15 años de Leticia</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-fondo: #fff9f6;
+      --color-fondo-alterno: #f3e4d9;
+      --color-titulos: #a72039;
+      --color-secundario: #fff1dc;
+      --color-acento: #d1475c;
+      --color-texto: #653b3b;
+      --color-botones: #a9364b;
+      --color-bordes: #8d5a54;
+      --color-ornamentos: #ffa287;
+      --color-texto-claro: #ffffff;
+      --color-foco: #8d0000;
+      --color-principal: var(--color-titulos);
+      --font-title: "Great Vibes", cursive;
+      --font-body: "Montserrat", sans-serif;
+      --font-signature: "Great Vibes", cursive;
+      --section-space: clamp(4rem, 9vw, 6.5rem);
+      --content-width: 760px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      font-family: var(--font-body);
+    }
+
+    body {
+      margin: 0;
+      overflow-x: clip;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a,
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--color-foco);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 11000;
+      padding: 0.75rem 1rem;
+      border-radius: 999px;
+      background: var(--color-texto-claro);
+      color: var(--color-acento);
+      transform: translateY(-180%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    .loader.is-hidden {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader__spinner {
+      width: 50px;
+      aspect-ratio: 1;
+      border: 3px solid var(--color-fondo-alterno);
+      border-top-color: var(--color-principal);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loader__text {
+      margin: 0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .container {
+      width: min(100%, var(--content-width));
+      margin-inline: auto;
+    }
+
+    section {
+      position: relative;
+      padding: var(--section-space) clamp(1.125rem, 5vw, 2rem);
+      text-align: center;
+    }
+
+    .tone-light { background: var(--color-fondo); }
+    .tone-alternate { background: var(--color-fondo-alterno); }
+    .tone-accent {
+      background: var(--color-acento);
+      color: var(--color-texto-claro);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    .font-signature,
+    .hero-title,
+    .section-title,
+    .schedule__title,
+    .modal__title,
+    .footer__signature {
+      font-family: var(--font-title);
+      font-weight: 400;
+    }
+
+    .section-title {
+      margin-bottom: 0.75rem;
+      color: var(--color-principal);
+      font-size: clamp(2.75rem, 9vw, 4.6rem);
+      line-height: 1.05;
+    }
+
+    .tone-accent .section-title,
+    .tone-accent p {
+      color: var(--color-texto-claro);
+    }
+
+    .section-eyebrow {
+      margin-bottom: 0.35rem;
+      color: var(--color-acento);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-copy {
+      max-width: 610px;
+      margin: 0 auto 1rem;
+      line-height: 1.65;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 1.4rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid var(--color-botones);
+      border-radius: 999px;
+      background: var(--color-botones);
+      color: var(--color-texto-claro);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      line-height: 1.25;
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--color-acento);
+      background: var(--color-acento);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--color-botones);
+    }
+
+    .tone-accent .btn-outline {
+      border-color: var(--color-texto-claro);
+      color: var(--color-texto-claro);
+    }
+
+    .tone-accent .btn-outline:hover {
+      background: var(--color-texto-claro);
+      color: var(--color-acento);
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      min-height: 100svh;
+      place-items: center;
+      overflow: hidden;
+      padding: 2rem 1.25rem;
+      background-image: url("images/foto-01.png");
+      background-position: center;
+      background-size: cover;
+      color: var(--color-texto-claro);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 760px);
+      margin-top: 25svh;
+      text-align: center;
+    }
+
+    .hero-name {
+      margin-bottom: 0.25rem;
+      color: var(--color-texto-claro);
+      font-size: clamp(4.4rem, 20vw, 8rem);
+      line-height: 0.95;
+      overflow-wrap: anywhere;
+      text-shadow: 0 2px 8px rgb(0 0 0 / 30%);
+    }
+
+    .hero-date {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(0.65rem, 3vw, 1rem);
+      margin: 1rem auto;
+      color: var(--color-texto-claro);
+      font-size: clamp(0.82rem, 3.5vw, 1.05rem);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .hero-date::before,
+    .hero-date::after {
+      width: clamp(1.5rem, 10vw, 3rem);
+      height: 1px;
+      background: currentColor;
+      content: "";
+    }
+
+    .hero-title {
+      margin: 0;
+      color: var(--color-secundario);
+      font-size: clamp(1.85rem, 7vw, 3.15rem);
+      line-height: 1;
+      text-shadow: 0 2px 8px rgb(0 0 0 / 30%);
+    }
+
+    .hero-ornament {
+      position: absolute;
+      z-index: 3;
+      width: min(38vw, 180px);
+      pointer-events: none;
+    }
+
+    .hero-ornament--top { top: 0; right: 0; }
+    .hero-ornament--bottom { bottom: 0; left: 0; }
+
+    .countdown {
+      display: grid;
+      grid-template-columns: repeat(7, auto);
+      align-items: start;
+      justify-content: center;
+      gap: clamp(0.15rem, 1.6vw, 0.85rem);
+      margin-top: 2.75rem;
+    }
+
+    .countdown__item {
+      display: flex;
+      min-width: clamp(2.65rem, 14vw, 5.5rem);
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .countdown__number,
+    .countdown__separator {
+      color: var(--color-principal);
+      font-size: clamp(1.75rem, 8vw, 4.75rem);
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .countdown__label {
+      margin-top: 0.55rem;
+      font-size: clamp(0.5rem, 2.2vw, 0.72rem);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .event-detail {
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+      line-height: 1.55;
+    }
+
+    .event-detail--strong { font-weight: 700; }
+
+    .quote {
+      max-width: 590px;
+      margin: 0 auto;
+      color: var(--color-principal);
+      font-family: var(--font-title);
+      font-size: clamp(2rem, 7vw, 3.25rem);
+      line-height: 1.25;
+    }
+
+    .section-ornament {
+      position: relative;
+      z-index: 20;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .section-ornament img {
+      position: absolute;
+      top: 0;
+      width: clamp(105px, 24vw, 195px);
+      max-width: none;
+    }
+
+    .section-ornament--left img {
+      left: 0;
+      transform: translateY(-50%);
+      transform-origin: left center;
+      animation: ornament-left 6s ease-in-out infinite;
+    }
+
+    .section-ornament--right img {
+      right: 0;
+      transform: translateY(-50%);
+      transform-origin: right center;
+      animation: ornament-right 6s ease-in-out infinite;
+    }
+
+    @keyframes ornament-left {
+      50% { transform: translateY(-54%) rotate(1deg); }
+    }
+
+    @keyframes ornament-right {
+      50% { transform: translateY(-54%) rotate(-1deg); }
+    }
+
+    .schedule {
+      width: min(100%, 650px);
+      margin: 2rem auto 0;
+      text-align: left;
+    }
+
+    .schedule__item {
+      display: grid;
+      min-height: 110px;
+      grid-template-columns: clamp(3.5rem, 16vw, 5rem) 2.25rem minmax(0, 1fr);
+    }
+
+    .schedule__time {
+      padding-right: 0.35rem;
+      color: var(--color-principal);
+      font-size: clamp(1rem, 4vw, 1.5rem);
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: right;
+    }
+
+    .schedule__line {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .schedule__line span {
+      position: relative;
+      z-index: 2;
+      width: 14px;
+      height: 14px;
+      margin-top: 2px;
+      border: 2px solid var(--color-principal);
+      border-radius: 50%;
+      background: var(--color-fondo);
+    }
+
+    .schedule__line::after {
+      position: absolute;
+      top: 16px;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--color-principal);
+      content: "";
+      opacity: 0.35;
+      transform: translateX(-50%);
+    }
+
+    .schedule__item:last-child .schedule__line::after { display: none; }
+
+    .schedule__content {
+      padding: 0 0 2rem 0.45rem;
+    }
+
+    .schedule__title {
+      margin-bottom: 0.2rem;
+      color: var(--color-principal);
+      font-size: clamp(1.8rem, 7vw, 2.35rem);
+      line-height: 1.05;
+    }
+
+    .schedule__description {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .parallax-section {
+      position: relative;
+      display: grid;
+      overflow: hidden;
+      min-height: clamp(350px, 70svh, 620px);
+      place-items: center;
+      isolation: isolate;
+      background: var(--color-fondo-alterno);
+      color: var(--color-texto-claro);
+    }
+
+    .parallax-section__media {
+      position: absolute;
+      z-index: 0;
+      inset: -20% 0;
+      background-image:
+        linear-gradient(rgb(0 0 0 / 18%), rgb(0 0 0 / 18%)),
+        url("images/foto-05.jpg");
+      background-position: center 35%;
+      background-size: cover;
+      transform: translate3d(0, var(--parallax-shift, 0px), 0);
+      will-change: transform;
+    }
+
+    .parallax-section__content {
+      position: relative;
+      z-index: 1;
+      width: min(100% - 2rem, 760px);
+      text-align: center;
+    }
+
+    .parallax-section .section-title {
+      color: var(--color-texto-claro);
+      text-shadow: 0 2px 8px rgb(45 18 15 / 70%);
+    }
+
+    .gallery-grid {
+      display: grid;
+      width: min(100%, 820px);
+      margin: 1.5rem auto 0;
+      grid-template-columns: repeat(auto-fit, minmax(min(135px, 100%), 1fr));
+      gap: 0.75rem;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      padding: 0;
+      border: 0;
+      border-radius: 12px;
+      aspect-ratio: 1;
+      background: var(--color-fondo-alterno);
+      box-shadow: 0 4px 12px rgb(89 42 37 / 18%);
+      cursor: pointer;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery-item:hover img { transform: scale(1.035); }
+
+    .social-tag {
+      margin: 0.75rem 0 1.25rem;
+      color: var(--color-principal);
+      font-family: var(--font-body);
+      font-size: clamp(1.35rem, 5vw, 2rem);
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    .footer {
+      padding: 3rem 1.25rem;
+      background: var(--color-acento);
+      color: var(--color-texto-claro);
+      text-align: center;
+    }
+
+    .footer__signature {
+      margin-bottom: 0.25rem;
+      color: var(--color-secundario);
+      font-size: 2rem;
+    }
+
+    .footer__description {
+      margin-bottom: 1.25rem;
+      font-size: 0.86rem;
+    }
+
+    .footer__divider {
+      width: min(100%, 220px);
+      margin: 0 auto 1.25rem;
+      border: 0;
+      border-top: 1px solid rgb(255 255 255 / 55%);
+    }
+
+    .footer__legal {
+      margin: 0;
+      font-size: 0.75rem;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+      background: color-mix(in srgb, var(--color-acento) 84%, transparent);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal.is-open { display: flex; }
+
+    .modal__content {
+      position: relative;
+      width: min(100%, 500px);
+      max-height: min(88dvh, 760px);
+      overflow-y: auto;
+      padding: 2.5rem clamp(1.25rem, 5vw, 2rem) 2rem;
+      border: 2px solid var(--color-secundario);
+      border-radius: 16px;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      box-shadow: 0 18px 50px rgb(45 18 15 / 45%);
+      text-align: center;
+      animation: modal-pop 0.28s ease-out;
+    }
+
+    @keyframes modal-pop {
+      from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    }
+
+    .modal__close {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+      display: grid;
+      width: 44px;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--color-principal);
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .modal__title {
+      margin-bottom: 1rem;
+      color: var(--color-principal);
+      font-size: clamp(2.2rem, 9vw, 3.25rem);
+      line-height: 1.05;
+    }
+
+    .modal__copy { line-height: 1.6; }
+
+    .form-grid {
+      display: grid;
+      gap: 0.9rem;
+      margin-top: 1.25rem;
+      text-align: left;
+    }
+
+    .field {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .field label {
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 46px;
+      padding: 0.7rem 0.8rem;
+      border: 1px solid var(--color-bordes);
+      border-radius: 10px;
+      background: var(--color-texto-claro);
+      color: var(--color-texto);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .form-status {
+      min-height: 1.5rem;
+      margin: 0.75rem 0 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .qr-demo {
+      display: grid;
+      width: min(180px, 70vw);
+      aspect-ratio: 1;
+      margin: 1.25rem auto;
+      place-items: center;
+      border: 12px solid var(--color-texto-claro);
+      background:
+        repeating-linear-gradient(45deg, #2f2121 0 8px, #ffffff 8px 16px),
+        repeating-linear-gradient(-45deg, transparent 0 8px, #2f2121 8px 16px);
+      box-shadow: 0 3px 14px rgb(45 18 15 / 25%);
+    }
+
+    .qr-demo span {
+      padding: 0.45rem;
+      background: var(--color-texto-claro);
+      color: #2f2121;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .lightbox__content {
+      position: relative;
+      display: grid;
+      width: min(92vw, 920px);
+      height: min(86dvh, 900px);
+      place-items: center;
+    }
+
+    .lightbox__image {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 12px;
+      object-fit: contain;
+      box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
+    }
+
+    .lightbox__close {
+      top: -0.5rem;
+      right: -0.5rem;
+      background: var(--color-texto-claro);
+    }
+
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
+
+    .js .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.75s ease-out, transform 0.75s ease-out;
+    }
+
+    .js .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 560px) {
+      .hero-content { margin-top: 18svh; }
+      .button-row { flex-direction: column; align-items: stretch; }
+      .button-row .btn { width: 100%; }
+    }
+
+    @media (min-width: 768px) {
+      .hero { background-position: center 24%; }
+      .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (min-width: 1100px) {
+      .hero-content { margin-top: 20vh; }
+      .gallery-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      .parallax-section__media {
+        inset: 0;
+        transform: none;
+        will-change: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .parallax-section__media {
+        inset: 0;
+        transform: none;
+        will-change: auto;
+      }
+      .js .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Saltar al contenido</a>
+
+  <div id="loader" class="loader" role="status" aria-live="polite">
+    <div class="loader__spinner" aria-hidden="true"></div>
+    <p class="loader__text">CARGANDO EXPERIENCIA...</p>
+  </div>
+
+  <main id="main-content">
+    <section id="sec-hero" class="hero" data-section="hero">
+      <img src="images/esquina-superior-derecha.png" class="hero-ornament hero-ornament--top" alt="" aria-hidden="true">
+      <img src="images/esquina-inferior-izquierda.png" class="hero-ornament hero-ornament--bottom" alt="" aria-hidden="true">
+      <div class="hero-content">
+        <p id="hero-name" class="font-signature hero-name">Leticia</p>
+        <p id="hero-date" class="hero-date">Sábado 15 de noviembre</p>
+        <h1 id="hero-event-title" class="hero-title">Mis 15 Años</h1>
+      </div>
+    </section>
+
+    <section id="sec-countdown" class="tone-light" data-section="countdown">
+      <div class="container">
+        <p class="section-eyebrow">Falta muy poco</p>
+        <h2 class="section-title">Cuenta regresiva</h2>
+        <div id="countdown" class="countdown" role="timer" aria-label="Cuenta regresiva para el evento">
+          <div class="countdown__item"><span id="countdown-days" class="countdown__number">00</span><span class="countdown__label">Días</span></div>
+          <span class="countdown__separator" aria-hidden="true">:</span>
+          <div class="countdown__item"><span id="countdown-hours" class="countdown__number">00</span><span class="countdown__label">Horas</span></div>
+          <span class="countdown__separator" aria-hidden="true">:</span>
+          <div class="countdown__item"><span id="countdown-minutes" class="countdown__number">00</span><span class="countdown__label">Minutos</span></div>
+          <span class="countdown__separator" aria-hidden="true">:</span>
+          <div class="countdown__item"><span id="countdown-seconds" class="countdown__number">00</span><span class="countdown__label">Segundos</span></div>
+        </div>
+        <p id="countdown-finished" class="section-copy" hidden>¡Llegó el gran día!</p>
+      </div>
+    </section>
+
+    <div class="section-ornament section-ornament--right" aria-hidden="true"><img src="images/orna-derecha.png" alt="" loading="lazy"></div>
+
+    <section id="sec-location" class="tone-accent reveal" data-section="location">
+      <div class="container">
+        <h2 class="section-title">¿Cuándo y dónde?</h2>
+        <p id="event-date-line" class="event-detail event-detail--strong">Sábado 15 de noviembre · 21:00 h</p>
+        <p id="event-place-line" class="event-detail">Salón Eventos Premium · Montevideo</p>
+        <div class="button-row">
+          <button class="btn btn-outline" type="button" data-open-modal="modal-map">Cómo llegar</button>
+          <button id="calendar-button" class="btn btn-outline" type="button">Agendar evento</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-quote" class="tone-light reveal" data-section="quote">
+      <div class="container"><p id="quote-text" class="quote">“Hay momentos en la vida que son especiales por sí solos, pero compartirlos con vos los hace inolvidables.”</p></div>
+    </section>
+
+    <div class="section-ornament section-ornament--left" aria-hidden="true"><img src="images/ornamento_naranja_izq.png" alt="" loading="lazy"></div>
+
+    <section id="sec-dresscode" class="tone-alternate reveal" data-section="dressCode">
+      <div class="container">
+        <h2 class="section-title">Código de vestimenta</h2>
+        <p id="dresscode-summary" class="section-copy">Elegante formal</p>
+        <button class="btn" type="button" data-open-modal="modal-dresscode">Ver detalles</button>
+      </div>
+    </section>
+
+    <section id="sec-schedule" class="tone-light reveal" data-section="schedule">
+      <div class="container">
+        <h2 class="section-title">Cronograma</h2>
+        <div id="schedule-list" class="schedule"></div>
+      </div>
+    </section>
+
+    <section id="sec-parallax" class="parallax-section" data-section="parallax">
+      <div class="parallax-section__media" aria-hidden="true"></div>
+      <div class="parallax-section__content">
+        <h2 class="section-title">¡Te espero para celebrar!</h2>
+      </div>
+    </section>
+
+    <section id="sec-gallery" class="tone-alternate reveal" data-section="gallery">
+      <div class="container">
+        <h2 class="section-title">Galería de fotos</h2>
+        <p class="section-copy">Un recorrido por momentos inolvidables</p>
+        <div id="gallery-grid" class="gallery-grid"></div>
+      </div>
+    </section>
+
+    <div class="section-ornament section-ornament--right" aria-hidden="true"><img src="images/orna-derecha.png" alt="" loading="lazy"></div>
+
+    <section id="sec-hotels" class="tone-accent reveal" data-section="hotels">
+      <div class="container">
+        <h2 class="section-title">Alojamiento cercano</h2>
+        <p class="section-copy">Opciones recomendadas para quienes vienen de lejos.</p>
+        <button class="btn btn-outline" type="button" data-open-modal="modal-hotels">Ver hoteles</button>
+      </div>
+    </section>
+
+    <section id="sec-gifts" class="tone-light reveal" data-section="gifts">
+      <div class="container">
+        <h2 class="section-title">Mesa de regalos</h2>
+        <p class="section-copy">Tu presencia es nuestro mejor regalo. Si deseás hacer un presente, podés consultar los datos.</p>
+        <button class="btn" type="button" data-open-modal="modal-gifts">Ver cuenta o lista</button>
+      </div>
+    </section>
+
+    <div class="section-ornament section-ornament--left" aria-hidden="true"><img src="images/ornamento_naranja_izq.png" alt="" loading="lazy"></div>
+
+    <section id="sec-photo-upload" class="tone-accent reveal" data-section="photoUpload">
+      <div class="container">
+        <h2 class="section-title">Compartí tus fotos</h2>
+        <p class="section-copy">Subí tus fotos del evento a nuestra carpeta compartida.</p>
+        <button class="btn btn-outline" type="button" data-preview-action="photoUpload">Subir fotos</button>
+      </div>
+    </section>
+
+    <section id="sec-social" class="tone-alternate reveal" data-section="social">
+      <div class="container">
+        <h2 class="section-title">Instagram y redes</h2>
+        <p class="section-copy">Etiquetanos usando nuestro hashtag:</p>
+        <p id="social-hashtag" class="social-tag">#Lety15Años</p>
+        <button class="btn" type="button" data-preview-action="instagram">Ver Instagram</button>
+      </div>
+    </section>
+
+    <div class="section-ornament section-ornament--right" aria-hidden="true"><img src="images/orna-derecha.png" alt="" loading="lazy"></div>
+
+    <section id="sec-qr-pass" class="tone-accent reveal" data-section="qrPass">
+      <div class="container">
+        <h2 class="section-title">Tu pase</h2>
+        <p class="section-copy">Presentá tu código QR en la entrada del salón.</p>
+        <button class="btn btn-outline" type="button" data-open-modal="modal-qr">Ver mi pase QR</button>
+      </div>
+    </section>
+
+    <section id="sec-rsvp" class="tone-light reveal" data-section="rsvp">
+      <div class="container">
+        <h2 class="section-title">Confirmación de asistencia</h2>
+        <p id="rsvp-deadline" class="section-copy">Por favor confirmá tu asistencia antes del 1 de noviembre.</p>
+        <button class="btn" type="button" data-open-modal="modal-rsvp">Confirmar asistencia</button>
+      </div>
+    </section>
+
+    <div class="section-ornament section-ornament--left" aria-hidden="true"><img src="images/ornamento_naranja_izq.png" alt="" loading="lazy"></div>
+  </main>
+
+  <footer class="footer">
+    <p class="footer__signature">Save Your Date</p>
+    <p class="footer__description">Invitaciones digitales para momentos inolvidables</p>
+    <hr class="footer__divider">
+    <p class="footer__legal">© <span id="footer-year"></span> Save Your Date · Todos los derechos reservados</p>
+  </footer>
+
+  <div id="modal-map" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-map-title" hidden>
+    <div class="modal__content">
+      <button class="modal__close" type="button" data-close-modal aria-label="Cerrar ubicación">×</button>
+      <h2 id="modal-map-title" class="modal__title">Ubicación del evento</h2>
+      <p id="modal-map-copy" class="modal__copy">Salón Eventos Premium · Av. Principal 1234, Montevideo</p>
+      <button class="btn" type="button" data-preview-action="maps">Abrir mapa</button>
+    </div>
+  </div>
+
+  <div id="modal-dresscode" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-dresscode-title" hidden>
+    <div class="modal__content">
+      <button class="modal__close" type="button" data-close-modal aria-label="Cerrar código de vestimenta">×</button>
+      <h2 id="modal-dresscode-title" class="modal__title">Dress code</h2>
+      <p id="dresscode-details" class="modal__copy">Elegante formal. Traje o vestido largo.</p>
+    </div>
+  </div>
+
+  <div id="modal-hotels" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-hotels-title" hidden>
+    <div class="modal__content">
+      <button class="modal__close" type="button" data-close-modal aria-label="Cerrar alojamientos">×</button>
+      <h2 id="modal-hotels-title" class="modal__title">Hoteles recomendados</h2>
+      <p class="modal__copy"><strong>Hotel Central Plaza</strong><br>Opción de referencia para la preview. Codex deberá renderizar la lista configurada para cada evento.</p>
+    </div>
+  </div>
+
+  <div id="modal-gifts" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-gifts-title" hidden>
+    <div class="modal__content">
+      <button class="modal__close" type="button" data-close-modal aria-label="Cerrar datos de regalos">×</button>
+      <h2 id="modal-gifts-title" class="modal__title">Datos para regalos</h2>
+      <p class="modal__copy"><strong>Alias de demostración:</strong> LETICIA.QUINCE</p>
+      <button id="copy-gift-button" class="btn btn-outline" type="button">Copiar alias</button>
+      <p id="copy-status" class="form-status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div id="modal-qr" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-qr-title" hidden>
+    <div class="modal__content">
+      <button class="modal__close" type="button" data-close-modal aria-label="Cerrar pase QR">×</button>
+      <h2 id="modal-qr-title" class="modal__title">Tu entrada digital</h2>
+      <div class="qr-demo" role="img" aria-label="Código QR de demostración"><span>QR DEMO</span></div>
+      <p class="modal__copy">Vista de referencia. Codex deberá generar el QR seguro correspondiente al invitado o grupo.</p>
+    </div>
+  </div>
+
+  <div id="modal-rsvp" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-rsvp-title" hidden>
+    <div class="modal__content">
+      <button class="modal__close" type="button" data-close-modal aria-label="Cerrar confirmación de asistencia">×</button>
+      <h2 id="modal-rsvp-title" class="modal__title">Confirmar asistencia</h2>
+      <form id="rsvp-form" class="form-grid">
+        <div class="field"><label for="rsvp-name">Nombre completo</label><input id="rsvp-name" name="name" type="text" autocomplete="name" required></div>
+        <div class="field"><label for="rsvp-attendance">¿Vas a asistir?</label><select id="rsvp-attendance" name="attendance" required><option value="">Seleccioná una opción</option><option value="yes">Sí, voy a asistir</option><option value="no">No voy a poder asistir</option></select></div>
+        <div class="field"><label for="rsvp-food">Restricción alimentaria</label><select id="rsvp-food" name="food"><option value="none">Ninguna</option><option value="celiac">Celíaco/a</option><option value="vegetarian">Vegetariano/a</option><option value="vegan">Vegano/a</option><option value="other">Otra</option></select></div>
+        <div id="rsvp-food-other-field" class="field" hidden><label for="rsvp-food-other">Contanos cuál</label><input id="rsvp-food-other" name="foodOther" type="text"></div>
+        <div class="field"><label for="rsvp-message">Mensaje para los anfitriones</label><textarea id="rsvp-message" name="message"></textarea></div>
+        <button class="btn" type="submit">Confirmar</button>
+        <p id="rsvp-status" class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-lightbox" class="modal" role="dialog" aria-modal="true" aria-label="Fotografía ampliada" hidden>
+    <div class="lightbox__content">
+      <button class="modal__close lightbox__close" type="button" data-close-modal aria-label="Cerrar fotografía">×</button>
+      <img id="lightbox-image" class="lightbox__image" src="images/foto-01.jpg" alt="">
+    </div>
+  </div>
+
+  <script>
+    /*
+      CONFIGURACIÓN DEMO DE WORK.
+      Codex debe reemplazar esta fuente local por la configuración del sistema,
+      sin cambiar la composición visual aprobada.
+    */
+    const PALETTE_PRESETS = {
+      "bordo-calida": {
+        fondo: "#fff9f6", fondoAlterno: "#f3e4d9", titulos: "#a72039",
+        secundario: "#fff1dc", texto: "#653b3b", botones: "#a9364b", acento: "#d1475c",
+        bordes: "#8d5a54", ornamentos: "#ffa287", textoClaro: "#ffffff", foco: "#8d0000"
+      },
+      "verde-agua": {
+        fondo: "#dadfd9", fondoAlterno: "#c5d3d0", titulos: "#69949b",
+        secundario: "#ebf3e9", texto: "#2d5f67", botones: "#285b64", acento: "#79a7b0",
+        bordes: "#98babe", ornamentos: "#bbccca", textoClaro: "#ffffff", foco: "#3d7078"
+      }
+    };
+
+    const TRANSLATIONS = {
+      es: {
+        locale: "es-UY", skip: "Saltar al contenido", loading: "CARGANDO EXPERIENCIA...",
+        eventTitle: "Mis 15 Años", countdownEyebrow: "Falta muy poco", countdownTitle: "Cuenta regresiva",
+        units: ["Días", "Horas", "Minutos", "Segundos"], countdownDone: "¡Llegó el gran día!",
+        locationTitle: "¿Cuándo y dónde?", mapButton: "Cómo llegar", calendarButton: "Agendar evento",
+        quote: "“Hay momentos en la vida que son especiales por sí solos, pero compartirlos con vos los hace inolvidables.”",
+        dressTitle: "Código de vestimenta", dressSummary: "Elegante formal", dressButton: "Ver detalles",
+        dressModalTitle: "Dress code", dressDetails: "Elegante formal. Traje o vestido largo.",
+        scheduleTitle: "Cronograma", schedule: [
+          ["Recepción", "Bienvenida a los invitados y cóctel de inicio."],
+          ["Cena principal", "Cena y momentos especiales con familia y amigos."],
+          ["Apertura de pista", "¡Comienza el baile y la fiesta!"],
+          ["Cotillón y cierre", "Fiesta de cotillón, trasnoche y cierre del evento."]
+        ],
+        parallaxTitle: "¡Te espero para celebrar!", galleryTitle: "Galería de fotos",
+        galleryCopy: "Un recorrido por momentos inolvidables", galleryAlts: [
+          "Retrato de Leticia con corona de flores", "Retrato de Leticia al aire libre",
+          "Leticia sonriendo con flores rosadas", "Retrato de Leticia en un campo de flores", "Retrato de Leticia sentada"
+        ],
+        hotelsTitle: "Alojamiento cercano", hotelsCopy: "Opciones recomendadas para quienes vienen de lejos.",
+        hotelsButton: "Ver hoteles", hotelsModalTitle: "Hoteles recomendados",
+        hotelsModalCopy: "Opción de referencia para la preview. Codex deberá renderizar la lista configurada para cada evento.",
+        giftsTitle: "Mesa de regalos", giftsCopy: "Tu presencia es nuestro mejor regalo. Si deseás hacer un presente, podés consultar los datos.",
+        giftsButton: "Ver cuenta o lista", giftsModalTitle: "Datos para regalos", giftAliasLabel: "Alias de demostración:",
+        copyAlias: "Copiar alias", copied: "Alias copiado.", copyFallback: "Copiá manualmente:",
+        photosTitle: "Compartí tus fotos", photosCopy: "Subí tus fotos del evento a nuestra carpeta compartida.", photosButton: "Subir fotos",
+        socialTitle: "Instagram y redes", socialCopy: "Etiquetanos usando nuestro hashtag:", socialButton: "Ver Instagram",
+        qrTitle: "Tu pase", qrCopy: "Presentá tu código QR en la entrada del salón.", qrButton: "Ver mi pase QR",
+        qrModalTitle: "Tu entrada digital", qrModalCopy: "Vista de referencia. Codex deberá generar el QR seguro correspondiente al invitado o grupo.", qrDemo: "QR DEMO",
+        rsvpTitle: "Confirmación de asistencia", rsvpDeadline: "Por favor confirmá tu asistencia antes del 1 de noviembre.", rsvpButton: "Confirmar asistencia",
+        rsvpModalTitle: "Confirmar asistencia", nameLabel: "Nombre completo", attendanceLabel: "¿Vas a asistir?",
+        attendanceOptions: ["Seleccioná una opción", "Sí, voy a asistir", "No voy a poder asistir"], foodLabel: "Restricción alimentaria",
+        foodOptions: ["Ninguna", "Celíaco/a", "Vegetariano/a", "Vegano/a", "Otra"], otherFoodLabel: "Contanos cuál",
+        messageLabel: "Mensaje para los anfitriones", confirmButton: "Confirmar",
+        rsvpPreview: "Preview completada. Codex deberá conectar este formulario al backend y manejar carga, éxito, error y reintento.",
+        mapModalTitle: "Ubicación del evento", openMap: "Abrir mapa", photoDialog: "Fotografía ampliada",
+        footerDescription: "Invitaciones digitales para momentos inolvidables", rights: "Todos los derechos reservados",
+        states: { loading: "Cargando...", success: "Operación completada.", error: "No pudimos completar la operación.", retry: "Reintentar", empty: "No hay información disponible." },
+        close: "Cerrar", previewMap: "El enlace del mapa será provisto por la configuración del evento.",
+        previewPhotos: "El enlace para subir fotos será provisto por la configuración del evento.",
+        previewInstagram: "El enlace de Instagram será provisto por la configuración del evento."
+      },
+      pt: {
+        locale: "pt-BR", skip: "Ir para o conteúdo", loading: "CARREGANDO EXPERIÊNCIA...",
+        eventTitle: "Meus 15 Anos", countdownEyebrow: "Falta muito pouco", countdownTitle: "Contagem regressiva",
+        units: ["Dias", "Horas", "Minutos", "Segundos"], countdownDone: "O grande dia chegou!",
+        locationTitle: "Quando e onde?", mapButton: "Como chegar", calendarButton: "Adicionar à agenda",
+        quote: "“Há momentos na vida que são especiais por si só, mas compartilhá-los com você os torna inesquecíveis.”",
+        dressTitle: "Código de vestimenta", dressSummary: "Social completo", dressButton: "Ver detalhes",
+        dressModalTitle: "Traje", dressDetails: "Social completo. Terno ou vestido longo.",
+        scheduleTitle: "Programação", schedule: [
+          ["Recepção", "Boas-vindas aos convidados e coquetel de abertura."],
+          ["Jantar", "Jantar e momentos especiais com família e amigos."],
+          ["Abertura da pista", "A dança e a festa começam!"],
+          ["Festa e encerramento", "Festa, lanche da madrugada e encerramento do evento."]
+        ],
+        parallaxTitle: "Espero você para comemorar!", galleryTitle: "Galeria de fotos",
+        galleryCopy: "Um passeio por momentos inesquecíveis", galleryAlts: [
+          "Retrato de Leticia com coroa de flores", "Retrato de Leticia ao ar livre",
+          "Leticia sorrindo com flores cor-de-rosa", "Retrato de Leticia em um campo de flores", "Retrato de Leticia sentada"
+        ],
+        hotelsTitle: "Hospedagem próxima", hotelsCopy: "Opções recomendadas para quem vem de longe.",
+        hotelsButton: "Ver hotéis", hotelsModalTitle: "Hotéis recomendados",
+        hotelsModalCopy: "Opção de referência para a prévia. O Codex deverá renderizar a lista configurada para cada evento.",
+        giftsTitle: "Lista de presentes", giftsCopy: "Sua presença é o nosso melhor presente. Se desejar presentear, consulte os dados.",
+        giftsButton: "Ver conta ou lista", giftsModalTitle: "Dados para presentes", giftAliasLabel: "Alias de demonstração:",
+        copyAlias: "Copiar alias", copied: "Alias copiado.", copyFallback: "Copie manualmente:",
+        photosTitle: "Compartilhe suas fotos", photosCopy: "Envie as fotos do evento para a nossa pasta compartilhada.", photosButton: "Enviar fotos",
+        socialTitle: "Instagram e redes", socialCopy: "Marque a gente usando a nossa hashtag:", socialButton: "Ver Instagram",
+        qrTitle: "Seu convite", qrCopy: "Apresente o código QR na entrada do salão.", qrButton: "Ver meu QR code",
+        qrModalTitle: "Seu convite digital", qrModalCopy: "Visual de referência. O Codex deverá gerar o QR seguro do convidado ou grupo.", qrDemo: "QR DEMO",
+        rsvpTitle: "Confirmação de presença", rsvpDeadline: "Confirme sua presença até 1º de novembro.", rsvpButton: "Confirmar presença",
+        rsvpModalTitle: "Confirmar presença", nameLabel: "Nome completo", attendanceLabel: "Você vai comparecer?",
+        attendanceOptions: ["Selecione uma opção", "Sim, vou comparecer", "Não poderei comparecer"], foodLabel: "Restrição alimentar",
+        foodOptions: ["Nenhuma", "Celíaco/a", "Vegetariano/a", "Vegano/a", "Outra"], otherFoodLabel: "Conte qual é",
+        messageLabel: "Mensagem para os anfitriões", confirmButton: "Confirmar",
+        rsvpPreview: "Prévia concluída. O Codex deverá conectar este formulário ao backend e tratar carregamento, sucesso, erro e nova tentativa.",
+        mapModalTitle: "Local do evento", openMap: "Abrir mapa", photoDialog: "Foto ampliada",
+        footerDescription: "Convites digitais para momentos inesquecíveis", rights: "Todos os direitos reservados",
+        states: { loading: "Carregando...", success: "Operação concluída.", error: "Não foi possível concluir a operação.", retry: "Tentar novamente", empty: "Nenhuma informação disponível." },
+        close: "Fechar", previewMap: "O link do mapa será fornecido pela configuração do evento.",
+        previewPhotos: "O link para envio de fotos será fornecido pela configuração do evento.",
+        previewInstagram: "O link do Instagram será fornecido pela configuração do evento."
+      },
+      en: {
+        locale: "en-US", skip: "Skip to content", loading: "LOADING EXPERIENCE...",
+        eventTitle: "My 15th Birthday", countdownEyebrow: "Almost time", countdownTitle: "Countdown",
+        units: ["Days", "Hours", "Minutes", "Seconds"], countdownDone: "The big day is here!",
+        locationTitle: "When and where?", mapButton: "Get directions", calendarButton: "Add to calendar",
+        quote: "“Some moments are special on their own, but sharing them with you makes them unforgettable.”",
+        dressTitle: "Dress code", dressSummary: "Formal attire", dressButton: "View details",
+        dressModalTitle: "Dress code", dressDetails: "Formal attire. Suit or floor-length dress.",
+        scheduleTitle: "Schedule", schedule: [
+          ["Welcome reception", "Welcome drinks and reception for our guests."],
+          ["Dinner", "Dinner and special moments with family and friends."],
+          ["Dance floor opens", "Let the dancing and celebration begin!"],
+          ["Party and farewell", "Late-night celebration, snacks, and event closing."]
+        ],
+        parallaxTitle: "I can’t wait to celebrate with you!", galleryTitle: "Photo gallery",
+        galleryCopy: "A collection of unforgettable moments", galleryAlts: [
+          "Portrait of Leticia wearing a flower crown", "Outdoor portrait of Leticia",
+          "Leticia smiling with pink flowers", "Portrait of Leticia in a flower field", "Portrait of Leticia seated"
+        ],
+        hotelsTitle: "Nearby accommodation", hotelsCopy: "Recommended options for guests traveling from out of town.",
+        hotelsButton: "View hotels", hotelsModalTitle: "Recommended hotels",
+        hotelsModalCopy: "Preview example. Codex must render the accommodation list configured for each event.",
+        giftsTitle: "Gift registry", giftsCopy: "Your presence is the greatest gift. If you would like to give something, you can view the details.",
+        giftsButton: "View details", giftsModalTitle: "Gift details", giftAliasLabel: "Demo alias:",
+        copyAlias: "Copy alias", copied: "Alias copied.", copyFallback: "Copy manually:",
+        photosTitle: "Share your photos", photosCopy: "Upload your event photos to our shared folder.", photosButton: "Upload photos",
+        socialTitle: "Instagram and social", socialCopy: "Tag us using our hashtag:", socialButton: "View Instagram",
+        qrTitle: "Your pass", qrCopy: "Show your QR code at the venue entrance.", qrButton: "View my QR pass",
+        qrModalTitle: "Your digital pass", qrModalCopy: "Preview only. Codex must generate the secure QR code assigned to the guest or group.", qrDemo: "QR DEMO",
+        rsvpTitle: "RSVP", rsvpDeadline: "Please reply by November 1.", rsvpButton: "Respond to invitation",
+        rsvpModalTitle: "RSVP", nameLabel: "Full name", attendanceLabel: "Will you attend?",
+        attendanceOptions: ["Select an option", "Yes, I’ll be there", "I won’t be able to attend"], foodLabel: "Dietary requirements",
+        foodOptions: ["None", "Gluten-free", "Vegetarian", "Vegan", "Other"], otherFoodLabel: "Please tell us more",
+        messageLabel: "Message for the hosts", confirmButton: "Submit RSVP",
+        rsvpPreview: "Preview completed. Codex must connect this form to the backend and handle loading, success, error, and retry states.",
+        mapModalTitle: "Event location", openMap: "Open map", photoDialog: "Enlarged photograph",
+        footerDescription: "Digital invitations for unforgettable moments", rights: "All rights reserved",
+        states: { loading: "Loading...", success: "Operation completed.", error: "We couldn’t complete the operation.", retry: "Try again", empty: "No information available." },
+        close: "Close", previewMap: "The map URL will be provided by the event configuration.",
+        previewPhotos: "The photo upload URL will be provided by the event configuration.",
+        previewInstagram: "The Instagram URL will be provided by the event configuration."
+      }
+    };
+
+    const previewParams = new URLSearchParams(window.location.search);
+    const siteConfig = window.VERONA_SITE_CONFIG || {};
+    const requestedLocale = siteConfig.locale || previewParams.get("lang") || "es";
+    const requestedPalette = siteConfig.palettePreset || previewParams.get("palette") || "bordo-calida";
+
+    const EVENT_CONFIG = {
+      locale: Object.hasOwn(TRANSLATIONS, requestedLocale) ? requestedLocale : "es",
+      palettePreset: Object.hasOwn(PALETTE_PRESETS, requestedPalette) ? requestedPalette : "bordo-calida",
+      event: {
+        name: "Leticia",
+        typeLabel: "",
+        dateTime: "2031-11-15T21:00:00-03:00",
+        endDateTime: "2031-11-16T05:00:00-03:00",
+        timezone: "America/Montevideo",
+        venue: "Salón Eventos Premium",
+        address: "Av. Principal 1234, Montevideo",
+        mapsUrl: "",
+        calendarTitle: "Mis 15 años de Leticia",
+        ...(siteConfig.event || {})
+      },
+      content: { hashtag: "#Lety15Años", ...(siteConfig.content || {}) },
+      links: { maps: "", photoUpload: "", instagram: "", ...(siteConfig.links || {}) },
+      gifts: { copyValue: "LETICIA.QUINCE", ...(siteConfig.gifts || {}) },
+      scheduleTimes: siteConfig.scheduleTimes || ["21:00", "22:30", "00:00", "03:30"],
+      gallery: siteConfig.gallery || [
+        { src: "images/foto-01.jpg" }, { src: "images/foto-02.jpg" }, { src: "images/foto-03.jpg" },
+        { src: "images/foto-04.jpg" }, { src: "images/foto-05.jpg" }
+      ],
+      sections: {
+        hero: true,
+        countdown: true,
+        location: true,
+        quote: true,
+        dressCode: true,
+        schedule: true,
+        parallax: true,
+        gallery: true,
+        hotels: true,
+        gifts: true,
+        photoUpload: true,
+        social: true,
+        qrPass: true,
+        rsvp: true,
+        ...(siteConfig.sections || {})
+      }
+    };
+
+    const byId = (id) => document.getElementById(id);
+    let activeModal = null;
+    let modalTrigger = null;
+    let countdownTimer = null;
+
+    function applyPalette() {
+      const palette = PALETTE_PRESETS[EVENT_CONFIG.palettePreset] || PALETTE_PRESETS["bordo-calida"];
+      const root = document.documentElement;
+      const tokenMap = {
+        fondo: "--color-fondo", fondoAlterno: "--color-fondo-alterno", titulos: "--color-titulos",
+        secundario: "--color-secundario", texto: "--color-texto", botones: "--color-botones", acento: "--color-acento",
+        bordes: "--color-bordes", ornamentos: "--color-ornamentos", textoClaro: "--color-texto-claro", foco: "--color-foco"
+      };
+      Object.entries(tokenMap).forEach(([key, token]) => {
+        root.style.setProperty(token, palette[key] || palette.fondoAlterno);
+      });
+      root.dataset.palette = EVENT_CONFIG.palettePreset;
+      document.querySelector('meta[name="theme-color"]').content = palette.acento;
+    }
+
+    function formatEventDate(includeTime = false) {
+      const translation = TRANSLATIONS[EVENT_CONFIG.locale];
+      const date = new Date(EVENT_CONFIG.event.dateTime);
+      const dateOptions = { weekday: "long", day: "numeric", month: "long", timeZone: EVENT_CONFIG.event.timezone };
+      if (includeTime) Object.assign(dateOptions, { hour: "2-digit", minute: "2-digit", hour12: EVENT_CONFIG.locale === "en" });
+      const formatted = new Intl.DateTimeFormat(translation.locale, dateOptions).format(date);
+      return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+    }
+
+    function setText(selector, value) {
+      const element = document.querySelector(selector);
+      if (element && value !== undefined) element.textContent = value;
+    }
+
+    function applyTranslations() {
+      const t = TRANSLATIONS[EVENT_CONFIG.locale];
+      document.documentElement.lang = EVENT_CONFIG.locale;
+      document.title = `${t.eventTitle} · ${EVENT_CONFIG.event.name}`;
+      document.querySelector('meta[name="description"]').content = t.quote.replace(/[“”]/g, "");
+      document.querySelector('meta[property="og:title"]').content = `${t.eventTitle} · ${EVENT_CONFIG.event.name}`;
+      document.querySelector('meta[property="og:description"]').content = t.quote.replace(/[“”]/g, "");
+
+      const textMap = {
+        ".skip-link": t.skip, ".loader__text": t.loading,
+        "#hero-event-title": t.eventTitle, "#sec-countdown .section-eyebrow": t.countdownEyebrow,
+        "#sec-countdown .section-title": t.countdownTitle, "#countdown-finished": t.countdownDone,
+        "#sec-location .section-title": t.locationTitle, "[data-open-modal='modal-map']": t.mapButton,
+        "#calendar-button": t.calendarButton, "#quote-text": t.quote,
+        "#sec-dresscode .section-title": t.dressTitle, "#dresscode-summary": t.dressSummary,
+        "[data-open-modal='modal-dresscode']": t.dressButton, "#modal-dresscode-title": t.dressModalTitle,
+        "#dresscode-details": t.dressDetails, "#sec-schedule .section-title": t.scheduleTitle,
+        "#sec-parallax .section-title": t.parallaxTitle, "#sec-gallery .section-title": t.galleryTitle,
+        "#sec-gallery .section-copy": t.galleryCopy, "#sec-hotels .section-title": t.hotelsTitle,
+        "#sec-hotels .section-copy": t.hotelsCopy, "[data-open-modal='modal-hotels']": t.hotelsButton,
+        "#modal-hotels-title": t.hotelsModalTitle, "#modal-hotels .modal__copy": t.hotelsModalCopy,
+        "#sec-gifts .section-title": t.giftsTitle, "#sec-gifts .section-copy": t.giftsCopy,
+        "[data-open-modal='modal-gifts']": t.giftsButton, "#modal-gifts-title": t.giftsModalTitle,
+        "#copy-gift-button": t.copyAlias, "#sec-photo-upload .section-title": t.photosTitle,
+        "#sec-photo-upload .section-copy": t.photosCopy, "[data-preview-action='photoUpload']": t.photosButton,
+        "#sec-social .section-title": t.socialTitle, "#sec-social .section-copy": t.socialCopy,
+        "[data-preview-action='instagram']": t.socialButton, "#sec-qr-pass .section-title": t.qrTitle,
+        "#sec-qr-pass .section-copy": t.qrCopy, "[data-open-modal='modal-qr']": t.qrButton,
+        "#modal-qr-title": t.qrModalTitle, "#modal-qr .modal__copy": t.qrModalCopy,
+        ".qr-demo span": t.qrDemo, "#sec-rsvp .section-title": t.rsvpTitle,
+        "#rsvp-deadline": t.rsvpDeadline, "[data-open-modal='modal-rsvp']": t.rsvpButton,
+        "#modal-rsvp-title": t.rsvpModalTitle, "label[for='rsvp-name']": t.nameLabel,
+        "label[for='rsvp-attendance']": t.attendanceLabel, "label[for='rsvp-food']": t.foodLabel,
+        "label[for='rsvp-food-other']": t.otherFoodLabel, "label[for='rsvp-message']": t.messageLabel,
+        "#rsvp-form button[type='submit']": t.confirmButton, "#modal-map-title": t.mapModalTitle,
+        "[data-preview-action='maps']": t.openMap, ".footer__description": t.footerDescription
+      };
+      Object.entries(textMap).forEach(([selector, value]) => setText(selector, value));
+
+      document.querySelectorAll(".countdown__label").forEach((element, index) => { element.textContent = t.units[index]; });
+      document.querySelectorAll("#rsvp-attendance option").forEach((element, index) => { element.textContent = t.attendanceOptions[index]; });
+      document.querySelectorAll("#rsvp-food option").forEach((element, index) => { element.textContent = t.foodOptions[index]; });
+      document.querySelectorAll("[data-close-modal]").forEach((button) => { button.setAttribute("aria-label", t.close); });
+      byId("modal-lightbox").setAttribute("aria-label", t.photoDialog);
+      byId("footer-year").parentElement.lastChild.textContent = ` Save Your Date · ${t.rights}`;
+      byId("modal-gifts").querySelector(".modal__copy").innerHTML = `<strong>${t.giftAliasLabel}</strong> ${EVENT_CONFIG.gifts.copyValue}`;
+    }
+
+    function applyConfig() {
+      const t = TRANSLATIONS[EVENT_CONFIG.locale];
+      applyPalette();
+      applyTranslations();
+      byId("hero-name").textContent = EVENT_CONFIG.event.name;
+      byId("hero-date").textContent = formatEventDate(false);
+      byId("hero-event-title").textContent = t.eventTitle;
+      byId("event-date-line").textContent = formatEventDate(true);
+      byId("event-place-line").textContent = `${EVENT_CONFIG.event.venue} · ${EVENT_CONFIG.event.address}`;
+      byId("modal-map-copy").textContent = `${EVENT_CONFIG.event.venue} · ${EVENT_CONFIG.event.address}`;
+      byId("social-hashtag").textContent = EVENT_CONFIG.content.hashtag;
+
+      document.querySelectorAll("[data-section]").forEach((element) => {
+        element.hidden = EVENT_CONFIG.sections[element.dataset.section] === false;
+      });
+
+      byId("schedule-list").replaceChildren(...t.schedule.map((copy, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "schedule__item";
+        const time = document.createElement("div");
+        time.className = "schedule__time";
+        time.textContent = EVENT_CONFIG.scheduleTimes[index];
+        const line = document.createElement("div");
+        line.className = "schedule__line";
+        line.append(document.createElement("span"));
+        const content = document.createElement("div");
+        content.className = "schedule__content";
+        const title = document.createElement("h3");
+        title.className = "schedule__title";
+        title.textContent = copy[0];
+        const description = document.createElement("p");
+        description.className = "schedule__description";
+        description.textContent = copy[1];
+        content.append(title, description);
+        wrapper.append(time, line, content);
+        return wrapper;
+      }));
+
+      byId("gallery-grid").replaceChildren(...EVENT_CONFIG.gallery.map((image, index) => {
+        const button = document.createElement("button");
+        button.className = "gallery-item";
+        button.type = "button";
+        button.dataset.galleryIndex = String(index);
+        button.setAttribute("aria-label", `${t.galleryTitle}: ${t.galleryAlts[index]}`);
+        const img = document.createElement("img");
+        img.src = image.src;
+        img.alt = t.galleryAlts[index];
+        img.loading = "lazy";
+        button.append(img);
+        return button;
+      }));
+    }
+
+    function updateCountdown() {
+      const difference = new Date(EVENT_CONFIG.event.dateTime).getTime() - Date.now();
+      if (!Number.isFinite(difference) || difference <= 0) {
+        byId("countdown").hidden = true;
+        byId("countdown-finished").hidden = false;
+        if (countdownTimer) window.clearInterval(countdownTimer);
+        return;
+      }
+      const totalSeconds = Math.floor(difference / 1000);
+      const values = {
+        days: Math.floor(totalSeconds / 86400),
+        hours: Math.floor((totalSeconds % 86400) / 3600),
+        minutes: Math.floor((totalSeconds % 3600) / 60),
+        seconds: totalSeconds % 60
+      };
+      Object.entries(values).forEach(([key, value]) => {
+        byId(`countdown-${key}`).textContent = String(value).padStart(2, "0");
+      });
+    }
+
+    function getFocusable(modal) {
+      return [...modal.querySelectorAll("button, input, select, textarea, a[href]")].filter((element) => !element.hidden && !element.disabled);
+    }
+
+    function openModal(id, trigger) {
+      const modal = byId(id);
+      if (!modal) return;
+      activeModal = modal;
+      modalTrigger = trigger || document.activeElement;
+      modal.hidden = false;
+      modal.classList.add("is-open");
+      document.body.classList.add("modal-open");
+      getFocusable(modal)[0]?.focus();
+    }
+
+    function closeModal() {
+      if (!activeModal) return;
+      activeModal.classList.remove("is-open");
+      activeModal.hidden = true;
+      document.body.classList.remove("modal-open");
+      const previousTrigger = modalTrigger;
+      activeModal = null;
+      modalTrigger = null;
+      previousTrigger?.focus();
+    }
+
+    function openGalleryItem(index, trigger) {
+      const image = EVENT_CONFIG.gallery[index];
+      if (!image) return;
+      byId("lightbox-image").src = image.src;
+      byId("lightbox-image").alt = TRANSLATIONS[EVENT_CONFIG.locale].galleryAlts[index];
+      openModal("modal-lightbox", trigger);
+    }
+
+    function previewExternalAction(type) {
+      const url = type === "maps" ? EVENT_CONFIG.links.maps : EVENT_CONFIG.links[type];
+      if (url) {
+        window.open(url, "_blank", "noopener,noreferrer");
+        return;
+      }
+      const t = TRANSLATIONS[EVENT_CONFIG.locale];
+      const messages = { maps: t.previewMap, photoUpload: t.previewPhotos, instagram: t.previewInstagram };
+      window.alert(messages[type] || "Integración pendiente para Codex.");
+    }
+
+    function downloadCalendarFile() {
+      const formatDate = (date) => date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+      const content = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Save Your Date//Verona//ES",
+        "BEGIN:VEVENT",
+        `DTSTART:${formatDate(new Date(EVENT_CONFIG.event.dateTime))}`,
+        `DTEND:${formatDate(new Date(EVENT_CONFIG.event.endDateTime))}`,
+        `SUMMARY:${TRANSLATIONS[EVENT_CONFIG.locale].eventTitle} · ${EVENT_CONFIG.event.name}`,
+        `LOCATION:${EVENT_CONFIG.event.venue}, ${EVENT_CONFIG.event.address}`,
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\r\n");
+      const url = URL.createObjectURL(new Blob([content], { type: "text/calendar;charset=utf-8" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "evento-verona.ics";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function setupReveal() {
+      const elements = [...document.querySelectorAll(".reveal")];
+      if (!("IntersectionObserver" in window)) {
+        elements.forEach((element) => element.classList.add("is-visible"));
+        return;
+      }
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      elements.forEach((element) => observer.observe(element));
+    }
+
+    function setupParallax() {
+      const section = byId("sec-parallax");
+      const media = section?.querySelector(".parallax-section__media");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const coarsePointer = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+
+      if (!section || !media || section.hidden || reduceMotion || coarsePointer) return;
+
+      let isNearViewport = false;
+      let frameRequested = false;
+
+      const render = () => {
+        frameRequested = false;
+        if (!isNearViewport) return;
+
+        const rect = section.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const progress = Math.min(1, Math.max(0, (viewportHeight - rect.top) / (viewportHeight + rect.height)));
+        const maxShift = Math.min(150, viewportHeight * 0.17);
+        const shift = (progress - 0.5) * maxShift * 2;
+        media.style.setProperty("--parallax-shift", `${shift.toFixed(2)}px`);
+      };
+
+      const requestRender = () => {
+        if (!frameRequested) {
+          frameRequested = true;
+          window.requestAnimationFrame(render);
+        }
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        isNearViewport = entries[0].isIntersecting;
+        if (isNearViewport) requestRender();
+      }, { rootMargin: "30% 0px" });
+
+      observer.observe(section);
+      window.addEventListener("scroll", requestRender, { passive: true });
+      window.addEventListener("resize", requestRender);
+    }
+
+    document.addEventListener("click", (event) => {
+      const opener = event.target.closest("[data-open-modal]");
+      if (opener) openModal(opener.dataset.openModal, opener);
+
+      if (event.target.closest("[data-close-modal]")) closeModal();
+
+      const galleryItem = event.target.closest("[data-gallery-index]");
+      if (galleryItem) openGalleryItem(Number(galleryItem.dataset.galleryIndex), galleryItem);
+
+      const previewAction = event.target.closest("[data-preview-action]");
+      if (previewAction) previewExternalAction(previewAction.dataset.previewAction);
+
+      if (activeModal && event.target === activeModal) closeModal();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (!activeModal) return;
+      if (event.key === "Escape") closeModal();
+      if (event.key === "Tab") {
+        const focusable = getFocusable(activeModal);
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    byId("calendar-button").addEventListener("click", downloadCalendarFile);
+
+    byId("copy-gift-button").addEventListener("click", async () => {
+      const t = TRANSLATIONS[EVENT_CONFIG.locale];
+      try {
+        await navigator.clipboard.writeText(EVENT_CONFIG.gifts.copyValue);
+        byId("copy-status").textContent = t.copied;
+      } catch {
+        byId("copy-status").textContent = `${t.copyFallback} ${EVENT_CONFIG.gifts.copyValue}`;
+      }
+    });
+
+    byId("rsvp-food").addEventListener("change", (event) => {
+      const field = byId("rsvp-food-other-field");
+      const input = byId("rsvp-food-other");
+      field.hidden = event.target.value !== "other";
+      input.required = event.target.value === "other";
+    });
+
+    byId("rsvp-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      byId("rsvp-status").textContent = TRANSLATIONS[EVENT_CONFIG.locale].rsvpPreview;
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      applyConfig();
+      updateCountdown();
+      countdownTimer = window.setInterval(updateCountdown, 1000);
+      setupReveal();
+      setupParallax();
+      byId("footer-year").textContent = String(new Date().getFullYear());
+      window.setTimeout(() => byId("loader").classList.add("is-hidden"), 500);
+    });
+
+    window.addEventListener("load", () => byId("loader").classList.add("is-hidden"));
+    window.setTimeout(() => byId("loader")?.classList.add("is-hidden"), 3000);
+  </script>
+</body>
+</html>
