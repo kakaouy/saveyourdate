@@ -3,37 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Invitación a los 15 años de Leticia">
+  <meta name="description" content="Invitación a los 15 años de Martina">
   <meta name="theme-color" content="#c94f5d">
   <meta name="robots" content="noindex, nofollow">
-  <meta property="og:title" content="Mis 15 años de Leticia">
+  <meta property="og:title" content="Mis 15 años de Martina">
   <meta property="og:description" content="Te espero para compartir una noche inolvidable">
   <meta property="og:image" content="images/foto-01.jpg">
-  <title>Mis 15 años de Leticia</title>
+  <title>Mis 15 años de Martina</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Beth+Ellen&family=Cormorant+Upright:wght@300;400;500;600;700&family=Lavishly+Yours&family=Parisienne&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Prata&family=Qwitcher+Grypen:wght@400;700&family=Sail&family=Sofia&family=WindSong:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Beth+Ellen&family=Cormorant+Upright:wght@300;400;500;600;700&family=Lavishly+Yours&family=Parisienne&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Prata&family=Qwitcher+Grypen:wght@400;700&family=Sail&family=Sofia&family=WindSong:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --color-fondo: #fff9f6;
       --color-fondo-alterno: #f3e4d9;
-      --color-titulos: #a72039;
+      --color-titulos: #fa5d91;
       --color-secundario: #fff1dc;
-      --color-acento: #d1475c;
-      --color-texto: #653b3b;
-      --color-botones: #a9364b;
+      --color-acento: #fa5d91;
+      --color-texto: #d1475c;
+      --color-botones: #ef639f;
       --color-bordes: #8d5a54;
       --color-ornamentos: #ffa287;
       --color-texto-claro: #ffffff;
-      --color-foco: #8d0000;
+      --color-foco: #ed739b;
       --color-principal: var(--color-titulos);
-      --font-title: "Great Vibes", cursive;
+      --font-title: "Baskervville", cursive;
       --font-body: "Montserrat", sans-serif;
-      --font-signature: "Great Vibes", cursive;
+      --font-signature: "Beth Ellen", cursive;
       --section-space: clamp(4rem, 9vw, 6.5rem);
       --content-width: 760px;
+
+      --pruebita1:  #05838e;
+      --pruebita0:  #14ab9c;
+      --pruebita2:  #23c2b2;
+      --pruebita3:  #53d0c4;
+      --pruebita4:  #7cd0c8;
+      --pruebita5:  #a2d1cc;
     }
 
     *,
@@ -157,6 +166,19 @@
       color: var(--color-texto-claro);
     }
 
+    /* Fondo personalizado para Alojamiento, Instagram y Footer */
+    #sec-hotels,
+    #sec-social,
+    .footer {
+      background-color: #05838e !important;
+      color: var(--color-texto-claro);
+    }
+
+    #sec-hotels .section-title,
+    #sec-social .section-title {
+      color: var(--color-texto-claro);
+    }
+
     h1,
     h2,
     h3,
@@ -171,13 +193,18 @@
     .modal__title,
     .footer__signature {
       font-family: var(--font-title);
+      font-weight: 250;
+    }
+
+    .font-signature {
+      font-family: var(--font-signature);
       font-weight: 400;
     }
 
     .section-title {
       margin-bottom: 0.75rem;
       color: var(--color-principal);
-      font-size: clamp(2.75rem, 9vw, 4.6rem);
+      font-size: clamp(2.4rem, 6vw, 4rem);
       line-height: 1.05;
     }
 
@@ -216,12 +243,12 @@
       justify-content: center;
       padding: 0.75rem 1.5rem;
       border: 2px solid var(--color-botones);
-      border-radius: 999px;
+      border-radius: 20px;
       background: var(--color-botones);
       color: var(--color-texto-claro);
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.2em;
       line-height: 1.25;
       text-align: center;
       text-decoration: none;
@@ -273,9 +300,9 @@
     }
 
     .hero-name {
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.60rem;
       color: var(--color-texto-claro);
-      font-size: clamp(4.4rem, 20vw, 8rem);
+      font-size: clamp(4.0rem, 20vw, 7rem);
       line-height: 0.95;
       overflow-wrap: anywhere;
       text-shadow: 0 2px 8px rgb(0 0 0 / 30%);
@@ -286,7 +313,8 @@
       align-items: center;
       justify-content: center;
       gap: clamp(0.65rem, 3vw, 1rem);
-      margin: 1rem auto;
+      margin: 2rem auto;
+      margin-bottom:  0.80rem;
       color: var(--color-texto-claro);
       font-size: clamp(0.82rem, 3.5vw, 1.05rem);
       font-weight: 600;
@@ -313,12 +341,12 @@
     .hero-ornament {
       position: absolute;
       z-index: 3;
-      width: min(38vw, 180px);
+      width: min(60vw, 400px);
       pointer-events: none;
     }
 
-    .hero-ornament--top { top: 0; right: 0; }
-    .hero-ornament--bottom { bottom: 0; left: 0; }
+    .hero-ornament--top { top: 0; left: 0; }
+    .hero-ornament--bottom { bottom: 0; right: 0; transform: scale(-1, -1); }
 
     .countdown {
       display: grid;
@@ -365,7 +393,7 @@
       margin: 0 auto;
       color: var(--color-principal);
       font-family: var(--font-title);
-      font-size: clamp(2rem, 7vw, 3.25rem);
+      font-size: clamp(2rem, 5vw, 3.25rem);
       line-height: 1.25;
     }
 
@@ -379,7 +407,7 @@
     .section-ornament img {
       position: absolute;
       top: 0;
-      width: clamp(105px, 24vw, 195px);
+      width: clamp(105px, 34vw, 280px);
       max-width: none;
     }
 
@@ -405,6 +433,58 @@
       50% { transform: translateY(-54%) rotate(-1deg); }
     }
 
+    /* Animación de latido */
+    @keyframes heartbeat {
+      0% {
+        transform: scale(1);
+      }
+      14% {
+        transform: scale(1.08);
+      }
+      28% {
+        transform: scale(1);
+      }
+      42% {
+        transform: scale(1.08);
+      }
+      70% {
+        transform: scale(1);
+      }
+    }
+
+    /* Aplicar latido al ornamento superior (normal) */
+    .hero-ornament--top {
+      top: 0;
+      left: 0;
+      animation: heartbeat 25.5s ease-in-out infinite;
+    }
+
+    /* Aplicar latido al ornamento inferior (manteniendo el espejado) */
+    .hero-ornament--bottom {
+      bottom: 0;
+      right: 0;
+      animation: heartbeat-flipped 25.5s ease-in-out infinite;
+    }
+
+    /* Keyframes específicos para el ornamento espejado */
+    @keyframes heartbeat-flipped {
+      0% {
+        transform: scale(-1, -1);
+      }
+      7% {
+        transform: scale(-1.08, -1.08);
+      }
+      20% {
+        transform: scale(-1, -1);
+      }
+      28% {
+        transform: scale(-1.08, -1.08);
+      }
+      35% {
+        transform: scale(-1, -1);
+      }
+    }
+
     .schedule {
       width: min(100%, 650px);
       margin: 2rem auto 0;
@@ -418,10 +498,11 @@
     }
 
     .schedule__time {
+      padding-top: 0.70rem;
       padding-right: 0.35rem;
       color: var(--color-principal);
       font-size: clamp(1rem, 4vw, 1.5rem);
-      font-weight: 700;
+      font-weight: 500;
       line-height: 1.15;
       text-align: right;
     }
@@ -436,8 +517,8 @@
       position: relative;
       z-index: 2;
       width: 14px;
-      height: 14px;
-      margin-top: 2px;
+      height: 16px;
+      margin-top: 0.7rem;
       border: 2px solid var(--color-principal);
       border-radius: 50%;
       background: var(--color-fondo);
@@ -445,8 +526,8 @@
 
     .schedule__line::after {
       position: absolute;
-      top: 16px;
-      bottom: 0;
+      top: calc(0.70rem + 16px);
+      bottom: -0.7rem;
       left: 50%;
       width: 2px;
       background: var(--color-principal);
@@ -464,7 +545,7 @@
     .schedule__title {
       margin-bottom: 0.2rem;
       color: var(--color-principal);
-      font-size: clamp(1.8rem, 7vw, 2.35rem);
+      font-size: clamp(1.8rem, 6vw, 2.35rem);
       line-height: 1.05;
     }
 
@@ -540,7 +621,7 @@
 
     .social-tag {
       margin: 0.75rem 0 1.25rem;
-      color: var(--color-principal);
+      color: var(--color-texto-claro);
       font-family: var(--font-body);
       font-size: clamp(1.35rem, 5vw, 2rem);
       font-weight: 600;
@@ -787,17 +868,17 @@
   </div>
 
   <main id="main-content">
-    <section id="sec-hero" class="hero" data-section="hero">
-      <img src="images/esquina-superior-derecha.png" class="hero-ornament hero-ornament--top" alt="" aria-hidden="true">
-      <img src="images/esquina-inferior-izquierda.png" class="hero-ornament hero-ornament--bottom" alt="" aria-hidden="true">
+    <section id="sec-hero" class="hero reveal" data-section="hero">
+      <img src="/Users/cecilia.paciel/Documents/GitHub_kakao/saveyourdate/temp-vite-app/public/varezzia/images/esq-sup-izq.png" class="hero-ornament hero-ornament--top" alt="" aria-hidden="true">
+      <img src="/Users/cecilia.paciel/Documents/GitHub_kakao/saveyourdate/temp-vite-app/public/varezzia/images/esq-sup-izq.png" class="hero-ornament  hero-ornament--bottom" alt="" aria-hidden="true">
       <div class="hero-content">
-        <p id="hero-name" class="font-signature hero-name">Leticia</p>
+        <p id="hero-name" class="font-signature hero-name">Martina</p>
         <p id="hero-date" class="hero-date">Sábado 15 de noviembre</p>
-        <h1 id="hero-event-title" class="hero-title">Mis 15 Años</h1>
+        <h1 id="hero-event-title" class="font-title hero-title">Mis 15 Años</h1>
       </div>
     </section>
 
-    <section id="sec-countdown" class="tone-light" data-section="countdown">
+    <section id="sec-countdown" class="tone-light reveal" data-section="countdown">
       <div class="container">
         <p class="section-eyebrow">Falta muy poco</p>
         <h2 class="section-title">Cuenta regresiva</h2>
@@ -814,7 +895,7 @@
       </div>
     </section>
 
-    <div class="section-ornament section-ornament--right" aria-hidden="true"><img src="images/orna-derecha.png" alt="" loading="lazy"></div>
+    <div class="section-ornament section-ornament--right reveal" aria-hidden="true"><img src="/Users/cecilia.paciel/Documents/GitHub_kakao/saveyourdate/temp-vite-app/public/varezzia/images/separador_derecha.png" alt="" loading="lazy"></div>
 
     <section id="sec-location" class="tone-accent reveal" data-section="location">
       <div class="container">
@@ -832,13 +913,13 @@
       <div class="container"><p id="quote-text" class="quote">“Hay momentos en la vida que son especiales por sí solos, pero compartirlos con vos los hace inolvidables.”</p></div>
     </section>
 
-    <div class="section-ornament section-ornament--left" aria-hidden="true"><img src="images/ornamento_naranja_izq.png" alt="" loading="lazy"></div>
+    <div class="section-ornament section-ornament--left" aria-hidden="true"><img src="temp-vite-app/public/varezzia/images/separador_izquierda.png" alt="" loading="lazy"></div>
 
-    <section id="sec-dresscode" class="tone-alternate reveal" data-section="dressCode">
+    <section id="sec-dresscode" class="tone-accent reveal" data-section="dressCode">
       <div class="container">
         <h2 class="section-title">Código de vestimenta</h2>
         <p id="dresscode-summary" class="section-copy">Elegante formal</p>
-        <button class="btn" type="button" data-open-modal="modal-dresscode">Ver detalles</button>
+        <button class="btn btn-outline" type="button" data-open-modal="modal-dresscode">Ver detalles</button>
       </div>
     </section>
 
@@ -856,7 +937,7 @@
       </div>
     </section>
 
-    <section id="sec-gallery" class="tone-alternate reveal" data-section="gallery">
+    <section id="sec-gallery" class="tone-accent reveal" data-section="gallery">
       <div class="container">
         <h2 class="section-title">Galería de fotos</h2>
         <p class="section-copy">Un recorrido por momentos inolvidables</p>
@@ -864,7 +945,7 @@
       </div>
     </section>
 
-    <div class="section-ornament section-ornament--right" aria-hidden="true"><img src="images/orna-derecha.png" alt="" loading="lazy"></div>
+    <div class="section-ornament section-ornament--right reveal" aria-hidden="true"><img src="/Users/cecilia.paciel/Documents/GitHub_kakao/saveyourdate/temp-vite-app/public/varezzia/images/separador_derecha.png" alt="" loading="lazy"></div>
 
     <section id="sec-hotels" class="tone-accent reveal" data-section="hotels">
       <div class="container">
@@ -882,7 +963,7 @@
       </div>
     </section>
 
-    <div class="section-ornament section-ornament--left" aria-hidden="true"><img src="images/ornamento_naranja_izq.png" alt="" loading="lazy"></div>
+    <div class="section-ornament section-ornament--left reveal" aria-hidden="true"><img src="/Users/cecilia.paciel/Documents/GitHub_kakao/saveyourdate/temp-vite-app/public/varezzia/images/separador_izquierda.png" alt="" loading="lazy"></div>
 
     <section id="sec-photo-upload" class="tone-accent reveal" data-section="photoUpload">
       <div class="container">
@@ -892,16 +973,24 @@
       </div>
     </section>
 
-    <section id="sec-social" class="tone-alternate reveal" data-section="social">
+    <section id="sec-social" class="tone-accent reveal" data-section="social">
       <div class="container">
         <h2 class="section-title">Instagram y redes</h2>
         <p class="section-copy">Etiquetanos usando nuestro hashtag:</p>
-        <p id="social-hashtag" class="social-tag">#Lety15Años</p>
-        <button class="btn" type="button" data-preview-action="instagram">Ver Instagram</button>
+        <p id="social-hashtag" class="social-tag">#Martina15Años</p>
+        <button class="btn btn-outline" type="button" data-preview-action="instagram">Ver Instagram</button>
       </div>
     </section>
 
-    <div class="section-ornament section-ornament--right" aria-hidden="true"><img src="images/orna-derecha.png" alt="" loading="lazy"></div>
+    <section id="sec-spoty" class="tone-light reveal" data-section="spoty">
+      <div class="container">
+        <h2 class="section-title">Spoty</h2>
+        <p class="section-copy">Qué canción no puede faltar?</p>
+        <button class="btn" type="button" data-open-modal="modal-spoty">SUGERÍ MÚSICA</button>
+      </div>
+    </section>
+
+    <div class="section-ornament section-ornament--right reveal" aria-hidden="true"><img src="/Users/cecilia.paciel/Documents/GitHub_kakao/saveyourdate/temp-vite-app/public/varezzia/images/separador_derecha.png" alt="" loading="lazy"></div>
 
     <section id="sec-qr-pass" class="tone-accent reveal" data-section="qrPass">
       <div class="container">
@@ -919,7 +1008,7 @@
       </div>
     </section>
 
-    <div class="section-ornament section-ornament--left" aria-hidden="true"><img src="images/ornamento_naranja_izq.png" alt="" loading="lazy"></div>
+    <div class="section-ornament section-ornament--left reveal" aria-hidden="true"><img src="/Users/cecilia.paciel/Documents/GitHub_kakao/saveyourdate/temp-vite-app/public/varezzia/images/separador_izquierda.png" alt="" loading="lazy"></div>
   </main>
 
   <footer class="footer">
@@ -958,7 +1047,7 @@
     <div class="modal__content">
       <button class="modal__close" type="button" data-close-modal aria-label="Cerrar datos de regalos">×</button>
       <h2 id="modal-gifts-title" class="modal__title">Datos para regalos</h2>
-      <p class="modal__copy"><strong>Alias de demostración:</strong> LETICIA.QUINCE</p>
+      <p class="modal__copy"><strong>Alias de demostración:</strong> MARTINA.QUINCE</p>
       <button id="copy-gift-button" class="btn btn-outline" type="button">Copiar alias</button>
       <p id="copy-status" class="form-status" role="status" aria-live="polite"></p>
     </div>
@@ -989,6 +1078,17 @@
     </div>
   </div>
 
+   <div id="modal-spoty" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-spoty-title" hidden>
+    <div class="modal__content">
+      <button class="modal__close" type="button" data-close-modal aria-label="Cerrar sugerencias de música">×</button>
+      <h2 id="modal-spoty-title" class="modal__title">Sugerencias de música</h2>
+      <p class="modal__copy">Qué canción no puede faltar?</p>
+        <div class="field"><label for="spoty-name">Link de la canción</label><input id="spoty-name" name="name" type="text" autocomplete="name" required></div>
+        <button class="btn" type="submit">ENVIAR</button>
+        <p id="spoty-status" class="form-status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
   <div id="modal-lightbox" class="modal" role="dialog" aria-modal="true" aria-label="Fotografía ampliada" hidden>
     <div class="lightbox__content">
       <button class="modal__close lightbox__close" type="button" data-close-modal aria-label="Cerrar fotografía">×</button>
@@ -997,21 +1097,27 @@
   </div>
 
   <script>
-    /*
-      CONFIGURACIÓN DEMO DE WORK.
-      Codex debe reemplazar esta fuente local por la configuración del sistema,
-      sin cambiar la composición visual aprobada.
-    */
     const PALETTE_PRESETS = {
       "bordo-calida": {
-        fondo: "#fff9f6", fondoAlterno: "#f3e4d9", titulos: "#a72039",
-        secundario: "#fff1dc", texto: "#653b3b", botones: "#a9364b", acento: "#d1475c",
-        bordes: "#8d5a54", ornamentos: "#ffa287", textoClaro: "#ffffff", foco: "#8d0000"
+        fondo: "#fff9f6", fondoAlterno: "#f3e4d9", titulos: "#fa5d91",
+        secundario: "#fff1dc", texto: "#d1475c", botones: "#ef639f", acento: "#fa5d91",
+        bordes: "#8d5a54", ornamentos: "#ffa287", textoClaro: "#ffffff", foco: "#ed739b"
       },
       "verde-agua": {
-        fondo: "#dadfd9", fondoAlterno: "#c5d3d0", titulos: "#69949b",
-        secundario: "#ebf3e9", texto: "#2d5f67", botones: "#285b64", acento: "#79a7b0",
-        bordes: "#98babe", ornamentos: "#bbccca", textoClaro: "#ffffff", foco: "#3d7078"
+        fondo: "#ffffff", /*fondo cuenta*/
+        fondoAlterno: "#53d0c4", /*fondo vestimenta*/
+        acento: "#7cd0c8",/*fondo cuando*/
+
+        titulos: "#a2d1cc",/*fondo cuenta*/
+        secundario: "#ffffff", /*Mis 15*/
+        texto: "#2d5f67", /*texto minutos y explicaciones*/
+        textoClaro: "#ffffff", /*fondo cuenta*/
+
+        botones: "#05838e", /*fondo cuenta*/
+        bordes: "#ffffff", /*fondo cuenta*/
+        
+        ornamentos: "#8d5a54", /*fondo cuenta*/
+        foco: "#8d5a54" /*fondo cuenta*/
       }
     };
 
@@ -1032,8 +1138,8 @@
         ],
         parallaxTitle: "¡Te espero para celebrar!", galleryTitle: "Galería de fotos",
         galleryCopy: "Un recorrido por momentos inolvidables", galleryAlts: [
-          "Retrato de Leticia con corona de flores", "Retrato de Leticia al aire libre",
-          "Leticia sonriendo con flores rosadas", "Retrato de Leticia en un campo de flores", "Retrato de Leticia sentada"
+          "Retrato de Martina con corona de flores", "Retrato de Martina al aire libre",
+          "Martina sonriendo con flores rosadas", "Retrato de Martina en un campo de flores", "Retrato de Martina sentada"
         ],
         hotelsTitle: "Alojamiento cercano", hotelsCopy: "Opciones recomendadas para quienes vienen de lejos.",
         hotelsButton: "Ver hoteles", hotelsModalTitle: "Hoteles recomendados",
@@ -1074,8 +1180,8 @@
         ],
         parallaxTitle: "Espero você para comemorar!", galleryTitle: "Galeria de fotos",
         galleryCopy: "Um passeio por momentos inesquecíveis", galleryAlts: [
-          "Retrato de Leticia com coroa de flores", "Retrato de Leticia ao ar livre",
-          "Leticia sorrindo com flores cor-de-rosa", "Retrato de Leticia em um campo de flores", "Retrato de Leticia sentada"
+          "Retrato de Martina com coroa de flores", "Retrato de Martina ao ar livre",
+          "Martina sorrindo com flores cor-de-rosa", "Retrato de Martina em um campo de flores", "Retrato de Martina sentada"
         ],
         hotelsTitle: "Hospedagem próxima", hotelsCopy: "Opções recomendadas para quem vem de longe.",
         hotelsButton: "Ver hotéis", hotelsModalTitle: "Hotéis recomendados",
@@ -1116,8 +1222,8 @@
         ],
         parallaxTitle: "I can’t wait to celebrate with you!", galleryTitle: "Photo gallery",
         galleryCopy: "A collection of unforgettable moments", galleryAlts: [
-          "Portrait of Leticia wearing a flower crown", "Outdoor portrait of Leticia",
-          "Leticia smiling with pink flowers", "Portrait of Leticia in a flower field", "Portrait of Leticia seated"
+          "Portrait of Martina wearing a flower crown", "Outdoor portrait of Martina",
+          "Martina smiling with pink flowers", "Portrait of Martina in a flower field", "Portrait of Martina seated"
         ],
         hotelsTitle: "Nearby accommodation", hotelsCopy: "Recommended options for guests traveling from out of town.",
         hotelsButton: "View hotels", hotelsModalTitle: "Recommended hotels",
@@ -1147,13 +1253,13 @@
     const previewParams = new URLSearchParams(window.location.search);
     const siteConfig = window.VERONA_SITE_CONFIG || {};
     const requestedLocale = siteConfig.locale || previewParams.get("lang") || "es";
-    const requestedPalette = siteConfig.palettePreset || previewParams.get("palette") || "bordo-calida";
+    const requestedPalette = siteConfig.palettePreset || previewParams.get("palette") || "verde-agua";
 
     const EVENT_CONFIG = {
       locale: Object.hasOwn(TRANSLATIONS, requestedLocale) ? requestedLocale : "es",
-      palettePreset: Object.hasOwn(PALETTE_PRESETS, requestedPalette) ? requestedPalette : "bordo-calida",
+      palettePreset: Object.hasOwn(PALETTE_PRESETS, requestedPalette) ? requestedPalette : "verde-agua",
       event: {
-        name: "Leticia",
+        name: "Martina",
         typeLabel: "",
         dateTime: "2031-11-15T21:00:00-03:00",
         endDateTime: "2031-11-16T05:00:00-03:00",
@@ -1161,12 +1267,12 @@
         venue: "Salón Eventos Premium",
         address: "Av. Principal 1234, Montevideo",
         mapsUrl: "",
-        calendarTitle: "Mis 15 años de Leticia",
+        calendarTitle: "Mis 15 años de Martina",
         ...(siteConfig.event || {})
       },
-      content: { hashtag: "#Lety15Años", ...(siteConfig.content || {}) },
+      content: { hashtag: "#Martina15Años", ...(siteConfig.content || {}) },
       links: { maps: "", photoUpload: "", instagram: "", ...(siteConfig.links || {}) },
-      gifts: { copyValue: "LETICIA.QUINCE", ...(siteConfig.gifts || {}) },
+      gifts: { copyValue: "MARTINA.QUINCE", ...(siteConfig.gifts || {}) },
       scheduleTimes: siteConfig.scheduleTimes || ["21:00", "22:30", "00:00", "03:30"],
       gallery: siteConfig.gallery || [
         { src: "images/foto-01.jpg" }, { src: "images/foto-02.jpg" }, { src: "images/foto-03.jpg" },
@@ -1197,7 +1303,7 @@
     let countdownTimer = null;
 
     function applyPalette() {
-      const palette = PALETTE_PRESETS[EVENT_CONFIG.palettePreset] || PALETTE_PRESETS["bordo-calida"];
+      const palette = PALETTE_PRESETS[EVENT_CONFIG.palettePreset] || PALETTE_PRESETS["verde-agua"];
       const root = document.documentElement;
       const tokenMap = {
         fondo: "--color-fondo", fondoAlterno: "--color-fondo-alterno", titulos: "--color-titulos",
@@ -1251,6 +1357,11 @@
         "#copy-gift-button": t.copyAlias, "#sec-photo-upload .section-title": t.photosTitle,
         "#sec-photo-upload .section-copy": t.photosCopy, "[data-preview-action='photoUpload']": t.photosButton,
         "#sec-social .section-title": t.socialTitle, "#sec-social .section-copy": t.socialCopy,
+        
+        "#sec-spoty .section-title": t.spotyTitle, "#sec-spoty .section-copy": t.spotyCopy,
+        "[data-open-modal='modal-spoty']": t.spotyButton, "#modal-spoty-title": t.spotyModalTitle,
+        "#copy-spoty-button": t.copyAlias, "#sec-photo-upload .section-title": t.photosTitle,
+
         "[data-preview-action='instagram']": t.socialButton, "#sec-qr-pass .section-title": t.qrTitle,
         "#sec-qr-pass .section-copy": t.qrCopy, "[data-open-modal='modal-qr']": t.qrButton,
         "#modal-qr-title": t.qrModalTitle, "#modal-qr .modal__copy": t.qrModalCopy,
