@@ -249,7 +249,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
     badge: 'Nuevo',
     demoName1: 'Leticia',
     date: '15 de Noviembre, 2031',
-    previewImage: '/verona/foto-01.png',
+    previewImage: '/previews/verona.png',
     active: true,
     order: 23,
     features: ['Cuenta Regresiva', 'Galería de fotos', 'Cronograma', 'Ubicación', 'Código de Vestimenta', 'Regalos / CBU', 'Confirmación RSVP'],
@@ -260,6 +260,57 @@ export const INVITATION_MODELS: InvitationModel[] = [
     palettes: [
       { id: 'bordo-calida', name: 'Bordó cálida', color: '#a72039' },
       { id: 'verde-agua', name: 'Verde agua', color: '#69949b' }
+    ]
+  },
+  {
+    id: 'varezzia',
+    title: 'Varezzia',
+    category: '15years',
+    description: 'Una propuesta romántica y editorial, con fotografía protagonista, ornamentos florales y detalles elegantes para celebrar tus 15 años.',
+    badge: 'Nuevo',
+    demoName1: 'Martina',
+    date: '15 de Noviembre, 2031',
+    previewImage: '/varezzia/images/foto-01.png',
+    active: true,
+    order: 24,
+    features: [
+      'Cuenta Regresiva',
+      'Ubicación',
+      'Agregar al calendario',
+      'Código de Vestimenta',
+      'Cronograma',
+      'Foto destacada con efecto parallax',
+      'Galería de fotos',
+      'Alojamiento',
+      'Regalos / CBU',
+      'Álbum colaborativo',
+      'Instagram',
+      'Sugerencia de canciones',
+      'Pase QR',
+      'Confirmación RSVP',
+      'Multiidioma'
+    ],
+    themeClass: 'mock-theme-varezzia',
+    illustrationType: 'crown',
+    location: 'Salón Eventos Premium, Montevideo',
+    includedSections: [
+      'countdown',
+      'location',
+      'dresscode',
+      'schedule',
+      'featuredPhoto',
+      'gallery',
+      'hotels',
+      'gifts',
+      'photoUpload',
+      'instagram',
+      'songSuggestions',
+      'qr',
+      'rsvp'
+    ],
+    palettes: [
+      { id: 'bordo-calida', name: 'Bordó cálida', color: '#bc3771' },
+      { id: 'verde-agua', name: 'Verde agua', color: '#05838e' }
     ]
   },
   {
