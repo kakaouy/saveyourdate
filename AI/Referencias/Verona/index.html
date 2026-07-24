@@ -17,17 +17,17 @@
 
   <style>
     :root {
-      --color-fondo: #fff9f6;
-      --color-fondo-alterno: #f3e4d9;
-      --color-titulos: #a72039;
-      --color-secundario: #fff1dc;
-      --color-acento: #d1475c;
-      --color-texto: #653b3b;
-      --color-botones: #a9364b;
-      --color-bordes: #8d5a54;
-      --color-ornamentos: #ffa287;
+      --color-fondo: #dadfd9;
+      --color-fondo-alterno: #c5d3d0;
+      --color-titulos: #69949b;
+      --color-secundario: #ebf3e9;
+      --color-acento: #79a7b0;
+      --color-texto: #2d5f67;
+      --color-botones: #285b64;
+      --color-bordes: #98babe;
+      --color-ornamentos: #bbccca;
       --color-texto-claro: #ffffff;
-      --color-foco: #8d0000;
+      --color-foco: #3d7078;
       --color-principal: var(--color-titulos);
       --font-title: "Great Vibes", cursive;
       --font-body: "Montserrat", sans-serif;
@@ -381,6 +381,7 @@
       top: 0;
       width: clamp(105px, 24vw, 195px);
       max-width: none;
+      filter: drop-shadow(0 8px 16px color-mix(in srgb, var(--color-ornamentos) 24%, transparent));
     }
 
     .section-ornament--left img {
@@ -1003,6 +1004,21 @@
       sin cambiar la composición visual aprobada.
     */
     const PALETTE_PRESETS = {
+      coral: {
+        fondo: "#fff9f6", fondoAlterno: "#f3e4d9", titulos: "#a9364b",
+        texto: "#653b3b", botones: "#a9364b", acento: "#9b3f2f",
+        bordes: "#8d5a54", ornamentos: "#c66b55", textoClaro: "#ffffff", foco: "#702238"
+      },
+      botanica: {
+        fondo: "#f7fbf8", fondoAlterno: "#dfece6", titulos: "#1f5f63",
+        texto: "#274843", botones: "#176268", acento: "#285d52",
+        bordes: "#568074", ornamentos: "#d86f5c", textoClaro: "#ffffff", foco: "#123f43"
+      },
+      blush: {
+        fondo: "#fff8fa", fondoAlterno: "#f4e0e7", titulos: "#8a3053",
+        texto: "#573743", botones: "#8a3053", acento: "#6f3650",
+        bordes: "#9f6c7d", ornamentos: "#d46f7d", textoClaro: "#ffffff", foco: "#552039"
+      },
       "bordo-calida": {
         fondo: "#fff9f6", fondoAlterno: "#f3e4d9", titulos: "#a72039",
         secundario: "#fff1dc", texto: "#653b3b", botones: "#a9364b", acento: "#d1475c",
@@ -1147,11 +1163,11 @@
     const previewParams = new URLSearchParams(window.location.search);
     const siteConfig = window.VERONA_SITE_CONFIG || {};
     const requestedLocale = siteConfig.locale || previewParams.get("lang") || "es";
-    const requestedPalette = siteConfig.palettePreset || previewParams.get("palette") || "bordo-calida";
+    const requestedPalette = siteConfig.palettePreset || previewParams.get("palette") || "verde-agua";
 
     const EVENT_CONFIG = {
       locale: Object.hasOwn(TRANSLATIONS, requestedLocale) ? requestedLocale : "es",
-      palettePreset: Object.hasOwn(PALETTE_PRESETS, requestedPalette) ? requestedPalette : "bordo-calida",
+      palettePreset: Object.hasOwn(PALETTE_PRESETS, requestedPalette) ? requestedPalette : "verde-agua",
       event: {
         name: "Leticia",
         typeLabel: "",
@@ -1197,7 +1213,7 @@
     let countdownTimer = null;
 
     function applyPalette() {
-      const palette = PALETTE_PRESETS[EVENT_CONFIG.palettePreset] || PALETTE_PRESETS["bordo-calida"];
+      const palette = PALETTE_PRESETS[EVENT_CONFIG.palettePreset] || PALETTE_PRESETS.coral;
       const root = document.documentElement;
       const tokenMap = {
         fondo: "--color-fondo", fondoAlterno: "--color-fondo-alterno", titulos: "--color-titulos",

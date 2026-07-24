@@ -3,6 +3,7 @@ import './App.css';
 import { INVITATION_MODELS } from './data/models';
 import type { InvitationModel } from './data/models';
 import OrderFlow from './components/OrderFlow';
+import { VarezziaInvitation } from './components/varezzia/VarezziaInvitation';
 
 
 const MODEL_COLOR_OPTIONS = [
@@ -2224,7 +2225,7 @@ function App() {
                     <div className="card-info">
                       <h3 className="card-title">{model.title}</h3>
 
-                      {model.id !== '15-verona' && <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
+                      {!['15-verona', 'varezzia'].includes(model.id) && <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
                         {modelPaletteOptions.map((option) => (
                           <button
                             key={option.color}
@@ -2704,7 +2705,7 @@ function App() {
                               <input className="form-input" type="text" placeholder="Ej. 0000021000..." value={quinceData.giftCbu} onChange={e => setQuinceData({...quinceData, giftCbu: e.target.value})} />
                             </div>
                           </div>
-                          {wizardModel !== '15-verona' && (
+                          {!['15-verona', 'varezzia'].includes(wizardModel) && (
                             <div className="form-group" style={{ marginBottom: '12px' }}>
                               <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.music}</label>
                               <input className="form-input" type="text" placeholder="Ej. Don't Start Now - Dua Lipa" value={quinceData.musicPreference} onChange={e => setQuinceData({...quinceData, musicPreference: e.target.value})} />
@@ -3158,7 +3159,16 @@ function App() {
               >
                 <div className="demo-phone-speaker"></div>
                 <div className="demo-phone-screen">
-                  {demoModel.id === '15-verona' ? (
+                  {demoModel.id === 'varezzia' ? (
+                    <VarezziaInvitation
+                      embedded
+                      locale={lang}
+                      palette={getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      ) as 'bordo-calida' | 'verde-agua'}
+                    />
+                  ) : demoModel.id === '15-verona' ? (
                     <iframe
                       className="demo-real-invitation-frame"
                       src={`/verona/index.html?preview=1&palette=${getPaletteIdFromColor(
