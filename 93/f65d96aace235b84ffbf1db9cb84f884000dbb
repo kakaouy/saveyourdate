@@ -1,0 +1,37 @@
+temp-vite-app/public/varezzia/index.html
+  h_978362ea3daf54 853-854,879,929,947,974,992
+  s_9d12dacf17b748::t_22512fd660f6ab 28,897,966,968,970,1062,1065,1067,1069,1084,1088-1090,1224,1226,1230,1264,1277,1332-1334,1626
+temp-vite-app/public/desarrollo/quince/invite_002/styles.css
+  s_9d12dacf17b748::t_62af24f3bb1899 96-105,162-164,188-222
+temp-vite-app/src/App.tsx
+  s_9d12dacf17b748::t_fcaa95a0338c46 6,2228,2708,3162-3171
+temp-vite-app/src/components/varezzia/VarezziaInvitation.tsx
+  s_9d12dacf17b748::t_a7a01a39c51dfa 1-94
+temp-vite-app/src/components/varezzia/config.ts
+  s_9d12dacf17b748::t_2a72f4c00bee5c 1-51
+temp-vite-app/src/components/varezzia/varezzia.css
+  s_9d12dacf17b748::t_9ddc20a8118b68 1-46
+temp-vite-app/src/data/models.ts
+  s_9d12dacf17b748::t_aeb4a05457df4b 252,265-315
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "93f65d96aace235b84ffbf1db9cb84f884000dbb",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  },
+  "sessions": {
+    "s_9d12dacf17b748": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9134-eb50-7093-94a7-61a0dda45bbf",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
