@@ -270,7 +270,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
     badge: 'Nuevo',
     demoName1: 'Martina',
     date: '15 de Noviembre, 2031',
-    previewImage: '/varezzia/images/foto-01.png',
+    previewImage: '/previews/varezzia.png',
     active: true,
     order: 24,
     features: [

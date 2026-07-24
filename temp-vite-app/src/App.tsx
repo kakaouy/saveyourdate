@@ -2178,7 +2178,7 @@ function App() {
                         <div className="model-phone-screen">
                           {model.previewImage ? (
                             <img
-                              className="model-custom-preview-image"
+                              className={`model-custom-preview-image model-preview-${model.id}`}
                               src={model.previewImage}
                               alt={`Preview ${model.title}`}
                               loading="lazy"

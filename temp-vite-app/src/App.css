@@ -4314,3 +4314,14 @@ html {
   object-fit: cover;
   object-position: center top;
 }
+
+.model-preview-15-jardin-floral {
+  object-fit: contain;
+  object-position: center;
+  background: #fbfaf5;
+}
+
+.model-preview-varezzia {
+  object-fit: cover;
+  object-position: center;
+}
