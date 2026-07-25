@@ -45,3 +45,14 @@
 .vz-buttons-tone .vz-btn.outline:hover{background:var(--color-texto-claro);color:var(--color-botones)}
 .varezzia .vz-footer{background:var(--color-botones)}
 .varezzia .vz-hero>div{z-index:4}
+.varezzia .vz-corner{width:min(50.6667vw,240px);animation:vz-hero-heartbeat 25.5s ease-in-out infinite}
+.varezzia .vz-corner.bottom{animation-name:vz-hero-heartbeat-flipped}
+
+@keyframes vz-hero-heartbeat{
+  0%,28%,70%,100%{transform:scale(1)}
+  14%,42%{transform:scale(1.08)}
+}
+@keyframes vz-hero-heartbeat-flipped{
+  0%,20%,35%,100%{transform:scale(-1,-1)}
+  7%,28%{transform:scale(-1.08,-1.08)}
+}
