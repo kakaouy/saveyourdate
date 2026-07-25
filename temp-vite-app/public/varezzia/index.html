@@ -155,6 +155,10 @@
 
     .tone-light { background: var(--color-fondo); }
     .tone-alternate { background: var(--color-fondo-alterno); }
+    .tone-buttons {
+      background: var(--color-botones);
+      color: var(--color-texto-claro);
+    }
     .tone-accent {
       background: var(--color-acento);
       color: var(--color-texto-claro);
@@ -190,7 +194,9 @@
     }
 
     .tone-accent .section-title,
-    .tone-accent p {
+    .tone-accent p,
+    .tone-buttons .section-title,
+    .tone-buttons p {
       color: var(--color-texto-claro);
     }
 
@@ -249,7 +255,8 @@
       color: var(--color-botones);
     }
 
-    .tone-accent .btn-outline {
+    .tone-accent .btn-outline,
+    .tone-buttons .btn-outline {
       border-color: var(--color-texto-claro);
       color: var(--color-texto-claro);
     }
@@ -257,6 +264,11 @@
     .tone-accent .btn-outline:hover {
       background: var(--color-texto-claro);
       color: var(--color-acento);
+    }
+
+    .tone-buttons .btn-outline:hover {
+      background: var(--color-texto-claro);
+      color: var(--color-botones);
     }
 
     .hero {
@@ -274,7 +286,7 @@
 
     .hero-content {
       position: relative;
-      z-index: 2;
+      z-index: 4;
       width: min(100%, 760px);
       margin-top: 25svh;
       text-align: center;
@@ -928,7 +940,7 @@
 
     <div class="section-ornament section-ornament--right reveal" aria-hidden="true"><img src="images/separador_derecha.png" alt="" loading="lazy"></div>
 
-    <section id="sec-hotels" class="tone-accent reveal" data-section="hotels">
+    <section id="sec-hotels" class="tone-buttons reveal" data-section="hotels">
       <div class="container">
         <h2 class="section-title">Alojamiento cercano</h2>
         <p class="section-copy">Opciones recomendadas para quienes vienen de lejos.</p>
@@ -954,7 +966,7 @@
       </div>
     </section>
 
-    <section id="sec-social" class="tone-accent reveal" data-section="social">
+    <section id="sec-social" class="tone-buttons reveal" data-section="social">
       <div class="container">
         <h2 class="section-title">Instagram y redes</h2>
         <p class="section-copy">Etiquetanos usando nuestro hashtag:</p>

@@ -44,3 +44,4 @@
 .vz-buttons-tone .vz-btn.outline{border-color:var(--color-texto-claro);color:var(--color-texto-claro)}
 .vz-buttons-tone .vz-btn.outline:hover{background:var(--color-texto-claro);color:var(--color-botones)}
 .varezzia .vz-footer{background:var(--color-botones)}
+.varezzia .vz-hero>div{z-index:4}
