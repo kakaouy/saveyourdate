@@ -1,0 +1,26 @@
+temp-vite-app/public/varezzia/index.html
+  s_9d12dacf17b748::t_f13a83e769b456 337
+temp-vite-app/src/components/varezzia/varezzia.css
+  s_9d12dacf17b748::t_8523c87d5a21ad 48-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "ed229235d3a66d77f69fee2f4771af1fb7d87cbd",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  },
+  "sessions": {
+    "s_9d12dacf17b748": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9134-eb50-7093-94a7-61a0dda45bbf",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
