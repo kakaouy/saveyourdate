@@ -43,16 +43,36 @@ async function handler(request: Request) {
       status: 'payment_validated',
       approval_token_used_at: new Date().toISOString()
     });
+    const customerCopy = {
+      es: {
+        subject: `Pago validado — ${order.order_number}`,
+        title: '¡Tu pago fue validado!',
+        hello: `Hola ${escapeHtml(order.customer_name)}, confirmamos el pago de tu pedido`,
+        message: 'Ya podemos comenzar a preparar tu invitación. Podés consultar el estado desde el enlace privado que recibiste con el pedido.'
+      },
+      en: {
+        subject: `Payment validated — ${order.order_number}`,
+        title: 'Your payment was validated!',
+        hello: `Hi ${escapeHtml(order.customer_name)}, we confirmed payment for your order`,
+        message: 'We can now start preparing your invitation. You can check its status using the private link from your order email.'
+      },
+      pt: {
+        subject: `Pagamento validado — ${order.order_number}`,
+        title: 'Seu pagamento foi validado!',
+        hello: `Olá ${escapeHtml(order.customer_name)}, confirmamos o pagamento do seu pedido`,
+        message: 'Já podemos começar a preparar seu convite. Você pode consultar o status pelo link privado recebido no e-mail do pedido.'
+      }
+    }[order.language];
     let emailSent = true;
     try {
       await sendEmail({
         to: order.customer_email,
-        subject: `Pago validado — ${order.order_number}`,
+        subject: customerCopy.subject,
         idempotencyKey: `payment-approved-${order.order_number}`,
         html: emailShell(
-          '¡Tu pago fue validado!',
-          `<p>Hola ${escapeHtml(order.customer_name)}, confirmamos el pago de tu pedido <strong>${order.order_number}</strong>.</p>
-           <p>Ya podemos comenzar a preparar tu invitación. Podés consultar el estado desde el enlace privado que recibiste con el pedido.</p>`
+          customerCopy.title,
+          `<p>${customerCopy.hello} <strong>${order.order_number}</strong>.</p>
+           <p>${customerCopy.message}</p>`
         )
       });
     } catch (emailError) {

@@ -285,6 +285,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
           email: String(form.get('email') || ''),
           whatsapp: String(form.get('whatsapp') || ''),
           paymentOperation,
+          language: lang,
           plan: plan === 'basic' ? 'Básico' : 'Premium',
           modelId,
           modelName: selectedModel?.title || modelId
