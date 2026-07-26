@@ -6,7 +6,7 @@ const labels = {
   payment_validated: 'Pago validado'
 };
 
-export default async function handler(request: Request) {
+async function handler(request: Request) {
   if (request.method !== 'GET') return json({ error: 'Método no permitido.' }, 405);
   try {
     const token = new URL(request.url).searchParams.get('token') || '';
@@ -27,3 +27,5 @@ export default async function handler(request: Request) {
     return json({ error: 'No pudimos consultar el pedido.' }, 500);
   }
 }
+
+export default { fetch: handler };
