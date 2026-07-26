@@ -9,6 +9,7 @@ type StatusResponse = {
   status: 'pending_payment' | 'payment_reported' | 'payment_validated' | 'published';
   statusLabel: string;
   invitationUrl: string | null;
+  previewUrl: string | null;
   updatedAt: string;
 };
 
@@ -21,6 +22,7 @@ const copy = {
     plan: 'Plan',
     steps: ['Pago pendiente', 'Pago informado', 'Pago validado', 'Invitación entregada'],
     open: 'Abrir mi invitación',
+    preview: 'Ver modelo en preparación',
     delivered: 'Tu invitación ya está publicada y lista para compartir.',
     validated: 'Tu pago está confirmado. Ya podemos comenzar a preparar la invitación.',
     reported: 'Recibimos el número de operación y estamos verificándolo.',
@@ -35,6 +37,7 @@ const copy = {
     plan: 'Plan',
     steps: ['Payment pending', 'Payment reported', 'Payment validated', 'Invitation delivered'],
     open: 'Open my invitation',
+    preview: 'View template in preparation',
     delivered: 'Your invitation is published and ready to share.',
     validated: 'Your payment is confirmed. We can now start preparing your invitation.',
     reported: 'We received the transaction number and are verifying it.',
@@ -49,6 +52,7 @@ const copy = {
     plan: 'Plano',
     steps: ['Pagamento pendente', 'Pagamento informado', 'Pagamento validado', 'Convite entregue'],
     open: 'Abrir meu convite',
+    preview: 'Ver modelo em preparação',
     delivered: 'Seu convite está publicado e pronto para compartilhar.',
     validated: 'Seu pagamento está confirmado. Já podemos começar a preparar o convite.',
     reported: 'Recebemos o número da operação e estamos verificando.',
@@ -132,6 +136,7 @@ export default function OrderStatusPage() {
                   : text.pending}
             </p>
             {order.invitationUrl && <a className="private-order-approve private-order-open-link" href={order.invitationUrl} target="_blank" rel="noopener noreferrer">{text.open}</a>}
+            {order.previewUrl && <a className="private-order-approve private-order-open-link" href={order.previewUrl}>{text.preview}</a>}
           </>
         )}
         <a className="private-order-home" href="/#crear">{text.back}</a>

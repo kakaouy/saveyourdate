@@ -1,4 +1,4 @@
-import { findOrderByToken, hashToken, json } from '../_lib/orders.js';
+import { appUrl, findOrderByToken, hashToken, json, previewTokenFor } from '../_lib/orders.js';
 
 const labels = {
   es: {
@@ -28,6 +28,9 @@ async function handler(request: Request) {
     if (token.length < 32) return json({ error: 'Enlace inválido.' }, 400);
     const order = await findOrderByToken('status_token_hash', await hashToken(token));
     if (!order) return json({ error: 'Pedido no encontrado.' }, 404);
+    const previewUrl = order.status === 'payment_validated'
+      ? `${appUrl()}/preparando?token=${encodeURIComponent(await previewTokenFor(order.order_number))}`
+      : null;
     return json({
       orderNumber: order.order_number,
       customerName: order.customer_name,
@@ -37,6 +40,7 @@ async function handler(request: Request) {
       status: order.status,
       statusLabel: labels[order.language][order.status],
       invitationUrl: order.status === 'published' ? order.invitation_url : null,
+      previewUrl,
       updatedAt: order.updated_at
     });
   } catch (error) {

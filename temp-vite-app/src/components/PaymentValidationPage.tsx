@@ -88,7 +88,7 @@ export default function PaymentValidationPage() {
         ) : approved ? (
           <>
             <span className="private-order-icon">{delivered ? '✓' : '↗'}</span>
-            <h1>{delivered ? 'Invitación entregada' : 'Entregar invitación'}</h1>
+            <h1>{delivered ? 'Invitación entregada' : 'Pago validado'}</h1>
             <p>Pedido <strong>{order.orderNumber}</strong> · {order.customerName}</p>
             {delivered && !deliverySuccess ? (
               <>
@@ -99,6 +99,10 @@ export default function PaymentValidationPage() {
               <p className="private-order-delivery-success">{deliverySuccess}</p>
             ) : (
               <form className="delivery-form" onSubmit={deliver}>
+                <div className="delivery-form-heading">
+                  <strong>Entrega final</strong>
+                  <p>Completá estos enlaces recién cuando la invitación personalizada esté terminada. No es necesario hacerlo al validar el pago.</p>
+                </div>
                 <label>
                   <span>Link de la invitación personalizada</span>
                   <input name="invitationUrl" type="url" required placeholder="https://..." defaultValue={order.invitationUrl || ''} />

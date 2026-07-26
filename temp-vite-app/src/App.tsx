@@ -1107,6 +1107,10 @@ const TRANSLATIONS = {
         };
 
 function App() {
+  const pageParams = new URLSearchParams(window.location.search);
+  const embeddedPreview = pageParams.get('embeddedPreview') === '1';
+  const previewModelId = pageParams.get('previewModel');
+  const changeOrderNumber = pageParams.get('pedido') || '';
   // Navigation & Language UI States
   const [lang, setLang] = useState<'es' | 'en' | 'pt'>('es');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'wedding' | '15years' | 'other'>('all');
@@ -1136,7 +1140,9 @@ function App() {
   };
   
   // Interactive Simulator Modal States
-  const [demoModel, setDemoModel] = useState<InvitationModel | null>(null);
+  const [demoModel, setDemoModel] = useState<InvitationModel | null>(
+    () => INVITATION_MODELS.find((model) => model.id === previewModelId) || null
+  );
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const [selectedRsvpOption, setSelectedRsvpOption] = useState('');
   const [guestCount, setGuestCount] = useState('1');
@@ -1156,7 +1162,9 @@ function App() {
   const [simpleContactData, setSimpleContactData] = useState({
     name: '',
     whatsapp: '',
-    message: ''
+    message: changeOrderNumber
+      ? `Quiero cambiar o agregar información en mi pedido ${changeOrderNumber}: `
+      : ''
   });
 
   // PORTAL DE CREACIÓN / ORDER WIZARD STATES
@@ -3156,7 +3164,7 @@ function App() {
       {/* STANDARD MODEL DEMO */}
       {demoModel && (
         <div className="demo-page" role="dialog" aria-modal="true" aria-label={`${DEMO_COPY[lang].special}: ${demoModel.title}`}>
-          <button className="demo-page-close" onClick={() => setDemoModel(null)} aria-label={DEMO_COPY[lang].close}>×</button>
+          {!embeddedPreview && <button className="demo-page-close" onClick={() => setDemoModel(null)} aria-label={DEMO_COPY[lang].close}>×</button>}
 
           <div className="demo-page-inner">
             <div className="demo-phone-column">

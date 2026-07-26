@@ -26,6 +26,7 @@ export interface StoredOrder {
   invitation_url: string | null;
   sheet_url: string | null;
   delivered_at: string | null;
+  order_payload: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -71,6 +72,16 @@ export const approvalTokenFor = async (orderNumber: string) => {
   return Array.from(new Uint8Array(signature), (byte) =>
     byte.toString(16).padStart(2, '0')
   ).join('');
+};
+
+export const previewTokenFor = async (orderNumber: string) =>
+  `${orderNumber}.${await approvalTokenFor(`preview:${orderNumber}`)}`;
+
+export const orderNumberFromPreviewToken = async (token: string) => {
+  const [orderNumber, signature, ...rest] = token.split('.');
+  if (rest.length || !orderNumber || !signature) return null;
+  const expected = await previewTokenFor(orderNumber);
+  return expected === token ? orderNumber : null;
 };
 
 export const createOrderNumber = () => {
@@ -120,7 +131,15 @@ export const findOrderByToken = async (
   tokenHash: string
 ) => {
   const response = await supabaseRequest(
-    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,created_at,updated_at&limit=1`
+    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
+  );
+  const rows = (await response.json()) as StoredOrder[];
+  return rows[0] || null;
+};
+
+export const findOrderByNumber = async (orderNumber: string) => {
+  const response = await supabaseRequest(
+    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   return rows[0] || null;
@@ -132,7 +151,7 @@ export const findOrderForPaymentReport = async (
 ) => {
   const normalized = contact.trim().toLowerCase();
   const response = await supabaseRequest(
-    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,created_at,updated_at&limit=1`
+    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   const order = rows[0];

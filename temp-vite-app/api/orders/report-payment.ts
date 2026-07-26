@@ -21,7 +21,11 @@ async function handler(request: Request) {
     }
     const order = await findOrderForPaymentReport(orderNumber, contact);
     if (!order) return json({ error: 'Los datos no coinciden con el pedido.' }, 404);
-    if (order.status === 'payment_validated') {
+    if (order.status === 'payment_validated' || order.status === 'published') {
+      return json({ ok: true, alreadyValidated: true });
+    }
+    if (order.approval_token_used_at) {
+      await updateOrder(orderNumber, { status: 'payment_validated' });
       return json({ ok: true, alreadyValidated: true });
     }
     await updateOrder(orderNumber, {
