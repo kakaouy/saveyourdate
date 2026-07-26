@@ -7,8 +7,8 @@ type EventCategory = InvitationModel['category'];
 type Language = 'es' | 'en' | 'pt';
 
 const PAYMENT_LINKS: Record<Plan, string> = {
-  basic: 'https://mpago.la/1gRs45Z',
-  premium: 'https://mpago.la/1de2PiW'
+  basic: 'https://mpago.la/2z4ME1Q',
+  premium: 'https://mpago.la/2z4ME1Q'
 };
 
 const PLAN_PRICES: Record<Plan, string> = {
