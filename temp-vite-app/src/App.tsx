@@ -4,6 +4,7 @@ import { INVITATION_MODELS } from './data/models';
 import type { InvitationModel } from './data/models';
 import OrderFlow from './components/OrderFlow';
 import { VarezziaInvitation } from './components/varezzia/VarezziaInvitation';
+import { RivendellInvitation } from './components/rivendell/RivendellInvitation';
 
 
 const MODEL_COLOR_OPTIONS = [
@@ -155,7 +156,8 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     salvia: 'Sage green',
     lavanda: 'Lavender',
     'bordo-calida': 'Warm burgundy',
-    'verde-agua': 'Aqua green'
+    'verde-agua': 'Aqua green',
+    'verde-azulado': 'Blue green'
   },
   pt: {
     rosa: 'Rosa',
@@ -179,7 +181,8 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     salvia: 'Verde sálvia',
     lavanda: 'Lavanda',
     'bordo-calida': 'Bordô quente',
-    'verde-agua': 'Verde água'
+    'verde-agua': 'Verde água',
+    'verde-azulado': 'Verde azulado'
   }
 };
 
@@ -2225,7 +2228,7 @@ function App() {
                     <div className="card-info">
                       <h3 className="card-title">{model.title}</h3>
 
-                      {!['15-verona', 'varezzia'].includes(model.id) && <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
+                      {!['15-verona', 'varezzia', 'rivendell'].includes(model.id) && <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
                         {modelPaletteOptions.map((option) => (
                           <button
                             key={option.color}
@@ -2705,7 +2708,7 @@ function App() {
                               <input className="form-input" type="text" placeholder="Ej. 0000021000..." value={quinceData.giftCbu} onChange={e => setQuinceData({...quinceData, giftCbu: e.target.value})} />
                             </div>
                           </div>
-                          {!['15-verona', 'varezzia'].includes(wizardModel) && (
+                          {!['15-verona', 'varezzia', 'rivendell'].includes(wizardModel) && (
                             <div className="form-group" style={{ marginBottom: '12px' }}>
                               <label className="form-label" style={{ fontSize: '12px' }}>{t.quinceForm.music}</label>
                               <input className="form-input" type="text" placeholder="Ej. Don't Start Now - Dua Lipa" value={quinceData.musicPreference} onChange={e => setQuinceData({...quinceData, musicPreference: e.target.value})} />
@@ -3167,6 +3170,15 @@ function App() {
                         demoModel,
                         selectedModelColors[demoModel.id]
                       ) as 'bordo-calida' | 'verde-agua'}
+                    />
+                  ) : demoModel.id === 'rivendell' ? (
+                    <RivendellInvitation
+                      embedded
+                      locale={lang}
+                      palette={getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      ) as 'rosa' | 'verde-agua' | 'verde-azulado'}
                     />
                   ) : demoModel.id === '15-verona' ? (
                     <iframe
