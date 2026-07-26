@@ -5,5 +5,9 @@
       "desarrollo-*": false,
       "agent/*": false
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/estado", "destination": "/index.html" },
+    { "source": "/validar-pago", "destination": "/index.html" }
+  ]
 }

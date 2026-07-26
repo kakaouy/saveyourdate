@@ -31,8 +31,6 @@ const SECTION_OPTIONS = [
   { id: 'messages', title: 'Muro de saludos', description: 'Mensajes y buenos deseos para los anfitriones.' }
 ];
 
-const createOrderNumber = () => `SYD-${Date.now().toString().slice(-6)}`;
-
 interface OrderFlowProps {
   models: InvitationModel[];
   initialModelId: string;
@@ -52,6 +50,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
   const [photoCount, setPhotoCount] = useState(0);
   const [photoError, setPhotoError] = useState('');
   const [submittedOrder, setSubmittedOrder] = useState('');
+  const [submittedStatusUrl, setSubmittedStatusUrl] = useState('');
   const [paymentUpdated, setPaymentUpdated] = useState(false);
   const [sending, setSending] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -247,7 +246,6 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
     );
     const attachmentSize = attachments.reduce((total, file) => total + file.size, 0);
     const paymentOperation = String(form.get('paymentOperation') || prepayment.operation || '');
-    const orderNumber = createOrderNumber();
     setSubmitError('');
     setSending(true);
     try {
@@ -256,11 +254,10 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
       }
       formElement.querySelectorAll('[data-order-generated="true"]').forEach((field) => field.remove());
       const generatedFields: Record<string, string> = {
-        _subject: `Nuevo pedido ${orderNumber} - Save Your Date`,
+        _subject: 'Nuevo pedido - Save Your Date',
         _template: 'table',
         _captcha: 'false',
         _replyto: String(form.get('email') || ''),
-        'Número de pedido': orderNumber,
         'Idioma de la invitación': lang === 'es' ? 'Español' : lang === 'en' ? 'English' : 'Português',
         'Código de idioma': lang,
         Plan: plan === 'basic' ? 'Básico' : 'Premium',
@@ -274,6 +271,36 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
         'Estado del pago': paymentOperation ? 'Pago informado - pendiente de validación' : 'Pago pendiente',
         'Archivos adjuntos': attachments.length ? attachments.map((file) => file.name).join(', ') : 'Sin archivos'
       };
+      const textFields = Object.fromEntries(
+        Array.from(form.entries())
+          .filter((entry): entry is [string, string] => typeof entry[1] === 'string')
+      );
+      const orderResponse = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...textFields,
+          ...generatedFields,
+          name: String(form.get('name') || ''),
+          email: String(form.get('email') || ''),
+          whatsapp: String(form.get('whatsapp') || ''),
+          paymentOperation,
+          plan: plan === 'basic' ? 'Básico' : 'Premium',
+          modelId,
+          modelName: selectedModel?.title || modelId
+        })
+      });
+      const orderResult = await orderResponse.json() as {
+        orderNumber?: string;
+        statusUrl?: string;
+        error?: string;
+      };
+      if (!orderResponse.ok || !orderResult.orderNumber) {
+        throw new Error(orderResult.error || 'No pudimos registrar el pedido.');
+      }
+      const orderNumber = orderResult.orderNumber;
+      generatedFields._subject = `Nuevo pedido ${orderNumber} - Save Your Date`;
+      generatedFields['Número de pedido'] = orderNumber;
       Object.entries(generatedFields).forEach(([name, value]) => {
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -289,6 +316,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
       HTMLFormElement.prototype.submit.call(formElement);
       window.setTimeout(() => {
         setSubmittedOrder(orderNumber);
+        setSubmittedStatusUrl(orderResult.statusUrl || '');
         setSending(false);
       }, 1200);
     } catch (error) {
@@ -334,13 +362,17 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
     setSubmitError('');
     setSending(true);
     try {
-      await sendForm({
-        _subject: `Pago informado para ${String(form.get('orderNumber') || '')}`,
-        'Número de pedido': String(form.get('orderNumber') || ''),
-        'Número de operación Mercado Pago': String(form.get('paymentOperation') || ''),
-        'Email o WhatsApp del pedido': String(form.get('contact') || ''),
-        Estado: 'Pago informado - pendiente de validación interna'
+      const response = await fetch('/api/orders/report-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNumber: String(form.get('orderNumber') || ''),
+          paymentOperation: String(form.get('paymentOperation') || ''),
+          contact: String(form.get('contact') || '')
+        })
       });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || 'No pudimos informar el pago.');
       setPaymentUpdated(true);
     } catch {
       setSubmitError(l('No pudimos informar el pago. Revisá tu conexión e intentá nuevamente.', 'We could not report the payment. Check your connection and try again.', 'Não foi possível informar o pagamento. Verifique sua conexão e tente novamente.'));
@@ -403,6 +435,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
             <p>{l('Guardá este número para consultar o informar el pago más adelante.', 'Save this number to check or report payment later.', 'Guarde este número para consultar ou informar o pagamento depois.')}</p>
             <strong>{submittedOrder}</strong>
             <p className="order-status-note">{l('Estado inicial: pedido recibido. La publicación final se libera después de validar el pago.', 'Initial status: order received. Final publication is released after payment validation.', 'Estado inicial: pedido recebido. A publicação final é liberada após a validação do pagamento.')}</p>
+            {submittedStatusUrl && <a className="btn-secondary" href={submittedStatusUrl}>{l('Consultar estado', 'Check status', 'Consultar status')}</a>}
             <button className="btn-secondary" onClick={() => { setActiveTab('payment'); setPaymentUpdated(false); }}>{l('Informar un pago', 'Report a payment', 'Informar um pagamento')}</button>
           </div>
         ) : (
@@ -540,7 +573,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
           <form className="order-form payment-update-form" onSubmit={submitPaymentUpdate}>
             <div className="order-form-block">
               <div className="order-block-title"><span>✓</span><div><h3>{l('Informá el pago de un pedido existente', 'Report payment for an existing order', 'Informe o pagamento de um pedido existente')}</h3><p>{l('No necesitás volver a cargar los datos de tu invitación.', 'You do not need to enter your invitation details again.', 'Você não precisa preencher novamente os dados do convite.')}</p></div></div>
-              <div className="form-group"><label className="form-label">{l('Número de pedido', 'Order number', 'Número do pedido')}</label><input name="orderNumber" className="form-input" required placeholder="SYD-123456" pattern="SYD-[0-9]{6}" /></div>
+              <div className="form-group"><label className="form-label">{l('Número de pedido', 'Order number', 'Número do pedido')}</label><input name="orderNumber" className="form-input" required placeholder="SYD-ABCD-2345" pattern="SYD-[A-Z0-9]{4}-[A-Z0-9]{4}" /></div>
               <div className="form-group"><label className="form-label">{l('Número de operación de Mercado Pago', 'Mercado Pago transaction number', 'Número da operação do Mercado Pago')}</label><input name="paymentOperation" className="form-input" required /></div>
               <div className="form-group"><label className="form-label">{l('Email o WhatsApp usado en el pedido', 'Email or WhatsApp used for the order', 'E-mail ou WhatsApp usado no pedido')}</label><input name="contact" className="form-input" required /></div>
               {submitError && <p className="order-error" role="alert">{submitError}</p>}

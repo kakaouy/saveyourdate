@@ -1,32 +1,49 @@
-# React + TypeScript + Vite
+# Save Your Date
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Sitio React/Vite desplegado en Vercel.
 
-Currently, two official plugins are available:
+## Pedidos persistentes
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+El flujo guarda cada pedido en Supabase, envía un enlace privado de consulta al
+cliente y un enlace privado de aprobación al correo administrativo. La
+aprobación requiere revisar el resumen y presionar un botón; abrir el email no
+cambia el estado.
 
-## React Compiler
+### 1. Crear la tabla
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+En Supabase, abrir **SQL Editor**, pegar el contenido de
+`supabase/orders.sql` y ejecutarlo una sola vez.
 
-## Expanding the Oxlint configuration
+### 2. Variables de Vercel
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+Configurar en Production, Preview y Development:
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```text
+SUPABASE_URL=https://TU-PROYECTO.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=sb_secret_...
+RESEND_API_KEY=re_...
+ORDER_ADMIN_EMAIL=saveyourdate.invite@gmail.com
+ORDER_EMAIL_FROM=Save Your Date <hello@saveyourdate.site>
+PUBLIC_APP_URL=https://www.saveyourdate.site
+ORDER_APPROVAL_SECRET=una-cadena-aleatoria-larga-de-al-menos-32-caracteres
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+En proyectos nuevos, usar la **Secret key** con prefijo `sb_secret_`. El nombre
+de la variable se conserva por compatibilidad con proyectos anteriores.
+
+`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` y `ORDER_APPROVAL_SECRET` son
+secretos: nunca deben usar el prefijo `VITE_` ni incorporarse al frontend.
+
+En Resend debe verificarse `saveyourdate.site` antes de enviar desde
+`hello@saveyourdate.site`. Las respuestas se dirigen a `ORDER_ADMIN_EMAIL`.
+
+### 3. Flujo
+
+1. El cliente envía el pedido.
+2. Recibe el número y el enlace privado `/estado?token=...`.
+3. El administrador recibe `/validar-pago?token=...`.
+4. El administrador verifica Mercado Pago y confirma.
+5. El pedido cambia a `payment_validated` y el cliente recibe un email.
+
+Los archivos adjuntos siguen enviándose al correo mediante FormSubmit; los
+datos principales y el estado quedan persistidos en Supabase.
