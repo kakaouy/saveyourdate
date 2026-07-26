@@ -86,7 +86,10 @@ const supabaseRequest = async (
   if (!serviceKey.startsWith('sb_secret_')) {
     headers.set('Authorization', `Bearer ${serviceKey}`);
   }
-  const response = await fetch(`${requiredEnv('SUPABASE_URL')}/rest/v1/${path}`, {
+  const supabaseUrl = requiredEnv('SUPABASE_URL')
+    .replace(/\/rest\/v1\/?$/, '')
+    .replace(/\/$/, '');
+  const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
     ...init,
     headers
   });
