@@ -25,3 +25,5 @@ create index if not exists orders_created_at_idx on public.orders(created_at des
 alter table public.orders enable row level security;
 
 revoke all on public.orders from anon, authenticated;
+
+grant select, insert, update on public.orders to service_role;
