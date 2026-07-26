@@ -12,10 +12,13 @@ create table if not exists public.orders (
     check (language in ('es', 'en', 'pt')),
   payment_operation text,
   status text not null default 'pending_payment'
-    check (status in ('pending_payment', 'payment_reported', 'payment_validated')),
+    check (status in ('pending_payment', 'payment_reported', 'payment_validated', 'published')),
   status_token_hash text unique not null,
   approval_token_hash text unique not null,
   approval_token_used_at timestamptz,
+  invitation_url text,
+  sheet_url text,
+  delivered_at timestamptz,
   order_payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -23,6 +26,18 @@ create table if not exists public.orders (
 
 alter table public.orders
   add column if not exists language text not null default 'es';
+
+alter table public.orders
+  add column if not exists invitation_url text,
+  add column if not exists sheet_url text,
+  add column if not exists delivered_at timestamptz;
+
+alter table public.orders
+  drop constraint if exists orders_status_check;
+
+alter table public.orders
+  add constraint orders_status_check
+  check (status in ('pending_payment', 'payment_reported', 'payment_validated', 'published'));
 
 do $$
 begin

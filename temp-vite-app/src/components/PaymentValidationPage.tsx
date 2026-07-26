@@ -7,6 +7,8 @@ type ApprovalOrder = {
   modelName: string;
   paymentOperation: string | null;
   status: string;
+  invitationUrl: string | null;
+  sheetUrl: string | null;
 };
 
 export default function PaymentValidationPage() {
@@ -15,6 +17,8 @@ export default function PaymentValidationPage() {
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
   const [approved, setApproved] = useState(false);
+  const [delivered, setDelivered] = useState(false);
+  const [deliverySuccess, setDeliverySuccess] = useState('');
 
   useEffect(() => {
     fetch(`/api/orders/approve?token=${encodeURIComponent(token)}`)
@@ -22,7 +26,8 @@ export default function PaymentValidationPage() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
         setOrder(data);
-        setApproved(data.status === 'payment_validated');
+        setApproved(data.status === 'payment_validated' || data.status === 'published');
+        setDelivered(data.status === 'published');
       })
       .catch((reason) => setError(reason.message || 'No pudimos abrir el pedido.'));
   }, [token]);
@@ -46,6 +51,32 @@ export default function PaymentValidationPage() {
     }
   };
 
+  const deliver = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSending(true);
+    setError('');
+    const form = new FormData(event.currentTarget);
+    try {
+      const response = await fetch('/api/orders/deliver', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          invitationUrl: String(form.get('invitationUrl') || ''),
+          sheetUrl: String(form.get('sheetUrl') || '')
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setDelivered(true);
+      setDeliverySuccess('La entrega quedó guardada y el cliente recibió el email.');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No pudimos entregar la invitación.');
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <main className="private-order-page">
       <section className="private-order-card">
@@ -56,9 +87,33 @@ export default function PaymentValidationPage() {
           <><div className="private-order-loader" /><h1>Abriendo el pedido…</h1></>
         ) : approved ? (
           <>
-            <span className="private-order-icon">✓</span>
-            <h1>Pago validado</h1>
-            <p>El pedido <strong>{order.orderNumber}</strong> quedó aprobado y el cliente recibió el aviso por email.</p>
+            <span className="private-order-icon">{delivered ? '✓' : '↗'}</span>
+            <h1>{delivered ? 'Invitación entregada' : 'Entregar invitación'}</h1>
+            <p>Pedido <strong>{order.orderNumber}</strong> · {order.customerName}</p>
+            {delivered && !deliverySuccess ? (
+              <>
+                <p>La invitación ya fue enviada al cliente.</p>
+                {order.invitationUrl && <a className="private-order-approve private-order-open-link" href={order.invitationUrl} target="_blank" rel="noopener noreferrer">Abrir invitación</a>}
+              </>
+            ) : deliverySuccess ? (
+              <p className="private-order-delivery-success">{deliverySuccess}</p>
+            ) : (
+              <form className="delivery-form" onSubmit={deliver}>
+                <label>
+                  <span>Link de la invitación personalizada</span>
+                  <input name="invitationUrl" type="url" required placeholder="https://..." defaultValue={order.invitationUrl || ''} />
+                </label>
+                <label>
+                  <span>Link de Google Sheets <small>(opcional)</small></span>
+                  <input name="sheetUrl" type="url" placeholder="https://docs.google.com/..." defaultValue={order.sheetUrl || ''} />
+                </label>
+                <p className="private-order-warning">Revisá ambos enlaces antes de enviar. El cliente recibirá inmediatamente el email final.</p>
+                <button className="private-order-approve" type="submit" disabled={sending}>
+                  {sending ? 'Enviando…' : 'Guardar y enviar al cliente'}
+                </button>
+                {error && <p className="private-order-error">{error}</p>}
+              </form>
+            )}
           </>
         ) : (
           <>

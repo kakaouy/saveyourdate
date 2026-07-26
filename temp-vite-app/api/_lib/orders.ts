@@ -7,7 +7,8 @@ const requiredEnv = (name: string) => {
 export type OrderStatus =
   | 'pending_payment'
   | 'payment_reported'
-  | 'payment_validated';
+  | 'payment_validated'
+  | 'published';
 
 export interface StoredOrder {
   order_number: string;
@@ -22,6 +23,9 @@ export interface StoredOrder {
   status_token_hash: string;
   approval_token_hash: string;
   approval_token_used_at: string | null;
+  invitation_url: string | null;
+  sheet_url: string | null;
+  delivered_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -116,7 +120,7 @@ export const findOrderByToken = async (
   tokenHash: string
 ) => {
   const response = await supabaseRequest(
-    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,created_at,updated_at&limit=1`
+    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   return rows[0] || null;
@@ -128,7 +132,7 @@ export const findOrderForPaymentReport = async (
 ) => {
   const normalized = contact.trim().toLowerCase();
   const response = await supabaseRequest(
-    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,created_at,updated_at&limit=1`
+    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   const order = rows[0];

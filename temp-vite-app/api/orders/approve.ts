@@ -29,11 +29,13 @@ async function handler(request: Request) {
         plan: order.plan,
         modelName: order.model_name,
         paymentOperation: order.payment_operation,
-        status: order.status
+        status: order.status,
+        invitationUrl: order.invitation_url,
+        sheetUrl: order.sheet_url
       });
     }
 
-    if (order.status === 'payment_validated' || order.approval_token_used_at) {
+    if (order.status === 'payment_validated' || order.status === 'published' || order.approval_token_used_at) {
       return json({ ok: true, alreadyValidated: true, orderNumber: order.order_number });
     }
     if (!order.payment_operation) {
