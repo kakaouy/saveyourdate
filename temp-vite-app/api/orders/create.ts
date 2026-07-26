@@ -30,6 +30,10 @@ async function handler(request: Request) {
     const status = paymentOperation ? 'payment_reported' : 'pending_payment';
     const modelName = String(body.modelName || body.modelId || 'A definir');
     const plan = String(body.plan || 'Básico');
+    const requestedLanguage = String(body.language || body['Código de idioma'] || 'es');
+    const language = requestedLanguage === 'en' || requestedLanguage === 'pt'
+      ? requestedLanguage
+      : 'es';
     const safeName = escapeHtml(name);
     const safeEmail = escapeHtml(email);
     const safeWhatsapp = escapeHtml(whatsapp);
@@ -43,6 +47,7 @@ async function handler(request: Request) {
       whatsapp,
       plan,
       model_name: modelName,
+      language,
       payment_operation: paymentOperation || null,
       status,
       status_token_hash: await hashToken(statusToken),
@@ -53,18 +58,44 @@ async function handler(request: Request) {
     const statusUrl = `${appUrl()}/estado?token=${statusToken}`;
     const approvalUrl = `${appUrl()}/validar-pago?token=${approvalToken}`;
     const adminEmail = process.env.ORDER_ADMIN_EMAIL || 'saveyourdate.invite@gmail.com';
+    const customerCopy = {
+      es: {
+        subject: `Recibimos tu pedido ${orderNumber}`,
+        title: '¡Recibimos tu pedido!',
+        hello: `Hola ${safeName}, tu número de pedido es`,
+        status: paymentOperation ? 'Pago informado' : 'Pago pendiente',
+        button: 'Consultar mi pedido',
+        note: 'Guardá este correo: el enlace es privado.'
+      },
+      en: {
+        subject: `We received your order ${orderNumber}`,
+        title: 'We received your order!',
+        hello: `Hi ${safeName}, your order number is`,
+        status: paymentOperation ? 'Payment reported' : 'Payment pending',
+        button: 'Check my order',
+        note: 'Keep this email: the link is private.'
+      },
+      pt: {
+        subject: `Recebemos seu pedido ${orderNumber}`,
+        title: 'Recebemos seu pedido!',
+        hello: `Olá ${safeName}, o número do seu pedido é`,
+        status: paymentOperation ? 'Pagamento informado' : 'Pagamento pendente',
+        button: 'Consultar meu pedido',
+        note: 'Guarde este e-mail: o link é privado.'
+      }
+    }[language];
 
     const emailResults = await Promise.allSettled([
       sendEmail({
         to: email,
-        subject: `Recibimos tu pedido ${orderNumber}`,
+        subject: customerCopy.subject,
         idempotencyKey: `order-customer-${orderNumber}`,
         html: emailShell(
-          '¡Recibimos tu pedido!',
-          `<p>Hola ${safeName}, tu número de pedido es <strong>${orderNumber}</strong>.</p>
-           <p>Estado actual: <strong>${paymentOperation ? 'Pago informado' : 'Pago pendiente'}</strong>.</p>
-           ${emailButton('Consultar mi pedido', statusUrl)}
-           <p style="font-size:13px;color:#765f69">Guardá este correo: el enlace es privado.</p>`
+          customerCopy.title,
+          `<p>${customerCopy.hello} <strong>${orderNumber}</strong>.</p>
+           <p><strong>${customerCopy.status}</strong>.</p>
+           ${emailButton(customerCopy.button, statusUrl)}
+           <p style="font-size:13px;color:#765f69">${customerCopy.note}</p>`
         )
       }),
       sendEmail({

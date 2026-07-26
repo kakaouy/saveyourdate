@@ -5,21 +5,68 @@ type StatusResponse = {
   customerName: string;
   plan: string;
   modelName: string;
+  language: 'es' | 'en' | 'pt';
   status: 'pending_payment' | 'payment_reported' | 'payment_validated';
   statusLabel: string;
   updatedAt: string;
 };
 
-const steps = [
-  { id: 'pending_payment', label: 'Pago pendiente' },
-  { id: 'payment_reported', label: 'Pago informado' },
-  { id: 'payment_validated', label: 'Pago validado' }
-] as const;
+const copy = {
+  es: {
+    checking: 'Consultando tu pedido…',
+    notFound: 'No encontramos el pedido',
+    order: 'Pedido',
+    hello: 'Hola',
+    plan: 'Plan',
+    steps: ['Pago pendiente', 'Pago informado', 'Pago validado'],
+    validated: 'Tu pago está confirmado. Ya podemos comenzar a preparar la invitación.',
+    reported: 'Recibimos el número de operación y estamos verificándolo.',
+    pending: 'Cuando realices el pago, informanos el número de operación desde la página principal.',
+    back: 'Volver a Save Your Date'
+  },
+  en: {
+    checking: 'Checking your order…',
+    notFound: 'We could not find the order',
+    order: 'Order',
+    hello: 'Hi',
+    plan: 'Plan',
+    steps: ['Payment pending', 'Payment reported', 'Payment validated'],
+    validated: 'Your payment is confirmed. We can now start preparing your invitation.',
+    reported: 'We received the transaction number and are verifying it.',
+    pending: 'After paying, report the transaction number from the main page.',
+    back: 'Back to Save Your Date'
+  },
+  pt: {
+    checking: 'Consultando seu pedido…',
+    notFound: 'Não encontramos o pedido',
+    order: 'Pedido',
+    hello: 'Olá',
+    plan: 'Plano',
+    steps: ['Pagamento pendente', 'Pagamento informado', 'Pagamento validado'],
+    validated: 'Seu pagamento está confirmado. Já podemos começar a preparar o convite.',
+    reported: 'Recebemos o número da operação e estamos verificando.',
+    pending: 'Após o pagamento, informe o número da operação na página principal.',
+    back: 'Voltar ao Save Your Date'
+  }
+} as const;
 
 export default function OrderStatusPage() {
   const token = new URLSearchParams(window.location.search).get('token') || '';
   const [order, setOrder] = useState<StatusResponse | null>(null);
   const [error, setError] = useState('');
+  const language = order?.language || (
+    navigator.language.startsWith('pt')
+      ? 'pt'
+      : navigator.language.startsWith('en')
+        ? 'en'
+        : 'es'
+  );
+  const text = copy[language];
+  const steps = [
+    { id: 'pending_payment', label: text.steps[0] },
+    { id: 'payment_reported', label: text.steps[1] },
+    { id: 'payment_validated', label: text.steps[2] }
+  ] as const;
 
   useEffect(() => {
     fetch(`/api/orders/status?token=${encodeURIComponent(token)}`)
@@ -34,6 +81,9 @@ export default function OrderStatusPage() {
   const activeIndex = order
     ? steps.findIndex((step) => step.id === order.status)
     : -1;
+  const displayPlan = order?.plan === 'Básico' && language === 'en'
+    ? 'Basic'
+    : order?.plan || '';
 
   return (
     <main className="private-order-page">
@@ -42,19 +92,19 @@ export default function OrderStatusPage() {
         {error ? (
           <>
             <span className="private-order-icon private-order-icon-error">!</span>
-            <h1>No encontramos el pedido</h1>
+            <h1>{text.notFound}</h1>
             <p>{error}</p>
           </>
         ) : !order ? (
           <>
             <div className="private-order-loader" />
-            <h1>Consultando tu pedido…</h1>
+            <h1>{text.checking}</h1>
           </>
         ) : (
           <>
-            <span className="private-order-kicker">Pedido {order.orderNumber}</span>
-            <h1>Hola, {order.customerName}</h1>
-            <p>{order.modelName} · Plan {order.plan}</p>
+            <span className="private-order-kicker">{text.order} {order.orderNumber}</span>
+            <h1>{text.hello}, {order.customerName}</h1>
+            <p>{order.modelName} · {text.plan} {displayPlan}</p>
             <div className="order-status-steps">
               {steps.map((step, index) => (
                 <div className={index <= activeIndex ? 'complete' : ''} key={step.id}>
@@ -66,14 +116,14 @@ export default function OrderStatusPage() {
             <strong className="private-order-current">{order.statusLabel}</strong>
             <p className="private-order-help">
               {order.status === 'payment_validated'
-                ? 'Tu pago está confirmado. Ya podemos comenzar a preparar la invitación.'
+                ? text.validated
                 : order.status === 'payment_reported'
-                  ? 'Recibimos el número de operación y estamos verificándolo.'
-                  : 'Cuando realices el pago, informanos el número de operación desde la página principal.'}
+                  ? text.reported
+                  : text.pending}
             </p>
           </>
         )}
-        <a className="private-order-home" href="/#crear">Volver a Save Your Date</a>
+        <a className="private-order-home" href="/#crear">{text.back}</a>
       </section>
     </main>
   );

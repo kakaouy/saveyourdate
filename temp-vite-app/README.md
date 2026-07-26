@@ -45,5 +45,9 @@ En Resend debe verificarse `saveyourdate.site` antes de enviar desde
 4. El administrador verifica Mercado Pago y confirma.
 5. El pedido cambia a `payment_validated` y el cliente recibe un email.
 
+El idioma elegido al enviar el pedido (`es`, `en` o `pt`) se conserva en la
+tabla y se usa en los correos y en la página privada del cliente. Los avisos
+administrativos permanecen en español.
+
 Los archivos adjuntos siguen enviándose al correo mediante FormSubmit; los
 datos principales y el estado quedan persistidos en Supabase.

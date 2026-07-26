@@ -16,6 +16,7 @@ export interface StoredOrder {
   whatsapp: string;
   plan: string;
   model_name: string;
+  language: 'es' | 'en' | 'pt';
   payment_operation: string | null;
   status: OrderStatus;
   status_token_hash: string;
@@ -115,7 +116,7 @@ export const findOrderByToken = async (
   tokenHash: string
 ) => {
   const response = await supabaseRequest(
-    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,created_at,updated_at&limit=1`
+    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   return rows[0] || null;
@@ -127,7 +128,7 @@ export const findOrderForPaymentReport = async (
 ) => {
   const normalized = contact.trim().toLowerCase();
   const response = await supabaseRequest(
-    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,created_at,updated_at&limit=1`
+    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   const order = rows[0];

@@ -1,9 +1,21 @@
 import { findOrderByToken, hashToken, json } from '../_lib/orders.js';
 
 const labels = {
-  pending_payment: 'Pago pendiente',
-  payment_reported: 'Pago informado',
-  payment_validated: 'Pago validado'
+  es: {
+    pending_payment: 'Pago pendiente',
+    payment_reported: 'Pago informado',
+    payment_validated: 'Pago validado'
+  },
+  en: {
+    pending_payment: 'Payment pending',
+    payment_reported: 'Payment reported',
+    payment_validated: 'Payment validated'
+  },
+  pt: {
+    pending_payment: 'Pagamento pendente',
+    payment_reported: 'Pagamento informado',
+    payment_validated: 'Pagamento validado'
+  }
 };
 
 async function handler(request: Request) {
@@ -18,8 +30,9 @@ async function handler(request: Request) {
       customerName: order.customer_name,
       plan: order.plan,
       modelName: order.model_name,
+      language: order.language,
       status: order.status,
-      statusLabel: labels[order.status],
+      statusLabel: labels[order.language][order.status],
       updatedAt: order.updated_at
     });
   } catch (error) {
