@@ -8,7 +8,7 @@ import {
   updateOrder
 } from '../_lib/orders.js';
 
-export default async function handler(request: Request) {
+async function handler(request: Request) {
   if (request.method !== 'GET' && request.method !== 'POST') {
     return json({ error: 'Método no permitido.' }, 405);
   }
@@ -65,3 +65,5 @@ export default async function handler(request: Request) {
     return json({ error: 'No pudimos validar el pago.' }, 500);
   }
 }
+
+export default { fetch: handler };

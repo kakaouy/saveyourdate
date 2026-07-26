@@ -9,7 +9,7 @@ import {
   updateOrder
 } from '../_lib/orders.js';
 
-export default async function handler(request: Request) {
+async function handler(request: Request) {
   if (request.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
   try {
     const body = await request.json() as Record<string, unknown>;
@@ -55,3 +55,5 @@ export default async function handler(request: Request) {
     return json({ error: 'No pudimos informar el pago.' }, 500);
   }
 }
+
+export default { fetch: handler };
