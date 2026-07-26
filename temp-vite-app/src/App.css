@@ -2759,6 +2759,8 @@ html, body, .app-wrapper {
 .order-success-card h3 { margin: 0 0 8px; font: 700 28px/1.1 var(--font-serif); }
 .order-success-card p { color: #6d6370; }
 .order-success-card > strong { display: inline-block; margin: 10px 0; padding: 12px 20px; border: 1px dashed #ff6f91; border-radius: 11px; color: #ff6f91; font: 800 23px/1 monospace; letter-spacing: .08em; }
+.order-success-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 4px 0 14px; }
+.order-success-actions .btn-secondary { margin: 0; }
 .order-status-note { font-size: 12px; }
 .payment-update-form { width: min(620px, 100%); }
 
