@@ -31,6 +31,8 @@ const getPaletteIdFromColor = (
 };
 
 const CATALOG_MODELS = INVITATION_MODELS.filter((model) => model.active !== false);
+const LATEST_CATALOG_MODEL = [...CATALOG_MODELS]
+  .sort((first, second) => (second.order ?? 0) - (first.order ?? 0))[0] || CATALOG_MODELS[0];
 const firstModelIdFor = (category: InvitationModel['category']) =>
   CATALOG_MODELS.find((model) => model.category === category)?.id || '';
 
@@ -1213,11 +1215,11 @@ function App() {
     BRL: { symbol: 'R$ ', suffix: 'BRL', bronze: 255, silver: 380, gold: 550, label: 'Real Brasileño', bank: 'Mercado Pago Brasil / PIX', bankDetails: 'Chave PIX (E-mail): pix@saveyourdate.com.br' }
   };
 
-  const PAYMENT_LINKS = {
-    bronze: 'https://mpago.la/1gRs45Z',
-    silver: 'https://mpago.la/1de2PiW',
-    gold: 'https://mpago.la/1W6btGs'
-  };
+    const PAYMENT_LINKS = {
+      bronze: 'https://mpago.la/2z4ME1Q',
+      silver: 'https://mpago.la/2z4ME1Q',
+      gold: 'https://mpago.la/2z4ME1Q'
+    };
 
   // Valid pre-approved mock codes for testing!
   const VALID_MOCK_CODES = ['WEDDING2026', 'QUINCE2026', 'VIPCUSTOMER', 'MP-PAY-OK'];
@@ -2078,34 +2080,23 @@ function App() {
             {/* Smart mock smartphone */}
             <div className="phone-frame">
               <div className="phone-screen">
-                <div className="phone-header">
-                  <h3 className="phone-header-title">Sofía & Mateo</h3>
-                  <p className="phone-header-sub">¡Nos Casamos!</p>
-                </div>
-                <div className="phone-body">
-                  <span style={{ fontSize: '11px', color: 'var(--color-accent)', fontWeight: 'bold' }}>{t.hero.miniCountdown}</span>
-                  <div className="mini-countdown">
-                    <div className="mini-cd-box">
-                      <span className="mini-cd-num">32</span>
-                      <span className="mini-cd-lbl">{t.hero.days}</span>
-                    </div>
-                    <div className="mini-cd-box">
-                      <span className="mini-cd-num">15</span>
-                      <span className="mini-cd-lbl">{t.hero.hours}</span>
-                    </div>
-                    <div className="mini-cd-box">
-                      <span className="mini-cd-num">44</span>
-                      <span className="mini-cd-lbl">{t.hero.mins}</span>
-                    </div>
+                {LATEST_CATALOG_MODEL.previewImage ? (
+                  <img
+                    className="hero-latest-model-preview"
+                    src={LATEST_CATALOG_MODEL.previewImage}
+                    alt={`Preview ${LATEST_CATALOG_MODEL.title}`}
+                  />
+                ) : (
+                  <div className={`hero-latest-model-fallback ${LATEST_CATALOG_MODEL.themeClass}`}>
+                    <strong>{LATEST_CATALOG_MODEL.demoName1}</strong>
+                    <span>{LATEST_CATALOG_MODEL.date}</span>
                   </div>
-                  <div className="phone-section-divider"></div>
-                  <div className="phone-details-box">
-                    <p style={{ fontWeight: 'bold', margin: '0 0 4px 0', fontSize: '11px' }}>Sábado 24 de Octubre</p>
-                    <p style={{ margin: '0', fontSize: '10px', color: '#666' }}>18:30 hs • Estancia La Linda</p>
-                  </div>
-                  <button 
+                )}
+                <div className="hero-latest-model-action">
+                  <span>{LATEST_CATALOG_MODEL.title}</span>
+                  <button
                     className="phone-action-btn"
-                    onClick={() => handleOpenDemo(INVITATION_MODELS[0])}
+                    onClick={() => handleOpenDemo(LATEST_CATALOG_MODEL)}
                   >
                     {t.hero.miniBtn}
                   </button>
@@ -2139,13 +2130,19 @@ function App() {
               {filteredModels.map((model) => {
                 const modelPaletteOptions = getModelPaletteOptions(model);
                 const selectedColor = selectedModelColors[model.id] || modelPaletteOptions[0].color;
+                const isComingSoon = model.category === 'other';
+                const comingSoonLabel = lang === 'es' ? 'Próximamente' : (lang === 'en' ? 'Coming soon' : 'Em breve');
 
                 return (
-                  <article className="model-card model-phone-card" key={model.id}>
+                  <article className={`model-card model-phone-card${isComingSoon ? ' model-card-coming-soon' : ''}`} key={model.id}>
                     <div className="model-card-preview">
-                      {model.badge && (
-                        <span className="card-badge">
-                          {model.badge === 'Más Elegido' ? t.catalog.popularBadge : (model.badge === 'Nuevo' ? t.catalog.newBadge : t.catalog.trendBadge)}
+                      {(model.badge || isComingSoon) && (
+                        <span className={`card-badge${isComingSoon ? ' card-badge-coming-soon' : ''}`}>
+                          {isComingSoon
+                            ? comingSoonLabel
+                            : model.badge === 'Más Elegido'
+                              ? t.catalog.popularBadge
+                              : (model.badge === 'Nuevo' ? t.catalog.newBadge : t.catalog.trendBadge)}
                         </span>
                       )}
 
@@ -2166,12 +2163,13 @@ function App() {
                       <div
                         className="model-phone-frame"
                         style={{ '--model-color': selectedColor } as React.CSSProperties}
-                        role="button"
-                        tabIndex={0}
-                        aria-label={`${t.catalog.verDemo}: ${model.title}`}
-                        onClick={() => handleOpenDemo(model)}
+                        role={isComingSoon ? undefined : 'button'}
+                        tabIndex={isComingSoon ? undefined : 0}
+                        aria-label={isComingSoon ? `${model.title}: ${comingSoonLabel}` : `${t.catalog.verDemo}: ${model.title}`}
+                        aria-disabled={isComingSoon || undefined}
+                        onClick={() => { if (!isComingSoon) handleOpenDemo(model); }}
                         onKeyDown={(event) => {
-                          if (event.key === 'Enter' || event.key === ' ') {
+                          if (!isComingSoon && (event.key === 'Enter' || event.key === ' ')) {
                             event.preventDefault();
                             handleOpenDemo(model);
                           }
@@ -2242,14 +2240,20 @@ function App() {
                         ))}
                       </div>}
 
-                       <div className="card-footer">
-                        <button className="btn-card-demo" onClick={() => handleOpenDemo(model)}>
-                          {t.catalog.verDemo}
-                        </button>
-                        <button className="btn-card-order" onClick={() => handleSelectModelForOrder(model.id)}>
-                          {lang === 'es' ? 'Crear' : (lang === 'en' ? 'Create' : 'Criar')}
-                        </button>
-                      </div>
+                      {isComingSoon ? (
+                        <div className="card-footer card-footer-coming-soon">
+                          <span>{comingSoonLabel}</span>
+                        </div>
+                      ) : (
+                        <div className="card-footer">
+                          <button className="btn-card-demo" onClick={() => handleOpenDemo(model)}>
+                            {t.catalog.verDemo}
+                          </button>
+                          <button className="btn-card-order" onClick={() => handleSelectModelForOrder(model.id)}>
+                            {lang === 'es' ? 'Crear' : (lang === 'en' ? 'Create' : 'Criar')}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </article>
                 );
