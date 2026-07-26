@@ -4,17 +4,20 @@ const labels = {
   es: {
     pending_payment: 'Pago pendiente',
     payment_reported: 'Pago informado',
-    payment_validated: 'Pago validado'
+    payment_validated: 'Pago validado',
+    published: 'Invitación entregada'
   },
   en: {
     pending_payment: 'Payment pending',
     payment_reported: 'Payment reported',
-    payment_validated: 'Payment validated'
+    payment_validated: 'Payment validated',
+    published: 'Invitation delivered'
   },
   pt: {
     pending_payment: 'Pagamento pendente',
     payment_reported: 'Pagamento informado',
-    payment_validated: 'Pagamento validado'
+    payment_validated: 'Pagamento validado',
+    published: 'Convite entregue'
   }
 };
 
@@ -33,6 +36,7 @@ async function handler(request: Request) {
       language: order.language,
       status: order.status,
       statusLabel: labels[order.language][order.status],
+      invitationUrl: order.status === 'published' ? order.invitation_url : null,
       updatedAt: order.updated_at
     });
   } catch (error) {

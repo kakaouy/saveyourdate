@@ -44,6 +44,10 @@ En Resend debe verificarse `saveyourdate.site` antes de enviar desde
 3. El administrador recibe `/validar-pago?token=...`.
 4. El administrador verifica Mercado Pago y confirma.
 5. El pedido cambia a `payment_validated` y el cliente recibe un email.
+6. Desde el mismo enlace administrativo se cargan la URL final de la
+   invitación y, opcionalmente, la planilla de Google Sheets.
+7. El sistema guarda ambos enlaces, cambia el estado a `published` y envía el
+   email final con accesos e instrucciones para compartir.
 
 El idioma elegido al enviar el pedido (`es`, `en` o `pt`) se conserva en la
 tabla y se usa en los correos y en la página privada del cliente. Los avisos
