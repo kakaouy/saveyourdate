@@ -4325,3 +4325,8 @@ html {
   object-fit: cover;
   object-position: center;
 }
+
+.model-preview-rivendell {
+  object-fit: cover;
+  object-position: center top;
+}

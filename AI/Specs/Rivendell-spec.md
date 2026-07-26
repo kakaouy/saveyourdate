@@ -183,7 +183,7 @@ No volver a fijar esos fondos con un hexadecimal.
 
 Valores permitidos:
 
-"rosa" | "verde-agua" | "verde-hojas"
+"rosa" | "verde-agua" | "verde-azulado"
 
 Rosa — predeterminada
 
@@ -219,7 +219,7 @@ Verde agua
 
 Debe respetar claramente el verde claro y el verde oscuro en las distintas secciones.
 
-Verde hojas
+Verde azulado
 
 Inspirada en los verdes azulados de las hojas del PNG de referencia.
 
@@ -333,6 +333,10 @@ Nombre preparado para nombres largos.
 
 Cuenta regresiva completa dentro del ancho.
 
+En preview embebida, toda escala tipográfica debe calcularse contra el contenedor del teléfono, nunca contra el viewport exterior.
+
+Los textos secundarios deben reducirse proporcionalmente dentro del teléfono y conservar una lectura cómoda.
+
 Botones de 44 px como mínimo; objetivo 48 px.
 
 Modales con scroll interno.
@@ -392,6 +396,10 @@ cuatro pétalos de referencia;
 botón inferior de navegación.
 
 Los valores Milena, fecha, imágenes y textos son de demostración y deben parametrizarse.
+
+La fotografía debe usar background-size: cover y priorizar el sector derecho mediante una posición focal configurable, porque el rostro se encuentra habitualmente de ese lado.
+
+El nombre debe verse al menos 1,5 veces más grande que en la primera integración React, escalar según el ancho disponible y reducirse según su longitud para permanecer siempre en una sola línea sin desbordar.
 
 Capas:
 
@@ -497,6 +505,10 @@ sin valores negativos;
 
 mensaje final configurable.
 
+Los números usan peso regular, no negrita, y una escala contenida.
+
+En contenedores de teléfono de hasta 390 px, Días y Horas forman la primera fila; Minutos y Segundos, la segunda.
+
 Cuándo y dónde
 
 fecha;
@@ -520,6 +532,8 @@ centrada;
 ancho máximo;
 
 tipografía editorial.
+
+En preview de teléfono debe usar aproximadamente la mitad del tamaño de la primera integración React y conservar el ancho completo sin recortes.
 
 Código de vestimenta
 
@@ -556,6 +570,8 @@ fallback estático en táctiles;
 estático con reduced motion;
 
 sin saltos ni bordes vacíos.
+
+La imagen aprobada para el parallax es images/foto-02.jpg.
 
 Galería y lightbox
 
@@ -600,6 +616,8 @@ usa accentDark;
 hashtag y URL configurables;
 
 desactivable.
+
+El hashtag debe usar el mismo orden de tamaño que un texto secundario; no debe comportarse como título.
 
 Sugerencia de canciones
 
@@ -688,6 +706,14 @@ aria-modal="true";
 título asociado;
 
 reduced motion.
+
+En preview de teléfono, los títulos deben medir aproximadamente 40 % del tamaño usado en la primera integración React.
+
+El botón de cierre debe mantener alto contraste, fondo visible y un área táctil mínima de 44 × 44 px.
+
+El círculo visible puede ser levemente menor que el área táctil. La cruz debe centrarse ópticamente dentro de ese círculo mediante un elemento interno, sin depender de la línea base del carácter.
+
+El modal, sus formularios y el lightbox nunca deben generar scroll horizontal.
 
 15. Animaciones aprobadas
 
@@ -792,7 +818,7 @@ Registro del modelo:
   name: "Rivendell",
   category: "quince",
   previewPath: "/rivendell/index.html",
-  palettes: ["rosa", "verde-agua", "verde-hojas"]
+  palettes: ["rosa", "verde-agua", "verde-azulado"]
 }
 
 El modal debe mostrar:
@@ -824,7 +850,7 @@ Debe transferir:
 {
   modelId: "rivendell",
   category: "quince",
-  palettePreset: "rosa" | "verde-agua" | "verde-hojas",
+  palettePreset: "rosa" | "verde-agua" | "verde-azulado",
   locale: "es" | "pt" | "en"
 }
 
@@ -1118,7 +1144,7 @@ Se reconoce como Rivendell.
 
 Handflair se usa en el nombre.
 
-Sólo existen Rosa, Verde agua y Verde hojas.
+Sólo existen Rosa, Verde agua y Verde azulado.
 
 La fotografía conserva sus colores.
 
@@ -1304,18 +1330,6 @@ responsive base.
 
 Pendiente para producción
 
-modularización;
-
-integración con React;
-
-catálogo;
-
-modal estándar;
-
-selector externo;
-
-flujo de pedido;
-
 backends;
 
 RSVP persistente;
@@ -1329,3 +1343,27 @@ siguiente sección activa dinámica;
 optimización;
 
 pruebas automatizadas y visuales.
+
+Implementado en React
+
+configuración, recursos, estilos y comportamiento separados;
+
+integración con React;
+
+catálogo;
+
+modal estándar;
+
+selector externo con Rosa predeterminada;
+
+flujo de pedido con modelo, paleta e idioma;
+
+secciones activables;
+
+siguiente sección activa dinámica;
+
+Handflair local;
+
+animaciones y reduced motion;
+
+footer corporativo compartiendo los tokens de Rivendell.
