@@ -8,6 +8,8 @@
   },
   "rewrites": [
     { "source": "/estado", "destination": "/index.html" },
-    { "source": "/validar-pago", "destination": "/index.html" }
+    { "source": "/consultar", "destination": "/index.html" },
+    { "source": "/validar-pago", "destination": "/index.html" },
+    { "source": "/preparando", "destination": "/index.html" }
   ]
 }

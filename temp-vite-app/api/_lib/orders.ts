@@ -26,6 +26,7 @@ export interface StoredOrder {
   invitation_url: string | null;
   sheet_url: string | null;
   delivered_at: string | null;
+  order_payload: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -71,6 +72,16 @@ export const approvalTokenFor = async (orderNumber: string) => {
   return Array.from(new Uint8Array(signature), (byte) =>
     byte.toString(16).padStart(2, '0')
   ).join('');
+};
+
+export const previewTokenFor = async (orderNumber: string) =>
+  `${orderNumber}.${await approvalTokenFor(`preview:${orderNumber}`)}`;
+
+export const orderNumberFromPreviewToken = async (token: string) => {
+  const [orderNumber, signature, ...rest] = token.split('.');
+  if (rest.length || !orderNumber || !signature) return null;
+  const expected = await previewTokenFor(orderNumber);
+  return expected === token ? orderNumber : null;
 };
 
 export const createOrderNumber = () => {
@@ -120,27 +131,50 @@ export const findOrderByToken = async (
   tokenHash: string
 ) => {
   const response = await supabaseRequest(
-    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,created_at,updated_at&limit=1`
+    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   return rows[0] || null;
+};
+
+export const findOrderByNumber = async (orderNumber: string) => {
+  const response = await supabaseRequest(
+    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
+  );
+  const rows = (await response.json()) as StoredOrder[];
+  return rows[0] || null;
+};
+
+const contactMatchesOrder = (order: StoredOrder, contact: string) => {
+  const normalized = contact.trim().toLowerCase();
+  return order.customer_email.toLowerCase() === normalized ||
+    order.whatsapp.replace(/\D/g, '') === contact.replace(/\D/g, '');
+};
+
+export const findOrderForLookup = async (identifier: string, contact: string) => {
+  const normalizedIdentifier = identifier.trim();
+  const isOrderNumber = normalizedIdentifier.toUpperCase().startsWith('SYD-');
+  const field = isOrderNumber ? 'order_number' : 'payment_operation';
+  const value = isOrderNumber ? normalizedIdentifier.toUpperCase() : normalizedIdentifier;
+  const response = await supabaseRequest(
+    `orders?${field}=eq.${encodeURIComponent(value)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
+  );
+  const rows = (await response.json()) as StoredOrder[];
+  const order = rows[0];
+  return order && contactMatchesOrder(order, contact) ? order : null;
 };
 
 export const findOrderForPaymentReport = async (
   orderNumber: string,
   contact: string
 ) => {
-  const normalized = contact.trim().toLowerCase();
   const response = await supabaseRequest(
-    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,created_at,updated_at&limit=1`
+    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   const order = rows[0];
   if (!order) return null;
-  const matches =
-    order.customer_email.toLowerCase() === normalized ||
-    order.whatsapp.replace(/\D/g, '') === contact.replace(/\D/g, '');
-  return matches ? order : null;
+  return contactMatchesOrder(order, contact) ? order : null;
 };
 
 export const updateOrder = async (
@@ -161,6 +195,24 @@ export const updateOrder = async (
 
 export const appUrl = () =>
   (process.env.PUBLIC_APP_URL || 'https://www.saveyourdate.site').replace(/\/$/, '');
+
+export const customerHelpHtml = (
+  language: 'es' | 'en' | 'pt',
+  orderNumber: string
+) => {
+  const question = language === 'en'
+    ? 'Questions or changes?'
+    : language === 'pt'
+      ? 'Dúvidas ou alterações?'
+      : '¿Dudas o cambios?';
+  const whatsapp = language === 'en' ? 'Chat on WhatsApp' : language === 'pt' ? 'Falar pelo WhatsApp' : 'Escribir por WhatsApp';
+  const form = language === 'en' ? 'Contact form' : language === 'pt' ? 'Formulário de contato' : 'Formulario de contacto';
+  const whatsappUrl = `https://wa.me/59899134504?text=${encodeURIComponent(`Save Your Date · ${orderNumber}`)}`;
+  const formUrl = `${appUrl()}/?pedido=${encodeURIComponent(orderNumber)}#contacto`;
+  return `<p style="margin-top:22px;font-size:13px;color:#765f69"><strong>${question}</strong><br>
+    <a href="${whatsappUrl}" style="color:#a64064">${whatsapp}</a> ·
+    <a href="${formUrl}" style="color:#a64064">${form}</a></p>`;
+};
 
 export const sendEmail = async ({
   to,

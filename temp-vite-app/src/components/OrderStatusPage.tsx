@@ -9,6 +9,7 @@ type StatusResponse = {
   status: 'pending_payment' | 'payment_reported' | 'payment_validated' | 'published';
   statusLabel: string;
   invitationUrl: string | null;
+  previewUrl: string | null;
   updatedAt: string;
 };
 
@@ -19,8 +20,9 @@ const copy = {
     order: 'Pedido',
     hello: 'Hola',
     plan: 'Plan',
-    steps: ['Pago pendiente', 'Pago informado', 'Pago validado', 'Invitación entregada'],
+    steps: ['Pedido recibido', 'Pago validado', 'En preparación', 'Invitación entregada'],
     open: 'Abrir mi invitación',
+    preview: 'Ver modelo en preparación',
     delivered: 'Tu invitación ya está publicada y lista para compartir.',
     validated: 'Tu pago está confirmado. Ya podemos comenzar a preparar la invitación.',
     reported: 'Recibimos el número de operación y estamos verificándolo.',
@@ -33,8 +35,9 @@ const copy = {
     order: 'Order',
     hello: 'Hi',
     plan: 'Plan',
-    steps: ['Payment pending', 'Payment reported', 'Payment validated', 'Invitation delivered'],
+    steps: ['Order received', 'Payment validated', 'In preparation', 'Invitation delivered'],
     open: 'Open my invitation',
+    preview: 'View template in preparation',
     delivered: 'Your invitation is published and ready to share.',
     validated: 'Your payment is confirmed. We can now start preparing your invitation.',
     reported: 'We received the transaction number and are verifying it.',
@@ -47,8 +50,9 @@ const copy = {
     order: 'Pedido',
     hello: 'Olá',
     plan: 'Plano',
-    steps: ['Pagamento pendente', 'Pagamento informado', 'Pagamento validado', 'Convite entregue'],
+    steps: ['Pedido recebido', 'Pagamento validado', 'Em preparação', 'Convite entregue'],
     open: 'Abrir meu convite',
+    preview: 'Ver modelo em preparação',
     delivered: 'Seu convite está publicado e pronto para compartilhar.',
     validated: 'Seu pagamento está confirmado. Já podemos começar a preparar o convite.',
     reported: 'Recebemos o número da operação e estamos verificando.',
@@ -70,11 +74,11 @@ export default function OrderStatusPage() {
   );
   const text = copy[language];
   const steps = [
-    { id: 'pending_payment', label: text.steps[0] },
-    { id: 'payment_reported', label: text.steps[1] },
-    { id: 'payment_validated', label: text.steps[2] },
-    { id: 'published', label: text.steps[3] }
-  ] as const;
+    text.steps[0],
+    text.steps[1],
+    text.steps[2],
+    text.steps[3]
+  ];
 
   useEffect(() => {
     fetch(`/api/orders/status?token=${encodeURIComponent(token)}`)
@@ -87,7 +91,11 @@ export default function OrderStatusPage() {
   }, [token]);
 
   const activeIndex = order
-    ? steps.findIndex((step) => step.id === order.status)
+    ? order.status === 'published'
+      ? 3
+      : order.status === 'payment_validated'
+        ? 2
+        : 0
     : -1;
   const displayPlan = order?.plan === 'Básico' && language === 'en'
     ? 'Basic'
@@ -115,9 +123,9 @@ export default function OrderStatusPage() {
             <p>{order.modelName} · {text.plan} {displayPlan}</p>
             <div className="order-status-steps">
               {steps.map((step, index) => (
-                <div className={index <= activeIndex ? 'complete' : ''} key={step.id}>
+                <div className={index <= activeIndex ? 'complete' : ''} key={step}>
                   <span>{index <= activeIndex ? '✓' : index + 1}</span>
-                  <strong>{step.label}</strong>
+                  <strong>{step}</strong>
                 </div>
               ))}
             </div>
@@ -132,6 +140,7 @@ export default function OrderStatusPage() {
                   : text.pending}
             </p>
             {order.invitationUrl && <a className="private-order-approve private-order-open-link" href={order.invitationUrl} target="_blank" rel="noopener noreferrer">{text.open}</a>}
+            {order.previewUrl && <a className="private-order-approve private-order-open-link" href={order.previewUrl}>{text.preview}</a>}
           </>
         )}
         <a className="private-order-home" href="/#crear">{text.back}</a>

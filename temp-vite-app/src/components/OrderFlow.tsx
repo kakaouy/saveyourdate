@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { InvitationModel } from '../data/models';
 
 type Plan = 'basic' | 'premium';
-type FlowTab = 'new' | 'pay-first' | 'payment';
+type FlowTab = 'new' | 'pay-first';
 type EventCategory = InvitationModel['category'];
 type Language = 'es' | 'en' | 'pt';
 
@@ -22,7 +22,7 @@ const SECTION_OPTIONS = [
   { id: 'featuredPhoto', title: 'Foto destacada', description: 'Imagen importante con efecto parallax.' },
   { id: 'agenda', title: 'Agenda o itinerario', description: 'Horarios y momentos importantes del evento.' },
   { id: 'location', title: 'Ubicación y mapa', description: 'Dirección, Google Maps o Waze.' },
-  { id: 'rsvp', title: 'Confirmación de asistencia', description: 'Incluye Google Sheets, link de envío, restricciones alimentarias y cédula para control de ingreso.' },
+  { id: 'rsvp', title: 'Confirmación de asistencia', description: 'Incluye Google Sheets, link de envío y restricciones alimentarias.' },
   { id: 'gallery', title: 'Galería de fotos', description: 'Hasta 5 fotos en Básico y hasta 8 en Premium.' },
   { id: 'gifts', title: 'Regalos', description: 'Alias, cuenta bancaria o lista de regalos.' },
   { id: 'dresscode', title: 'Código de vestimenta', description: 'Dress code y recomendaciones para los invitados.' },
@@ -53,13 +53,11 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
   const [submittedStatusUrl, setSubmittedStatusUrl] = useState('');
   const [submittedWhatsapp, setSubmittedWhatsapp] = useState('');
   const [orderCopied, setOrderCopied] = useState(false);
-  const [paymentUpdated, setPaymentUpdated] = useState(false);
   const [sending, setSending] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [prepayment, setPrepayment] = useState({ name: '', email: '', whatsapp: '', operation: '' });
   const [selectedColor, setSelectedColor] = useState('#ff6f91');
 
-  const sectionLimit = plan === 'basic' ? 5 : 8;
   const photoLimit = plan === 'basic' ? 5 : 8;
   const selectedModel = useMemo(() => models.find((model) => model.id === modelId), [models, modelId]);
   const defaultSections = selectedModel?.includedSections || [];
@@ -67,20 +65,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
     () => new Set(sections),
     [sections]
   );
-  const galleryIncludedWithDesign =
-    defaultSections.includes('gallery');
-  const countedSections = useMemo(
-    () => sections.filter(
-      (sectionId) =>
-        sectionId !== 'music' &&
-        !(
-          sectionId === 'gallery' &&
-          galleryIncludedWithDesign
-        )
-    ),
-    [sections, galleryIncludedWithDesign]
-  );
-  const usedSectionCount = countedSections.length;
+  const addedSections = sections.filter((sectionId) => !defaultSections.includes(sectionId));
   const gallerySelected = activeSections.has('gallery');
   const rsvpSelected = activeSections.has('rsvp');
   const sectionOptions = useMemo(() => SECTION_OPTIONS.map((section) => {
@@ -90,7 +75,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
       countdown: ['Cuenta regresiva', 'Countdown', 'Contagem regressiva', 'Contador dinámico hasta el día del evento.', 'Dynamic countdown to the event date.', 'Contador dinâmico até o dia do evento.'],
       agenda: ['Agenda o itinerario', 'Schedule or itinerary', 'Agenda ou itinerário', 'Horarios y momentos importantes del evento.', 'Times and important moments of the event.', 'Horários e momentos importantes do evento.'],
       location: ['Ubicación y mapa', 'Location and map', 'Localização e mapa', 'Dirección, Google Maps o Waze.', 'Address, Google Maps or Waze.', 'Endereço, Google Maps ou Waze.'],
-      rsvp: ['Confirmación de asistencia', 'RSVP', 'Confirmação de presença', 'Incluye Google Sheets, link de envío, restricciones alimentarias y cédula para control de ingreso.', 'Includes Google Sheets, sending link, dietary restrictions and ID for access control.', 'Inclui Google Sheets, link de envio, restrições alimentares e documento para controle de entrada.'],
+      rsvp: ['Confirmación de asistencia', 'RSVP', 'Confirmação de presença', 'Incluye Google Sheets, link de envío y restricciones alimentarias.', 'Includes Google Sheets, sending link and dietary restrictions.', 'Inclui Google Sheets, link de envio e restrições alimentares.'],
       gallery: ['Galería de fotos', 'Photo gallery', 'Galeria de fotos', 'Hasta 5 fotos en Básico y hasta 8 en Premium.', 'Up to 5 photos in Basic and 8 in Premium.', 'Até 5 fotos no Básico e 8 no Premium.'],
       gifts: ['Regalos', 'Gifts', 'Presentes', 'Alias, cuenta bancaria o lista de regalos.', 'Bank details, registry or gift list.', 'Dados bancários, lista ou sugestões de presentes.'],
       dresscode: ['Código de vestimenta', 'Dress code', 'Código de vestimenta', 'Dress code y recomendaciones para los invitados.', 'Dress code and recommendations for guests.', 'Código de vestimenta e recomendações para os convidados.'],
@@ -120,12 +105,11 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
   }, []);
 
   useEffect(() => {
-    if (sections.length > sectionLimit) setSections((current) => current.slice(0, sectionLimit));
     if (photoCount > photoLimit) {
       setPhotoCount(0);
       setPhotoError(`Este plan admite hasta ${photoLimit} fotos.`);
     }
-  }, [plan, sectionLimit, photoCount, photoLimit, sections.length]);
+  }, [plan, photoCount, photoLimit]);
 
   const filteredModels = useMemo(() => models.filter((model) => model.category === eventCategory), [models, eventCategory]);
   const availableColors = useMemo(
@@ -163,21 +147,13 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
       false
     );
 
-    const countedDefaults =
-      defaults.filter(
-        (sectionId) =>
-          !(
-            sectionId === 'gallery' &&
-            selectedModel?.includedSections?.includes('gallery')
-          )
-      );
-
-    setPlan(
-      countedDefaults.length > 5
-        ? 'premium'
-        : 'basic'
-    );
   }, [modelId, selectedModel]);
+
+  useEffect(() => {
+    if (plan === 'basic') {
+      setSections(defaultSections.filter((sectionId) => sectionId !== 'music'));
+    }
+  }, [plan, modelId]);
 
   useEffect(() => {
     if (availableColors.length) {
@@ -193,16 +169,11 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
   };
 
   const toggleSection = (sectionId: string) => {
+    if (plan === 'basic') return;
     setSections((current) => {
       if (current.includes(sectionId)) return current.filter((id) => id !== sectionId);
-      const isFreeGallery =
-        sectionId === 'gallery' &&
-        galleryIncludedWithDesign;
-
-      if (
-        !isFreeGallery &&
-        usedSectionCount >= sectionLimit
-      ) {
+      const isNewSection = !defaultSections.includes(sectionId);
+      if (isNewSection && addedSections.length >= 3) {
         return current;
       }
 
@@ -376,31 +347,6 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
     }
   };
 
-  const submitPaymentUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    setSubmitError('');
-    setSending(true);
-    try {
-      const response = await fetch('/api/orders/report-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderNumber: String(form.get('orderNumber') || ''),
-          paymentOperation: String(form.get('paymentOperation') || ''),
-          contact: String(form.get('contact') || '')
-        })
-      });
-      const result = await response.json() as { error?: string };
-      if (!response.ok) throw new Error(result.error || 'No pudimos informar el pago.');
-      setPaymentUpdated(true);
-    } catch {
-      setSubmitError(l('No pudimos informar el pago. Revisá tu conexión e intentá nuevamente.', 'We could not report the payment. Check your connection and try again.', 'Não foi possível informar o pagamento. Verifique sua conexão e tente novamente.'));
-    } finally {
-      setSending(false);
-    }
-  };
-
   return (
     <section id="crear" className="order-flow-section">
       <iframe name="order-submit-frame" title="Envío del pedido" style={{ display: 'none' }} />
@@ -413,19 +359,18 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
 
         {!started ? (
           <div className="order-start-card">
-            <h3>{l('¿Qué querés hacer?', 'What would you like to do?', 'O que você quer fazer?')}</h3>
-            <p>{l('El formulario aparece únicamente cuando iniciás un pedido o necesitás informar el pago de uno existente.', 'The form appears only when you start an order or report payment for an existing one.', 'O formulário aparece somente quando você inicia um pedido ou informa o pagamento de um pedido existente.')}</p>
+            <h3>{l('¿Cómo querés empezar?', 'How would you like to start?', 'Como você quer começar?')}</h3>
+            <p>{l('Las dos opciones forman parte del mismo pedido. Elegí la que te resulte más cómoda.', 'Both options are part of the same order. Choose whichever is easier for you.', 'As duas opções fazem parte do mesmo pedido. Escolha a mais conveniente.')}</p>
             <div className="order-start-actions">
-              <button className="btn-primary" onClick={() => { setStarted(true); setActiveTab('new'); }}>{l('Hacer el pedido y pagar después', 'Order now and pay later', 'Fazer o pedido e pagar depois')}</button>
-              <button className="btn-secondary" onClick={() => { setStarted(true); setActiveTab('pay-first'); }}>{l('Pagar primero', 'Pay first', 'Pagar primeiro')}</button>
-              <button className="btn-secondary" onClick={() => { setStarted(true); setActiveTab('payment'); }}>{l('Ya hice un pedido', 'I already placed an order', 'Já fiz um pedido')}</button>
+              <button className="btn-primary" onClick={() => { setStarted(true); setActiveTab('new'); }}>{l('Hacer el pedido y pagar', 'Order and pay', 'Fazer o pedido e pagar')}</button>
+              <button className="btn-secondary" onClick={() => { setStarted(true); setActiveTab('pay-first'); }}>{l('Pagar y hacer el pedido', 'Pay and place the order', 'Pagar e fazer o pedido')}</button>
             </div>
+            <a className="order-lookup-link" href="/consultar">{l('¿Ya tenés un pedido? Consultá su estado', 'Already have an order? Check its status', 'Já tem um pedido? Consulte o status')}</a>
           </div>
         ) : <>
         <div className="order-flow-tabs" role="tablist">
-          <button className={activeTab === 'new' ? 'active' : ''} onClick={() => setActiveTab('new')}>{l('Creá tu invite', 'Create your invite', 'Crie seu convite')}</button>
-          <button className={activeTab === 'pay-first' ? 'active' : ''} onClick={() => setActiveTab('pay-first')}>{l('Pagar primero', 'Pay first', 'Pagar primeiro')}</button>
-          <button className={activeTab === 'payment' ? 'active' : ''} onClick={() => setActiveTab('payment')}>{l('Ya creaste tu invite', 'Already created yours?', 'Já criou seu convite?')}</button>
+          <button className={activeTab === 'new' ? 'active' : ''} onClick={() => setActiveTab('new')}>{l('Pedido → pago', 'Order → payment', 'Pedido → pagamento')}</button>
+          <button className={activeTab === 'pay-first' ? 'active' : ''} onClick={() => setActiveTab('pay-first')}>{l('Pago → pedido', 'Payment → order', 'Pagamento → pedido')}</button>
         </div>
 
         {activeTab === 'pay-first' && (
@@ -433,7 +378,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
             <div className="order-form-block">
               <div className="order-block-title"><span>1</span><div><h3>{l('Elegí el plan y pagá', 'Choose a plan and pay', 'Escolha o plano e pague')}</h3><p>{l('Primero dejanos tus datos para poder identificar el pago. Después de informarlo vas a completar el pedido.', 'First leave your details so we can identify the payment. After reporting it, you will complete the order.', 'Primeiro deixe seus dados para identificarmos o pagamento. Depois, você completará o pedido.')}</p></div></div>
               <div className="order-plan-grid">
-                {(['basic', 'premium'] as Plan[]).map((item) => <button type="button" key={item} className={`order-plan-card ${plan === item ? 'active' : ''}`} onClick={() => setPlan(item)}><small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{item === 'basic' ? l('Básico', 'Basic', 'Básico') : 'Premium'}</h4><strong>{PLAN_PRICES[item]}</strong><p>{item === 'basic' ? l('Hasta 5 secciones.', 'Up to 5 sections.', 'Até 5 seções.') : l('Hasta 8 secciones.', 'Up to 8 sections.', 'Até 8 seções.')}</p></button>)}
+                {(['basic', 'premium'] as Plan[]).map((item) => <button type="button" key={item} className={`order-plan-card ${plan === item ? 'active' : ''}`} onClick={() => setPlan(item)}><small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{item === 'basic' ? l('Básico', 'Basic', 'Básico') : 'Premium'}</h4><strong>{PLAN_PRICES[item]}</strong><p>{item === 'basic' ? l('Plantilla original y hasta 5 fotos si incluye galería.', 'Original template and up to 5 photos when it includes a gallery.', 'Modelo original e até 5 fotos quando inclui galeria.') : l('Hasta 3 secciones nuevas, podés eliminar existentes y usar hasta 8 fotos.', 'Add up to 3 sections, remove existing ones and use up to 8 photos.', 'Adicione até 3 seções, remova existentes e use até 8 fotos.')}</p></button>)}
               </div>
               <div className="form-row-2col">
                 <div className="form-group"><label className="form-label">{l('Nombre y apellido', 'Full name', 'Nome e sobrenome')}</label><input name="name" className="form-input" required /></div>
@@ -466,7 +411,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
             </div>
             <p className="order-status-note">{l('Estado inicial: pedido recibido. La publicación final se libera después de validar el pago.', 'Initial status: order received. Final publication is released after payment validation.', 'Estado inicial: pedido recebido. A publicação final é liberada após a validação do pagamento.')}</p>
             {submittedStatusUrl && <a className="btn-secondary" href={submittedStatusUrl}>{l('Consultar estado', 'Check status', 'Consultar status')}</a>}
-            <button className="btn-secondary" onClick={() => { setActiveTab('payment'); setPaymentUpdated(false); }}>{l('Informar un pago', 'Report a payment', 'Informar um pagamento')}</button>
+            <a className="btn-secondary" href="/consultar">{l('Consultar o informar el pago', 'Check or report payment', 'Consultar ou informar o pagamento')}</a>
           </div>
         ) : (
           <form className="order-form" onSubmit={submitOrder} encType="multipart/form-data">
@@ -474,16 +419,16 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
               <div className="order-block-title"><span>1</span><div><h3>{l('Elegí tu plan', 'Choose your plan', 'Escolha seu plano')}</h3><p>{l('La portada está incluida y no cuenta como sección.', 'The cover is included and does not count as a section.', 'A capa está incluída e não conta como seção.')}</p></div></div>
               <div className="order-plan-grid">
                 <button type="button" className={`order-plan-card ${plan === 'basic' ? 'active' : ''}`} onClick={() => setPlan('basic')}>
-                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{l('Básico', 'Basic', 'Básico')}</h4><strong>{PLAN_PRICES.basic}</strong><p>{l('Hasta 5 secciones. Galería de hasta 5 fotos cuando el diseño la incluye.', 'Up to 5 sections. Gallery with up to 5 photos when included in the design.', 'Até 5 seções. Galeria de até 5 fotos quando incluída no design.')}</p>
+                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>{l('Básico', 'Basic', 'Básico')}</h4><strong>{PLAN_PRICES.basic}</strong><p>{l('La plantilla conserva sus secciones. Hasta 5 fotos cuando incluye galería.', 'The template keeps its sections. Up to 5 photos when it includes a gallery.', 'O modelo mantém suas seções. Até 5 fotos quando inclui galeria.')}</p>
                 </button>
                 <button type="button" className={`order-plan-card ${plan === 'premium' ? 'active' : ''}`} onClick={() => setPlan('premium')}>
-                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>Premium</h4><strong>{PLAN_PRICES.premium}</strong><p>{l('Hasta 8 secciones. Galería de hasta 8 fotos si la elegís.', 'Up to 8 sections. Gallery with up to 8 photos if selected.', 'Até 8 seções. Galeria de até 8 fotos, se escolhida.')}</p>
+                  <small>{l('PLAN', 'PLAN', 'PLANO')}</small><h4>Premium</h4><strong>{PLAN_PRICES.premium}</strong><p>{l('Agregá hasta 3 secciones, eliminá las que no necesites y usá hasta 8 fotos.', 'Add up to 3 sections, remove what you do not need and use up to 8 photos.', 'Adicione até 3 seções, remova as desnecessárias e use até 8 fotos.')}</p>
                 </button>
               </div>
             </div>
 
             <div className="order-form-block">
-              <div className="order-block-title"><span>2</span><div><h3>{l('Elegí el modelo y las secciones', 'Choose the model and sections', 'Escolha o modelo e as seções')}</h3><p>{usedSectionCount} {l('de', 'of', 'de')} {sectionLimit} {l('secciones contabilizadas.', 'counted sections.', 'seções contabilizadas.')} {galleryIncludedWithDesign && l('La galería y la portada están incluidas sin consumir lugares.', 'Gallery and cover are included without using slots.', 'Galeria e capa estão incluídas sem consumir vagas.')}</p></div></div>
+              <div className="order-block-title"><span>2</span><div><h3>{l('Elegí el modelo', 'Choose the template', 'Escolha o modelo')}</h3><p>{plan === 'basic' ? l('Usaremos las secciones originales de la plantilla.', 'We will use the template’s original sections.', 'Usaremos as seções originais do modelo.') : l(`Podés eliminar secciones y agregar hasta 3 nuevas. Agregaste ${addedSections.length} de 3.`, `You may remove sections and add up to 3 new ones. You added ${addedSections.length} of 3.`, `Você pode remover seções e adicionar até 3 novas. Adicionou ${addedSections.length} de 3.`)}</p></div></div>
               <span className="form-label">{l('Primero, elegí el tipo de evento', 'First, choose the event type', 'Primeiro, escolha o tipo de evento')}</span>
               <div className="order-event-categories" role="group" aria-label="Tipo de evento">
                 {([
@@ -517,26 +462,25 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
                   ))}
                 </div>
               </div>
-              <div className="order-sections-grid">
+              {plan === 'basic' ? (
+                <div className="basic-template-summary">
+                  <strong>{l('Secciones incluidas en esta plantilla', 'Sections included in this template', 'Seções incluídas neste modelo')}</strong>
+                  <p>{defaultSections.filter((id) => id !== 'music').map((id) => sectionOptions.find((item) => item.id === id)?.title || id).join(' · ')}</p>
+                </div>
+              ) : <div className="order-sections-grid">
                 {sectionOptions.map((section) => {
                   const includedByDefault = defaultSections.includes(section.id);
                   const selected = sections.includes(section.id);
-                  const isFreeGallery =
-                    section.id === 'gallery' &&
-                    galleryIncludedWithDesign;
-                  const disabled =
-                    !selected &&
-                    !isFreeGallery &&
-                    usedSectionCount >= sectionLimit;
+                  const disabled = !selected && !includedByDefault && addedSections.length >= 3;
                   return (
                     <button type="button" key={section.id} disabled={disabled} className={`order-section-option ${selected ? 'active' : ''} ${includedByDefault ? 'included' : ''}`} onClick={() => toggleSection(section.id)}>
                       <span className="order-section-check">{selected ? '✓' : '+'}</span>
-                      <span><strong>{section.title}</strong><small>{includedByDefault ? l('Incluida por defecto; podés cambiarla · ', 'Included by default; you can change it · ', 'Incluída por padrão; você pode alterá-la · ') : ''}{section.description}</small></span>
+                      <span><strong>{section.title}</strong><small>{includedByDefault ? l('Incluida en la plantilla; podés eliminarla · ', 'Included in the template; you may remove it · ', 'Incluída no modelo; você pode removê-la · ') : l('Sección nueva · ', 'New section · ', 'Nova seção · ')}{section.description}</small></span>
                     </button>
                   );
                 })}
-              </div>
-              {rsvpSelected && <div className="rsvp-included-note"><strong>{l('RSVP completo incluido', 'Complete RSVP included', 'RSVP completo incluído')}</strong><span>{l('Google Sheets · link de envío · restricciones alimentarias para catering · cédula para control de ingreso.', 'Google Sheets · sending link · dietary restrictions for catering · ID for access control.', 'Google Sheets · link de envio · restrições alimentares para catering · documento para controle de entrada.')}</span></div>}
+              </div>}
+              {rsvpSelected && <div className="rsvp-included-note"><strong>{l('RSVP completo incluido', 'Complete RSVP included', 'RSVP completo incluído')}</strong><span>{l('Google Sheets · link de envío · restricciones alimentarias para catering.', 'Google Sheets · sending link · dietary restrictions for catering.', 'Google Sheets · link de envio · restrições alimentares para catering.')}</span></div>}
             </div>
 
             <div className="order-form-block">
@@ -563,7 +507,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
 
               {activeSections.has('location') && <div className="dynamic-section-fields"><h4>{l('Ubicación y mapa', 'Location and map', 'Localização e mapa')}</h4><div className="form-group"><label className="form-label">{l('Nombre del lugar', 'Venue name', 'Nome do local')}</label><input name="locationName" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Dirección completa', 'Full address', 'Endereço completo')}</label><input name="locationAddress" className="form-input" required /></div><div className="form-group"><label className="form-label">Google Maps / Waze</label><input name="locationMap" className="form-input" type="url" required placeholder="https://..." /></div></div>}
 
-              {activeSections.has('rsvp') && <div className="dynamic-section-fields"><h4>RSVP</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha límite para confirmar', 'RSVP deadline', 'Prazo para confirmação')}</label><input name="rsvpDeadline" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Cantidad máxima por invitación', 'Maximum guests per invitation', 'Máximo de convidados por convite')}</label><input name="rsvpMaxGuests" className="form-input" type="number" min="1" required /></div></div><div className="form-group"><label className="form-label">{l('Texto o indicaciones para confirmar', 'RSVP instructions', 'Instruções para confirmação')}</label><textarea name="rsvpInstructions" className="form-textarea" required /></div><p className="dynamic-help">{l('La planilla incluirá nombre, asistencia, acompañantes, restricciones alimentarias y cédula de identidad.', 'The spreadsheet will include name, attendance, guests, dietary restrictions and ID.', 'A planilha incluirá nome, presença, acompanhantes, restrições alimentares e documento.')}</p></div>}
+              {activeSections.has('rsvp') && <div className="dynamic-section-fields"><h4>RSVP</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha límite para confirmar', 'RSVP deadline', 'Prazo para confirmação')}</label><input name="rsvpDeadline" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Cantidad máxima por invitación', 'Maximum guests per invitation', 'Máximo de convidados por convite')}</label><input name="rsvpMaxGuests" className="form-input" type="number" min="1" required /></div></div><div className="form-group"><label className="form-label">{l('Texto o indicaciones para confirmar', 'RSVP instructions', 'Instruções para confirmação')}</label><textarea name="rsvpInstructions" className="form-textarea" required /></div><p className="dynamic-help">{l('La planilla incluirá nombre, asistencia, acompañantes y restricciones alimentarias.', 'The spreadsheet will include name, attendance, guests and dietary restrictions.', 'A planilha incluirá nome, presença, acompanhantes e restrições alimentares.')}</p></div>}
 
               {activeSections.has('gifts') && <div className="dynamic-section-fields"><h4>Regalos</h4><p>Podés agregar hasta 3 cuentas bancarias, listas o lugares de compra.</p>{[1, 2, 3].map((item) => <div className="gift-row" key={item}><select name={`gift${item}Type`} className="form-select" required={item === 1}><option value="">Tipo {item}</option><option>Cuenta bancaria</option><option>Link de compra</option><option>Lista de regalos</option><option>Otro</option></select><input name={`gift${item}Label`} className="form-input" required={item === 1} placeholder={`Banco, tienda o título${item > 1 ? ' (opcional)' : ''}`} /><input name={`gift${item}Detail`} className="form-input" required={item === 1} placeholder="Alias, número de cuenta o link" /></div>)}</div>}
 
@@ -593,24 +537,10 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
             </div>
 
             {submitError && <p className="order-error" role="alert">{submitError}</p>}
-            <button className="btn-form-submit order-submit" type="submit" disabled={sending || activeSections.size === 0 || usedSectionCount > sectionLimit || !!photoError}>{sending ? l('Enviando pedido…', 'Sending order…', 'Enviando pedido…') : l('Enviar mi pedido', 'Send my order', 'Enviar meu pedido')}</button>
+            <button className="btn-form-submit order-submit" type="submit" disabled={sending || activeSections.size === 0 || addedSections.length > 3 || !!photoError}>{sending ? l('Enviando pedido…', 'Sending order…', 'Enviando pedido…') : l('Enviar mi pedido', 'Send my order', 'Enviar meu pedido')}</button>
           </form>
         ))}
 
-        {activeTab === 'payment' && (paymentUpdated ? (
-          <div className="order-success-card"><span>✓</span><h3>{l('Pago informado', 'Payment reported', 'Pagamento informado')}</h3><p>{l('Recibimos el número de operación. Lo verificaremos internamente y actualizaremos el estado de tu pedido.', 'We received the transaction number. We will verify it and update your order status.', 'Recebemos o número da operação. Vamos verificá-lo e atualizar o status do seu pedido.')}</p><strong>{l('Pendiente de validación', 'Pending validation', 'Pendente de validação')}</strong></div>
-        ) : (
-          <form className="order-form payment-update-form" onSubmit={submitPaymentUpdate}>
-            <div className="order-form-block">
-              <div className="order-block-title"><span>✓</span><div><h3>{l('Informá el pago de un pedido existente', 'Report payment for an existing order', 'Informe o pagamento de um pedido existente')}</h3><p>{l('No necesitás volver a cargar los datos de tu invitación.', 'You do not need to enter your invitation details again.', 'Você não precisa preencher novamente os dados do convite.')}</p></div></div>
-              <div className="form-group"><label className="form-label">{l('Número de pedido', 'Order number', 'Número do pedido')}</label><input name="orderNumber" className="form-input" required placeholder="SYD-ABCD-2345" autoCapitalize="characters" spellCheck={false} /></div>
-              <div className="form-group"><label className="form-label">{l('Número de operación de Mercado Pago', 'Mercado Pago transaction number', 'Número da operação do Mercado Pago')}</label><input name="paymentOperation" className="form-input" required /></div>
-              <div className="form-group"><label className="form-label">{l('Email o WhatsApp usado en el pedido', 'Email or WhatsApp used for the order', 'E-mail ou WhatsApp usado no pedido')}</label><input name="contact" className="form-input" required /></div>
-              {submitError && <p className="order-error" role="alert">{submitError}</p>}
-              <button className="btn-form-submit" type="submit" disabled={sending}>{sending ? l('Enviando…', 'Sending…', 'Enviando…') : l('Enviar número de operación', 'Send transaction number', 'Enviar número da operação')}</button>
-            </div>
-          </form>
-        ))}
         </>}
       </div>
     </section>

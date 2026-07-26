@@ -19,6 +19,7 @@ export default function PaymentValidationPage() {
   const [approved, setApproved] = useState(false);
   const [delivered, setDelivered] = useState(false);
   const [deliverySuccess, setDeliverySuccess] = useState('');
+  const [progressSuccess, setProgressSuccess] = useState('');
 
   useEffect(() => {
     fetch(`/api/orders/approve?token=${encodeURIComponent(token)}`)
@@ -77,6 +78,28 @@ export default function PaymentValidationPage() {
     }
   };
 
+  const sendProgress = async (event: 'order_reviewed' | 'changes_applied') => {
+    setSending(true);
+    setError('');
+    setProgressSuccess('');
+    try {
+      const response = await fetch('/api/orders/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, event })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setProgressSuccess(event === 'order_reviewed'
+        ? 'El cliente recibió la confirmación de que revisamos el pedido.'
+        : 'El cliente recibió el aviso de modificaciones realizadas.');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No pudimos enviar la actualización.');
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <main className="private-order-page">
       <section className="private-order-card">
@@ -88,7 +111,7 @@ export default function PaymentValidationPage() {
         ) : approved ? (
           <>
             <span className="private-order-icon">{delivered ? '✓' : '↗'}</span>
-            <h1>{delivered ? 'Invitación entregada' : 'Entregar invitación'}</h1>
+            <h1>{delivered ? 'Invitación entregada' : 'Pago validado'}</h1>
             <p>Pedido <strong>{order.orderNumber}</strong> · {order.customerName}</p>
             {delivered && !deliverySuccess ? (
               <>
@@ -98,7 +121,19 @@ export default function PaymentValidationPage() {
             ) : deliverySuccess ? (
               <p className="private-order-delivery-success">{deliverySuccess}</p>
             ) : (
+              <>
+              <div className="admin-progress-actions">
+                <strong>Informar avances</strong>
+                <p>Usá solamente el aviso que corresponda. Cada botón envía un email inmediato.</p>
+                <button type="button" onClick={() => sendProgress('order_reviewed')} disabled={sending}>Pedido revisado</button>
+                <button type="button" onClick={() => sendProgress('changes_applied')} disabled={sending}>Modificaciones realizadas</button>
+                {progressSuccess && <p className="private-order-delivery-success">{progressSuccess}</p>}
+              </div>
               <form className="delivery-form" onSubmit={deliver}>
+                <div className="delivery-form-heading">
+                  <strong>Entrega final</strong>
+                  <p>Completá estos enlaces recién cuando la invitación personalizada esté terminada. No es necesario hacerlo al validar el pago.</p>
+                </div>
                 <label>
                   <span>Link de la invitación personalizada</span>
                   <input name="invitationUrl" type="url" required placeholder="https://..." defaultValue={order.invitationUrl || ''} />
@@ -113,6 +148,7 @@ export default function PaymentValidationPage() {
                 </button>
                 {error && <p className="private-order-error">{error}</p>}
               </form>
+              </>
             )}
           </>
         ) : (
