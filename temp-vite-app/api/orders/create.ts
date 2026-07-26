@@ -1,5 +1,6 @@
 import {
   appUrl,
+  customerHelpHtml,
   approvalTokenFor,
   createOrderNumber,
   emailButton,
@@ -60,7 +61,9 @@ async function handler(request: Request) {
     const adminEmail = process.env.ORDER_ADMIN_EMAIL || 'saveyourdate.invite@gmail.com';
     const customerCopy = {
       es: {
-        subject: `Recibimos tu pedido ${orderNumber}`,
+        subject: paymentOperation
+          ? `[${orderNumber}] Pedido recibido y pago informado — estamos verificándolo`
+          : `[${orderNumber}] Pedido recibido — próximo paso: realizar el pago`,
         title: '¡Recibimos tu pedido!',
         hello: `Hola ${safeName}, tu número de pedido es`,
         status: paymentOperation ? 'Pago informado' : 'Pago pendiente',
@@ -68,7 +71,9 @@ async function handler(request: Request) {
         note: 'Guardá este correo: el enlace es privado.'
       },
       en: {
-        subject: `We received your order ${orderNumber}`,
+        subject: paymentOperation
+          ? `[${orderNumber}] Order received and payment reported — verification in progress`
+          : `[${orderNumber}] Order received — next step: complete payment`,
         title: 'We received your order!',
         hello: `Hi ${safeName}, your order number is`,
         status: paymentOperation ? 'Payment reported' : 'Payment pending',
@@ -76,7 +81,9 @@ async function handler(request: Request) {
         note: 'Keep this email: the link is private.'
       },
       pt: {
-        subject: `Recebemos seu pedido ${orderNumber}`,
+        subject: paymentOperation
+          ? `[${orderNumber}] Pedido recebido e pagamento informado — estamos verificando`
+          : `[${orderNumber}] Pedido recebido — próximo passo: realizar o pagamento`,
         title: 'Recebemos seu pedido!',
         hello: `Olá ${safeName}, o número do seu pedido é`,
         status: paymentOperation ? 'Pagamento informado' : 'Pagamento pendente',
@@ -95,7 +102,8 @@ async function handler(request: Request) {
           `<p>${customerCopy.hello} <strong>${orderNumber}</strong>.</p>
            <p><strong>${customerCopy.status}</strong>.</p>
            ${emailButton(customerCopy.button, statusUrl)}
-           <p style="font-size:13px;color:#765f69">${customerCopy.note}</p>`
+           <p style="font-size:13px;color:#765f69">${customerCopy.note}</p>
+           ${customerHelpHtml(language, orderNumber)}`
         )
       }),
       sendEmail({

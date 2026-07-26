@@ -208,7 +208,7 @@ const TRANSLATIONS = {
       tag: "Invitaciones Digitales Premium",
       title1: "Tu evento empieza en la",
       titleHighlight: "primera pantalla",
-      desc: "Diseñamos invitaciones digitales hermosas, interactivas y orientadas a tus invitados. Con cuenta regresiva, confirmación de asistencia en tiempo real, mapas, música y mucho más. Todo en un solo link fácil de compartir.",
+      desc: "Elegí una plantilla, envianos la información y recibí una invitación personalizada, lista para compartir desde un solo link.",
       ctaPrimary: "Crea tu invite ♥",
       ctaSecondary: "Ver modelos",
       miniCountdown: "FALTAN SOLO",
@@ -272,7 +272,7 @@ const TRANSLATIONS = {
         { q: "¿Cómo informo un pago de Mercado Pago?", a: "Si ya pagaste, podés pegar el número de operación en el formulario del pedido. Si pagás después, ingresá en ‘Ya creaste tu invite’ y enviá tu número de pedido junto con el número de operación." },
         { q: "¿Qué incluye el Plan Básico?", a: "Incluye portada cuando el modelo la lleve, hasta 5 secciones elegidas por vos y galería de hasta 5 fotos cuando la galería sea una de las secciones seleccionadas. También podés agregar música de fondo sin consumir una sección." },
         { q: "¿Qué incluye el Plan Premium?", a: "Incluye portada cuando el modelo la lleve, hasta 8 secciones elegidas por vos y galería de hasta 8 fotos cuando la galería sea una de las secciones seleccionadas. También podés agregar música de fondo sin consumir una sección." },
-        { q: "¿Qué incluye la confirmación de asistencia?", a: "La sección RSVP incluye formulario de confirmación, Google Sheets, link de envío, registro de restricciones alimentarias para catering y cédula de identidad para control de ingreso." }
+        { q: "¿Qué incluye la confirmación de asistencia?", a: "La sección RSVP incluye formulario de confirmación, Google Sheets, link de envío y registro de restricciones alimentarias para catering." }
       ]
     },
     portal: {
@@ -514,7 +514,7 @@ const TRANSLATIONS = {
       tag: "Premium Digital Invitations",
       title1: "Your event starts on the",
       titleHighlight: "first screen",
-      desc: "We design beautiful, interactive, and guest-oriented digital invitations. Featuring live count down, real-time RSVP confirmations, maps, background music, and much more. All in a single easy-to-share link.",
+      desc: "Choose a template, send us your information and receive a personalized invitation ready to share from one simple link.",
       ctaPrimary: "Create your invite ♥",
       ctaSecondary: "View models",
       miniCountdown: "ONLY REMAINING",
@@ -817,7 +817,7 @@ const TRANSLATIONS = {
       tag: "Convites Digitais Premium",
       title1: "Seu evento começa na",
       titleHighlight: "primeira tela",
-      desc: "Desenhamos convites digitais bonitos, interativos e focados nos seus convidados. Com contagem regressiva, confirmação de presença em tempo real, mapas, música e muito mais. Tudo num link fácil de compartilhar.",
+      desc: "Escolha um modelo, envie suas informações e receba um convite personalizado, pronto para compartilhar em um único link.",
       ctaPrimary: "Crie seu convite ♥",
       ctaSecondary: "Ver modelos",
       miniCountdown: "FALTAM SÓ",
@@ -1992,7 +1992,9 @@ function App() {
             <a href="#modelos" className="nav-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
             <a href="#incluyen" className="nav-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
             <a href="#planes" className="nav-link" onClick={(e) => handleScrollToSection(e, 'planes')}>{lang === 'es' ? 'Planes' : (lang === 'en' ? 'Plans' : 'Planos')}</a>
+            <a href="#pedido" className="nav-link" onClick={(e) => handleScrollToSection(e, 'pedido')}>{lang === 'es' ? 'Cómo funciona' : (lang === 'en' ? 'How it works' : 'Como funciona')}</a>
             <a href="#preguntas" className="nav-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{lang === 'es' ? 'Preguntas' : 'FAQ'}</a>
+            <a href="/consultar" className="nav-link nav-order-status">{lang === 'es' ? 'Consultar pedido' : (lang === 'en' ? 'Check order' : 'Consultar pedido')}</a>
             
             {/* Language Selector in Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#fafafa', border: '1px solid var(--color-border)', borderRadius: '15px', padding: '2px 8px', marginLeft: '8px' }}>
@@ -2028,7 +2030,9 @@ function App() {
         <a href="#modelos" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
         <a href="#incluyen" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
         <a href="#planes" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'planes')}>{lang === 'es' ? 'Planes' : (lang === 'en' ? 'Plans' : 'Planos')}</a>
+        <a href="#pedido" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'pedido')}>{lang === 'es' ? 'Cómo funciona' : (lang === 'en' ? 'How it works' : 'Como funciona')}</a>
         <a href="#preguntas" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{lang === 'es' ? 'Preguntas' : 'FAQ'}</a>
+        <a href="/consultar" className="sidebar-link">{lang === 'es' ? 'Consultar pedido' : (lang === 'en' ? 'Check order' : 'Consultar pedido')}</a>
         
         {/* Language Selector in Sidebar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 0', borderBottom: '1px solid var(--color-border)' }}>
@@ -2286,37 +2290,37 @@ function App() {
         <div className="container">
           <div className="section-header plans-header">
             <span className="section-subtitle">{lang === 'es' ? 'Dos opciones simples' : (lang === 'en' ? 'Two simple options' : 'Duas opções simples')}</span>
-            <h2 className="section-title">{lang === 'es' ? 'Elegí cuánto querés contar' : (lang === 'en' ? 'Choose how much you want to share' : 'Escolha quanto você quer contar')}</h2>
-            <p className="section-desc">{lang === 'es' ? 'La portada está incluida y no consume una sección. La música de fondo es opcional en ambos planes.' : (lang === 'en' ? 'The cover is included and does not count as a section. Background music is optional in both plans.' : 'A capa está incluída e não conta como seção. A música de fundo é opcional nos dois planos.')}</p>
+            <h2 className="section-title">{lang === 'es' ? 'Elegí cuánto querés adaptar' : (lang === 'en' ? 'Choose how much you want to customize' : 'Escolha quanto deseja adaptar')}</h2>
+            <p className="section-desc">{lang === 'es' ? 'En ambos planes personalizamos textos, datos y colores disponibles. Premium también permite modificar la estructura.' : (lang === 'en' ? 'Both plans personalize text, details and available colors. Premium also lets you change the structure.' : 'Nos dois planos personalizamos textos, dados e cores disponíveis. O Premium também permite alterar a estrutura.')}</p>
           </div>
 
           <div className="plans-comparison">
             <article className="plan-card-simple">
               <span className="plan-label">{lang === 'es' ? 'PLAN BÁSICO' : (lang === 'en' ? 'BASIC PLAN' : 'PLANO BÁSICO')}</span>
-              <h3>{lang === 'es' ? 'Lo esencial, bien contado' : (lang === 'en' ? 'Everything essential' : 'O essencial, bem contado')}</h3>
+              <h3>{lang === 'es' ? 'La plantilla lista para vos' : (lang === 'en' ? 'The ready-made template' : 'O modelo pronto para você')}</h3>
               <ul>
-                <li><strong>5</strong> {lang === 'es' ? 'secciones a elección' : (lang === 'en' ? 'sections of your choice' : 'seções à escolha')}</li>
-                <li>{lang === 'es' ? 'Galería de hasta 5 fotos' : (lang === 'en' ? 'Gallery with up to 5 photos' : 'Galeria de até 5 fotos')}</li>
-                <li>{lang === 'es' ? 'Portada incluida' : (lang === 'en' ? 'Cover included' : 'Capa incluída')}</li>
-                <li>{lang === 'es' ? 'Música opcional' : (lang === 'en' ? 'Optional music' : 'Música opcional')}</li>
+                <li>{lang === 'es' ? 'Secciones originales del modelo' : (lang === 'en' ? 'Original template sections' : 'Seções originais do modelo')}</li>
+                <li>{lang === 'es' ? 'Hasta 5 fotos si incluye galería' : (lang === 'en' ? 'Up to 5 photos when a gallery is included' : 'Até 5 fotos quando inclui galeria')}</li>
+                <li>{lang === 'es' ? 'Textos, datos y colores personalizados' : (lang === 'en' ? 'Personalized text, details and colors' : 'Textos, dados e cores personalizados')}</li>
+                <li>{lang === 'es' ? 'Sin cambios de estructura' : (lang === 'en' ? 'No structural changes' : 'Sem alterações de estrutura')}</li>
               </ul>
               <a href="#crear" className="plan-cta" onClick={(e) => { handleScrollToSection(e, 'crear'); window.dispatchEvent(new CustomEvent('start-saveyourdate-order', { detail: { plan: 'basic' } })); }}>{lang === 'es' ? 'Elegir Básico' : (lang === 'en' ? 'Choose Basic' : 'Escolher Básico')}</a>
             </article>
 
             <article className="plan-card-simple featured">
               <span className="plan-label">{lang === 'es' ? 'PLAN PREMIUM' : (lang === 'en' ? 'PREMIUM PLAN' : 'PLANO PREMIUM')}</span>
-              <h3>{lang === 'es' ? 'Más espacio para cada detalle' : (lang === 'en' ? 'More room for every detail' : 'Mais espaço para cada detalhe')}</h3>
+              <h3>{lang === 'es' ? 'La plantilla adaptada a tu evento' : (lang === 'en' ? 'A template adapted to your event' : 'O modelo adaptado ao seu evento')}</h3>
               <ul>
-                <li><strong>8</strong> {lang === 'es' ? 'secciones a elección' : (lang === 'en' ? 'sections of your choice' : 'seções à escolha')}</li>
+                <li>{lang === 'es' ? 'Todo lo incluido en Básico' : (lang === 'en' ? 'Everything in Basic' : 'Tudo do plano Básico')}</li>
+                <li><strong>+3</strong> {lang === 'es' ? 'secciones nuevas como máximo' : (lang === 'en' ? 'new sections maximum' : 'novas seções no máximo')}</li>
+                <li>{lang === 'es' ? 'Podés eliminar secciones existentes' : (lang === 'en' ? 'Remove existing sections' : 'Remova seções existentes')}</li>
                 <li>{lang === 'es' ? 'Galería de hasta 8 fotos' : (lang === 'en' ? 'Gallery with up to 8 photos' : 'Galeria de até 8 fotos')}</li>
-                <li>{lang === 'es' ? 'Portada incluida' : (lang === 'en' ? 'Cover included' : 'Capa incluída')}</li>
-                <li>{lang === 'es' ? 'Música opcional' : (lang === 'en' ? 'Optional music' : 'Música opcional')}</li>
               </ul>
               <a href="#crear" className="plan-cta" onClick={(e) => { handleScrollToSection(e, 'crear'); window.dispatchEvent(new CustomEvent('start-saveyourdate-order', { detail: { plan: 'premium' } })); }}>{lang === 'es' ? 'Elegir Premium' : (lang === 'en' ? 'Choose Premium' : 'Escolher Premium')}</a>
             </article>
           </div>
 
-          <p className="plans-rsvp-note"><img src="/features/feature-rsvp.png" alt="" />{lang === 'es' ? 'Si elegís RSVP, incluye Google Sheets, link de envío, restricciones alimentarias y cédula para control de ingreso.' : (lang === 'en' ? 'If you choose RSVP, it includes Google Sheets, sending link, dietary restrictions and ID for access control.' : 'Se escolher RSVP, inclui Google Sheets, link de envio, restrições alimentares e documento para controle de entrada.')}</p>
+          <p className="plans-rsvp-note"><img src="/features/feature-rsvp.png" alt="" />{lang === 'es' ? 'Si elegís RSVP, incluye Google Sheets, link de envío y restricciones alimentarias.' : (lang === 'en' ? 'If you choose RSVP, it includes Google Sheets, a sending link and dietary restrictions.' : 'Se escolher RSVP, inclui Google Sheets, link de envio e restrições alimentares.')}</p>
         </div>
       </section>
 
@@ -2341,7 +2345,6 @@ function App() {
             <div className="feature-group organizer-group">
               <div className="feature-group-heading"><span>✓</span><div><h3>{lang === 'es' ? 'Para organizarte' : (lang === 'en' ? 'For your planning' : 'Para sua organização')}</h3><p>{lang === 'es' ? 'Información ordenada y lista para usar.' : (lang === 'en' ? 'Organized information, ready to use.' : 'Informação organizada e pronta para usar.')}</p></div></div>
               <article className="feature-line"><img src="/features/feature-rsvp.png" alt="" /><div><h4>RSVP + Google Sheets</h4><p>{lang === 'es' ? 'Asistencia, acompañantes y respuestas en tiempo real.' : (lang === 'en' ? 'Attendance, guests and real-time responses.' : 'Presença, acompanhantes e respostas em tempo real.')}</p></div></article>
-              <article className="feature-line"><img src="/features/feature-responsive.png" alt="" /><div><h4>{lang === 'es' ? 'Control de ingreso' : (lang === 'en' ? 'Access control' : 'Controle de entrada')}</h4><p>{lang === 'es' ? 'Cédula de identidad y listado organizado para el evento.' : (lang === 'en' ? 'ID and an organized event list.' : 'Documento e lista organizada para o evento.')}</p></div></article>
               <article className="feature-line"><img src="/features/feature-gift.png" alt="" /><div><h4>{lang === 'es' ? 'Información para catering' : (lang === 'en' ? 'Catering information' : 'Informação para catering')}</h4><p>{lang === 'es' ? 'Restricciones alimentarias reunidas en una sola planilla.' : (lang === 'en' ? 'Dietary restrictions in one spreadsheet.' : 'Restrições alimentares em uma única planilha.')}</p></div></article>
               <article className="feature-line"><img src="/features/feature-responsive.png" alt="" /><div><h4>{lang === 'es' ? 'Link listo para enviar' : (lang === 'en' ? 'Ready-to-send link' : 'Link pronto para enviar')}</h4><p>{lang === 'es' ? 'Compartilo fácilmente por WhatsApp o correo.' : (lang === 'en' ? 'Share it easily by WhatsApp or email.' : 'Compartilhe facilmente por WhatsApp ou e-mail.')}</p></div></article>
             </div>

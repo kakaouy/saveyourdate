@@ -1,4 +1,5 @@
 import {
+  customerHelpHtml,
   emailButton,
   emailShell,
   escapeHtml,
@@ -43,7 +44,7 @@ async function handler(request: Request) {
     const safeSheetUrl = escapeHtml(sheetUrl);
     const copy = {
       es: {
-        subject: `Tu invitación está lista — ${order.order_number}`,
+        subject: `[${order.order_number}] Invitación definitiva lista — accedé a tu entrega`,
         title: '¡Tu invitación está lista!',
         hello: `Hola ${safeName}, terminamos tu invitación personalizada.`,
         open: 'Abrir mi invitación',
@@ -58,7 +59,7 @@ async function handler(request: Request) {
         note: 'Guardá este correo: contiene los accesos de tu evento.'
       },
       en: {
-        subject: `Your invitation is ready — ${order.order_number}`,
+        subject: `[${order.order_number}] Final invitation ready — access your delivery`,
         title: 'Your invitation is ready!',
         hello: `Hi ${safeName}, your personalized invitation is ready.`,
         open: 'Open my invitation',
@@ -73,7 +74,7 @@ async function handler(request: Request) {
         note: 'Keep this email: it contains your event links.'
       },
       pt: {
-        subject: `Seu convite está pronto — ${order.order_number}`,
+        subject: `[${order.order_number}] Convite definitivo pronto — acesse sua entrega`,
         title: 'Seu convite está pronto!',
         hello: `Olá ${safeName}, seu convite personalizado está pronto.`,
         open: 'Abrir meu convite',
@@ -100,7 +101,8 @@ async function handler(request: Request) {
          <h2 style="font-size:18px;margin-top:30px">${copy.guideTitle}</h2>
          ${copy.guide}
          ${sheetUrl ? `<p>${copy.sheetHelp}</p>${emailButton(copy.sheet, safeSheetUrl)}` : ''}
-         <p style="font-size:13px;color:#765f69;margin-top:28px">${copy.note}</p>`
+         <p style="font-size:13px;color:#765f69;margin-top:28px">${copy.note}</p>
+         ${customerHelpHtml(order.language, order.order_number)}`
       )
     });
 

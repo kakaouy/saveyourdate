@@ -4,19 +4,19 @@ const labels = {
   es: {
     pending_payment: 'Pago pendiente',
     payment_reported: 'Pago informado',
-    payment_validated: 'Pago validado',
+    payment_validated: 'Invitación en preparación',
     published: 'Invitación entregada'
   },
   en: {
     pending_payment: 'Payment pending',
     payment_reported: 'Payment reported',
-    payment_validated: 'Payment validated',
+    payment_validated: 'Invitation in preparation',
     published: 'Invitation delivered'
   },
   pt: {
     pending_payment: 'Pagamento pendente',
     payment_reported: 'Pagamento informado',
-    payment_validated: 'Pagamento validado',
+    payment_validated: 'Convite em preparação',
     published: 'Convite entregue'
   }
 };

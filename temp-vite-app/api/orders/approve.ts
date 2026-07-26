@@ -1,5 +1,6 @@
 import {
   appUrl,
+  customerHelpHtml,
   emailButton,
   emailShell,
   escapeHtml,
@@ -51,21 +52,21 @@ async function handler(request: Request) {
     const previewUrl = `${appUrl()}/preparando?token=${encodeURIComponent(await previewTokenFor(order.order_number))}`;
     const customerCopy = {
       es: {
-        subject: `Pago validado — ${order.order_number}`,
+        subject: `[${order.order_number}] Pago validado — comenzamos tu invitación`,
         title: '¡Tu pago fue validado!',
         hello: `Hola ${escapeHtml(order.customer_name)}, confirmamos el pago de tu pedido`,
         message: 'Ya estamos preparando tu invitación. Mientras tanto, podés volver a ver el modelo que elegiste y avisarnos si necesitás cambiar o agregar información.',
         button: 'Ver modelo en preparación'
       },
       en: {
-        subject: `Payment validated — ${order.order_number}`,
+        subject: `[${order.order_number}] Payment validated — we are starting your invitation`,
         title: 'Your payment was validated!',
         hello: `Hi ${escapeHtml(order.customer_name)}, we confirmed payment for your order`,
         message: 'We are now preparing your invitation. In the meantime, you can review your chosen template and tell us if you need to change or add information.',
         button: 'View template in preparation'
       },
       pt: {
-        subject: `Pagamento validado — ${order.order_number}`,
+        subject: `[${order.order_number}] Pagamento validado — começamos seu convite`,
         title: 'Seu pagamento foi validado!',
         hello: `Olá ${escapeHtml(order.customer_name)}, confirmamos o pagamento do seu pedido`,
         message: 'Já estamos preparando seu convite. Enquanto isso, você pode rever o modelo escolhido e nos avisar se precisar alterar ou adicionar informações.',
@@ -82,7 +83,8 @@ async function handler(request: Request) {
           customerCopy.title,
           `<p>${customerCopy.hello} <strong>${order.order_number}</strong>.</p>
            <p>${customerCopy.message}</p>
-           ${emailButton(customerCopy.button, previewUrl)}`
+           ${emailButton(customerCopy.button, previewUrl)}
+           ${customerHelpHtml(order.language, order.order_number)}`
         )
       });
     } catch (emailError) {
