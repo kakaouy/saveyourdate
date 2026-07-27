@@ -925,6 +925,7 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
   const [backingUp, setBackingUp] = useState(false);
   const [reminderDaysBefore, setReminderDaysBefore] = useState(7);
   const [automaticRemindersEnabled, setAutomaticRemindersEnabled] = useState(false);
+  const [testingReminder, setTestingReminder] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/settings", { cache: "no-store" }).then(async (response) => {
@@ -979,6 +980,21 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
     }
   };
 
+  const sendTestReminder = async () => {
+    setTestingReminder(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/admin/test-reminder", { method: "POST" });
+      const result = await response.json() as { message?: string; error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos enviar la prueba.");
+      setMessage(result.message || "Correo de prueba enviado.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos enviar la prueba.");
+    } finally {
+      setTestingReminder(false);
+    }
+  };
+
   return <>
     <div className="page-heading"><div><span className="eyebrow">Preferencias del evento</span><h1>Configuración</h1><p>Definí valores predeterminados para automatizar la gestión.</p></div></div>
     <section className="panel settings-panel">
@@ -991,6 +1007,10 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
         <button className="primary-button small" disabled={saving} onClick={save}>{saving ? "Guardando…" : "Guardar configuración"}</button>
       </div>
       {message && <p className="settings-message" role="status">{message}</p>}
+    </section>
+    <section className="panel settings-panel">
+      <div className="panel-title"><div><h2>Probar recordatorio por email</h2><p>Envía una muestra únicamente al email del propietario. No contacta invitados ni modifica confirmaciones.</p></div></div>
+      <div className="settings-form"><button className="outline-button" disabled={testingReminder} onClick={sendTestReminder}>{testingReminder ? "Enviando…" : "Enviar email de prueba"}</button></div>
     </section>
     <section className="panel settings-panel">
       <div className="panel-title"><div><h2>Respaldo de datos</h2><p>Descargá una copia completa del evento sin contraseñas, códigos ni secretos de autenticación.</p></div></div>
@@ -1033,6 +1053,7 @@ function Accesses({ order }: { order: AdminOrder }) {
     "guest.updated": "Actualizó un invitado",
     "guest.deleted": "Eliminó un invitado",
     "guest.reminded": "Registró un recordatorio",
+    "reminder.test_sent": "Envió un recordatorio de prueba",
     "table.created": "Creó una mesa",
     "table.updated": "Actualizó una mesa",
     "table.deleted": "Eliminó una mesa",

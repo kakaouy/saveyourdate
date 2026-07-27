@@ -8,6 +8,7 @@ import requestCode from '../_lib/admin/request-code.js';
 import session from '../_lib/admin/session.js';
 import settings from '../_lib/admin/settings.js';
 import tables from '../_lib/admin/tables.js';
+import testReminder from '../_lib/admin/test-reminder.js';
 import verifyCode from '../_lib/admin/verify-code.js';
 import { json } from '../_lib/orders.js';
 
@@ -22,6 +23,7 @@ const handlers: Record<string, { fetch: (request: Request) => Promise<Response> 
   session,
   settings,
   tables,
+  'test-reminder': testReminder,
   'verify-code': verifyCode
 };
 

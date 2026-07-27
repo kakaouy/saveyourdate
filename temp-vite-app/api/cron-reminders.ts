@@ -1,4 +1,5 @@
-import { appUrl, emailShell, escapeHtml, json, sendEmail, supabaseRequest } from './_lib/orders.js';
+import { appUrl, json, sendEmail, supabaseRequest } from './_lib/orders.js';
+import { reminderEmailHtml } from './_lib/reminder-email.js';
 import { isReminderDue, reminderDaysFor } from './_lib/reminder-rules.js';
 
 type ReminderOrder = {
@@ -44,13 +45,7 @@ async function handler(request: Request) {
             to: guest.email,
             subject: `Recordatorio de confirmación · ${eventTitle}`,
             idempotencyKey: `rsvp-reminder-${guest.id}-${daysBefore}`,
-            html: emailShell(
-              '¿Nos acompañás?',
-              `<p>Hola <strong>${escapeHtml(guest.name)}</strong>, falta poco para <strong>${escapeHtml(eventTitle)}</strong>.</p>
-               <p>Tu respuesta todavía está pendiente. Podés confirmar asistencia, acompañantes y preferencias desde este enlace:</p>
-               <p style="text-align:center;margin:28px 0"><a href="${confirmationUrl}" style="display:inline-block;padding:13px 22px;border-radius:9px;background:#0aabb0;color:#fff;text-decoration:none;font-weight:800">Confirmar asistencia</a></p>
-               <p style="font-size:13px;color:#765f69">Si ya respondiste por otro medio, podés ignorar este mensaje.</p>`
-            )
+            html: reminderEmailHtml({ recipientName: guest.name, eventTitle, actionUrl: confirmationUrl })
           });
           const remindedAt = new Date().toISOString();
           await supabaseRequest(
