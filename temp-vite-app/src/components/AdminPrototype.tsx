@@ -279,6 +279,26 @@ function Dashboard({ guests, onNavigate, order }: { guests: Guest[]; onNavigate:
   const responseRate = guests.length
     ? Math.round(((guests.length - pending) / guests.length) * 100)
     : 0;
+  const recentGuests = [...guests]
+    .filter((guest) => guest.updatedAt)
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 5);
+  const activityCopy = (guest: Guest) => {
+    if (guest.status === "Confirmado") return { title: `${guest.name} confirmó asistencia`, detail: `${guest.confirmed} ${guest.confirmed === 1 ? "persona" : "personas"} confirmadas`, tone: "avatar-mint" };
+    if (guest.status === "No asiste") return { title: `${guest.name} no asistirá`, detail: "La respuesta quedó registrada", tone: "avatar-coral" };
+    const remindedRecently = guest.reminded !== "—" && Math.abs(new Date(guest.reminded).getTime() - new Date(guest.updatedAt).getTime()) < 5000;
+    if (remindedRecently) return { title: `Recordatorio enviado a ${guest.name}`, detail: guest.phone || "WhatsApp sin registrar", tone: "avatar-blue" };
+    return { title: `${guest.name} fue actualizado`, detail: guest.group || "Sin grupo asignado", tone: "avatar-blue" };
+  };
+  const relativeTime = (value: string) => {
+    const minutes = Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 60000));
+    if (minutes < 1) return "Ahora";
+    if (minutes < 60) return `Hace ${minutes} min`;
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return `Hace ${hours} h`;
+    const days = Math.round(hours / 24);
+    return `Hace ${days} d`;
+  };
 
   return (
     <>
@@ -319,9 +339,12 @@ function Dashboard({ guests, onNavigate, order }: { guests: Guest[]; onNavigate:
 
       <section className="panel recent-panel">
         <div className="panel-title"><div><h2>Actividad reciente</h2><p>Últimas respuestas y cambios</p></div><button onClick={() => onNavigate("Confirmaciones")}>Ver todas →</button></div>
-        <div className="activity-list">{guests.length === 0
+        <div className="activity-list">{recentGuests.length === 0
           ? <div><p><strong>Todavía no hay actividad</strong><small>Los cambios aparecerán cuando agregues invitados y recibas respuestas.</small></p></div>
-          : <div><p><strong>Invitados cargados</strong><small>{guests.length} registros disponibles.</small></p></div>}
+          : recentGuests.map((guest) => {
+            const activity = activityCopy(guest);
+            return <div key={guest.id}><span className={`avatar ${activity.tone}`}>{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span><p><strong>{activity.title}</strong><small>{activity.detail}</small></p><time dateTime={guest.updatedAt} title={reportDate(guest.updatedAt)}>{relativeTime(guest.updatedAt)}</time></div>;
+          })}
         </div>
       </section>
     </>
