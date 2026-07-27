@@ -923,6 +923,15 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [backingUp, setBackingUp] = useState(false);
+  const [reminderDaysBefore, setReminderDaysBefore] = useState(7);
+
+  useEffect(() => {
+    fetch("/api/admin/settings", { cache: "no-store" }).then(async (response) => {
+      if (!response.ok) return;
+      const result = await response.json() as { reminderDaysBefore?: number };
+      setReminderDaysBefore(result.reminderDaysBefore || 7);
+    });
+  }, []);
 
   const save = async () => {
     const value = selection === "custom" ? customCode.trim() : selection;
@@ -932,11 +941,12 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
       const response = await fetch("/api/admin/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ defaultPhoneCountryCode: value })
+        body: JSON.stringify({ defaultPhoneCountryCode: value, reminderDaysBefore })
       });
-      const result = await response.json() as { defaultPhoneCountryCode?: string; error?: string };
+      const result = await response.json() as { defaultPhoneCountryCode?: string; reminderDaysBefore?: number; error?: string };
       if (!response.ok || !result.defaultPhoneCountryCode) throw new Error(result.error || "No pudimos guardar la configuración.");
       onChange(result.defaultPhoneCountryCode);
+      setReminderDaysBefore(result.reminderDaysBefore || reminderDaysBefore);
       setMessage("Configuración guardada. Los invitados nuevos usarán este código automáticamente.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No pudimos guardar la configuración.");
@@ -973,6 +983,7 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
       <div className="settings-form">
         <label>País<select value={selection} onChange={(event) => setSelection(event.target.value)}>{countryCodes.map(([country, value]) => <option key={value} value={value}>{country} {value}</option>)}<option value="custom">Otro país</option></select></label>
         {selection === "custom" && <label>Código internacional<input value={customCode} onChange={(event) => setCustomCode(event.target.value)} placeholder="+___" /></label>}
+        <label>Enviar recordatorio automático<input type="number" min="1" max="60" value={reminderDaysBefore} onChange={(event) => setReminderDaysBefore(Math.max(1, Math.min(60, Number(event.target.value) || 1)))} /><small>Días antes del evento</small></label>
         <button className="primary-button small" disabled={saving} onClick={save}>{saving ? "Guardando…" : "Guardar configuración"}</button>
       </div>
       {message && <p className="settings-message" role="status">{message}</p>}
