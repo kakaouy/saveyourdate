@@ -8,7 +8,6 @@ type ApprovalOrder = {
   paymentOperation: string | null;
   status: string;
   invitationUrl: string | null;
-  sheetUrl: string | null;
 };
 
 export default function PaymentValidationPage() {
@@ -63,8 +62,7 @@ export default function PaymentValidationPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           token,
-          invitationUrl: String(form.get('invitationUrl') || ''),
-          sheetUrl: String(form.get('sheetUrl') || '')
+          invitationUrl: String(form.get('invitationUrl') || '')
         })
       });
       const data = await response.json();
@@ -138,11 +136,7 @@ export default function PaymentValidationPage() {
                   <span>Link de la invitación personalizada</span>
                   <input name="invitationUrl" type="url" required placeholder="https://..." defaultValue={order.invitationUrl || ''} />
                 </label>
-                <label>
-                  <span>Link de Google Sheets <small>(opcional)</small></span>
-                  <input name="sheetUrl" type="url" placeholder="https://docs.google.com/..." defaultValue={order.sheetUrl || ''} />
-                </label>
-                <p className="private-order-warning">Revisá ambos enlaces antes de enviar. El cliente recibirá inmediatamente el email final.</p>
+                <p className="private-order-warning">Revisá el enlace antes de enviar. El cliente recibirá la invitación y el acceso a su panel personalizado.</p>
                 <button className="private-order-approve" type="submit" disabled={sending}>
                   {sending ? 'Enviando…' : 'Guardar y enviar al cliente'}
                 </button>

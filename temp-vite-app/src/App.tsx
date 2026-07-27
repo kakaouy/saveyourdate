@@ -269,7 +269,7 @@ const TRANSLATIONS = {
         { q: "¿Qué incluye el Plan Básico?", a: "Usa la plantilla elegida con sus secciones originales y permite hasta 5 fotos en la galería, cuando el modelo tenga galería." },
         { q: "¿Qué incluye el Plan Premium?", a: "Parte de una plantilla existente y permite eliminar secciones, agregar hasta 3 secciones nuevas y usar hasta 8 fotos en la galería." },
         { q: "¿Puedo pedir cambios?", a: "Sí. Desde la vista previa podés comunicarte por WhatsApp o por el formulario del sitio para pedir cambios o agregar información antes de recibir el enlace definitivo." },
-        { q: "¿Cómo confirman asistencia los invitados?", a: "Si elegís la sección RSVP, tus invitados completan el formulario dentro de la invitación y las respuestas se organizan en una planilla de Google Sheets." },
+        { q: "¿Cómo confirman asistencia los invitados?", a: "Si elegís la sección RSVP, tus invitados completan el formulario dentro de la invitación y las respuestas se organizan en tu panel personalizado." },
         { q: "¿Qué métodos de pago aceptan?", a: "Las opciones disponibles se muestran al iniciar el pedido y pueden adaptarse según el país. El pago se informa con el número de operación correspondiente." },
         { q: "¿Por cuánto tiempo permanece activo el enlace?", a: "La invitación permanece activa hasta 30 días después del evento. Si necesitás extender ese plazo, podés consultarnos por WhatsApp o desde el formulario del sitio." }
       ]
@@ -300,9 +300,9 @@ const TRANSLATIONS = {
       selectModel: "Modelo de Plantilla de Interés",
       btnContinue: "Continuar a Carga de Datos",
       successTitle: "¡Borrador Generado Exitosamente!",
-      successDesc: "Nuestros diseñadores están vinculando tus archivos y optimizando tu link personalizado. Te hemos enviado un correo y un mensaje de WhatsApp con los accesos al borrador web y tu planilla de invitados en Google Sheets.",
+      successDesc: "Nuestros diseñadores están vinculando tus archivos y optimizando tu link personalizado. Te enviamos los accesos al borrador y, cuando se publique, podrás gestionar el evento desde tu panel.",
       successTrack: "CÓDIGO DE SEGUIMIENTO",
-      successSheet: "PLANILLA DE INVITADOS: Listo para Google Sheets ✓",
+      successSheet: "PANEL DEL EVENTO: Incluido con tu pedido ✓",
       btnGenerate: "Generar e Inicializar Invitación"
     },
     weddingForm: {
@@ -374,7 +374,7 @@ const TRANSLATIONS = {
       bronzeTitle: "Plan Bronce (Básico)",
       bronzeDesc: "Invitación de un solo link, cuenta regresiva, detalles de ubicación con mapas y alias bancario.",
       silverTitle: "Plan Plata (Premium) ⭐",
-      silverDesc: "Todo lo de Bronce + Música de fondo, formulario interactivo de RSVP en tiempo real con planilla de Google Sheets incluida.",
+      silverDesc: "Todo lo de Bronce + Música de fondo, RSVP en tiempo real y panel personalizado para gestionar el evento.",
       goldTitle: "Plan Oro (Diseño 100% Custom)",
       goldDesc: "Plata + Panel de administración avanzado, hasta 20 fotos en la galería, playlist colaborativa de Spotify y adaptaciones de diseño únicas.",
       formTitle: "Formulario de Pago Seguro",
@@ -442,7 +442,7 @@ const TRANSLATIONS = {
         "Registro de restricciones alimentarias.",
         "Canciones sugeridas por los invitados.",
         "Muro de saludos digital.",
-        "Panel privado en Google Sheets con información en tiempo real.",
+        "Panel personalizado con información del evento en tiempo real.",
         "Reporte automático para catering.",
         "Enlaces de WhatsApp para contactar invitados pendientes.",
         "Código QR de acceso.",
@@ -572,7 +572,7 @@ const TRANSLATIONS = {
         { q: "What does the Basic Plan include?", a: "It uses the selected template with its original sections and supports up to 5 gallery photos when that template includes a gallery." },
         { q: "What does the Premium Plan include?", a: "It starts from an existing template and lets you remove sections, add up to 3 new sections, and use up to 8 gallery photos." },
         { q: "Can I request changes?", a: "Yes. From the preview you can contact us through WhatsApp or the website form before receiving the final link." },
-        { q: "How do guests confirm attendance?", a: "If you choose RSVP, guests complete the form inside the invitation and responses are organized in a Google Sheet." },
+        { q: "How do guests confirm attendance?", a: "If you choose RSVP, guests complete the form inside the invitation and responses are organized in your personalized dashboard." },
         { q: "Which payment methods are accepted?", a: "Available options are shown when you start the order and may vary by country. Report your payment using the corresponding transaction number." },
         { q: "How long does the invitation stay active?", a: "The invitation stays active until 30 days after the event. Contact us if you need an extension." }
       ]
@@ -603,9 +603,9 @@ const TRANSLATIONS = {
       selectModel: "Interest Template Model",
       btnContinue: "Continue to Information Form",
       successTitle: "Draft Generated Successfully!",
-      successDesc: "Our designers are linking your files and optimizing your custom link. We have sent you an email and a WhatsApp message with the draft access and your Google Sheets guest sheet.",
+      successDesc: "Our designers are linking your files and optimizing your custom link. We sent the draft access, and once published you can manage the event from your dashboard.",
       successTrack: "TRACKING CODE",
-      successSheet: "GUEST SPREADSHEET: Ready on Google Sheets ✓",
+      successSheet: "EVENT DASHBOARD: Included with your order ✓",
       btnGenerate: "Generate and Build Digital Invite"
     },
     weddingForm: {
@@ -677,7 +677,7 @@ const TRANSLATIONS = {
       bronzeTitle: "Bronze Plan (Basic)",
       bronzeDesc: "Single web link, live countdown timer, location details with maps, and banking details.",
       silverTitle: "Silver Plan (Premium) ⭐",
-      silverDesc: "Everything in Bronze + Background music, interactive RSVP guest form linked in real time to your Google Sheet.",
+      silverDesc: "Everything in Bronze + Background music, real-time RSVP and a personalized event dashboard.",
       goldTitle: "Gold Plan (100% Custom)",
       goldDesc: "Silver + Advanced admin panel, up to 20 gallery photos, Spotify group playlist, and custom layout adaptations.",
       formTitle: "Secure Payment Checkout",
@@ -745,7 +745,7 @@ const TRANSLATIONS = {
         "Dietary restriction and food allergy registry.",
         "Song suggestions from your guests.",
         "Digital congratulations guest book wall.",
-        "Private Google Sheets panel with real-time sync.",
+        "Personalized dashboard with real-time event information.",
         "Automatic catering reports.",
         "WhatsApp shortcut links to contact pending guests.",
         "Access QR code.",
@@ -875,7 +875,7 @@ const TRANSLATIONS = {
         { q: "O que inclui o Plano Básico?", a: "Usa o modelo escolhido com suas seções originais e permite até 5 fotos na galeria, quando o modelo tiver galeria." },
         { q: "O que inclui o Plano Premium?", a: "Parte de um modelo existente e permite remover seções, adicionar até 3 novas seções e usar até 8 fotos na galeria." },
         { q: "Posso solicitar alterações?", a: "Sim. Na prévia, você pode falar conosco pelo WhatsApp ou formulário do site antes de receber o link definitivo." },
-        { q: "Como os convidados confirmam presença?", a: "Se escolher RSVP, os convidados completam o formulário no convite e as respostas são organizadas em uma planilha do Google Sheets." },
+        { q: "Como os convidados confirmam presença?", a: "Se escolher RSVP, os convidados completam o formulário no convite e as respostas são organizadas no seu painel personalizado." },
         { q: "Quais pagamentos são aceitos?", a: "As opções disponíveis aparecem ao iniciar o pedido e podem variar conforme o país. Informe o pagamento com o número da transação." },
         { q: "Por quanto tempo o convite fica ativo?", a: "O convite permanece ativo até 30 dias após o evento. Fale conosco se precisar estender esse prazo." }
       ]
@@ -906,9 +906,9 @@ const TRANSLATIONS = {
       selectModel: "Modelo de Template de Interesse",
       btnContinue: "Continuar para Carregamento de Dados",
       successTitle: "Rascunho Gerado com Sucesso!",
-      successDesc: "Nossos designers estão vinculando seus arquivos e otimizando seu link personalizado. Enviamos um e-mail e um WhatsApp com os acessos ao rascunho web e sua planilha de convidados no Google Sheets.",
+      successDesc: "Nossos designers estão vinculando seus arquivos e otimizando seu link personalizado. Enviamos o acesso ao rascunho e, após a publicação, você poderá gerenciar o evento no painel.",
       successTrack: "CÓDIGO DE RASTREAMENTO",
-      successSheet: "PLANILHA DE CONVIDADOS: Pronto no Google Sheets ✓",
+      successSheet: "PAINEL DO EVENTO: Incluído no seu pedido ✓",
       btnGenerate: "Gerar e Inicializar Convite Digital"
     },
     weddingForm: {
@@ -980,7 +980,7 @@ const TRANSLATIONS = {
       bronzeTitle: "Plano Bronze (Básico)",
       bronzeDesc: "Convite de link único, contagem regressiva, detalhes de localização com mapas e chave bancária.",
       silverTitle: "Plano Prata (Premium) ⭐",
-      silverDesc: "Tudo do Bronze + Música de fundo, formulário interativo de presença RSVP conectado em tempo real com sua planilha de Google Sheets.",
+      silverDesc: "Tudo do Bronze + Música de fundo, RSVP em tempo real e painel personalizado para gerenciar o evento.",
       goldTitle: "Plano Ouro (Design 100% Personalizado)",
       goldDesc: "Prata + Painel de administração avançado, até 20 fotos na galeria, playlist colaborativa do Spotify e adaptações exclusivas de layout.",
       formTitle: "Formulário de Pagamento Seguro",
@@ -1048,7 +1048,7 @@ const TRANSLATIONS = {
         "Registro de restrições alimentares e alergias.",
         "Músicas sugeridas pelos convidados.",
         "Mural de recados digital para saudações.",
-        "Painel privado no Google Sheets em tempo real.",
+        "Painel personalizado com informações do evento em tempo real.",
         "Relatório automático para buffet/catering.",
         "Atalhos de WhatsApp para contatar convidados pendentes.",
         "Código QR de acesso.",
@@ -2058,7 +2058,7 @@ function App() {
             <div className="hero-benefits" aria-label="Beneficios principales">
               <span>✓ {lang === 'es' ? 'Diseño personalizado' : (lang === 'en' ? 'Custom design' : 'Design personalizado')}</span>
               <span>✓ {lang === 'es' ? 'Lista para WhatsApp' : (lang === 'en' ? 'Ready for WhatsApp' : 'Pronto para WhatsApp')}</span>
-              <span>✓ RSVP + Google Sheets</span>
+              <span>✓ RSVP + {lang === 'es' ? 'panel personalizado' : lang === 'en' ? 'personalized dashboard' : 'painel personalizado'}</span>
             </div>
             <div className="hero-ctas">
               <a href="#crear" className="btn-primary animate-heartbeat" onClick={(e) => handleScrollToSection(e, 'crear')}>
@@ -2315,7 +2315,7 @@ function App() {
             </article>
           </div>
 
-          <p className="plans-rsvp-note"><img src="/features/feature-rsvp.png" alt="" />{lang === 'es' ? 'Si elegís RSVP, incluye Google Sheets, link de envío y restricciones alimentarias.' : (lang === 'en' ? 'If you choose RSVP, it includes Google Sheets, a sending link and dietary restrictions.' : 'Se escolher RSVP, inclui Google Sheets, link de envio e restrições alimentares.')}</p>
+          <p className="plans-rsvp-note"><img src="/features/feature-rsvp.png" alt="" />{lang === 'es' ? 'Si elegís RSVP, incluye panel personalizado, enlaces individuales y restricciones alimentarias.' : (lang === 'en' ? 'If you choose RSVP, it includes a personalized dashboard, individual links and dietary restrictions.' : 'Se escolher RSVP, inclui painel personalizado, links individuais e restrições alimentares.')}</p>
         </div>
       </section>
 
@@ -2339,10 +2339,36 @@ function App() {
             </div>
             <div className="feature-group organizer-group">
               <div className="feature-group-heading"><span>✓</span><div><h3>{lang === 'es' ? 'Para organizarte' : (lang === 'en' ? 'For your planning' : 'Para sua organização')}</h3><p>{lang === 'es' ? 'Información ordenada y lista para usar.' : (lang === 'en' ? 'Organized information, ready to use.' : 'Informação organizada e pronta para usar.')}</p></div></div>
-              <article className="feature-line"><img src="/features/feature-rsvp.png" alt="" /><div><h4>RSVP + Google Sheets</h4><p>{lang === 'es' ? 'Asistencia, acompañantes y respuestas en tiempo real.' : (lang === 'en' ? 'Attendance, guests and real-time responses.' : 'Presença, acompanhantes e respostas em tempo real.')}</p></div></article>
-              <article className="feature-line"><img src="/features/feature-gift.png" alt="" /><div><h4>{lang === 'es' ? 'Información para catering' : (lang === 'en' ? 'Catering information' : 'Informação para catering')}</h4><p>{lang === 'es' ? 'Restricciones alimentarias reunidas en una sola planilla.' : (lang === 'en' ? 'Dietary restrictions in one spreadsheet.' : 'Restrições alimentares em uma única planilha.')}</p></div></article>
+              <article className="feature-line"><img src="/features/feature-rsvp.png" alt="" /><div><h4>{lang === 'es' ? 'RSVP + panel personalizado' : lang === 'en' ? 'RSVP + personalized dashboard' : 'RSVP + painel personalizado'}</h4><p>{lang === 'es' ? 'Asistencia, acompañantes y respuestas en tiempo real.' : (lang === 'en' ? 'Attendance, guests and real-time responses.' : 'Presença, acompanhantes e respostas em tempo real.')}</p></div></article>
+              <article className="feature-line"><img src="/features/feature-gift.png" alt="" /><div><h4>{lang === 'es' ? 'Información para catering' : (lang === 'en' ? 'Catering information' : 'Informação para catering')}</h4><p>{lang === 'es' ? 'Restricciones alimentarias organizadas dentro del panel.' : (lang === 'en' ? 'Dietary restrictions organized in your dashboard.' : 'Restrições alimentares organizadas dentro do painel.')}</p></div></article>
               <article className="feature-line"><img src="/features/feature-responsive.png" alt="" /><div><h4>{lang === 'es' ? 'Link listo para enviar' : (lang === 'en' ? 'Ready-to-send link' : 'Link pronto para enviar')}</h4><p>{lang === 'es' ? 'Compartilo fácilmente por WhatsApp o correo.' : (lang === 'en' ? 'Share it easily by WhatsApp or email.' : 'Compartilhe facilmente por WhatsApp ou e-mail.')}</p></div></article>
             </div>
+          </div>
+
+          <div className="event-dashboard-showcase">
+            <div>
+              <span>{lang === 'es' ? 'Incluido con tu invitación' : lang === 'en' ? 'Included with your invitation' : 'Incluído com seu convite'}</span>
+              <h3>{lang === 'es' ? 'Todo tu evento, en un solo lugar' : lang === 'en' ? 'Your whole event, in one place' : 'Todo o seu evento em um só lugar'}</h3>
+              <p>{lang === 'es' ? 'Accedé a un panel privado, adaptado al idioma de tu pedido y disponible hasta 30 días después del evento.' : lang === 'en' ? 'Access a private dashboard in your order language, available until 30 days after the event.' : 'Acesse um painel privado no idioma do pedido, disponível até 30 dias após o evento.'}</p>
+            </div>
+            <ul>
+              {(lang === 'es' ? [
+                'Resumen y confirmaciones en tiempo real', 'Invitados, cupos y enlaces personalizados',
+                'Acompañantes, restricciones y canciones', 'Organización de mesas y capacidades',
+                'Recordatorios y estados de WhatsApp', 'Colaboradores, roles e historial',
+                'Respaldo, privacidad y eliminación segura'
+              ] : lang === 'en' ? [
+                'Real-time overview and confirmations', 'Guests, seats and personalized links',
+                'Companions, dietary needs and songs', 'Table planning and capacities',
+                'Reminders and WhatsApp statuses', 'Collaborators, roles and activity history',
+                'Backups, privacy and secure deletion'
+              ] : [
+                'Resumo e confirmações em tempo real', 'Convidados, vagas e links personalizados',
+                'Acompanhantes, restrições e músicas', 'Organização de mesas e capacidades',
+                'Lembretes e estados do WhatsApp', 'Colaboradores, funções e histórico',
+                'Backup, privacidade e exclusão segura'
+              ]).map((item) => <li key={item}><span>✓</span>{item}</li>)}
+            </ul>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px' }}>

@@ -1,4 +1,5 @@
 import {
+  appUrl,
   customerHelpHtml,
   emailButton,
   emailShell,
@@ -24,13 +25,9 @@ async function handler(request: Request) {
     const body = await request.json() as Record<string, unknown>;
     const token = String(body.token || '');
     const invitationUrl = String(body.invitationUrl || '').trim();
-    const sheetUrl = String(body.sheetUrl || '').trim();
     if (token.length < 32) return json({ error: 'Enlace administrativo inválido.' }, 400);
     if (!validHttpsUrl(invitationUrl)) {
       return json({ error: 'Ingresá un enlace HTTPS válido para la invitación.' }, 400);
-    }
-    if (sheetUrl && !validHttpsUrl(sheetUrl)) {
-      return json({ error: 'El enlace de Google Sheets debe ser HTTPS.' }, 400);
     }
 
     const order = await findOrderByToken('approval_token_hash', await hashToken(token));
@@ -41,7 +38,7 @@ async function handler(request: Request) {
 
     const safeName = escapeHtml(order.customer_name);
     const safeInvitationUrl = escapeHtml(invitationUrl);
-    const safeSheetUrl = escapeHtml(sheetUrl);
+    const safePanelUrl = escapeHtml(`${appUrl()}/admin`);
     const copy = {
       es: {
         subject: `[${order.order_number}] Invitación definitiva lista — accedé a tu entrega`,
@@ -54,8 +51,8 @@ async function handler(request: Request) {
           <li><strong>Correo:</strong> pegá el enlace en el mensaje que quieras enviar.</li>
           <li><strong>Instagram:</strong> compartilo por mensaje directo o agregalo temporalmente a tu biografía.</li>
         </ul>`,
-        sheet: 'Abrir planilla de respuestas',
-        sheetHelp: 'La planilla reúne automáticamente las respuestas de tus invitados.',
+        panel: 'Abrir el panel de mi evento',
+        panelHelp: `Ingresá con el pedido ${order.order_number} y el email asociado.`,
         note: 'Guardá este correo: contiene los accesos de tu evento.'
       },
       en: {
@@ -69,8 +66,8 @@ async function handler(request: Request) {
           <li><strong>Email:</strong> paste the link into the message you want to send.</li>
           <li><strong>Instagram:</strong> share it by direct message or temporarily add it to your bio.</li>
         </ul>`,
-        sheet: 'Open response spreadsheet',
-        sheetHelp: 'The spreadsheet automatically collects your guests’ responses.',
+        panel: 'Open my event dashboard',
+        panelHelp: `Sign in with order ${order.order_number} and its associated email.`,
         note: 'Keep this email: it contains your event links.'
       },
       pt: {
@@ -84,8 +81,8 @@ async function handler(request: Request) {
           <li><strong>E-mail:</strong> cole o link na mensagem que deseja enviar.</li>
           <li><strong>Instagram:</strong> compartilhe por mensagem direta ou adicione temporariamente à sua bio.</li>
         </ul>`,
-        sheet: 'Abrir planilha de respostas',
-        sheetHelp: 'A planilha reúne automaticamente as respostas dos convidados.',
+        panel: 'Abrir o painel do meu evento',
+        panelHelp: `Entre com o pedido ${order.order_number} e o e-mail associado.`,
         note: 'Guarde este e-mail: ele contém os acessos do seu evento.'
       }
     }[order.language];
@@ -93,14 +90,14 @@ async function handler(request: Request) {
     await sendEmail({
       to: order.customer_email,
       subject: copy.subject,
-      idempotencyKey: `delivery-${order.order_number}-${(await hashToken(`${invitationUrl}|${sheetUrl}`)).slice(0, 20)}`,
+      idempotencyKey: `delivery-${order.order_number}-${(await hashToken(invitationUrl)).slice(0, 20)}`,
       html: emailShell(
         copy.title,
         `<p>${copy.hello}</p>
          ${emailButton(copy.open, safeInvitationUrl)}
          <h2 style="font-size:18px;margin-top:30px">${copy.guideTitle}</h2>
          ${copy.guide}
-         ${sheetUrl ? `<p>${copy.sheetHelp}</p>${emailButton(copy.sheet, safeSheetUrl)}` : ''}
+         <p>${copy.panelHelp}</p>${emailButton(copy.panel, safePanelUrl)}
          <p style="font-size:13px;color:#765f69;margin-top:28px">${copy.note}</p>
          ${customerHelpHtml(order.language, order.order_number)}`
       )
@@ -110,7 +107,6 @@ async function handler(request: Request) {
     await updateOrder(order.order_number, {
       status: 'published',
       invitation_url: invitationUrl,
-      sheet_url: sheetUrl || null,
       delivered_at: deliveredAt
     });
     return json({ ok: true, orderNumber: order.order_number, deliveredAt });

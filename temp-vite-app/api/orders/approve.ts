@@ -34,8 +34,7 @@ async function handler(request: Request) {
         modelName: order.model_name,
         paymentOperation: order.payment_operation,
         status: order.status,
-        invitationUrl: order.invitation_url,
-        sheetUrl: order.sheet_url
+        invitationUrl: order.invitation_url
       });
     }
 

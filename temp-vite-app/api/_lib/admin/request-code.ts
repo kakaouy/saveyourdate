@@ -45,21 +45,37 @@ async function handler(request: Request) {
     }
     const code = createSixDigitCode();
     const challenge = await createChallenge(order.order_number, code, loginEmail, accessRole);
+    const copy = order.language === 'en' ? {
+      subject: `${code} · Access code for your event`, title: 'Your access code',
+      intro: `Use this code to open the dashboard for order <strong>${escapeHtml(order.order_number)}</strong>:`,
+      expires: 'The code expires in 10 minutes and can only be used once.',
+      ignore: 'If you did not request access, you can ignore this message.'
+    } : order.language === 'pt' ? {
+      subject: `${code} · Código de acesso ao seu evento`, title: 'Seu código de acesso',
+      intro: `Use este código para acessar o painel do pedido <strong>${escapeHtml(order.order_number)}</strong>:`,
+      expires: 'O código expira em 10 minutos e só pode ser usado uma vez.',
+      ignore: 'Se você não solicitou este acesso, pode ignorar esta mensagem.'
+    } : {
+      subject: `${code} · Código de acceso a tu evento`, title: 'Tu código de acceso',
+      intro: `Usá este código para ingresar al panel del pedido <strong>${escapeHtml(order.order_number)}</strong>:`,
+      expires: 'El código vence en 10 minutos y solo puede utilizarse una vez.',
+      ignore: 'Si no solicitaste este acceso, podés ignorar el mensaje.'
+    };
     await sendEmail({
       to: loginEmail,
-      subject: `${code} · Código de acceso a tu evento`,
+      subject: copy.subject,
       idempotencyKey: `admin-login-${challenge.id}`,
       html: emailShell(
-        'Tu código de acceso',
-        `<p>Usá este código para ingresar al panel de administración del pedido <strong>${escapeHtml(order.order_number)}</strong>:</p>
+        copy.title,
+        `<p>${copy.intro}</p>
          <p style="font-size:34px;letter-spacing:8px;font-weight:800;text-align:center">${code}</p>
-         <p>El código vence en 10 minutos y solo puede utilizarse una vez.</p>
-         <p style="font-size:13px;color:#765f69">Si no solicitaste este acceso, podés ignorar el mensaje.</p>`
+         <p>${copy.expires}</p>
+         <p style="font-size:13px;color:#765f69">${copy.ignore}</p>`
       )
     });
     const [name, domain] = loginEmail.split('@');
     const maskedEmail = `${name.slice(0, 2)}***@${domain}`;
-    return json({ challengeId: challenge.id, maskedEmail, expiresIn: 600 });
+    return json({ challengeId: challenge.id, maskedEmail, expiresIn: 600, language: order.language });
   } catch (error) {
     console.error(error);
     return json({ error: 'No pudimos enviar el código. Intentá nuevamente.' }, 500);
