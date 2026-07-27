@@ -1112,11 +1112,12 @@ function Settings({ code, onChange, orderNumber }: { code: string; onChange: (va
     </section>
     <section className="panel settings-panel">
       <div className="panel-title"><div><h2>Restaurar respaldo</h2><p>Primero validamos el archivo. Para evitar mezclas o sobrescrituras, sólo se puede restaurar cuando invitados, mesas y colaboradores están vacíos.</p></div></div>
-      <div className="settings-form">
-        <label>Archivo JSON<input type="file" accept="application/json,.json" onChange={(event) => void inspectBackup(event.target.files?.[0])} /></label>
+      <div className="settings-form restore-form">
+        <label className="restore-file">Archivo JSON<input type="file" accept="application/json,.json" onChange={(event) => void inspectBackup(event.target.files?.[0])} /></label>
         {restoreSummary && <p className="restore-summary"><strong>{restoreSummary.guests}</strong> invitados · <strong>{restoreSummary.tables}</strong> mesas · <strong>{restoreSummary.collaborators}</strong> colaboradores</p>}
-        {restoreSummary && <label>Confirmación<input value={restoreConfirmation} onChange={(event) => setRestoreConfirmation(event.target.value)} placeholder={`Escribí ${orderNumber}`} /></label>}
-        {restoreSummary && <button className="outline-button" disabled={!canRestore || restoring || restoreConfirmation.trim().toUpperCase() !== orderNumber} onClick={restoreData}>{restoring ? "Restaurando…" : "Restaurar datos"}</button>}
+        {restoreSummary && !canRestore && <p className="restore-blocked" role="status">Este evento ya contiene datos. La restauración está bloqueada para evitar sobrescrituras.</p>}
+        {restoreSummary && canRestore && <label>Confirmación<input value={restoreConfirmation} onChange={(event) => setRestoreConfirmation(event.target.value)} placeholder={`Escribí ${orderNumber}`} /></label>}
+        {restoreSummary && canRestore && <button className="outline-button" disabled={restoring || restoreConfirmation.trim().toUpperCase() !== orderNumber} onClick={restoreData}>{restoring ? "Restaurando…" : "Restaurar datos"}</button>}
       </div>
     </section>
     <section className="panel settings-panel privacy-panel">
