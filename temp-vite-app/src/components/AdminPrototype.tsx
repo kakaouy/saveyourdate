@@ -1,5 +1,5 @@
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "../admin-prototype.css";
 
 type Guest = {
@@ -890,15 +890,38 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
   const [guests, setGuests] = useState(guestsSeed);
   const [mobileNav, setMobileNav] = useState(false);
   const [defaultPhoneCountryCode, setDefaultPhoneCountryCode] = useState(order.defaultPhoneCountryCode || "+598");
+  const [lastSynced, setLastSynced] = useState<Date | null>(null);
+  const [syncing, setSyncing] = useState(false);
   const title = useMemo(() => view === "Resumen" ? "Panel principal" : view, [view]);
 
-  useEffect(() => {
-    fetch("/api/admin/guests")
-      .then(async (response) => {
-        if (!response.ok) return;
-        setGuests(((await response.json()) as { guests: Guest[] }).guests);
-      });
+  const refreshGuests = useCallback(async (showProgress = false) => {
+    if (showProgress) setSyncing(true);
+    try {
+      const response = await fetch("/api/admin/guests", { cache: "no-store" });
+      if (!response.ok) return;
+      setGuests(((await response.json()) as { guests: Guest[] }).guests);
+      setLastSynced(new Date());
+    } finally {
+      if (showProgress) setSyncing(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void refreshGuests(true);
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === "visible") void refreshGuests();
+    }, 30000);
+    const refreshVisible = () => {
+      if (document.visibilityState === "visible") void refreshGuests();
+    };
+    window.addEventListener("focus", refreshVisible);
+    document.addEventListener("visibilitychange", refreshVisible);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refreshVisible);
+      document.removeEventListener("visibilitychange", refreshVisible);
+    };
+  }, [refreshGuests]);
 
   const navigate = (item: string) => {
     setView(item);
@@ -916,7 +939,7 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
       </aside>
       {mobileNav && <button className="sidebar-overlay" aria-label="Cerrar menú" onClick={() => setMobileNav(false)} />}
       <section className="admin-main">
-        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>Última actualización: ahora</small></div><div className="topbar-actions"><button className="notification">♢</button><div className="admin-user"><span>{initials(order.customerName)}</span><div><strong>{order.customerName}</strong><small>Propietaria</small></div><button>⌄</button></div></div></header>
+        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>{lastSynced ? `Sincronizado ${lastSynced.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" })}` : "Sincronizando datos…"}</small></div><div className="topbar-actions"><button className={`notification sync-button ${syncing ? "syncing" : ""}`} onClick={() => refreshGuests(true)} aria-label="Actualizar datos" title="Actualizar datos">↻</button><div className="admin-user"><span>{initials(order.customerName)}</span><div><strong>{order.customerName}</strong><small>Propietaria</small></div><button>⌄</button></div></div></header>
         <div className="admin-content">
           {view === "Resumen" && <Dashboard guests={guests} onNavigate={navigate} order={order} />}
           {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} defaultPhoneCountryCode={defaultPhoneCountryCode} />}
