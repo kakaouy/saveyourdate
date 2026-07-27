@@ -1107,6 +1107,7 @@ const TRANSLATIONS = {
 
 function App() {
   const pageParams = new URLSearchParams(window.location.search);
+  const isAdminRoute = (window.location.pathname.replace(/\/+$/, '') || '/') === '/admin';
   const embeddedPreview = pageParams.get('embeddedPreview') === '1';
   const previewModelId = pageParams.get('previewModel');
   const changeOrderNumber = pageParams.get('pedido') || '';
@@ -1233,7 +1234,7 @@ function App() {
 
   // ADMIN CONTROL STATES & MOCK GUEST LIST DATA
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const showAdminLogin = isAdminRoute;
   const [adminActiveTab, setAdminActiveTab] = useState<'overview' | 'guests' | 'tables'>('overview');
   const [loginContact, setLoginContact] = useState('');
   const [loginCode, setLoginCode] = useState('');
@@ -1576,7 +1577,7 @@ function App() {
       <div className="admin-login-takeover">
         <header className="admin-header">
           <div className="container admin-header-container">
-            <div className="logo" style={{ cursor: 'pointer' }} onClick={() => setShowAdminLogin(false)}>
+            <div className="logo" style={{ cursor: 'pointer' }} onClick={() => window.location.assign('/')}>
               <img src="/logo.svg" alt="Save Your Date" className="logo-img" />
             </div>
             
@@ -1595,7 +1596,7 @@ function App() {
                 </select>
               </div>
 
-              <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px', borderRadius: '20px' }} onClick={() => setShowAdminLogin(false)}>
+              <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px', borderRadius: '20px' }} onClick={() => window.location.assign('/')}>
                 ← {lang === 'es' ? 'Volver' : (lang === 'en' ? 'Back' : 'Voltar')}
               </button>
             </div>
