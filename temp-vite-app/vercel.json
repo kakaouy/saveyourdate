@@ -6,6 +6,9 @@
       "agent/*": false
     }
   },
+  "crons": [
+    { "path": "/api/cron-reminders", "schedule": "0 12 * * *" }
+  ],
   "rewrites": [
     { "source": "/estado", "destination": "/index.html" },
     { "source": "/consultar", "destination": "/index.html" },
