@@ -395,7 +395,7 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
         {error && <p className="table-error" role="alert">{error}</p>}
         <div className="table-footer"><span>Mostrando {filtered.length} de {guests.length} invitados</span><div><button>←</button><button className="active">1</button><button>→</button></div></div>
       </section>
-      {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={addGuest} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre y apellido<input name="name" required /></label><label>Grupo<input name="group" placeholder="Ej. Familia" /></label><label>WhatsApp<input name="phone" /></label><label>Cupos<input name="seats" type="number" min="1" max="20" defaultValue="1" /></label><label>Email<input name="email" type="email" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar invitado"}</button></div></form></div>}
+      {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={addGuest} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre y apellido<input name="name" required /></label><label>Grupo<input name="group" placeholder="Ej. Familia" /></label><label>WhatsApp<input name="phone" inputMode="tel" placeholder="+598 99 123 456" /></label><label>Cupos<input name="seats" type="number" min="1" max="20" defaultValue="1" /></label><label>Email<input name="email" type="email" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar invitado"}</button></div></form></div>}
       {editingGuest && <div className="modal-backdrop" onMouseDown={() => setEditingGuest(null)}><form className="modal" onSubmit={updateDetails} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setEditingGuest(null)}>×</button><span className="eyebrow">Información del invitado</span><h2>Editar a {editingGuest.name}</h2><div className="form-grid"><label>Restricción alimentaria<input name="food" defaultValue={editingGuest.food === "—" ? "" : editingGuest.food} placeholder="Ej. Vegetariano, celíaco…" /></label><label>Canción sugerida<input name="song" defaultValue={editingGuest.song === "—" ? "" : editingGuest.song} placeholder="Canción — Artista" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setEditingGuest(null)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</button></div></form></div>}
     </>
   );
@@ -642,14 +642,26 @@ function SimpleModule({ view, guests, setGuests, order }: { view: string; guests
     : new Intl.DateTimeFormat("es-UY", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
 
   const remindGuest = async (guest: Guest) => {
-    const phone = guest.phone.replace(/\D/g, "");
-    if (!phone) {
-      setModuleError(`${guest.name} no tiene un número de WhatsApp cargado.`);
+    const rawPhone = guest.phone.replace(/\D/g, "").replace(/^00/, "");
+    const phone = rawPhone.startsWith("5980")
+      ? `598${rawPhone.slice(4)}`
+      : rawPhone.startsWith("0") && rawPhone.length === 9
+        ? `598${rawPhone.slice(1)}`
+        : rawPhone;
+    if (phone.length < 8) {
+      setModuleError(`${guest.name} no tiene un número válido. Editalo incluyendo el código de país, por ejemplo +598.`);
       return;
     }
     const personalizedLink = `${window.location.origin}/confirmar?token=${guest.inviteToken}`;
     const message = `Hola ${guest.name}, te recordamos confirmar tu asistencia a ${order.eventTitle}. Podés responder acá: ${personalizedLink}`;
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+    const whatsappUrl = `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
+    const whatsappWindow = window.open("", "_blank");
+    if (whatsappWindow) {
+      whatsappWindow.opener = null;
+      whatsappWindow.location.href = whatsappUrl;
+    } else {
+      window.location.href = whatsappUrl;
+    }
     setRemindingId(guest.id);
     setModuleError("");
     try {
