@@ -11,6 +11,7 @@ type TableRow = {
 type AssignmentRow = {
   id: string;
   table_id: string | null;
+  confirmed?: number;
 };
 
 const clientTable = (row: TableRow, assignments: AssignmentRow[] = []) => ({
@@ -59,11 +60,30 @@ async function handler(request: Request) {
       const guestId = String(body.guestId || '');
       const tableId = String(body.tableId || '');
       if (tableId) {
-        const tableResponse = await supabaseRequest(
-          `event_tables?id=eq.${encodeURIComponent(tableId)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=id&limit=1`
-        );
-        if (!(await tableResponse.json() as Pick<TableRow, 'id'>[])[0]) {
+        const [tableResponse, guestResponse, occupantsResponse] = await Promise.all([
+          supabaseRequest(
+            `event_tables?id=eq.${encodeURIComponent(tableId)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=id,capacity&limit=1`
+          ),
+          supabaseRequest(
+            `event_guests?id=eq.${encodeURIComponent(guestId)}&order_number=eq.${encodeURIComponent(session.order_number)}&status=eq.Confirmado&select=id,confirmed,table_id&limit=1`
+          ),
+          supabaseRequest(
+            `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=eq.${encodeURIComponent(tableId)}&status=eq.Confirmado&select=id,confirmed`
+          )
+        ]);
+        const table = (await tableResponse.json() as Pick<TableRow, 'id' | 'capacity'>[])[0];
+        const guest = (await guestResponse.json() as AssignmentRow[])[0];
+        if (!table) {
           return json({ error: 'La mesa seleccionada no pertenece a este evento.' }, 400);
+        }
+        if (!guest) {
+          return json({ error: 'El invitado debe estar confirmado para asignarle una mesa.' }, 400);
+        }
+        const occupied = (await occupantsResponse.json() as AssignmentRow[])
+          .filter((occupant) => occupant.id !== guestId)
+          .reduce((total, occupant) => total + Number(occupant.confirmed || 0), 0);
+        if (occupied + Number(guest.confirmed || 0) > table.capacity) {
+          return json({ error: `No hay lugar suficiente en esta mesa. Quedan ${Math.max(0, table.capacity - occupied)} lugares.` }, 409);
         }
       }
       const response = await supabaseRequest(
@@ -83,6 +103,15 @@ async function handler(request: Request) {
     if (request.method === 'PATCH') {
       const id = String(body.id || '');
       const name = String(body.name || '').trim();
+      const capacity = Math.max(1, Math.min(30, Number(body.capacity) || 8));
+      const occupantsResponse = await supabaseRequest(
+        `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=eq.${encodeURIComponent(id)}&status=eq.Confirmado&select=confirmed`
+      );
+      const occupied = (await occupantsResponse.json() as AssignmentRow[])
+        .reduce((total, occupant) => total + Number(occupant.confirmed || 0), 0);
+      if (capacity < occupied) {
+        return json({ error: `La mesa ya tiene ${occupied} personas. Quitá invitados antes de reducir su capacidad.` }, 409);
+      }
       const response = await supabaseRequest(
         `event_tables?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
         {
@@ -90,7 +119,7 @@ async function handler(request: Request) {
           headers: { Prefer: 'return=representation' },
           body: JSON.stringify({
             name,
-            capacity: Math.max(1, Math.min(30, Number(body.capacity) || 8)),
+            capacity,
             note: String(body.note || '').trim(),
             updated_at: new Date().toISOString()
           })

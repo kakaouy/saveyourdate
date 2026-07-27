@@ -727,7 +727,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   <p><strong>{guest.name}</strong><small>{guest.confirmed} {guest.confirmed === 1 ? "persona" : "personas"} · {guest.group}</small></p>
                   <select value={currentTable?.id ?? ""} disabled={!canEdit} onChange={(event) => event.target.value ? assignGuest(guest.id, event.target.value) : unassignGuest(guest.id)} aria-label={`Mesa de ${guest.name}`}>
                     <option value="">Sin mesa</option>
-                    {tables.map((table) => <option key={table.id} value={table.id}>{table.name}</option>)}
+                    {tables.map((table) => {
+                      const occupied = table.guests.reduce((total, id) => total + (guests.find((item) => item.id === id)?.confirmed ?? 0), 0);
+                      const available = table.capacity - occupied;
+                      const lacksSpace = table.id !== currentTable?.id && available < guest.confirmed;
+                      return <option key={table.id} value={table.id} disabled={lacksSpace}>{table.name}{lacksSpace ? ` · faltan ${guest.confirmed - available} lugares` : ` · ${available} libres`}</option>;
+                    })}
                   </select>
                 </div>
               );
@@ -773,7 +778,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           <h2>{editing ? "Editar mesa" : "Agregar mesa"}</h2>
           <div className="form-grid">
             <label>Nombre o número<input value={tableName} onChange={(event) => setTableName(event.target.value)} placeholder="Ej. Mesa Familia" /></label>
-            <label>Cantidad de personas<input type="number" min="1" max="30" value={capacity} onChange={(event) => setCapacity(Math.max(1, Number(event.target.value)))} /></label>
+            <label>Cantidad de personas<input type="number" min={editing ? editing.guests.reduce((total, id) => total + (guests.find((guest) => guest.id === id)?.confirmed ?? 0), 0) || 1 : 1} max="30" value={capacity} onChange={(event) => setCapacity(Math.max(1, Number(event.target.value)))} /></label>
           </div>
           <label className="modal-note">Ubicación u observaciones<input value={note} onChange={(event) => setNote(event.target.value)} placeholder="Ej. Cerca de la pista" /></label>
           <div className="modal-actions table-modal-actions">
