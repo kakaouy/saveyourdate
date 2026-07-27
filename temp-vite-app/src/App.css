@@ -3645,7 +3645,7 @@ html {
 }
 
 .feature-group-heading h3 { margin: 0 0 2px; font: 700 24px/1 var(--font-serif); }
-.feature-group-heading p { margin: 0; color: #766d79; font-size: 11px; }
+.feature-group-heading p { margin: 0; color: #766d79; font-size: 14px; line-height: 1.4; }
 
 .feature-line {
   min-height: 92px;
@@ -3660,7 +3660,7 @@ html {
 .organizer-group .feature-line { background: rgba(255,255,255,.72); }
 .feature-line img { width: 31px; height: 31px; object-fit: contain; }
 .feature-line h4 { margin: 0 0 3px; color: #392e3b; font-size: 13px; }
-.feature-line p { margin: 0; color: #766d79; font-size: 10px; line-height: 1.4; }
+.feature-line p { margin: 0; color: #766d79; font-size: 13px; line-height: 1.45; }
 
 #incluyen .btn-secondary {
   border-color: #392e3b !important;
@@ -4251,20 +4251,23 @@ html {
 @media (max-width: 576px) {
   .sidebar {
     width: min(82vw, 280px);
-    padding: 52px 18px 12px;
-    gap: 0;
+    padding: clamp(58px, 9vh, 76px) 18px clamp(14px, 3vh, 24px);
+    gap: clamp(3px, 0.8vh, 9px);
   }
 
   .sidebar-link {
-    padding: 3px 0;
-    font-size: 14px;
-    line-height: 1.05;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    padding: clamp(5px, 0.8vh, 8px) 0;
+    font-size: clamp(14px, 4vw, 16px);
+    line-height: 1.15;
   }
 
   .sidebar > div {
     flex-wrap: nowrap;
     gap: 6px !important;
-    padding: 3px 0 !important;
+    padding: clamp(5px, 0.8vh, 8px) 0 !important;
   }
 
   .sidebar > div span {
@@ -4279,10 +4282,10 @@ html {
   }
 
   .sidebar .btn-primary {
-    min-height: 38px;
-    margin-top: 2px !important;
-    padding: 8px 14px;
-    font-size: 13px;
+    min-height: 42px;
+    margin-top: clamp(3px, 0.8vh, 9px) !important;
+    padding: 10px 14px;
+    font-size: 14px;
   }
 
   .hero-section::after {
@@ -4298,9 +4301,9 @@ html {
 
 @media (max-height: 700px) and (max-width: 900px) {
   .sidebar {
-    padding-top: 46px;
-    padding-bottom: 8px;
-    gap: 0;
+    padding-top: 52px;
+    padding-bottom: 10px;
+    gap: 2px;
   }
 
   .sidebar-close-button {
@@ -4312,13 +4315,14 @@ html {
   }
 
   .sidebar-link {
-    padding: 2px 0;
-    font-size: 13px;
-    line-height: 1;
+    min-height: 31px;
+    padding: 4px 0;
+    font-size: 14px;
+    line-height: 1.1;
   }
 
   .sidebar > div {
-    padding: 2px 0 !important;
+    padding: 4px 0 !important;
   }
 
   .sidebar select {
@@ -4327,8 +4331,22 @@ html {
   }
 
   .sidebar .btn-primary {
-    min-height: 36px;
-    padding: 7px 12px;
+    min-height: 38px;
+    padding: 8px 12px;
+  }
+}
+
+@media (min-width: 577px) {
+  .sidebar {
+    padding-top: clamp(76px, 11vh, 96px);
+    padding-bottom: clamp(20px, 4vh, 36px);
+    gap: clamp(8px, 1.4vh, 17px);
+  }
+
+  .sidebar-link {
+    padding: clamp(6px, 1vh, 10px) 0;
+    font-size: clamp(17px, 2.2vh, 20px);
+    line-height: 1.15;
   }
 }
 
