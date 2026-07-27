@@ -6,9 +6,11 @@ import {
 import {
   emailShell,
   escapeHtml,
+  findOrderByNumber,
   findOrderForLookup,
   json,
-  sendEmail
+  sendEmail,
+  supabaseRequest
 } from '../orders.js';
 
 async function handler(request: Request) {
@@ -19,15 +21,28 @@ async function handler(request: Request) {
     const contact = String(body.contact || '').trim();
     const genericError = 'No encontramos un pedido activo con esos datos.';
     if (!orderNumber.startsWith('SYD-') || !contact) return json({ error: genericError }, 400);
-    const order = await findOrderForLookup(orderNumber, contact);
+    let order = await findOrderForLookup(orderNumber, contact);
+    let loginEmail = order?.customer_email || '';
+    let accessRole: 'owner' | 'editor' | 'viewer' = 'owner';
+    if (!order && contact.includes('@')) {
+      const response = await supabaseRequest(
+        `event_admins?order_number=eq.${encodeURIComponent(orderNumber)}&email=eq.${encodeURIComponent(contact.toLowerCase())}&select=email,role&limit=1`
+      );
+      const access = ((await response.json()) as Array<{ email: string; role: 'editor' | 'viewer' }>)[0];
+      if (access) {
+        order = await findOrderByNumber(orderNumber);
+        loginEmail = access.email;
+        accessRole = access.role;
+      }
+    }
     if (!order) return json({ error: genericError }, 404);
-    if (await recentChallengeCount(order.order_number) >= 3) {
+    if (await recentChallengeCount(order.order_number, loginEmail) >= 3) {
       return json({ error: 'Alcanzaste el límite de envíos. Probá nuevamente en 15 minutos.' }, 429);
     }
     const code = createSixDigitCode();
-    const challenge = await createChallenge(order.order_number, code);
+    const challenge = await createChallenge(order.order_number, code, loginEmail, accessRole);
     await sendEmail({
-      to: order.customer_email,
+      to: loginEmail,
       subject: `${code} · Código de acceso a tu evento`,
       idempotencyKey: `admin-login-${challenge.id}`,
       html: emailShell(
@@ -38,7 +53,7 @@ async function handler(request: Request) {
          <p style="font-size:13px;color:#765f69">Si no solicitaste este acceso, podés ignorar el mensaje.</p>`
       )
     });
-    const [name, domain] = order.customer_email.split('@');
+    const [name, domain] = loginEmail.split('@');
     const maskedEmail = `${name.slice(0, 2)}***@${domain}`;
     return json({ challengeId: challenge.id, maskedEmail, expiresIn: 600 });
   } catch (error) {

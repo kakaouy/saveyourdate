@@ -70,6 +70,8 @@ create table if not exists public.admin_login_codes (
   id uuid primary key default gen_random_uuid(),
   order_number text not null references public.orders(order_number) on delete cascade,
   code_hash text not null,
+  login_email text not null default '',
+  access_role text not null default 'owner',
   attempts integer not null default 0,
   expires_at timestamptz not null,
   used_at timestamptz,
@@ -83,6 +85,8 @@ create table if not exists public.admin_sessions (
   id uuid primary key default gen_random_uuid(),
   order_number text not null references public.orders(order_number) on delete cascade,
   token_hash text unique not null,
+  login_email text not null default '',
+  access_role text not null default 'owner',
   expires_at timestamptz not null,
   revoked_at timestamptz,
   created_at timestamptz not null default now()
@@ -96,6 +100,28 @@ alter table public.admin_sessions enable row level security;
 
 revoke all on public.admin_login_codes, public.admin_sessions from anon, authenticated;
 grant select, insert, update on public.admin_login_codes, public.admin_sessions to service_role;
+
+alter table public.admin_login_codes
+  add column if not exists login_email text not null default '',
+  add column if not exists access_role text not null default 'owner';
+
+alter table public.admin_sessions
+  add column if not exists login_email text not null default '',
+  add column if not exists access_role text not null default 'owner';
+
+create table if not exists public.event_admins (
+  id uuid primary key default gen_random_uuid(),
+  order_number text not null references public.orders(order_number) on delete cascade,
+  email text not null,
+  role text not null default 'editor' check (role in ('editor', 'viewer')),
+  created_at timestamptz not null default now(),
+  unique(order_number, email)
+);
+
+create index if not exists event_admins_order_idx on public.event_admins(order_number);
+alter table public.event_admins enable row level security;
+revoke all on public.event_admins from anon, authenticated;
+grant select, insert, update, delete on public.event_admins to service_role;
 
 create table if not exists public.event_guests (
   id uuid primary key default gen_random_uuid(),

@@ -29,6 +29,8 @@ type AdminOrder = {
   eventDate: string;
   eventType: string;
   defaultPhoneCountryCode: string;
+  accessRole: "owner" | "editor" | "viewer";
+  loginEmail: string;
 };
 
 const guestsSeed: Guest[] = [];
@@ -885,6 +887,54 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
   </>;
 }
 
+type AdminAccess = { id: string; email: string; role: "editor" | "viewer"; created_at: string };
+
+function Accesses({ order }: { order: AdminOrder }) {
+  const [accesses, setAccesses] = useState<AdminAccess[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(() => {
+    fetch("/api/admin/access").then(async (response) => {
+      if (response.ok) setAccesses(((await response.json()) as { accesses: AdminAccess[] }).accesses);
+    });
+  }, []);
+  useEffect(load, [load]);
+
+  const invite = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSaving(true); setError("");
+    const data = new FormData(event.currentTarget);
+    try {
+      const response = await fetch("/api/admin/access", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(data))
+      });
+      const result = await response.json() as { access?: AdminAccess; error?: string };
+      if (!response.ok || !result.access) throw new Error(result.error || "No pudimos invitar al colaborador.");
+      setAccesses((current) => [...current, result.access!]); setShowModal(false);
+    } catch (inviteError) {
+      setError(inviteError instanceof Error ? inviteError.message : "No pudimos invitar al colaborador.");
+    } finally { setSaving(false); }
+  };
+
+  const remove = async (id: string) => {
+    const response = await fetch(`/api/admin/access?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    if (response.ok) setAccesses((current) => current.filter((access) => access.id !== id));
+  };
+
+  return <>
+    <div className="page-heading"><div><span className="eyebrow">Seguridad del evento</span><h1>Accesos</h1><p>Gestioná quién puede ingresar y qué puede modificar.</p></div>{order.accessRole === "owner" && <button className="primary-button small" onClick={() => setShowModal(true)}>＋ Agregar colaborador</button>}</div>
+    <section className="metrics-grid mini"><Metric label="Propietarios" value="1" note="acceso total" tone="blue" /><Metric label="Editores" value={String(accesses.filter((access) => access.role === "editor").length)} note="pueden modificar" tone="green" /><Metric label="Solo lectura" value={String(accesses.filter((access) => access.role === "viewer").length)} note="sin cambios" tone="amber" /></section>
+    <section className="panel table-panel"><div className="table-scroll"><table><thead><tr><th>Administrador</th><th>Rol</th><th>Estado</th><th /></tr></thead><tbody>
+      <tr><td><strong>{order.loginEmail}</strong></td><td>Propietario</td><td><span className="status status-confirmado">Activo</span></td><td /></tr>
+      {accesses.map((access) => <tr key={access.id}><td><strong>{access.email}</strong></td><td>{access.role === "editor" ? "Editor" : "Solo lectura"}</td><td><span className="status status-confirmado">Activo</span></td><td>{order.accessRole === "owner" && <button className="more-button" onClick={() => remove(access.id)}>Eliminar</button>}</td></tr>)}
+    </tbody></table></div></section>
+    {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={invite} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo acceso</span><h2>Agregar colaborador</h2><div className="form-grid"><label>Email<input name="email" type="email" required /></label><label>Rol<select name="role"><option value="editor">Editor</option><option value="viewer">Solo lectura</option></select></label></div><p className="dynamic-help">Recibirá un email y podrá ingresar con el número de pedido y su propia dirección.</p>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" disabled={saving}>{saving ? "Enviando…" : "Enviar invitación"}</button></div></form></div>}
+  </>;
+}
+
 function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder }) {
   const [view, setView] = useState("Resumen");
   const [guests, setGuests] = useState(guestsSeed);
@@ -933,19 +983,20 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
       <aside className={`sidebar ${mobileNav ? "mobile-open" : ""}`}>
         <div className="sidebar-top"><Logo compact /><button className="mobile-close" onClick={() => setMobileNav(false)}>×</button></div>
         <div className="event-switcher"><span>{initials(order.eventTitle)}</span><div><strong>{order.eventTitle}</strong><small>Pedido {order.orderNumber}</small></div><button>⌄</button></div>
-        <nav>{nav.map(([item, icon]) => <button key={item} className={view === item ? "active" : ""} onClick={() => navigate(item)}><span>{icon}</span>{item}{item === "Recordatorios" && guests.filter((guest) => guest.status === "Pendiente").length > 0 && <b>{guests.filter((guest) => guest.status === "Pendiente").length}</b>}</button>)}</nav>
+        <nav>{nav.filter(([item]) => item !== "Configuración" || order.accessRole === "owner").map(([item, icon]) => <button key={item} className={view === item ? "active" : ""} onClick={() => navigate(item)}><span>{icon}</span>{item}{item === "Recordatorios" && guests.filter((guest) => guest.status === "Pendiente").length > 0 && <b>{guests.filter((guest) => guest.status === "Pendiente").length}</b>}</button>)}</nav>
         <div className="sidebar-help"><span>?</span><div><strong>¿Necesitás ayuda?</strong><small>Estamos para acompañarte.</small></div><button>Contactar soporte</button></div>
         <button className="logout" onClick={onLogout}><span>↪</span>Cerrar sesión</button>
       </aside>
       {mobileNav && <button className="sidebar-overlay" aria-label="Cerrar menú" onClick={() => setMobileNav(false)} />}
       <section className="admin-main">
-        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>{lastSynced ? `Sincronizado ${lastSynced.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" })}` : "Sincronizando datos…"}</small></div><div className="topbar-actions"><button className={`notification sync-button ${syncing ? "syncing" : ""}`} onClick={() => refreshGuests(true)} aria-label="Actualizar datos" title="Actualizar datos">↻</button><div className="admin-user"><span>{initials(order.customerName)}</span><div><strong>{order.customerName}</strong><small>Propietaria</small></div><button>⌄</button></div></div></header>
+        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>{lastSynced ? `Sincronizado ${lastSynced.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" })}` : "Sincronizando datos…"}</small></div><div className="topbar-actions"><button className={`notification sync-button ${syncing ? "syncing" : ""}`} onClick={() => refreshGuests(true)} aria-label="Actualizar datos" title="Actualizar datos">↻</button><div className="admin-user"><span>{initials(order.loginEmail || order.customerName)}</span><div><strong>{order.loginEmail || order.customerName}</strong><small>{order.accessRole === "owner" ? "Propietario" : order.accessRole === "editor" ? "Editor" : "Solo lectura"}</small></div><button>⌄</button></div></div></header>
         <div className="admin-content">
           {view === "Resumen" && <Dashboard guests={guests} onNavigate={navigate} order={order} />}
           {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} defaultPhoneCountryCode={defaultPhoneCountryCode} />}
           {view === "Confirmaciones" && <Confirmations guests={guests} />}
           {view === "Mesas" && <Seating guests={guests} />}
-          {["Restricciones", "Canciones", "Recordatorios", "Accesos"].includes(view) && <SimpleModule view={view} guests={guests} setGuests={setGuests} order={order} />}
+          {["Restricciones", "Canciones", "Recordatorios"].includes(view) && <SimpleModule view={view} guests={guests} setGuests={setGuests} order={order} />}
+          {view === "Accesos" && <Accesses order={order} />}
           {view === "Configuración" && <Settings code={defaultPhoneCountryCode} onChange={setDefaultPhoneCountryCode} />}
         </div>
         <footer><span>Save Your Date</span><small>Invitaciones digitales para momentos inolvidables · Panel v106</small></footer>
