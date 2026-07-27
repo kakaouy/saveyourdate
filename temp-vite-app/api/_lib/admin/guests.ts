@@ -52,6 +52,21 @@ async function handler(request: Request) {
     if (request.method === 'PATCH') {
       const body = await request.json() as Record<string, unknown>;
       const id = String(body.id || '');
+      if (body.action === 'remind') {
+        if (!id) return json({ error: 'Falta identificar al invitado.' }, 400);
+        const remindedAt = new Date().toISOString();
+        const response = await supabaseRequest(
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&status=eq.Pendiente`,
+          {
+            method: 'PATCH',
+            headers: { Prefer: 'return=representation' },
+            body: JSON.stringify({ reminded_at: remindedAt, updated_at: remindedAt })
+          }
+        );
+        const rows = await response.json() as GuestRow[];
+        if (!rows[0]) return json({ error: 'El invitado ya respondió o no existe.' }, 404);
+        return json({ guest: clientGuest(rows[0]) });
+      }
       const status = String(body.status || '');
       if (!id || !['Confirmado', 'Pendiente', 'No asiste'].includes(status)) {
         return json({ error: 'Los datos de la confirmación no son válidos.' }, 400);
