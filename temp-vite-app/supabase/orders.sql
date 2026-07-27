@@ -61,3 +61,34 @@ alter table public.orders enable row level security;
 revoke all on public.orders from anon, authenticated;
 
 grant select, insert, update on public.orders to service_role;
+
+create table if not exists public.admin_login_codes (
+  id uuid primary key default gen_random_uuid(),
+  order_number text not null references public.orders(order_number) on delete cascade,
+  code_hash text not null,
+  attempts integer not null default 0,
+  expires_at timestamptz not null,
+  used_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists admin_login_codes_order_idx
+  on public.admin_login_codes(order_number, created_at desc);
+
+create table if not exists public.admin_sessions (
+  id uuid primary key default gen_random_uuid(),
+  order_number text not null references public.orders(order_number) on delete cascade,
+  token_hash text unique not null,
+  expires_at timestamptz not null,
+  revoked_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists admin_sessions_token_idx
+  on public.admin_sessions(token_hash);
+
+alter table public.admin_login_codes enable row level security;
+alter table public.admin_sessions enable row level security;
+
+revoke all on public.admin_login_codes, public.admin_sessions from anon, authenticated;
+grant select, insert, update on public.admin_login_codes, public.admin_sessions to service_role;

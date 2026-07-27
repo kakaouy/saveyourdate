@@ -91,7 +91,7 @@ export const createOrderNumber = () => {
   return `SYD-${code.slice(0, 4)}-${code.slice(4)}`;
 };
 
-const supabaseRequest = async (
+export const supabaseRequest = async (
   path: string,
   init: RequestInit = {}
 ): Promise<Response> => {
