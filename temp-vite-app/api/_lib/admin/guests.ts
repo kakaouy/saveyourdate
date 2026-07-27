@@ -71,6 +71,8 @@ async function handler(request: Request) {
           body: JSON.stringify({
             status,
             confirmed,
+            food: String(body.food ?? '—').trim() || '—',
+            song: String(body.song ?? '—').trim() || '—',
             updated_at: new Date().toISOString()
           })
         }

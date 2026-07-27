@@ -211,6 +211,8 @@ function Dashboard({ guests, onNavigate, order }: { guests: Guest[]; onNavigate:
   const seats = guests.reduce((total, guest) => total + guest.seats, 0);
   const pending = guests.filter((guest) => guest.status === "Pendiente").length;
   const declined = guests.filter((guest) => guest.status === "No asiste").length;
+  const restrictions = guests.filter((guest) => guest.food !== "—" && guest.food !== "Ninguna").length;
+  const songs = guests.filter((guest) => guest.song !== "—").length;
   const responseRate = guests.length
     ? Math.round(((guests.length - pending) / guests.length) * 100)
     : 0;
@@ -247,8 +249,8 @@ function Dashboard({ guests, onNavigate, order }: { guests: Guest[]; onNavigate:
         <article className="panel next-actions">
           <div className="panel-title"><div><h2>Próximas acciones</h2><p>Recomendaciones para avanzar</p></div></div>
           <button onClick={() => onNavigate("Recordatorios")}><span className="action-icon action-yellow">↗</span><div><strong>Enviar recordatorios</strong><small>{pending} invitados todavía no respondieron</small></div><b>→</b></button>
-          <button onClick={() => onNavigate("Restricciones")}><span className="action-icon action-coral">◇</span><div><strong>Revisar restricciones</strong><small>3 requerimientos alimentarios</small></div><b>→</b></button>
-          <button onClick={() => onNavigate("Canciones")}><span className="action-icon action-blue">♫</span><div><strong>Armar playlist</strong><small>3 canciones sugeridas</small></div><b>→</b></button>
+          <button onClick={() => onNavigate("Restricciones")}><span className="action-icon action-coral">◇</span><div><strong>Revisar restricciones</strong><small>{restrictions} requerimientos alimentarios</small></div><b>→</b></button>
+          <button onClick={() => onNavigate("Canciones")}><span className="action-icon action-blue">♫</span><div><strong>Armar playlist</strong><small>{songs} canciones sugeridas</small></div><b>→</b></button>
         </article>
       </section>
 
@@ -269,6 +271,7 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
+  const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [error, setError] = useState("");
   const filtered = guests.filter((guest) => {
     const matches = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
@@ -312,7 +315,9 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
         body: JSON.stringify({
           id: guest.id,
           status,
-          confirmed: status === "Confirmado" ? Math.max(guest.confirmed, guest.seats) : 0
+          confirmed: status === "Confirmado" ? Math.max(guest.confirmed, guest.seats) : 0,
+          food: guest.food,
+          song: guest.song
         })
       });
       const result = await response.json() as { guest?: Guest; error?: string };
@@ -322,6 +327,35 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
       setError(updateError instanceof Error ? updateError.message : "No pudimos actualizar la confirmación.");
     } finally {
       setUpdatingId("");
+    }
+  };
+
+  const updateDetails = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editingGuest) return;
+    setSaving(true);
+    setError("");
+    const data = new FormData(event.currentTarget);
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingGuest.id,
+          status: editingGuest.status,
+          confirmed: editingGuest.confirmed,
+          food: data.get("food"),
+          song: data.get("song")
+        })
+      });
+      const result = await response.json() as { guest?: Guest; error?: string };
+      if (!response.ok || !result.guest) throw new Error(result.error || "No pudimos guardar los datos.");
+      setGuests((current) => current.map((item) => item.id === editingGuest.id ? result.guest! : item));
+      setEditingGuest(null);
+    } catch (updateError) {
+      setError(updateError instanceof Error ? updateError.message : "No pudimos guardar los datos.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -341,7 +375,7 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
               <tr key={guest.id}>
                 <td><div className="person"><span className="avatar avatar-blue">{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span><p><strong>{guest.name}</strong><small>{guest.phone}</small></p></div></td>
                 <td>{guest.group}</td><td>{guest.confirmed}/{guest.seats}</td><td><select className={`status-select status-${guest.status.toLowerCase().replace(" ", "-")}`} value={guest.status} disabled={updatingId === guest.id} onChange={(event) => updateStatus(guest, event.target.value as Guest["status"])} aria-label={`Estado de ${guest.name}`}><option>Confirmado</option><option>Pendiente</option><option>No asiste</option></select></td><td>{guest.food}</td>
-                <td><button className="copy-button">Copiar link</button></td><td><button className="more-button" onClick={() => deleteGuest(guest.id)} aria-label={`Eliminar a ${guest.name}`}>Eliminar</button></td>
+                <td><button className="copy-button">Copiar link</button></td><td><div className="row-actions"><button className="copy-button" onClick={() => setEditingGuest(guest)}>Editar</button><button className="more-button" onClick={() => deleteGuest(guest.id)} aria-label={`Eliminar a ${guest.name}`}>Eliminar</button></div></td>
               </tr>
             ))}</tbody>
           </table>
@@ -350,6 +384,7 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
         <div className="table-footer"><span>Mostrando {filtered.length} de {guests.length} invitados</span><div><button>←</button><button className="active">1</button><button>→</button></div></div>
       </section>
       {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={addGuest} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre y apellido<input name="name" required /></label><label>Grupo<input name="group" placeholder="Ej. Familia" /></label><label>WhatsApp<input name="phone" /></label><label>Cupos<input name="seats" type="number" min="1" max="20" defaultValue="1" /></label><label>Email<input name="email" type="email" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar invitado"}</button></div></form></div>}
+      {editingGuest && <div className="modal-backdrop" onMouseDown={() => setEditingGuest(null)}><form className="modal" onSubmit={updateDetails} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setEditingGuest(null)}>×</button><span className="eyebrow">Información del invitado</span><h2>Editar a {editingGuest.name}</h2><div className="form-grid"><label>Restricción alimentaria<input name="food" defaultValue={editingGuest.food === "—" ? "" : editingGuest.food} placeholder="Ej. Vegetariano, celíaco…" /></label><label>Canción sugerida<input name="song" defaultValue={editingGuest.song === "—" ? "" : editingGuest.song} placeholder="Canción — Artista" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setEditingGuest(null)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</button></div></form></div>}
     </>
   );
 }
@@ -526,10 +561,14 @@ function Seating({ guests }: { guests: Guest[] }) {
 }
 
 function SimpleModule({ view, guests }: { view: string; guests: Guest[] }) {
+  const restrictions = guests.filter((g) => g.food !== "—" && g.food !== "Ninguna");
+  const songs = guests.filter((g) => g.song !== "—");
+  const pending = guests.filter((g) => g.status === "Pendiente");
+  const reminded = pending.filter((g) => g.reminded !== "—");
   const content = {
-    Restricciones: { eyebrow: "Información para catering", title: "Restricciones alimentarias", description: "Organizá los requerimientos de tus invitados.", stats: [["Registradas", "0"], ["Personas", "0"], ["Pendientes", "0"]], rows: guests.filter((g) => g.food !== "—" && g.food !== "Ninguna"), headers: ["Invitado", "Grupo", "Restricción", "Personas"] },
-    Canciones: { eyebrow: "Playlist colaborativa", title: "Canciones sugeridas", description: "Revisá y organizá las canciones enviadas.", stats: [["Sugeridas", "0"], ["Aprobadas", "0"], ["Pendientes", "0"]], rows: guests.filter((g) => g.song !== "—"), headers: ["Invitado", "Canción", "Estado", "Acción"] },
-    Recordatorios: { eyebrow: "Seguimiento RSVP", title: "Recordatorios", description: "Contactá a quienes todavía no respondieron.", stats: [["Pendientes", "0"], ["Recordados", "0"], ["Sin contactar", "0"]], rows: guests.filter((g) => g.status === "Pendiente"), headers: ["Invitado", "WhatsApp", "Último recordatorio", "Acción"] },
+    Restricciones: { eyebrow: "Información para catering", title: "Restricciones alimentarias", description: "Organizá los requerimientos de tus invitados.", stats: [["Registradas", String(restrictions.length)], ["Personas", String(restrictions.reduce((total, guest) => total + (guest.confirmed || 1), 0))], ["Pendientes", String(restrictions.filter((guest) => guest.status === "Pendiente").length)]], rows: restrictions, headers: ["Invitado", "Grupo", "Restricción", "Personas"] },
+    Canciones: { eyebrow: "Playlist colaborativa", title: "Canciones sugeridas", description: "Revisá y organizá las canciones enviadas.", stats: [["Sugeridas", String(songs.length)], ["Con respuesta", String(songs.filter((guest) => guest.status !== "Pendiente").length)], ["Pendientes", String(songs.filter((guest) => guest.status === "Pendiente").length)]], rows: songs, headers: ["Invitado", "Canción", "Estado", "Acción"] },
+    Recordatorios: { eyebrow: "Seguimiento RSVP", title: "Recordatorios", description: "Contactá a quienes todavía no respondieron.", stats: [["Pendientes", String(pending.length)], ["Recordados", String(reminded.length)], ["Sin contactar", String(pending.length - reminded.length)]], rows: pending, headers: ["Invitado", "WhatsApp", "Último recordatorio", "Acción"] },
     Accesos: { eyebrow: "Seguridad del evento", title: "Administradores", description: "Gestioná quién puede acceder al panel.", stats: [["Activos", "1"], ["Invitados", "0"], ["Sesiones", "1"]], rows: [], headers: ["Administrador", "Contacto", "Rol", "Estado"] },
   }[view]!;
 
