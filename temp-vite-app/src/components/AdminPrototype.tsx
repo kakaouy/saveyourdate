@@ -15,6 +15,7 @@ type Guest = {
   food: string;
   song: string;
   reminded: string;
+  updatedAt: string;
 };
 
 type AdminOrder = {
@@ -37,6 +38,25 @@ const formatEventDate = (value: string) => {
 
 const initials = (value: string) =>
   value.split(/\s+|&/).filter(Boolean).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+
+const exportCsv = (filename: string, headers: string[], rows: Array<Array<string | number>>) => {
+  const safeCell = (value: string | number) => {
+    const text = String(value ?? "");
+    const protectedText = /^[=+\-@]/.test(text) ? `'${text}` : text;
+    return `"${protectedText.replaceAll('"', '""')}"`;
+  };
+  const csv = [headers, ...rows].map((row) => row.map(safeCell).join(",")).join("\r\n");
+  const url = URL.createObjectURL(new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+const reportDate = (value: string) => value
+  ? new Intl.DateTimeFormat("es-UY", { dateStyle: "short", timeStyle: "short" }).format(new Date(value))
+  : "—";
 
 const nav = [
   ["Resumen", "⌂"],
@@ -419,9 +439,14 @@ function Confirmations({ guests }: { guests: Guest[] }) {
   const confirmed = guests.reduce((total, guest) => total + guest.confirmed, 0);
   const pending = guests.filter((guest) => guest.status === "Pendiente").length;
   const declined = guests.filter((guest) => guest.status === "No asiste").length;
+  const exportReport = () => exportCsv(
+    `confirmaciones-${new Date().toISOString().slice(0, 10)}.csv`,
+    ["Invitado", "Grupo", "Estado", "Cupos asignados", "Personas confirmadas", "WhatsApp", "Restricción", "Canción", "Última actualización"],
+    guests.map((guest) => [guest.name, guest.group, guest.status, guest.seats, guest.confirmed, guest.phone, guest.food, guest.song, reportDate(guest.updatedAt)])
+  );
   return (
     <>
-      <div className="page-heading"><div><span className="eyebrow">Respuestas RSVP</span><h1>Confirmaciones</h1><p>Consultá las respuestas recibidas y su información asociada.</p></div><button className="outline-button">⇩ Exportar reporte</button></div>
+      <div className="page-heading"><div><span className="eyebrow">Respuestas RSVP</span><h1>Confirmaciones</h1><p>Consultá las respuestas recibidas y su información asociada.</p></div><button className="outline-button" onClick={exportReport}>⇩ Exportar reporte</button></div>
       <section className="metrics-grid mini">
         <Metric label="Confirmaron" value={String(confirmed)} note="Personas" tone="green" />
         <Metric label="Pendientes" value={String(pending)} note="Invitaciones" tone="amber" />
@@ -429,7 +454,7 @@ function Confirmations({ guests }: { guests: Guest[] }) {
       </section>
       <section className="panel table-panel">
         <div className="table-scroll"><table><thead><tr><th>Invitado</th><th>Respuesta</th><th>Personas</th><th>Restricción</th><th>Canción</th><th>Fecha</th></tr></thead>
-        <tbody>{guests.filter((guest) => guest.status !== "Pendiente").map((guest) => <tr key={guest.id}><td><strong>{guest.name}</strong><small className="cell-sub">{guest.group}</small></td><td><Status value={guest.status} /></td><td>{guest.confirmed}</td><td>{guest.food}</td><td>{guest.song}</td><td>22/07/2026</td></tr>)}</tbody></table></div>
+        <tbody>{guests.filter((guest) => guest.status !== "Pendiente").map((guest) => <tr key={guest.id}><td><strong>{guest.name}</strong><small className="cell-sub">{guest.group}</small></td><td><Status value={guest.status} /></td><td>{guest.confirmed}</td><td>{guest.food}</td><td>{guest.song}</td><td>{reportDate(guest.updatedAt)}</td></tr>)}</tbody></table></div>
       </section>
     </>
   );
@@ -651,6 +676,23 @@ function SimpleModule({ view, guests, setGuests, order }: { view: string; guests
     Accesos: { eyebrow: "Seguridad del evento", title: "Administradores", description: "Gestioná quién puede acceder al panel.", stats: [["Activos", "1"], ["Invitados", "0"], ["Sesiones", "1"]], rows: [], headers: ["Administrador", "Contacto", "Rol", "Estado"] },
   }[view]!;
 
+  const exportModule = () => {
+    if (view === "Restricciones") {
+      exportCsv(
+        `restricciones-${new Date().toISOString().slice(0, 10)}.csv`,
+        ["Invitado", "Grupo", "Restricción", "Personas confirmadas", "Estado"],
+        restrictions.map((guest) => [guest.name, guest.group, guest.food, guest.confirmed, guest.status])
+      );
+    }
+    if (view === "Canciones") {
+      exportCsv(
+        `canciones-${new Date().toISOString().slice(0, 10)}.csv`,
+        ["Invitado", "Grupo", "Canción sugerida", "Estado"],
+        songs.map((guest) => [guest.name, guest.group, guest.song, guest.status])
+      );
+    }
+  };
+
   const reminderDate = (value: string) => value === "—"
     ? value
     : new Intl.DateTimeFormat("es-UY", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
@@ -696,7 +738,7 @@ function SimpleModule({ view, guests, setGuests, order }: { view: string; guests
 
   return (
     <>
-      <div className="page-heading"><div><span className="eyebrow">{content.eyebrow}</span><h1>{content.title}</h1><p>{content.description}</p></div>{view !== "Recordatorios" && <button className="primary-button small">＋ {view === "Accesos" ? "Agregar administrador" : "Exportar"}</button>}</div>
+      <div className="page-heading"><div><span className="eyebrow">{content.eyebrow}</span><h1>{content.title}</h1><p>{content.description}</p></div>{view !== "Recordatorios" && <button className="primary-button small" onClick={view === "Accesos" ? undefined : exportModule}>＋ {view === "Accesos" ? "Agregar administrador" : "Exportar CSV"}</button>}</div>
       <section className="metrics-grid mini">{content.stats.map(([label, value], index) => <Metric key={label} label={label} value={value} note={view === "Accesos" ? "usuarios" : "registros"} tone={["blue", "green", "amber"][index]} />)}</section>
       <section className="panel table-panel"><div className="table-scroll"><table><thead><tr>{content.headers.map((header) => <th key={header}>{header}</th>)}</tr></thead>
         <tbody>{content.rows.map((guest, index) => <tr key={guest.id}>
