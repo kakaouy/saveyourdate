@@ -6,6 +6,7 @@ create table if not exists public.orders (
   customer_name text not null,
   customer_email text not null,
   whatsapp text not null,
+  default_phone_country_code text not null default '+598',
   plan text not null,
   model_name text not null,
   language text not null default 'es'
@@ -26,6 +27,9 @@ create table if not exists public.orders (
 
 alter table public.orders
   add column if not exists language text not null default 'es';
+
+alter table public.orders
+  add column if not exists default_phone_country_code text not null default '+598';
 
 alter table public.orders
   add column if not exists invitation_url text,
@@ -101,6 +105,7 @@ create table if not exists public.event_guests (
   group_name text not null default '',
   email text not null default '',
   phone text not null default '',
+  phone_country_code text not null default '+598',
   seats integer not null default 1 check (seats between 1 and 20),
   confirmed integer not null default 0 check (confirmed between 0 and 20),
   status text not null default 'Pendiente'
@@ -114,6 +119,9 @@ create table if not exists public.event_guests (
 
 alter table public.event_guests
   add column if not exists invite_token uuid unique not null default gen_random_uuid();
+
+alter table public.event_guests
+  add column if not exists phone_country_code text not null default '+598';
 
 create index if not exists event_guests_order_idx
   on public.event_guests(order_number, created_at);

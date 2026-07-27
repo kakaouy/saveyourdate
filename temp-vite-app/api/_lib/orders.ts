@@ -15,6 +15,7 @@ export interface StoredOrder {
   customer_name: string;
   customer_email: string;
   whatsapp: string;
+  default_phone_country_code: string;
   plan: string;
   model_name: string;
   language: 'es' | 'en' | 'pt';
@@ -131,7 +132,7 @@ export const findOrderByToken = async (
   tokenHash: string
 ) => {
   const response = await supabaseRequest(
-    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
+    `orders?${field}=eq.${encodeURIComponent(tokenHash)}&select=order_number,customer_name,customer_email,whatsapp,default_phone_country_code,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   return rows[0] || null;
@@ -139,7 +140,7 @@ export const findOrderByToken = async (
 
 export const findOrderByNumber = async (orderNumber: string) => {
   const response = await supabaseRequest(
-    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
+    `orders?order_number=eq.${encodeURIComponent(orderNumber.toUpperCase())}&select=order_number,customer_name,customer_email,whatsapp,default_phone_country_code,plan,model_name,language,payment_operation,status,status_token_hash,approval_token_hash,approval_token_used_at,invitation_url,sheet_url,delivered_at,order_payload,created_at,updated_at&limit=1`
   );
   const rows = (await response.json()) as StoredOrder[];
   return rows[0] || null;

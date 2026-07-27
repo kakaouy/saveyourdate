@@ -2,6 +2,7 @@ import guests from '../_lib/admin/guests.js';
 import logout from '../_lib/admin/logout.js';
 import requestCode from '../_lib/admin/request-code.js';
 import session from '../_lib/admin/session.js';
+import settings from '../_lib/admin/settings.js';
 import tables from '../_lib/admin/tables.js';
 import verifyCode from '../_lib/admin/verify-code.js';
 import { json } from '../_lib/orders.js';
@@ -11,6 +12,7 @@ const handlers: Record<string, { fetch: (request: Request) => Promise<Response> 
   logout,
   'request-code': requestCode,
   session,
+  settings,
   tables,
   'verify-code': verifyCode
 };

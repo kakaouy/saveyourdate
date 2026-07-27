@@ -2,7 +2,7 @@ import { findSession, readSessionToken } from '../admin-auth.js';
 import { json, supabaseRequest } from '../orders.js';
 
 type GuestRow = {
-  id: string; invite_token: string; name: string; group_name: string; phone: string; seats: number;
+  id: string; invite_token: string; name: string; group_name: string; phone: string; phone_country_code: string; seats: number;
   confirmed: number; status: 'Confirmado' | 'Pendiente' | 'No asiste';
   food: string; song: string; reminded_at: string | null;
 };
@@ -13,6 +13,7 @@ const clientGuest = (row: GuestRow) => ({
   name: row.name,
   group: row.group_name,
   phone: row.phone,
+  phoneCountryCode: row.phone_country_code,
   seats: row.seats,
   confirmed: row.confirmed,
   status: row.status,
@@ -35,6 +36,9 @@ async function handler(request: Request) {
       const body = await request.json() as Record<string, unknown>;
       const name = String(body.name || '').trim();
       if (!name) return json({ error: 'Ingresá el nombre del invitado.' }, 400);
+      const phoneCountryCode = String(body.phoneCountryCode || '+598').trim();
+      const phoneDigits = String(body.phone || '').replace(/\D/g, '').replace(/^0+/, '');
+      if (!/^\+\d{1,4}$/.test(phoneCountryCode)) return json({ error: 'El código de país no es válido.' }, 400);
       const response = await supabaseRequest('event_guests', {
         method: 'POST',
         headers: { Prefer: 'return=representation' },
@@ -43,7 +47,8 @@ async function handler(request: Request) {
           name,
           group_name: String(body.group || '').trim(),
           email: String(body.email || '').trim().toLowerCase(),
-          phone: String(body.phone || '').trim(),
+          phone: phoneDigits ? `${phoneCountryCode}${phoneDigits}` : '',
+          phone_country_code: phoneCountryCode,
           seats: Math.max(1, Math.min(20, Number(body.seats) || 1))
         })
       });
@@ -72,13 +77,16 @@ async function handler(request: Request) {
         return json({ error: 'Los datos de la confirmación no son válidos.' }, 400);
       }
       const guestResponse = await supabaseRequest(
-        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats`
+        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,phone,phone_country_code`
       );
       const existingGuests = await guestResponse.json() as Pick<GuestRow, 'seats'>[];
       if (!existingGuests[0]) return json({ error: 'No encontramos ese invitado.' }, 404);
       const confirmed = status === 'Confirmado'
         ? Math.max(1, Math.min(existingGuests[0].seats, Number(body.confirmed) || existingGuests[0].seats))
         : 0;
+      const phoneCountryCode = String(body.phoneCountryCode || existingGuests[0].phone_country_code || '+598').trim();
+      const suppliedPhone = body.phone === undefined ? null : String(body.phone).replace(/\D/g, '').replace(/^0+/, '');
+      if (!/^\+\d{1,4}$/.test(phoneCountryCode)) return json({ error: 'El código de país no es válido.' }, 400);
       const response = await supabaseRequest(
         `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
         {
@@ -89,6 +97,8 @@ async function handler(request: Request) {
             confirmed,
             food: String(body.food ?? '—').trim() || '—',
             song: String(body.song ?? '—').trim() || '—',
+            phone_country_code: phoneCountryCode,
+            phone: suppliedPhone === null ? existingGuests[0].phone : suppliedPhone ? `${phoneCountryCode}${suppliedPhone}` : '',
             updated_at: new Date().toISOString()
           })
         }
