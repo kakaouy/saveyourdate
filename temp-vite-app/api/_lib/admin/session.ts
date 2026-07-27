@@ -1,5 +1,5 @@
-import { findSession, readSessionToken } from '../_lib/admin-auth.js';
-import { findOrderByNumber, json } from '../_lib/orders.js';
+import { findSession, readSessionToken } from '../admin-auth.js';
+import { findOrderByNumber, json } from '../orders.js';
 
 async function handler(request: Request) {
   if (request.method !== 'GET') return json({ error: 'Método no permitido.' }, 405);

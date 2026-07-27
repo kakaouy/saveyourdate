@@ -2,14 +2,14 @@ import {
   createChallenge,
   createSixDigitCode,
   recentChallengeCount
-} from '../_lib/admin-auth.js';
+} from '../admin-auth.js';
 import {
   emailShell,
   escapeHtml,
   findOrderForLookup,
   json,
   sendEmail
-} from '../_lib/orders.js';
+} from '../orders.js';
 
 async function handler(request: Request) {
   if (request.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
