@@ -3,6 +3,7 @@ import './App.css';
 import { INVITATION_MODELS } from './data/models';
 import type { InvitationModel } from './data/models';
 import OrderFlow from './components/OrderFlow';
+import { PAYMENT_LINKS, PLAN_PRICES } from './config/plans';
 import { VarezziaInvitation } from './components/varezzia/VarezziaInvitation';
 import { RivendellInvitation } from './components/rivendell/RivendellInvitation';
 
@@ -1212,7 +1213,7 @@ function App() {
 
   // Regional Currency and Payment Data (Rounded locally)
   const CURRENCY_DATA = {
-    USD: { symbol: '$', suffix: 'USD', bronze: 50, silver: 75, gold: 100, label: 'Dólar (Internacional)', bank: 'PayPal / Stripe (USD)', bankDetails: 'Email de pago: saveyourdate.invite@gmail.com' },
+    USD: { symbol: '$', suffix: 'USD', bronze: 60, silver: 90, gold: 90, label: 'Dólar (Internacional)', bank: 'Mercado Pago (USD)', bankDetails: 'El enlace de pago depende del plan elegido.' },
     ARS: { symbol: '$', suffix: 'ARS', bronze: 50000, silver: 75000, gold: 100000, label: 'Peso Argentino', bank: 'Mercado Pago / Transferencia', bankDetails: 'Los datos de pago se muestran al elegir transferencia.' },
     MXN: { symbol: '$', suffix: 'MXN', bronze: 900, silver: 1350, gold: 1800, label: 'Peso Mexicano', bank: 'Mercado Pago México / SPEI', bankDetails: 'CLABE SPEI: 012180009999999888 | BANCO: BBVA México' },
     CLP: { symbol: '$', suffix: 'CLP', bronze: 48000, silver: 72000, gold: 95000, label: 'Peso Chileno', bank: 'Mercado Pago Chile / Transferencia', bankDetails: 'Banco de Chile - Cuenta Corriente: 123-45678-90 | RUT: 77.777.777-7' },
@@ -1222,10 +1223,10 @@ function App() {
     BRL: { symbol: 'R$ ', suffix: 'BRL', bronze: 255, silver: 380, gold: 550, label: 'Real Brasileño', bank: 'Mercado Pago Brasil / PIX', bankDetails: 'Chave PIX (E-mail): pix@saveyourdate.com.br' }
   };
 
-    const PAYMENT_LINKS = {
-      bronze: 'https://mpago.la/2z4ME1Q',
-      silver: 'https://mpago.la/2z4ME1Q',
-      gold: 'https://mpago.la/2z4ME1Q'
+    const LEGACY_PAYMENT_LINKS = {
+      bronze: PAYMENT_LINKS.basic,
+      silver: PAYMENT_LINKS.premium,
+      gold: PAYMENT_LINKS.premium
     };
 
   // Valid pre-approved mock codes for testing!
@@ -2293,6 +2294,7 @@ function App() {
             <article className="plan-card-simple">
               <span className="plan-label">{lang === 'es' ? 'PLAN BÁSICO' : (lang === 'en' ? 'BASIC PLAN' : 'PLANO BÁSICO')}</span>
               <h3>{lang === 'es' ? 'La plantilla lista para vos' : (lang === 'en' ? 'The ready-made template' : 'O modelo pronto para você')}</h3>
+              <strong className="commercial-plan-price">{PLAN_PRICES.basic}</strong>
               <ul>
                 <li>{lang === 'es' ? 'Secciones originales del modelo' : (lang === 'en' ? 'Original template sections' : 'Seções originais do modelo')}</li>
                 <li>{lang === 'es' ? 'Hasta 5 fotos si incluye galería' : (lang === 'en' ? 'Up to 5 photos when a gallery is included' : 'Até 5 fotos quando inclui galeria')}</li>
@@ -2305,6 +2307,7 @@ function App() {
             <article className="plan-card-simple featured">
               <span className="plan-label">{lang === 'es' ? 'PLAN PREMIUM' : (lang === 'en' ? 'PREMIUM PLAN' : 'PLANO PREMIUM')}</span>
               <h3>{lang === 'es' ? 'La plantilla adaptada a tu evento' : (lang === 'en' ? 'A template adapted to your event' : 'O modelo adaptado ao seu evento')}</h3>
+              <strong className="commercial-plan-price">{PLAN_PRICES.premium}</strong>
               <ul>
                 <li>{lang === 'es' ? 'Todo lo incluido en Básico' : (lang === 'en' ? 'Everything in Basic' : 'Tudo do plano Básico')}</li>
                 <li><strong>+3</strong> {lang === 'es' ? 'secciones nuevas como máximo' : (lang === 'en' ? 'new sections maximum' : 'novas seções no máximo')}</li>
@@ -3024,7 +3027,7 @@ function App() {
                     </p>
                     <div style={{ marginTop: '10px', borderTop: '1px dashed var(--color-border)', paddingTop: '8px' }}>
                       <strong>Enlace de Pago Oficial:</strong> <br />
-                      <a href={PAYMENT_LINKS[paymentPlan]} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '4px', backgroundColor: '#009EE3', color: 'white', fontWeight: 'bold', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontSize: '11px' }}>
+                      <a href={LEGACY_PAYMENT_LINKS[paymentPlan]} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '4px', backgroundColor: '#009EE3', color: 'white', fontWeight: 'bold', padding: '6px 12px', borderRadius: '6px', textDecoration: 'none', fontSize: '11px' }}>
                         Pagar con Mercado Pago ↗
                       </a>
                     </div>

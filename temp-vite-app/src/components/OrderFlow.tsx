@@ -1,20 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { InvitationModel } from '../data/models';
+import { PAYMENT_LINKS, PLAN_PRICES, type CommercialPlan } from '../config/plans';
 
-type Plan = 'basic' | 'premium';
+type Plan = CommercialPlan;
 type FlowTab = 'new' | 'pay-first';
 type EventCategory = InvitationModel['category'];
 type Language = 'es' | 'en' | 'pt';
-
-const PAYMENT_LINKS: Record<Plan, string> = {
-  basic: 'https://mpago.la/2z4ME1Q',
-  premium: 'https://mpago.la/2z4ME1Q'
-};
-
-const PLAN_PRICES: Record<Plan, string> = {
-  basic: '$ 2.000 UYU',
-  premium: '$ 3.000 UYU'
-};
 
 const SECTION_OPTIONS = [
   { id: 'countdown', title: 'Cuenta regresiva', description: 'Contador dinámico hasta el día del evento.' },

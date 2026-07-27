@@ -3552,9 +3552,15 @@ html {
 }
 
 .plan-card-simple h3 {
-  margin: 18px 0 18px;
+  margin: 18px 0 8px;
   color: #392e3b;
   font: 700 27px/1.1 var(--font-serif);
+}
+
+.commercial-plan-price {
+  margin-bottom: 20px;
+  color: var(--syd-blue);
+  font: 800 28px/1 var(--font-serif);
 }
 
 .plan-card-simple ul {
