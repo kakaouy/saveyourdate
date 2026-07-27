@@ -959,9 +959,15 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
 }
 
 type AdminAccess = { id: string; email: string; role: "editor" | "viewer"; created_at: string };
+type AdminActivity = {
+  id: string; actor_email: string; actor_role: "owner" | "editor" | "viewer";
+  action: string; entity_type: string; entity_id: string | null;
+  details: Record<string, unknown>; created_at: string;
+};
 
 function Accesses({ order }: { order: AdminOrder }) {
   const [accesses, setAccesses] = useState<AdminAccess[]>([]);
+  const [activities, setActivities] = useState<AdminActivity[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -973,6 +979,29 @@ function Accesses({ order }: { order: AdminOrder }) {
     });
   }, []);
   useEffect(load, [load]);
+  useEffect(() => {
+    if (order.accessRole !== "owner") return;
+    fetch("/api/admin/activity", { cache: "no-store" }).then(async (response) => {
+      if (response.ok) setActivities(((await response.json()) as { activities: AdminActivity[] }).activities);
+    });
+  }, [order.accessRole]);
+
+  const activityLabel = (action: string) => ({
+    "guest.created": "Agregó un invitado",
+    "guests.imported": "Importó invitados",
+    "guest.updated": "Actualizó un invitado",
+    "guest.deleted": "Eliminó un invitado",
+    "guest.reminded": "Registró un recordatorio",
+    "table.created": "Creó una mesa",
+    "table.updated": "Actualizó una mesa",
+    "table.deleted": "Eliminó una mesa",
+    "table.guest_assigned": "Asignó un grupo a una mesa",
+    "table.guest_unassigned": "Quitó un grupo de una mesa",
+    "access.created": "Agregó un colaborador",
+    "access.role_updated": "Cambió un rol",
+    "access.deleted": "Revocó un acceso",
+    "settings.updated": "Actualizó la configuración"
+  }[action] || action);
 
   const invite = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -1027,6 +1056,10 @@ function Accesses({ order }: { order: AdminOrder }) {
       <tr><td><strong>{order.loginEmail}</strong></td><td>Propietario</td><td><span className="status status-confirmado">Activo</span></td><td /></tr>
       {accesses.map((access) => <tr key={access.id}><td><strong>{access.email}</strong></td><td>{order.accessRole === "owner" ? <select className="status-select" value={access.role} disabled={updatingId === access.id} onChange={(event) => updateRole(access, event.target.value as AdminAccess["role"])} aria-label={`Rol de ${access.email}`}><option value="editor">Editor</option><option value="viewer">Solo lectura</option></select> : access.role === "editor" ? "Editor" : "Solo lectura"}</td><td><span className="status status-confirmado">Activo</span></td><td>{order.accessRole === "owner" && <button className="more-button" disabled={updatingId === access.id} onClick={() => remove(access.id)}>Eliminar</button>}</td></tr>)}
     </tbody></table></div>{error && <p className="table-error" role="alert">{error}</p>}</section>
+    {order.accessRole === "owner" && <section className="panel table-panel audit-panel"><div className="panel-title"><div><h2>Historial de actividad</h2><p>Últimos cambios realizados desde el panel.</p></div></div><div className="table-scroll"><table><thead><tr><th>Usuario</th><th>Acción</th><th>Elemento</th><th>Fecha</th></tr></thead><tbody>
+      {activities.map((activity) => <tr key={activity.id}><td><strong>{activity.actor_email}</strong><small className="cell-sub">{activity.actor_role === "owner" ? "Propietario" : activity.actor_role === "editor" ? "Editor" : "Solo lectura"}</small></td><td>{activityLabel(activity.action)}</td><td>{activity.entity_type}</td><td>{reportDate(activity.created_at)}</td></tr>)}
+      {!activities.length && <tr><td colSpan={4}><span className="muted">Los próximos cambios administrativos aparecerán acá.</span></td></tr>}
+    </tbody></table></div></section>}
     {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={invite} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo acceso</span><h2>Agregar colaborador</h2><div className="form-grid"><label>Email<input name="email" type="email" required /></label><label>Rol<select name="role"><option value="editor">Editor</option><option value="viewer">Solo lectura</option></select></label></div><p className="dynamic-help">Recibirá un email y podrá ingresar con el número de pedido y su propia dirección.</p>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" disabled={saving}>{saving ? "Enviando…" : "Enviar invitación"}</button></div></form></div>}
   </>;
 }

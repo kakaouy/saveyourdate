@@ -1,5 +1,6 @@
 import { findSession, readSessionToken } from '../admin-auth.js';
 import { json, supabaseRequest } from '../orders.js';
+import { logAdminActivity } from './audit.js';
 
 type GuestRow = {
   id: string; invite_token: string; name: string; group_name: string; phone: string; phone_country_code: string; seats: number;
@@ -70,7 +71,9 @@ async function handler(request: Request) {
           headers: { Prefer: 'return=representation' },
           body: JSON.stringify(rows)
         });
-        return json({ guests: ((await response.json()) as GuestRow[]).map(clientGuest) }, 201);
+        const createdGuests = (await response.json()) as GuestRow[];
+        await logAdminActivity(session, 'guests.imported', 'guest', '', { count: createdGuests.length });
+        return json({ guests: createdGuests.map(clientGuest) }, 201);
       }
       const name = String(body.name || '').trim();
       if (!name) return json({ error: 'Ingresá el nombre del invitado.' }, 400);
@@ -92,7 +95,9 @@ async function handler(request: Request) {
           seats: Math.max(1, Math.min(20, Number(body.seats) || 1))
         })
       });
-      return json({ guest: clientGuest(((await response.json()) as GuestRow[])[0]) }, 201);
+      const createdGuest = ((await response.json()) as GuestRow[])[0];
+      await logAdminActivity(session, 'guest.created', 'guest', createdGuest.id, { name: createdGuest.name });
+      return json({ guest: clientGuest(createdGuest) }, 201);
     }
     if (request.method === 'PATCH') {
       const body = await request.json() as Record<string, unknown>;
@@ -110,6 +115,7 @@ async function handler(request: Request) {
         );
         const rows = await response.json() as GuestRow[];
         if (!rows[0]) return json({ error: 'El invitado ya respondió o no existe.' }, 404);
+        await logAdminActivity(session, 'guest.reminded', 'guest', rows[0].id, { name: rows[0].name });
         return json({ guest: clientGuest(rows[0]) });
       }
       const status = String(body.status || '');
@@ -147,6 +153,7 @@ async function handler(request: Request) {
       );
       const rows = await response.json() as GuestRow[];
       if (!rows[0]) return json({ error: 'No encontramos ese invitado.' }, 404);
+      await logAdminActivity(session, 'guest.updated', 'guest', rows[0].id, { name: rows[0].name, status: rows[0].status });
       return json({ guest: clientGuest(rows[0]) });
     }
     if (request.method === 'DELETE') {
@@ -155,6 +162,7 @@ async function handler(request: Request) {
         `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
         { method: 'DELETE' }
       );
+      await logAdminActivity(session, 'guest.deleted', 'guest', id);
       return json({ ok: true });
     }
     return json({ error: 'Método no permitido.' }, 405);
