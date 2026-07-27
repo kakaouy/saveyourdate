@@ -562,7 +562,7 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
           {view === "Mesas" && <Seating guests={guests} />}
           {["Restricciones", "Canciones", "Recordatorios", "Accesos"].includes(view) && <SimpleModule view={view} guests={guests} />}
         </div>
-        <footer><span>Save Your Date</span><small>Invitaciones digitales para momentos inolvidables · Prototipo con datos ficticios</small></footer>
+        <footer><span>Save Your Date</span><small>Invitaciones digitales para momentos inolvidables · Panel v106</small></footer>
       </section>
     </main>
   );
