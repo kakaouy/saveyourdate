@@ -89,6 +89,7 @@ button { color: inherit; }
 .sidebar nav button.active { box-shadow: inset 3px 0 var(--teal); }
 .sidebar-help { margin-top: auto; padding: 16px; border-radius: 12px; color: var(--ink); background: var(--mint); }
 .sidebar-help > span { display: grid; place-items: center; width: 26px; height: 26px; margin-bottom: 10px; border-radius: 50%; color: white; background: var(--teal); font-weight: 900; }
+.admin-shell .sidebar-help > span { flex: 0 0 26px; width: 26px !important; min-width: 26px; height: 26px; padding: 0 !important; aspect-ratio: 1; font-size: 14px !important; line-height: 1; }
 .sidebar-help div { display: grid; gap: 3px; }
 .sidebar-help strong { font-size: 11px; }
 .sidebar-help small { color: #617b83; font-size: 9px; }
