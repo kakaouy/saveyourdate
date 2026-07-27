@@ -922,6 +922,7 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
   const [customCode, setCustomCode] = useState(knownCode ? "" : code);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [backingUp, setBackingUp] = useState(false);
 
   const save = async () => {
     const value = selection === "custom" ? customCode.trim() : selection;
@@ -944,6 +945,27 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
     }
   };
 
+  const downloadBackup = async () => {
+    setBackingUp(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/admin/backup", { cache: "no-store" });
+      const result = await response.json() as { backup?: Record<string, unknown>; error?: string };
+      if (!response.ok || !result.backup) throw new Error(result.error || "No pudimos generar el respaldo.");
+      const url = URL.createObjectURL(new Blob([JSON.stringify(result.backup, null, 2)], { type: "application/json" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `save-your-date-respaldo-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      setMessage("Respaldo generado correctamente.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos generar el respaldo.");
+    } finally {
+      setBackingUp(false);
+    }
+  };
+
   return <>
     <div className="page-heading"><div><span className="eyebrow">Preferencias del evento</span><h1>Configuración</h1><p>Definí valores predeterminados para automatizar la gestión.</p></div></div>
     <section className="panel settings-panel">
@@ -954,6 +976,10 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
         <button className="primary-button small" disabled={saving} onClick={save}>{saving ? "Guardando…" : "Guardar configuración"}</button>
       </div>
       {message && <p className="settings-message" role="status">{message}</p>}
+    </section>
+    <section className="panel settings-panel">
+      <div className="panel-title"><div><h2>Respaldo de datos</h2><p>Descargá una copia completa del evento sin contraseñas, códigos ni secretos de autenticación.</p></div></div>
+      <div className="settings-form"><button className="outline-button" disabled={backingUp} onClick={downloadBackup}>{backingUp ? "Generando…" : "⇩ Descargar respaldo JSON"}</button></div>
     </section>
   </>;
 }
