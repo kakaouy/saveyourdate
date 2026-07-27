@@ -924,12 +924,14 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
   const [saving, setSaving] = useState(false);
   const [backingUp, setBackingUp] = useState(false);
   const [reminderDaysBefore, setReminderDaysBefore] = useState(7);
+  const [automaticRemindersEnabled, setAutomaticRemindersEnabled] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/settings", { cache: "no-store" }).then(async (response) => {
       if (!response.ok) return;
-      const result = await response.json() as { reminderDaysBefore?: number };
+      const result = await response.json() as { reminderDaysBefore?: number; automaticRemindersEnabled?: boolean };
       setReminderDaysBefore(result.reminderDaysBefore || 7);
+      setAutomaticRemindersEnabled(result.automaticRemindersEnabled === true);
     });
   }, []);
 
@@ -941,13 +943,14 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
       const response = await fetch("/api/admin/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ defaultPhoneCountryCode: value, reminderDaysBefore })
+        body: JSON.stringify({ defaultPhoneCountryCode: value, reminderDaysBefore, automaticRemindersEnabled })
       });
-      const result = await response.json() as { defaultPhoneCountryCode?: string; reminderDaysBefore?: number; error?: string };
+      const result = await response.json() as { defaultPhoneCountryCode?: string; reminderDaysBefore?: number; automaticRemindersEnabled?: boolean; error?: string };
       if (!response.ok || !result.defaultPhoneCountryCode) throw new Error(result.error || "No pudimos guardar la configuración.");
       onChange(result.defaultPhoneCountryCode);
       setReminderDaysBefore(result.reminderDaysBefore || reminderDaysBefore);
-      setMessage("Configuración guardada. Los invitados nuevos usarán este código automáticamente.");
+      setAutomaticRemindersEnabled(result.automaticRemindersEnabled === true);
+      setMessage("Configuración guardada correctamente.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No pudimos guardar la configuración.");
     } finally {
@@ -983,7 +986,8 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
       <div className="settings-form">
         <label>País<select value={selection} onChange={(event) => setSelection(event.target.value)}>{countryCodes.map(([country, value]) => <option key={value} value={value}>{country} {value}</option>)}<option value="custom">Otro país</option></select></label>
         {selection === "custom" && <label>Código internacional<input value={customCode} onChange={(event) => setCustomCode(event.target.value)} placeholder="+___" /></label>}
-        <label>Enviar recordatorio automático<input type="number" min="1" max="60" value={reminderDaysBefore} onChange={(event) => setReminderDaysBefore(Math.max(1, Math.min(60, Number(event.target.value) || 1)))} /><small>Días antes del evento</small></label>
+        <label>Recordatorios automáticos<select value={automaticRemindersEnabled ? "enabled" : "disabled"} onChange={(event) => setAutomaticRemindersEnabled(event.target.value === "enabled")}><option value="disabled">Desactivados</option><option value="enabled">Activados</option></select></label>
+        <label>Enviar con anticipación<input type="number" min="1" max="60" disabled={!automaticRemindersEnabled} value={reminderDaysBefore} onChange={(event) => setReminderDaysBefore(Math.max(1, Math.min(60, Number(event.target.value) || 1)))} /><small>Días antes del evento</small></label>
         <button className="primary-button small" disabled={saving} onClick={save}>{saving ? "Guardando…" : "Guardar configuración"}</button>
       </div>
       {message && <p className="settings-message" role="status">{message}</p>}

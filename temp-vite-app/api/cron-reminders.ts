@@ -28,6 +28,7 @@ async function handler(request: Request) {
     const orders = await ordersResponse.json() as ReminderOrder[];
     const today = utcDate(new Date());
     const dueOrders = orders.filter((order) => {
+      if (order.order_payload.automaticRemindersEnabled !== true) return false;
       const eventDate = String(order.order_payload.eventDate || '');
       if (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) return false;
       const event = new Date(`${eventDate}T00:00:00Z`);
