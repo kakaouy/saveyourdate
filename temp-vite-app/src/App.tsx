@@ -1987,10 +1987,8 @@ function App() {
 
           {/* Desktop Navigation */}
           <nav className="desktop-nav">
-            <a href="#inicio" className="nav-link" onClick={(e) => handleScrollToSection(e, 'inicio')}>{t.nav.home}</a>
             <a href="#modelos" className="nav-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
             <a href="#incluyen" className="nav-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
-            <a href="#planes" className="nav-link" onClick={(e) => handleScrollToSection(e, 'planes')}>{lang === 'es' ? 'Planes' : (lang === 'en' ? 'Plans' : 'Planos')}</a>
             <a href="#pedido" className="nav-link" onClick={(e) => handleScrollToSection(e, 'pedido')}>{lang === 'es' ? 'Cómo funciona' : (lang === 'en' ? 'How it works' : 'Como funciona')}</a>
             <a href="#preguntas" className="nav-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{lang === 'es' ? 'Preguntas' : 'FAQ'}</a>
             <a href="/consultar" className="nav-link nav-order-status">{lang === 'es' ? 'Consultar pedido' : (lang === 'en' ? 'Check order' : 'Consultar pedido')}</a>
@@ -2025,10 +2023,8 @@ function App() {
       <div className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={toggleSidebar}></div>
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <button className="sidebar-close-button" type="button" onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú">×</button>
-        <a href="#inicio" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'inicio')}>{t.nav.home}</a>
         <a href="#modelos" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'modelos')}>{t.nav.models}</a>
         <a href="#incluyen" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'incluyen')}>{t.nav.features}</a>
-        <a href="#planes" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'planes')}>{lang === 'es' ? 'Planes' : (lang === 'en' ? 'Plans' : 'Planos')}</a>
         <a href="#pedido" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'pedido')}>{lang === 'es' ? 'Cómo funciona' : (lang === 'en' ? 'How it works' : 'Como funciona')}</a>
         <a href="#preguntas" className="sidebar-link" onClick={(e) => handleScrollToSection(e, 'preguntas')}>{lang === 'es' ? 'Preguntas' : 'FAQ'}</a>
         <a href="/consultar" className="sidebar-link">{lang === 'es' ? 'Consultar pedido' : (lang === 'en' ? 'Check order' : 'Consultar pedido')}</a>
