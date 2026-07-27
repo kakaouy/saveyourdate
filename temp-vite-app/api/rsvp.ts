@@ -10,11 +10,13 @@ type GuestRow = {
   status: 'Confirmado' | 'Pendiente' | 'No asiste';
   food: string;
   song: string;
+  identification_type: string;
+  identification_number: string;
 };
 
 const findGuest = async (token: string) => {
   const response = await supabaseRequest(
-    `event_guests?invite_token=eq.${encodeURIComponent(token)}&select=id,order_number,name,group_name,seats,confirmed,status,food,song&limit=1`
+    `event_guests?invite_token=eq.${encodeURIComponent(token)}&select=id,order_number,name,group_name,seats,confirmed,status,food,song,identification_type,identification_number&limit=1`
   );
   const rows = await response.json() as GuestRow[];
   return rows[0] || null;
@@ -45,7 +47,9 @@ async function handler(request: Request) {
           confirmed: guest.confirmed,
           status: guest.status,
           food: guest.food,
-          song: guest.song
+          song: guest.song,
+          identificationType: guest.identification_type,
+          identificationNumber: guest.identification_number
         }
       });
     }
@@ -66,6 +70,8 @@ async function handler(request: Request) {
           confirmed,
           food: String(body.food || '').trim() || 'Ninguna',
           song: String(body.song || '').trim() || '—',
+          identification_type: String(body.identificationType || '').trim(),
+          identification_number: String(body.identificationNumber || '').trim(),
           updated_at: new Date().toISOString()
         })
       });
