@@ -181,6 +181,9 @@ alter table public.event_guests
 create index if not exists event_guests_table_idx
   on public.event_guests(table_id);
 
+alter table public.event_guests
+  add column if not exists companions jsonb not null default '[]'::jsonb;
+
 alter table public.event_tables enable row level security;
 revoke all on public.event_tables from anon, authenticated;
 grant select, insert, update, delete on public.event_tables to service_role;

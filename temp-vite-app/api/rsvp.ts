@@ -12,11 +12,12 @@ type GuestRow = {
   song: string;
   identification_type: string;
   identification_number: string;
+  companions: Array<{ name: string; food: string; identificationType: string; identificationNumber: string }>;
 };
 
 const findGuest = async (token: string) => {
   const response = await supabaseRequest(
-    `event_guests?invite_token=eq.${encodeURIComponent(token)}&select=id,order_number,name,group_name,seats,confirmed,status,food,song,identification_type,identification_number&limit=1`
+    `event_guests?invite_token=eq.${encodeURIComponent(token)}&select=id,order_number,name,group_name,seats,confirmed,status,food,song,identification_type,identification_number,companions&limit=1`
   );
   const rows = await response.json() as GuestRow[];
   return rows[0] || null;
@@ -49,7 +50,8 @@ async function handler(request: Request) {
           food: guest.food,
           song: guest.song,
           identificationType: guest.identification_type,
-          identificationNumber: guest.identification_number
+          identificationNumber: guest.identification_number,
+          companions: Array.isArray(guest.companions) ? guest.companions : []
         }
       });
     }
@@ -63,6 +65,23 @@ async function handler(request: Request) {
       const confirmed = status === 'Confirmado'
         ? Math.max(1, Math.min(guest.seats, Number(body.confirmed) || 1))
         : 0;
+      const companions = status === 'Confirmado' && Array.isArray(body.companions)
+        ? body.companions.slice(0, Math.max(0, confirmed - 1)).map((item) => {
+            const companion = item as Record<string, unknown>;
+            return {
+              name: String(companion.name || '').trim().slice(0, 120),
+              food: String(companion.food || '').trim().slice(0, 250),
+              identificationType: String(companion.identificationType || '').trim().slice(0, 30),
+              identificationNumber: String(companion.identificationNumber || '').trim().slice(0, 80)
+            };
+          })
+        : [];
+      if (status === 'Confirmado' && companions.length !== Math.max(0, confirmed - 1)) {
+        return json({ error: 'Completá los datos de todos los acompañantes.' }, 400);
+      }
+      if (companions.some((companion) => !companion.name)) {
+        return json({ error: 'Ingresá el nombre de cada acompañante.' }, 400);
+      }
       await supabaseRequest(`event_guests?id=eq.${encodeURIComponent(guest.id)}`, {
         method: 'PATCH',
         body: JSON.stringify({
@@ -72,6 +91,7 @@ async function handler(request: Request) {
           song: String(body.song || '').trim() || '—',
           identification_type: String(body.identificationType || '').trim(),
           identification_number: String(body.identificationNumber || '').trim(),
+          companions,
           updated_at: new Date().toISOString()
         })
       });

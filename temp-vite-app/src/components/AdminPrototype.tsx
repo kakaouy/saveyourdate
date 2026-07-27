@@ -16,6 +16,7 @@ type Guest = {
   status: "Confirmado" | "Pendiente" | "No asiste";
   food: string;
   song: string;
+  companions: Array<{ name: string; food: string; identificationType: string; identificationNumber: string }>;
   reminded: string;
   updatedAt: string;
 };
@@ -269,12 +270,14 @@ function Status({ value }: { value: Guest["status"] }) {
   return <span className={`status status-${value.toLowerCase().replace(" ", "-")}`}>{value}</span>;
 }
 
-function Dashboard({ guests, onNavigate, order }: { guests: Guest[]; onNavigate: (view: string) => void; order: AdminOrder }) {
+function Dashboard({ guests, onNavigate, order, canEdit }: { guests: Guest[]; onNavigate: (view: string) => void; order: AdminOrder; canEdit: boolean }) {
   const confirmed = guests.reduce((total, guest) => total + guest.confirmed, 0);
   const seats = guests.reduce((total, guest) => total + guest.seats, 0);
   const pending = guests.filter((guest) => guest.status === "Pendiente").length;
   const declined = guests.filter((guest) => guest.status === "No asiste").length;
-  const restrictions = guests.filter((guest) => guest.food !== "—" && guest.food !== "Ninguna").length;
+  const restrictions = guests.reduce((total, guest) => total
+    + (guest.food !== "—" && guest.food !== "Ninguna" ? 1 : 0)
+    + guest.companions.filter((companion) => companion.food).length, 0);
   const songs = guests.filter((guest) => guest.song !== "—").length;
   const responseRate = guests.length
     ? Math.round(((guests.length - pending) / guests.length) * 100)
@@ -304,7 +307,7 @@ function Dashboard({ guests, onNavigate, order }: { guests: Guest[]; onNavigate:
     <>
       <div className="page-heading">
         <div><span className="eyebrow">{order.eventType} · {formatEventDate(order.eventDate)}</span><h1>Buenas tardes, {order.customerName.split(" ")[0]}</h1><p>Este es el estado de tu evento hoy.</p></div>
-        <button className="outline-button" onClick={() => onNavigate("Invitados")}>＋ Agregar invitado</button>
+        {canEdit && <button className="outline-button" onClick={() => onNavigate("Invitados")}>＋ Agregar invitado</button>}
       </div>
 
       <section className="metrics-grid">
@@ -351,7 +354,7 @@ function Dashboard({ guests, onNavigate, order }: { guests: Guest[]; onNavigate:
   );
 }
 
-function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; defaultPhoneCountryCode: string }) {
+function Guests({ guests, setGuests, defaultPhoneCountryCode, canEdit }: { guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; defaultPhoneCountryCode: string; canEdit: boolean }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("Todos");
   const [showModal, setShowModal] = useState(false);
@@ -524,21 +527,21 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
 
   return (
     <>
-      <div className="page-heading"><div><span className="eyebrow">Gestión del evento</span><h1>Invitados</h1><p>Administrá grupos, cupos y enlaces personalizados.</p></div><button className="primary-button small" onClick={() => setShowModal(true)}>＋ Agregar invitado</button></div>
+      <div className="page-heading"><div><span className="eyebrow">Gestión del evento</span><h1>Invitados</h1><p>{canEdit ? "Administrá grupos, cupos y enlaces personalizados." : "Consultá grupos, cupos y enlaces personalizados."}</p></div>{canEdit && <button className="primary-button small" onClick={() => setShowModal(true)}>＋ Agregar invitado</button>}</div>
       <section className="panel table-panel">
         <div className="table-tools">
           <label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar invitado o grupo…" /></label>
           <div className="filter-pills">{["Todos", "Confirmado", "Pendiente", "No asiste"].map((item) => <button key={item} className={filter === item ? "active" : ""} onClick={() => setFilter(item)}>{item}</button>)}</div>
-          <div className="import-actions"><button className="copy-button" onClick={downloadTemplate}>Plantilla</button><button className="outline-button compact" disabled={saving} onClick={() => importInput.current?.click()}>{saving ? "Importando…" : "⇩ Importar CSV"}</button><input ref={importInput} className="visually-hidden" type="file" accept=".csv,text/csv" onChange={importCsv} /></div>
+          {canEdit && <div className="import-actions"><button className="copy-button" onClick={downloadTemplate}>Plantilla</button><button className="outline-button compact" disabled={saving} onClick={() => importInput.current?.click()}>{saving ? "Importando…" : "⇩ Importar CSV"}</button><input ref={importInput} className="visually-hidden" type="file" accept=".csv,text/csv" onChange={importCsv} /></div>}
         </div>
         <div className="table-scroll">
           <table>
-            <thead><tr><th>Invitado</th><th>Grupo</th><th>Cupos</th><th>Estado</th><th>Restricción</th><th>Enlace</th><th /></tr></thead>
+            <thead><tr><th>Invitado</th><th>Grupo</th><th>Cupos</th><th>Estado</th><th>Restricción</th><th>Enlace</th>{canEdit && <th />}</tr></thead>
             <tbody>{filtered.map((guest) => (
               <tr key={guest.id}>
                 <td><div className="person"><span className="avatar avatar-blue">{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span><p><strong>{guest.name}</strong><small>{guest.phone}</small></p></div></td>
-                <td>{guest.group}</td><td>{guest.confirmed}/{guest.seats}</td><td><select className={`status-select status-${guest.status.toLowerCase().replace(" ", "-")}`} value={guest.status} disabled={updatingId === guest.id} onChange={(event) => updateStatus(guest, event.target.value as Guest["status"])} aria-label={`Estado de ${guest.name}`}><option>Confirmado</option><option>Pendiente</option><option>No asiste</option></select></td><td>{guest.food}</td>
-                <td><button className="copy-button" onClick={() => copyInviteLink(guest)}>{copiedId === guest.id ? "¡Copiado!" : "Copiar link"}</button></td><td><div className="row-actions"><button className="copy-button" onClick={() => setEditingGuest(guest)}>Editar</button><button className="more-button" onClick={() => deleteGuest(guest.id)} aria-label={`Eliminar a ${guest.name}`}>Eliminar</button></div></td>
+                <td>{guest.group}</td><td>{guest.confirmed}/{guest.seats}</td><td>{canEdit ? <select className={`status-select status-${guest.status.toLowerCase().replace(" ", "-")}`} value={guest.status} disabled={updatingId === guest.id} onChange={(event) => updateStatus(guest, event.target.value as Guest["status"])} aria-label={`Estado de ${guest.name}`}><option>Confirmado</option><option>Pendiente</option><option>No asiste</option></select> : <Status value={guest.status} />}</td><td>{guest.food}</td>
+                <td><button className="copy-button" onClick={() => copyInviteLink(guest)}>{copiedId === guest.id ? "¡Copiado!" : "Copiar link"}</button></td>{canEdit && <td><div className="row-actions"><button className="copy-button" onClick={() => setEditingGuest(guest)}>Editar</button><button className="more-button" onClick={() => deleteGuest(guest.id)} aria-label={`Eliminar a ${guest.name}`}>Eliminar</button></div></td>}
               </tr>
             ))}</tbody>
           </table>
@@ -560,7 +563,10 @@ function Confirmations({ guests }: { guests: Guest[] }) {
   const exportReport = () => exportCsv(
     `confirmaciones-${new Date().toISOString().slice(0, 10)}.csv`,
     ["Invitado", "Grupo", "Estado", "Cupos asignados", "Personas confirmadas", "WhatsApp", "Tipo identificación", "Identificación", "Restricción", "Canción", "Última actualización"],
-    guests.map((guest) => [guest.name, guest.group, guest.status, guest.seats, guest.confirmed, guest.phone, guest.identificationType, guest.identificationNumber, guest.food, guest.song, reportDate(guest.updatedAt)])
+    guests.flatMap((guest) => [
+      [guest.name, guest.group, guest.status, guest.seats, guest.confirmed, guest.phone, guest.identificationType, guest.identificationNumber, guest.food, guest.song, reportDate(guest.updatedAt)],
+      ...guest.companions.map((companion) => [`↳ ${companion.name}`, guest.group, guest.status, "", "", "", companion.identificationType, companion.identificationNumber, companion.food || "Ninguna", "", reportDate(guest.updatedAt)])
+    ])
   );
   return (
     <>
@@ -572,7 +578,7 @@ function Confirmations({ guests }: { guests: Guest[] }) {
       </section>
       <section className="panel table-panel">
         <div className="table-scroll"><table><thead><tr><th>Invitado</th><th>Respuesta</th><th>Personas</th><th>Restricción</th><th>Canción</th><th>Fecha</th></tr></thead>
-        <tbody>{guests.filter((guest) => guest.status !== "Pendiente").map((guest) => <tr key={guest.id}><td><strong>{guest.name}</strong><small className="cell-sub">{guest.group}</small></td><td><Status value={guest.status} /></td><td>{guest.confirmed}</td><td>{guest.food}</td><td>{guest.song}</td><td>{reportDate(guest.updatedAt)}</td></tr>)}</tbody></table></div>
+        <tbody>{guests.filter((guest) => guest.status !== "Pendiente").map((guest) => <React.Fragment key={guest.id}><tr><td><strong>{guest.name}</strong><small className="cell-sub">{guest.group}</small></td><td><Status value={guest.status} /></td><td>{guest.confirmed}</td><td>{guest.food}</td><td>{guest.song}</td><td>{reportDate(guest.updatedAt)}</td></tr>{guest.companions.map((companion, index) => <tr className="companion-row" key={`${guest.id}-${index}`}><td><strong>↳ {companion.name}</strong><small className="cell-sub">Acompañante</small></td><td><Status value={guest.status} /></td><td>1</td><td>{companion.food || "Ninguna"}</td><td>—</td><td>{reportDate(guest.updatedAt)}</td></tr>)}</React.Fragment>)}</tbody></table></div>
       </section>
     </>
   );
@@ -586,7 +592,7 @@ type EventTable = {
   note: string;
 };
 
-function Seating({ guests }: { guests: Guest[] }) {
+function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const confirmedGuests = guests.filter((guest) => guest.status === "Confirmado");
   const [tables, setTables] = useState<EventTable[]>([]);
   const [loading, setLoading] = useState(true);
@@ -697,8 +703,8 @@ function Seating({ guests }: { guests: Guest[] }) {
   return (
     <>
       <div className="page-heading">
-        <div><span className="eyebrow">Distribución del salón</span><h1>Organización de mesas</h1><p>Asigná invitados confirmados y controlá la capacidad de cada mesa.</p></div>
-        <button className="primary-button small" onClick={openNew}>＋ Agregar mesa</button>
+        <div><span className="eyebrow">Distribución del salón</span><h1>Organización de mesas</h1><p>{canEdit ? "Asigná invitados confirmados y controlá la capacidad de cada mesa." : "Consultá la distribución y capacidad de las mesas."}</p></div>
+        {canEdit && <button className="primary-button small" onClick={openNew}>＋ Agregar mesa</button>}
       </div>
       {loading && <p className="module-notice">Cargando organización de mesas…</p>}
       {error && <p className="table-error seating-error" role="alert">{error}</p>}
@@ -719,7 +725,7 @@ function Seating({ guests }: { guests: Guest[] }) {
                 <div key={guest.id} className={currentTable ? "guest-assigned" : ""}>
                   <span className="avatar avatar-blue">{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span>
                   <p><strong>{guest.name}</strong><small>{guest.confirmed} {guest.confirmed === 1 ? "persona" : "personas"} · {guest.group}</small></p>
-                  <select value={currentTable?.id ?? ""} onChange={(event) => event.target.value ? assignGuest(guest.id, event.target.value) : unassignGuest(guest.id)} aria-label={`Mesa de ${guest.name}`}>
+                  <select value={currentTable?.id ?? ""} disabled={!canEdit} onChange={(event) => event.target.value ? assignGuest(guest.id, event.target.value) : unassignGuest(guest.id)} aria-label={`Mesa de ${guest.name}`}>
                     <option value="">Sin mesa</option>
                     {tables.map((table) => <option key={table.id} value={table.id}>{table.name}</option>)}
                   </select>
@@ -743,19 +749,19 @@ function Seating({ guests }: { guests: Guest[] }) {
                   <div className="table-card-top">
                     <span className="table-number">{index + 1}</span>
                     <div><h3>{table.name}</h3><p>{table.note || "Sin observaciones"}</p></div>
-                    <button onClick={() => openEdit(table)} aria-label={`Editar ${table.name}`}>•••</button>
+                    {canEdit && <button onClick={() => openEdit(table)} aria-label={`Editar ${table.name}`}>•••</button>}
                   </div>
                   <div className="capacity-row"><span>{occupied} de {table.capacity} lugares</span><strong>{over ? `${Math.abs(remaining)} de más` : full ? "Completa" : `${remaining} libres`}</strong></div>
                   <div className="capacity-bar"><i style={{ width: `${Math.min(100, (occupied / table.capacity) * 100)}%` }} /></div>
                   <div className="seated-guests">
-                    {tableGuests.map((guest) => <div key={guest.id}><span>{guest.name}</span><small>{guest.confirmed} lugares</small><button onClick={() => unassignGuest(guest.id)} aria-label={`Quitar a ${guest.name}`}>×</button></div>)}
-                    {!tableGuests.length && <button className="empty-table" onClick={() => document.querySelector<HTMLSelectElement>(".guest-assign-list select")?.focus()}>＋ Asignar invitados</button>}
+                    {tableGuests.map((guest) => <div key={guest.id}><span>{guest.name}</span><small>{guest.confirmed} lugares</small>{canEdit && <button onClick={() => unassignGuest(guest.id)} aria-label={`Quitar a ${guest.name}`}>×</button>}</div>)}
+                    {!tableGuests.length && (canEdit ? <button className="empty-table" onClick={() => document.querySelector<HTMLSelectElement>(".guest-assign-list select")?.focus()}>＋ Asignar invitados</button> : <span className="empty-table">Sin invitados asignados</span>)}
                   </div>
                   {over && <div className="capacity-alert">La mesa supera la capacidad configurada.</div>}
                 </article>
               );
             })}
-            <button className="add-table-card" onClick={openNew}><span>＋</span><strong>Agregar otra mesa</strong><small>Definí nombre y capacidad</small></button>
+            {canEdit && <button className="add-table-card" onClick={openNew}><span>＋</span><strong>Agregar otra mesa</strong><small>Definí nombre y capacidad</small></button>}
           </div>
         </section>
       </div>
@@ -782,10 +788,15 @@ function Seating({ guests }: { guests: Guest[] }) {
   );
 }
 
-function SimpleModule({ view, guests, setGuests, order }: { view: string; guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; order: AdminOrder }) {
+function SimpleModule({ view, guests, setGuests, order, canEdit }: { view: string; guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; order: AdminOrder; canEdit: boolean }) {
   const [remindingId, setRemindingId] = useState("");
   const [moduleError, setModuleError] = useState("");
-  const restrictions = guests.filter((g) => g.food !== "—" && g.food !== "Ninguna");
+  const restrictions = guests.flatMap((guest) => [
+    ...(guest.food !== "—" && guest.food !== "Ninguna" ? [guest] : []),
+    ...guest.companions
+      .map((companion, index) => ({ ...guest, id: `${guest.id}-companion-${index}`, name: companion.name, food: companion.food || "Ninguna", confirmed: 1 }))
+      .filter((companion) => companion.food !== "Ninguna")
+  ]);
   const songs = guests.filter((g) => g.song !== "—");
   const pending = guests.filter((g) => g.status === "Pendiente");
   const reminded = pending.filter((g) => g.reminded !== "—");
@@ -865,7 +876,7 @@ function SimpleModule({ view, guests, setGuests, order }: { view: string; guests
           <td><div className="person"><span className="avatar avatar-blue">{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span><p><strong>{view === "Accesos" && index === 0 ? "Ana Pereira" : view === "Accesos" && index === 1 ? "Martín Costa" : guest.name}</strong><small>{guest.group}</small></p></div></td>
           {view === "Restricciones" && <><td>{guest.group}</td><td><span className="status status-pendiente">{guest.food}</span></td><td>{guest.confirmed || 1}</td></>}
           {view === "Canciones" && <><td>{guest.song}</td><td><span className="status status-confirmado">Registrada</span></td></>}
-          {view === "Recordatorios" && <><td>{guest.phone || "Sin número"}</td><td>{reminderDate(guest.reminded)}</td><td><button className="whatsapp-button" disabled={remindingId === guest.id} onClick={() => remindGuest(guest)}>{remindingId === guest.id ? "Registrando…" : "Abrir WhatsApp ↗"}</button></td></>}
+          {view === "Recordatorios" && <><td>{guest.phone || "Sin número"}</td><td>{reminderDate(guest.reminded)}</td><td>{canEdit ? <button className="whatsapp-button" disabled={remindingId === guest.id} onClick={() => remindGuest(guest)}>{remindingId === guest.id ? "Registrando…" : "Abrir WhatsApp ↗"}</button> : <span className="muted">Solo lectura</span>}</td></>}
           {view === "Accesos" && <><td>{index === 0 ? "ana@ejemplo.com" : index === 1 ? "martin@ejemplo.com" : "sofia@ejemplo.com"}</td><td>{index === 0 ? "Propietaria" : index === 1 ? "Colaborador" : "Solo lectura"}</td><td><span className={`status ${index < 2 ? "status-confirmado" : "status-pendiente"}`}>{index < 2 ? "Activo" : "Invitación pendiente"}</span></td></>}
         </tr>)}</tbody></table></div>{moduleError && <p className="table-error" role="alert">{moduleError}</p>}</section>
     </>
@@ -1020,11 +1031,11 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
       <section className="admin-main">
         <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>{lastSynced ? `Sincronizado ${lastSynced.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" })}` : "Sincronizando datos…"}</small></div><div className="topbar-actions"><button className={`notification sync-button ${syncing ? "syncing" : ""}`} onClick={() => refreshGuests(true)} aria-label="Actualizar datos" title="Actualizar datos">↻</button><div className="admin-user"><span>{initials(order.loginEmail || order.customerName)}</span><div><strong>{order.loginEmail || order.customerName}</strong><small>{order.accessRole === "owner" ? "Propietario" : order.accessRole === "editor" ? "Editor" : "Solo lectura"}</small></div></div></div></header>
         <div className="admin-content">
-          {view === "Resumen" && <Dashboard guests={guests} onNavigate={navigate} order={order} />}
-          {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} defaultPhoneCountryCode={defaultPhoneCountryCode} />}
+          {view === "Resumen" && <Dashboard guests={guests} onNavigate={navigate} order={order} canEdit={order.accessRole !== "viewer"} />}
+          {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} defaultPhoneCountryCode={defaultPhoneCountryCode} canEdit={order.accessRole !== "viewer"} />}
           {view === "Confirmaciones" && <Confirmations guests={guests} />}
-          {view === "Mesas" && <Seating guests={guests} />}
-          {["Restricciones", "Canciones", "Recordatorios"].includes(view) && <SimpleModule view={view} guests={guests} setGuests={setGuests} order={order} />}
+          {view === "Mesas" && <Seating guests={guests} canEdit={order.accessRole !== "viewer"} />}
+          {["Restricciones", "Canciones", "Recordatorios"].includes(view) && <SimpleModule view={view} guests={guests} setGuests={setGuests} order={order} canEdit={order.accessRole !== "viewer"} />}
           {view === "Accesos" && <Accesses order={order} />}
           {view === "Configuración" && <Settings code={defaultPhoneCountryCode} onChange={setDefaultPhoneCountryCode} />}
         </div>

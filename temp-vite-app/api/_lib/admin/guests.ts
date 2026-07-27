@@ -6,6 +6,7 @@ type GuestRow = {
   identification_type: string; identification_number: string;
   confirmed: number; status: 'Confirmado' | 'Pendiente' | 'No asiste';
   food: string; song: string; reminded_at: string | null; updated_at: string;
+  companions: Array<{ name: string; food: string; identificationType: string; identificationNumber: string }>;
 };
 
 const clientGuest = (row: GuestRow) => ({
@@ -22,6 +23,7 @@ const clientGuest = (row: GuestRow) => ({
   status: row.status,
   food: row.food,
   song: row.song,
+  companions: Array.isArray(row.companions) ? row.companions : [],
   reminded: row.reminded_at || '—',
   updatedAt: row.updated_at
 });
