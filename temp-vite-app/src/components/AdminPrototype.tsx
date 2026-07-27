@@ -937,6 +937,7 @@ function Accesses({ order }: { order: AdminOrder }) {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [updatingId, setUpdatingId] = useState("");
 
   const load = useCallback(() => {
     fetch("/api/admin/access").then(async (response) => {
@@ -965,8 +966,30 @@ function Accesses({ order }: { order: AdminOrder }) {
   const remove = async (id: string) => {
     const access = accesses.find((item) => item.id === id);
     if (!window.confirm(`¿Revocar el acceso de ${access?.email || "este colaborador"}?`)) return;
-    const response = await fetch(`/api/admin/access?id=${encodeURIComponent(id)}`, { method: "DELETE" });
-    if (response.ok) setAccesses((current) => current.filter((access) => access.id !== id));
+    setUpdatingId(id); setError("");
+    try {
+      const response = await fetch(`/api/admin/access?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos revocar el acceso.");
+      setAccesses((current) => current.filter((access) => access.id !== id));
+    } catch (removeError) {
+      setError(removeError instanceof Error ? removeError.message : "No pudimos revocar el acceso.");
+    } finally { setUpdatingId(""); }
+  };
+
+  const updateRole = async (access: AdminAccess, role: AdminAccess["role"]) => {
+    setUpdatingId(access.id); setError("");
+    try {
+      const response = await fetch("/api/admin/access", {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: access.id, role })
+      });
+      const result = await response.json() as { access?: AdminAccess; error?: string };
+      if (!response.ok || !result.access) throw new Error(result.error || "No pudimos cambiar el rol.");
+      setAccesses((current) => current.map((item) => item.id === access.id ? result.access! : item));
+    } catch (roleError) {
+      setError(roleError instanceof Error ? roleError.message : "No pudimos cambiar el rol.");
+    } finally { setUpdatingId(""); }
   };
 
   return <>
@@ -974,8 +997,8 @@ function Accesses({ order }: { order: AdminOrder }) {
     <section className="metrics-grid mini"><Metric label="Propietarios" value="1" note="acceso total" tone="blue" /><Metric label="Editores" value={String(accesses.filter((access) => access.role === "editor").length)} note="pueden modificar" tone="green" /><Metric label="Solo lectura" value={String(accesses.filter((access) => access.role === "viewer").length)} note="sin cambios" tone="amber" /></section>
     <section className="panel table-panel"><div className="table-scroll"><table><thead><tr><th>Administrador</th><th>Rol</th><th>Estado</th><th /></tr></thead><tbody>
       <tr><td><strong>{order.loginEmail}</strong></td><td>Propietario</td><td><span className="status status-confirmado">Activo</span></td><td /></tr>
-      {accesses.map((access) => <tr key={access.id}><td><strong>{access.email}</strong></td><td>{access.role === "editor" ? "Editor" : "Solo lectura"}</td><td><span className="status status-confirmado">Activo</span></td><td>{order.accessRole === "owner" && <button className="more-button" onClick={() => remove(access.id)}>Eliminar</button>}</td></tr>)}
-    </tbody></table></div></section>
+      {accesses.map((access) => <tr key={access.id}><td><strong>{access.email}</strong></td><td>{order.accessRole === "owner" ? <select className="status-select" value={access.role} disabled={updatingId === access.id} onChange={(event) => updateRole(access, event.target.value as AdminAccess["role"])} aria-label={`Rol de ${access.email}`}><option value="editor">Editor</option><option value="viewer">Solo lectura</option></select> : access.role === "editor" ? "Editor" : "Solo lectura"}</td><td><span className="status status-confirmado">Activo</span></td><td>{order.accessRole === "owner" && <button className="more-button" disabled={updatingId === access.id} onClick={() => remove(access.id)}>Eliminar</button>}</td></tr>)}
+    </tbody></table></div>{error && <p className="table-error" role="alert">{error}</p>}</section>
     {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={invite} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo acceso</span><h2>Agregar colaborador</h2><div className="form-grid"><label>Email<input name="email" type="email" required /></label><label>Rol<select name="role"><option value="editor">Editor</option><option value="viewer">Solo lectura</option></select></label></div><p className="dynamic-help">Recibirá un email y podrá ingresar con el número de pedido y su propia dirección.</p>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" disabled={saving}>{saving ? "Enviando…" : "Enviar invitación"}</button></div></form></div>}
   </>;
 }

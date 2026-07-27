@@ -41,12 +41,47 @@ async function handler(request: Request) {
       return json({ access }, 201);
     }
 
+    if (request.method === 'PATCH') {
+      const body = await request.json() as Record<string, unknown>;
+      const id = String(body.id || '');
+      const role = String(body.role || '');
+      if (!id || !['editor', 'viewer'].includes(role)) {
+        return json({ error: 'Seleccioná un rol válido.' }, 400);
+      }
+      const response = await supabaseRequest(
+        `event_admins?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
+        {
+          method: 'PATCH',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify({ role })
+        }
+      );
+      const access = ((await response.json()) as AccessRow[])[0];
+      if (!access) return json({ error: 'No encontramos ese colaborador.' }, 404);
+      await supabaseRequest(
+        `admin_sessions?order_number=eq.${encodeURIComponent(session.order_number)}&login_email=eq.${encodeURIComponent(access.email)}&revoked_at=is.null`,
+        { method: 'PATCH', body: JSON.stringify({ revoked_at: new Date().toISOString() }) }
+      );
+      return json({ access });
+    }
+
     if (request.method === 'DELETE') {
       const id = new URL(request.url).searchParams.get('id') || '';
-      await supabaseRequest(
+      const accessResponse = await supabaseRequest(
+        `event_admins?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=email&limit=1`
+      );
+      const access = ((await accessResponse.json()) as Pick<AccessRow, 'email'>[])[0];
+      if (!access) return json({ error: 'No encontramos ese colaborador.' }, 404);
+      await Promise.all([
+        supabaseRequest(
         `event_admins?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
         { method: 'DELETE' }
-      );
+        ),
+        supabaseRequest(
+          `admin_sessions?order_number=eq.${encodeURIComponent(session.order_number)}&login_email=eq.${encodeURIComponent(access.email)}&revoked_at=is.null`,
+          { method: 'PATCH', body: JSON.stringify({ revoked_at: new Date().toISOString() }) }
+        )
+      ]);
       return json({ ok: true });
     }
 
