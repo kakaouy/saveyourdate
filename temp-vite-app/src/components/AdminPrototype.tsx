@@ -432,6 +432,9 @@ type EventTable = {
 function Seating({ guests }: { guests: Guest[] }) {
   const confirmedGuests = guests.filter((guest) => guest.status === "Confirmado");
   const [tables, setTables] = useState<EventTable[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<EventTable | null>(null);
   const [tableName, setTableName] = useState("Mesa 3");
@@ -443,6 +446,17 @@ function Seating({ guests }: { guests: Guest[] }) {
   const assignedPeople = tables.reduce((total, table) => total + table.guests.reduce((sum, id) => sum + (guests.find((guest) => guest.id === id)?.confirmed ?? 0), 0), 0);
   const totalConfirmed = confirmedGuests.reduce((total, guest) => total + guest.confirmed, 0);
   const totalCapacity = tables.reduce((total, table) => total + table.capacity, 0);
+
+  useEffect(() => {
+    fetch("/api/admin/tables")
+      .then(async (response) => {
+        const result = await response.json() as { tables?: EventTable[]; error?: string };
+        if (!response.ok || !result.tables) throw new Error(result.error || "No pudimos cargar las mesas.");
+        setTables(result.tables);
+      })
+      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "No pudimos cargar las mesas."))
+      .finally(() => setLoading(false));
+  }, []);
 
   const openNew = () => {
     setEditing(null);
@@ -460,31 +474,66 @@ function Seating({ guests }: { guests: Guest[] }) {
     setShowModal(true);
   };
 
-  const saveTable = () => {
-    if (editing) {
-      setTables((current) => current.map((table) => table.id === editing.id ? { ...table, name: tableName, capacity, note } : table));
-    } else {
-      setTables((current) => [...current, { id: `table-${Date.now()}`, name: tableName, capacity, note, guests: [] }]);
+  const saveTable = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/tables", {
+        method: editing ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: editing?.id, name: tableName, capacity, note })
+      });
+      const result = await response.json() as { table?: EventTable; error?: string };
+      if (!response.ok || !result.table) throw new Error(result.error || "No pudimos guardar la mesa.");
+      setTables((current) => editing
+        ? current.map((table) => table.id === editing.id ? { ...result.table!, guests: table.guests } : table)
+        : [...current, result.table!]);
+      setShowModal(false);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "No pudimos guardar la mesa.");
+    } finally {
+      setSaving(false);
     }
-    setShowModal(false);
   };
 
-  const deleteTable = (tableId: string) => {
-    setTables((current) => current.filter((table) => table.id !== tableId));
+  const deleteTable = async (tableId: string) => {
+    setSaving(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/tables?id=${encodeURIComponent(tableId)}`, { method: "DELETE" });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos eliminar la mesa.");
+      setTables((current) => current.filter((table) => table.id !== tableId));
+      setShowModal(false);
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : "No pudimos eliminar la mesa.");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const assignGuest = (guestId: string, tableId: string) => {
-    setTables((current) => current.map((table) => ({
-      ...table,
-      guests: table.id === tableId
-        ? [...table.guests.filter((id) => id !== guestId), guestId]
-        : table.guests.filter((id) => id !== guestId),
-    })));
+  const assignGuest = async (guestId: string, tableId: string) => {
+    setError("");
+    try {
+      const response = await fetch("/api/admin/tables", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "assign", guestId, tableId })
+      });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos asignar el invitado.");
+      setTables((current) => current.map((table) => ({
+        ...table,
+        guests: table.id === tableId
+          ? [...table.guests.filter((id) => id !== guestId), guestId]
+          : table.guests.filter((id) => id !== guestId),
+      })));
+    } catch (assignError) {
+      setError(assignError instanceof Error ? assignError.message : "No pudimos asignar el invitado.");
+    }
   };
 
-  const unassignGuest = (guestId: string) => {
-    setTables((current) => current.map((table) => ({ ...table, guests: table.guests.filter((id) => id !== guestId) })));
-  };
+  const unassignGuest = (guestId: string) => assignGuest(guestId, "");
 
   return (
     <>
@@ -492,6 +541,8 @@ function Seating({ guests }: { guests: Guest[] }) {
         <div><span className="eyebrow">Distribución del salón</span><h1>Organización de mesas</h1><p>Asigná invitados confirmados y controlá la capacidad de cada mesa.</p></div>
         <button className="primary-button small" onClick={openNew}>＋ Agregar mesa</button>
       </div>
+      {loading && <p className="module-notice">Cargando organización de mesas…</p>}
+      {error && <p className="table-error seating-error" role="alert">{error}</p>}
 
       <section className="seating-summary">
         <article><span>Mesas creadas</span><strong>{tables.length}</strong><small>{totalCapacity} lugares disponibles</small></article>
@@ -561,10 +612,10 @@ function Seating({ guests }: { guests: Guest[] }) {
           </div>
           <label className="modal-note">Ubicación u observaciones<input value={note} onChange={(event) => setNote(event.target.value)} placeholder="Ej. Cerca de la pista" /></label>
           <div className="modal-actions table-modal-actions">
-            {editing && <button className="delete-button" onClick={() => { deleteTable(editing.id); setShowModal(false); }}>Eliminar mesa</button>}
+            {editing && <button className="delete-button" disabled={saving} onClick={() => deleteTable(editing.id)}>Eliminar mesa</button>}
             <span />
             <button className="outline-button" onClick={() => setShowModal(false)}>Cancelar</button>
-            <button className="primary-button small" onClick={saveTable}>{editing ? "Guardar cambios" : "Crear mesa"}</button>
+            <button className="primary-button small" disabled={saving} onClick={saveTable}>{saving ? "Guardando…" : editing ? "Guardar cambios" : "Crear mesa"}</button>
           </div>
         </div>
       </div>}

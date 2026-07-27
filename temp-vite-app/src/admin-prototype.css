@@ -203,6 +203,8 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
 .modal-actions .primary-button { width: auto; }
 .seating-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+.module-notice, .seating-error { margin: 0 0 14px; border-radius: 9px; }
+.module-notice { padding: 10px 14px; color: var(--muted); background: white; font-size: 10px; }
 .seating-summary article { display: grid; gap: 5px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: white; }
 .seating-summary span { color: var(--muted); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 .seating-summary strong { font-family: Georgia, serif; font-size: 27px; font-weight: 500; }

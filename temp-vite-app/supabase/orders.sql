@@ -121,3 +121,26 @@ create index if not exists event_guests_order_idx
 alter table public.event_guests enable row level security;
 revoke all on public.event_guests from anon, authenticated;
 grant select, insert, update, delete on public.event_guests to service_role;
+
+create table if not exists public.event_tables (
+  id uuid primary key default gen_random_uuid(),
+  order_number text not null references public.orders(order_number) on delete cascade,
+  name text not null,
+  capacity integer not null default 8 check (capacity between 1 and 30),
+  note text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists event_tables_order_idx
+  on public.event_tables(order_number, created_at);
+
+alter table public.event_guests
+  add column if not exists table_id uuid references public.event_tables(id) on delete set null;
+
+create index if not exists event_guests_table_idx
+  on public.event_guests(table_id);
+
+alter table public.event_tables enable row level security;
+revoke all on public.event_tables from anon, authenticated;
+grant select, insert, update, delete on public.event_tables to service_role;
