@@ -268,6 +268,7 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
   const [filter, setFilter] = useState("Todos");
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [updatingId, setUpdatingId] = useState("");
   const [error, setError] = useState("");
   const filtered = guests.filter((guest) => {
     const matches = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
@@ -301,6 +302,29 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
     if (response.ok) setGuests((current) => current.filter((guest) => guest.id !== id));
   };
 
+  const updateStatus = async (guest: Guest, status: Guest["status"]) => {
+    setUpdatingId(guest.id);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: guest.id,
+          status,
+          confirmed: status === "Confirmado" ? Math.max(guest.confirmed, guest.seats) : 0
+        })
+      });
+      const result = await response.json() as { guest?: Guest; error?: string };
+      if (!response.ok || !result.guest) throw new Error(result.error || "No pudimos actualizar la confirmación.");
+      setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+    } catch (updateError) {
+      setError(updateError instanceof Error ? updateError.message : "No pudimos actualizar la confirmación.");
+    } finally {
+      setUpdatingId("");
+    }
+  };
+
   return (
     <>
       <div className="page-heading"><div><span className="eyebrow">Gestión del evento</span><h1>Invitados</h1><p>Administrá grupos, cupos y enlaces personalizados.</p></div><button className="primary-button small" onClick={() => setShowModal(true)}>＋ Agregar invitado</button></div>
@@ -316,12 +340,13 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
             <tbody>{filtered.map((guest) => (
               <tr key={guest.id}>
                 <td><div className="person"><span className="avatar avatar-blue">{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span><p><strong>{guest.name}</strong><small>{guest.phone}</small></p></div></td>
-                <td>{guest.group}</td><td>{guest.confirmed}/{guest.seats}</td><td><Status value={guest.status} /></td><td>{guest.food}</td>
+                <td>{guest.group}</td><td>{guest.confirmed}/{guest.seats}</td><td><select className={`status-select status-${guest.status.toLowerCase().replace(" ", "-")}`} value={guest.status} disabled={updatingId === guest.id} onChange={(event) => updateStatus(guest, event.target.value as Guest["status"])} aria-label={`Estado de ${guest.name}`}><option>Confirmado</option><option>Pendiente</option><option>No asiste</option></select></td><td>{guest.food}</td>
                 <td><button className="copy-button">Copiar link</button></td><td><button className="more-button" onClick={() => deleteGuest(guest.id)} aria-label={`Eliminar a ${guest.name}`}>Eliminar</button></td>
               </tr>
             ))}</tbody>
           </table>
         </div>
+        {error && <p className="table-error" role="alert">{error}</p>}
         <div className="table-footer"><span>Mostrando {filtered.length} de {guests.length} invitados</span><div><button>←</button><button className="active">1</button><button>→</button></div></div>
       </section>
       {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={addGuest} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre y apellido<input name="name" required /></label><label>Grupo<input name="group" placeholder="Ej. Familia" /></label><label>WhatsApp<input name="phone" /></label><label>Cupos<input name="seats" type="number" min="1" max="20" defaultValue="1" /></label><label>Email<input name="email" type="email" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar invitado"}</button></div></form></div>}
