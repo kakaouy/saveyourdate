@@ -100,7 +100,7 @@ const FEATURE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'Foto destacada con efecto parallax': 'Featured photo with parallax effect',
     'Confirmación RSVP': 'RSVP confirmation',
     'Cuenta Regresiva': 'Countdown',
-    'Regalos / CBU': 'Gifts / Bank details',
+    'Regalos / datos de pago': 'Gifts / Payment details',
     'Google Maps': 'Google Maps',
     'Playlist Spotify': 'Spotify playlist',
     'Dress Code': 'Dress code',
@@ -121,7 +121,7 @@ const FEATURE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'Foto destacada con efecto parallax': 'Foto destacada com efeito parallax',
     'Confirmación RSVP': 'Confirmação de presença',
     'Cuenta Regresiva': 'Contagem regressiva',
-    'Regalos / CBU': 'Presentes / Dados bancários',
+    'Regalos / datos de pago': 'Presentes / Dados de pagamento',
     'Google Maps': 'Google Maps',
     'Playlist Spotify': 'Playlist do Spotify',
     'Dress Code': 'Código de vestimenta',
@@ -240,9 +240,9 @@ const TRANSLATIONS = {
         { t: "Confirmación RSVP", d: "Tus invitados confirman su asistencia con un formulario online directo. Recibís los datos organizados al instante." },
         { t: "Música de Fondo", d: "Elegí la canción que los define para ambientar la navegación desde que se abre la pantalla." },
         { t: "Ubicación con GPS", d: "Un enlace directo a Google Maps o Waze para que nadie se pierda y todos lleguen a tiempo al festejo." },
-        { t: "Sugerencia de Regalos", d: "Incluí tus datos bancarios, CBU, alias o un link a tu lista de regalos para facilitar el presente a tus invitados." },
+        { t: "Sugerencia de Regalos", d: "Incluí los datos de pago disponibles en tu país o un link a tu lista de regalos para facilitar el presente a tus invitados." },
         { t: "Código de Vestimenta", d: "Informá a tus invitados sobre el Dress Code de forma elegante (Gala, Elegante Sport, Temático, etc.)." },
-        { t: "Galería de Fotos", d: "Compartí un álbum con los mejores momentos de la pareja o fotos previas para emocionar a todos." },
+        { t: "Galería de Fotos", d: "Compartí un álbum con tus mejores momentos para emocionar a todos." },
         { t: "Diseño 100% Responsivo", d: "Se adapta de manera fluida y fluida a cualquier dispositivo: computadoras, tablets y sobre todo smartphones." }
       ]
     },
@@ -263,16 +263,15 @@ const TRANSLATIONS = {
       title: "Preguntas Frecuentes",
       desc: "Queremos darte total tranquilidad. Aquí respondemos las principales dudas sobre el funcionamiento y personalización de tu invitación digital.",
       items: [
-        { q: "¿Cuánto tiempo tarda en estar lista mi invitación?", a: "Una vez que completás el formulario con todos tus datos y subís tus fotos, el borrador privado estará listo en 24 a 48 horas hábiles para tu revisión completa." },
-        { q: "¿Puedo realizar cambios después de que esté publicada?", a: "¡Sí, totalmente! Sabemos que pueden surgir imprevistos (cambios de horario, mesa, etc.). Los cambios de información de texto, cronograma y ubicación son gratuitos y los realizamos a la brevedad durante todo tu evento." },
-        { q: "¿Cómo confirman asistencia los invitados?", a: "Tus invitados completan un formulario RSVP dentro de la misma invitación web. La respuesta te llega automáticamente a tu planilla de Google Sheets vinculada en tiempo real para que veas el listado organizado al instante." },
-        { q: "¿Por cuánto tiempo permanece activo el enlace web?", a: "La invitación permanece activa, online y funcional hasta 30 días después de realizado tu evento. Si necesitás extender el tiempo por algún motivo, podés solicitarlo." },
-        { q: "¿Qué métodos de pago aceptan?", a: "Aceptamos transferencias bancarias directas (CBU/Alias) y todas las tarjetas de crédito o débito a través de la pasarela de Mercado Pago." },
-        { q: "¿Puedo hacer el pedido antes de pagar?", a: "Sí. Podés elegir el modelo, completar todos los datos y enviar el pedido sin realizar el pago. La invitación se libera una vez que validamos el pago internamente." },
-        { q: "¿Cómo informo un pago de Mercado Pago?", a: "Si ya pagaste, podés pegar el número de operación en el formulario del pedido. Si pagás después, ingresá en ‘Ya creaste tu invite’ y enviá tu número de pedido junto con el número de operación." },
-        { q: "¿Qué incluye el Plan Básico?", a: "Incluye portada cuando el modelo la lleve, hasta 5 secciones elegidas por vos y galería de hasta 5 fotos cuando la galería sea una de las secciones seleccionadas. También podés agregar música de fondo sin consumir una sección." },
-        { q: "¿Qué incluye el Plan Premium?", a: "Incluye portada cuando el modelo la lleve, hasta 8 secciones elegidas por vos y galería de hasta 8 fotos cuando la galería sea una de las secciones seleccionadas. También podés agregar música de fondo sin consumir una sección." },
-        { q: "¿Qué incluye la confirmación de asistencia?", a: "La sección RSVP incluye formulario de confirmación, Google Sheets, link de envío y registro de restricciones alimentarias para catering." }
+        { q: "¿Cómo hago el pedido?", a: "Elegí un modelo y un plan. Después podés hacer el pedido y pagar, o pagar primero y completar el pedido a continuación. En ambos casos te damos un número de pedido para seguir todo el proceso." },
+        { q: "¿Cómo sé si mi pago fue validado?", a: "Consultá el estado con tu email o WhatsApp y tu número de pedido o de pago. También te avisamos por email cuando recibimos el pedido, validamos el pago, realizamos modificaciones y entregamos la invitación final." },
+        { q: "¿Cuánto tiempo tarda en estar lista?", a: "Cuando el pago esté validado y tengamos toda la información necesaria, recibirás una vista previa durante la preparación. El plazo puede variar según el plan y las modificaciones solicitadas." },
+        { q: "¿Qué incluye el Plan Básico?", a: "Usa la plantilla elegida con sus secciones originales y permite hasta 5 fotos en la galería, cuando el modelo tenga galería." },
+        { q: "¿Qué incluye el Plan Premium?", a: "Parte de una plantilla existente y permite eliminar secciones, agregar hasta 3 secciones nuevas y usar hasta 8 fotos en la galería." },
+        { q: "¿Puedo pedir cambios?", a: "Sí. Desde la vista previa podés comunicarte por WhatsApp o por el formulario del sitio para pedir cambios o agregar información antes de recibir el enlace definitivo." },
+        { q: "¿Cómo confirman asistencia los invitados?", a: "Si elegís la sección RSVP, tus invitados completan el formulario dentro de la invitación y las respuestas se organizan en una planilla de Google Sheets." },
+        { q: "¿Qué métodos de pago aceptan?", a: "Las opciones disponibles se muestran al iniciar el pedido y pueden adaptarse según el país. El pago se informa con el número de operación correspondiente." },
+        { q: "¿Por cuánto tiempo permanece activo el enlace?", a: "La invitación permanece activa hasta 30 días después del evento. Si necesitás extender ese plazo, podés consultarnos por WhatsApp o desde el formulario del sitio." }
       ]
     },
     portal: {
@@ -323,7 +322,7 @@ const TRANSLATIONS = {
       gps: "Link de Ubicación (Google Maps)",
       giftTitle: "🎁 Regalo y Detalles Premium",
       alias: "ALIAS de Mercado Pago / Banco",
-      cbu: "CBU / CVU Bancario",
+      cbu: "Datos bancarios o de pago",
       music: "Música preferida (Link de Youtube/Spotify)",
       dress: "Código de Vestimenta (Dress Code)",
       upload: "Subir fotos para la galería (Cargar hasta 5 archivos)",
@@ -340,7 +339,7 @@ const TRANSLATIONS = {
       gps: "Link de Ubicación (Google Maps)",
       styleTitle: "🌟 Estilo, Playlist y Regalo",
       alias: "ALIAS para Lluvia de Sobres / Regalos",
-      cbu: "CBU / CVU Bancario",
+      cbu: "Datos bancarios o de pago",
       music: "Música o Canción Favorita (Link de Spotify/Youtube)",
       dress: "Código de Vestimenta (Dress Code)",
       hashtag: "Hashtag del Evento para Instagram",
@@ -358,7 +357,7 @@ const TRANSLATIONS = {
       gps: "Link de Ubicación (Google Maps)",
       giftTitle: "🎁 Regalo, Música y Requerimientos",
       alias: "ALIAS para Transferencias o Lista",
-      cbu: "CBU o CVU Bancario",
+      cbu: "Datos bancarios o de pago",
       music: "Música preferida (Link de Youtube/Spotify)",
       instructions: "Indicaciones Especiales / Campos Libres para los Invitados",
       upload: "Subir fotos alusivas (Hasta 5 fotos)"
@@ -367,7 +366,7 @@ const TRANSLATIONS = {
       successTitle: "¡Pago Simulado con Éxito!",
       successDesc: "Hemos recibido la simulación de tu pago. Se ha generado un nuevo código de validación exclusivo para tu invitación. Podés copiarlo abajo e ingresarlo para empezar a diseñar.",
       codeLabel: "Tu código de validación premium",
-      destLabel: "CBU destino de pago: Mercado Pago Save Your Date S.A.",
+      destLabel: "Datos de destino del pago",
       btnStart: "Comenzar a Crear mi Invitación con este Código 🚀",
       title: "Elegí tu Plan Save Your Date",
       desc: "Seleccioná el nivel de interactividad que buscás. El pago generará inmediatamente tu código de acceso para subir toda tu información.",
@@ -427,13 +426,13 @@ const TRANSLATIONS = {
       guestSolo: "Voy solo/a (1)",
       guestMultiple: "Somos {count} personas",
       btnConfirm: "Confirmar",
-      giftTitle: "Regalo o CBU",
+      giftTitle: "Datos para regalos",
       giftDesc: "El mejor regalo es tu presencia, pero si deseás colaborar con nuestra luna de miel, podés hacerlo con una transferencia."
     },
     extras: {
-      btn: "✨ Ver Extras & Beneficios Incluidos",
-      title: "Beneficios Premium Incluidos",
-      desc: "Además de las funciones interactivas, tu invitación Save Your Date incluye una suite completa de herramientas para facilitar la organización de tu gran día:",
+      btn: "✨ Ver secciones Premium para elegir",
+      title: "Secciones Premium para elegir",
+      desc: "Estas secciones no están incluidas automáticamente. Con el Plan Premium podés elegir las que mejor se adapten a tu evento y agregar hasta 3 a la plantilla:",
       items: [
         "Diseño exclusivo, animado y adaptable a celulares.",
         "Link listo para compartir por WhatsApp o correo.",
@@ -446,7 +445,7 @@ const TRANSLATIONS = {
         "Panel privado en Google Sheets con información en tiempo real.",
         "Reporte automático para catering.",
         "Enlaces de WhatsApp para contactar invitados pendientes.",
-        "Código QR listo para imprimir.",
+        "Código QR de acceso.",
         "Opción para agregar el evento al calendario.",
         "Galería o álbum colaborativo.",
         "Mensaje de agradecimiento después del evento.",
@@ -546,7 +545,7 @@ const TRANSLATIONS = {
         { t: "GPS Location Map", d: "Direct link to Google Maps or Waze so that nobody gets lost and everyone arrives at the party on time." },
         { t: "Gift Registry / Bank", d: "Include your bank account details, wire info, or a registry link to make gifts easy and convenient." },
         { t: "Dress Code Guide", d: "Inform your guests about the preferred dress code in an elegant way (Black Tie, Smart Casual, White, etc.)." },
-        { t: "Photo Gallery", d: "Share a beautiful photo album with the couple's best moments or pre-wedding shoots to touch everyone." },
+        { t: "Photo Gallery", d: "Share a beautiful album with your best moments to touch everyone." },
         { t: "100% Responsive Design", d: "Adapts smoothly and elegantly to any device: desktop computers, tablets, and especially smartphones." }
       ]
     },
@@ -567,15 +566,15 @@ const TRANSLATIONS = {
       title: "Frequently Asked Questions",
       desc: "We want you to have peace of mind. Here we answer the main questions regarding how your digital invitation works.",
       items: [
-        { q: "How long does it take for my invitation to be ready?", a: "Once you complete the form with your details and upload your photos, your private draft will be ready in 24 to 48 business hours for review." },
-        { q: "Can I make changes after it is published?", a: "Yes, absolutely! We know unexpected adjustments happen (schedule changes, table numbers, etc.). Text and location updates are free throughout the duration of your event." },
-        { q: "How do guests confirm their attendance?", a: "Your guests fill out an RSVP form within the web invitation. Answers are automatically added to your linked Google Sheet in real time." },
-        { q: "How long does the web link remain active?", a: "The invitation remains active and fully functional online up to 30 days after your event has taken place." },
-        { q: "What payment methods do you accept?", a: "We accept local bank transfers, wire transfers, and all credit/debit cards processed securely through Mercado Pago or PayPal." },
-        { q: "What are the prices of the plans?", a: "Our prices vary depending on the interactivity plan you choose and your country's currency. You can check the updated rates and make your secure payment simulation in the <a href='#pago'>Choose Your Save Your Date Plan</a> section." },
-        { q: "What does the Bronze Plan include?", a: "The Bronze Plan is perfect for simple and elegant events. It includes: single web link invitation active up to 30 days after the event, live countdown timer, location details with interactive GPS maps, gift registry or bank wire details, and a photo gallery with up to 5 photos." },
-        { q: "What does the Silver Plan include?", a: "The Silver Plan is our most popular Premium plan. It includes everything in the Bronze Plan (with up to 10 gallery photos) plus advanced interactive features: background music of your choice and the digital RSVP form so your guests can confirm attendance directly from the website, with answers synced in real-time to your private Google Sheets spreadsheet." },
-        { q: "What does the Gold Plan include?", a: "The Gold Plan is the ultimate interactive experience. It includes everything in the Silver Plan (with up to 15 gallery photos) plus advanced benefits: a collaborative Spotify playlist for your guests to suggest party songs and an advanced private admin panel to manage guests." }
+        { q: "How do I place an order?", a: "Choose a design and a plan. You can place the order before paying or pay first and complete it afterward. Either way, you receive an order number to track the process." },
+        { q: "How do I know if my payment was approved?", a: "Check the status using your email or WhatsApp plus your order or payment number. We also email you when the order is received, payment is approved, changes are made, and the final invitation is delivered." },
+        { q: "How long does it take?", a: "Once payment is approved and we have all required information, you receive a preview while we prepare the invitation. Timing may vary depending on the plan and requested changes." },
+        { q: "What does the Basic Plan include?", a: "It uses the selected template with its original sections and supports up to 5 gallery photos when that template includes a gallery." },
+        { q: "What does the Premium Plan include?", a: "It starts from an existing template and lets you remove sections, add up to 3 new sections, and use up to 8 gallery photos." },
+        { q: "Can I request changes?", a: "Yes. From the preview you can contact us through WhatsApp or the website form before receiving the final link." },
+        { q: "How do guests confirm attendance?", a: "If you choose RSVP, guests complete the form inside the invitation and responses are organized in a Google Sheet." },
+        { q: "Which payment methods are accepted?", a: "Available options are shown when you start the order and may vary by country. Report your payment using the corresponding transaction number." },
+        { q: "How long does the invitation stay active?", a: "The invitation stays active until 30 days after the event. Contact us if you need an extension." }
       ]
     },
     portal: {
@@ -626,7 +625,7 @@ const TRANSLATIONS = {
       gps: "Location Link (Google Maps)",
       giftTitle: "🎁 Gift Registry & Wire Details",
       alias: "Alias / Banking Code",
-      cbu: "CBU / Wire Code",
+      cbu: "Bank or payment details",
       music: "Favorite Song (Youtube/Spotify Link)",
       dress: "Dress Code",
       upload: "Upload photos for the gallery (Up to 5 files)",
@@ -643,7 +642,7 @@ const TRANSLATIONS = {
       gps: "Location Link (Google Maps)",
       styleTitle: "🌟 Style, Playlist & Gifts",
       alias: "Gift Envelope / Bank Alias",
-      cbu: "CBU / Wire Code",
+      cbu: "Bank or payment details",
       music: "Favorite Song (Spotify/Youtube Link)",
       dress: "Dress Code / Theme",
       hashtag: "Event Instagram Hashtag",
@@ -661,7 +660,7 @@ const TRANSLATIONS = {
       gps: "Location Link (Google Maps)",
       giftTitle: "🎁 Gifts, Music & Requirements",
       alias: "Bank Alias or Wire Details",
-      cbu: "CBU / Wire Code",
+      cbu: "Bank or payment details",
       music: "Background Music (Youtube/Spotify Link)",
       instructions: "Special Instructions / Custom Notes for Guests",
       upload: "Upload Event Photos (Up to 5 files)"
@@ -734,9 +733,9 @@ const TRANSLATIONS = {
       giftDesc: "The best gift is your presence, but if you wish to collaborate with our honeymoon fund, you can wire a transfer."
     },
     extras: {
-      btn: "✨ See Included Extras & Benefits",
-      title: "Premium Included Benefits",
-      desc: "In addition to interactive features, your Save Your Date invitation includes a full suite of organization tools for your big day:",
+      btn: "✨ View Premium sections to choose from",
+      title: "Premium sections to choose from",
+      desc: "These sections are not included automatically. With the Premium Plan, choose the ones that fit your event and add up to 3 to the template:",
       items: [
         "Exclusive, animated, and fully mobile-responsive design.",
         "Ready-to-share link for WhatsApp or email.",
@@ -749,7 +748,7 @@ const TRANSLATIONS = {
         "Private Google Sheets panel with real-time sync.",
         "Automatic catering reports.",
         "WhatsApp shortcut links to contact pending guests.",
-        "Print-ready QR Code.",
+        "Access QR code.",
         "Add-to-calendar event options.",
         "Collaborative guest photo gallery or album.",
         "Thank-you message page post-event.",
@@ -849,7 +848,7 @@ const TRANSLATIONS = {
         { t: "Localização com GPS", d: "Um link direto para o Google Maps ou Waze para que ninguém se perca e todos cheguem a tempo para celebrar." },
         { t: "Sugestão de Presentes", d: "Inclua seus dados bancários, chave PIX, conta ou link da sua lista de presentes para facilitar para seus convidados." },
         { t: "Código de Vestimenta", d: "Informe seus convidados sobre o Dress Code de forma elegante (Gala, Esporte Fino, Temático, etc.)." },
-        { t: "Galeria de Fotos", d: "Compartilhe um álbum com os melhores momentos do casal ou fotos do ensaio pré-casamento para emocionar a todos." },
+        { t: "Galeria de Fotos", d: "Compartilhe um álbum com seus melhores momentos para emocionar a todos." },
         { t: "Design 100% Responsivo", d: "Adapta-se de forma fluida a qualquer dispositivo: computadores, tablets e, principalmente, smartphones." }
       ]
     },
@@ -870,15 +869,15 @@ const TRANSLATIONS = {
       title: "Perguntas Frequentes",
       desc: "Queremos lhe dar total tranquilidade. Aqui respondemos as principais dúvidas sobre o funcionamento e personalização do seu convite digital.",
       items: [
-        { q: "Quanto tempo demora para meu convite ficar pronto?", a: "Assim que você preencher o formulário com seus dados e enviar as fotos, o rascunho privado estará pronto em 24 a 48 horas úteis para sua revisão." },
-        { q: "Posso fazer alterações depois de publicado?", a: "Sim, com certeza! Sabemos que imprevistos acontecem (mudanças de horário, mesa, etc.). Alterações de texto e localização são gratuitas durante todo o evento." },
-        { q: "Como os convidados confirmam presença?", a: "Seus convidados preenchem o formulário RSVP dentro do próprio convite digital. A resposta chega de forma automática na sua planilha do Google Sheets vinculada em tempo real." },
-        { q: "Por quanto tempo o link permanece ativo?", a: "O convite digital permanece ativo e totalmente funcional online até 30 dias após a realização do seu evento." },
-        { q: "Quais métodos de pagamento são aceitos?", a: "Aceitamos transferências bancárias locais, PIX (no Brasil) e todos os cartões de crédito ou débito através do Mercado Pago ou PayPal." },
-        { q: "Quais são os preços dos planos?", a: "Nossos preços variam de acordo com o plano de interatividade escolhido e a moeda do seu país. Você pode consultar as tarifas atualizadas e simular seu pagamento com segurança na seção <a href='#pago'>Escolha seu Plano Save Your Date</a>." },
-        { q: "O que inclui o Plano Bronze?", a: "O Plano Bronze é ideal para eventos simples e elegantes. Inclui: convite web de link único ativo até 30 dias após o evento, relógio de contagem regressiva, detalhes de localização com mapas GPS interativos, dados de presente ou chave bancária para transferências, e galeria de fotos com até 5 fotos." },
-        { q: "O que inclui o Plano Prata?", a: "O Plano Prata é o nosso plano Premium mais escolhido. Inclui tudo do Plano Bronze (com até 10 fotos na galeria) além de recursos interativos avançados: música de fundo de sua escolha e o formulário digital RSVP para seus convidados confirmarem presença diretamente pelo site, com as respostas sincronizadas em tempo real na sua planilha privada do Google Sheets." },
-        { q: "O que inclui o Plano Ouro?", a: "O Plano Ouro é a experiência interativa definitiva. Inclui tudo do Plano Prata (com até 15 fotos na galeria) além de benefícios avançados: playlist colaborativa do Spotify para os convidados sugerirem músicas para a festa e um painel de administração privado e avançado para gerenciar convidados." }
+        { q: "Como faço o pedido?", a: "Escolha um modelo e um plano. Você pode fazer o pedido antes de pagar ou pagar primeiro e completar o pedido depois. Em ambos os casos, recebe um número para acompanhar o processo." },
+        { q: "Como sei se o pagamento foi validado?", a: "Consulte o status com seu e-mail ou WhatsApp e o número do pedido ou pagamento. Também enviamos e-mails em cada etapa importante." },
+        { q: "Quanto tempo demora?", a: "Quando o pagamento estiver validado e tivermos todas as informações, você receberá uma prévia durante a preparação. O prazo pode variar conforme o plano e as alterações." },
+        { q: "O que inclui o Plano Básico?", a: "Usa o modelo escolhido com suas seções originais e permite até 5 fotos na galeria, quando o modelo tiver galeria." },
+        { q: "O que inclui o Plano Premium?", a: "Parte de um modelo existente e permite remover seções, adicionar até 3 novas seções e usar até 8 fotos na galeria." },
+        { q: "Posso solicitar alterações?", a: "Sim. Na prévia, você pode falar conosco pelo WhatsApp ou formulário do site antes de receber o link definitivo." },
+        { q: "Como os convidados confirmam presença?", a: "Se escolher RSVP, os convidados completam o formulário no convite e as respostas são organizadas em uma planilha do Google Sheets." },
+        { q: "Quais pagamentos são aceitos?", a: "As opções disponíveis aparecem ao iniciar o pedido e podem variar conforme o país. Informe o pagamento com o número da transação." },
+        { q: "Por quanto tempo o convite fica ativo?", a: "O convite permanece ativo até 30 dias após o evento. Fale conosco se precisar estender esse prazo." }
       ]
     },
     portal: {
@@ -929,7 +928,7 @@ const TRANSLATIONS = {
       gps: "Link de Localização (Google Maps)",
       giftTitle: "🎁 Presente e Detalhes Premium",
       alias: "Chave PIX / Código do Banco",
-      cbu: "Cód. de Transferência (CBU/IBAN)",
+      cbu: "Dados bancários ou de pagamento",
       music: "Música preferida (Link de Youtube/Spotify)",
       dress: "Código de Vestimenta (Dress Code)",
       upload: "Enviar fotos para a galeria (Carregar até 5 arquivos)",
@@ -946,7 +945,7 @@ const TRANSLATIONS = {
       gps: "Link de Localização (Google Maps)",
       styleTitle: "🌟 Estilo, Playlist e Presentes",
       alias: "Chave PIX / Lista de Presentes",
-      cbu: "Cód. de Transferência (CBU/Wire)",
+      cbu: "Dados bancários ou de pagamento",
       music: "Música Favorita (Link do Spotify/Youtube)",
       dress: "Código de Vestimenta / Tema",
       hashtag: "Hashtag do Evento para o Instagram",
@@ -964,7 +963,7 @@ const TRANSLATIONS = {
       gps: "Link de Localização (Google Maps)",
       giftTitle: "🎁 Presente, Música e Requisitos",
       alias: "Chave PIX ou Detalhes da Conta",
-      cbu: "Cód. de Transferência (CBU/Wire)",
+      cbu: "Dados bancários ou de pagamento",
       music: "Música de Fundo (Link de Youtube/Spotify)",
       instructions: "Instruções Especiais / Notas para os Convidados",
       upload: "Carregar Fotos Alusivas (Até 5 arquivos)"
@@ -1037,9 +1036,9 @@ const TRANSLATIONS = {
       giftDesc: "O melhor presente é a sua presença, mas se desejar colaborar com nossa lua de mel, você pode enviar um PIX ou transferência."
     },
     extras: {
-      btn: "✨ Ver Extras & Benefícios Incluídos",
-      title: "Benefícios Premium Incluídos",
-      desc: "Além das funções interactivas, seu convite Save Your Date inclui um conjunto completo de ferramentas de organização:",
+      btn: "✨ Ver seções Premium para escolher",
+      title: "Seções Premium para escolher",
+      desc: "Estas seções não são incluídas automaticamente. Com o Plano Premium, escolha as que combinam com seu evento e adicione até 3 ao modelo:",
       items: [
         "Design exclusivo, animado e totalmente adaptável a celulares.",
         "Link pronto para compartilhar por WhatsApp ou e-mail.",
@@ -1052,7 +1051,7 @@ const TRANSLATIONS = {
         "Painel privado no Google Sheets em tempo real.",
         "Relatório automático para buffet/catering.",
         "Atalhos de WhatsApp para contatar convidados pendentes.",
-        "Código QR pronto para impressão.",
+        "Código QR de acesso.",
         "Opção para adicionar o evento ao calendário.",
         "Galeria ou álbum colaborativo de fotos.",
         "Mensagem de agradecimento pós-evento.",
@@ -1214,7 +1213,7 @@ function App() {
   // Regional Currency and Payment Data (Rounded locally)
   const CURRENCY_DATA = {
     USD: { symbol: '$', suffix: 'USD', bronze: 50, silver: 75, gold: 100, label: 'Dólar (Internacional)', bank: 'PayPal / Stripe (USD)', bankDetails: 'Email de pago: saveyourdate.invite@gmail.com' },
-    ARS: { symbol: '$', suffix: 'ARS', bronze: 50000, silver: 75000, gold: 100000, label: 'Peso Argentino', bank: 'Mercado Pago / Transferencia', bankDetails: 'ALIAS: saveyourdate.mp | CBU: 0000003100099999987654' },
+    ARS: { symbol: '$', suffix: 'ARS', bronze: 50000, silver: 75000, gold: 100000, label: 'Peso Argentino', bank: 'Mercado Pago / Transferencia', bankDetails: 'Los datos de pago se muestran al elegir transferencia.' },
     MXN: { symbol: '$', suffix: 'MXN', bronze: 900, silver: 1350, gold: 1800, label: 'Peso Mexicano', bank: 'Mercado Pago México / SPEI', bankDetails: 'CLABE SPEI: 012180009999999888 | BANCO: BBVA México' },
     CLP: { symbol: '$', suffix: 'CLP', bronze: 48000, silver: 72000, gold: 95000, label: 'Peso Chileno', bank: 'Mercado Pago Chile / Transferencia', bankDetails: 'Banco de Chile - Cuenta Corriente: 123-45678-90 | RUT: 77.777.777-7' },
     COP: { symbol: '$', suffix: 'COP', bronze: 200000, silver: 300000, gold: 400000, label: 'Peso Colombiano', bank: 'Mercado Pago / PSE / Nequi', bankDetails: 'Nequi / Daviplata: 310 000 0000 | Convenio PSE: Save Your Date' },
@@ -3136,10 +3135,10 @@ function App() {
                 position: 'relative'
               }}>
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '26px', margin: '0 0 10px 0', color: 'white' }}>
-                  {t.extras?.title || "Beneficios Premium Incluidos"}
+                  {t.extras?.title || "Secciones Premium para elegir"}
                 </h3>
                 <p style={{ fontSize: '13px', margin: 0, opacity: 0.9, lineHeight: 1.4 }}>
-                  {t.extras?.desc || "Además de las funciones interactivas, tu invitación Save Your Date incluye una suite completa de herramientas para facilitar la organización de tu gran día:"}
+                  {t.extras?.desc || "Estas secciones no están incluidas automáticamente. Elegí las que mejor se adapten a tu evento."}
                 </p>
               </div>
 
