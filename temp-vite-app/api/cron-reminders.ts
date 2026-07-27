@@ -22,7 +22,6 @@ async function handler(request: Request) {
     return json({ error: 'No autorizado.' }, 401);
   }
   try {
-    const daysBefore = Math.max(1, Math.min(60, Number(process.env.REMINDER_DAYS_BEFORE) || 7));
     const ordersResponse = await supabaseRequest(
       'orders?status=eq.published&select=order_number,customer_name,order_payload&order=created_at.asc&limit=500'
     );
@@ -32,6 +31,7 @@ async function handler(request: Request) {
       const eventDate = String(order.order_payload.eventDate || '');
       if (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) return false;
       const event = new Date(`${eventDate}T00:00:00Z`);
+      const daysBefore = Math.max(1, Math.min(60, Number(order.order_payload.reminderDaysBefore) || 7));
       return Math.round((utcDate(event) - today) / 86400000) === daysBefore;
     });
 
@@ -44,6 +44,7 @@ async function handler(request: Request) {
       );
       const guests = await guestsResponse.json() as PendingGuest[];
       const eventTitle = String(order.order_payload.eventTitle || order.customer_name);
+      const daysBefore = Math.max(1, Math.min(60, Number(order.order_payload.reminderDaysBefore) || 7));
       for (const guest of guests) {
         try {
           const confirmationUrl = `${appUrl()}/confirmar?token=${encodeURIComponent(guest.invite_token)}`;
