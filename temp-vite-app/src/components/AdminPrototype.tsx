@@ -4,6 +4,7 @@ import "../admin-prototype.css";
 
 type Guest = {
   id: string;
+  inviteToken: string;
   name: string;
   group: string;
   phone: string;
@@ -273,6 +274,7 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
   const [updatingId, setUpdatingId] = useState("");
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [error, setError] = useState("");
+  const [copiedId, setCopiedId] = useState("");
   const filtered = guests.filter((guest) => {
     const matches = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
     return matches && (filter === "Todos" || guest.status === filter);
@@ -359,6 +361,16 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
     }
   };
 
+  const copyInviteLink = async (guest: Guest) => {
+    if (!guest.inviteToken) {
+      setError("Falta aplicar la migración de enlaces personalizados en Supabase.");
+      return;
+    }
+    await navigator.clipboard.writeText(`${window.location.origin}/confirmar?token=${guest.inviteToken}`);
+    setCopiedId(guest.id);
+    window.setTimeout(() => setCopiedId(""), 1800);
+  };
+
   return (
     <>
       <div className="page-heading"><div><span className="eyebrow">Gestión del evento</span><h1>Invitados</h1><p>Administrá grupos, cupos y enlaces personalizados.</p></div><button className="primary-button small" onClick={() => setShowModal(true)}>＋ Agregar invitado</button></div>
@@ -375,7 +387,7 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
               <tr key={guest.id}>
                 <td><div className="person"><span className="avatar avatar-blue">{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span><p><strong>{guest.name}</strong><small>{guest.phone}</small></p></div></td>
                 <td>{guest.group}</td><td>{guest.confirmed}/{guest.seats}</td><td><select className={`status-select status-${guest.status.toLowerCase().replace(" ", "-")}`} value={guest.status} disabled={updatingId === guest.id} onChange={(event) => updateStatus(guest, event.target.value as Guest["status"])} aria-label={`Estado de ${guest.name}`}><option>Confirmado</option><option>Pendiente</option><option>No asiste</option></select></td><td>{guest.food}</td>
-                <td><button className="copy-button">Copiar link</button></td><td><div className="row-actions"><button className="copy-button" onClick={() => setEditingGuest(guest)}>Editar</button><button className="more-button" onClick={() => deleteGuest(guest.id)} aria-label={`Eliminar a ${guest.name}`}>Eliminar</button></div></td>
+                <td><button className="copy-button" onClick={() => copyInviteLink(guest)}>{copiedId === guest.id ? "¡Copiado!" : "Copiar link"}</button></td><td><div className="row-actions"><button className="copy-button" onClick={() => setEditingGuest(guest)}>Editar</button><button className="more-button" onClick={() => deleteGuest(guest.id)} aria-label={`Eliminar a ${guest.name}`}>Eliminar</button></div></td>
               </tr>
             ))}</tbody>
           </table>

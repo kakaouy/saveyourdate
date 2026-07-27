@@ -95,6 +95,7 @@ grant select, insert, update on public.admin_login_codes, public.admin_sessions 
 
 create table if not exists public.event_guests (
   id uuid primary key default gen_random_uuid(),
+  invite_token uuid unique not null default gen_random_uuid(),
   order_number text not null references public.orders(order_number) on delete cascade,
   name text not null,
   group_name text not null default '',
@@ -110,6 +111,9 @@ create table if not exists public.event_guests (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.event_guests
+  add column if not exists invite_token uuid unique not null default gen_random_uuid();
 
 create index if not exists event_guests_order_idx
   on public.event_guests(order_number, created_at);

@@ -2,13 +2,14 @@ import { findSession, readSessionToken } from '../admin-auth.js';
 import { json, supabaseRequest } from '../orders.js';
 
 type GuestRow = {
-  id: string; name: string; group_name: string; phone: string; seats: number;
+  id: string; invite_token: string; name: string; group_name: string; phone: string; seats: number;
   confirmed: number; status: 'Confirmado' | 'Pendiente' | 'No asiste';
   food: string; song: string; reminded_at: string | null;
 };
 
 const clientGuest = (row: GuestRow) => ({
   id: row.id,
+  inviteToken: row.invite_token,
   name: row.name,
   group: row.group_name,
   phone: row.phone,
