@@ -15,14 +15,25 @@ type Guest = {
   reminded: string;
 };
 
-const guestsSeed: Guest[] = [
-  { id: "INV-001", name: "María Pérez", group: "Familia Pérez", phone: "099 123 456", seats: 2, confirmed: 2, status: "Confirmado", food: "Vegetariano", song: "Perfect · Ed Sheeran", reminded: "—" },
-  { id: "INV-002", name: "Carlos Rodríguez", group: "Familia Rodríguez", phone: "098 765 432", seats: 1, confirmed: 0, status: "No asiste", food: "Ninguna", song: "—", reminded: "—" },
-  { id: "INV-003", name: "Lucía Silva", group: "Amigos", phone: "098 111 222", seats: 2, confirmed: 0, status: "Pendiente", food: "—", song: "—", reminded: "22 jul" },
-  { id: "INV-004", name: "Sofía Fernández", group: "Amigos", phone: "097 332 118", seats: 2, confirmed: 2, status: "Confirmado", food: "Celíaca", song: "A Sky Full of Stars · Coldplay", reminded: "—" },
-  { id: "INV-005", name: "Mateo López", group: "Trabajo", phone: "096 245 993", seats: 1, confirmed: 0, status: "Pendiente", food: "—", song: "—", reminded: "20 jul" },
-  { id: "INV-006", name: "Elena García", group: "Familia García", phone: "099 665 102", seats: 3, confirmed: 3, status: "Confirmado", food: "Sin lactosa", song: "September · Earth, Wind & Fire", reminded: "—" },
-];
+type AdminOrder = {
+  orderNumber: string;
+  customerName: string;
+  plan: string;
+  modelName: string;
+  eventTitle: string;
+  eventDate: string;
+  eventType: string;
+};
+
+const guestsSeed: Guest[] = [];
+
+const formatEventDate = (value: string) => {
+  if (!value) return "Fecha pendiente";
+  return new Intl.DateTimeFormat("es-UY", { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
+};
+
+const initials = (value: string) =>
+  value.split(/\s+|&/).filter(Boolean).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
 
 const nav = [
   ["Resumen", "⌂"],
@@ -195,23 +206,25 @@ function Status({ value }: { value: Guest["status"] }) {
   return <span className={`status status-${value.toLowerCase().replace(" ", "-")}`}>{value}</span>;
 }
 
-function Dashboard({ guests, onNavigate }: { guests: Guest[]; onNavigate: (view: string) => void }) {
+function Dashboard({ guests, onNavigate, order }: { guests: Guest[]; onNavigate: (view: string) => void; order: AdminOrder }) {
   const confirmed = guests.reduce((total, guest) => total + guest.confirmed, 0);
   const seats = guests.reduce((total, guest) => total + guest.seats, 0);
   const pending = guests.filter((guest) => guest.status === "Pendiente").length;
   const declined = guests.filter((guest) => guest.status === "No asiste").length;
-  const responseRate = Math.round(((guests.length - pending) / guests.length) * 100);
+  const responseRate = guests.length
+    ? Math.round(((guests.length - pending) / guests.length) * 100)
+    : 0;
 
   return (
     <>
       <div className="page-heading">
-        <div><span className="eyebrow">Boda · 12 de diciembre de 2026</span><h1>Buenas tardes, Ana</h1><p>Este es el estado de tu evento hoy.</p></div>
+        <div><span className="eyebrow">{order.eventType} · {formatEventDate(order.eventDate)}</span><h1>Buenas tardes, {order.customerName.split(" ")[0]}</h1><p>Este es el estado de tu evento hoy.</p></div>
         <button className="outline-button" onClick={() => onNavigate("Invitados")}>＋ Agregar invitado</button>
       </div>
 
       <section className="metrics-grid">
-        <Metric label="Cupos asignados" value={String(seats)} note="6 grupos cargados" tone="blue" />
-        <Metric label="Confirmados" value={String(confirmed)} note="3 respuestas positivas" tone="green" />
+        <Metric label="Cupos asignados" value={String(seats)} note={`${guests.length} grupos cargados`} tone="blue" />
+        <Metric label="Confirmados" value={String(confirmed)} note={`${confirmed} respuestas positivas`} tone="green" />
         <Metric label="Pendientes" value={String(pending)} note="Requieren seguimiento" tone="amber" />
         <Metric label="No asisten" value={String(declined)} note={`${responseRate}% de respuesta total`} tone="coral" />
       </section>
@@ -224,7 +237,7 @@ function Dashboard({ guests, onNavigate }: { guests: Guest[]; onNavigate: (view:
               <div><strong>{responseRate}%</strong><span>respondió</span></div>
             </div>
             <div className="legend">
-              <div><i className="dot dot-green" /><span>Confirmados</span><strong>3</strong></div>
+              <div><i className="dot dot-green" /><span>Confirmados</span><strong>{confirmed}</strong></div>
               <div><i className="dot dot-amber" /><span>Pendientes</span><strong>{pending}</strong></div>
               <div><i className="dot dot-coral" /><span>No asisten</span><strong>{declined}</strong></div>
             </div>
@@ -241,10 +254,9 @@ function Dashboard({ guests, onNavigate }: { guests: Guest[]; onNavigate: (view:
 
       <section className="panel recent-panel">
         <div className="panel-title"><div><h2>Actividad reciente</h2><p>Últimas respuestas y cambios</p></div><button onClick={() => onNavigate("Confirmaciones")}>Ver todas →</button></div>
-        <div className="activity-list">
-          <div><span className="avatar avatar-mint">MP</span><p><strong>María Pérez confirmó asistencia</strong><small>2 personas · Vegetariano</small></p><time>Hace 2 h</time></div>
-          <div><span className="avatar avatar-blue">SF</span><p><strong>Sofía Fernández sugirió una canción</strong><small>A Sky Full of Stars · Coldplay</small></p><time>Ayer</time></div>
-          <div><span className="avatar avatar-coral">CR</span><p><strong>Carlos Rodríguez no podrá asistir</strong><small>Envió un mensaje para los novios</small></p><time>22 jul</time></div>
+        <div className="activity-list">{guests.length === 0
+          ? <div><p><strong>Todavía no hay actividad</strong><small>Los cambios aparecerán cuando agregues invitados y recibas respuestas.</small></p></div>
+          : <div><p><strong>Invitados cargados</strong><small>{guests.length} registros disponibles.</small></p></div>}
         </div>
       </section>
     </>
@@ -294,13 +306,16 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
 }
 
 function Confirmations({ guests }: { guests: Guest[] }) {
+  const confirmed = guests.reduce((total, guest) => total + guest.confirmed, 0);
+  const pending = guests.filter((guest) => guest.status === "Pendiente").length;
+  const declined = guests.filter((guest) => guest.status === "No asiste").length;
   return (
     <>
       <div className="page-heading"><div><span className="eyebrow">Respuestas RSVP</span><h1>Confirmaciones</h1><p>Consultá las respuestas recibidas y su información asociada.</p></div><button className="outline-button">⇩ Exportar reporte</button></div>
       <section className="metrics-grid mini">
-        <Metric label="Confirmaron" value="7" note="Personas" tone="green" />
-        <Metric label="Pendientes" value="2" note="Invitaciones" tone="amber" />
-        <Metric label="No asisten" value="1" note="Invitación" tone="coral" />
+        <Metric label="Confirmaron" value={String(confirmed)} note="Personas" tone="green" />
+        <Metric label="Pendientes" value={String(pending)} note="Invitaciones" tone="amber" />
+        <Metric label="No asisten" value={String(declined)} note="Invitaciones" tone="coral" />
       </section>
       <section className="panel table-panel">
         <div className="table-scroll"><table><thead><tr><th>Invitado</th><th>Respuesta</th><th>Personas</th><th>Restricción</th><th>Canción</th><th>Fecha</th></tr></thead>
@@ -320,10 +335,7 @@ type EventTable = {
 
 function Seating({ guests }: { guests: Guest[] }) {
   const confirmedGuests = guests.filter((guest) => guest.status === "Confirmado");
-  const [tables, setTables] = useState<EventTable[]>([
-    { id: "table-1", name: "Mesa Familia", capacity: 6, guests: ["INV-001", "INV-006"], note: "Cerca de la pista" },
-    { id: "table-2", name: "Mesa Amigos", capacity: 4, guests: ["INV-004"], note: "Sector ventana" },
-  ]);
+  const [tables, setTables] = useState<EventTable[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<EventTable | null>(null);
   const [tableName, setTableName] = useState("Mesa 3");
@@ -466,10 +478,10 @@ function Seating({ guests }: { guests: Guest[] }) {
 
 function SimpleModule({ view, guests }: { view: string; guests: Guest[] }) {
   const content = {
-    Restricciones: { eyebrow: "Información para catering", title: "Restricciones alimentarias", description: "Organizá los requerimientos de tus invitados.", stats: [["Vegetarianos", "1"], ["Celíacos", "1"], ["Sin lactosa", "1"]], rows: guests.filter((g) => g.food !== "—" && g.food !== "Ninguna"), headers: ["Invitado", "Grupo", "Restricción", "Personas"] },
-    Canciones: { eyebrow: "Playlist colaborativa", title: "Canciones sugeridas", description: "Revisá y organizá las canciones enviadas.", stats: [["Sugeridas", "3"], ["Aprobadas", "2"], ["Pendientes", "1"]], rows: guests.filter((g) => g.song !== "—"), headers: ["Invitado", "Canción", "Estado", "Acción"] },
-    Recordatorios: { eyebrow: "Seguimiento RSVP", title: "Recordatorios", description: "Contactá a quienes todavía no respondieron.", stats: [["Pendientes", "2"], ["Recordados", "2"], ["Sin contactar", "0"]], rows: guests.filter((g) => g.status === "Pendiente"), headers: ["Invitado", "WhatsApp", "Último recordatorio", "Acción"] },
-    Accesos: { eyebrow: "Seguridad del evento", title: "Administradores", description: "Gestioná quién puede acceder al panel.", stats: [["Activos", "2"], ["Invitados", "1"], ["Sesiones", "2"]], rows: guests.slice(0, 3), headers: ["Administrador", "Contacto", "Rol", "Estado"] },
+    Restricciones: { eyebrow: "Información para catering", title: "Restricciones alimentarias", description: "Organizá los requerimientos de tus invitados.", stats: [["Registradas", "0"], ["Personas", "0"], ["Pendientes", "0"]], rows: guests.filter((g) => g.food !== "—" && g.food !== "Ninguna"), headers: ["Invitado", "Grupo", "Restricción", "Personas"] },
+    Canciones: { eyebrow: "Playlist colaborativa", title: "Canciones sugeridas", description: "Revisá y organizá las canciones enviadas.", stats: [["Sugeridas", "0"], ["Aprobadas", "0"], ["Pendientes", "0"]], rows: guests.filter((g) => g.song !== "—"), headers: ["Invitado", "Canción", "Estado", "Acción"] },
+    Recordatorios: { eyebrow: "Seguimiento RSVP", title: "Recordatorios", description: "Contactá a quienes todavía no respondieron.", stats: [["Pendientes", "0"], ["Recordados", "0"], ["Sin contactar", "0"]], rows: guests.filter((g) => g.status === "Pendiente"), headers: ["Invitado", "WhatsApp", "Último recordatorio", "Acción"] },
+    Accesos: { eyebrow: "Seguridad del evento", title: "Administradores", description: "Gestioná quién puede acceder al panel.", stats: [["Activos", "1"], ["Invitados", "0"], ["Sesiones", "1"]], rows: [], headers: ["Administrador", "Contacto", "Rol", "Estado"] },
   }[view]!;
 
   return (
@@ -488,7 +500,7 @@ function SimpleModule({ view, guests }: { view: string; guests: Guest[] }) {
   );
 }
 
-function Admin({ onLogout }: { onLogout: () => void }) {
+function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder }) {
   const [view, setView] = useState("Resumen");
   const [guests, setGuests] = useState(guestsSeed);
   const [mobileNav, setMobileNav] = useState(false);
@@ -503,16 +515,16 @@ function Admin({ onLogout }: { onLogout: () => void }) {
     <main className="admin-shell">
       <aside className={`sidebar ${mobileNav ? "mobile-open" : ""}`}>
         <div className="sidebar-top"><Logo compact /><button className="mobile-close" onClick={() => setMobileNav(false)}>×</button></div>
-        <div className="event-switcher"><span>A&amp;M</span><div><strong>Ana &amp; Martín</strong><small>Pedido SYD-1048</small></div><button>⌄</button></div>
+        <div className="event-switcher"><span>{initials(order.eventTitle)}</span><div><strong>{order.eventTitle}</strong><small>Pedido {order.orderNumber}</small></div><button>⌄</button></div>
         <nav>{nav.map(([item, icon]) => <button key={item} className={view === item ? "active" : ""} onClick={() => navigate(item)}><span>{icon}</span>{item}{item === "Recordatorios" && <b>2</b>}</button>)}</nav>
         <div className="sidebar-help"><span>?</span><div><strong>¿Necesitás ayuda?</strong><small>Estamos para acompañarte.</small></div><button>Contactar soporte</button></div>
         <button className="logout" onClick={onLogout}><span>↪</span>Cerrar sesión</button>
       </aside>
       {mobileNav && <button className="sidebar-overlay" aria-label="Cerrar menú" onClick={() => setMobileNav(false)} />}
       <section className="admin-main">
-        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>Última actualización: ahora</small></div><div className="topbar-actions"><button className="notification">♢<b>2</b></button><div className="admin-user"><span>AP</span><div><strong>Ana Pereira</strong><small>Propietaria</small></div><button>⌄</button></div></div></header>
+        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>Última actualización: ahora</small></div><div className="topbar-actions"><button className="notification">♢</button><div className="admin-user"><span>{initials(order.customerName)}</span><div><strong>{order.customerName}</strong><small>Propietaria</small></div><button>⌄</button></div></div></header>
         <div className="admin-content">
-          {view === "Resumen" && <Dashboard guests={guests} onNavigate={navigate} />}
+          {view === "Resumen" && <Dashboard guests={guests} onNavigate={navigate} order={order} />}
           {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} />}
           {view === "Confirmaciones" && <Confirmations guests={guests} />}
           {view === "Mesas" && <Seating guests={guests} />}
@@ -526,11 +538,17 @@ function Admin({ onLogout }: { onLogout: () => void }) {
 
 export function AdminPrototype() {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [order, setOrder] = useState<AdminOrder | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
 
   useEffect(() => {
     fetch("/api/admin/session")
-      .then((response) => setLoggedIn(response.ok))
+      .then(async (response) => {
+        if (!response.ok) return;
+        const result = await response.json() as { order: AdminOrder };
+        setOrder(result.order);
+        setLoggedIn(true);
+      })
       .finally(() => setCheckingSession(false));
   }, []);
 
@@ -540,7 +558,9 @@ export function AdminPrototype() {
   };
 
   if (checkingSession) return <main className="admin-loading">Verificando acceso…</main>;
-  return loggedIn ? <Admin onLogout={logout} /> : <Login onLogin={() => setLoggedIn(true)} />;
+  return loggedIn && order
+    ? <Admin onLogout={logout} order={order} />
+    : <Login onLogin={() => window.location.reload()} />;
 }
 
 export default AdminPrototype;

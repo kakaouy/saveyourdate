@@ -14,7 +14,10 @@ async function handler(request: Request) {
         orderNumber: order.order_number,
         customerName: order.customer_name,
         plan: order.plan,
-        modelName: order.model_name
+        modelName: order.model_name,
+        eventTitle: String(order.order_payload.eventTitle || order.customer_name),
+        eventDate: String(order.order_payload.eventDate || ''),
+        eventType: String(order.order_payload['Tipo de evento'] || 'Evento')
       },
       expiresAt: session.expires_at
     });
