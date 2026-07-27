@@ -1,6 +1,7 @@
 import { findSession, readSessionToken } from '../admin-auth.js';
 import { json, supabaseRequest } from '../orders.js';
 import { logAdminActivity } from './audit.js';
+import { canAssignGuest, occupiedSeats } from './capacity.js';
 
 type TableRow = {
   id: string;
@@ -82,10 +83,9 @@ async function handler(request: Request) {
         if (!guest) {
           return json({ error: 'El invitado debe estar confirmado para asignarle una mesa.' }, 400);
         }
-        const occupied = (await occupantsResponse.json() as AssignmentRow[])
-          .filter((occupant) => occupant.id !== guestId)
-          .reduce((total, occupant) => total + Number(occupant.confirmed || 0), 0);
-        if (occupied + Number(guest.confirmed || 0) > table.capacity) {
+        const occupants = await occupantsResponse.json() as AssignmentRow[];
+        const occupied = occupiedSeats(occupants, guestId);
+        if (!canAssignGuest(table.capacity, occupants, guestId, Number(guest.confirmed || 0))) {
           return json({ error: `No hay lugar suficiente en esta mesa. Quedan ${Math.max(0, table.capacity - occupied)} lugares.` }, 409);
         }
       }
@@ -111,8 +111,7 @@ async function handler(request: Request) {
       const occupantsResponse = await supabaseRequest(
         `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=eq.${encodeURIComponent(id)}&status=eq.Confirmado&select=confirmed`
       );
-      const occupied = (await occupantsResponse.json() as AssignmentRow[])
-        .reduce((total, occupant) => total + Number(occupant.confirmed || 0), 0);
+      const occupied = occupiedSeats(await occupantsResponse.json() as AssignmentRow[]);
       if (capacity < occupied) {
         return json({ error: `La mesa ya tiene ${occupied} personas. Quitá invitados antes de reducir su capacidad.` }, 409);
       }

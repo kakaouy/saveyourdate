@@ -1,4 +1,5 @@
 import { appUrl, emailShell, escapeHtml, json, sendEmail, supabaseRequest } from './_lib/orders.js';
+import { isReminderDue, reminderDaysFor } from './_lib/reminder-rules.js';
 
 type ReminderOrder = {
   order_number: string;
@@ -13,8 +14,6 @@ type PendingGuest = {
   email: string;
 };
 
-const utcDate = (value: Date) => Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate());
-
 async function handler(request: Request) {
   if (request.method !== 'GET') return json({ error: 'Método no permitido.' }, 405);
   const secret = process.env.CRON_SECRET || '';
@@ -26,15 +25,7 @@ async function handler(request: Request) {
       'orders?status=eq.published&select=order_number,customer_name,order_payload&order=created_at.asc&limit=500'
     );
     const orders = await ordersResponse.json() as ReminderOrder[];
-    const today = utcDate(new Date());
-    const dueOrders = orders.filter((order) => {
-      if (order.order_payload.automaticRemindersEnabled !== true) return false;
-      const eventDate = String(order.order_payload.eventDate || '');
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) return false;
-      const event = new Date(`${eventDate}T00:00:00Z`);
-      const daysBefore = Math.max(1, Math.min(60, Number(order.order_payload.reminderDaysBefore) || 7));
-      return Math.round((utcDate(event) - today) / 86400000) === daysBefore;
-    });
+    const dueOrders = orders.filter((order) => isReminderDue(order.order_payload));
 
     let sent = 0;
     let failed = 0;
@@ -45,7 +36,7 @@ async function handler(request: Request) {
       );
       const guests = await guestsResponse.json() as PendingGuest[];
       const eventTitle = String(order.order_payload.eventTitle || order.customer_name);
-      const daysBefore = Math.max(1, Math.min(60, Number(order.order_payload.reminderDaysBefore) || 7));
+      const daysBefore = reminderDaysFor(order.order_payload);
       for (const guest of guests) {
         try {
           const confirmationUrl = `${appUrl()}/confirmar?token=${encodeURIComponent(guest.invite_token)}`;
