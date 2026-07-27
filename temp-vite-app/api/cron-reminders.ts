@@ -1,10 +1,13 @@
 import { appUrl, emailShell, escapeHtml, json, sendEmail, supabaseRequest } from './_lib/orders.js';
 import { reminderEmailHtml } from './_lib/reminder-email.js';
 import { isReminderDue, reminderDaysFor } from './_lib/reminder-rules.js';
+import { deleteEventData } from './_lib/delete-event.js';
+import { daysBeforeRetentionDeadline, eventAccessExpired, retentionDeadline } from './_lib/event-lifecycle.js';
 
 type ReminderOrder = {
   order_number: string;
   customer_name: string;
+  customer_email: string;
   order_payload: Record<string, unknown>;
 };
 
@@ -39,10 +42,37 @@ async function handler(request: Request) {
   }
   try {
     const ordersResponse = await supabaseRequest(
-      'orders?status=eq.published&select=order_number,customer_name,order_payload&order=created_at.asc&limit=500'
+      'orders?status=eq.published&select=order_number,customer_name,customer_email,order_payload&order=created_at.asc&limit=500'
     );
     const orders = await ordersResponse.json() as ReminderOrder[];
-    const dueOrders = orders.filter((order) => isReminderDue(order.order_payload));
+    const activeOrders: ReminderOrder[] = [];
+    let deleted = 0;
+    let privacyNotices = 0;
+    for (const order of orders) {
+      const eventDate = String(order.order_payload.eventDate || '');
+      if (eventAccessExpired(order.order_payload)) {
+        await deleteEventData(order.order_number, eventDate, 'retention_expired');
+        deleted += 1;
+        continue;
+      }
+      activeOrders.push(order);
+      const noticeDays = daysBeforeRetentionDeadline(order.order_payload);
+      if (noticeDays === 30 || noticeDays === 7) {
+        const deadline = retentionDeadline(eventDate);
+        await sendEmail({
+          to: order.customer_email,
+          subject: `Aviso de privacidad · ${noticeDays} días para descargar tus datos`,
+          idempotencyKey: `privacy-retention-${order.order_number}-${noticeDays}`,
+          html: emailShell(
+            'Tu evento se eliminará próximamente',
+            `<p>Por privacidad, los datos del pedido <strong>${escapeHtml(order.order_number)}</strong> se eliminarán el <strong>${deadline?.toISOString().slice(0, 10)}</strong>.</p>
+             <p>Antes de esa fecha podés ingresar al panel y descargar un respaldo JSON. Al vencer el plazo se deshabilitarán por completo el panel, los enlaces y las confirmaciones.</p>`
+          )
+        });
+        privacyNotices += 1;
+      }
+    }
+    const dueOrders = activeOrders.filter((order) => isReminderDue(order.order_payload));
 
     let sent = 0;
     let failed = 0;
@@ -82,7 +112,7 @@ async function handler(request: Request) {
         `cron-reminder-partial-${new Date().toISOString().slice(0, 10)}`
       );
     }
-    return json({ ok: true, checkedOrders: orders.length, dueOrders: dueOrders.length, sent, failed });
+    return json({ ok: true, checkedOrders: orders.length, dueOrders: dueOrders.length, sent, failed, privacyNotices, deleted });
   } catch (error) {
     console.error(error);
     await sendCronAlert(

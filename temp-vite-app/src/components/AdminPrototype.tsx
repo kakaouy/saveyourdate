@@ -19,6 +19,7 @@ type Guest = {
   companions: Array<{ name: string; food: string; identificationType: string; identificationNumber: string }>;
   reminded: string;
   updatedAt: string;
+  whatsappStatus?: string;
 };
 
 type AdminOrder = {
@@ -821,7 +822,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   );
 }
 
-function SimpleModule({ view, guests, setGuests, order, canEdit }: { view: string; guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; order: AdminOrder; canEdit: boolean }) {
+function SimpleModule({ view, guests, setGuests, canEdit }: { view: string; guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; canEdit: boolean }) {
   const [remindingId, setRemindingId] = useState("");
   const [moduleError, setModuleError] = useState("");
   const restrictions = guests.flatMap((guest) => [
@@ -836,7 +837,7 @@ function SimpleModule({ view, guests, setGuests, order, canEdit }: { view: strin
   const content = {
     Restricciones: { eyebrow: "Información para catering", title: "Restricciones alimentarias", description: "Organizá los requerimientos de tus invitados.", stats: [["Registradas", String(restrictions.length)], ["Personas", String(restrictions.reduce((total, guest) => total + (guest.confirmed || 1), 0))], ["Pendientes", String(restrictions.filter((guest) => guest.status === "Pendiente").length)]], rows: restrictions, headers: ["Invitado", "Grupo", "Restricción", "Personas"] },
     Canciones: { eyebrow: "Playlist colaborativa", title: "Canciones sugeridas", description: "Revisá y organizá las canciones enviadas.", stats: [["Sugeridas", String(songs.length)], ["Con respuesta", String(songs.filter((guest) => guest.status !== "Pendiente").length)], ["Pendientes", String(songs.filter((guest) => guest.status === "Pendiente").length)]], rows: songs, headers: ["Invitado", "Canción", "Estado"] },
-    Recordatorios: { eyebrow: "Seguimiento RSVP", title: "Recordatorios", description: "Contactá a quienes todavía no respondieron.", stats: [["Pendientes", String(pending.length)], ["Recordados", String(reminded.length)], ["Sin contactar", String(pending.length - reminded.length)]], rows: pending, headers: ["Invitado", "WhatsApp", "Último recordatorio", "Acción"] },
+    Recordatorios: { eyebrow: "Seguimiento RSVP", title: "Recordatorios", description: "Contactá a quienes todavía no respondieron.", stats: [["Pendientes", String(pending.length)], ["Recordados", String(reminded.length)], ["Sin contactar", String(pending.length - reminded.length)]], rows: pending, headers: ["Invitado", "WhatsApp", "Estado", "Último recordatorio", "Acción"] },
     Accesos: { eyebrow: "Seguridad del evento", title: "Administradores", description: "Gestioná quién puede acceder al panel.", stats: [["Activos", "1"], ["Invitados", "0"], ["Sesiones", "1"]], rows: [], headers: ["Administrador", "Contacto", "Rol", "Estado"] },
   }[view]!;
 
@@ -860,28 +861,15 @@ function SimpleModule({ view, guests, setGuests, order, canEdit }: { view: strin
   const reminderDate = (value: string) => value === "—"
     ? value
     : new Intl.DateTimeFormat("es-UY", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+  const whatsappStatus = (value = "") => ({
+    accepted: ["Aceptado", "pending"],
+    sent: ["Enviado", "sent"],
+    delivered: ["Entregado", "delivered"],
+    read: ["Leído", "read"],
+    failed: ["Error", "failed"]
+  } as Record<string, [string, string]>)[value] || ["Sin envío", "empty"];
 
   const remindGuest = async (guest: Guest) => {
-    const rawPhone = guest.phone.replace(/\D/g, "").replace(/^00/, "");
-    const phone = rawPhone.startsWith("5980")
-      ? `598${rawPhone.slice(4)}`
-      : rawPhone.startsWith("0") && rawPhone.length === 9
-        ? `598${rawPhone.slice(1)}`
-        : rawPhone;
-    if (phone.length < 8) {
-      setModuleError(`${guest.name} no tiene un número válido. Editalo incluyendo el código de país, por ejemplo +598.`);
-      return;
-    }
-    const personalizedLink = `${window.location.origin}/confirmar?token=${guest.inviteToken}`;
-    const message = `Hola ${guest.name}, te recordamos confirmar tu asistencia a ${order.eventTitle}. Podés responder acá: ${personalizedLink}`;
-    const whatsappUrl = `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
-    const whatsappWindow = window.open("", "_blank");
-    if (whatsappWindow) {
-      whatsappWindow.opener = null;
-      whatsappWindow.location.href = whatsappUrl;
-    } else {
-      window.location.href = whatsappUrl;
-    }
     setRemindingId(guest.id);
     setModuleError("");
     try {
@@ -890,8 +878,14 @@ function SimpleModule({ view, guests, setGuests, order, canEdit }: { view: strin
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: guest.id, action: "remind" })
       });
-      const result = await response.json() as { guest?: Guest; error?: string };
-      if (!response.ok || !result.guest) throw new Error(result.error || "No pudimos registrar el recordatorio.");
+      const result = await response.json() as { guest?: Guest; mode?: "business" | "manual"; url?: string; error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos enviar el recordatorio.");
+      if (result.mode === "manual" && result.url) {
+        const whatsappWindow = window.open(result.url, "_blank", "noopener,noreferrer");
+        if (!whatsappWindow) window.location.href = result.url;
+        return;
+      }
+      if (!result.guest) throw new Error("No pudimos registrar el recordatorio.");
       setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
     } catch (error) {
       setModuleError(error instanceof Error ? error.message : "No pudimos registrar el recordatorio.");
@@ -909,14 +903,14 @@ function SimpleModule({ view, guests, setGuests, order, canEdit }: { view: strin
           <td><div className="person"><span className="avatar avatar-blue">{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span><p><strong>{view === "Accesos" && index === 0 ? "Ana Pereira" : view === "Accesos" && index === 1 ? "Martín Costa" : guest.name}</strong><small>{guest.group}</small></p></div></td>
           {view === "Restricciones" && <><td>{guest.group}</td><td><span className="status status-pendiente">{guest.food}</span></td><td>{guest.confirmed || 1}</td></>}
           {view === "Canciones" && <><td>{guest.song}</td><td><span className="status status-confirmado">Registrada</span></td></>}
-          {view === "Recordatorios" && <><td>{guest.phone || "Sin número"}</td><td>{reminderDate(guest.reminded)}</td><td>{canEdit ? <button className="whatsapp-button" disabled={remindingId === guest.id} onClick={() => remindGuest(guest)}>{remindingId === guest.id ? "Registrando…" : "Abrir WhatsApp ↗"}</button> : <span className="muted">Solo lectura</span>}</td></>}
+          {view === "Recordatorios" && <><td>{guest.phone || "Sin número"}</td><td><span className={`delivery-status is-${whatsappStatus(guest.whatsappStatus)[1]}`}><i aria-hidden="true" />{whatsappStatus(guest.whatsappStatus)[0]}</span></td><td>{reminderDate(guest.reminded)}</td><td>{canEdit ? <button className="whatsapp-button" disabled={remindingId === guest.id || !guest.phone} onClick={() => remindGuest(guest)}>{remindingId === guest.id ? "Enviando…" : guest.phone ? "Enviar por WhatsApp" : "Falta teléfono"}</button> : <span className="muted">Solo lectura</span>}</td></>}
           {view === "Accesos" && <><td>{index === 0 ? "ana@ejemplo.com" : index === 1 ? "martin@ejemplo.com" : "sofia@ejemplo.com"}</td><td>{index === 0 ? "Propietaria" : index === 1 ? "Colaborador" : "Solo lectura"}</td><td><span className={`status ${index < 2 ? "status-confirmado" : "status-pendiente"}`}>{index < 2 ? "Activo" : "Invitación pendiente"}</span></td></>}
         </tr>)}</tbody></table></div>{moduleError && <p className="table-error" role="alert">{moduleError}</p>}</section>
     </>
   );
 }
 
-function Settings({ code, onChange }: { code: string; onChange: (value: string) => void }) {
+function Settings({ code, onChange, orderNumber }: { code: string; onChange: (value: string) => void; orderNumber: string }) {
   const knownCode = countryCodes.some(([, value]) => value === code);
   const [selection, setSelection] = useState(knownCode ? code : "custom");
   const [customCode, setCustomCode] = useState(knownCode ? "" : code);
@@ -931,6 +925,14 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
     checkedAt: string;
     services: Record<"database" | "email" | "scheduler", { status: "ok" | "error"; detail: string }>;
   } | null>(null);
+  const [retentionDeadline, setRetentionDeadline] = useState("");
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deletingEvent, setDeletingEvent] = useState(false);
+  const [restoreBackup, setRestoreBackup] = useState<Record<string, unknown> | null>(null);
+  const [restoreSummary, setRestoreSummary] = useState<{ guests: number; tables: number; collaborators: number } | null>(null);
+  const [canRestore, setCanRestore] = useState(false);
+  const [restoreConfirmation, setRestoreConfirmation] = useState("");
+  const [restoring, setRestoring] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/settings", { cache: "no-store" }).then(async (response) => {
@@ -956,6 +958,14 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
   }, []);
 
   useEffect(() => { void loadHealth(); }, [loadHealth]);
+
+  useEffect(() => {
+    fetch("/api/admin/privacy", { cache: "no-store" }).then(async (response) => {
+      if (!response.ok) return;
+      const result = await response.json() as { retentionDeadline?: string | null };
+      setRetentionDeadline(result.retentionDeadline || "");
+    });
+  }, []);
 
   const save = async () => {
     const value = selection === "custom" ? customCode.trim() : selection;
@@ -1016,6 +1026,69 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
     }
   };
 
+  const deleteEvent = async () => {
+    if (deleteConfirmation.trim().toUpperCase() !== orderNumber) return;
+    if (!window.confirm("Esta acción elimina definitivamente el evento y no se puede deshacer. ¿Querés continuar?")) return;
+    setDeletingEvent(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/admin/privacy", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmation: deleteConfirmation })
+      });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos eliminar el evento.");
+      window.location.reload();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos eliminar el evento.");
+      setDeletingEvent(false);
+    }
+  };
+
+  const inspectBackup = async (file?: File) => {
+    setRestoreBackup(null);
+    setRestoreSummary(null);
+    setCanRestore(false);
+    setRestoreConfirmation("");
+    if (!file) return;
+    try {
+      const backup = JSON.parse(await file.text()) as Record<string, unknown>;
+      const response = await fetch("/api/admin/restore", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ backup })
+      });
+      const result = await response.json() as { valid?: boolean; canRestore?: boolean; summary?: { guests: number; tables: number; collaborators: number }; error?: string };
+      if (!response.ok || !result.valid || !result.summary) throw new Error(result.error || "El respaldo no es válido.");
+      setRestoreBackup(backup);
+      setRestoreSummary(result.summary);
+      setCanRestore(result.canRestore === true);
+      setMessage(result.canRestore ? "Respaldo válido. Revisá el resumen antes de restaurar." : "El respaldo es válido, pero este evento contiene datos y no puede restaurarse sin riesgo.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos leer el respaldo.");
+    }
+  };
+
+  const restoreData = async () => {
+    if (!restoreBackup || !canRestore || restoreConfirmation.trim().toUpperCase() !== orderNumber) return;
+    setRestoring(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/admin/restore", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ backup: restoreBackup, apply: true, confirmation: restoreConfirmation })
+      });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos restaurar el respaldo.");
+      window.location.reload();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos restaurar el respaldo.");
+      setRestoring(false);
+    }
+  };
+
   return <>
     <div className="page-heading"><div><span className="eyebrow">Preferencias del evento</span><h1>Configuración</h1><p>Definí valores predeterminados para automatizar la gestión.</p></div></div>
     <section className="panel settings-panel">
@@ -1036,6 +1109,23 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
     <section className="panel settings-panel">
       <div className="panel-title"><div><h2>Respaldo de datos</h2><p>Descargá una copia completa del evento sin contraseñas, códigos ni secretos de autenticación.</p></div></div>
       <div className="settings-form"><button className="outline-button" disabled={backingUp} onClick={downloadBackup}>{backingUp ? "Generando…" : "⇩ Descargar respaldo JSON"}</button></div>
+    </section>
+    <section className="panel settings-panel">
+      <div className="panel-title"><div><h2>Restaurar respaldo</h2><p>Primero validamos el archivo. Para evitar mezclas o sobrescrituras, sólo se puede restaurar cuando invitados, mesas y colaboradores están vacíos.</p></div></div>
+      <div className="settings-form">
+        <label>Archivo JSON<input type="file" accept="application/json,.json" onChange={(event) => void inspectBackup(event.target.files?.[0])} /></label>
+        {restoreSummary && <p className="restore-summary"><strong>{restoreSummary.guests}</strong> invitados · <strong>{restoreSummary.tables}</strong> mesas · <strong>{restoreSummary.collaborators}</strong> colaboradores</p>}
+        {restoreSummary && <label>Confirmación<input value={restoreConfirmation} onChange={(event) => setRestoreConfirmation(event.target.value)} placeholder={`Escribí ${orderNumber}`} /></label>}
+        {restoreSummary && <button className="outline-button" disabled={!canRestore || restoring || restoreConfirmation.trim().toUpperCase() !== orderNumber} onClick={restoreData}>{restoring ? "Restaurando…" : "Restaurar datos"}</button>}
+      </div>
+    </section>
+    <section className="panel settings-panel privacy-panel">
+      <div className="panel-title"><div><h2>Privacidad y eliminación</h2><p>Los datos se conservan durante 30 días después del evento. Luego se bloquean todos los accesos y se eliminan automáticamente.</p></div></div>
+      {retentionDeadline && <p className="privacy-deadline">El acceso finalizará el <strong>{new Date(retentionDeadline).toLocaleDateString("es-UY", { dateStyle: "long", timeZone: "UTC" })}</strong>.</p>}
+      <div className="settings-form">
+        <label>Confirmación<input value={deleteConfirmation} onChange={(event) => setDeleteConfirmation(event.target.value)} placeholder={`Escribí ${orderNumber}`} /></label>
+        <button className="danger-button" disabled={deletingEvent || deleteConfirmation.trim().toUpperCase() !== orderNumber} onClick={deleteEvent}>{deletingEvent ? "Eliminando…" : "Eliminar evento y todos sus datos"}</button>
+      </div>
     </section>
     <section className="panel settings-panel">
       <div className="panel-title"><div><h2>Estado del sistema</h2><p>Diagnóstico privado de los servicios que sostienen el panel y los recordatorios.</p></div><button className="outline-button" disabled={healthBusy} onClick={() => void loadHealth()}>{healthBusy ? "Comprobando…" : "Actualizar estado"}</button></div>
@@ -1221,9 +1311,9 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
           {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} defaultPhoneCountryCode={defaultPhoneCountryCode} canEdit={order.accessRole !== "viewer"} />}
           {view === "Confirmaciones" && <Confirmations guests={guests} />}
           {view === "Mesas" && <Seating guests={guests} canEdit={order.accessRole !== "viewer"} />}
-          {["Restricciones", "Canciones", "Recordatorios"].includes(view) && <SimpleModule view={view} guests={guests} setGuests={setGuests} order={order} canEdit={order.accessRole !== "viewer"} />}
+          {["Restricciones", "Canciones", "Recordatorios"].includes(view) && <SimpleModule view={view} guests={guests} setGuests={setGuests} canEdit={order.accessRole !== "viewer"} />}
           {view === "Accesos" && <Accesses order={order} />}
-          {view === "Configuración" && <Settings code={defaultPhoneCountryCode} onChange={setDefaultPhoneCountryCode} />}
+          {view === "Configuración" && <Settings code={defaultPhoneCountryCode} onChange={setDefaultPhoneCountryCode} orderNumber={order.orderNumber} />}
         </div>
         <footer><span>Save Your Date</span><small>Invitaciones digitales para momentos inolvidables · Panel v106</small></footer>
       </section>

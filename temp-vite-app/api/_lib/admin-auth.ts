@@ -1,4 +1,5 @@
 import { hashToken, randomToken, supabaseRequest } from './orders.js';
+import { eventAccessExpired } from './event-lifecycle.js';
 
 export type LoginCode = {
   id: string;
@@ -108,5 +109,18 @@ export const findSession = async (token: string) => {
   const response = await supabaseRequest(
     `admin_sessions?token_hash=eq.${await hashToken(token)}&revoked_at=is.null&expires_at=gt.${encodeURIComponent(new Date().toISOString())}&select=id,order_number,login_email,access_role,expires_at&limit=1`
   );
-  return ((await response.json()) as Array<{ id: string; order_number: string; login_email: string; access_role: 'owner' | 'editor' | 'viewer'; expires_at: string }>)[0] || null;
+  const session = ((await response.json()) as Array<{ id: string; order_number: string; login_email: string; access_role: 'owner' | 'editor' | 'viewer'; expires_at: string }>)[0] || null;
+  if (!session) return null;
+  const orderResponse = await supabaseRequest(
+    `orders?order_number=eq.${encodeURIComponent(session.order_number)}&select=order_payload&limit=1`
+  );
+  const order = ((await orderResponse.json()) as Array<{ order_payload: Record<string, unknown> }>)[0];
+  if (!order || eventAccessExpired(order.order_payload)) {
+    await supabaseRequest(`admin_sessions?id=eq.${encodeURIComponent(session.id)}&revoked_at=is.null`, {
+      method: 'PATCH',
+      body: JSON.stringify({ revoked_at: new Date().toISOString() })
+    });
+    return null;
+  }
+  return session;
 };

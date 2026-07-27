@@ -1,4 +1,5 @@
 import { findOrderByNumber, json, supabaseRequest } from './_lib/orders.js';
+import { eventAccessExpired } from './_lib/event-lifecycle.js';
 
 type GuestRow = {
   id: string;
@@ -32,10 +33,13 @@ async function handler(request: Request) {
     }
     const guest = await findGuest(token);
     if (!guest) return json({ error: 'El enlace no existe o fue desactivado.' }, 404);
+    const order = await findOrderByNumber(guest.order_number);
+    if (!order) return json({ error: 'No encontramos el evento.' }, 404);
+    if (eventAccessExpired(order.order_payload)) {
+      return json({ error: 'Este evento ya no se encuentra disponible.' }, 410);
+    }
 
     if (request.method === 'GET') {
-      const order = await findOrderByNumber(guest.order_number);
-      if (!order) return json({ error: 'No encontramos el evento.' }, 404);
       return json({
         event: {
           title: String(order.order_payload.eventTitle || order.customer_name),

@@ -1,0 +1,108 @@
+import { findSession, readSessionToken } from '../admin-auth.js';
+import { validateBackup } from '../backup-validation.js';
+import { json, supabaseRequest } from '../orders.js';
+import { logAdminActivity } from './audit.js';
+
+const countRows = async (table: string, orderNumber: string) => {
+  const response = await supabaseRequest(
+    `${table}?order_number=eq.${encodeURIComponent(orderNumber)}&select=id`
+  );
+  return (await response.json() as Array<{ id: string }>).length;
+};
+
+async function handler(request: Request) {
+  if (request.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
+  let restoringOrderNumber = '';
+  try {
+    const session = await findSession(readSessionToken(request));
+    if (!session) return json({ error: 'Sesión vencida.' }, 401);
+    if (session.access_role !== 'owner') return json({ error: 'Sólo el propietario puede restaurar respaldos.' }, 403);
+    const body = await request.json() as Record<string, unknown>;
+    const validation = validateBackup(body.backup, session.order_number);
+    if ('error' in validation) return json({ error: validation.error }, 400);
+    const [guestCount, tableCount, collaboratorCount] = await Promise.all([
+      countRows('event_guests', session.order_number),
+      countRows('event_tables', session.order_number),
+      countRows('event_admins', session.order_number)
+    ]);
+    const summary = {
+      guests: validation.guests.length,
+      tables: validation.tables.length,
+      collaborators: validation.collaborators.length
+    };
+    if (body.apply !== true) {
+      return json({ valid: true, canRestore: guestCount + tableCount + collaboratorCount === 0, current: { guests: guestCount, tables: tableCount, collaborators: collaboratorCount }, summary });
+    }
+    if (guestCount + tableCount + collaboratorCount > 0) {
+      return json({ error: 'El evento contiene datos. Para evitar sobrescrituras, la restauración sólo se permite sobre un evento vacío.' }, 409);
+    }
+    if (String(body.confirmation || '').trim().toUpperCase() !== session.order_number) {
+      return json({ error: 'Escribí el número de pedido completo para confirmar.' }, 400);
+    }
+    restoringOrderNumber = session.order_number;
+    if (validation.tables.length) {
+      await supabaseRequest('event_tables', {
+        method: 'POST',
+        body: JSON.stringify(validation.tables.map((table) => ({
+          id: String(table.id),
+          order_number: session.order_number,
+          name: String(table.name).trim().slice(0, 120),
+          capacity: Number(table.capacity),
+          note: String(table.note || '').trim().slice(0, 500)
+        })))
+      });
+    }
+    if (validation.guests.length) {
+      await supabaseRequest('event_guests', {
+        method: 'POST',
+        body: JSON.stringify(validation.guests.map((guest) => ({
+          id: String(guest.id),
+          ...(guest.invite_token ? { invite_token: String(guest.invite_token) } : {}),
+          order_number: session.order_number,
+          name: String(guest.name).trim().slice(0, 120),
+          group_name: String(guest.group_name || '').trim().slice(0, 120),
+          email: String(guest.email || '').trim().toLowerCase().slice(0, 254),
+          phone: String(guest.phone || '').trim().slice(0, 30),
+          phone_country_code: String(guest.phone_country_code || '+598').trim().slice(0, 6),
+          identification_type: String(guest.identification_type || '').trim().slice(0, 30),
+          identification_number: String(guest.identification_number || '').trim().slice(0, 80),
+          seats: Number(guest.seats),
+          confirmed: Number(guest.confirmed),
+          status: ['Confirmado', 'Pendiente', 'No asiste'].includes(String(guest.status)) ? guest.status : 'Pendiente',
+          food: String(guest.food || '—').trim().slice(0, 250),
+          song: String(guest.song || '—').trim().slice(0, 250),
+          companions: Array.isArray(guest.companions) ? guest.companions : [],
+          table_id: guest.table_id ? String(guest.table_id) : null,
+          reminded_at: guest.reminded_at || null
+        })))
+      });
+    }
+    if (validation.collaborators.length) {
+      await supabaseRequest('event_admins', {
+        method: 'POST',
+        body: JSON.stringify(validation.collaborators.map((access) => ({
+          order_number: session.order_number,
+          email: String(access.email || '').trim().toLowerCase().slice(0, 254),
+          role: access.role === 'viewer' ? 'viewer' : 'editor'
+        })).filter((access) => access.email))
+      });
+    }
+    await logAdminActivity(session, 'backup.restored', 'backup', session.order_number, summary);
+    restoringOrderNumber = '';
+    return json({ ok: true, summary });
+  } catch (error) {
+    console.error(error);
+    if (restoringOrderNumber) {
+      try {
+        await supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(restoringOrderNumber)}`, { method: 'DELETE' });
+        await supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(restoringOrderNumber)}`, { method: 'DELETE' });
+        await supabaseRequest(`event_admins?order_number=eq.${encodeURIComponent(restoringOrderNumber)}`, { method: 'DELETE' });
+      } catch (rollbackError) {
+        console.error('No pudimos revertir una restauración incompleta.', rollbackError);
+      }
+    }
+    return json({ error: 'No pudimos restaurar el respaldo.' }, 500);
+  }
+}
+
+export default { fetch: handler };
