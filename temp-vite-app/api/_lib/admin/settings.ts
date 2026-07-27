@@ -7,6 +7,7 @@ async function handler(request: Request) {
   try {
     const session = await findSession(readSessionToken(request));
     if (!session) return json({ error: 'Sesión vencida.' }, 401);
+    if (request.method !== 'GET' && session.access_role !== 'owner') return json({ error: 'Sólo el propietario puede modificar la configuración.' }, 403);
 
     if (request.method === 'GET') {
       const order = await findOrderByNumber(session.order_number);

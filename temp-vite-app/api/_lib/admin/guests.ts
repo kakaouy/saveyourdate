@@ -30,6 +30,7 @@ async function handler(request: Request) {
   try {
     const session = await findSession(readSessionToken(request));
     if (!session) return json({ error: 'Sesión vencida.' }, 401);
+    if (request.method !== 'GET' && session.access_role === 'viewer') return json({ error: 'Tu acceso es de solo lectura.' }, 403);
     if (request.method === 'GET') {
       const response = await supabaseRequest(
         `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc`

@@ -23,7 +23,7 @@ async function handler(request: Request) {
       return json({ error: 'El código ingresado no es correcto.' }, 401);
     }
     await updateChallenge(challenge.id, { used_at: new Date().toISOString() });
-    const session = await createSession(challenge.order_number);
+    const session = await createSession(challenge.order_number, challenge.login_email, challenge.access_role);
     const response = json({ ok: true, expiresAt: session.expiresAt });
     response.headers.set('Set-Cookie', sessionCookie(session.token));
     return response;

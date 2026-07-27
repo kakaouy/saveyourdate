@@ -1,3 +1,4 @@
+import access from '../_lib/admin/access.js';
 import guests from '../_lib/admin/guests.js';
 import logout from '../_lib/admin/logout.js';
 import requestCode from '../_lib/admin/request-code.js';
@@ -8,6 +9,7 @@ import verifyCode from '../_lib/admin/verify-code.js';
 import { json } from '../_lib/orders.js';
 
 const handlers: Record<string, { fetch: (request: Request) => Promise<Response> }> = {
+  access,
   guests,
   logout,
   'request-code': requestCode,
