@@ -9,6 +9,8 @@ type Guest = {
   group: string;
   phone: string;
   phoneCountryCode: string;
+  identificationType: string;
+  identificationNumber: string;
   seats: number;
   confirmed: number;
   status: "Confirmado" | "Pendiente" | "No asiste";
@@ -101,6 +103,9 @@ const countryCodes = [
   ["México", "+52"], ["Estados Unidos / Canadá", "+1"], ["España", "+34"],
   ["Italia", "+39"], ["Francia", "+33"], ["Reino Unido", "+44"]
 ];
+
+const suggestedIdentification = (code: string) =>
+  code === "+598" ? "CI" : code === "+54" ? "DNI" : code === "+55" ? "CPF" : "Pasaporte";
 
 function Logo({ compact = false }: { compact?: boolean }) {
   return (
@@ -332,6 +337,7 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
   const [notice, setNotice] = useState("");
   const [copiedId, setCopiedId] = useState("");
   const [newGuestCode, setNewGuestCode] = useState(defaultPhoneCountryCode);
+  const [newIdentificationType, setNewIdentificationType] = useState(suggestedIdentification(defaultPhoneCountryCode));
   const [customGuestCode, setCustomGuestCode] = useState("");
   const importInput = useRef<HTMLInputElement>(null);
   const filtered = guests.filter((guest) => {
@@ -409,7 +415,9 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
           food: data.get("food"),
           song: data.get("song"),
           phone: data.get("phone"),
-          phoneCountryCode: data.get("phoneCountryCode")
+          phoneCountryCode: data.get("phoneCountryCode"),
+          identificationType: data.get("identificationType"),
+          identificationNumber: data.get("identificationNumber")
         })
       });
       const result = await response.json() as { guest?: Guest; error?: string };
@@ -435,8 +443,8 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
 
   const downloadTemplate = () => exportCsv(
     "plantilla-invitados.csv",
-    ["Nombre", "Grupo", "WhatsApp", "Código país", "Cupos", "Email"],
-    [["Valentina Pérez", "Familia Pérez", "99123456", defaultPhoneCountryCode, 2, "valentina@ejemplo.com"]]
+    ["Nombre", "Grupo", "WhatsApp", "Código país", "Cupos", "Email", "Tipo identificación", "Identificación"],
+    [["Valentina Pérez", "Familia Pérez", "99123456", defaultPhoneCountryCode, 2, "valentina@ejemplo.com", suggestedIdentification(defaultPhoneCountryCode), ""]]
   );
 
   const importCsv = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -459,13 +467,17 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
       const codeIndex = column("codigo pais", "codigo de pais", "pais", "caracteristica");
       const seatsIndex = column("cupos", "personas", "cantidad");
       const emailIndex = column("email", "correo");
+      const identificationTypeIndex = column("tipo identificacion", "tipo de identificacion", "documento");
+      const identificationNumberIndex = column("identificacion", "numero identificacion", "numero de identificacion");
       const imported = rows.slice(1).map((values) => ({
         name: values[nameIndex],
         group: groupIndex >= 0 ? values[groupIndex] : "",
         phone: phoneIndex >= 0 ? values[phoneIndex] : "",
         phoneCountryCode: codeIndex >= 0 && values[codeIndex] ? values[codeIndex] : defaultPhoneCountryCode,
         seats: seatsIndex >= 0 ? values[seatsIndex] : "1",
-        email: emailIndex >= 0 ? values[emailIndex] : ""
+        email: emailIndex >= 0 ? values[emailIndex] : "",
+        identificationType: identificationTypeIndex >= 0 && values[identificationTypeIndex] ? values[identificationTypeIndex] : "",
+        identificationNumber: identificationNumberIndex >= 0 ? values[identificationNumberIndex] : ""
       })).filter((guest) => guest.name);
       const response = await fetch("/api/admin/guests", {
         method: "POST",
@@ -508,8 +520,8 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
         {error && <p className="table-error" role="alert">{error}</p>}
         <div className="table-footer"><span>Mostrando {filtered.length} de {guests.length} invitados</span><div><button>←</button><button className="active">1</button><button>→</button></div></div>
       </section>
-      {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={addGuest} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre y apellido<input name="name" required /></label><label>Grupo<input name="group" placeholder="Ej. Familia" /></label><label>País de WhatsApp<select value={countryCodes.some(([, code]) => code === newGuestCode) ? newGuestCode : "custom"} onChange={(event) => setNewGuestCode(event.target.value)}>{countryCodes.map(([country, code]) => <option key={code} value={code}>{country} {code}</option>)}<option value="custom">Otro país</option></select></label>{newGuestCode === "custom" && <label>Código internacional<input value={customGuestCode} onChange={(event) => setCustomGuestCode(event.target.value)} placeholder="+___" required /></label>}<label>WhatsApp<input name="phone" inputMode="tel" placeholder="99 123 456" /></label><label>Cupos<input name="seats" type="number" min="1" max="20" defaultValue="1" /></label><label>Email<input name="email" type="email" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar invitado"}</button></div></form></div>}
-      {editingGuest && <div className="modal-backdrop" onMouseDown={() => setEditingGuest(null)}><form className="modal" onSubmit={updateDetails} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setEditingGuest(null)}>×</button><span className="eyebrow">Información del invitado</span><h2>Editar a {editingGuest.name}</h2><div className="form-grid"><label>Código de país<input name="phoneCountryCode" defaultValue={editingGuest.phoneCountryCode || defaultPhoneCountryCode} placeholder="+598" required /></label><label>WhatsApp<input name="phone" inputMode="tel" defaultValue={editingGuest.phone.replace(editingGuest.phoneCountryCode || defaultPhoneCountryCode, "")} /></label><label>Restricción alimentaria<input name="food" defaultValue={editingGuest.food === "—" ? "" : editingGuest.food} placeholder="Ej. Vegetariano, celíaco…" /></label><label>Canción sugerida<input name="song" defaultValue={editingGuest.song === "—" ? "" : editingGuest.song} placeholder="Canción — Artista" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setEditingGuest(null)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</button></div></form></div>}
+      {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={addGuest} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre y apellido<input name="name" required /></label><label>Grupo<input name="group" placeholder="Ej. Familia" /></label><label>País de WhatsApp<select value={countryCodes.some(([, code]) => code === newGuestCode) ? newGuestCode : "custom"} onChange={(event) => { const code = event.target.value; setNewGuestCode(code); if (code !== "custom") setNewIdentificationType(suggestedIdentification(code)); }}>{countryCodes.map(([country, code]) => <option key={code} value={code}>{country} {code}</option>)}<option value="custom">Otro país</option></select></label>{newGuestCode === "custom" && <label>Código internacional<input value={customGuestCode} onChange={(event) => setCustomGuestCode(event.target.value)} placeholder="+___" required /></label>}<label>WhatsApp<input name="phone" inputMode="tel" placeholder="99 123 456" /></label><label>Cupos<input name="seats" type="number" min="1" max="20" defaultValue="1" /></label><label>Email<input name="email" type="email" /></label><label>Tipo de identificación<select name="identificationType" value={newIdentificationType} onChange={(event) => setNewIdentificationType(event.target.value)}><option value="">Sin identificación</option><option>CI</option><option>DNI</option><option>CPF</option><option>Pasaporte</option><option>Otro</option></select></label><label>Número de identificación<input name="identificationNumber" placeholder="Opcional" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar invitado"}</button></div></form></div>}
+      {editingGuest && <div className="modal-backdrop" onMouseDown={() => setEditingGuest(null)}><form className="modal" onSubmit={updateDetails} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setEditingGuest(null)}>×</button><span className="eyebrow">Información del invitado</span><h2>Editar a {editingGuest.name}</h2><div className="form-grid"><label>Código de país<input name="phoneCountryCode" defaultValue={editingGuest.phoneCountryCode || defaultPhoneCountryCode} placeholder="+598" required /></label><label>WhatsApp<input name="phone" inputMode="tel" defaultValue={editingGuest.phone.replace(editingGuest.phoneCountryCode || defaultPhoneCountryCode, "")} /></label><label>Tipo de identificación<select name="identificationType" defaultValue={editingGuest.identificationType}><option value="">Sin identificación</option><option>CI</option><option>DNI</option><option>CPF</option><option>Pasaporte</option><option>Otro</option></select></label><label>Número de identificación<input name="identificationNumber" defaultValue={editingGuest.identificationNumber} placeholder="Opcional" /></label><label>Restricción alimentaria<input name="food" defaultValue={editingGuest.food === "—" ? "" : editingGuest.food} placeholder="Ej. Vegetariano, celíaco…" /></label><label>Canción sugerida<input name="song" defaultValue={editingGuest.song === "—" ? "" : editingGuest.song} placeholder="Canción — Artista" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setEditingGuest(null)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</button></div></form></div>}
     </>
   );
 }
@@ -520,8 +532,8 @@ function Confirmations({ guests }: { guests: Guest[] }) {
   const declined = guests.filter((guest) => guest.status === "No asiste").length;
   const exportReport = () => exportCsv(
     `confirmaciones-${new Date().toISOString().slice(0, 10)}.csv`,
-    ["Invitado", "Grupo", "Estado", "Cupos asignados", "Personas confirmadas", "WhatsApp", "Restricción", "Canción", "Última actualización"],
-    guests.map((guest) => [guest.name, guest.group, guest.status, guest.seats, guest.confirmed, guest.phone, guest.food, guest.song, reportDate(guest.updatedAt)])
+    ["Invitado", "Grupo", "Estado", "Cupos asignados", "Personas confirmadas", "WhatsApp", "Tipo identificación", "Identificación", "Restricción", "Canción", "Última actualización"],
+    guests.map((guest) => [guest.name, guest.group, guest.status, guest.seats, guest.confirmed, guest.phone, guest.identificationType, guest.identificationNumber, guest.food, guest.song, reportDate(guest.updatedAt)])
   );
   return (
     <>

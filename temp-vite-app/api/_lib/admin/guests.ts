@@ -3,6 +3,7 @@ import { json, supabaseRequest } from '../orders.js';
 
 type GuestRow = {
   id: string; invite_token: string; name: string; group_name: string; phone: string; phone_country_code: string; seats: number;
+  identification_type: string; identification_number: string;
   confirmed: number; status: 'Confirmado' | 'Pendiente' | 'No asiste';
   food: string; song: string; reminded_at: string | null; updated_at: string;
 };
@@ -14,6 +15,8 @@ const clientGuest = (row: GuestRow) => ({
   group: row.group_name,
   phone: row.phone,
   phoneCountryCode: row.phone_country_code,
+  identificationType: row.identification_type,
+  identificationNumber: row.identification_number,
   seats: row.seats,
   confirmed: row.confirmed,
   status: row.status,
@@ -54,6 +57,8 @@ async function handler(request: Request) {
             email: String(guest.email || '').trim().toLowerCase(),
             phone: phoneDigits ? `${phoneCountryCode}${phoneDigits}` : '',
             phone_country_code: phoneCountryCode,
+            identification_type: String(guest.identificationType || '').trim(),
+            identification_number: String(guest.identificationNumber || '').trim(),
             seats: Math.max(1, Math.min(20, Number(guest.seats) || 1))
           };
         });
@@ -79,6 +84,8 @@ async function handler(request: Request) {
           email: String(body.email || '').trim().toLowerCase(),
           phone: phoneDigits ? `${phoneCountryCode}${phoneDigits}` : '',
           phone_country_code: phoneCountryCode,
+          identification_type: String(body.identificationType || '').trim(),
+          identification_number: String(body.identificationNumber || '').trim(),
           seats: Math.max(1, Math.min(20, Number(body.seats) || 1))
         })
       });
@@ -107,7 +114,7 @@ async function handler(request: Request) {
         return json({ error: 'Los datos de la confirmación no son válidos.' }, 400);
       }
       const guestResponse = await supabaseRequest(
-        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,phone,phone_country_code`
+        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,phone,phone_country_code,identification_type,identification_number`
       );
       const existingGuests = await guestResponse.json() as Pick<GuestRow, 'seats'>[];
       if (!existingGuests[0]) return json({ error: 'No encontramos ese invitado.' }, 404);
@@ -129,6 +136,8 @@ async function handler(request: Request) {
             song: String(body.song ?? '—').trim() || '—',
             phone_country_code: phoneCountryCode,
             phone: suppliedPhone === null ? existingGuests[0].phone : suppliedPhone ? `${phoneCountryCode}${suppliedPhone}` : '',
+            identification_type: body.identificationType === undefined ? existingGuests[0].identification_type : String(body.identificationType).trim(),
+            identification_number: body.identificationNumber === undefined ? existingGuests[0].identification_number : String(body.identificationNumber).trim(),
             updated_at: new Date().toISOString()
           })
         }
