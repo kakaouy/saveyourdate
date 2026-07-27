@@ -140,6 +140,16 @@ function LanguageSwitcher({ value, onChange, compact = false }: { value: AdminLa
   );
 }
 
+function FontSizeSwitcher({ comfortable, onChange }: { comfortable: boolean; onChange: (comfortable: boolean) => void }) {
+  const { text: t } = useAdminI18n();
+  return (
+    <div className="font-size-switcher" role="group" aria-label={t("Tamaño de texto", "Text size", "Tamanho do texto")}>
+      <button type="button" className={!comfortable ? "active" : ""} onClick={() => onChange(false)} aria-pressed={!comfortable} title={t("Texto chico", "Small text", "Texto pequeno")}>A</button>
+      <button type="button" className={comfortable ? "active" : ""} onClick={() => onChange(true)} aria-pressed={comfortable} title={t("Texto cómodo", "Comfortable text", "Texto confortável")}>A+</button>
+    </div>
+  );
+}
+
 function Login({ onLogin }: { onLogin: () => void }) {
   const [language, setLanguage] = useState<AdminLanguage>("es");
   const [languageTouched, setLanguageTouched] = useState(false);
@@ -1319,6 +1329,7 @@ function Admin({ onLogout, order, onLanguageChange }: { onLogout: () => void; or
   const [defaultPhoneCountryCode, setDefaultPhoneCountryCode] = useState(order.defaultPhoneCountryCode || "+598");
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [comfortableText, setComfortableText] = useState(() => window.sessionStorage.getItem("syd-admin-font-size") === "comfortable");
   const navLabel = useCallback((item: string) => ({
     Resumen: t("Resumen", "Overview", "Resumo"), Invitados: t("Invitados", "Guests", "Convidados"),
     Confirmaciones: t("Confirmaciones", "Confirmations", "Confirmações"), Mesas: t("Mesas", "Tables", "Mesas"),
@@ -1361,9 +1372,13 @@ function Admin({ onLogout, order, onLanguageChange }: { onLogout: () => void; or
     setView(item);
     setMobileNav(false);
   };
+  const changeTextSize = (comfortable: boolean) => {
+    setComfortableText(comfortable);
+    window.sessionStorage.setItem("syd-admin-font-size", comfortable ? "comfortable" : "small");
+  };
 
   return (
-    <main className="admin-shell">
+    <main className={`admin-shell ${comfortableText ? "font-comfortable" : "font-small"}`}>
       <aside className={`sidebar ${mobileNav ? "mobile-open" : ""}`}>
         <div className="sidebar-top"><Logo compact /><button className="mobile-close" onClick={() => setMobileNav(false)}>×</button></div>
         <div className="event-switcher"><span>{initials(order.eventTitle)}</span><div><strong>{order.eventTitle}</strong><small>{t("Pedido", "Order", "Pedido")} {order.orderNumber}</small></div></div>
@@ -1373,7 +1388,7 @@ function Admin({ onLogout, order, onLanguageChange }: { onLogout: () => void; or
       </aside>
       {mobileNav && <button className="sidebar-overlay" aria-label="Cerrar menú" onClick={() => setMobileNav(false)} />}
       <section className="admin-main">
-        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>{lastSynced ? `${t("Sincronizado", "Synced", "Sincronizado")} ${lastSynced.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}` : t("Sincronizando datos…", "Syncing data…", "Sincronizando dados…")}</small></div><div className="topbar-actions"><LanguageSwitcher compact value={language} onChange={onLanguageChange} /><button className={`notification sync-button ${syncing ? "syncing" : ""}`} onClick={() => refreshGuests(true)} aria-label={t("Actualizar datos", "Refresh data", "Atualizar dados")} title={t("Actualizar datos", "Refresh data", "Atualizar dados")}>↻</button><div className="admin-user"><span>{initials(order.loginEmail || order.customerName)}</span><div><strong>{order.loginEmail || order.customerName}</strong><small>{order.accessRole === "owner" ? t("Propietario", "Owner", "Proprietário") : order.accessRole === "editor" ? "Editor" : t("Solo lectura", "Read only", "Somente leitura")}</small></div></div></div></header>
+        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div className="topbar-title"><span>{title}</span><small>{lastSynced ? `${t("Sincronizado", "Synced", "Sincronizado")} ${lastSynced.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}` : t("Sincronizando datos…", "Syncing data…", "Sincronizando dados…")}</small></div><div className="topbar-actions"><FontSizeSwitcher comfortable={comfortableText} onChange={changeTextSize} /><LanguageSwitcher compact value={language} onChange={onLanguageChange} /><button className={`notification sync-button ${syncing ? "syncing" : ""}`} onClick={() => refreshGuests(true)} aria-label={t("Actualizar datos", "Refresh data", "Atualizar dados")} title={t("Actualizar datos", "Refresh data", "Atualizar dados")}>↻</button><div className="admin-user"><span>{initials(order.loginEmail || order.customerName)}</span><div><strong>{order.loginEmail || order.customerName}</strong><small>{order.accessRole === "owner" ? t("Propietario", "Owner", "Proprietário") : order.accessRole === "editor" ? "Editor" : t("Solo lectura", "Read only", "Somente leitura")}</small></div></div></div></header>
         <div className="admin-content">
           {view === "Resumen" && <Dashboard guests={guests} onNavigate={navigate} order={order} canEdit={order.accessRole !== "viewer"} />}
           {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} defaultPhoneCountryCode={defaultPhoneCountryCode} canEdit={order.accessRole !== "viewer"} />}
