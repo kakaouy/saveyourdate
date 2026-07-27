@@ -127,8 +127,22 @@ function Logo({ compact = false }: { compact?: boolean }) {
   );
 }
 
+function LanguageSwitcher({ value, onChange, compact = false }: { value: AdminLanguage; onChange: (language: AdminLanguage) => void; compact?: boolean }) {
+  const labels: Record<AdminLanguage, string> = { es: "Español", en: "English", pt: "Português" };
+  return (
+    <label className={`language-switcher ${compact ? "is-compact" : ""}`}>
+      <span className="visually-hidden">{adminText(value, "Idioma", "Language", "Idioma")}</span>
+      <span aria-hidden="true">🌐</span>
+      <select value={value} onChange={(event) => onChange(event.target.value as AdminLanguage)} aria-label={adminText(value, "Cambiar idioma", "Change language", "Alterar idioma")}>
+        {(Object.keys(labels) as AdminLanguage[]).map((language) => <option key={language} value={language}>{labels[language]}</option>)}
+      </select>
+    </label>
+  );
+}
+
 function Login({ onLogin }: { onLogin: () => void }) {
-  const [language, setLanguage] = useState<"es" | "en" | "pt">("es");
+  const [language, setLanguage] = useState<AdminLanguage>("es");
+  const [languageTouched, setLanguageTouched] = useState(false);
   const [step, setStep] = useState<"credentials" | "code">("credentials");
   const [contact, setContact] = useState<"email" | "whatsapp">("email");
   const [orderNumber, setOrderNumber] = useState("");
@@ -144,6 +158,10 @@ function Login({ onLogin }: { onLogin: () => void }) {
   const [recoveryMessage, setRecoveryMessage] = useState("");
   const [recovering, setRecovering] = useState(false);
   const t = (es: string, en: string, pt: string) => adminText(language, es, en, pt);
+  useEffect(() => {
+    document.documentElement.lang = language;
+    window.sessionStorage.setItem("syd-admin-language", language);
+  }, [language]);
 
   const copySupportEmail = async () => {
     await navigator.clipboard.writeText("hola@saveyourdate.site");
@@ -183,7 +201,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
       if (!response.ok || !result.challengeId) throw new Error(result.error || "No pudimos enviar el código.");
       setChallengeId(result.challengeId);
       setMaskedEmail(result.maskedEmail || "");
-      setLanguage(result.language || "es");
+      if (!languageTouched) setLanguage(result.language || "es");
       setStep("code");
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "No pudimos enviar el código.");
@@ -212,41 +230,43 @@ function Login({ onLogin }: { onLogin: () => void }) {
   };
 
   return (
+    <AdminI18nProvider language={language}>
     <main className="login-shell">
       <section className="login-story">
         <div className="story-orb story-orb-one" />
         <div className="story-orb story-orb-two" />
         <Logo />
         <div className="story-copy">
-          <span className="eyebrow">Tu evento, bajo control</span>
-          <h1>Todo listo para disfrutar el gran día.</h1>
-          <p>Gestioná invitados, confirmaciones y cada detalle desde un único lugar.</p>
+          <span className="eyebrow">{t("Tu evento, bajo control", "Your event, under control", "Seu evento sob controle")}</span>
+          <h1>{t("Todo listo para disfrutar el gran día.", "Everything ready to enjoy the big day.", "Tudo pronto para aproveitar o grande dia.")}</h1>
+          <p>{t("Gestioná invitados, confirmaciones y cada detalle desde un único lugar.", "Manage guests, RSVPs and every detail from one place.", "Gerencie convidados, confirmações e cada detalhe em um só lugar.")}</p>
         </div>
       </section>
 
       <section className="login-panel">
+        <div className="login-language"><LanguageSwitcher value={language} onChange={(nextLanguage) => { setLanguageTouched(true); setLanguage(nextLanguage); }} /></div>
         <div className="mobile-login-logo"><Logo compact /></div>
         <div className="login-card">
-          <div className="login-step">Paso {step === "credentials" ? "1 de 2" : "2 de 2"}</div>
+          <div className="login-step">{t("Paso", "Step", "Etapa")} {step === "credentials" ? "1 / 2" : "2 / 2"}</div>
           {step === "credentials" ? (
             <>
-              <h2>Ingresá a tu evento</h2>
-              <p className="muted">Usá los datos asociados a tu pedido.</p>
+              <h2>{t("Ingresá a tu evento", "Access your event", "Acesse seu evento")}</h2>
+              <p className="muted">{t("Usá los datos asociados a tu pedido.", "Use the details associated with your order.", "Use os dados associados ao seu pedido.")}</p>
               <label>
-                Número de pedido
-                <input value={orderNumber} onChange={(event) => setOrderNumber(event.target.value)} placeholder="Ej. SYD-ABCD-1234" aria-label="Número de pedido" />
+                {t("Número de pedido", "Order number", "Número do pedido")}
+                <input value={orderNumber} onChange={(event) => setOrderNumber(event.target.value)} placeholder={t("Ej. SYD-ABCD-1234", "E.g. SYD-ABCD-1234", "Ex. SYD-ABCD-1234")} aria-label={t("Número de pedido", "Order number", "Número do pedido")} />
               </label>
               <div className="segmented" aria-label="Tipo de contacto">
                 <button className={contact === "email" ? "active" : ""} onClick={() => setContact("email")}>Email</button>
                 <button className={contact === "whatsapp" ? "active" : ""} onClick={() => setContact("whatsapp")}>WhatsApp</button>
               </div>
               <label>
-                {contact === "email" ? "Email registrado" : "WhatsApp registrado"}
-                <input value={contactValue} onChange={(event) => setContactValue(event.target.value)} placeholder={contact === "email" ? "nombre@ejemplo.com" : "099 123 456"} aria-label="Contacto registrado" />
+                {contact === "email" ? t("Email registrado", "Registered email", "Email cadastrado") : t("WhatsApp registrado", "Registered WhatsApp", "WhatsApp cadastrado")}
+                <input value={contactValue} onChange={(event) => setContactValue(event.target.value)} placeholder={contact === "email" ? t("nombre@ejemplo.com", "name@example.com", "nome@exemplo.com") : "099 123 456"} aria-label={t("Contacto registrado", "Registered contact", "Contato cadastrado")} />
               </label>
               {error && <p className="login-error" role="alert">{error}</p>}
-              <button className="primary-button" disabled={busy || !orderNumber || !contactValue} onClick={requestCode}>{busy ? "Enviando…" : "Continuar"} <span>→</span></button>
-              <p className="security-note"><span>✓</span> Tus datos están protegidos y nunca compartimos la información del evento.</p>
+              <button className="primary-button" disabled={busy || !orderNumber || !contactValue} onClick={requestCode}>{busy ? t("Enviando…", "Sending…", "Enviando…") : t("Continuar", "Continue", "Continuar")} <span>→</span></button>
+              <p className="security-note"><span>✓</span> {t("Tus datos están protegidos y nunca compartimos la información del evento.", "Your data is protected and we never share your event information.", "Seus dados estão protegidos e nunca compartilhamos as informações do evento.")}</p>
             </>
           ) : (
             <>
@@ -263,35 +283,36 @@ function Login({ onLogin }: { onLogin: () => void }) {
               <p className="security-note"><span>✓</span> {t("La sesión permanecerá activa durante 24 horas.", "Your session will remain active for 24 hours.", "Sua sessão permanecerá ativa por 24 horas.")}</p>
             </>
           )}
-          <button className="help-link" type="button" onClick={() => setShowHelp(true)}>¿Necesitás ayuda con tu acceso?</button>
+          <button className="help-link" type="button" onClick={() => setShowHelp(true)}>{t("¿Necesitás ayuda con tu acceso?", "Need help signing in?", "Precisa de ajuda para acessar?")}</button>
         </div>
       </section>
       {showHelp && (
         <div className="modal-backdrop" onMouseDown={() => setShowHelp(false)}>
           <div className="modal access-help-modal" onMouseDown={(event) => event.stopPropagation()}>
-            <button className="modal-close" type="button" onClick={() => setShowHelp(false)} aria-label="Cerrar ayuda">×</button>
-            <span className="eyebrow">Ayuda de acceso</span>
-            <h2>¿No podés ingresar?</h2>
-            <p>Encontrás el número de pedido en el email de confirmación de Save Your Date. Ingresá también el mismo email o WhatsApp que usaste al realizar el pedido.</p>
+            <button className="modal-close" type="button" onClick={() => setShowHelp(false)} aria-label={t("Cerrar ayuda", "Close help", "Fechar ajuda")}>×</button>
+            <span className="eyebrow">{t("Ayuda de acceso", "Access help", "Ajuda de acesso")}</span>
+            <h2>{t("¿No podés ingresar?", "Can't sign in?", "Não consegue acessar?")}</h2>
+            <p>{t("Encontrás el número de pedido en el email de confirmación de Save Your Date. Ingresá también el mismo email o WhatsApp que usaste al realizar el pedido.", "Your order number is in the Save Your Date confirmation email. Use the same email or WhatsApp number used for the order.", "O número do pedido está no email de confirmação da Save Your Date. Use também o mesmo email ou WhatsApp utilizado no pedido.")}</p>
             <form className="recovery-form" onSubmit={recoverAccess}>
-              <label>Email asociado<input type="email" required value={recoveryEmail} onChange={(event) => setRecoveryEmail(event.target.value)} placeholder="nombre@ejemplo.com" /></label>
-              <button className="primary-button small" disabled={recovering}>{recovering ? "Buscando…" : "Recuperar número de pedido"}</button>
+              <label>{t("Email asociado", "Associated email", "Email associado")}<input type="email" required value={recoveryEmail} onChange={(event) => setRecoveryEmail(event.target.value)} placeholder={t("nombre@ejemplo.com", "name@example.com", "nome@exemplo.com")} /></label>
+              <button className="primary-button small" disabled={recovering}>{recovering ? t("Buscando…", "Searching…", "Buscando…") : t("Recuperar número de pedido", "Recover order number", "Recuperar número do pedido")}</button>
               {recoveryMessage && <p className="settings-message" role="status">{recoveryMessage}</p>}
             </form>
             <div className="support-email">
-              <span>Soporte por email</span>
+              <span>{t("Soporte por email", "Email support", "Suporte por email")}</span>
               <strong>hola@saveyourdate.site</strong>
-              <button type="button" onClick={copySupportEmail}>{emailCopied ? "Email copiado ✓" : "Copiar email"}</button>
+              <button type="button" onClick={copySupportEmail}>{emailCopied ? t("Email copiado ✓", "Email copied ✓", "Email copiado ✓") : t("Copiar email", "Copy email", "Copiar email")}</button>
             </div>
-            <p className="support-note">Si nos escribís, incluí tu nombre y cualquier dato que ayude a localizar el pedido. Nunca te vamos a pedir una contraseña.</p>
+            <p className="support-note">{t("Si nos escribís, incluí tu nombre y cualquier dato que ayude a localizar el pedido. Nunca te vamos a pedir una contraseña.", "If you contact us, include your name and any details that help locate the order. We will never ask for a password.", "Ao entrar em contato, inclua seu nome e qualquer dado que ajude a localizar o pedido. Nunca pediremos uma senha.")}</p>
             <div className="modal-actions">
-              <button className="outline-button" type="button" onClick={() => setShowHelp(false)}>Volver al ingreso</button>
-              <a className="primary-button small" href="mailto:hola@saveyourdate.site?subject=Ayuda%20con%20el%20acceso%20al%20panel">Escribir a soporte</a>
+              <button className="outline-button" type="button" onClick={() => setShowHelp(false)}>{t("Volver al ingreso", "Back to sign in", "Voltar ao acesso")}</button>
+              <a className="primary-button small" href="mailto:hola@saveyourdate.site?subject=Ayuda%20con%20el%20acceso%20al%20panel">{t("Escribir a soporte", "Contact support", "Falar com o suporte")}</a>
             </div>
           </div>
         </div>
       )}
     </main>
+    </AdminI18nProvider>
   );
 }
 
@@ -1290,8 +1311,8 @@ function Accesses({ order }: { order: AdminOrder }) {
   </>;
 }
 
-function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder }) {
-  const { text: t, locale } = useAdminI18n();
+function Admin({ onLogout, order, onLanguageChange }: { onLogout: () => void; order: AdminOrder; onLanguageChange: (language: AdminLanguage) => void }) {
+  const { text: t, locale, language } = useAdminI18n();
   const [view, setView] = useState("Resumen");
   const [guests, setGuests] = useState(guestsSeed);
   const [mobileNav, setMobileNav] = useState(false);
@@ -1352,7 +1373,7 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
       </aside>
       {mobileNav && <button className="sidebar-overlay" aria-label="Cerrar menú" onClick={() => setMobileNav(false)} />}
       <section className="admin-main">
-        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>{lastSynced ? `${t("Sincronizado", "Synced", "Sincronizado")} ${lastSynced.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}` : t("Sincronizando datos…", "Syncing data…", "Sincronizando dados…")}</small></div><div className="topbar-actions"><button className={`notification sync-button ${syncing ? "syncing" : ""}`} onClick={() => refreshGuests(true)} aria-label={t("Actualizar datos", "Refresh data", "Atualizar dados")} title={t("Actualizar datos", "Refresh data", "Atualizar dados")}>↻</button><div className="admin-user"><span>{initials(order.loginEmail || order.customerName)}</span><div><strong>{order.loginEmail || order.customerName}</strong><small>{order.accessRole === "owner" ? t("Propietario", "Owner", "Proprietário") : order.accessRole === "editor" ? "Editor" : t("Solo lectura", "Read only", "Somente leitura")}</small></div></div></div></header>
+        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>{lastSynced ? `${t("Sincronizado", "Synced", "Sincronizado")} ${lastSynced.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}` : t("Sincronizando datos…", "Syncing data…", "Sincronizando dados…")}</small></div><div className="topbar-actions"><LanguageSwitcher compact value={language} onChange={onLanguageChange} /><button className={`notification sync-button ${syncing ? "syncing" : ""}`} onClick={() => refreshGuests(true)} aria-label={t("Actualizar datos", "Refresh data", "Atualizar dados")} title={t("Actualizar datos", "Refresh data", "Atualizar dados")}>↻</button><div className="admin-user"><span>{initials(order.loginEmail || order.customerName)}</span><div><strong>{order.loginEmail || order.customerName}</strong><small>{order.accessRole === "owner" ? t("Propietario", "Owner", "Proprietário") : order.accessRole === "editor" ? "Editor" : t("Solo lectura", "Read only", "Somente leitura")}</small></div></div></div></header>
         <div className="admin-content">
           {view === "Resumen" && <Dashboard guests={guests} onNavigate={navigate} order={order} canEdit={order.accessRole !== "viewer"} />}
           {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} defaultPhoneCountryCode={defaultPhoneCountryCode} canEdit={order.accessRole !== "viewer"} />}
@@ -1372,6 +1393,8 @@ export function AdminPrototype() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [order, setOrder] = useState<AdminOrder | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [panelLanguage, setPanelLanguage] = useState<AdminLanguage>("es");
+  useEffect(() => { document.documentElement.lang = panelLanguage; }, [panelLanguage]);
 
   useEffect(() => {
     fetch("/api/admin/session")
@@ -1379,6 +1402,8 @@ export function AdminPrototype() {
         if (!response.ok) return;
         const result = await response.json() as { order: AdminOrder };
         setOrder(result.order);
+        const savedLanguage = window.sessionStorage.getItem("syd-admin-language") as AdminLanguage | null;
+        setPanelLanguage(savedLanguage && ["es", "en", "pt"].includes(savedLanguage) ? savedLanguage : result.order.language);
         setLoggedIn(true);
       })
       .finally(() => setCheckingSession(false));
@@ -1388,10 +1413,15 @@ export function AdminPrototype() {
     await fetch("/api/admin/logout", { method: "POST" });
     setLoggedIn(false);
   };
+  const changePanelLanguage = (language: AdminLanguage) => {
+    setPanelLanguage(language);
+    window.sessionStorage.setItem("syd-admin-language", language);
+    document.documentElement.lang = language;
+  };
 
   if (checkingSession) return <main className="admin-loading">Verificando acceso…</main>;
   return loggedIn && order
-    ? <AdminI18nProvider language={order.language}><Admin onLogout={logout} order={order} /></AdminI18nProvider>
+    ? <AdminI18nProvider language={panelLanguage}><Admin onLogout={logout} order={order} onLanguageChange={changePanelLanguage} /></AdminI18nProvider>
     : <Login onLogin={() => window.location.reload()} />;
 }
 

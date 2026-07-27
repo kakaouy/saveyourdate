@@ -34,7 +34,13 @@ button { color: inherit; }
 .story-copy .eyebrow { color: var(--yellow); }
 .story-copy h1 { max-width: 480px; margin: 0 0 22px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(44px, 5vw, 76px); font-weight: 500; line-height: .98; letter-spacing: -.04em; }
 .story-copy p { max-width: 420px; margin: 0; color: rgba(255,255,255,.82); font-size: 17px; line-height: 1.65; }
-.login-panel { display: grid; place-items: center; padding: 48px; }
+.login-panel { position: relative; display: grid; place-items: center; padding: 48px; }
+.login-language { position: absolute; top: 24px; right: 28px; }
+.language-switcher { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: white; box-shadow: 0 3px 12px rgba(25,53,77,.05); }
+.language-switcher > span[aria-hidden="true"] { font-size: 14px; }
+.language-switcher select { min-width: 92px; border: 0; outline: 0; color: inherit; background: transparent; font-size: 11px; font-weight: 750; cursor: pointer; }
+.language-switcher.is-compact { min-height: 36px; }
+.language-switcher.is-compact select { min-width: 76px; }
 .login-card { width: min(100%, 440px); }
 .mobile-login-logo { display: none; }
 .login-step { display: inline-flex; margin-bottom: 22px; padding: 7px 12px; border-radius: 999px; background: var(--mint); color: var(--teal-dark); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
@@ -372,6 +378,9 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .menu-button { display: block; margin-right: 10px; }
   .topbar > div:first-of-type { margin-right: auto; }
   .admin-user div, .admin-user button, .topbar > div:first-of-type small { display: none; }
+  .topbar-actions { gap: 8px; }
+  .topbar .language-switcher { padding-inline: 7px; }
+  .topbar .language-switcher select { min-width: 72px; }
   .admin-content { padding: 24px 18px; }
 }
 
@@ -379,6 +388,7 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .login-shell { display: block; background: linear-gradient(160deg, var(--mint), white 45%); }
   .login-story { display: none; }
   .login-panel { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 28px 22px; }
+  .login-language { top: 18px; right: 18px; }
   .mobile-login-logo { display: block; margin-bottom: 24px; }
   .mobile-login-logo .brand img { filter: none; }
   .login-card { padding: 26px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.9); box-shadow: 0 20px 60px rgba(25,53,77,.12); }
@@ -412,6 +422,12 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .table-modal-actions > span { display: none; }
   .delete-button { width: 100%; order: 3; }
   footer { align-items: flex-start; flex-direction: column; gap: 5px; padding: 18px; }
+}
+
+@media (max-width: 480px) {
+  .topbar .language-switcher > span[aria-hidden="true"] { display: none; }
+  .topbar .language-switcher select { min-width: 58px; max-width: 72px; }
+  .topbar .notification { display: none; }
 }
 
 @media (max-width: 430px) {
