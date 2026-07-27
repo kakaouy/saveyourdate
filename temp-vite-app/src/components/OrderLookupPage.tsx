@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PAYMENT_LINKS, commercialPlanFromLabel } from '../config/plans';
 
 type LookupOrder = {
   orderNumber: string;
@@ -14,7 +15,6 @@ type LookupOrder = {
   invitationUrl: string | null;
 };
 
-const PAYMENT_URL = 'https://mpago.la/2z4ME1Q';
 const WHATSAPP_URL = 'https://wa.me/59899134504?text=Hola%20Save%20Your%20Date%2C%20necesito%20ayuda%20con%20mi%20pedido.';
 
 const copy = {
@@ -165,7 +165,7 @@ export default function OrderLookupPage() {
             <div className="order-next-step"><strong>{text.next}</strong><p>{order.nextStep}</p></div>
             {order.status === 'pending_payment' && !paymentReported && (
               <form className="order-lookup-payment" onSubmit={reportPayment}>
-                <a className="mercado-pago-link" href={PAYMENT_URL} target="_blank" rel="noopener noreferrer">{text.payment} ↗</a>
+                <a className="mercado-pago-link" href={PAYMENT_LINKS[commercialPlanFromLabel(order.plan)]} target="_blank" rel="noopener noreferrer">{text.payment} ↗</a>
                 <label><span>{text.operation}</span><input name="paymentOperation" required /></label>
                 <button className="private-order-approve" type="submit" disabled={sending}>{sending ? text.reporting : text.report}</button>
               </form>
