@@ -14,7 +14,8 @@ async function handler(request: Request) {
       const order = await findOrderByNumber(session.order_number);
       return json({
         defaultPhoneCountryCode: order?.default_phone_country_code || '+598',
-        reminderDaysBefore: Math.max(1, Math.min(60, Number(order?.order_payload.reminderDaysBefore) || 7))
+        reminderDaysBefore: Math.max(1, Math.min(60, Number(order?.order_payload.reminderDaysBefore) || 7)),
+        automaticRemindersEnabled: order?.order_payload.automaticRemindersEnabled === true
       });
     }
 
@@ -22,6 +23,7 @@ async function handler(request: Request) {
       const body = await request.json() as Record<string, unknown>;
       const code = String(body.defaultPhoneCountryCode || '').trim();
       const reminderDaysBefore = Math.max(1, Math.min(60, Number(body.reminderDaysBefore) || 7));
+      const automaticRemindersEnabled = body.automaticRemindersEnabled === true;
       if (!validCode(code)) return json({ error: 'El código de país no es válido.' }, 400);
       const order = await findOrderByNumber(session.order_number);
       if (!order) return json({ error: 'No encontramos el evento.' }, 404);
@@ -29,12 +31,12 @@ async function handler(request: Request) {
         method: 'PATCH',
         body: JSON.stringify({
           default_phone_country_code: code,
-          order_payload: { ...order.order_payload, reminderDaysBefore },
+          order_payload: { ...order.order_payload, reminderDaysBefore, automaticRemindersEnabled },
           updated_at: new Date().toISOString()
         })
       });
-      await logAdminActivity(session, 'settings.updated', 'settings', session.order_number, { defaultPhoneCountryCode: code, reminderDaysBefore });
-      return json({ defaultPhoneCountryCode: code, reminderDaysBefore });
+      await logAdminActivity(session, 'settings.updated', 'settings', session.order_number, { defaultPhoneCountryCode: code, reminderDaysBefore, automaticRemindersEnabled });
+      return json({ defaultPhoneCountryCode: code, reminderDaysBefore, automaticRemindersEnabled });
     }
 
     return json({ error: 'Método no permitido.' }, 405);
