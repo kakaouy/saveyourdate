@@ -1,5 +1,6 @@
 import { findSession, readSessionToken } from '../admin-auth.js';
 import { json, supabaseRequest } from '../orders.js';
+import { logAdminActivity } from './audit.js';
 
 type TableRow = {
   id: string;
@@ -53,7 +54,9 @@ async function handler(request: Request) {
           note: String(body.note || '').trim()
         })
       });
-      return json({ table: clientTable(((await response.json()) as TableRow[])[0]) }, 201);
+      const createdTable = ((await response.json()) as TableRow[])[0];
+      await logAdminActivity(session, 'table.created', 'table', createdTable.id, { name: createdTable.name, capacity: createdTable.capacity });
+      return json({ table: clientTable(createdTable) }, 201);
     }
 
     if (request.method === 'PATCH' && body.action === 'assign') {
@@ -97,6 +100,7 @@ async function handler(request: Request) {
       if (!(await response.json() as AssignmentRow[])[0]) {
         return json({ error: 'El invitado debe estar confirmado para asignarle una mesa.' }, 400);
       }
+      await logAdminActivity(session, tableId ? 'table.guest_assigned' : 'table.guest_unassigned', 'guest', guestId, { tableId: tableId || null });
       return json({ ok: true });
     }
 
@@ -127,6 +131,7 @@ async function handler(request: Request) {
       );
       const rows = await response.json() as TableRow[];
       if (!rows[0]) return json({ error: 'No encontramos esa mesa.' }, 404);
+      await logAdminActivity(session, 'table.updated', 'table', rows[0].id, { name: rows[0].name, capacity: rows[0].capacity });
       return json({ table: clientTable(rows[0]) });
     }
 
@@ -136,6 +141,7 @@ async function handler(request: Request) {
         `event_tables?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
         { method: 'DELETE' }
       );
+      await logAdminActivity(session, 'table.deleted', 'table', id);
       return json({ ok: true });
     }
 

@@ -1,5 +1,6 @@
 import { findSession, readSessionToken } from '../admin-auth.js';
 import { findOrderByNumber, json, supabaseRequest } from '../orders.js';
+import { logAdminActivity } from './audit.js';
 
 const validCode = (value: string) => /^\+\d{1,4}$/.test(value);
 
@@ -22,6 +23,7 @@ async function handler(request: Request) {
         method: 'PATCH',
         body: JSON.stringify({ default_phone_country_code: code, updated_at: new Date().toISOString() })
       });
+      await logAdminActivity(session, 'settings.updated', 'settings', session.order_number, { defaultPhoneCountryCode: code });
       return json({ defaultPhoneCountryCode: code });
     }
 

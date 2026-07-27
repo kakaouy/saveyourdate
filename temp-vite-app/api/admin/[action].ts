@@ -1,4 +1,5 @@
 import access from '../_lib/admin/access.js';
+import activity from '../_lib/admin/activity.js';
 import guests from '../_lib/admin/guests.js';
 import logout from '../_lib/admin/logout.js';
 import recoverAccess from '../_lib/admin/recover-access.js';
@@ -11,6 +12,7 @@ import { json } from '../_lib/orders.js';
 
 const handlers: Record<string, { fetch: (request: Request) => Promise<Response> }> = {
   access,
+  activity,
   guests,
   logout,
   'recover-access': recoverAccess,

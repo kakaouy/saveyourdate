@@ -1,5 +1,6 @@
 import { findSession, readSessionToken } from '../admin-auth.js';
 import { emailShell, escapeHtml, json, sendEmail, supabaseRequest } from '../orders.js';
+import { logAdminActivity } from './audit.js';
 
 type AccessRow = { id: string; email: string; role: 'editor' | 'viewer'; created_at: string };
 
@@ -38,6 +39,7 @@ async function handler(request: Request) {
            <p>Ingresá en <a href="https://www.saveyourdate.site/admin">saveyourdate.site/admin</a> usando este email y el número de pedido.</p>`
         )
       });
+      await logAdminActivity(session, 'access.created', 'access', access.id, { email: access.email, role: access.role });
       return json({ access }, 201);
     }
 
@@ -62,6 +64,7 @@ async function handler(request: Request) {
         `admin_sessions?order_number=eq.${encodeURIComponent(session.order_number)}&login_email=eq.${encodeURIComponent(access.email)}&revoked_at=is.null`,
         { method: 'PATCH', body: JSON.stringify({ revoked_at: new Date().toISOString() }) }
       );
+      await logAdminActivity(session, 'access.role_updated', 'access', access.id, { email: access.email, role: access.role });
       return json({ access });
     }
 
@@ -82,6 +85,7 @@ async function handler(request: Request) {
           { method: 'PATCH', body: JSON.stringify({ revoked_at: new Date().toISOString() }) }
         )
       ]);
+      await logAdminActivity(session, 'access.deleted', 'access', id, { email: access.email });
       return json({ ok: true });
     }
 

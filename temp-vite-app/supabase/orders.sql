@@ -162,6 +162,25 @@ alter table public.event_guests enable row level security;
 revoke all on public.event_guests from anon, authenticated;
 grant select, insert, update, delete on public.event_guests to service_role;
 
+create table if not exists public.admin_activity_log (
+  id uuid primary key default gen_random_uuid(),
+  order_number text not null references public.orders(order_number) on delete cascade,
+  actor_email text not null,
+  actor_role text not null check (actor_role in ('owner', 'editor', 'viewer')),
+  action text not null,
+  entity_type text not null,
+  entity_id text,
+  details jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists admin_activity_order_idx
+  on public.admin_activity_log(order_number, created_at desc);
+
+alter table public.admin_activity_log enable row level security;
+revoke all on public.admin_activity_log from anon, authenticated;
+grant select, insert on public.admin_activity_log to service_role;
+
 create table if not exists public.event_tables (
   id uuid primary key default gen_random_uuid(),
   order_number text not null references public.orders(order_number) on delete cascade,
