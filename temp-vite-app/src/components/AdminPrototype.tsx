@@ -572,7 +572,9 @@ function Seating({ guests }: { guests: Guest[] }) {
   );
 }
 
-function SimpleModule({ view, guests }: { view: string; guests: Guest[] }) {
+function SimpleModule({ view, guests, setGuests, order }: { view: string; guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; order: AdminOrder }) {
+  const [remindingId, setRemindingId] = useState("");
+  const [moduleError, setModuleError] = useState("");
   const restrictions = guests.filter((g) => g.food !== "—" && g.food !== "Ninguna");
   const songs = guests.filter((g) => g.song !== "—");
   const pending = guests.filter((g) => g.status === "Pendiente");
@@ -584,18 +586,49 @@ function SimpleModule({ view, guests }: { view: string; guests: Guest[] }) {
     Accesos: { eyebrow: "Seguridad del evento", title: "Administradores", description: "Gestioná quién puede acceder al panel.", stats: [["Activos", "1"], ["Invitados", "0"], ["Sesiones", "1"]], rows: [], headers: ["Administrador", "Contacto", "Rol", "Estado"] },
   }[view]!;
 
+  const reminderDate = (value: string) => value === "—"
+    ? value
+    : new Intl.DateTimeFormat("es-UY", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+
+  const remindGuest = async (guest: Guest) => {
+    const phone = guest.phone.replace(/\D/g, "");
+    if (!phone) {
+      setModuleError(`${guest.name} no tiene un número de WhatsApp cargado.`);
+      return;
+    }
+    const personalizedLink = `${window.location.origin}/confirmar?token=${guest.inviteToken}`;
+    const message = `Hola ${guest.name}, te recordamos confirmar tu asistencia a ${order.eventTitle}. Podés responder acá: ${personalizedLink}`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+    setRemindingId(guest.id);
+    setModuleError("");
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: guest.id, action: "remind" })
+      });
+      const result = await response.json() as { guest?: Guest; error?: string };
+      if (!response.ok || !result.guest) throw new Error(result.error || "No pudimos registrar el recordatorio.");
+      setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+    } catch (error) {
+      setModuleError(error instanceof Error ? error.message : "No pudimos registrar el recordatorio.");
+    } finally {
+      setRemindingId("");
+    }
+  };
+
   return (
     <>
-      <div className="page-heading"><div><span className="eyebrow">{content.eyebrow}</span><h1>{content.title}</h1><p>{content.description}</p></div><button className="primary-button small">＋ {view === "Accesos" ? "Agregar administrador" : view === "Recordatorios" ? "Recordar pendientes" : "Exportar"}</button></div>
+      <div className="page-heading"><div><span className="eyebrow">{content.eyebrow}</span><h1>{content.title}</h1><p>{content.description}</p></div>{view !== "Recordatorios" && <button className="primary-button small">＋ {view === "Accesos" ? "Agregar administrador" : "Exportar"}</button>}</div>
       <section className="metrics-grid mini">{content.stats.map(([label, value], index) => <Metric key={label} label={label} value={value} note={view === "Accesos" ? "usuarios" : "registros"} tone={["blue", "green", "amber"][index]} />)}</section>
       <section className="panel table-panel"><div className="table-scroll"><table><thead><tr>{content.headers.map((header) => <th key={header}>{header}</th>)}</tr></thead>
         <tbody>{content.rows.map((guest, index) => <tr key={guest.id}>
           <td><div className="person"><span className="avatar avatar-blue">{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span><p><strong>{view === "Accesos" && index === 0 ? "Ana Pereira" : view === "Accesos" && index === 1 ? "Martín Costa" : guest.name}</strong><small>{guest.group}</small></p></div></td>
           {view === "Restricciones" && <><td>{guest.group}</td><td><span className="status status-pendiente">{guest.food}</span></td><td>{guest.confirmed || 1}</td></>}
           {view === "Canciones" && <><td>{guest.song}</td><td><span className={`status ${index < 2 ? "status-confirmado" : "status-pendiente"}`}>{index < 2 ? "Aprobada" : "Pendiente"}</span></td><td><button className="copy-button">Revisar</button></td></>}
-          {view === "Recordatorios" && <><td>{guest.phone}</td><td>{guest.reminded}</td><td><button className="whatsapp-button">Abrir WhatsApp ↗</button></td></>}
+          {view === "Recordatorios" && <><td>{guest.phone || "Sin número"}</td><td>{reminderDate(guest.reminded)}</td><td><button className="whatsapp-button" disabled={remindingId === guest.id} onClick={() => remindGuest(guest)}>{remindingId === guest.id ? "Registrando…" : "Abrir WhatsApp ↗"}</button></td></>}
           {view === "Accesos" && <><td>{index === 0 ? "ana@ejemplo.com" : index === 1 ? "martin@ejemplo.com" : "sofia@ejemplo.com"}</td><td>{index === 0 ? "Propietaria" : index === 1 ? "Colaborador" : "Solo lectura"}</td><td><span className={`status ${index < 2 ? "status-confirmado" : "status-pendiente"}`}>{index < 2 ? "Activo" : "Invitación pendiente"}</span></td></>}
-        </tr>)}</tbody></table></div></section>
+        </tr>)}</tbody></table></div>{moduleError && <p className="table-error" role="alert">{moduleError}</p>}</section>
     </>
   );
 }
@@ -624,7 +657,7 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
       <aside className={`sidebar ${mobileNav ? "mobile-open" : ""}`}>
         <div className="sidebar-top"><Logo compact /><button className="mobile-close" onClick={() => setMobileNav(false)}>×</button></div>
         <div className="event-switcher"><span>{initials(order.eventTitle)}</span><div><strong>{order.eventTitle}</strong><small>Pedido {order.orderNumber}</small></div><button>⌄</button></div>
-        <nav>{nav.map(([item, icon]) => <button key={item} className={view === item ? "active" : ""} onClick={() => navigate(item)}><span>{icon}</span>{item}{item === "Recordatorios" && <b>2</b>}</button>)}</nav>
+        <nav>{nav.map(([item, icon]) => <button key={item} className={view === item ? "active" : ""} onClick={() => navigate(item)}><span>{icon}</span>{item}{item === "Recordatorios" && guests.filter((guest) => guest.status === "Pendiente").length > 0 && <b>{guests.filter((guest) => guest.status === "Pendiente").length}</b>}</button>)}</nav>
         <div className="sidebar-help"><span>?</span><div><strong>¿Necesitás ayuda?</strong><small>Estamos para acompañarte.</small></div><button>Contactar soporte</button></div>
         <button className="logout" onClick={onLogout}><span>↪</span>Cerrar sesión</button>
       </aside>
@@ -636,7 +669,7 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
           {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} />}
           {view === "Confirmaciones" && <Confirmations guests={guests} />}
           {view === "Mesas" && <Seating guests={guests} />}
-          {["Restricciones", "Canciones", "Recordatorios", "Accesos"].includes(view) && <SimpleModule view={view} guests={guests} />}
+          {["Restricciones", "Canciones", "Recordatorios", "Accesos"].includes(view) && <SimpleModule view={view} guests={guests} setGuests={setGuests} order={order} />}
         </div>
         <footer><span>Save Your Date</span><small>Invitaciones digitales para momentos inolvidables · Panel v106</small></footer>
       </section>

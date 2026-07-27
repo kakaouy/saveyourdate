@@ -177,6 +177,7 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .table-error { margin: 0; padding: 10px 16px; border-top: 1px solid #ffd5d1; color: #9c4d46; background: #fff5f4; font-size: 9px; }
 .copy-button, .more-button, .whatsapp-button { border: 0; background: transparent; color: var(--teal-dark); font-size: 9px; font-weight: 800; cursor: pointer; }
 .whatsapp-button { padding: 8px 11px; border-radius: 8px; color: white; background: #2aa96b; }
+.whatsapp-button:disabled { cursor: wait; opacity: .65; }
 .more-button { color: var(--muted); letter-spacing: .1em; }
 .row-actions { display: flex; align-items: center; gap: 10px; }
 .rsvp-shell { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: linear-gradient(145deg, #f5faf9, #edf4f7); }
