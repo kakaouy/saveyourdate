@@ -19,6 +19,7 @@ async function handler(request: Request) {
         eventDate: String(order.order_payload.eventDate || ''),
         eventType: String(order.order_payload['Tipo de evento'] || 'Evento'),
         defaultPhoneCountryCode: order.default_phone_country_code || '+598',
+        language: order.language,
         accessRole: session.access_role,
         loginEmail: session.login_email
       },
