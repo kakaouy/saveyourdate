@@ -4,7 +4,7 @@ import { json, supabaseRequest } from '../orders.js';
 type GuestRow = {
   id: string; invite_token: string; name: string; group_name: string; phone: string; phone_country_code: string; seats: number;
   confirmed: number; status: 'Confirmado' | 'Pendiente' | 'No asiste';
-  food: string; song: string; reminded_at: string | null;
+  food: string; song: string; reminded_at: string | null; updated_at: string;
 };
 
 const clientGuest = (row: GuestRow) => ({
@@ -19,7 +19,8 @@ const clientGuest = (row: GuestRow) => ({
   status: row.status,
   food: row.food,
   song: row.song,
-  reminded: row.reminded_at || '—'
+  reminded: row.reminded_at || '—',
+  updatedAt: row.updated_at
 });
 
 async function handler(request: Request) {
