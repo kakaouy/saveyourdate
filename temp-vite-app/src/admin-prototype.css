@@ -34,10 +34,6 @@ button { color: inherit; }
 .story-copy .eyebrow { color: var(--yellow); }
 .story-copy h1 { max-width: 480px; margin: 0 0 22px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(44px, 5vw, 76px); font-weight: 500; line-height: .98; letter-spacing: -.04em; }
 .story-copy p { max-width: 420px; margin: 0; color: rgba(255,255,255,.82); font-size: 17px; line-height: 1.65; }
-.story-event { position: relative; z-index: 1; display: grid; width: fit-content; padding: 18px 24px; border: 1px solid rgba(255,255,255,.2); border-radius: 16px; background: rgba(255,255,255,.08); backdrop-filter: blur(10px); }
-.story-event span { color: var(--yellow); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.story-event strong { margin: 5px 0 2px; font-family: Georgia, serif; font-size: 22px; }
-.story-event small { color: rgba(255,255,255,.7); }
 .login-panel { display: grid; place-items: center; padding: 48px; }
 .login-card { width: min(100%, 440px); }
 .mobile-login-logo { display: none; }
@@ -59,7 +55,14 @@ button { color: inherit; }
 .outline-button.compact { min-height: 38px; padding: 0 13px; font-size: 12px; }
 .security-note { display: flex; gap: 8px; margin: 17px 0 25px; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .security-note span { color: var(--teal); font-weight: 900; }
-.help-link { display: block; color: var(--teal-dark); font-size: 12px; text-align: center; text-decoration: none; }
+.help-link { display: block; width: 100%; padding: 0; border: 0; color: var(--teal-dark); background: transparent; font-size: 12px; text-align: center; text-decoration: none; cursor: pointer; }
+.access-help-modal p { margin: 0 0 20px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.support-email { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; margin-bottom: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--canvas); }
+.support-email span { color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.support-email strong { grid-column: 1; font-size: 14px; }
+.support-email button { grid-column: 2; grid-row: 1 / 3; padding: 9px 12px; border: 1px solid var(--teal); border-radius: 8px; color: var(--teal-dark); background: white; font-size: 10px; font-weight: 800; cursor: pointer; }
+.access-help-modal .support-note { margin-bottom: 22px; padding-left: 12px; border-left: 3px solid var(--yellow); font-size: 11px; }
+.access-help-modal .primary-button { text-decoration: none; }
 .back-link, .code-meta button { padding: 0; border: 0; background: transparent; color: var(--teal-dark); cursor: pointer; }
 .back-link { margin-bottom: 24px; font-size: 12px; font-weight: 700; }
 .code-input { font-size: 23px; font-weight: 800; letter-spacing: .35em; text-align: center; }
@@ -258,6 +261,8 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .mobile-login-logo .brand img { filter: none; }
   .login-card { padding: 26px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.9); box-shadow: 0 20px 60px rgba(25,53,77,.12); }
   .login-card h2 { font-size: 32px; }
+  .support-email { grid-template-columns: 1fr; }
+  .support-email button { grid-column: 1; grid-row: auto; width: fit-content; margin-top: 8px; }
   .admin-shell { display: block; }
   .sidebar { position: fixed; left: 0; top: 0; z-index: 80; width: min(84vw, 290px); transform: translateX(-105%); transition: transform .25s ease; box-shadow: 18px 0 50px rgba(0,0,0,.2); }
   .sidebar.mobile-open { transform: translateX(0); }

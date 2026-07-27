@@ -47,6 +47,13 @@ function Logo({ compact = false }: { compact?: boolean }) {
 function Login({ onLogin }: { onLogin: () => void }) {
   const [step, setStep] = useState<"credentials" | "code">("credentials");
   const [contact, setContact] = useState<"email" | "whatsapp">("email");
+  const [showHelp, setShowHelp] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
+
+  const copySupportEmail = async () => {
+    await navigator.clipboard.writeText("hola@saveyourdate.site");
+    setEmailCopied(true);
+  };
 
   return (
     <main className="login-shell">
@@ -58,11 +65,6 @@ function Login({ onLogin }: { onLogin: () => void }) {
           <span className="eyebrow">Tu evento, bajo control</span>
           <h1>Todo listo para disfrutar el gran día.</h1>
           <p>Gestioná invitados, confirmaciones y cada detalle desde un único lugar.</p>
-        </div>
-        <div className="story-event">
-          <span>Próximo evento</span>
-          <strong>Ana &amp; Martín</strong>
-          <small>12 de diciembre de 2026</small>
         </div>
       </section>
 
@@ -103,9 +105,29 @@ function Login({ onLogin }: { onLogin: () => void }) {
               <p className="security-note"><span>✓</span> La sesión permanecerá activa durante 24 horas.</p>
             </>
           )}
-          <a className="help-link" href="mailto:hola@saveyourdate.site">¿Necesitás ayuda con tu acceso?</a>
+          <button className="help-link" type="button" onClick={() => setShowHelp(true)}>¿Necesitás ayuda con tu acceso?</button>
         </div>
       </section>
+      {showHelp && (
+        <div className="modal-backdrop" onMouseDown={() => setShowHelp(false)}>
+          <div className="modal access-help-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setShowHelp(false)} aria-label="Cerrar ayuda">×</button>
+            <span className="eyebrow">Ayuda de acceso</span>
+            <h2>¿No podés ingresar?</h2>
+            <p>Encontrás el número de pedido en el email de confirmación de Save Your Date. Ingresá también el mismo email o WhatsApp que usaste al realizar el pedido.</p>
+            <div className="support-email">
+              <span>Soporte por email</span>
+              <strong>hola@saveyourdate.site</strong>
+              <button type="button" onClick={copySupportEmail}>{emailCopied ? "Email copiado ✓" : "Copiar email"}</button>
+            </div>
+            <p className="support-note">Si nos escribís, incluí tu nombre y cualquier dato que ayude a localizar el pedido. Nunca te vamos a pedir una contraseña.</p>
+            <div className="modal-actions">
+              <button className="outline-button" type="button" onClick={() => setShowHelp(false)}>Volver al ingreso</button>
+              <a className="primary-button small" href="mailto:hola@saveyourdate.site?subject=Ayuda%20con%20el%20acceso%20al%20panel">Escribir a soporte</a>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
