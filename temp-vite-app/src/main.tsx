@@ -6,6 +6,7 @@ import OrderStatusPage from './components/OrderStatusPage.tsx'
 import PaymentValidationPage from './components/PaymentValidationPage.tsx'
 import PreparationPreviewPage from './components/PreparationPreviewPage.tsx'
 import OrderLookupPage from './components/OrderLookupPage.tsx'
+import GuestRsvpPage from './components/GuestRsvpPage.tsx'
 
 const AdminPrototype = lazy(() => import('./components/AdminPrototype.tsx'))
 
@@ -16,6 +17,8 @@ const Page = pathname === '/estado'
     ? OrderLookupPage
   : pathname === '/admin'
     ? AdminPrototype
+  : pathname === '/confirmar'
+    ? GuestRsvpPage
   : pathname === '/validar-pago'
     ? PaymentValidationPage
     : pathname === '/preparando'
