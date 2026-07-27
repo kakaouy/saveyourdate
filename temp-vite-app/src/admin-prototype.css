@@ -171,6 +171,10 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .person { display: flex; align-items: center; gap: 10px; min-width: 170px; }
 .status { display: inline-flex; padding: 6px 9px; border-radius: 999px; font-size: 8px; font-weight: 800; }
 .status-confirmado { color: #28745c; background: #def3e9; }.status-pendiente { color: #846211; background: #fff1bd; }.status-no-asiste { color: #9c4d46; background: #ffe2df; }
+.status-select { max-width: 112px; padding: 6px 24px 6px 9px; border: 0; border-radius: 999px; outline: none; font-size: 8px; font-weight: 800; cursor: pointer; }
+.status-select:focus { box-shadow: 0 0 0 2px rgba(10,171,176,.2); }
+.status-select:disabled { cursor: wait; opacity: .65; }
+.table-error { margin: 0; padding: 10px 16px; border-top: 1px solid #ffd5d1; color: #9c4d46; background: #fff5f4; font-size: 9px; }
 .copy-button, .more-button, .whatsapp-button { border: 0; background: transparent; color: var(--teal-dark); font-size: 9px; font-weight: 800; cursor: pointer; }
 .whatsapp-button { padding: 8px 11px; border-radius: 8px; color: white; background: #2aa96b; }
 .more-button { color: var(--muted); letter-spacing: .1em; }

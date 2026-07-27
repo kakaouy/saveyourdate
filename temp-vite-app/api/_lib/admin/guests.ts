@@ -48,6 +48,37 @@ async function handler(request: Request) {
       });
       return json({ guest: clientGuest(((await response.json()) as GuestRow[])[0]) }, 201);
     }
+    if (request.method === 'PATCH') {
+      const body = await request.json() as Record<string, unknown>;
+      const id = String(body.id || '');
+      const status = String(body.status || '');
+      if (!id || !['Confirmado', 'Pendiente', 'No asiste'].includes(status)) {
+        return json({ error: 'Los datos de la confirmación no son válidos.' }, 400);
+      }
+      const guestResponse = await supabaseRequest(
+        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats`
+      );
+      const existingGuests = await guestResponse.json() as Pick<GuestRow, 'seats'>[];
+      if (!existingGuests[0]) return json({ error: 'No encontramos ese invitado.' }, 404);
+      const confirmed = status === 'Confirmado'
+        ? Math.max(1, Math.min(existingGuests[0].seats, Number(body.confirmed) || existingGuests[0].seats))
+        : 0;
+      const response = await supabaseRequest(
+        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
+        {
+          method: 'PATCH',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify({
+            status,
+            confirmed,
+            updated_at: new Date().toISOString()
+          })
+        }
+      );
+      const rows = await response.json() as GuestRow[];
+      if (!rows[0]) return json({ error: 'No encontramos ese invitado.' }, 404);
+      return json({ guest: clientGuest(rows[0]) });
+    }
     if (request.method === 'DELETE') {
       const id = new URL(request.url).searchParams.get('id') || '';
       await supabaseRequest(
