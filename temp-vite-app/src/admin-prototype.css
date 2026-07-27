@@ -73,7 +73,7 @@ button { color: inherit; }
 
 .admin-shell { min-height: 100vh; display: grid; grid-template-columns: 252px minmax(0, 1fr); overflow-x: clip; }
 .admin-shell section { position: relative; padding: 0; }
-.admin-shell .sidebar { position: sticky; top: 0; right: auto; z-index: 40; width: auto; height: 100vh; display: flex; flex-direction: column; gap: 0; padding: 24px 18px; color: white; background: var(--ink); box-shadow: none; transition: none; }
+.admin-shell .sidebar { position: sticky; top: 0; right: auto; z-index: 40; width: auto; height: 100vh; height: 100dvh; display: flex; flex-direction: column; gap: 0; padding: 24px 18px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; color: white; background: var(--ink); box-shadow: none; transition: none; }
 .sidebar .brand { padding: 0 7px 15px; border-bottom: 1px solid rgba(255,255,255,.09); }
 .sidebar .brand img { width: 92px; height: 44px; }
 .sidebar-top { display: flex; justify-content: space-between; align-items: center; }
@@ -98,6 +98,27 @@ button { color: inherit; }
 .sidebar-help small { color: #617b83; font-size: 9px; }
 .sidebar-help button { margin-top: 12px; padding: 0; border: 0; color: var(--teal-dark); background: transparent; font-size: 10px; font-weight: 800; cursor: pointer; }
 .logout { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 12px 13px; border: 0; color: #9fb1bd; background: transparent; font-size: 11px; cursor: pointer; }
+
+@media (max-height: 850px) {
+  .admin-shell .sidebar { padding: 12px 14px; }
+  .sidebar .brand { padding-bottom: 7px; }
+  .sidebar .brand img { height: 36px; }
+  .event-switcher { margin: 8px 0; padding: 8px; }
+  .event-switcher > span { width: 32px; height: 32px; }
+  .sidebar nav { gap: 2px; }
+  .sidebar nav button { min-height: 35px; padding-inline: 10px; font-size: 11px; }
+  .sidebar nav button span { font-size: 14px; }
+  .sidebar-help { padding: 10px 12px; }
+  .sidebar-help > span { float: left; margin: 0 8px 5px 0; }
+  .sidebar-help small { display: none; }
+  .sidebar-help button { margin-top: 7px; }
+  .logout { margin-top: 5px; padding-block: 8px; }
+}
+
+@media (max-height: 680px) {
+  .sidebar-help { display: none; }
+  .logout { margin-top: auto; }
+}
 .admin-main { min-width: 0; display: flex; flex-direction: column; }
 .topbar { position: sticky; top: 0; z-index: 30; min-height: 74px; display: flex; align-items: center; justify-content: space-between; padding: 0 34px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.94); backdrop-filter: blur(12px); }
 .topbar > div:first-of-type { display: grid; }
