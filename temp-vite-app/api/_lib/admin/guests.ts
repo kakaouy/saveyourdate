@@ -35,6 +35,35 @@ async function handler(request: Request) {
     }
     if (request.method === 'POST') {
       const body = await request.json() as Record<string, unknown>;
+      if (Array.isArray(body.guests)) {
+        if (body.guests.length === 0 || body.guests.length > 500) {
+          return json({ error: 'El archivo debe contener entre 1 y 500 invitados.' }, 400);
+        }
+        const fallbackCode = String(body.defaultPhoneCountryCode || '+598').trim();
+        const rows = body.guests.map((item) => {
+          const guest = item as Record<string, unknown>;
+          const name = String(guest.name || '').trim();
+          const phoneCountryCode = String(guest.phoneCountryCode || fallbackCode).trim();
+          if (!name) throw new Error('Todos los invitados deben tener nombre.');
+          if (!/^\+\d{1,4}$/.test(phoneCountryCode)) throw new Error(`Código de país inválido para ${name}.`);
+          const phoneDigits = String(guest.phone || '').replace(/\D/g, '').replace(/^0+/, '');
+          return {
+            order_number: session.order_number,
+            name,
+            group_name: String(guest.group || '').trim(),
+            email: String(guest.email || '').trim().toLowerCase(),
+            phone: phoneDigits ? `${phoneCountryCode}${phoneDigits}` : '',
+            phone_country_code: phoneCountryCode,
+            seats: Math.max(1, Math.min(20, Number(guest.seats) || 1))
+          };
+        });
+        const response = await supabaseRequest('event_guests', {
+          method: 'POST',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify(rows)
+        });
+        return json({ guests: ((await response.json()) as GuestRow[]).map(clientGuest) }, 201);
+      }
       const name = String(body.name || '').trim();
       if (!name) return json({ error: 'Ingresá el nombre del invitado.' }, 400);
       const phoneCountryCode = String(body.phoneCountryCode || '+598').trim();

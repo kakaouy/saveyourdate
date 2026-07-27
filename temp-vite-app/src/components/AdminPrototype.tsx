@@ -1,5 +1,5 @@
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "../admin-prototype.css";
 
 type Guest = {
@@ -57,6 +57,31 @@ const exportCsv = (filename: string, headers: string[], rows: Array<Array<string
 const reportDate = (value: string) => value
   ? new Intl.DateTimeFormat("es-UY", { dateStyle: "short", timeStyle: "short" }).format(new Date(value))
   : "—";
+
+const parseCsv = (text: string) => {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let quoted = false;
+  const delimiter = (text.split(/\r?\n/, 1)[0].match(/;/g)?.length || 0) > (text.split(/\r?\n/, 1)[0].match(/,/g)?.length || 0) ? ";" : ",";
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (character === '"') {
+      if (quoted && text[index + 1] === '"') { cell += '"'; index += 1; }
+      else quoted = !quoted;
+    } else if (character === delimiter && !quoted) {
+      row.push(cell.trim()); cell = "";
+    } else if ((character === "\n" || character === "\r") && !quoted) {
+      if (character === "\r" && text[index + 1] === "\n") index += 1;
+      row.push(cell.trim());
+      if (row.some(Boolean)) rows.push(row);
+      row = []; cell = "";
+    } else cell += character;
+  }
+  row.push(cell.trim());
+  if (row.some(Boolean)) rows.push(row);
+  return rows;
+};
 
 const nav = [
   ["Resumen", "⌂"],
@@ -304,9 +329,11 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
   const [updatingId, setUpdatingId] = useState("");
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [copiedId, setCopiedId] = useState("");
   const [newGuestCode, setNewGuestCode] = useState(defaultPhoneCountryCode);
   const [customGuestCode, setCustomGuestCode] = useState("");
+  const importInput = useRef<HTMLInputElement>(null);
   const filtered = guests.filter((guest) => {
     const matches = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
     return matches && (filter === "Todos" || guest.status === filter);
@@ -316,6 +343,7 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
     event.preventDefault();
     setSaving(true);
     setError("");
+    setNotice("");
     const data = new FormData(event.currentTarget);
     try {
       const response = await fetch("/api/admin/guests", {
@@ -405,6 +433,56 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
     window.setTimeout(() => setCopiedId(""), 1800);
   };
 
+  const downloadTemplate = () => exportCsv(
+    "plantilla-invitados.csv",
+    ["Nombre", "Grupo", "WhatsApp", "Código país", "Cupos", "Email"],
+    [["Valentina Pérez", "Familia Pérez", "99123456", defaultPhoneCountryCode, 2, "valentina@ejemplo.com"]]
+  );
+
+  const importCsv = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setSaving(true);
+    setError("");
+    setNotice("");
+    try {
+      const rows = parseCsv(await file.text());
+      if (rows.length < 2) throw new Error("El archivo no contiene invitados.");
+      const normalize = (value: string) => value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+      const headers = rows[0].map(normalize);
+      const column = (...names: string[]) => headers.findIndex((header) => names.includes(header));
+      const nameIndex = column("nombre", "invitado", "nombre y apellido");
+      if (nameIndex < 0) throw new Error('La plantilla debe incluir una columna "Nombre".');
+      const groupIndex = column("grupo", "familia");
+      const phoneIndex = column("whatsapp", "telefono", "celular");
+      const codeIndex = column("codigo pais", "codigo de pais", "pais", "caracteristica");
+      const seatsIndex = column("cupos", "personas", "cantidad");
+      const emailIndex = column("email", "correo");
+      const imported = rows.slice(1).map((values) => ({
+        name: values[nameIndex],
+        group: groupIndex >= 0 ? values[groupIndex] : "",
+        phone: phoneIndex >= 0 ? values[phoneIndex] : "",
+        phoneCountryCode: codeIndex >= 0 && values[codeIndex] ? values[codeIndex] : defaultPhoneCountryCode,
+        seats: seatsIndex >= 0 ? values[seatsIndex] : "1",
+        email: emailIndex >= 0 ? values[emailIndex] : ""
+      })).filter((guest) => guest.name);
+      const response = await fetch("/api/admin/guests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ guests: imported, defaultPhoneCountryCode })
+      });
+      const result = await response.json() as { guests?: Guest[]; error?: string };
+      if (!response.ok || !result.guests) throw new Error(result.error || "No pudimos importar los invitados.");
+      setGuests((current) => [...current, ...result.guests!]);
+      setNotice(`${result.guests.length} invitados importados correctamente.`);
+    } catch (importError) {
+      setError(importError instanceof Error ? importError.message : "No pudimos importar el archivo.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <>
       <div className="page-heading"><div><span className="eyebrow">Gestión del evento</span><h1>Invitados</h1><p>Administrá grupos, cupos y enlaces personalizados.</p></div><button className="primary-button small" onClick={() => setShowModal(true)}>＋ Agregar invitado</button></div>
@@ -412,7 +490,7 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
         <div className="table-tools">
           <label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar invitado o grupo…" /></label>
           <div className="filter-pills">{["Todos", "Confirmado", "Pendiente", "No asiste"].map((item) => <button key={item} className={filter === item ? "active" : ""} onClick={() => setFilter(item)}>{item}</button>)}</div>
-          <button className="outline-button compact">⇩ Importar CSV</button>
+          <div className="import-actions"><button className="copy-button" onClick={downloadTemplate}>Plantilla</button><button className="outline-button compact" disabled={saving} onClick={() => importInput.current?.click()}>{saving ? "Importando…" : "⇩ Importar CSV"}</button><input ref={importInput} className="visually-hidden" type="file" accept=".csv,text/csv" onChange={importCsv} /></div>
         </div>
         <div className="table-scroll">
           <table>
@@ -426,6 +504,7 @@ function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[
             ))}</tbody>
           </table>
         </div>
+        {notice && <p className="import-success" role="status">{notice}</p>}
         {error && <p className="table-error" role="alert">{error}</p>}
         <div className="table-footer"><span>Mostrando {filtered.length} de {guests.length} invitados</span><div><button>←</button><button className="active">1</button><button>→</button></div></div>
       </section>
