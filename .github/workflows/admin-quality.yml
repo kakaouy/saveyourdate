@@ -1,0 +1,25 @@
+name: Admin quality
+
+on:
+  pull_request:
+    paths:
+      - "temp-vite-app/**"
+      - ".github/workflows/admin-quality.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: temp-vite-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: temp-vite-app/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm run lint
