@@ -267,14 +267,38 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("Todos");
   const [showModal, setShowModal] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const filtered = guests.filter((guest) => {
     const matches = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
     return matches && (filter === "Todos" || guest.status === filter);
   });
 
-  const addGuest = () => {
-    setGuests((current) => [...current, { id: `INV-00${current.length + 1}`, name: "Valentina Torres", group: "Amigos", phone: "099 000 321", seats: 2, confirmed: 0, status: "Pendiente", food: "—", song: "—", reminded: "—" }]);
-    setShowModal(false);
+  const addGuest = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    const data = new FormData(event.currentTarget);
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(data))
+      });
+      const result = await response.json() as { guest?: Guest; error?: string };
+      if (!response.ok || !result.guest) throw new Error(result.error || "No pudimos guardar el invitado.");
+      setGuests((current) => [...current, result.guest!]);
+      setShowModal(false);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "No pudimos guardar el invitado.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteGuest = async (id: string) => {
+    const response = await fetch(`/api/admin/guests?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    if (response.ok) setGuests((current) => current.filter((guest) => guest.id !== id));
   };
 
   return (
@@ -293,14 +317,14 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
               <tr key={guest.id}>
                 <td><div className="person"><span className="avatar avatar-blue">{guest.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</span><p><strong>{guest.name}</strong><small>{guest.phone}</small></p></div></td>
                 <td>{guest.group}</td><td>{guest.confirmed}/{guest.seats}</td><td><Status value={guest.status} /></td><td>{guest.food}</td>
-                <td><button className="copy-button">Copiar link</button></td><td><button className="more-button">•••</button></td>
+                <td><button className="copy-button">Copiar link</button></td><td><button className="more-button" onClick={() => deleteGuest(guest.id)} aria-label={`Eliminar a ${guest.name}`}>Eliminar</button></td>
               </tr>
             ))}</tbody>
           </table>
         </div>
         <div className="table-footer"><span>Mostrando {filtered.length} de {guests.length} invitados</span><div><button>←</button><button className="active">1</button><button>→</button></div></div>
       </section>
-      {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><div className="modal" onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre<input defaultValue="Valentina" /></label><label>Apellido<input defaultValue="Torres" /></label><label>Grupo<input defaultValue="Amigos" /></label><label>WhatsApp<input defaultValue="099 000 321" /></label><label>Cupos<input type="number" defaultValue="2" /></label><label>Email<input defaultValue="valentina@ejemplo.com" /></label></div><div className="modal-actions"><button className="outline-button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" onClick={addGuest}>Guardar invitado</button></div></div></div>}
+      {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={addGuest} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre y apellido<input name="name" required /></label><label>Grupo<input name="group" placeholder="Ej. Familia" /></label><label>WhatsApp<input name="phone" /></label><label>Cupos<input name="seats" type="number" min="1" max="20" defaultValue="1" /></label><label>Email<input name="email" type="email" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar invitado"}</button></div></form></div>}
     </>
   );
 }
@@ -505,6 +529,14 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
   const [guests, setGuests] = useState(guestsSeed);
   const [mobileNav, setMobileNav] = useState(false);
   const title = useMemo(() => view === "Resumen" ? "Panel principal" : view, [view]);
+
+  useEffect(() => {
+    fetch("/api/admin/guests")
+      .then(async (response) => {
+        if (!response.ok) return;
+        setGuests(((await response.json()) as { guests: Guest[] }).guests);
+      });
+  }, []);
 
   const navigate = (item: string) => {
     setView(item);
