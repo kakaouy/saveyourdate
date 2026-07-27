@@ -1,4 +1,4 @@
-import { appUrl, json, sendEmail, supabaseRequest } from './_lib/orders.js';
+import { appUrl, emailShell, escapeHtml, json, sendEmail, supabaseRequest } from './_lib/orders.js';
 import { reminderEmailHtml } from './_lib/reminder-email.js';
 import { isReminderDue, reminderDaysFor } from './_lib/reminder-rules.js';
 
@@ -13,6 +13,22 @@ type PendingGuest = {
   invite_token: string;
   name: string;
   email: string;
+};
+
+const sendCronAlert = async (subject: string, detail: string, key: string) => {
+  try {
+    await sendEmail({
+      to: process.env.ORDER_ADMIN_EMAIL || 'saveyourdate.invite@gmail.com',
+      subject,
+      idempotencyKey: key,
+      html: emailShell(
+        'Alerta de recordatorios automáticos',
+        `<p>El proceso automático necesita revisión.</p><p><strong>Detalle:</strong> ${escapeHtml(detail)}</p>`
+      )
+    });
+  } catch (alertError) {
+    console.error('Tampoco pudimos enviar la alerta operativa.', alertError);
+  }
 };
 
 async function handler(request: Request) {
@@ -59,9 +75,21 @@ async function handler(request: Request) {
         }
       }
     }
+    if (failed > 0) {
+      await sendCronAlert(
+        'Alerta · fallaron recordatorios automáticos',
+        `${failed} envío(s) fallaron. Se enviaron correctamente ${sent}.`,
+        `cron-reminder-partial-${new Date().toISOString().slice(0, 10)}`
+      );
+    }
     return json({ ok: true, checkedOrders: orders.length, dueOrders: dueOrders.length, sent, failed });
   } catch (error) {
     console.error(error);
+    await sendCronAlert(
+      'Alerta · no se ejecutaron los recordatorios automáticos',
+      error instanceof Error ? error.message : 'Error desconocido.',
+      `cron-reminder-failed-${new Date().toISOString().slice(0, 10)}`
+    );
     return json({ error: 'No pudimos procesar los recordatorios automáticos.' }, 500);
   }
 }
