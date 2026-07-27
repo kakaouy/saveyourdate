@@ -12,6 +12,7 @@ import {
   sendEmail,
   supabaseRequest
 } from '../orders.js';
+import { eventAccessExpired } from '../event-lifecycle.js';
 
 async function handler(request: Request) {
   if (request.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
@@ -36,6 +37,9 @@ async function handler(request: Request) {
       }
     }
     if (!order) return json({ error: genericError }, 404);
+    if (eventAccessExpired(order.order_payload)) {
+      return json({ error: 'El período de acceso finalizó 30 días después del evento.' }, 410);
+    }
     if (await recentChallengeCount(order.order_number, loginEmail) >= 3) {
       return json({ error: 'Alcanzaste el límite de envíos. Probá nuevamente en 15 minutos.' }, 429);
     }

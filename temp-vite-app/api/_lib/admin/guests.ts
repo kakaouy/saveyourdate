@@ -1,5 +1,6 @@
 import { findSession, readSessionToken } from '../admin-auth.js';
-import { json, supabaseRequest } from '../orders.js';
+import { appUrl, findOrderByNumber, json, supabaseRequest } from '../orders.js';
+import { normalizeWhatsAppPhone, sendWhatsAppTemplate } from '../whatsapp.js';
 import { logAdminActivity } from './audit.js';
 
 type GuestRow = {
@@ -10,7 +11,7 @@ type GuestRow = {
   companions: Array<{ name: string; food: string; identificationType: string; identificationNumber: string }>;
 };
 
-const clientGuest = (row: GuestRow) => ({
+const clientGuest = (row: GuestRow, whatsappStatus = '') => ({
   id: row.id,
   inviteToken: row.invite_token,
   name: row.name,
@@ -26,8 +27,16 @@ const clientGuest = (row: GuestRow) => ({
   song: row.song,
   companions: Array.isArray(row.companions) ? row.companions : [],
   reminded: row.reminded_at || '—',
-  updatedAt: row.updated_at
+  updatedAt: row.updated_at,
+  whatsappStatus
 });
+
+const currentGuestCount = async (orderNumber: string) => {
+  const response = await supabaseRequest(
+    `event_guests?order_number=eq.${encodeURIComponent(orderNumber)}&select=id`
+  );
+  return (await response.json() as Array<{ id: string }>).length;
+};
 
 async function handler(request: Request) {
   try {
@@ -35,16 +44,25 @@ async function handler(request: Request) {
     if (!session) return json({ error: 'Sesión vencida.' }, 401);
     if (request.method !== 'GET' && session.access_role === 'viewer') return json({ error: 'Tu acceso es de solo lectura.' }, 403);
     if (request.method === 'GET') {
-      const response = await supabaseRequest(
-        `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc`
-      );
-      return json({ guests: ((await response.json()) as GuestRow[]).map(clientGuest) });
+      const [response, messagesResponse] = await Promise.all([
+        supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc&limit=500`),
+        supabaseRequest(`whatsapp_message_log?order_number=eq.${encodeURIComponent(session.order_number)}&select=guest_id,status&order=created_at.desc&limit=500`)
+      ]);
+      const messages = await messagesResponse.json() as Array<{ guest_id: string | null; status: string }>;
+      const latestStatus = new Map<string, string>();
+      messages.forEach((message) => {
+        if (message.guest_id && !latestStatus.has(message.guest_id)) latestStatus.set(message.guest_id, message.status);
+      });
+      return json({ guests: ((await response.json()) as GuestRow[]).map((guest) => clientGuest(guest, latestStatus.get(guest.id) || '')) });
     }
     if (request.method === 'POST') {
       const body = await request.json() as Record<string, unknown>;
       if (Array.isArray(body.guests)) {
         if (body.guests.length === 0 || body.guests.length > 500) {
           return json({ error: 'El archivo debe contener entre 1 y 500 invitados.' }, 400);
+        }
+        if (await currentGuestCount(session.order_number) + body.guests.length > 500) {
+          return json({ error: 'El evento admite hasta 500 invitaciones. Eliminá registros o importá un archivo más pequeño.' }, 409);
         }
         const fallbackCode = String(body.defaultPhoneCountryCode || '+598').trim();
         const rows = body.guests.map((item) => {
@@ -77,6 +95,9 @@ async function handler(request: Request) {
       }
       const name = String(body.name || '').trim();
       if (!name) return json({ error: 'Ingresá el nombre del invitado.' }, 400);
+      if (await currentGuestCount(session.order_number) >= 500) {
+        return json({ error: 'El evento alcanzó el máximo de 500 invitaciones.' }, 409);
+      }
       const phoneCountryCode = String(body.phoneCountryCode || '+598').trim();
       const phoneDigits = String(body.phone || '').replace(/\D/g, '').replace(/^0+/, '');
       if (!/^\+\d{1,4}$/.test(phoneCountryCode)) return json({ error: 'El código de país no es válido.' }, 400);
@@ -104,6 +125,34 @@ async function handler(request: Request) {
       const id = String(body.id || '');
       if (body.action === 'remind') {
         if (!id) return json({ error: 'Falta identificar al invitado.' }, 400);
+        const guestResponse = await supabaseRequest(
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&status=eq.Pendiente&select=*&limit=1`
+        );
+        const guest = (await guestResponse.json() as GuestRow[])[0];
+        if (!guest) return json({ error: 'El invitado ya respondió o no existe.' }, 404);
+        const phone = normalizeWhatsAppPhone(guest.phone);
+        if (phone.length < 8) return json({ error: 'El invitado no tiene un número de WhatsApp válido.' }, 400);
+        const order = await findOrderByNumber(session.order_number);
+        if (!order) return json({ error: 'No encontramos el evento.' }, 404);
+        const confirmationUrl = `${appUrl()}/confirmar?token=${encodeURIComponent(guest.invite_token)}`;
+        const delivery = await sendWhatsAppTemplate({
+          phone,
+          recipientName: guest.name,
+          eventTitle: String(order.order_payload.eventTitle || order.customer_name),
+          confirmationUrl
+        });
+        if (!delivery.sent) {
+          return json({ mode: 'manual', url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(`Hola ${guest.name}, te recordamos confirmar tu asistencia a ${String(order.order_payload.eventTitle || order.customer_name)}. Podés responder acá: ${confirmationUrl}`)}&type=phone_number&app_absent=0` });
+        }
+        await supabaseRequest('whatsapp_message_log', {
+          method: 'POST',
+          body: JSON.stringify({
+            order_number: session.order_number,
+            guest_id: guest.id,
+            message_id: delivery.messageId,
+            status: 'accepted'
+          })
+        });
         const remindedAt = new Date().toISOString();
         const response = await supabaseRequest(
           `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&status=eq.Pendiente`,
@@ -115,8 +164,8 @@ async function handler(request: Request) {
         );
         const rows = await response.json() as GuestRow[];
         if (!rows[0]) return json({ error: 'El invitado ya respondió o no existe.' }, 404);
-        await logAdminActivity(session, 'guest.reminded', 'guest', rows[0].id, { name: rows[0].name });
-        return json({ guest: clientGuest(rows[0]) });
+        await logAdminActivity(session, 'guest.reminded', 'guest', rows[0].id, { name: rows[0].name, channel: 'whatsapp_business', messageId: delivery.messageId });
+        return json({ guest: clientGuest(rows[0]), mode: 'business' });
       }
       const status = String(body.status || '');
       if (!id || !['Confirmado', 'Pendiente', 'No asiste'].includes(status)) {
