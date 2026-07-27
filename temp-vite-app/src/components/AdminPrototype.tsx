@@ -8,6 +8,7 @@ type Guest = {
   name: string;
   group: string;
   phone: string;
+  phoneCountryCode: string;
   seats: number;
   confirmed: number;
   status: "Confirmado" | "Pendiente" | "No asiste";
@@ -24,6 +25,7 @@ type AdminOrder = {
   eventTitle: string;
   eventDate: string;
   eventType: string;
+  defaultPhoneCountryCode: string;
 };
 
 const guestsSeed: Guest[] = [];
@@ -45,6 +47,14 @@ const nav = [
   ["Recordatorios", "↗"],
   ["Mesas", "▦"],
   ["Accesos", "♢"],
+  ["Configuración", "⚙"],
+];
+
+const countryCodes = [
+  ["Uruguay", "+598"], ["Argentina", "+54"], ["Brasil", "+55"], ["Paraguay", "+595"],
+  ["Chile", "+56"], ["Bolivia", "+591"], ["Perú", "+51"], ["Colombia", "+57"],
+  ["México", "+52"], ["Estados Unidos / Canadá", "+1"], ["España", "+34"],
+  ["Italia", "+39"], ["Francia", "+33"], ["Reino Unido", "+44"]
 ];
 
 function Logo({ compact = false }: { compact?: boolean }) {
@@ -266,7 +276,7 @@ function Dashboard({ guests, onNavigate, order }: { guests: Guest[]; onNavigate:
   );
 }
 
-function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>> }) {
+function Guests({ guests, setGuests, defaultPhoneCountryCode }: { guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; defaultPhoneCountryCode: string }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("Todos");
   const [showModal, setShowModal] = useState(false);
@@ -275,6 +285,8 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState("");
+  const [newGuestCode, setNewGuestCode] = useState(defaultPhoneCountryCode);
+  const [customGuestCode, setCustomGuestCode] = useState("");
   const filtered = guests.filter((guest) => {
     const matches = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
     return matches && (filter === "Todos" || guest.status === filter);
@@ -289,7 +301,7 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
       const response = await fetch("/api/admin/guests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(Object.fromEntries(data))
+        body: JSON.stringify({ ...Object.fromEntries(data), phoneCountryCode: newGuestCode === "custom" ? customGuestCode : newGuestCode })
       });
       const result = await response.json() as { guest?: Guest; error?: string };
       if (!response.ok || !result.guest) throw new Error(result.error || "No pudimos guardar el invitado.");
@@ -347,7 +359,9 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
           status: editingGuest.status,
           confirmed: editingGuest.confirmed,
           food: data.get("food"),
-          song: data.get("song")
+          song: data.get("song"),
+          phone: data.get("phone"),
+          phoneCountryCode: data.get("phoneCountryCode")
         })
       });
       const result = await response.json() as { guest?: Guest; error?: string };
@@ -395,8 +409,8 @@ function Guests({ guests, setGuests }: { guests: Guest[]; setGuests: React.Dispa
         {error && <p className="table-error" role="alert">{error}</p>}
         <div className="table-footer"><span>Mostrando {filtered.length} de {guests.length} invitados</span><div><button>←</button><button className="active">1</button><button>→</button></div></div>
       </section>
-      {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={addGuest} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre y apellido<input name="name" required /></label><label>Grupo<input name="group" placeholder="Ej. Familia" /></label><label>WhatsApp<input name="phone" inputMode="tel" placeholder="+598 99 123 456" /></label><label>Cupos<input name="seats" type="number" min="1" max="20" defaultValue="1" /></label><label>Email<input name="email" type="email" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar invitado"}</button></div></form></div>}
-      {editingGuest && <div className="modal-backdrop" onMouseDown={() => setEditingGuest(null)}><form className="modal" onSubmit={updateDetails} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setEditingGuest(null)}>×</button><span className="eyebrow">Información del invitado</span><h2>Editar a {editingGuest.name}</h2><div className="form-grid"><label>Restricción alimentaria<input name="food" defaultValue={editingGuest.food === "—" ? "" : editingGuest.food} placeholder="Ej. Vegetariano, celíaco…" /></label><label>Canción sugerida<input name="song" defaultValue={editingGuest.song === "—" ? "" : editingGuest.song} placeholder="Canción — Artista" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setEditingGuest(null)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</button></div></form></div>}
+      {showModal && <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}><form className="modal" onSubmit={addGuest} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowModal(false)}>×</button><span className="eyebrow">Nuevo registro</span><h2>Agregar invitado</h2><div className="form-grid"><label>Nombre y apellido<input name="name" required /></label><label>Grupo<input name="group" placeholder="Ej. Familia" /></label><label>País de WhatsApp<select value={countryCodes.some(([, code]) => code === newGuestCode) ? newGuestCode : "custom"} onChange={(event) => setNewGuestCode(event.target.value)}>{countryCodes.map(([country, code]) => <option key={code} value={code}>{country} {code}</option>)}<option value="custom">Otro país</option></select></label>{newGuestCode === "custom" && <label>Código internacional<input value={customGuestCode} onChange={(event) => setCustomGuestCode(event.target.value)} placeholder="+___" required /></label>}<label>WhatsApp<input name="phone" inputMode="tel" placeholder="99 123 456" /></label><label>Cupos<input name="seats" type="number" min="1" max="20" defaultValue="1" /></label><label>Email<input name="email" type="email" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setShowModal(false)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar invitado"}</button></div></form></div>}
+      {editingGuest && <div className="modal-backdrop" onMouseDown={() => setEditingGuest(null)}><form className="modal" onSubmit={updateDetails} onMouseDown={(event) => event.stopPropagation()}><button className="modal-close" type="button" onClick={() => setEditingGuest(null)}>×</button><span className="eyebrow">Información del invitado</span><h2>Editar a {editingGuest.name}</h2><div className="form-grid"><label>Código de país<input name="phoneCountryCode" defaultValue={editingGuest.phoneCountryCode || defaultPhoneCountryCode} placeholder="+598" required /></label><label>WhatsApp<input name="phone" inputMode="tel" defaultValue={editingGuest.phone.replace(editingGuest.phoneCountryCode || defaultPhoneCountryCode, "")} /></label><label>Restricción alimentaria<input name="food" defaultValue={editingGuest.food === "—" ? "" : editingGuest.food} placeholder="Ej. Vegetariano, celíaco…" /></label><label>Canción sugerida<input name="song" defaultValue={editingGuest.song === "—" ? "" : editingGuest.song} placeholder="Canción — Artista" /></label></div>{error && <p className="login-error">{error}</p>}<div className="modal-actions"><button className="outline-button" type="button" onClick={() => setEditingGuest(null)}>Cancelar</button><button className="primary-button small" type="submit" disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</button></div></form></div>}
     </>
   );
 }
@@ -696,10 +710,53 @@ function SimpleModule({ view, guests, setGuests, order }: { view: string; guests
   );
 }
 
+function Settings({ code, onChange }: { code: string; onChange: (value: string) => void }) {
+  const knownCode = countryCodes.some(([, value]) => value === code);
+  const [selection, setSelection] = useState(knownCode ? code : "custom");
+  const [customCode, setCustomCode] = useState(knownCode ? "" : code);
+  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    const value = selection === "custom" ? customCode.trim() : selection;
+    setSaving(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ defaultPhoneCountryCode: value })
+      });
+      const result = await response.json() as { defaultPhoneCountryCode?: string; error?: string };
+      if (!response.ok || !result.defaultPhoneCountryCode) throw new Error(result.error || "No pudimos guardar la configuración.");
+      onChange(result.defaultPhoneCountryCode);
+      setMessage("Configuración guardada. Los invitados nuevos usarán este código automáticamente.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos guardar la configuración.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return <>
+    <div className="page-heading"><div><span className="eyebrow">Preferencias del evento</span><h1>Configuración</h1><p>Definí valores predeterminados para automatizar la gestión.</p></div></div>
+    <section className="panel settings-panel">
+      <div className="panel-title"><div><h2>País predeterminado de WhatsApp</h2><p>Se aplicará automáticamente al agregar invitados y se podrá cambiar en cada caso.</p></div></div>
+      <div className="settings-form">
+        <label>País<select value={selection} onChange={(event) => setSelection(event.target.value)}>{countryCodes.map(([country, value]) => <option key={value} value={value}>{country} {value}</option>)}<option value="custom">Otro país</option></select></label>
+        {selection === "custom" && <label>Código internacional<input value={customCode} onChange={(event) => setCustomCode(event.target.value)} placeholder="+___" /></label>}
+        <button className="primary-button small" disabled={saving} onClick={save}>{saving ? "Guardando…" : "Guardar configuración"}</button>
+      </div>
+      {message && <p className="settings-message" role="status">{message}</p>}
+    </section>
+  </>;
+}
+
 function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder }) {
   const [view, setView] = useState("Resumen");
   const [guests, setGuests] = useState(guestsSeed);
   const [mobileNav, setMobileNav] = useState(false);
+  const [defaultPhoneCountryCode, setDefaultPhoneCountryCode] = useState(order.defaultPhoneCountryCode || "+598");
   const title = useMemo(() => view === "Resumen" ? "Panel principal" : view, [view]);
 
   useEffect(() => {
@@ -729,10 +786,11 @@ function Admin({ onLogout, order }: { onLogout: () => void; order: AdminOrder })
         <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)}>☰</button><div><span>{title}</span><small>Última actualización: ahora</small></div><div className="topbar-actions"><button className="notification">♢</button><div className="admin-user"><span>{initials(order.customerName)}</span><div><strong>{order.customerName}</strong><small>Propietaria</small></div><button>⌄</button></div></div></header>
         <div className="admin-content">
           {view === "Resumen" && <Dashboard guests={guests} onNavigate={navigate} order={order} />}
-          {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} />}
+          {view === "Invitados" && <Guests guests={guests} setGuests={setGuests} defaultPhoneCountryCode={defaultPhoneCountryCode} />}
           {view === "Confirmaciones" && <Confirmations guests={guests} />}
           {view === "Mesas" && <Seating guests={guests} />}
           {["Restricciones", "Canciones", "Recordatorios", "Accesos"].includes(view) && <SimpleModule view={view} guests={guests} setGuests={setGuests} order={order} />}
+          {view === "Configuración" && <Settings code={defaultPhoneCountryCode} onChange={setDefaultPhoneCountryCode} />}
         </div>
         <footer><span>Save Your Date</span><small>Invitaciones digitales para momentos inolvidables · Panel v106</small></footer>
       </section>

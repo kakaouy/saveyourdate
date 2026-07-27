@@ -17,7 +17,8 @@ async function handler(request: Request) {
         modelName: order.model_name,
         eventTitle: String(order.order_payload.eventTitle || order.customer_name),
         eventDate: String(order.order_payload.eventDate || ''),
-        eventType: String(order.order_payload['Tipo de evento'] || 'Evento')
+        eventType: String(order.order_payload['Tipo de evento'] || 'Evento'),
+        defaultPhoneCountryCode: order.default_phone_country_code || '+598'
       },
       expiresAt: session.expires_at
     });
