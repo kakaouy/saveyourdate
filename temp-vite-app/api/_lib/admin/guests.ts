@@ -1,5 +1,5 @@
-import { findSession, readSessionToken } from '../_lib/admin-auth.js';
-import { json, supabaseRequest } from '../_lib/orders.js';
+import { findSession, readSessionToken } from '../admin-auth.js';
+import { json, supabaseRequest } from '../orders.js';
 
 type GuestRow = {
   id: string; name: string; group_name: string; phone: string; seats: number;

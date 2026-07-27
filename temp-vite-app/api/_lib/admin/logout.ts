@@ -2,8 +2,8 @@ import {
   findSession,
   readSessionToken,
   sessionCookie
-} from '../_lib/admin-auth.js';
-import { json, supabaseRequest } from '../_lib/orders.js';
+} from '../admin-auth.js';
+import { json, supabaseRequest } from '../orders.js';
 
 async function handler(request: Request) {
   if (request.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
