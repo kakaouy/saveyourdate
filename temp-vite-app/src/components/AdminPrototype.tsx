@@ -131,10 +131,33 @@ function Login({ onLogin }: { onLogin: () => void }) {
   const [error, setError] = useState("");
   const [showHelp, setShowHelp] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState("");
+  const [recoveryMessage, setRecoveryMessage] = useState("");
+  const [recovering, setRecovering] = useState(false);
 
   const copySupportEmail = async () => {
     await navigator.clipboard.writeText("hola@saveyourdate.site");
     setEmailCopied(true);
+  };
+
+  const recoverAccess = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setRecovering(true);
+    setRecoveryMessage("");
+    try {
+      const response = await fetch("/api/admin/recover-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: recoveryEmail })
+      });
+      const result = await response.json() as { message?: string; error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos procesar la solicitud.");
+      setRecoveryMessage(result.message || "Revisá tu email.");
+    } catch (recoveryError) {
+      setRecoveryMessage(recoveryError instanceof Error ? recoveryError.message : "No pudimos procesar la solicitud.");
+    } finally {
+      setRecovering(false);
+    }
   };
 
   const requestCode = async () => {
@@ -239,6 +262,11 @@ function Login({ onLogin }: { onLogin: () => void }) {
             <span className="eyebrow">Ayuda de acceso</span>
             <h2>¿No podés ingresar?</h2>
             <p>Encontrás el número de pedido en el email de confirmación de Save Your Date. Ingresá también el mismo email o WhatsApp que usaste al realizar el pedido.</p>
+            <form className="recovery-form" onSubmit={recoverAccess}>
+              <label>Email asociado<input type="email" required value={recoveryEmail} onChange={(event) => setRecoveryEmail(event.target.value)} placeholder="nombre@ejemplo.com" /></label>
+              <button className="primary-button small" disabled={recovering}>{recovering ? "Buscando…" : "Recuperar número de pedido"}</button>
+              {recoveryMessage && <p className="settings-message" role="status">{recoveryMessage}</p>}
+            </form>
             <div className="support-email">
               <span>Soporte por email</span>
               <strong>hola@saveyourdate.site</strong>

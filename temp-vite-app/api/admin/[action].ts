@@ -1,6 +1,7 @@
 import access from '../_lib/admin/access.js';
 import guests from '../_lib/admin/guests.js';
 import logout from '../_lib/admin/logout.js';
+import recoverAccess from '../_lib/admin/recover-access.js';
 import requestCode from '../_lib/admin/request-code.js';
 import session from '../_lib/admin/session.js';
 import settings from '../_lib/admin/settings.js';
@@ -12,6 +13,7 @@ const handlers: Record<string, { fetch: (request: Request) => Promise<Response> 
   access,
   guests,
   logout,
+  'recover-access': recoverAccess,
   'request-code': requestCode,
   session,
   settings,
