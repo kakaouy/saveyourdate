@@ -161,8 +161,8 @@ button { color: inherit; }
 .metric small { color: var(--muted); font-size: 9px; }
 .metric-blue i { background: #63a9d1; }.metric-green i { background: #64b99a; }.metric-amber i { background: #e7bb40; }.metric-coral i { background: var(--coral); }
 .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(320px, .82fr); gap: 18px; margin-bottom: 18px; }
-.getting-started-panel { display: grid; grid-template-columns: minmax(0,1fr); gap: 16px; align-items: center; margin-bottom: 24px; padding: 22px; border-color: #cfe7e8; background: linear-gradient(135deg,#fff,#f3fbfb); }
-.getting-started-panel > div { padding-inline: 2px; }
+.admin-shell .getting-started-panel { display: grid; grid-template-columns: minmax(0,1fr); gap: 18px; align-items: center; margin-bottom: 24px; padding: 24px; border-color: #cfe7e8; background: linear-gradient(135deg,#fff,#f3fbfb); }
+.getting-started-panel > div { padding-inline: 2px; padding-top: 1px; }
 .getting-started-panel p { max-width: 760px; margin: 6px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; overflow-wrap: anywhere; }
 .getting-started-panel nav { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 9px; }
 .getting-started-panel button { display: flex; gap: 8px; align-items: center; min-width: 0; min-height: 42px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: white; font-size: 9px; font-weight: 750; cursor: pointer; overflow-wrap: anywhere; }
@@ -368,37 +368,80 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
 .admin-shell .context-help,
 .admin-shell .settings-panel { max-width: 100%; overflow-wrap: anywhere; }
 
-.admin-shell.font-comfortable { grid-template-columns: 276px minmax(0, 1fr); }
-.font-comfortable .sidebar nav button { min-height: 47px; font-size: 14px; }
-.font-comfortable .event-switcher strong { font-size: 14px; }
-.font-comfortable .event-switcher small,
-.font-comfortable .sidebar-help small { font-size: 11px; }
-.font-comfortable .sidebar-help strong,
-.font-comfortable .logout { font-size: 13px; }
-.font-comfortable .sidebar-help button { font-size: 12px; }
-.font-comfortable .topbar-title span { font-size: 16px; }
-.font-comfortable .topbar-title small,
-.font-comfortable .admin-user small { font-size: 11px; }
-.font-comfortable .admin-user strong { max-width: 240px; overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
-.font-comfortable .page-heading h1 { font-size: 41px; }
-.font-comfortable .page-heading p { font-size: 15px; line-height: 1.5; }
-.font-comfortable .eyebrow { font-size: 13px; }
-.font-comfortable .metric { min-height: 150px; }
+.admin-shell:is(.font-small,.font-comfortable) { grid-template-columns: 276px minmax(0, 1fr); }
+:is(.font-small,.font-comfortable) .sidebar nav button { min-height: 47px; font-size: 14px; }
+:is(.font-small,.font-comfortable) .event-switcher strong { font-size: 14px; }
+:is(.font-small,.font-comfortable) .event-switcher small,
+:is(.font-small,.font-comfortable) .sidebar-help small { font-size: 11px; }
+:is(.font-small,.font-comfortable) .sidebar-help strong,
+:is(.font-small,.font-comfortable) .logout { font-size: 13px; }
+:is(.font-small,.font-comfortable) .sidebar-help button { font-size: 12px; }
+:is(.font-small,.font-comfortable) .topbar-title span { font-size: 16px; }
+:is(.font-small,.font-comfortable) .topbar-title small,
+:is(.font-small,.font-comfortable) .admin-user small { font-size: 11px; }
+:is(.font-small,.font-comfortable) .admin-user strong { max-width: 240px; overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+:is(.font-small,.font-comfortable) .page-heading h1 { font-size: 41px; }
+:is(.font-small,.font-comfortable) .page-heading p { font-size: 15px; line-height: 1.5; }
+:is(.font-small,.font-comfortable) .eyebrow { font-size: 13px; }
+:is(.font-small,.font-comfortable) .metric { min-height: 150px; }
+:is(.font-small,.font-comfortable) .metric > div,
+:is(.font-small,.font-comfortable) .panel-title p,
+:is(.font-small,.font-comfortable) .context-help strong { font-size: 13px; }
+:is(.font-small,.font-comfortable) .metric strong { font-size: 38px; }
+:is(.font-small,.font-comfortable) .metric small,
+:is(.font-small,.font-comfortable) .context-help p,
+:is(.font-small,.font-comfortable) .getting-started-panel p { font-size: 12px; }
+:is(.font-small,.font-comfortable) .panel-title h2,
+:is(.font-small,.font-comfortable) .workspace-heading h2 { font-size: 16px; }
+:is(.font-small,.font-comfortable) .getting-started-panel button { min-height: 48px; font-size: 12px; }
+:is(.font-small,.font-comfortable) .getting-started-panel nav { grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); }
+:is(.font-small,.font-comfortable) .next-actions button strong,
+:is(.font-small,.font-comfortable) .activity-list strong,
+:is(.font-small,.font-comfortable) .person strong,
+:is(.font-small,.font-comfortable) td strong { font-size: 13px; }
+:is(.font-small,.font-comfortable) .next-actions button small,
+:is(.font-small,.font-comfortable) .activity-list small,
+:is(.font-small,.font-comfortable) .person small,
+:is(.font-small,.font-comfortable) .cell-sub,
+:is(.font-small,.font-comfortable) td,
+:is(.font-small,.font-comfortable) th,
+:is(.font-small,.font-comfortable) .table-footer,
+:is(.font-small,.font-comfortable) .muted { font-size: 12px; }
+:is(.font-small,.font-comfortable) .primary-button,
+:is(.font-small,.font-comfortable) .outline-button,
+:is(.font-small,.font-comfortable) .copy-button,
+:is(.font-small,.font-comfortable) .more-button,
+:is(.font-small,.font-comfortable) .status-select,
+:is(.font-small,.font-comfortable) .whatsapp-button { font-size: 13px; }
+:is(.font-small,.font-comfortable) .settings-form label,
+:is(.font-small,.font-comfortable) .form-grid label { font-size: 13px; }
+:is(.font-small,.font-comfortable) .settings-form select,
+:is(.font-small,.font-comfortable) .settings-form input,
+:is(.font-small,.font-comfortable) .form-grid input,
+:is(.font-small,.font-comfortable) .form-grid select { font-size: 14px; }
+:is(.font-small,.font-comfortable) footer small { font-size: 10px; }
+
+.admin-shell.font-comfortable { grid-template-columns: 294px minmax(0, 1fr); }
+.font-comfortable .sidebar nav button { min-height: 50px; font-size: 15px; }
+.font-comfortable .event-switcher strong { font-size: 15px; }
+.font-comfortable .topbar-title span { font-size: 17px; }
+.font-comfortable .page-heading h1 { font-size: 45px; }
+.font-comfortable .page-heading p { font-size: 16px; }
+.font-comfortable .eyebrow { font-size: 14px; }
+.font-comfortable .metric strong { font-size: 42px; }
 .font-comfortable .metric > div,
 .font-comfortable .panel-title p,
-.font-comfortable .context-help strong { font-size: 13px; }
-.font-comfortable .metric strong { font-size: 38px; }
+.font-comfortable .context-help strong { font-size: 14px; }
 .font-comfortable .metric small,
 .font-comfortable .context-help p,
-.font-comfortable .getting-started-panel p { font-size: 12px; }
+.font-comfortable .getting-started-panel p { font-size: 13px; }
 .font-comfortable .panel-title h2,
-.font-comfortable .workspace-heading h2 { font-size: 16px; }
-.font-comfortable .getting-started-panel button { min-height: 48px; font-size: 12px; }
-.font-comfortable .getting-started-panel nav { grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); }
+.font-comfortable .workspace-heading h2 { font-size: 18px; }
+.font-comfortable .getting-started-panel button { min-height: 52px; font-size: 13px; }
 .font-comfortable .next-actions button strong,
 .font-comfortable .activity-list strong,
 .font-comfortable .person strong,
-.font-comfortable td strong { font-size: 13px; }
+.font-comfortable td strong { font-size: 14px; }
 .font-comfortable .next-actions button small,
 .font-comfortable .activity-list small,
 .font-comfortable .person small,
@@ -406,26 +449,25 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
 .font-comfortable td,
 .font-comfortable th,
 .font-comfortable .table-footer,
-.font-comfortable .muted { font-size: 12px; }
+.font-comfortable .muted { font-size: 13px; }
 .font-comfortable .primary-button,
 .font-comfortable .outline-button,
 .font-comfortable .copy-button,
 .font-comfortable .more-button,
 .font-comfortable .status-select,
-.font-comfortable .whatsapp-button { font-size: 13px; }
+.font-comfortable .whatsapp-button,
 .font-comfortable .settings-form label,
-.font-comfortable .form-grid label { font-size: 13px; }
+.font-comfortable .form-grid label { font-size: 14px; }
 .font-comfortable .settings-form select,
 .font-comfortable .settings-form input,
 .font-comfortable .form-grid input,
-.font-comfortable .form-grid select { font-size: 14px; }
-.font-comfortable footer small { font-size: 10px; }
+.font-comfortable .form-grid select { font-size: 15px; }
 
 @media (max-width: 1050px) {
   .login-shell { grid-template-columns: .8fr 1.2fr; }
   .login-story { padding: 42px; }
   .story-copy h1 { font-size: 50px; }
-  .admin-shell, .admin-shell.font-comfortable { grid-template-columns: 230px minmax(0,1fr); }
+  .admin-shell, .admin-shell.font-small, .admin-shell.font-comfortable { grid-template-columns: 230px minmax(0,1fr); }
   .admin-shell .sidebar { padding-inline: 12px; }
   .metrics-grid { grid-template-columns: repeat(2, 1fr); }
   .dashboard-grid { grid-template-columns: 1fr; }
@@ -468,8 +510,8 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .page-heading .primary-button, .page-heading .outline-button { width: 100%; }
   .metrics-grid, .metrics-grid.mini { grid-template-columns: repeat(2, 1fr); }
   .getting-started-panel { grid-template-columns: 1fr; }
-  .getting-started-panel, .font-comfortable .getting-started-panel { padding: 18px 16px; }
-  .getting-started-panel nav, .font-comfortable .getting-started-panel nav { grid-template-columns: 1fr 1fr; }
+  .admin-shell .getting-started-panel { padding: 18px 16px; }
+  :is(.font-small,.font-comfortable) .getting-started-panel nav { grid-template-columns: 1fr 1fr; }
   .metric { min-height: 118px; padding: 16px; }
   .response-content { flex-direction: column; }
   .table-tools { align-items: stretch; flex-direction: column; }
@@ -497,7 +539,7 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .topbar .language-switcher > span[aria-hidden="true"] { display: none; }
   .topbar .language-switcher select { min-width: 58px; max-width: 72px; }
   .topbar .notification { display: none; }
-  .getting-started-panel nav, .font-comfortable .getting-started-panel nav { grid-template-columns: 1fr; }
+  :is(.font-small,.font-comfortable) .getting-started-panel nav { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 430px) {

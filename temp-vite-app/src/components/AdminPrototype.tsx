@@ -374,11 +374,21 @@ function Dashboard({ guests, onNavigate, order, canEdit }: { guests: Guest[]; on
     const days = Math.round(hours / 24);
     return `Hace ${days} d`;
   };
-  const guide = order.language === "en"
-    ? ["Quick start", "An invitation is one guest group; seats are the people allowed in that group.", ["Guests", "Confirmations", "Tables", "Reminders", "Backup"]]
-    : order.language === "pt"
-      ? ["Início rápido", "Um convite representa um grupo; as vagas são as pessoas permitidas nesse grupo.", ["Convidados", "Confirmações", "Mesas", "Lembretes", "Backup"]]
-      : ["Inicio rápido", "Una invitación representa un grupo; los cupos son las personas permitidas dentro de ese grupo.", ["Invitados", "Confirmaciones", "Mesas", "Recordatorios", "Respaldo"]];
+  const guide = [
+    t("Inicio rápido", "Quick start", "Início rápido"),
+    t(
+      "Una invitación representa un grupo; los cupos son las personas permitidas dentro de ese grupo.",
+      "An invitation is one guest group; seats are the people allowed in that group.",
+      "Um convite representa um grupo; as vagas são as pessoas permitidas nesse grupo."
+    ),
+    [
+      t("Invitados", "Guests", "Convidados"),
+      t("Confirmaciones", "Confirmations", "Confirmações"),
+      t("Mesas", "Tables", "Mesas"),
+      t("Recordatorios", "Reminders", "Lembretes"),
+      t("Respaldo", "Backup", "Backup")
+    ]
+  ];
 
   return (
     <>
@@ -1329,7 +1339,7 @@ function Admin({ onLogout, order, onLanguageChange }: { onLogout: () => void; or
   const [defaultPhoneCountryCode, setDefaultPhoneCountryCode] = useState(order.defaultPhoneCountryCode || "+598");
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   const [syncing, setSyncing] = useState(false);
-  const [comfortableText, setComfortableText] = useState(() => window.sessionStorage.getItem("syd-admin-font-size") === "comfortable");
+  const [comfortableText, setComfortableText] = useState(() => window.sessionStorage.getItem("syd-admin-font-size") === "comfortable-v2");
   const navLabel = useCallback((item: string) => ({
     Resumen: t("Resumen", "Overview", "Resumo"), Invitados: t("Invitados", "Guests", "Convidados"),
     Confirmaciones: t("Confirmaciones", "Confirmations", "Confirmações"), Mesas: t("Mesas", "Tables", "Mesas"),
@@ -1374,7 +1384,7 @@ function Admin({ onLogout, order, onLanguageChange }: { onLogout: () => void; or
   };
   const changeTextSize = (comfortable: boolean) => {
     setComfortableText(comfortable);
-    window.sessionStorage.setItem("syd-admin-font-size", comfortable ? "comfortable" : "small");
+    window.sessionStorage.setItem("syd-admin-font-size", comfortable ? "comfortable-v2" : "small-v2");
   };
 
   return (
