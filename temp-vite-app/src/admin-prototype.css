@@ -178,6 +178,7 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .copy-button, .more-button, .whatsapp-button { border: 0; background: transparent; color: var(--teal-dark); font-size: 9px; font-weight: 800; cursor: pointer; }
 .whatsapp-button { padding: 8px 11px; border-radius: 8px; color: white; background: #2aa96b; }
 .more-button { color: var(--muted); letter-spacing: .1em; }
+.row-actions { display: flex; align-items: center; gap: 10px; }
 .cell-sub { display: block; margin-top: 3px; color: var(--muted); font-size: 8px; }
 .table-footer { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; }
 .table-footer div { display: flex; gap: 4px; }
