@@ -2,6 +2,7 @@ import access from '../_lib/admin/access.js';
 import activity from '../_lib/admin/activity.js';
 import backup from '../_lib/admin/backup.js';
 import guests from '../_lib/admin/guests.js';
+import health from '../_lib/admin/health.js';
 import logout from '../_lib/admin/logout.js';
 import recoverAccess from '../_lib/admin/recover-access.js';
 import requestCode from '../_lib/admin/request-code.js';
@@ -17,6 +18,7 @@ const handlers: Record<string, { fetch: (request: Request) => Promise<Response> 
   activity,
   backup,
   guests,
+  health,
   logout,
   'recover-access': recoverAccess,
   'request-code': requestCode,

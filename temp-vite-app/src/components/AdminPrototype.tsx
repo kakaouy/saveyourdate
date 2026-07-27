@@ -926,6 +926,11 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
   const [reminderDaysBefore, setReminderDaysBefore] = useState(7);
   const [automaticRemindersEnabled, setAutomaticRemindersEnabled] = useState(false);
   const [testingReminder, setTestingReminder] = useState(false);
+  const [healthBusy, setHealthBusy] = useState(true);
+  const [health, setHealth] = useState<{
+    checkedAt: string;
+    services: Record<"database" | "email" | "scheduler", { status: "ok" | "error"; detail: string }>;
+  } | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/settings", { cache: "no-store" }).then(async (response) => {
@@ -935,6 +940,22 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
       setAutomaticRemindersEnabled(result.automaticRemindersEnabled === true);
     });
   }, []);
+
+  const loadHealth = useCallback(async () => {
+    setHealthBusy(true);
+    try {
+      const response = await fetch("/api/admin/health", { cache: "no-store" });
+      const result = await response.json() as typeof health & { error?: string };
+      if (!response.ok || !result?.services) throw new Error(result?.error || "No pudimos comprobar el sistema.");
+      setHealth(result);
+    } catch {
+      setHealth(null);
+    } finally {
+      setHealthBusy(false);
+    }
+  }, []);
+
+  useEffect(() => { void loadHealth(); }, [loadHealth]);
 
   const save = async () => {
     const value = selection === "custom" ? customCode.trim() : selection;
@@ -1015,6 +1036,20 @@ function Settings({ code, onChange }: { code: string; onChange: (value: string) 
     <section className="panel settings-panel">
       <div className="panel-title"><div><h2>Respaldo de datos</h2><p>Descargá una copia completa del evento sin contraseñas, códigos ni secretos de autenticación.</p></div></div>
       <div className="settings-form"><button className="outline-button" disabled={backingUp} onClick={downloadBackup}>{backingUp ? "Generando…" : "⇩ Descargar respaldo JSON"}</button></div>
+    </section>
+    <section className="panel settings-panel">
+      <div className="panel-title"><div><h2>Estado del sistema</h2><p>Diagnóstico privado de los servicios que sostienen el panel y los recordatorios.</p></div><button className="outline-button" disabled={healthBusy} onClick={() => void loadHealth()}>{healthBusy ? "Comprobando…" : "Actualizar estado"}</button></div>
+      <div className="health-grid">
+        {([
+          ["database", "Base de datos", "Invitados, mesas y confirmaciones"],
+          ["email", "Correo", "Accesos y recordatorios"],
+          ["scheduler", "Automatización", "Ejecución programada del cron"]
+        ] as const).map(([key, label, description]) => {
+          const service = health?.services[key];
+          return <article key={key}><span className={`health-indicator ${service?.status === "ok" ? "is-ok" : service ? "is-error" : "is-pending"}`} aria-hidden="true" /><div><strong>{label}</strong><small>{description}</small></div><span className={`health-status ${service?.status === "ok" ? "is-ok" : "is-error"}`}>{service ? service.detail : healthBusy ? "Comprobando…" : "Sin respuesta"}</span></article>;
+        })}
+      </div>
+      {health?.checkedAt && <p className="health-checked">Última comprobación: {new Date(health.checkedAt).toLocaleString("es-UY")}</p>}
     </section>
   </>;
 }
