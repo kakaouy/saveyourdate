@@ -164,6 +164,8 @@ button { color: inherit; }
 .filter-pills { display: flex; gap: 5px; }
 .filter-pills button { min-height: 32px; padding: 0 11px; border: 1px solid transparent; border-radius: 999px; color: var(--muted); background: #f3f6f7; font-size: 9px; cursor: pointer; }
 .filter-pills button.active { border-color: #a8dfe0; color: var(--teal-dark); background: var(--mint); font-weight: 800; }
+.import-actions { display: flex; align-items: center; gap: 7px; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .table-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 10px; }
 th { padding: 11px 16px; color: var(--muted); background: #f7f9fa; font-size: 8px; letter-spacing: .05em; text-align: left; text-transform: uppercase; white-space: nowrap; }
@@ -175,6 +177,7 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .status-select:focus { box-shadow: 0 0 0 2px rgba(10,171,176,.2); }
 .status-select:disabled { cursor: wait; opacity: .65; }
 .table-error { margin: 0; padding: 10px 16px; border-top: 1px solid #ffd5d1; color: #9c4d46; background: #fff5f4; font-size: 9px; }
+.import-success { margin: 0; padding: 10px 16px; border-top: 1px solid #c7e8db; color: #28745c; background: #f3fbf7; font-size: 9px; }
 .copy-button, .more-button, .whatsapp-button { border: 0; background: transparent; color: var(--teal-dark); font-size: 9px; font-weight: 800; cursor: pointer; }
 .whatsapp-button { padding: 8px 11px; border-radius: 8px; color: white; background: #2aa96b; }
 .whatsapp-button:disabled { cursor: wait; opacity: .65; }
