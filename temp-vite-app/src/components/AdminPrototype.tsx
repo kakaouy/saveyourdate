@@ -1,5 +1,5 @@
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "../admin-prototype.css";
 
 type Guest = {
@@ -47,12 +47,59 @@ function Logo({ compact = false }: { compact?: boolean }) {
 function Login({ onLogin }: { onLogin: () => void }) {
   const [step, setStep] = useState<"credentials" | "code">("credentials");
   const [contact, setContact] = useState<"email" | "whatsapp">("email");
+  const [orderNumber, setOrderNumber] = useState("");
+  const [contactValue, setContactValue] = useState("");
+  const [code, setCode] = useState("");
+  const [challengeId, setChallengeId] = useState("");
+  const [maskedEmail, setMaskedEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const [showHelp, setShowHelp] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
 
   const copySupportEmail = async () => {
     await navigator.clipboard.writeText("hola@saveyourdate.site");
     setEmailCopied(true);
+  };
+
+  const requestCode = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/request-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderNumber, contact: contactValue })
+      });
+      const result = await response.json() as { challengeId?: string; maskedEmail?: string; error?: string };
+      if (!response.ok || !result.challengeId) throw new Error(result.error || "No pudimos enviar el código.");
+      setChallengeId(result.challengeId);
+      setMaskedEmail(result.maskedEmail || "");
+      setStep("code");
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "No pudimos enviar el código.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const verifyCode = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challengeId, code })
+      });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos validar el código.");
+      onLogin();
+    } catch (verifyError) {
+      setError(verifyError instanceof Error ? verifyError.message : "No pudimos validar el código.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -78,7 +125,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
               <p className="muted">Usá los datos asociados a tu pedido.</p>
               <label>
                 Número de pedido
-                <input defaultValue="SYD-1048" aria-label="Número de pedido" />
+                <input value={orderNumber} onChange={(event) => setOrderNumber(event.target.value)} placeholder="Ej. SYD-ABCD-1234" aria-label="Número de pedido" />
               </label>
               <div className="segmented" aria-label="Tipo de contacto">
                 <button className={contact === "email" ? "active" : ""} onClick={() => setContact("email")}>Email</button>
@@ -86,22 +133,24 @@ function Login({ onLogin }: { onLogin: () => void }) {
               </div>
               <label>
                 {contact === "email" ? "Email registrado" : "WhatsApp registrado"}
-                <input defaultValue={contact === "email" ? "ana@ejemplo.com" : "099 123 456"} aria-label="Contacto registrado" />
+                <input value={contactValue} onChange={(event) => setContactValue(event.target.value)} placeholder={contact === "email" ? "nombre@ejemplo.com" : "099 123 456"} aria-label="Contacto registrado" />
               </label>
-              <button className="primary-button" onClick={() => setStep("code")}>Continuar <span>→</span></button>
+              {error && <p className="login-error" role="alert">{error}</p>}
+              <button className="primary-button" disabled={busy || !orderNumber || !contactValue} onClick={requestCode}>{busy ? "Enviando…" : "Continuar"} <span>→</span></button>
               <p className="security-note"><span>✓</span> Tus datos están protegidos y nunca compartimos la planilla.</p>
             </>
           ) : (
             <>
               <button className="back-link" onClick={() => setStep("credentials")}>← Volver</button>
               <h2>Revisá tu email</h2>
-              <p className="muted">Enviamos un código de seguridad a <strong>ana@ejemplo.com</strong>.</p>
+              <p className="muted">Enviamos un código de seguridad a <strong>{maskedEmail}</strong>.</p>
               <label>
                 Código de 6 dígitos
-                <input className="code-input" defaultValue="246810" inputMode="numeric" maxLength={6} aria-label="Código de seguridad" />
+                <input className="code-input" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" maxLength={6} aria-label="Código de seguridad" />
               </label>
-              <div className="code-meta"><span>Vence en 09:42</span><button>Reenviar código</button></div>
-              <button className="primary-button" onClick={onLogin}>Ingresar a mi evento <span>→</span></button>
+              <div className="code-meta"><span>Vence en 10 minutos</span><button disabled={busy} onClick={requestCode}>Reenviar código</button></div>
+              {error && <p className="login-error" role="alert">{error}</p>}
+              <button className="primary-button" disabled={busy || code.length !== 6} onClick={verifyCode}>{busy ? "Validando…" : "Ingresar a mi evento"} <span>→</span></button>
               <p className="security-note"><span>✓</span> La sesión permanecerá activa durante 24 horas.</p>
             </>
           )}
@@ -477,7 +526,21 @@ function Admin({ onLogout }: { onLogout: () => void }) {
 
 export function AdminPrototype() {
   const [loggedIn, setLoggedIn] = useState(false);
-  return loggedIn ? <Admin onLogout={() => setLoggedIn(false)} /> : <Login onLogin={() => setLoggedIn(true)} />;
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/admin/session")
+      .then((response) => setLoggedIn(response.ok))
+      .finally(() => setCheckingSession(false));
+  }, []);
+
+  const logout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
+    setLoggedIn(false);
+  };
+
+  if (checkingSession) return <main className="admin-loading">Verificando acceso…</main>;
+  return loggedIn ? <Admin onLogout={logout} /> : <Login onLogin={() => setLoggedIn(true)} />;
 }
 
 export default AdminPrototype;

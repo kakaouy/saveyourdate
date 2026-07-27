@@ -55,6 +55,9 @@ button { color: inherit; }
 .outline-button.compact { min-height: 38px; padding: 0 13px; font-size: 12px; }
 .security-note { display: flex; gap: 8px; margin: 17px 0 25px; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .security-note span { color: var(--teal); font-weight: 900; }
+.login-error { margin: -4px 0 16px; color: #a54a42; font-size: 12px; line-height: 1.45; }
+.primary-button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.admin-loading { min-height: 100vh; display: grid; place-items: center; color: var(--teal-dark); background: var(--canvas); font-size: 13px; font-weight: 800; }
 .help-link { display: block; width: 100%; padding: 0; border: 0; color: var(--teal-dark); background: transparent; font-size: 12px; text-align: center; text-decoration: none; cursor: pointer; }
 .access-help-modal p { margin: 0 0 20px; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .support-email { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; margin-bottom: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--canvas); }
