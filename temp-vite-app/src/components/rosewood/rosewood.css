@@ -41,3 +41,11 @@
 .rw-parallax{min-height:clamp(230px,44svh,410px)}.rw-parallax-image{inset:-90px 0;background-position:72% center}
 .rw-footer{padding:1.35rem 1rem 1.75rem}.rw-footer strong{font-size:1.25rem}.rw-footer p{margin:.35rem 0;font-size:.66rem}
 .rw-embedded .rw-section-ornament img{width:min(25cqw,82px)}.rw-embedded .rw-hero-ornament-top{width:min(38cqw,128px)}.rw-embedded .rw-hero-ornament-bottom{width:min(24cqw,82px)}
+
+/* Escala final aprobada para textura, ornamentos, separadores y footer. */
+.rw-hero{background-repeat:repeat;background-size:66.666% auto}
+.rw-hero-ornament-top{width:66.666%;max-width:none}.rw-hero-ornament-bottom{width:auto;max-width:none;height:66.666%;object-fit:contain;object-position:left bottom}
+.rw-section-ornament img{width:46vw;max-width:46vw}
+.rw-footer,.rw-footer strong,.rw-footer p,.rw-footer hr{text-align:center}.rw-footer strong,.rw-footer p{display:block;margin-right:auto;margin-left:auto}
+.rw-embedded .rw-hero-ornament-top{width:66.666cqw;max-width:none}.rw-embedded .rw-hero-ornament-bottom{width:auto;max-width:none;height:66.666cqh}
+.rw-embedded .rw-section-ornament img{width:46cqw;max-width:46cqw}
