@@ -352,7 +352,7 @@ export function RosewoodInvitation({
         )}
 
         {data.sections.schedule && (
-          <section className={sectionClass(data.tones.schedule)} data-rw-section="schedule">
+          <><section className={sectionClass(data.tones.schedule)} data-rw-section="schedule">
             <div className="rw-container rw-reveal">
               <h2>{t.scheduleTitle}</h2>
               <div className="rw-schedule">
@@ -364,7 +364,7 @@ export function RosewoodInvitation({
                 ))}
               </div>
             </div>
-          </section>
+          </section><SectionOrnament prefix="rw" side="right" src={data.assets.ornamentRight} /></>
         )}
 
         {data.sections.parallax && (
@@ -395,9 +395,9 @@ export function RosewoodInvitation({
           </section>
         )}
         {data.sections.gifts && data.gifts.visible && (
-          <section className={sectionClass(data.tones.gifts)} data-rw-section="gifts">
+          <><section className={sectionClass(data.tones.gifts)} data-rw-section="gifts">
             <div className="rw-container rw-reveal"><h2>{t.giftsTitle}</h2><p>{t.giftsCopy}</p><button className="rw-btn" onClick={(event) => openModal('gifts', event)}>{t.giftsButton}</button></div>
-          </section>
+          </section><SectionOrnament prefix="rw" side="left" src={data.assets.ornamentLeft} /></>
         )}
         {data.sections.photoUpload && (
           <section className={sectionClass(data.tones.photoUpload)} data-rw-section="photoUpload">
@@ -405,9 +405,9 @@ export function RosewoodInvitation({
           </section>
         )}
         {data.sections.social && (
-          <section className={sectionClass(data.tones.social)} data-rw-section="social">
+          <><section className={sectionClass(data.tones.social)} data-rw-section="social">
             <div className="rw-container rw-reveal"><h2>{t.socialTitle}</h2><p>{t.socialCopy}</p><p className="rw-hashtag">{data.content.hashtag}</p><button className="rw-btn rw-btn-outline" onClick={() => external(data.links.instagram)}>{t.socialButton}</button></div>
-          </section>
+          </section><SectionOrnament prefix="rw" side="right" src={data.assets.ornamentRight} /></>
         )}
         {data.sections.songSuggestions && (
           <section className={sectionClass(data.tones.songSuggestions)} data-rw-section="songSuggestions">
@@ -415,9 +415,9 @@ export function RosewoodInvitation({
           </section>
         )}
         {data.sections.qrPass && (
-          <section className={sectionClass(data.tones.qrPass)} data-rw-section="qrPass">
+          <><section className={sectionClass(data.tones.qrPass)} data-rw-section="qrPass">
             <div className="rw-container rw-reveal"><h2>{t.qrTitle}</h2><p>{t.qrCopy}</p><button className="rw-btn" onClick={(event) => openModal('qr', event)}>{t.qrButton}</button></div>
-          </section>
+          </section><SectionOrnament prefix="rw" side="left" src={data.assets.ornamentLeft} /></>
         )}
         {data.sections.rsvp && (
           <section className={sectionClass(data.tones.rsvp)} data-rw-section="rsvp">

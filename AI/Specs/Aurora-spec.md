@@ -248,3 +248,15 @@ La implementación no debe leer `window.VERONA_SITE_CONFIG`; Aurora tendrá tipo
 ## Validación pendiente
 
 - Revisión visual final en dispositivos físicos.
+
+## Cambios solicitados — 2026-08-03
+
+- Portada con textura de papel y sin fotografía.
+- Separadores laterales reducidos y ajustados al contenedor mobile.
+- Separadores alternados a lo largo de la invitación.
+- Parallax aproximadamente un tercio más bajo.
+- Footer institucional más compacto.
+
+## Implementado — corrección visual
+
+- Se aplicaron los cinco cambios solicitados preservando tipografías, paletas y estructura aprobadas.

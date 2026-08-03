@@ -364,7 +364,7 @@ export function AuroraInvitation({
         )}
 
         {data.sections.schedule && (
-          <section className={sectionClass(data.tones.schedule)} data-au-section="schedule">
+          <><section className={sectionClass(data.tones.schedule)} data-au-section="schedule">
             <div className="au-container au-reveal">
               <h2>{t.scheduleTitle}</h2>
               <div className="au-schedule">
@@ -376,7 +376,7 @@ export function AuroraInvitation({
                 ))}
               </div>
             </div>
-          </section>
+          </section><SectionOrnament prefix="au" side="right" src={data.assets.ornamentRight} /></>
         )}
 
         {data.sections.parallax && (
@@ -407,9 +407,9 @@ export function AuroraInvitation({
           </section>
         )}
         {data.sections.gifts && data.gifts.visible && (
-          <section className={sectionClass(data.tones.gifts)} data-au-section="gifts">
+          <><section className={sectionClass(data.tones.gifts)} data-au-section="gifts">
             <div className="au-container au-reveal"><h2>{t.giftsTitle}</h2><p>{t.giftsCopy}</p><button className="au-btn" onClick={(event) => openModal('gifts', event)}>{t.giftsButton}</button></div>
-          </section>
+          </section><SectionOrnament prefix="au" side="left" src={data.assets.ornamentLeft} /></>
         )}
         {data.sections.photoUpload && (
           <section className={sectionClass(data.tones.photoUpload)} data-au-section="photoUpload">
@@ -417,9 +417,9 @@ export function AuroraInvitation({
           </section>
         )}
         {data.sections.social && (
-          <section className={sectionClass(data.tones.social)} data-au-section="social">
+          <><section className={sectionClass(data.tones.social)} data-au-section="social">
             <div className="au-container au-reveal"><h2>{t.socialTitle}</h2><p>{t.socialCopy}</p><p className="au-hashtag">{data.content.hashtag}</p><button className="au-btn au-btn-outline" onClick={() => external(data.links.instagram)}>{t.socialButton}</button></div>
-          </section>
+          </section><SectionOrnament prefix="au" side="right" src={data.assets.ornamentRight} /></>
         )}
         {data.sections.songSuggestions && (
           <section className={sectionClass(data.tones.songSuggestions)} data-au-section="songSuggestions">
@@ -427,9 +427,9 @@ export function AuroraInvitation({
           </section>
         )}
         {data.sections.qrPass && (
-          <section className={sectionClass(data.tones.qrPass)} data-au-section="qrPass">
+          <><section className={sectionClass(data.tones.qrPass)} data-au-section="qrPass">
             <div className="au-container au-reveal"><h2>{t.qrTitle}</h2><p>{t.qrCopy}</p><button className="au-btn" onClick={(event) => openModal('qr', event)}>{t.qrButton}</button></div>
-          </section>
+          </section><SectionOrnament prefix="au" side="left" src={data.assets.ornamentLeft} /></>
         )}
         {data.sections.rsvp && (
           <section className={sectionClass(data.tones.rsvp)} data-au-section="rsvp">
