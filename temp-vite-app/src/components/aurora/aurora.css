@@ -32,3 +32,12 @@
 @media(max-width:360px){.au-section{padding-inline:.9rem}.au-countdown span{letter-spacing:-.02em}.au-name{font-size:clamp(3.5rem,20vw,5rem)}}
 @container (max-width:390px){.au-embedded .au-countdown{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem .75rem}.au-embedded .au-countdown strong{font-size:clamp(1.75rem,12cqw,2.75rem)}}
 @media(prefers-reduced-motion:reduce){.aurora{scroll-behavior:auto}.aurora *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.au-particles{display:none}.au-reveal{opacity:1;transform:none}.au-parallax-image{transform:none}}
+
+/* Ajustes visuales aprobados: portada de papel, escala mobile y bloques compactos. */
+.au-hero{background-color:var(--color-fondo);background-image:var(--hero-image);background-size:auto;color:var(--color-titulos)}
+.au-hero-content{color:var(--color-titulos);text-shadow:none}
+.au-navigate{background:color-mix(in srgb,var(--color-titulos) 12%,transparent)}.au-navigate img{filter:none}
+.au-section-ornament img{width:clamp(68px,22vw,170px)}
+.au-parallax{min-height:clamp(230px,44svh,410px)}.au-parallax-image{inset:-90px 0}
+.au-footer{padding:1.35rem 1rem 1.75rem}.au-footer strong{font-size:1.25rem}.au-footer p{margin:.35rem 0;font-size:.66rem}
+.au-embedded .au-section-ornament img{width:min(25cqw,82px)}

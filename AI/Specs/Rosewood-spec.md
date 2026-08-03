@@ -240,3 +240,15 @@ La implementación tendrá tipos y `DEFAULT_CONFIG` propios. Debe eliminarse la 
 ## Validación pendiente
 
 - Revisión visual final en dispositivos físicos.
+
+## Cambios solicitados — 2026-08-03
+
+- Portada con textura de papel, sin fotografía y con texto tomado de la paleta.
+- Ornamentos de portada reducidos al menos un tercio en mobile.
+- Separadores laterales reducidos y alternados durante todo el recorrido.
+- Parallax más bajo y con foco desplazado hacia la derecha.
+- Footer institucional más compacto.
+
+## Implementado — corrección visual
+
+- Se aplicaron los cinco cambios solicitados preservando tipografías, paletas y estructura aprobadas.

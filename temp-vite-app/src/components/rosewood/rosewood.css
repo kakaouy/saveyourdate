@@ -31,3 +31,13 @@
 @media(max-width:360px){.rw-section{padding-inline:.9rem}.rw-countdown span{letter-spacing:-.02em}.rw-name{font-size:clamp(3.5rem,20vw,5rem)}}
 @container (max-width:390px){.rw-embedded .rw-countdown{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem .75rem}.rw-embedded .rw-countdown strong{font-size:clamp(1.75rem,12cqw,2.75rem)}}
 @media(prefers-reduced-motion:reduce){.rosewood{scroll-behavior:auto}.rosewood *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.rw-particles{display:none}.rw-reveal{opacity:1;transform:none}.rw-parallax-image{transform:none}}
+
+/* Ajustes visuales aprobados: portada de papel, escala mobile y bloques compactos. */
+.rw-hero{background-color:var(--color-fondo);background-image:var(--hero-image);background-size:auto;color:var(--color-titulos)}
+.rw-hero-content{margin-top:0;color:var(--color-titulos);text-shadow:none}.rw-hero h1,.rw-name,.rw-date{color:var(--color-titulos)}
+.rw-navigate{background:color-mix(in srgb,var(--color-titulos) 12%,transparent)}.rw-navigate img{filter:none}
+.rw-hero-ornament-top{width:min(40vw,268px)}.rw-hero-ornament-bottom{width:min(25vw,200px)}
+.rw-section-ornament img{width:clamp(68px,22vw,170px)}
+.rw-parallax{min-height:clamp(230px,44svh,410px)}.rw-parallax-image{inset:-90px 0;background-position:72% center}
+.rw-footer{padding:1.35rem 1rem 1.75rem}.rw-footer strong{font-size:1.25rem}.rw-footer p{margin:.35rem 0;font-size:.66rem}
+.rw-embedded .rw-section-ornament img{width:min(25cqw,82px)}.rw-embedded .rw-hero-ornament-top{width:min(38cqw,128px)}.rw-embedded .rw-hero-ornament-bottom{width:min(24cqw,82px)}
