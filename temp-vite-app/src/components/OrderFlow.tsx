@@ -160,10 +160,10 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
   };
 
   const toggleSection = (sectionId: string) => {
-    if (plan === 'basic') return;
     setSections((current) => {
       if (current.includes(sectionId)) return current.filter((id) => id !== sectionId);
       const isNewSection = !defaultSections.includes(sectionId);
+      if (plan === 'basic' && isNewSection) return current;
       if (isNewSection && addedSections.length >= 3) {
         return current;
       }
@@ -419,7 +419,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
             </div>
 
             <div className="order-form-block">
-              <div className="order-block-title"><span>2</span><div><h3>{l('Elegí el modelo', 'Choose the template', 'Escolha o modelo')}</h3><p>{plan === 'basic' ? l('Usaremos las secciones originales de la plantilla.', 'We will use the template’s original sections.', 'Usaremos as seções originais do modelo.') : l(`Podés eliminar secciones y agregar hasta 3 nuevas. Agregaste ${addedSections.length} de 3.`, `You may remove sections and add up to 3 new ones. You added ${addedSections.length} of 3.`, `Você pode remover seções e adicionar até 3 novas. Adicionou ${addedSections.length} de 3.`)}</p></div></div>
+              <div className="order-block-title"><span>2</span><div><h3>{l('Elegí el modelo', 'Choose the template', 'Escolha o modelo')}</h3><p>{plan === 'basic' ? l('Podés deshabilitar cualquiera de las secciones incluidas.', 'You may disable any included section.', 'Você pode desabilitar qualquer seção incluída.') : l(`Podés eliminar secciones y agregar hasta 3 nuevas. Agregaste ${addedSections.length} de 3.`, `You may remove sections and add up to 3 new ones. You added ${addedSections.length} of 3.`, `Você pode remover seções e adicionar até 3 novas. Adicionou ${addedSections.length} de 3.`)}</p></div></div>
               <span className="form-label">{l('Primero, elegí el tipo de evento', 'First, choose the event type', 'Primeiro, escolha o tipo de evento')}</span>
               <div className="order-event-categories" role="group" aria-label="Tipo de evento">
                 {([
@@ -453,24 +453,19 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
                   ))}
                 </div>
               </div>
-              {plan === 'basic' ? (
-                <div className="basic-template-summary">
-                  <strong>{l('Secciones incluidas en esta plantilla', 'Sections included in this template', 'Seções incluídas neste modelo')}</strong>
-                  <p>{defaultSections.filter((id) => id !== 'music').map((id) => sectionOptions.find((item) => item.id === id)?.title || id).join(' · ')}</p>
-                </div>
-              ) : <div className="order-sections-grid">
-                {sectionOptions.map((section) => {
+              <div className="order-sections-grid">
+                {sectionOptions.filter((section) => plan === 'premium' || defaultSections.includes(section.id)).map((section) => {
                   const includedByDefault = defaultSections.includes(section.id);
                   const selected = sections.includes(section.id);
                   const disabled = !selected && !includedByDefault && addedSections.length >= 3;
                   return (
                     <button type="button" key={section.id} disabled={disabled} className={`order-section-option ${selected ? 'active' : ''} ${includedByDefault ? 'included' : ''}`} onClick={() => toggleSection(section.id)}>
-                      <span className="order-section-check">{selected ? '✓' : '+'}</span>
-                      <span><strong>{section.title}</strong><small>{includedByDefault ? l('Incluida en la plantilla; podés eliminarla · ', 'Included in the template; you may remove it · ', 'Incluída no modelo; você pode removê-la · ') : l('Sección nueva · ', 'New section · ', 'Nova seção · ')}{section.description}</small></span>
+                      <span className="order-section-check">{selected ? '✓' : (includedByDefault ? '×' : '+')}</span>
+                      <span><strong>{section.title}</strong><small>{includedByDefault ? (selected ? l('Incluida; tocá para deshabilitar · ', 'Included; tap to disable · ', 'Incluída; toque para desabilitar · ') : l('Deshabilitada; tocá para incluir · ', 'Disabled; tap to include · ', 'Desabilitada; toque para incluir · ')) : l('Sección nueva · ', 'New section · ', 'Nova seção · ')}{section.description}</small></span>
                     </button>
                   );
                 })}
-              </div>}
+              </div>
               {rsvpSelected && <div className="rsvp-included-note"><strong>{l('RSVP completo incluido', 'Complete RSVP included', 'RSVP completo incluído')}</strong><span>{l('Panel personalizado · enlaces individuales · restricciones alimentarias para catering.', 'Personalized dashboard · individual links · dietary restrictions for catering.', 'Painel personalizado · links individuais · restrições alimentares para catering.')}</span></div>}
             </div>
 

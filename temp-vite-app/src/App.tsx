@@ -269,7 +269,7 @@ const TRANSLATIONS = {
         { q: "¿Cómo hago el pedido?", a: "Elegí un modelo y un plan. Después podés hacer el pedido y pagar, o pagar primero y completar el pedido a continuación. En ambos casos te damos un número de pedido para seguir todo el proceso." },
         { q: "¿Cómo sé si mi pago fue validado?", a: "Consultá el estado con tu email o WhatsApp y tu número de pedido o de pago. También te avisamos por email cuando recibimos el pedido, validamos el pago, realizamos modificaciones y entregamos la invitación final." },
         { q: "¿Cuánto tiempo tarda en estar lista?", a: "Cuando el pago esté validado y tengamos toda la información necesaria, recibirás una vista previa durante la preparación. El plazo puede variar según el plan y las modificaciones solicitadas." },
-        { q: "¿Qué incluye el Plan Básico?", a: "Usa la plantilla elegida con sus secciones originales y permite hasta 5 fotos en la galería, cuando el modelo tenga galería." },
+        { q: "¿Qué incluye el Plan Básico?", a: "Usa la plantilla elegida, permite deshabilitar las secciones que no quieras y admite hasta 5 fotos cuando el modelo tenga galería." },
         { q: "¿Qué incluye el Plan Premium?", a: "Parte de una plantilla existente y permite eliminar secciones, agregar hasta 3 secciones nuevas y usar hasta 8 fotos en la galería." },
         { q: "¿Puedo pedir cambios?", a: "Sí. Desde la vista previa podés comunicarte por WhatsApp o por el formulario del sitio para pedir cambios o agregar información antes de recibir el enlace definitivo." },
         { q: "¿Cómo confirman asistencia los invitados?", a: "Si elegís la sección RSVP, tus invitados completan el formulario dentro de la invitación y las respuestas se organizan en tu panel personalizado." },
@@ -572,7 +572,7 @@ const TRANSLATIONS = {
         { q: "How do I place an order?", a: "Choose a design and a plan. You can place the order before paying or pay first and complete it afterward. Either way, you receive an order number to track the process." },
         { q: "How do I know if my payment was approved?", a: "Check the status using your email or WhatsApp plus your order or payment number. We also email you when the order is received, payment is approved, changes are made, and the final invitation is delivered." },
         { q: "How long does it take?", a: "Once payment is approved and we have all required information, you receive a preview while we prepare the invitation. Timing may vary depending on the plan and requested changes." },
-        { q: "What does the Basic Plan include?", a: "It uses the selected template with its original sections and supports up to 5 gallery photos when that template includes a gallery." },
+        { q: "What does the Basic Plan include?", a: "It uses the selected template, lets you disable sections you do not want, and supports up to 5 photos when the template includes a gallery." },
         { q: "What does the Premium Plan include?", a: "It starts from an existing template and lets you remove sections, add up to 3 new sections, and use up to 8 gallery photos." },
         { q: "Can I request changes?", a: "Yes. From the preview you can contact us through WhatsApp or the website form before receiving the final link." },
         { q: "How do guests confirm attendance?", a: "If you choose RSVP, guests complete the form inside the invitation and responses are organized in your personalized dashboard." },
@@ -875,7 +875,7 @@ const TRANSLATIONS = {
         { q: "Como faço o pedido?", a: "Escolha um modelo e um plano. Você pode fazer o pedido antes de pagar ou pagar primeiro e completar o pedido depois. Em ambos os casos, recebe um número para acompanhar o processo." },
         { q: "Como sei se o pagamento foi validado?", a: "Consulte o status com seu e-mail ou WhatsApp e o número do pedido ou pagamento. Também enviamos e-mails em cada etapa importante." },
         { q: "Quanto tempo demora?", a: "Quando o pagamento estiver validado e tivermos todas as informações, você receberá uma prévia durante a preparação. O prazo pode variar conforme o plano e as alterações." },
-        { q: "O que inclui o Plano Básico?", a: "Usa o modelo escolhido com suas seções originais e permite até 5 fotos na galeria, quando o modelo tiver galeria." },
+        { q: "O que inclui o Plano Básico?", a: "Usa o modelo escolhido, permite desabilitar as seções que você não quiser e admite até 5 fotos quando o modelo tiver galeria." },
         { q: "O que inclui o Plano Premium?", a: "Parte de um modelo existente e permite remover seções, adicionar até 3 novas seções e usar até 8 fotos na galeria." },
         { q: "Posso solicitar alterações?", a: "Sim. Na prévia, você pode falar conosco pelo WhatsApp ou formulário do site antes de receber o link definitivo." },
         { q: "Como os convidados confirmam presença?", a: "Se escolher RSVP, os convidados completam o formulário no convite e as respostas são organizadas no seu painel personalizado." },
@@ -2236,7 +2236,7 @@ function App() {
                     <div className="card-info">
                       <h3 className="card-title">{model.title}</h3>
 
-                      {!['15-verona', 'varezzia', 'rivendell'].includes(model.id) && <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
+                      <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
                         {modelPaletteOptions.map((option) => (
                           <button
                             key={option.color}
@@ -2248,7 +2248,7 @@ function App() {
                             onClick={() => setSelectedModelColors((current) => ({ ...current, [model.id]: option.color }))}
                           />
                         ))}
-                      </div>}
+                      </div>
 
                       {isComingSoon ? (
                         <div className="card-footer card-footer-coming-soon">
@@ -2289,7 +2289,7 @@ function App() {
           <div className="section-header plans-header">
             <span className="section-subtitle">{lang === 'es' ? 'Dos opciones simples' : (lang === 'en' ? 'Two simple options' : 'Duas opções simples')}</span>
             <h2 className="section-title">{lang === 'es' ? 'Elegí cuánto querés adaptar' : (lang === 'en' ? 'Choose how much you want to customize' : 'Escolha quanto deseja adaptar')}</h2>
-            <p className="section-desc">{lang === 'es' ? 'En ambos planes personalizamos textos, datos y colores disponibles. Premium también permite modificar la estructura.' : (lang === 'en' ? 'Both plans personalize text, details and available colors. Premium also lets you change the structure.' : 'Nos dois planos personalizamos textos, dados e cores disponíveis. O Premium também permite alterar a estrutura.')}</p>
+            <p className="section-desc">{lang === 'es' ? 'En ambos planes personalizamos textos, datos, colores y podés deshabilitar secciones. Premium también permite agregar secciones nuevas.' : (lang === 'en' ? 'Both plans personalize text, details and colors, and let you disable sections. Premium also lets you add new sections.' : 'Nos dois planos personalizamos textos, dados e cores, e você pode desabilitar seções. O Premium também permite adicionar novas seções.')}</p>
           </div>
 
           <div className="plans-comparison">
@@ -2298,10 +2298,10 @@ function App() {
               <h3>{lang === 'es' ? 'La plantilla lista para vos' : (lang === 'en' ? 'The ready-made template' : 'O modelo pronto para você')}</h3>
               <strong className="commercial-plan-price">{PLAN_PRICES.basic}</strong>
               <ul>
-                <li>{lang === 'es' ? 'Secciones originales del modelo' : (lang === 'en' ? 'Original template sections' : 'Seções originais do modelo')}</li>
+                <li>{lang === 'es' ? 'Podés deshabilitar secciones incluidas' : (lang === 'en' ? 'Disable any included section' : 'Desabilite qualquer seção incluída')}</li>
                 <li>{lang === 'es' ? 'Hasta 5 fotos si incluye galería' : (lang === 'en' ? 'Up to 5 photos when a gallery is included' : 'Até 5 fotos quando inclui galeria')}</li>
                 <li>{lang === 'es' ? 'Textos, datos y colores personalizados' : (lang === 'en' ? 'Personalized text, details and colors' : 'Textos, dados e cores personalizados')}</li>
-                <li>{lang === 'es' ? 'Sin cambios de estructura' : (lang === 'en' ? 'No structural changes' : 'Sem alterações de estrutura')}</li>
+                <li>{lang === 'es' ? 'Sin agregar secciones nuevas' : (lang === 'en' ? 'No additional sections' : 'Sem adicionar novas seções')}</li>
               </ul>
               <a href="#crear" className="plan-cta" onClick={(e) => { handleScrollToSection(e, 'crear'); window.dispatchEvent(new CustomEvent('start-saveyourdate-order', { detail: { plan: 'basic' } })); }}>{lang === 'es' ? 'Elegir Básico' : (lang === 'en' ? 'Choose Basic' : 'Escolher Básico')}</a>
             </article>
