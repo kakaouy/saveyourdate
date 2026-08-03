@@ -1366,23 +1366,45 @@
 
   <script>
     const PALETTE_PRESETS = {
-      "rosa": {
-        fondo: "#fff8fa",
-        fondoAlterno: "#ead1d9",
-        acento: "#d9a9b8",
-        acentoOscuro: "#9f6478",
+      "rosa-salvia": {
+  fondo: "#fbf7f3",
+  fondoAlterno: "#eadedb",
 
-        titulos: "#b9798f",
-        secundario: "#f8e7ed",
-        texto: "#76535f",
-        textoClaro: "#ffffff",
+  acento: "#bd8b91",
+  acentoOscuro: "#566b5f",
 
-        botones: "#b98395",
-        bordes: "#e8c8d2",
+  titulos: "#8f6269",
+  secundario: "#f3e8df",
 
-        ornamentos: "#c88da2",
-        foco: "#a96d82"
-      },
+  texto: "#655a57",
+  textoClaro: "#ffffff",
+
+  botones: "#a8757d",
+  bordes: "#dbc4bd",
+
+  ornamentos: "#879b83",
+  foco: "#785158"
+},
+
+"petroleo-champagne": {
+  fondo: "#faf8f2",
+  fondoAlterno: "#dce6e4",
+
+  acento: "#c3a46d",
+  acentoOscuro: "#244f52",
+
+  titulos: "#32666a",
+  secundario: "#f1e7d3",
+
+  texto: "#465b5a",
+  textoClaro: "#ffffff",
+
+  botones: "#a88850",
+  bordes: "#d8c7a5",
+
+  ornamentos: "#b99b61",
+  foco: "#7f663c"
+},
 
       "verde-dorado": {
         fondo: "#f7f7f1",
@@ -1404,23 +1426,7 @@
         foco: "#8d6b27"
       },
 
-      "verde-azulado": {
-        fondo: "#f7fbfa",
-        fondoAlterno: "#a9d5ce",
-        acento: "#4f8282",
-        acentoOscuro: "#315f68",
-
-        titulos: "#4d8790",
-        secundario: "#ffffff",
-        texto: "#365c63",
-        textoClaro: "#ffffff",
-
-        botones: "#4f8f91",
-        bordes: "#c8e3df",
-
-        ornamentos: "#487783",
-        foco: "#315f68"
-      }
+ 
     };
 
     const TRANSLATIONS = {
@@ -1555,11 +1561,11 @@
     const previewParams = new URLSearchParams(window.location.search);
     const siteConfig = window.VERONA_SITE_CONFIG || {};
     const requestedLocale = siteConfig.locale || previewParams.get("lang") || "es";
-    const requestedPalette = siteConfig.palettePreset || previewParams.get("palette") || "verde-dorado";
+    const requestedPalette = siteConfig.palettePreset || previewParams.get("palette") || "petroleo-champagne";
 
     const EVENT_CONFIG = {
       locale: Object.hasOwn(TRANSLATIONS, requestedLocale) ? requestedLocale : "es",
-      palettePreset: Object.hasOwn(PALETTE_PRESETS, requestedPalette) ? requestedPalette : "verde-dorado",
+      palettePreset: Object.hasOwn(PALETTE_PRESETS, requestedPalette) ? requestedPalette : "petroleo-champagne",
       event: {
         name: "Valentina",
         typeLabel: "",
