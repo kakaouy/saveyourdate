@@ -260,3 +260,9 @@ La implementación no debe leer `window.VERONA_SITE_CONFIG`; Aurora tendrá tipo
 ## Implementado — corrección visual
 
 - Se aplicaron los cinco cambios solicitados preservando tipografías, paletas y estructura aprobadas.
+
+## Cambios solicitados — escala final
+
+- Textura de papel repetida a `66.666%` del ancho para mostrar 1,5 repeticiones en mobile.
+- Separadores laterales al `46%` del ancho visible.
+- Contenido institucional del footer completamente centrado.

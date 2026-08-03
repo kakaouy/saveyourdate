@@ -252,3 +252,10 @@ La implementación tendrá tipos y `DEFAULT_CONFIG` propios. Debe eliminarse la 
 ## Implementado — corrección visual
 
 - Se aplicaron los cinco cambios solicitados preservando tipografías, paletas y estructura aprobadas.
+
+## Cambios solicitados — escala final
+
+- Textura de papel repetida a `66.666%` del ancho para mostrar 1,5 repeticiones en mobile.
+- Ornamento superior a 2/3 del ancho y ornamento inferior a 2/3 del alto de portada.
+- Separadores laterales al `46%` del ancho visible.
+- Contenido institucional del footer completamente centrado.

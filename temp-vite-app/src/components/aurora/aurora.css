@@ -41,3 +41,9 @@
 .au-parallax{min-height:clamp(230px,44svh,410px)}.au-parallax-image{inset:-90px 0}
 .au-footer{padding:1.35rem 1rem 1.75rem}.au-footer strong{font-size:1.25rem}.au-footer p{margin:.35rem 0;font-size:.66rem}
 .au-embedded .au-section-ornament img{width:min(25cqw,82px)}
+
+/* Escala final aprobada para textura, separadores y footer. */
+.au-hero{background-repeat:repeat;background-size:66.666% auto}
+.au-section-ornament img{width:46vw;max-width:46vw}
+.au-footer,.au-footer strong,.au-footer p,.au-footer hr{text-align:center}.au-footer strong,.au-footer p{display:block;margin-right:auto;margin-left:auto}
+.au-embedded .au-section-ornament img{width:46cqw;max-width:46cqw}
