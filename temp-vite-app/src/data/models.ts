@@ -369,6 +369,51 @@ export const INVITATION_MODELS: InvitationModel[] = [
     ]
   },
   {
+    id: 'aurora',
+    title: 'Aurora',
+    category: '15years',
+    description: 'Una propuesta luminosa y editorial, con fotografía protagonista, marco ornamental y detalles dorados para una celebración elegante.',
+    badge: 'Nuevo',
+    demoName1: 'Felicita',
+    date: '28 de Febrero, 2027',
+    previewImage: '/aurora/images/foto-01.jpg',
+    active: true,
+    order: 26,
+    features: ['Cuenta Regresiva', 'Ubicación', 'Agregar al calendario', 'Código de Vestimenta', 'Cronograma', 'Foto destacada', 'Alojamiento', 'Regalos', 'Álbum colaborativo', 'Instagram', 'Sugerencia de canciones', 'Pase QR', 'Confirmación RSVP', 'Multiidioma'],
+    themeClass: 'mock-theme-aurora',
+    illustrationType: 'crown',
+    location: 'Salón Eventos Premium, Montevideo',
+    includedSections: ['countdown', 'location', 'dresscode', 'schedule', 'featuredPhoto', 'hotels', 'gifts', 'photoUpload', 'instagram', 'songSuggestions', 'qr', 'rsvp'],
+    palettes: [
+      { id: 'verde-dorado', name: 'Verde dorado', color: '#2f5d50' },
+      { id: 'rosa-champagne', name: 'Rosa champagne', color: '#9e6670' },
+      { id: 'azul-plata', name: 'Azul plata', color: '#334f6b' },
+      { id: 'lavanda-dorado', name: 'Lavanda dorado', color: '#765d88' }
+    ]
+  },
+  {
+    id: 'rosewood',
+    title: 'Rosewood',
+    category: '15years',
+    description: 'Una invitación romántica y botánica, con fotografía protagonista, textura de papel y ornamentos florales de composición delicada.',
+    badge: 'Nuevo',
+    demoName1: 'Valentina',
+    date: '15 de Noviembre, 2027',
+    previewImage: '/rosewood/images/foto-01.png',
+    active: true,
+    order: 27,
+    features: ['Ubicación', 'Agregar al calendario', 'Código de Vestimenta', 'Cronograma', 'Foto destacada', 'Alojamiento', 'Regalos', 'Álbum colaborativo', 'Instagram', 'Sugerencia de canciones', 'Pase QR', 'Confirmación RSVP', 'Multiidioma'],
+    themeClass: 'mock-theme-rosewood',
+    illustrationType: 'crown',
+    location: 'Salón Eventos Premium, Montevideo',
+    includedSections: ['location', 'dresscode', 'schedule', 'featuredPhoto', 'hotels', 'gifts', 'photoUpload', 'instagram', 'songSuggestions', 'qr', 'rsvp'],
+    palettes: [
+      { id: 'petroleo-champagne', name: 'Petróleo champagne', color: '#32666a' },
+      { id: 'rosa-salvia', name: 'Rosa salvia', color: '#8f6269' },
+      { id: 'verde-dorado', name: 'Verde dorado', color: '#2f5d50' }
+    ]
+  },
+  {
     id: 'otros-baby',
     title: 'Baby Shower Especial',
     category: 'other',

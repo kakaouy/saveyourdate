@@ -6,6 +6,8 @@ import OrderFlow from './components/OrderFlow';
 import { PAYMENT_LINKS, PLAN_PRICES } from './config/plans';
 import { VarezziaInvitation } from './components/varezzia/VarezziaInvitation';
 import { RivendellInvitation } from './components/rivendell/RivendellInvitation';
+import { AuroraInvitation } from './components/aurora/AuroraInvitation';
+import { RosewoodInvitation } from './components/rosewood/RosewoodInvitation';
 
 
 const MODEL_COLOR_OPTIONS = [
@@ -3218,6 +3220,24 @@ function App() {
                         demoModel,
                         selectedModelColors[demoModel.id]
                       ) as 'rosa' | 'verde-agua' | 'verde-azulado'}
+                    />
+                  ) : demoModel.id === 'aurora' ? (
+                    <AuroraInvitation
+                      embedded
+                      locale={lang}
+                      palette={getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      ) as 'verde-dorado' | 'rosa-champagne' | 'azul-plata' | 'lavanda-dorado'}
+                    />
+                  ) : demoModel.id === 'rosewood' ? (
+                    <RosewoodInvitation
+                      embedded
+                      locale={lang}
+                      palette={getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      ) as 'petroleo-champagne' | 'rosa-salvia' | 'verde-dorado'}
                     />
                   ) : demoModel.id === '15-verona' ? (
                     <iframe
