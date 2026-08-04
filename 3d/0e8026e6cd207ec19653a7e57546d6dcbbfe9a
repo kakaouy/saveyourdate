@@ -1,0 +1,14 @@
+temp-vite-app/public/coruscant/index.html
+  h_978362ea3daf54 1-2594
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "3d0e8026e6cd207ec19653a7e57546d6dcbbfe9a",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
