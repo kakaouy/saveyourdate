@@ -1,0 +1,15 @@
+temp-vite-app/public/astraea/index.html
+  h_978362ea3daf54 1-168,170-183,186-1286
+  h_978362ea3daf54 169,184-185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "61076069844fd602767a06511590e790f8387879",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
