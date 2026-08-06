@@ -1,0 +1,42 @@
+.coruscant-model .au-hero{position:relative;min-height:78svh;place-items:center start;overflow:hidden;padding:1rem 1.5rem;background-color:var(--color-fondo);background-image:none;color:var(--color-texto);text-align:left}
+.coruscant-model .au-hero::before,.coruscant-model .au-hero::after{position:absolute;right:0;bottom:-1px;left:0;z-index:6;height:88px;content:"";pointer-events:none}
+.coruscant-model .au-hero::before{background:var(--color-ornamentos);clip-path:polygon(0 62%,71% 72%,0 100%)}
+.coruscant-model .au-hero::after{background:var(--color-secundario);clip-path:polygon(0 100%,48% 72%,100% 68%,100% 100%,0 100%)}
+.coruscant-model .au-hero-content{width:100%;margin:0;padding:0 0 0 6vw;text-shadow:none}
+.coruscant-model .au-editorial-intro{width:min(100%,430px);margin:0;text-align:left}
+.coruscant-model .au-editorial-date{margin:0 0 .85rem;color:var(--color-texto);font-family:var(--font-body);font-size:clamp(1rem,3.8vw,1.45rem);font-weight:300;letter-spacing:.04em;line-height:1.2;white-space:nowrap}
+.coruscant-model .au-name{width:100%;margin:0 0 .85rem;color:var(--color-titulos);font-family:var(--font-title);font-size:clamp(2.7rem,10vw,5rem);font-weight:400;letter-spacing:-.025em;line-height:.95;text-transform:uppercase;white-space:normal}
+.coruscant-model .au-editorial-title{margin:0;color:var(--color-texto);font-family:var(--font-title);font-size:clamp(1.3rem,4.5vw,2rem);font-weight:400;letter-spacing:.03em;line-height:1.15;text-transform:uppercase}
+.coruscant-model .au-hero-ornament-top{top:0;right:0;left:auto;width:80.5vw;max-width:none;transform-origin:top right}.coruscant-model .au-hero-ornament-bottom{right:auto;bottom:-10px;left:0;z-index:4;width:min(58vw,640px);max-height:58%;transform-origin:bottom left}
+.coruscant-model .au-navigate{z-index:9;bottom:.5rem}
+.coruscant-model .au-navigate img{opacity:.55}
+.coruscant-model [data-au-section="countdown"]{margin-top:-1px;padding-top:3.6rem;background:var(--color-secundario)}
+.coruscant-model .au-countdown{max-width:760px;margin-inline:auto}.coruscant-model .au-gallery button{border-radius:clamp(12px,5vw,32px)}
+.coruscant-model .au-section-ornament.left img{transform:translateY(-50%) scaleX(-1)}
+
+.coruscant-model [data-au-section]>.au-container::before{display:block;width:clamp(64px,14vw,85px);aspect-ratio:1;margin:0 auto 1.15rem;background-position:center;background-repeat:no-repeat;background-size:contain;content:"";opacity:.84;animation:coruscant-icon-pulse 10.2s ease-in-out infinite}
+.coruscant-model [data-au-section="countdown"]>.au-container::before,.coruscant-model [data-au-section="dateStack"]>.au-container::before{display:none}
+.coruscant-model [data-au-section="location"]>.au-container::before{background-image:url('/coruscant/images/icon-map.png')}
+.coruscant-model [data-au-section="quote"]>.au-container::before{background-image:url('/coruscant/images/icon-corazon.png')}
+.coruscant-model [data-au-section="dressCode"]>.au-container::before{background-image:url('/coruscant/images/icon-dress.png')}
+.coruscant-model [data-au-section="gallery"]>.au-container::before{background-image:url('/coruscant/images/icon-galeria.png')}
+.coruscant-model [data-au-section="hotels"]>.au-container::before{background-image:url('/coruscant/images/icon-hotel.png')}
+.coruscant-model [data-au-section="gifts"]>.au-container::before{background-image:url('/coruscant/images/icon-gift.png')}
+.coruscant-model [data-au-section="photoUpload"]>.au-container::before{background-image:url('/coruscant/images/icon-photo.png')}
+.coruscant-model [data-au-section="social"]>.au-container::before{background-image:url('/coruscant/images/icon-insta.png')}
+.coruscant-model [data-au-section="songSuggestions"]>.au-container::before{background-image:url('/coruscant/images/icon-music.png')}
+.coruscant-model [data-au-section="qrPass"]>.au-container::before{background-image:url('/coruscant/images/icon-qr.png')}
+.coruscant-model [data-au-section="rsvp"]>.au-container::before{background-image:url('/coruscant/images/icon-rsvp.png')}
+.coruscant-model .au-tone-light>.au-container::before,.coruscant-model .au-tone-alternate>.au-container::before{filter:brightness(0) saturate(100%) invert(49%) sepia(18%) saturate(765%) hue-rotate(294deg) brightness(90%) contrast(85%)}
+
+.coruscant-model .au-modal-box{isolation:isolate;overflow:hidden}
+.coruscant-model .au-modal-box::before,.coruscant-model .au-modal-box::after{position:absolute;z-index:0;width:clamp(150px,58vw,320px);height:clamp(110px,42vw,230px);background:url('/coruscant/images/separador_derecha.png') center/contain no-repeat;content:"";opacity:.13;pointer-events:none}
+.coruscant-model .au-modal-box::before{top:-2rem;right:-3rem}
+.coruscant-model .au-modal-box::after{bottom:-2rem;left:-3rem;transform:scaleX(-1)}
+.coruscant-model .au-modal-box>:not(.au-modal-close){position:relative;z-index:2}
+.coruscant-model .au-modal-close{z-index:3}
+@keyframes coruscant-icon-pulse{0%,100%{transform:scale(.8)}8%{transform:scale(.86)}16%{transform:scale(.8)}}
+@media(max-width:560px){.coruscant-model .au-hero{min-height:64svh;padding:0 1.5rem 0 6vw}.coruscant-model .au-hero-content{padding:0 0 0 7vw}.coruscant-model .au-editorial-intro{width:min(100%,330px)}.coruscant-model .au-hero-ornament-top{width:min(115vw,715px);max-height:56vh}.coruscant-model .au-hero-ornament-bottom{bottom:-15px;width:68vw;max-height:50%}.coruscant-model .au-name{font-size:clamp(3.15rem,15vw,4.75rem)}.coruscant-model .au-hero::before,.coruscant-model .au-hero::after{height:135px}.coruscant-model [data-au-section="countdown"]{padding-top:5.25rem}}
+@media(min-width:900px){.coruscant-model .au-hero-content{padding-left:14vw}}
+.au-embedded.coruscant-model .au-hero{min-height:100cqh;padding-right:.75rem;padding-left:.75rem}.au-embedded.coruscant-model .au-hero-content{padding-bottom:0;padding-left:7cqw}.au-embedded.coruscant-model .au-editorial-date{font-size:clamp(.7rem,4cqw,1rem)}.au-embedded.coruscant-model .au-name{font-size:clamp(3rem,17cqw,4.75rem)}.au-embedded.coruscant-model .au-editorial-title{font-size:clamp(1rem,6.5cqw,1.7rem)}.au-embedded.coruscant-model .au-hero::before,.au-embedded.coruscant-model .au-hero::after{height:22cqh}.au-embedded.coruscant-model .au-hero-ornament-top{width:80.5cqw}.au-embedded.coruscant-model .au-hero-ornament-bottom{width:68cqw}
+@media(prefers-reduced-motion:reduce){.coruscant-model [data-au-section]>.au-container::before{animation:none;transform:none}}

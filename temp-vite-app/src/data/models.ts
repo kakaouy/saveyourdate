@@ -611,5 +611,55 @@ export const INVITATION_MODELS: InvitationModel[] = [
     musicTitle: 'Celebration',
     musicArtist: 'Kool & The Gang',
     location: 'Salón del Sol, Recoleta'
+  },
+  {
+    id: 'astraea',
+    title: 'Astraea',
+    category: '15years',
+    description: 'Una propuesta cálida y luminosa, con acuarelas doradas, fecha editorial vertical y una experiencia orgánica y elegante.',
+    badge: 'Nuevo',
+    demoName1: 'Romina',
+    date: '2 de Abril, 2027',
+    previewImage: '/previews/astraea.png',
+    active: true,
+    order: 29,
+    features: ['Cuenta Regresiva','Fecha editorial','Ubicación','Código de Vestimenta','Foto destacada con efecto parallax','Galería de fotos','Regalos / datos de pago','Álbum colaborativo','Instagram','Sugerencia de canciones','Pase QR','Confirmación RSVP','Multiidioma'],
+    themeClass: 'mock-theme-astraea',
+    illustrationType: 'crown',
+    location: 'Salón Eventos Premium, Montevideo',
+    includedSections: ['countdown','date','location','dresscode','featuredPhoto','gallery','gifts','photoUpload','instagram','songSuggestions','qr','rsvp'],
+    palettes: [
+      { id: 'marron-arena', name: 'Marrón y arena', color: '#76584c' },
+      { id: 'lavanda-ciruela', name: 'Lavanda y ciruela', color: '#674c6d' },
+      { id: 'azul-polvo-champagne', name: 'Azul polvo y champagne', color: '#4f6c79' },
+      { id: 'rosa-viejo-borgona', name: 'Rosa viejo y borgoña', color: '#7b4a53' },
+      { id: 'rosa-salvia', name: 'Rosa y salvia', color: '#8f6269' },
+      { id: 'petroleo-champagne', name: 'Petróleo y champagne', color: '#32666a' },
+      { id: 'azul-champagne', name: 'Azul y champagne', color: '#27384a' },
+      { id: 'oliva-marfil', name: 'Oliva y marfil', color: '#4f5942' },
+      { id: 'borgona-rosa', name: 'Borgoña y rosa', color: '#6f303b' },
+      { id: 'ciruela-lavanda', name: 'Ciruela y lavanda', color: '#59405f' }
+    ]
+  },
+  {
+    id: 'coruscant',
+    title: 'Coruscant',
+    category: '15years',
+    description: 'Romanticismo contemporáneo en rosa empolvado y salvia, con fotografía protagonista, detalles dorados y composición editorial.',
+    badge: 'Nuevo',
+    demoName1: 'Paz',
+    date: '12 de Junio, 2027',
+    previewImage: '/previews/coruscant.png',
+    active: true,
+    order: 30,
+    features: ['Cuenta Regresiva','Ubicación','Código de Vestimenta','Foto destacada con efecto parallax','Galería de fotos','Alojamiento','Regalos / datos de pago','Álbum colaborativo','Instagram','Sugerencia de canciones','Pase QR','Confirmación RSVP','Multiidioma'],
+    themeClass: 'mock-theme-coruscant',
+    illustrationType: 'crown',
+    location: 'Salón Eventos Premium, Montevideo',
+    includedSections: ['countdown','location','dresscode','featuredPhoto','gallery','hotels','gifts','photoUpload','instagram','songSuggestions','qr','rsvp'],
+    palettes: [
+      { id: 'rosa-salvia', name: 'Rosa y salvia', color: '#9f6f7b' },
+      { id: 'verde-dorado', name: 'Verde y dorado', color: '#2f5d50' }
+    ]
   }
 ];

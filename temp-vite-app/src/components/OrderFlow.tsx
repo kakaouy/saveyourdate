@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { InvitationModel } from '../data/models';
 import { PAYMENT_LINKS, PLAN_PRICES, type CommercialPlan } from '../config/plans';
+import { buildOrderSelectionFields } from '../utils/orderSelection';
 
 type Plan = CommercialPlan;
 type FlowTab = 'new' | 'pay-first';
@@ -121,7 +122,18 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
     const names: Record<string, [string, string, string]> = {
       eucalipto: ['Eucalipto y dorado', 'Eucalyptus & gold', 'Eucalipto e dourado'],
       oliva: ['Oliva y champagne', 'Olive & champagne', 'Oliva e champanhe'],
-      petroleo: ['Petróleo y arena', 'Petrol blue & sand', 'Azul petróleo e areia']
+      petroleo: ['Petróleo y arena', 'Petrol blue & sand', 'Azul petróleo e areia'],
+      'marron-arena': ['Marrón y arena', 'Brown & sand', 'Marrom e areia'],
+      'lavanda-ciruela': ['Lavanda y ciruela', 'Lavender & plum', 'Lavanda e ameixa'],
+      'azul-polvo-champagne': ['Azul polvo y champagne', 'Dusty blue & champagne', 'Azul suave e champanhe'],
+      'rosa-viejo-borgona': ['Rosa viejo y borgoña', 'Antique rose & burgundy', 'Rosa antigo e bordô'],
+      'rosa-salvia': ['Rosa y salvia', 'Rose & sage', 'Rosa e sálvia'],
+      'petroleo-champagne': ['Petróleo y champagne', 'Petrol blue & champagne', 'Azul petróleo e champanhe'],
+      'azul-champagne': ['Azul y champagne', 'Blue & champagne', 'Azul e champanhe'],
+      'oliva-marfil': ['Oliva y marfil', 'Olive & ivory', 'Oliva e marfim'],
+      'borgona-rosa': ['Borgoña y rosa', 'Burgundy & rose', 'Bordô e rosa'],
+      'ciruela-lavanda': ['Ciruela y lavanda', 'Plum & lavender', 'Ameixa e lavanda'],
+      'verde-dorado': ['Verde y dorado', 'Green & gold', 'Verde e dourado']
     };
     const translated = names[option.id];
     return translated ? l(translated[0], translated[1], translated[2]) : option.name;
@@ -217,19 +229,15 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
         throw new Error(l('Las imágenes superan el máximo total de 10 MB.', 'The images exceed the 10 MB total limit.', 'As imagens excedem o limite total de 10 MB.'));
       }
       formElement.querySelectorAll('[data-order-generated="true"]').forEach((field) => field.remove());
+      const selectedPalette = availableColors.find((option) => option.color === selectedColor) || { id: '', name: selectedColor, color: selectedColor };
       const generatedFields: Record<string, string> = {
         _subject: 'Nuevo pedido - Save Your Date',
         _template: 'table',
         _captcha: 'false',
         _replyto: String(form.get('email') || ''),
-        'Idioma de la invitación': lang === 'es' ? 'Español' : lang === 'en' ? 'English' : 'Português',
-        'Código de idioma': lang,
+        ...buildOrderSelectionFields({language:lang,modelId,modelName:selectedModel?.title || modelId,paletteId:selectedPalette.id,paletteName:paletteName(selectedPalette),paletteColor:selectedColor}),
         Plan: plan === 'basic' ? 'Básico' : 'Premium',
         'Tipo de evento': eventCategory === 'wedding' ? 'Boda' : eventCategory === '15years' ? '15 Años' : 'Otros eventos',
-        'ID del modelo': modelId,
-        Modelo: selectedModel?.title || modelId,
-        'Color elegido': selectedColor,
-        'Paleta elegida': paletteName(availableColors.find((option) => option.color === selectedColor) || { id: '', name: selectedColor }),
         Secciones: Array.from(activeSections).map((id) => sectionOptions.find((item) => item.id === id)?.title || id).filter(Boolean).join(', '),
         'Música de fondo': hasMusic ? String(form.get('music') || 'Sí, a definir') : 'No',
         'Estado del pago': paymentOperation ? 'Pago informado - pendiente de validación' : 'Pago pendiente',
@@ -252,7 +260,10 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
           language: lang,
           plan: plan === 'basic' ? 'Básico' : 'Premium',
           modelId,
-          modelName: selectedModel?.title || modelId
+          modelName: selectedModel?.title || modelId,
+          paletteId: selectedPalette.id,
+          paletteName: paletteName(selectedPalette),
+          paletteColor: selectedColor
         })
       });
       const orderResult = await orderResponse.json() as {

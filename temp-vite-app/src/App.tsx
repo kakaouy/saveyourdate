@@ -8,6 +8,9 @@ import { VarezziaInvitation } from './components/varezzia/VarezziaInvitation';
 import { RivendellInvitation } from './components/rivendell/RivendellInvitation';
 import { AuroraInvitation } from './components/aurora/AuroraInvitation';
 import { RosewoodInvitation } from './components/rosewood/RosewoodInvitation';
+import { AstraeaInvitation } from './components/astraea/AstraeaInvitation';
+import type { AstraeaPalette } from './components/astraea/config';
+import { CoruscantInvitation } from './components/coruscant/CoruscantInvitation';
 
 
 const MODEL_COLOR_OPTIONS = [
@@ -163,6 +166,7 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'bordo-calida': 'Warm burgundy',
     'verde-agua': 'Aqua green',
     'verde-azulado': 'Blue green'
+    , 'marron-arena': 'Brown & sand', 'lavanda-ciruela': 'Lavender & plum', 'azul-polvo-champagne': 'Dusty blue & champagne', 'rosa-viejo-borgona': 'Antique rose & burgundy', 'rosa-salvia': 'Rose & sage', 'petroleo-champagne': 'Petrol blue & champagne', 'azul-champagne': 'Blue & champagne', 'oliva-marfil': 'Olive & ivory', 'borgona-rosa': 'Burgundy & rose', 'ciruela-lavanda': 'Plum & lavender', 'verde-dorado': 'Green & gold'
   },
   pt: {
     rosa: 'Rosa',
@@ -185,6 +189,7 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'rosa-antiguo': 'Rosa antigo',
     salvia: 'Verde sálvia',
     lavanda: 'Lavanda',
+    'marron-arena': 'Marrom e areia', 'lavanda-ciruela': 'Lavanda e ameixa', 'azul-polvo-champagne': 'Azul suave e champanhe', 'rosa-viejo-borgona': 'Rosa antigo e bordô', 'rosa-salvia': 'Rosa e sálvia', 'petroleo-champagne': 'Azul petróleo e champanhe', 'azul-champagne': 'Azul e champanhe', 'oliva-marfil': 'Oliva e marfim', 'borgona-rosa': 'Bordô e rosa', 'ciruela-lavanda': 'Ameixa e lavanda', 'verde-dorado': 'Verde e dourado',
     'bordo-calida': 'Bordô quente',
     'verde-agua': 'Verde água',
     'verde-azulado': 'Verde azulado'
@@ -3238,6 +3243,24 @@ function App() {
                         demoModel,
                         selectedModelColors[demoModel.id]
                       ) as 'petroleo-champagne' | 'rosa-salvia' | 'verde-dorado'}
+                    />
+                  ) : demoModel.id === 'astraea' ? (
+                    <AstraeaInvitation
+                      embedded
+                      locale={lang}
+                      palette={getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      ) as AstraeaPalette}
+                    />
+                  ) : demoModel.id === 'coruscant' ? (
+                    <CoruscantInvitation
+                      embedded
+                      locale={lang}
+                      palette={getPaletteIdFromColor(
+                        demoModel,
+                        selectedModelColors[demoModel.id]
+                      ) as 'rosa-salvia' | 'verde-dorado'}
                     />
                   ) : demoModel.id === '15-verona' ? (
                     <iframe

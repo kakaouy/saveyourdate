@@ -9,6 +9,7 @@ import type {
   AuroraConfig,
   AuroraLocale,
   AuroraPalette,
+  AuroraPaletteTokens,
   AuroraTone
 } from './config';
 import './aurora.css';
@@ -21,6 +22,12 @@ type Props = {
   embedded?: boolean;
   onClose?: () => void;
   config?: Partial<AuroraConfig>;
+  modelClass?: string;
+  paletteTokens?: AuroraPaletteTokens;
+  editorialHero?: boolean;
+  astraeaHero?: boolean;
+  globalPetals?: boolean;
+  carouselGallery?: boolean;
 };
 
 const sectionClass = (tone: AuroraTone = 'light') => `au-section au-tone-${tone}`;
@@ -30,7 +37,13 @@ export function AuroraInvitation({
   palette,
   embedded = false,
   onClose,
-  config
+  config,
+  modelClass = '',
+  paletteTokens,
+  editorialHero = false,
+  astraeaHero = false,
+  globalPetals = false,
+  carouselGallery = false
 }: Props) {
   const t = AURORA_COPY[locale];
   const data = useMemo(() => ({
@@ -46,7 +59,7 @@ export function AuroraInvitation({
     tones: { ...DEFAULT_AURORA_CONFIG.tones, ...config?.tones },
     metadata: { ...DEFAULT_AURORA_CONFIG.metadata, ...config?.metadata }
   }), [config]);
-  const colors = AURORA_PALETTES[palette];
+  const colors = paletteTokens || AURORA_PALETTES[palette];
   const rootRef = useRef<HTMLDivElement>(null);
   const parallaxRef = useRef<HTMLElement>(null);
   const parallaxImageRef = useRef<HTMLDivElement>(null);
@@ -54,7 +67,9 @@ export function AuroraInvitation({
   const triggerRef = useRef<HTMLElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [modal, setModal] = useState<ModalName | null>(null);
+  const [modalTop, setModalTop] = useState(0);
   const [lightbox, setLightbox] = useState(0);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [countdown, setCountdown] = useState([0, 0, 0, 0]);
   const [food, setFood] = useState('none');
   const [copyStatus, setCopyStatus] = useState('');
@@ -188,6 +203,7 @@ export function AuroraInvitation({
 
   const openModal = (name: ModalName, event: React.MouseEvent<HTMLElement>, index = 0) => {
     triggerRef.current = event.currentTarget;
+    if (embedded) setModalTop(rootRef.current?.scrollTop || 0);
     setLightbox(index);
     setModal(name);
   };
@@ -274,11 +290,16 @@ export function AuroraInvitation({
   return (
     <div
       ref={rootRef}
-      className={`aurora${embedded ? ' au-embedded' : ''}`}
+      className={`aurora${embedded ? ' au-embedded' : ''}${modelClass ? ` ${modelClass}` : ''}`}
       lang={locale}
       data-palette={palette}
       style={cssVars}
     >
+      {globalPetals && <div className="au-global-petals" aria-hidden="true">{[
+        [6,8,13,-7,34],[14,11,17,-2,-28],[23,7,15,-11,42],[32,10,19,-5,-36],
+        [41,8,14,-9,26],[50,12,20,-14,-44],[59,7,16,-4,38],[68,10,18,-12,-30],
+        [77,8,14,-1,32],[85,11,21,-16,-40],[92,7,15,-6,24],[97,9,18,-10,-34]
+      ].map(([left,width,duration,delay,drift],index)=><span key={index} style={{'--petal-left':`${left}%`,'--petal-width':`${width}px`,'--petal-duration':`${duration}s`,'--petal-delay':`${delay}s`,'--petal-drift':`${drift}px`} as React.CSSProperties}/>)}</div>}
       <a className="au-skip" href="#aurora-main">{t.skip}</a>
       {!embedded && onClose && <button className="au-site-close" onClick={onClose} aria-label={t.close}>×</button>}
       <div className={`au-loader${loaded ? ' is-hidden' : ''}`} aria-hidden={loaded}>
@@ -296,27 +317,55 @@ export function AuroraInvitation({
               {[1, 2, 3, 4].map((number) => <i className={`au-petal au-petal-${number}`} key={`petal-${number}`} />)}
             </div>
             <div className="au-hero-content">
-              <p className="au-kicker">{t.heroKicker}</p>
-              <p
-                className="au-name"
-                style={{
-                  '--au-name-size': embedded
-                    ? `clamp(3.25rem, ${Math.min(22, 132 / Math.max(data.event.name.length, 1))}cqw, 6rem)`
-                    : `clamp(4.8rem, ${Math.min(21, 210 / Math.max(data.event.name.length, 1))}vw, 8.5rem)`
-                } as React.CSSProperties}
-              >
-                {data.event.name}
-              </p>
-              <h1 className="au-visually-hidden">{t.eventType}</h1>
-              <div className="au-date-card" aria-label={formatDate(true)}>
-                <div><span />{heroDate.weekday}<span /></div>
-                <div><b>{heroDate.month}</b><strong>{heroDate.day}</strong><b>{heroDate.year}</b></div>
-                <div><span />{heroDate.time}<span /></div>
-              </div>
+              {astraeaHero ? (
+                <div className="au-astraea-intro">
+                  <p className="au-name">{data.event.name}</p>
+                  <h1 className="au-astraea-title">{t.heroKicker}</h1>
+                  <p className="au-astraea-quote">{data.content.heroQuote || data.content.quote || t.quote}</p>
+                </div>
+              ) : editorialHero ? (
+                <div className="au-editorial-intro">
+                  <p className="au-editorial-date" aria-label={formatDate(true)}>{heroDate.day} · {String(new Date(data.event.dateTime).getMonth() + 1).padStart(2, '0')} · {heroDate.year}</p>
+                  <p className="au-name">{data.event.name}</p>
+                  <h1 className="au-editorial-title">¡{t.heroKicker}!</h1>
+                </div>
+              ) : (
+                <>
+                  <p className="au-kicker">{t.heroKicker}</p>
+                  <p
+                    className="au-name"
+                    style={{
+                      '--au-name-size': embedded
+                        ? `clamp(3.25rem, ${Math.min(22, 132 / Math.max(data.event.name.length, 1))}cqw, 6rem)`
+                        : `clamp(4.8rem, ${Math.min(21, 210 / Math.max(data.event.name.length, 1))}vw, 8.5rem)`
+                    } as React.CSSProperties}
+                  >
+                    {data.event.name}
+                  </p>
+                  <h1 className="au-visually-hidden">{t.eventType}</h1>
+                  <div className="au-date-card" aria-label={formatDate(true)}>
+                    <div><span />{heroDate.weekday}<span /></div>
+                    <div><b>{heroDate.month}</b><strong>{heroDate.day}</strong><b>{heroDate.year}</b></div>
+                    <div><span />{heroDate.time}<span /></div>
+                  </div>
+                </>
+              )}
             </div>
             <button className="au-navigate" type="button" onClick={nextSection} aria-label={t.navigate}>
               <img src={data.assets.navigationIcon} alt="" aria-hidden="true" />
             </button>
+          </section>
+        )}
+
+        {data.sections.dateStack && (
+          <section className={`${sectionClass(data.tones.dateStack)} au-date-stack-section`} data-au-section="dateStack">
+            <div className="au-date-wave au-date-wave-top au-reveal" aria-hidden="true"><svg viewBox="0 0 40 140"><path d="M20 0 C5 18 35 32 20 50 C5 68 35 82 20 100 C8 116 28 126 20 140"/></svg></div>
+            <div className="au-date-stack au-reveal" aria-label={formatDate(true)}>
+              <span>{heroDate.day}</span>
+              <span>{String(new Date(data.event.dateTime).getMonth() + 1).padStart(2, '0')}</span>
+              <span>{heroDate.year.slice(-2)}</span>
+            </div>
+            <div className="au-date-wave au-date-wave-bottom au-reveal" aria-hidden="true"><svg viewBox="0 0 40 140"><path d="M20 0 C5 18 35 32 20 50 C5 68 35 82 20 100 C8 116 28 126 20 140"/></svg></div>
           </section>
         )}
 
@@ -390,13 +439,16 @@ export function AuroraInvitation({
           <section className={sectionClass(data.tones.gallery)} data-au-section="gallery">
             <div className="au-container au-reveal">
               <h2>{t.galleryTitle}</h2><p>{t.galleryCopy}</p>
-              <div className="au-gallery">
-                {gallery.map((image, index) => (
-                  <button key={`${image.src}-${index}`} onClick={(event) => openModal('lightbox', event, index)} aria-label={image.alt}>
-                    <img src={image.src} alt={image.alt} loading="lazy" />
-                  </button>
-                ))}
-              </div>
+              {carouselGallery ? <div className="au-gallery-carousel">
+                <button className="au-gallery-control prev" type="button" aria-label="Ver foto anterior" onClick={()=>setGalleryIndex((galleryIndex-1+gallery.length)%gallery.length)}>‹</button>
+                <div className="au-gallery-viewport"><div className="au-gallery-track" style={{'--gallery-index':galleryIndex} as React.CSSProperties}>
+                  {gallery.map((image,index)=><button className={`au-gallery-slide${index===galleryIndex?' is-active':''}`} key={`${image.src}-${index}`} onClick={(event)=>openModal('lightbox',event,index)} aria-label={image.alt}><img src={image.src} alt={image.alt} loading="lazy"/></button>)}
+                </div></div>
+                <button className="au-gallery-control next" type="button" aria-label="Ver foto siguiente" onClick={()=>setGalleryIndex((galleryIndex+1)%gallery.length)}>›</button>
+                <div className="au-gallery-dots">{gallery.map((image,index)=><button key={image.src} className={index===galleryIndex?'is-active':''} aria-label={`Ver fotografía ${index+1}`} onClick={()=>setGalleryIndex(index)}/>)}</div>
+              </div> : <div className="au-gallery">
+                {gallery.map((image, index) => <button key={`${image.src}-${index}`} onClick={(event) => openModal('lightbox', event, index)} aria-label={image.alt}><img src={image.src} alt={image.alt} loading="lazy" /></button>)}
+              </div>}
             </div>
           </section>
         )}
@@ -445,7 +497,7 @@ export function AuroraInvitation({
       </footer>
 
       {modal && (
-        <div className="au-modal" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal(); }}>
+        <div className="au-modal" style={embedded ? { top: modalTop, bottom: 'auto', height: rootRef.current?.clientHeight || '100%' } : undefined} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal(); }}>
           <div ref={modalRef} className="au-modal-box" role="dialog" aria-modal="true" aria-labelledby="au-modal-title">
             <button className="au-modal-close" onClick={closeModal} aria-label={t.close}>
               <span aria-hidden="true">×</span>

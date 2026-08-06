@@ -33,6 +33,11 @@
 @container (max-width:390px){.au-embedded .au-countdown{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem .75rem}.au-embedded .au-countdown strong{font-size:clamp(1.75rem,12cqw,2.75rem)}}
 @media(prefers-reduced-motion:reduce){.aurora{scroll-behavior:auto}.aurora *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.au-particles{display:none}.au-reveal{opacity:1;transform:none}.au-parallax-image{transform:none}}
 
+.au-date-stack-section{display:grid;min-height:78svh;place-items:center;overflow:hidden}
+.au-date-stack{display:grid;gap:.4rem;color:inherit;font-family:var(--font-title);font-size:clamp(5rem,20vw,9rem);line-height:.82}
+.au-date-stack span{display:block}
+.au-embedded .au-date-stack-section{min-height:75cqh}.au-embedded .au-date-stack{font-size:clamp(4rem,23cqw,7rem)}
+
 /* Ajustes visuales aprobados: portada de papel, escala mobile y bloques compactos. */
 .au-hero{background-color:var(--color-fondo);background-image:var(--hero-image);background-size:auto;color:var(--color-titulos)}
 .au-hero-content{color:var(--color-titulos);text-shadow:none}
