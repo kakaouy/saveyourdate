@@ -310,8 +310,7 @@ export function AuroraInvitation({
       <main id="aurora-main">
         {data.sections.hero && (
           <section className="au-hero" data-au-section="hero">
-            <img className="au-hero-ornament au-hero-ornament-top" src={data.assets.ornamentTop} alt="" aria-hidden="true" />
-            <img className="au-hero-ornament au-hero-ornament-bottom" src={data.assets.ornamentBottom} alt="" aria-hidden="true" />
+            {!astraeaHero && <><img className="au-hero-ornament au-hero-ornament-top" src={data.assets.ornamentTop} alt="" aria-hidden="true" /><img className="au-hero-ornament au-hero-ornament-bottom" src={data.assets.ornamentBottom} alt="" aria-hidden="true" /></>}
             <div className="au-particles" aria-hidden="true">
               {[1, 2, 3, 4, 5].map((number) => <i className={`au-spark au-spark-${number}`} key={`spark-${number}`} />)}
               {[1, 2, 3, 4].map((number) => <i className={`au-petal au-petal-${number}`} key={`petal-${number}`} />)}
@@ -322,6 +321,8 @@ export function AuroraInvitation({
                   <p className="au-name">{data.event.name}</p>
                   <h1 className="au-astraea-title">{t.heroKicker}</h1>
                   <p className="au-astraea-quote">{data.content.heroQuote || data.content.quote || t.quote}</p>
+                  <div className="au-astraea-divider au-reveal" aria-hidden="true" />
+                  <div className="au-astraea-date au-reveal" aria-label={formatDate(true)}><span>{heroDate.day}</span><span>{String(new Date(data.event.dateTime).getMonth() + 1).padStart(2, '0')}</span><span>{heroDate.year.slice(-2)}</span></div>
                 </div>
               ) : editorialHero ? (
                 <div className="au-editorial-intro">

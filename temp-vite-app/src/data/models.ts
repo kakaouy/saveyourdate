@@ -629,12 +629,12 @@ export const INVITATION_MODELS: InvitationModel[] = [
     location: 'Salón Eventos Premium, Montevideo',
     includedSections: ['countdown','date','location','dresscode','featuredPhoto','gallery','gifts','photoUpload','instagram','songSuggestions','qr','rsvp'],
     palettes: [
+      { id: 'petroleo-champagne', name: 'Petróleo y champagne', color: '#32666a' },
       { id: 'marron-arena', name: 'Marrón y arena', color: '#76584c' },
       { id: 'lavanda-ciruela', name: 'Lavanda y ciruela', color: '#674c6d' },
       { id: 'azul-polvo-champagne', name: 'Azul polvo y champagne', color: '#4f6c79' },
       { id: 'rosa-viejo-borgona', name: 'Rosa viejo y borgoña', color: '#7b4a53' },
       { id: 'rosa-salvia', name: 'Rosa y salvia', color: '#8f6269' },
-      { id: 'petroleo-champagne', name: 'Petróleo y champagne', color: '#32666a' },
       { id: 'azul-champagne', name: 'Azul y champagne', color: '#27384a' },
       { id: 'oliva-marfil', name: 'Oliva y marfil', color: '#4f5942' },
       { id: 'borgona-rosa', name: 'Borgoña y rosa', color: '#6f303b' },

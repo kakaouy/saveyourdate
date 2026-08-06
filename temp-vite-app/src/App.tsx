@@ -2108,7 +2108,6 @@ function App() {
                   </div>
                 )}
                 <div className="hero-latest-model-action">
-                  <span>{LATEST_CATALOG_MODEL.title}</span>
                   <button
                     className="phone-action-btn"
                     onClick={() => handleOpenDemo(LATEST_CATALOG_MODEL)}
@@ -2242,7 +2241,7 @@ function App() {
                       <h3 className="card-title">{model.title}</h3>
 
                       <div className="model-color-picker" aria-label={lang === 'es' ? 'Elegir color del modelo' : 'Choose model color'}>
-                        {modelPaletteOptions.map((option) => (
+                        {modelPaletteOptions.slice(0,5).map((option) => (
                           <button
                             key={option.color}
                             type="button"
@@ -2253,6 +2252,7 @@ function App() {
                             onClick={() => setSelectedModelColors((current) => ({ ...current, [model.id]: option.color }))}
                           />
                         ))}
+                        {modelPaletteOptions.length > 5 && <span className="model-color-more" aria-label={lang === 'es' ? 'Hay más colores disponibles en la demo' : lang === 'en' ? 'More colors are available in the demo' : 'Há mais cores disponíveis na demonstração'}>+</span>}
                       </div>
 
                       {isComingSoon ? (

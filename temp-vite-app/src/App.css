@@ -354,13 +354,10 @@
   bottom: 14px;
   left: 14px;
   display: grid;
-  gap: 7px;
-  padding: 10px;
-  border: 1px solid rgba(255,255,255,.65);
-  border-radius: 18px;
-  background: rgba(255,255,255,.88);
-  box-shadow: 0 8px 24px rgba(49,35,43,.18);
-  backdrop-filter: blur(8px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .hero-latest-model-action > span {
@@ -490,7 +487,11 @@
   font-weight: 700;
   cursor: pointer;
   margin-top: auto;
+  animation:phone-action-pulse 2.4s ease-in-out infinite;
 }
+
+@keyframes phone-action-pulse{0%,100%{opacity:.72}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.phone-action-btn{animation:none}}
 
 /* Section Headings */
 .section-header {
@@ -2369,6 +2370,18 @@ html, body, .app-wrapper {
   box-shadow: 0 0 0 2px #392e3b;
 }
 
+.model-color-more {
+  display: inline-grid;
+  min-width: 24px;
+  height: 18px;
+  place-items: center;
+  padding: 0 5px;
+  border: 1px dashed rgba(57,46,59,.3);
+  border-radius: 5px;
+  color: #625866;
+  font: 800 9px/1 var(--font-sans);
+}
+
 .model-phone-card .card-desc {
   min-height: 48px;
   margin: 0 0 14px;
@@ -3386,6 +3399,19 @@ html {
   border-color: #392e3b;
   color: #392e3b;
   box-shadow: 0 0 0 1px #392e3b;
+}
+
+.demo-palette-more {
+  display: inline-grid;
+  min-width: 36px;
+  min-height: 36px;
+  place-items: center;
+  padding: 6px 10px;
+  border: 1px dashed rgba(57,46,59,.3);
+  border-radius: 999px;
+  color: #625866;
+  background: rgba(255,255,255,.55);
+  font: 800 11px/1 var(--font-sans);
 }
 
 .demo-actions {

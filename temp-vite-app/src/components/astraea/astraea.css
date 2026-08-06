@@ -41,3 +41,44 @@
 .au-embedded.astraea-model .au-gallery-track{transform:translateX(calc(50cqw - ((var(--gallery-index) * 78cqw) + 39cqw)))}
 .astraea-model .au-date-stack:not(.is-visible) span{animation:none}.astraea-model .au-date-stack.is-visible span{animation:astraea-date-in .85s forwards}.astraea-model .au-date-stack.is-visible span:nth-child(2){animation-delay:.25s}.astraea-model .au-date-stack.is-visible span:nth-child(3){animation-delay:.5s}
 .astraea-model .au-date-wave:not(.is-visible){animation:none;opacity:0}.astraea-model .au-date-wave:not(.is-visible) path{animation:none;stroke-dashoffset:300}.astraea-model .au-date-wave.is-visible{animation:astraea-wave-fade .8s .2s forwards}.astraea-model .au-date-wave.is-visible path{animation:astraea-wave-draw 1.5s .2s forwards}
+
+/* Portada editorial unificada con la fecha */
+.astraea-model .au-global-petals span{width:calc(var(--petal-width)*1.08);height:calc(var(--petal-width)*1.68);background:linear-gradient(145deg,rgba(245,220,164,.88),rgba(194,145,62,.94));box-shadow:0 2px 8px rgb(48 28 18/18%);opacity:.9}
+.astraea-model .au-global-petals span:nth-child(3n){background:linear-gradient(145deg,rgba(255,248,228,.92),rgba(218,178,96,.9))}.astraea-model .au-global-petals span:nth-child(4n){opacity:.72}
+.astraea-model .au-hero{min-height:100svh;max-height:none;place-items:start;padding:0;background:var(--color-acento-oscuro);background-image:none;color:var(--color-texto-claro);text-align:left}
+.astraea-model .au-hero-content{--astraea-edge:clamp(1.5rem,7vw,7rem);width:100%;margin:0;padding:var(--astraea-edge);text-shadow:none}
+.astraea-model .au-astraea-intro{width:min(100%,540px)}
+.astraea-model .au-name{margin:0 0 .35rem;color:var(--color-texto-claro);font-size:clamp(3.5rem,12vw,6.4rem);line-height:.92}
+.astraea-model .au-astraea-title{margin:0 0 .75rem;color:var(--color-texto-claro)}
+.astraea-model .au-astraea-quote{color:var(--color-texto-claro);line-height:1.45}
+.astraea-model .au-astraea-wave{width:40px;height:clamp(82px,12vh,122px);margin:clamp(1.2rem,3vh,2rem) 0 clamp(.7rem,1.5vh,1rem);color:var(--color-texto-claro);opacity:.88}
+.astraea-model .au-astraea-wave svg{width:100%;height:100%;overflow:visible}.astraea-model .au-astraea-wave path{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300}.astraea-model .au-astraea-wave.is-visible path{animation:astraea-wave-draw 1.5s .15s forwards}
+.astraea-model .au-astraea-date{display:flex;flex-direction:column;align-items:flex-start;color:var(--color-texto-claro);font-family:'Bodoni Moda',Didot,var(--font-title);font-size:clamp(4.8rem,19vw,8.5rem);line-height:.76;opacity:.55}
+.astraea-model .au-astraea-date span{display:block;opacity:0;transform:translateY(22px)}.astraea-model .au-astraea-date.is-visible span{animation:astraea-date-in .75s forwards}.astraea-model .au-astraea-date.is-visible span:nth-child(2){animation-delay:.18s}.astraea-model .au-astraea-date.is-visible span:nth-child(3){animation-delay:.36s}
+.au-embedded.astraea-model .au-hero-content{--astraea-edge:7cqw;padding:var(--astraea-edge)}.au-embedded.astraea-model .au-astraea-date{font-size:clamp(3.7rem,21cqw,6.6rem)}
+@media(prefers-reduced-motion:reduce){.astraea-model .au-astraea-wave path{stroke-dashoffset:0}.astraea-model .au-astraea-date span{opacity:1;transform:none}}
+.astraea-model .au-particles{display:none}
+.astraea-model .au-hero-content{min-height:calc(100svh - (var(--astraea-edge)*2))}
+.astraea-model .au-astraea-intro{display:flex;min-height:inherit;flex-direction:column}
+.astraea-model .au-astraea-date{flex:1;justify-content:space-between;font-size:clamp(5.8rem,24vw,10rem);line-height:.9;opacity:.4}
+.au-embedded.astraea-model .au-global-petals{position:sticky;top:0;height:100cqh;margin-bottom:-100cqh}
+.au-embedded.astraea-model .au-hero-content{min-height:calc(100cqh - (var(--astraea-edge)*2))}.au-embedded.astraea-model .au-astraea-date{font-size:clamp(4.5rem,25cqw,7.8rem)}
+@keyframes astraea-petal-fall{0%{opacity:0;transform:translate3d(0,-10vh,0) rotate(0) scale(.82)}8%{opacity:.5}50%{opacity:.46;transform:translate3d(var(--petal-drift),55vh,0) rotate(185deg) scale(1)}100%{opacity:0;transform:translate3d(calc(var(--petal-drift)*-.55),118vh,0) rotate(365deg) scale(.94)}}
+.astraea-model .au-astraea-wave{display:none}
+.astraea-model .au-astraea-quote{font-size:clamp(1.05rem,3.1vw,1.3rem)}
+.astraea-model .au-astraea-divider{width:min(100%,23rem);height:1px;flex:0 0 1px;margin:clamp(1.35rem,3vh,2rem) 0 clamp(.75rem,1.5vh,1rem);background:currentColor;opacity:.55;transform:scaleX(0);transform-origin:left}
+.astraea-model .au-astraea-divider.is-visible{animation:astraea-divider-in .8s .1s ease-out forwards}
+.astraea-model .au-astraea-date{flex:1;justify-content:flex-end;gap:0;font-size:clamp(6.6rem,27vw,11rem);line-height:.78;opacity:.25}
+.au-embedded.astraea-model .au-astraea-quote{font-size:clamp(.82rem,4.2cqw,1.05rem)}.au-embedded.astraea-model .au-astraea-date{font-size:clamp(6.3rem,30cqw,9.8rem)}
+@keyframes astraea-divider-in{to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.astraea-model .au-astraea-divider{transform:none}}
+
+/* Proporciones finales de la portada combinada */
+.astraea-model .au-hero-content{height:100svh;min-height:0;padding:calc(var(--astraea-edge)*2) var(--astraea-edge)}
+.astraea-model .au-astraea-intro{height:100%;min-height:0}
+.astraea-model .au-astraea-divider{margin-top:clamp(1.35rem,3vh,2rem);margin-bottom:0}
+.astraea-model .au-astraea-date{min-height:0;padding-top:calc(var(--astraea-edge)*2);font-size:min(50vw,21svh);line-height:.84}
+.au-embedded.astraea-model .au-hero-content{height:100cqh;min-height:0;padding:calc(var(--astraea-edge)*2) var(--astraea-edge)}
+.au-embedded.astraea-model .au-astraea-date{font-size:min(50cqw,21cqh)}
+@media(orientation:landscape){.astraea-model .au-astraea-date{font-size:min(16vw,22svh);line-height:.84}.astraea-model .au-hero-content{--astraea-edge:clamp(1.25rem,4vw,4rem);padding:calc(var(--astraea-edge)*2) var(--astraea-edge)}}
+@container (min-aspect-ratio:1/1){.au-embedded.astraea-model .au-astraea-date{font-size:min(16cqw,22cqh)}.au-embedded.astraea-model .au-hero-content{--astraea-edge:4cqw}}

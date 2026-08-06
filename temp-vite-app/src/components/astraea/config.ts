@@ -21,6 +21,6 @@ export const DEFAULT_ASTRAEA_CONFIG: AuroraConfig = {
   gifts:{bank:'Banco de demostración',holder:'Familia de Romina',currency:'UYU',account:'0000000000',alias:'ROMINA.QUINCE',visible:true},
   schedule:[],gallery:[1,2,4,5,6].map(n=>({src:`/astraea/images/foto-0${n}.png`,alt:`Fotografía ${n} de Romina`})),hotels:[],qrPass:{value:'ASTRAEA-DEMO-GUEST'},
   assets:{hero:'/astraea/images/lador_derecho_sup.png',heroPositionMobile:'right top',heroPositionDesktop:'right top',heroOverlay:0,parallax:'/astraea/images/foto-03.png',ornamentTop:'/astraea/images/lador_derecho_sup.png',ornamentBottom:'/astraea/images/lado-izq-bottom.png',ornamentLeft:'/astraea/images/separador_derecha.png',ornamentRight:'/astraea/images/separador_derecha.png',navigationIcon:'/astraea/images/navegar.png'},
-  sections:{hero:true,dateStack:true,countdown:true,location:true,quote:true,dressCode:true,schedule:false,parallax:true,gallery:true,hotels:false,gifts:true,photoUpload:true,social:true,songSuggestions:true,qrPass:true,rsvp:true},
+  sections:{hero:true,dateStack:false,countdown:true,location:true,quote:true,dressCode:true,schedule:false,parallax:true,gallery:true,hotels:false,gifts:true,photoUpload:true,social:true,songSuggestions:true,qrPass:true,rsvp:true},
   tones:{dateStack:'accentDark',countdown:'alternate',location:'light',quote:'accentDark',dressCode:'alternate',parallax:'light',gallery:'accentDark',gifts:'light',photoUpload:'accentDark',social:'alternate',songSuggestions:'light',qrPass:'accentDark',rsvp:'alternate'},metadata:{private:true}
 };

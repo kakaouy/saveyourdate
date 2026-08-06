@@ -6,7 +6,7 @@ import { buildOrderSelectionFields } from '../src/utils/orderSelection.ts';
 
 test('Astraea usa una fecha única y conserva sus secciones aprobadas', () => {
   assert.equal(DEFAULT_ASTRAEA_CONFIG.event.dateTime, '2027-04-02T21:00:00-03:00');
-  assert.equal(DEFAULT_ASTRAEA_CONFIG.sections.dateStack, true);
+  assert.equal(DEFAULT_ASTRAEA_CONFIG.sections.dateStack, false);
   assert.equal(DEFAULT_ASTRAEA_CONFIG.sections.schedule, false);
   assert.equal(DEFAULT_ASTRAEA_CONFIG.sections.hotels, false);
   assert.ok(DEFAULT_ASTRAEA_CONFIG.gallery.every(({ src }) => src.startsWith('/astraea/images/')));
