@@ -147,6 +147,11 @@ export default function OrderLookupPage() {
   return (
     <main className="private-order-page">
       <section className="private-order-card order-lookup-card">
+        <a className="order-lookup-back-arrow" href="/" aria-label={text.back} title={text.back}>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14.5 5 7.5 12l7 7" />
+          </svg>
+        </a>
         <a className="private-order-brand" href="/">SAVE YOUR DATE</a>
         <h1>{text.title}</h1>
         <p>{text.description}</p>

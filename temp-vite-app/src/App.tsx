@@ -44,6 +44,96 @@ const firstModelIdFor = (category: InvitationModel['category']) =>
 
 type SiteLanguage = 'es' | 'en' | 'pt';
 
+const HERO_PHRASES: Record<SiteLanguage, string[]> = {
+  es: [
+    'Tu evento empieza en la primera pantalla.',
+    'El primer gran momento de tu fiesta pasa acá.',
+    'Menos planillas, más brindis.',
+    'Convocá a tu gente sin dar mil vueltas.',
+    'Un link, miles de emociones.',
+    'Menos logística, más fiesta.',
+    'Donde empieza la cuenta regresiva que más te importa.',
+    'Todo resuelto en minutos para que te dediques solo a festejar.',
+    'Tu evento empieza a disfrutarse desde la invitación.',
+    'Tu gente ya se está preparando para abrazarte.',
+    'Todo empieza con la emoción de recibir la invitación.',
+    'Conectá con tu gente antes del primer abrazo.',
+    'Todo organizado. Todo listo. Solo falta que vengan.',
+    'La previa de tu gran día empieza en la pantalla.',
+    'Tu evento en orden, vos en modo festejo.',
+    'Un espacio para compartir lo que se viene.',
+    'Cero enredos para vos, un lujo para tus invitados.',
+    'Creá la primera sonrisa de tu fiesta.',
+    'Tus invitados abren el link y ya se sienten ahí.',
+    'Mapa, confirmaciones, fotos, regalos y música... todo a un click de distancia.',
+    'La web que tu evento se merece, creada en minutos por vos.',
+    'Invitar bien no tiene por qué ser complicado.',
+    'Todo lo que tus invitados necesitan saber, organizado en un solo lugar.',
+    'Tu fiesta en una sola app/web. Así de simple, así de lindo.',
+    'Festejar es simple. Organizarlo, ahora también.',
+    'Tu celebración merecía su propio lugar.',
+    'Menos estrés, más celebración.'
+  ],
+  en: [
+    'Your event starts on the very first screen.',
+    'The first big moment of your celebration happens here.',
+    'Fewer spreadsheets, more toasts.',
+    'Bring your people together without the runaround.',
+    'One link, thousands of emotions.',
+    'Less logistics, more celebration.',
+    'Where the countdown that matters most begins.',
+    'Everything sorted in minutes, so all you have to do is celebrate.',
+    'Your event starts with the joy of the invitation.',
+    'Your people are already getting ready to hug you.',
+    'It all begins with the excitement of receiving the invitation.',
+    'Connect with your people before the first hug.',
+    'Everything organized. Everything ready. Now all that’s missing is your guests.',
+    'The build-up to your big day starts on screen.',
+    'Your event in order, you in celebration mode.',
+    'A place to share everything that’s coming.',
+    'No hassle for you, a premium experience for your guests.',
+    'Create the first smile of your celebration.',
+    'Your guests open the link and already feel like they’re there.',
+    'Map, RSVPs, photos, gifts and music... all just one click away.',
+    'The website your event deserves, created by you in minutes.',
+    'Inviting beautifully doesn’t have to be complicated.',
+    'Everything your guests need to know, organized in one place.',
+    'Your celebration in one app/web. That simple, that beautiful.',
+    'Celebrating is simple. Now organizing it is too.',
+    'Your celebration deserved a place of its own.',
+    'Less stress, more celebration.'
+  ],
+  pt: [
+    'Seu evento começa já na primeira tela.',
+    'O primeiro grande momento da sua festa acontece aqui.',
+    'Menos planilhas, mais brindes.',
+    'Reúna as pessoas queridas sem complicação.',
+    'Um link, milhares de emoções.',
+    'Menos logística, mais festa.',
+    'Onde começa a contagem regressiva que mais importa.',
+    'Tudo resolvido em minutos para você se dedicar só a comemorar.',
+    'Seu evento começa a ser curtido desde o convite.',
+    'As pessoas queridas já estão se preparando para abraçar você.',
+    'Tudo começa com a emoção de receber o convite.',
+    'Conecte-se com as pessoas queridas antes do primeiro abraço.',
+    'Tudo organizado. Tudo pronto. Só falta todo mundo chegar.',
+    'A expectativa para o seu grande dia começa na tela.',
+    'Seu evento em ordem, você em modo festa.',
+    'Um espaço para compartilhar tudo o que vem por aí.',
+    'Zero complicação para você, uma experiência incrível para seus convidados.',
+    'Crie o primeiro sorriso da sua festa.',
+    'Seus convidados abrem o link e já se sentem lá.',
+    'Mapa, confirmações, fotos, presentes e música... tudo a um clique de distância.',
+    'O site que seu evento merece, criado por você em poucos minutos.',
+    'Convidar bem não precisa ser complicado.',
+    'Tudo o que seus convidados precisam saber, organizado em um só lugar.',
+    'Sua festa em um único app/site. Simples assim, lindo assim.',
+    'Comemorar é simples. Agora organizar também ficou.',
+    'Sua celebração merecia um espaço só dela.',
+    'Menos estresse, mais celebração.'
+  ]
+};
+
 const DEMO_COPY: Record<SiteLanguage, {
   close: string;
   interactive: string;
@@ -1120,11 +1210,26 @@ function App() {
   const changeOrderNumber = pageParams.get('pedido') || '';
   // Navigation & Language UI States
   const [lang, setLang] = useState<'es' | 'en' | 'pt'>('es');
+  const [heroPhraseIndex, setHeroPhraseIndex] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'wedding' | '15years' | 'other'>('all');
   const [selectedModelColors, setSelectedModelColors] = useState<Record<string, string>>({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showExtrasModal, setShowExtrasModal] = useState(false);
   const carouselRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setHeroPhraseIndex(0);
+    const phraseTimer = window.setInterval(() => {
+      setHeroPhraseIndex((currentIndex) => {
+        const phraseCount = HERO_PHRASES[lang].length;
+        let nextIndex = Math.floor(Math.random() * (phraseCount - 1));
+        if (nextIndex >= currentIndex) nextIndex += 1;
+        return nextIndex;
+      });
+    }, 9000);
+
+    return () => window.clearInterval(phraseTimer);
+  }, [lang]);
 
   const scrollCarouselLeft = () => {
     if (carouselRef.current) {
@@ -2059,8 +2164,10 @@ function App() {
         <div className="container hero-grid">
           <div className="hero-content animate-fade-in">
             <span className="hero-tag">{t.hero.tag}</span>
-            <h1 className="hero-title">
-              {t.hero.title1} <span>{t.hero.titleHighlight}</span>.
+            <h1 className="hero-title hero-title-dynamic">
+              <span className="hero-phrase" key={`${lang}-${heroPhraseIndex}`}>
+                {HERO_PHRASES[lang][heroPhraseIndex]}
+              </span>
             </h1>
             <p className="hero-description">{t.hero.desc}</p>
             <div className="hero-benefits" aria-label="Beneficios principales">
