@@ -246,12 +246,7 @@ async function handler(request: Request) {
         const giftText = String(body.giftText || gifts).slice(0, 1500);
         const bodyHtml =
           body.template === "message" && messageText
-            ? `<p>${escapeHtml(messageText)
-                .replaceAll("{{nombre}}", escapeHtml(guest.name))
-                .replaceAll("{{evento}}", escapeHtml(eventTitle))
-                .replaceAll("{{fecha}}", escapeHtml(eventDate))
-                .replaceAll("{{confirmacion}}", `<a href="${confirmationUrl}">Confirmar asistencia</a>`)
-                .replaceAll("\n", "<br>")}</p>${giftText ? `<hr><p><strong>Si querés hacerme un regalo te dejo mis datos:</strong><br>${escapeHtml(giftText).replaceAll("\n", "<br>")}</p>` : ""}`
+            ? `<p>Hola <strong>${escapeHtml(guest.name)}</strong>.</p><p>${escapeHtml(messageText).replaceAll("\n", "<br>")}</p><p><a href="${confirmationUrl}">Confirmar asistencia</a></p>${giftText ? `<hr><p><strong>Si querés hacerme un regalo te dejo mis datos:</strong><br>${escapeHtml(giftText).replaceAll("\n", "<br>")}</p>` : ""}`
             : body.template === "custom" && customHtml
             ? customHtml
                 .replaceAll("{{nombre}}", escapeHtml(guest.name))
@@ -409,11 +404,14 @@ async function handler(request: Request) {
             },
           );
           const updatedRows = (await updateResponse.json()) as GuestRow[];
-          const manualMessage = reminderText || `Hola ${guest.name}, te recordamos que se acerca ${String(order.order_payload.eventTitle || order.customer_name)}. Si ya confirmaste, ¡muchas gracias! Si todavía no, completá tu confirmación: ${confirmationUrl}${giftText ? `\n\nSi querés hacerme un regalo te dejo mis datos: ${giftText}` : ""}`;
+          const baseMessage = reminderText
+            ? `Hola ${guest.name}.\n\n${reminderText}\n\nConfirmar asistencia: ${confirmationUrl}`
+            : `Hola ${guest.name}, te recordamos que se acerca ${String(order.order_payload.eventTitle || order.customer_name)}. Si ya confirmaste, ¡muchas gracias! Si todavía no, completá tu confirmación: ${confirmationUrl}`;
+          const manualMessage = `${baseMessage}${giftText ? `\n\nSi querés hacerme un regalo te dejo mis datos:\n${giftText}` : ""}`;
           return json({
             mode: "manual",
             guest: clientGuest(updatedRows[0], "sent"),
-            url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(manualMessage.replaceAll("{{nombre}}", guest.name).replaceAll("{{evento}}", String(order.order_payload.eventTitle || order.customer_name)).replaceAll("{{fecha}}", String(order.order_payload.eventDate || "")).replaceAll("{{confirmacion}}", confirmationUrl))}&type=phone_number&app_absent=0`,
+            url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(manualMessage)}&type=phone_number&app_absent=0`,
           });
         }
         await supabaseRequest("whatsapp_message_log", {

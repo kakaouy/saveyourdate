@@ -11,6 +11,19 @@ type TableRow = {
   space_name?: string;
   position_x?: number;
   position_y?: number;
+  layout_width?: number;
+  layout_height?: number;
+};
+
+type LayoutElementRow = {
+  id: string;
+  element_type: string;
+  label: string;
+  space_name: string;
+  position_x: number;
+  position_y: number;
+  element_width: number;
+  element_height: number;
 };
 
 type AssignmentRow = {
@@ -27,8 +40,12 @@ const clientTable = (row: TableRow, assignments: AssignmentRow[] = []) => ({
   space: row.space_name || 'Espacio 1',
   x: Number(row.position_x ?? 24),
   y: Number(row.position_y ?? 24),
+  width: Number(row.layout_width ?? 140),
+  height: Number(row.layout_height ?? 70),
   guests: assignments.filter((guest) => guest.table_id === row.id).map((guest) => guest.id)
 });
+
+const clientElement = (row: LayoutElementRow) => ({ id: row.id, kind: row.element_type, label: row.label, space: row.space_name, x: Number(row.position_x), y: Number(row.position_y), width: Number(row.element_width), height: Number(row.element_height) });
 
 async function handler(request: Request) {
   try {
@@ -37,16 +54,20 @@ async function handler(request: Request) {
     if (request.method !== 'GET' && session.access_role === 'viewer') return json({ error: 'Tu acceso es de solo lectura.' }, 403);
 
     if (request.method === 'GET') {
-      const [tablesResponse, assignmentsResponse] = await Promise.all([
-        supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y&order=created_at.asc`),
-        supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=not.is.null&select=id,table_id`)
+      const [tablesResponse, assignmentsResponse, elementsResponse] = await Promise.all([
+        supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y,layout_width,layout_height&order=created_at.asc`),
+        supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=not.is.null&select=id,table_id`),
+        supabaseRequest(`event_layout_elements?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc`),
       ]);
       const tables = await tablesResponse.json() as TableRow[];
       const assignments = await assignmentsResponse.json() as AssignmentRow[];
-      return json({ tables: tables.map((table) => clientTable(table, assignments)) });
+      const elements = await elementsResponse.json() as LayoutElementRow[];
+      return json({ tables: tables.map((table) => clientTable(table, assignments)), layoutElements: elements.map(clientElement) });
     }
 
-    const body = await request.json() as Record<string, unknown>;
+    const body = request.method === 'DELETE'
+      ? {} as Record<string, unknown>
+      : await request.json() as Record<string, unknown>;
     if (request.method === 'PATCH' && body.action === 'layout') {
       const id = String(body.id || '');
       const response = await supabaseRequest(
@@ -58,6 +79,8 @@ async function handler(request: Request) {
             space_name: String(body.space || 'Espacio 1').trim() || 'Espacio 1',
             position_x: Math.max(0, Math.min(840, Number(body.x) || 0)),
             position_y: Math.max(0, Math.min(440, Number(body.y) || 0)),
+            layout_width: Math.max(100, Math.min(300, Number(body.width) || 140)),
+            layout_height: Math.max(60, Math.min(180, Number(body.height) || 70)),
             updated_at: new Date().toISOString(),
           }),
         },
@@ -65,6 +88,29 @@ async function handler(request: Request) {
       const rows = await response.json() as TableRow[];
       if (!rows[0]) return json({ error: 'No encontramos esa mesa.' }, 404);
       return json({ table: clientTable(rows[0]) });
+    }
+    if (body.action === 'layout-element' && request.method === 'POST') {
+      const response = await supabaseRequest('event_layout_elements', {
+        method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
+          order_number: session.order_number,
+          element_type: String(body.kind || 'custom'), label: String(body.label || 'Texto editable').trim().slice(0, 120), space_name: String(body.space || 'Espacio 1'),
+          position_x: Number(body.x) || 0, position_y: Number(body.y) || 0, element_width: Number(body.width) || 150, element_height: Number(body.height) || 80,
+        }),
+      });
+      const row = ((await response.json()) as LayoutElementRow[])[0];
+      return json({ element: clientElement(row) }, 201);
+    }
+    if (body.action === 'layout-element' && request.method === 'PATCH') {
+      const id = String(body.id || '');
+      const response = await supabaseRequest(`event_layout_elements?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`, {
+        method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
+          label: String(body.label || '').trim().slice(0, 120) || 'Texto editable', space_name: String(body.space || 'Espacio 1'),
+          position_x: Math.max(0, Number(body.x) || 0), position_y: Math.max(0, Number(body.y) || 0), element_width: Math.max(90, Math.min(420, Number(body.width) || 150)), element_height: Math.max(55, Math.min(260, Number(body.height) || 80)), updated_at: new Date().toISOString(),
+        }),
+      });
+      const row = ((await response.json()) as LayoutElementRow[])[0];
+      if (!row) return json({ error: 'No encontramos ese elemento.' }, 404);
+      return json({ element: clientElement(row) });
     }
     if (request.method === 'POST') {
       const name = String(body.name || '').trim();
@@ -160,7 +206,13 @@ async function handler(request: Request) {
     }
 
     if (request.method === 'DELETE') {
-      const id = new URL(request.url).searchParams.get('id') || '';
+      const url = new URL(request.url);
+      const elementId = url.searchParams.get('elementId') || '';
+      if (elementId) {
+        await supabaseRequest(`event_layout_elements?id=eq.${encodeURIComponent(elementId)}&order_number=eq.${encodeURIComponent(session.order_number)}`, { method: 'DELETE' });
+        return json({ ok: true });
+      }
+      const id = url.searchParams.get('id') || '';
       await supabaseRequest(
         `event_tables?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
         { method: 'DELETE' }

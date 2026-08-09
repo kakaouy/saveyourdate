@@ -1997,7 +1997,7 @@ function Guests({
                           onClick={() => deleteGuest(guest.id)}
                           aria-label={`${t("Eliminar a", "Delete", "Excluir")} ${guest.name}`}
                         >
-                          ♲
+                          <svg className="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" /></svg>
                         </button>
                       </>}
                     </div>
@@ -2620,6 +2620,19 @@ type EventTable = {
   space: string;
   x: number;
   y: number;
+  width: number;
+  height: number;
+};
+
+type FloorElement = {
+  id: string;
+  kind: "entrance" | "dance-floor" | "gourmet" | "hydration" | "custom";
+  label: string;
+  space: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 };
 
 function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
@@ -2640,6 +2653,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [layoutMode, setLayoutMode] = useState(false);
   const [spaces, setSpaces] = useState(["Espacio 1"]);
   const [layoutNotice, setLayoutNotice] = useState("");
+  const [floorElements, setFloorElements] = useState<FloorElement[]>([]);
 
   const assignedIds = tables.flatMap((table) => table.guests);
   const unassigned = confirmedGuests.filter(
@@ -2669,11 +2683,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       .then(async (response) => {
         const result = (await response.json()) as {
           tables?: EventTable[];
+          layoutElements?: FloorElement[];
           error?: string;
         };
         if (!response.ok || !result.tables)
           throw new Error(result.error || "No pudimos cargar las mesas.");
         setTables(result.tables);
+        setFloorElements(result.layoutElements || []);
         const loadedSpaces = [...new Set(result.tables.map((table) => table.space || "Espacio 1"))];
         setSpaces(loadedSpaces.length ? loadedSpaces : ["Espacio 1"]);
       })
@@ -2806,19 +2822,83 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const unassignGuest = (guestId: string) => assignGuest(guestId, "");
 
+  const saveTableLayout = async (table: EventTable) => {
+    const response = await fetch("/api/admin/tables", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "layout", id: table.id, space: table.space, x: table.x, y: table.y, width: table.width, height: table.height }),
+    });
+    if (!response.ok) throw new Error("No pudimos guardar el plano.");
+  };
+
   const moveTable = async (table: EventTable, space: string, x: number, y: number) => {
     const next = { ...table, space, x: Math.max(0, x), y: Math.max(0, y) };
     setTables((current) => current.map((item) => item.id === table.id ? next : item));
     try {
-      const response = await fetch("/api/admin/tables", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "layout", id: table.id, space, x: next.x, y: next.y }),
-      });
-      if (!response.ok) throw new Error("No pudimos guardar la posición.");
+      await saveTableLayout(next);
     } catch (moveError) {
       setError(moveError instanceof Error ? moveError.message : "No pudimos guardar la posición.");
     }
+  };
+
+  const resizeTable = (table: EventTable, event: React.PointerEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startWidth = table.width || 140;
+    const startHeight = table.height || 70;
+    let resized = table;
+    const onMove = (moveEvent: PointerEvent) => {
+      resized = { ...table, width: Math.max(100, Math.min(300, startWidth + moveEvent.clientX - startX)), height: Math.max(60, Math.min(180, startHeight + moveEvent.clientY - startY)) };
+      setTables((current) => current.map((item) => item.id === table.id ? resized : item));
+    };
+    const onEnd = () => {
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerup", onEnd);
+      void saveTableLayout(resized).catch(() => setError("No pudimos guardar el nuevo tamaño."));
+    };
+    document.addEventListener("pointermove", onMove);
+    document.addEventListener("pointerup", onEnd);
+  };
+
+  const saveFloorElement = async (element: FloorElement, method: "POST" | "PATCH" = "PATCH") => {
+    const response = await fetch("/api/admin/tables", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "layout-element", ...element }) });
+    const result = await response.json() as { element?: FloorElement; error?: string };
+    if (!response.ok || !result.element) throw new Error(result.error || "No pudimos guardar el elemento.");
+    return result.element;
+  };
+
+  const addFloorElement = async (kind: FloorElement["kind"], label: string) => {
+    try {
+      const element = await saveFloorElement({ id: "", kind, label, space: spaces[0], x: 40, y: 90, width: kind === "dance-floor" ? 220 : 150, height: kind === "dance-floor" ? 130 : 80 }, "POST");
+      setFloorElements((current) => [...current, element]);
+    } catch (addError) { setError(addError instanceof Error ? addError.message : "No pudimos agregar el elemento."); }
+  };
+
+  const updateFloorElement = (element: FloorElement, changes: Partial<FloorElement>) => {
+    const next = { ...element, ...changes };
+    setFloorElements((current) => current.map((item) => item.id === element.id ? next : item));
+    return next;
+  };
+
+  const persistFloorElement = (element: FloorElement) => void saveFloorElement(element).catch((saveError) => setError(saveError instanceof Error ? saveError.message : "No pudimos guardar el elemento."));
+
+  const deleteFloorElement = async (id: string) => {
+    const response = await fetch(`/api/admin/tables?elementId=${encodeURIComponent(id)}`, { method: "DELETE" });
+    if (response.ok) setFloorElements((current) => current.filter((item) => item.id !== id));
+    else setError("No pudimos eliminar el elemento.");
+  };
+
+  const resizeFloorElement = (element: FloorElement, event: React.PointerEvent<HTMLButtonElement>) => {
+    event.preventDefault(); event.stopPropagation();
+    const startX = event.clientX, startY = event.clientY, startWidth = element.width, startHeight = element.height;
+    let resized = element;
+    const onMove = (moveEvent: PointerEvent) => {
+      resized = updateFloorElement(element, { width: Math.max(90, Math.min(420, startWidth + moveEvent.clientX - startX)), height: Math.max(55, Math.min(260, startHeight + moveEvent.clientY - startY)) });
+    };
+    const onEnd = () => { document.removeEventListener("pointermove", onMove); document.removeEventListener("pointerup", onEnd); persistFloorElement(resized); };
+    document.addEventListener("pointermove", onMove); document.addEventListener("pointerup", onEnd);
   };
 
   const exportPlan = () => {
@@ -2843,14 +2923,28 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         context.strokeStyle = "#0aabb0";
         context.lineWidth = 3;
         context.beginPath();
-        context.roundRect(x, y, 170, 82, 14);
+        const tableWidth = table.width || 140;
+        const tableHeight = table.height || 70;
+        context.roundRect(x, y, tableWidth, tableHeight, 14);
         context.fill();
         context.stroke();
         context.fillStyle = "#17384b";
         context.font = "bold 18px sans-serif";
-        context.fillText(table.name, x + 14, y + 32);
+        context.fillText(table.name, x + 14, y + Math.min(32, tableHeight / 2));
         context.font = "14px sans-serif";
-        context.fillText(`${table.capacity} lugares`, x + 14, y + 58);
+        context.fillText(`${table.capacity} lugares`, x + 14, y + Math.min(58, tableHeight - 10));
+      });
+      floorElements.filter((element) => element.space === space).forEach((element) => {
+        const x = Math.min(width - element.width, element.x);
+        const y = top + 58 + Math.min(420, element.y);
+        context.fillStyle = "#dff5f2";
+        context.strokeStyle = "#17384b";
+        context.lineWidth = 2;
+        context.fillRect(x, y, element.width, element.height);
+        context.strokeRect(x, y, element.width, element.height);
+        context.fillStyle = "#17384b";
+        context.font = "bold 16px sans-serif";
+        context.fillText(element.label, x + 12, y + 28);
       });
     });
     const link = document.createElement("a");
@@ -2863,11 +2957,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     setSaving(true);
     setError("");
     try {
-      const responses = await Promise.all(tables.map((table) => fetch("/api/admin/tables", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "layout", id: table.id, space: table.space || "Espacio 1", x: table.x || 24, y: table.y || 24 }),
-      })));
+      const responses = await Promise.all([
+        ...tables.map((table) => fetch("/api/admin/tables", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "layout", id: table.id, space: table.space || "Espacio 1", x: table.x || 24, y: table.y || 24, width: table.width || 140, height: table.height || 70 }) })),
+        ...floorElements.map((element) => fetch("/api/admin/tables", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "layout-element", ...element }) })),
+      ]);
       if (responses.some((response) => !response.ok)) throw new Error("No pudimos guardar todo el plano.");
       setLayoutNotice(t("Plano guardado.", "Layout saved.", "Plano salvo."));
       window.setTimeout(() => setLayoutNotice(""), 2000);
@@ -2984,21 +3077,38 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             }}>{t("Eliminar último espacio", "Remove last space", "Remover último espaço")}</button>}
           </div>
           {layoutNotice && <p className="import-success" role="status">{layoutNotice}</p>}
+          <div className="floor-editor">
+            {canEdit && <aside className="floor-elements-menu">
+              <strong>{t("Elementos del salón", "Venue elements", "Elementos do salão")}</strong>
+              <p>{t("Agregalos al plano y ubicalos donde quieras.", "Add them to the layout and place them anywhere.", "Adicione-os ao plano e posicione-os onde quiser.")}</p>
+              {([["entrance", "Entrada"], ["dance-floor", "Pista"], ["gourmet", "Zona Gourmet"], ["hydration", "Zona Hidratación"]] as const).map(([kind, label]) => <button key={kind} onClick={() => void addFloorElement(kind, label)}>＋ {label}</button>)}
+              <button onClick={() => void addFloorElement("custom", t("Texto editable", "Editable text", "Texto editável"))}>＋ {t("Caja con texto", "Text box", "Caixa de texto")}</button>
+            </aside>}
+            <div className="floor-spaces">
           {spaces.map((space) => (
             <div className="floor-space" key={space} onDragOver={(event) => event.preventDefault()} onDrop={(event) => {
-              const table = tables.find((item) => item.id === event.dataTransfer.getData("text/table-id"));
-              if (!table || !canEdit) return;
+              if (!canEdit) return;
               const bounds = event.currentTarget.getBoundingClientRect();
-              void moveTable(table, space, event.clientX - bounds.left - 70, event.clientY - bounds.top - 35);
+              const table = tables.find((item) => item.id === event.dataTransfer.getData("text/table-id"));
+              if (table) { void moveTable(table, space, event.clientX - bounds.left - (table.width || 140) / 2, event.clientY - bounds.top - (table.height || 70) / 2); return; }
+              const element = floorElements.find((item) => item.id === event.dataTransfer.getData("text/element-id"));
+              if (element) { const next = updateFloorElement(element, { space, x: Math.max(0, event.clientX - bounds.left - element.width / 2), y: Math.max(0, event.clientY - bounds.top - element.height / 2) }); persistFloorElement(next); }
             }}>
               <strong className="space-label">{space}</strong>
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className="floor-table" key={table.id} draggable={canEdit} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24 }}>
+                <article className="floor-table" key={table.id} draggable={canEdit} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <strong>{table.name}</strong><small>{table.capacity} {t("lugares", "seats", "lugares")}</small>
+                  {canEdit && <button className="resize-handle" onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
                 </article>
               ))}
+              {floorElements.filter((element) => element.space === space).map((element) => <article className={`floor-element is-${element.kind}`} key={element.id} draggable={canEdit} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height }}>
+                {element.kind === "custom" && canEdit ? <input value={element.label} onChange={(event) => updateFloorElement(element, { label: event.target.value })} onBlur={(event) => persistFloorElement(updateFloorElement(element, { label: event.target.value }))} aria-label={t("Texto del elemento", "Element text", "Texto do elemento")} /> : <strong>{element.label}</strong>}
+                {canEdit && <><button className="element-delete" onClick={() => void deleteFloorElement(element.id)} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${element.label}`}>×</button><button className="resize-handle" onPointerDown={(event) => resizeFloorElement(element, event)} aria-label={t("Cambiar tamaño", "Resize", "Redimensionar")} /></>}
+              </article>)}
             </div>
           ))}
+            </div>
+          </div>
         </section>
       )}
 
@@ -3375,7 +3485,7 @@ function SimpleModule({
   const [moduleError, setModuleError] = useState("");
   const [query, setQuery] = useState("");
   const [reminderMessage, setReminderMessage] = useState(
-    "Hola {{nombre}}. Te recordamos que se acerca {{evento}}, el {{fecha}}.\n\nSi ya confirmaste, ¡muchas gracias! Si todavía no, completá tu confirmación: {{confirmacion}}",
+    `Te recordamos que se acerca ${order.eventTitle}, el ${formatEventDate(order.eventDate)}. Si ya confirmaste, ¡muchas gracias! Si todavía no, nos encantaría recibir tu respuesta.`,
   );
   const [giftText, setGiftText] = useState(order.giftDetails);
   const restrictions = guests.flatMap((guest) => [
@@ -3393,6 +3503,8 @@ function SimpleModule({
   const songs = guests.filter((g) => g.song !== "—");
   const pending = guests.filter((g) => g.status === "Pendiente");
   const reminded = pending.filter((g) => g.reminded !== "—");
+  const previewGuest = pending[0];
+  const reminderPreview = `Hola ${previewGuest?.name || t("María", "Mary", "Maria")}.\n\n${reminderMessage}\n\n${t("Confirmar asistencia", "Confirm attendance", "Confirmar presença")}: ${previewGuest ? `${window.location.origin}/confirmar?token=${previewGuest.inviteToken}` : `${window.location.origin}/confirmar`}`;
   const content = {
     Restricciones: {
       eyebrow: "",
@@ -3666,21 +3778,6 @@ function SimpleModule({
           </button>
         )}
       </div>
-      {view === "Recordatorios" && (
-        <ContextHelp
-          title={t(
-            "Envío por WhatsApp",
-            "WhatsApp delivery",
-            "Envio pelo WhatsApp",
-          )}
-        >
-          {t(
-            "Si la integración Business está activa, el envío se registra automáticamente. En modo manual se abre WhatsApp con el mensaje preparado para que lo revises y envíes.",
-            "With Business integration enabled, delivery is recorded automatically. In manual mode, WhatsApp opens with a prepared message for you to review and send.",
-            "Com a integração Business ativa, o envio é registrado automaticamente. No modo manual, o WhatsApp abre com a mensagem pronta para você revisar e enviar.",
-          )}
-        </ContextHelp>
-      )}
       {view === "Recordatorios" && canEdit && (
         <section className="panel reminder-composer">
           <div className="panel-title">
@@ -3698,9 +3795,9 @@ function SimpleModule({
             </div>
           </div>
           <div className="reminder-form">
-            <label>{t("Mensaje", "Message", "Mensagem")}<textarea value={reminderMessage} onChange={(event) => setReminderMessage(event.target.value)} rows={6} /></label>
-            <label>{t("Datos para regalos", "Gift details", "Dados para presentes")}<textarea value={giftText} onChange={(event) => setGiftText(event.target.value)} rows={3} placeholder={t("Datos de la cuenta que deben ser completados", "Bank details to complete", "Dados bancários a completar")} /></label>
-            <small className="dynamic-help">{t("Variables disponibles", "Available variables", "Variáveis disponíveis")}: <code>{"{{nombre}} · {{evento}} · {{fecha}} · {{confirmacion}}"}</code></small>
+            <label>{t("Contenido del recordatorio", "Reminder content", "Conteúdo do lembrete")}<textarea value={reminderMessage} onChange={(event) => setReminderMessage(event.target.value)} rows={6} /></label>
+            <label>{t("Datos de la cuenta", "Account details", "Dados da conta")}<textarea value={giftText} onChange={(event) => setGiftText(event.target.value)} rows={3} placeholder={t("Agregá aquí los datos bancarios si querés incluirlos", "Add bank details here if you want to include them", "Adicione os dados bancários aqui se quiser incluí-los")} /></label>
+            <div className="message-preview"><span>{t("Así quedará el mensaje final", "Final message preview", "Assim ficará a mensagem final")}</span><p>{reminderPreview}</p>{giftText && <p><strong>{t("Datos para regalos", "Gift details", "Dados para presentes")}</strong><br />{giftText}</p>}</div>
           </div>
         </section>
       )}
@@ -5089,22 +5186,23 @@ function ThanksModule({
 }) {
   const { text: t, locale } = useAdminI18n();
   const [query, setQuery] = useState("");
-  const [honoree, setHonoree] = useState(order.customerName);
-  const [message, setMessage] = useState(
-    "Hola {{nombre}}.\n\n{{asistencia}}\n\nCon cariño, {{homenajeado}}.{{cuenta}}",
-  );
+  const honoree = order.customerName;
+  const message =
+    "Hola {{nombre}}.\n\n{{asistencia}}\n\nCon cariño, {{homenajeado}}.{{cuenta}}";
   const [attendedText, setAttendedText] = useState(
     "Muchas gracias por haber compartido este maravilloso momento con nosotros. Fue muy especial celebrarlo juntos.",
   );
   const [absentText, setAbsentText] = useState(
     "Lamentamos que no hayas podido asistir, pero pronto habrá nuevas oportunidades para encontrarnos y celebrar juntos.",
   );
-  const [bankDetails, setBankDetails] = useState(order.giftDetails);
+  const bankDetails = order.giftDetails;
   const [sendingId, setSendingId] = useState("");
   const [error, setError] = useState("");
   const visibleGuests = guests.filter((guest) =>
     `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase()),
   );
+  const previewName = visibleGuests[0]?.name || t("María", "Mary", "Maria");
+  const thanksPreview = (body: string) => `Hola ${previewName}.\n\n${body}\n\nCon cariño, ${honoree}.${bankDetails ? `\n\nSi querés hacerme un regalo, te dejo mis datos:\n${bankDetails}` : ""}`;
 
   const sendThanks = async (guest: Guest) => {
     setSendingId(guest.id);
@@ -5145,15 +5243,11 @@ function ThanksModule({
         </div>
       </div>
       <section className="panel thanks-composer">
-        <div className="panel-title"><div><h2>{t("Preparar mensaje", "Prepare message", "Preparar mensagem")}</h2><p>{t("El texto cambia automáticamente según la asistencia.", "The text changes automatically based on attendance.", "O texto muda automaticamente conforme a presença.")}</p></div></div>
-        <div className="form-grid">
-          <label>{t("Nombre del homenajeado", "Honoree name", "Nome do homenageado")}<input value={honoree} onChange={(event) => setHonoree(event.target.value)} /></label>
-          <label>{t("Datos bancarios", "Bank details", "Dados bancários")}<textarea rows={3} value={bankDetails} onChange={(event) => setBankDetails(event.target.value)} placeholder={t("Opcional", "Optional", "Opcional")} /></label>
-        </div>
+        <div className="panel-title"><div><h2>{t("Preparar mensajes", "Prepare messages", "Preparar mensagens")}</h2><p>{t("Escribí una opción para quienes asistieron y otra para quienes no pudieron venir.", "Write one option for attendees and another for those who could not come.", "Escreva uma opção para quem compareceu e outra para quem não pôde vir.")}</p></div></div>
         <label>{t("Mensaje para quienes asistieron", "Message for attendees", "Mensagem para quem compareceu")}<textarea rows={3} value={attendedText} onChange={(event) => setAttendedText(event.target.value)} /></label>
+        <div className="message-preview"><span>{t("Ejemplo del mensaje final", "Final message example", "Exemplo da mensagem final")}</span><p>{thanksPreview(attendedText)}</p></div>
         <label>{t("Mensaje para quienes no asistieron", "Message for non-attendees", "Mensagem para quem não compareceu")}<textarea rows={3} value={absentText} onChange={(event) => setAbsentText(event.target.value)} /></label>
-        <label>{t("Formato general", "General format", "Formato geral")}<textarea rows={5} value={message} onChange={(event) => setMessage(event.target.value)} /></label>
-        <small className="dynamic-help">{t("Variables", "Variables", "Variáveis")}: <code>{"{{nombre}} · {{asistencia}} · {{homenajeado}} · {{cuenta}}"}</code></small>
+        <div className="message-preview"><span>{t("Ejemplo del mensaje final", "Final message example", "Exemplo da mensagem final")}</span><p>{thanksPreview(absentText)}</p></div>
       </section>
       <section className="panel table-panel">
         <div className="table-tools"><label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label></div>
