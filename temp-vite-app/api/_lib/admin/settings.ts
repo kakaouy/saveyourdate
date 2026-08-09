@@ -23,6 +23,21 @@ async function handler(request: Request) {
 
     if (request.method === 'PATCH') {
       const body = await request.json() as Record<string, unknown>;
+      if (body.action === 'invitation-url') {
+        const invitationUrl = String(body.invitationUrl || '').trim();
+        try {
+          const parsed = new URL(invitationUrl);
+          if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error();
+        } catch {
+          return json({ error: 'El enlace de la invitación no es válido.' }, 400);
+        }
+        await supabaseRequest(`orders?order_number=eq.${encodeURIComponent(session.order_number)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ invitation_url: invitationUrl, updated_at: new Date().toISOString() })
+        });
+        await logAdminActivity(session, 'settings.invitation_linked', 'settings', session.order_number, {});
+        return json({ invitationUrl });
+      }
       const code = String(body.defaultPhoneCountryCode || '').trim();
       const reminderDaysBefore = Math.max(1, Math.min(60, Number(body.reminderDaysBefore) || 7));
       const automaticRemindersEnabled = body.automaticRemindersEnabled === true;

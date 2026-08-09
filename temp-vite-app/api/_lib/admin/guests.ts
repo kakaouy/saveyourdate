@@ -25,8 +25,17 @@ const confirmationUrlFor = (
     } catch { /* handled below */ }
     throw new Error("El enlace alternativo para confirmar no es válido.");
   }
-  const base = target === "invitation" && invitationUrl
-    ? invitationUrl
+  const invitationOverride = String(body.invitationUrlOverride || "").trim();
+  if (target === "invitation" && invitationOverride) {
+    try {
+      const parsed = new URL(invitationOverride);
+      if (!["http:", "https:"].includes(parsed.protocol)) throw new Error();
+    } catch {
+      throw new Error("El enlace de la invitación no es válido.");
+    }
+  }
+  const base = target === "invitation" && (invitationOverride || invitationUrl)
+    ? (invitationOverride || invitationUrl)!
     : `${appUrl()}/confirmar`;
   return `${base}${base.includes("?") ? "&" : "?"}token=${encodeURIComponent(inviteToken)}`;
 };

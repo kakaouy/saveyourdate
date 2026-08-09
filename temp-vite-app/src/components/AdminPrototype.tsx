@@ -3096,9 +3096,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             }}>
               <strong className="space-label">{space}</strong>
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className="floor-table" key={table.id} draggable={canEdit} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                <article className="floor-table" key={table.id} draggable={canEdit} onClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <strong>{table.name}</strong><small>{table.capacity} {t("lugares", "seats", "lugares")}</small>
-                  {canEdit && <button className="resize-handle" onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
+                  {canEdit && <><button className="element-delete" onClick={(event) => { event.stopPropagation(); void deleteTable(table.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${table.name}`}>×</button><button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} /></>}
                 </article>
               ))}
               {floorElements.filter((element) => element.space === space).map((element) => <article className={`floor-element is-${element.kind}`} key={element.id} draggable={canEdit} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height }}>
@@ -3473,22 +3473,26 @@ function SimpleModule({
   setGuests,
   order,
   canEdit,
+  onOrderChange,
 }: {
   view: string;
   guests: Guest[];
   setGuests: React.Dispatch<React.SetStateAction<Guest[]>>;
   order: AdminOrder;
   canEdit: boolean;
+  onOrderChange: (order: AdminOrder) => void;
 }) {
   const { text: t, locale, language } = useAdminI18n();
   const [remindingId, setRemindingId] = useState("");
   const [moduleError, setModuleError] = useState("");
   const [query, setQuery] = useState("");
   const [reminderMessage, setReminderMessage] = useState(
-    `Te recordamos que se acerca ${order.eventTitle}, el ${formatEventDate(order.eventDate)}. Si ya confirmaste, ¡muchas gracias! Si todavía no, nos encantaría recibir tu respuesta.`,
+    "Te recordamos que se acerca nuestro evento. Si ya confirmaste, ¡muchas gracias! Si todavía no, nos encantaría recibir tu respuesta.",
   );
   const [giftText, setGiftText] = useState(order.giftDetails);
-  const [confirmationTarget, setConfirmationTarget] = useState<"invitation" | "rsvp" | "custom">(order.invitationUrl ? "invitation" : "rsvp");
+  const [confirmationTarget, setConfirmationTarget] = useState<"invitation" | "rsvp" | "custom">("invitation");
+  const [invitationLink, setInvitationLink] = useState(order.invitationUrl);
+  const [savingInvitation, setSavingInvitation] = useState(false);
   const [customConfirmationUrl, setCustomConfirmationUrl] = useState("");
   const restrictions = guests.flatMap((guest) => [
     ...(guest.food !== "—" && guest.food !== "Ninguna" ? [guest] : []),
@@ -3506,8 +3510,8 @@ function SimpleModule({
   const pending = guests.filter((g) => g.status === "Pendiente");
   const reminded = pending.filter((g) => g.reminded !== "—");
   const previewGuest = pending[0];
-  const previewBaseUrl = confirmationTarget === "invitation" && order.invitationUrl
-    ? order.invitationUrl
+  const previewBaseUrl = confirmationTarget === "invitation" && invitationLink
+    ? invitationLink
     : confirmationTarget === "custom" && customConfirmationUrl
       ? customConfirmationUrl
       : `${window.location.origin}/confirmar`;
@@ -3516,6 +3520,20 @@ function SimpleModule({
     ? previewBaseUrl
     : `${previewBaseUrl}${previewSeparator}token=${previewGuest?.inviteToken || "enlace-personal"}`;
   const reminderPreview = `Hola ${previewGuest?.name || t("María", "Mary", "Maria")}.\n\n${reminderMessage}\n\n${t("Confirmar asistencia", "Confirm attendance", "Confirmar presença")}: ${previewConfirmationUrl}`;
+
+  const saveInvitationLink = async () => {
+    if (!invitationLink.trim() || invitationLink === order.invitationUrl) return;
+    setSavingInvitation(true);
+    setModuleError("");
+    try {
+      const response = await fetch("/api/admin/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "invitation-url", invitationUrl: invitationLink }) });
+      const result = await response.json() as { invitationUrl?: string; error?: string };
+      if (!response.ok || !result.invitationUrl) throw new Error(result.error || "No pudimos asociar la invitación.");
+      setInvitationLink(result.invitationUrl);
+      onOrderChange({ ...order, invitationUrl: result.invitationUrl });
+    } catch (saveError) { setModuleError(saveError instanceof Error ? saveError.message : "No pudimos asociar la invitación."); }
+    finally { setSavingInvitation(false); }
+  };
   const content = {
     Restricciones: {
       eyebrow: "",
@@ -3660,7 +3678,7 @@ function SimpleModule({
       const response = await fetch("/api/admin/guests", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: guest.id, action: "remind", message: reminderMessage, giftText, confirmationTarget, customConfirmationUrl }),
+        body: JSON.stringify({ id: guest.id, action: "remind", message: reminderMessage, giftText, confirmationTarget, customConfirmationUrl, invitationUrlOverride: invitationLink }),
       });
       const result = (await response.json()) as {
         guest?: Guest;
@@ -3707,6 +3725,7 @@ function SimpleModule({
           giftText,
           confirmationTarget,
           customConfirmationUrl,
+          invitationUrlOverride: invitationLink,
         }),
       });
       const result = (await response.json()) as {
@@ -3802,18 +3821,17 @@ function SimpleModule({
                   "Conteúdo do lembrete",
                 )}
               </h2>
-              <p>
-                {order.eventTitle} · {formatEventDate(order.eventDate)}
-              </p>
+              <p>{t("Configurá el contenido y el enlace que recibirá cada invitado.", "Set the content and link each guest will receive.", "Configure o conteúdo e o link que cada convidado receberá.")}</p>
             </div>
           </div>
           <div className="reminder-form message-composer-body">
             <label>{t("Contenido del recordatorio", "Reminder content", "Conteúdo do lembrete")}<textarea className="compact-message-textarea" value={reminderMessage} onChange={(event) => setReminderMessage(event.target.value)} rows={3} /></label>
             <label>{t("Destino para confirmar asistencia", "Attendance confirmation destination", "Destino para confirmar presença")}<select value={confirmationTarget} onChange={(event) => setConfirmationTarget(event.target.value as "invitation" | "rsvp" | "custom")}>
-              <option value="invitation" disabled={!order.invitationUrl}>{t("Invitación del evento", "Event invitation", "Convite do evento")}</option>
+              <option value="invitation">{t("Invitación del evento", "Event invitation", "Convite do evento")}</option>
               <option value="rsvp">{t("Pantalla de confirmación", "Confirmation screen", "Tela de confirmação")}</option>
               <option value="custom">{t("Otro formulario o pantalla", "Another form or page", "Outro formulário ou tela")}</option>
             </select></label>
+            {confirmationTarget === "invitation" && <label>{t("Enlace de la invitación", "Invitation link", "Link do convite")}<div className="inline-save-field"><input type="url" value={invitationLink} onChange={(event) => setInvitationLink(event.target.value)} placeholder="https://www.saveyourdate.site/..." /><button type="button" className="outline-button compact" disabled={savingInvitation || !invitationLink.trim()} onClick={() => void saveInvitationLink()}>{savingInvitation ? t("Guardando…", "Saving…", "Salvando…") : t("Asociar", "Link", "Associar")}</button></div></label>}
             {confirmationTarget === "custom" && <label>{t("Enlace alternativo", "Alternative link", "Link alternativo")}<input type="url" value={customConfirmationUrl} onChange={(event) => setCustomConfirmationUrl(event.target.value)} placeholder="https://" /></label>}
             <label>{t("Datos de la cuenta", "Account details", "Dados da conta")}<textarea value={giftText} onChange={(event) => setGiftText(event.target.value)} rows={3} placeholder={t("Agregá aquí los datos bancarios si querés incluirlos", "Add bank details here if you want to include them", "Adicione os dados bancários aqui se quiser incluí-los")} /></label>
             <div className="message-preview"><span>{t("Así quedará el mensaje final", "Final message preview", "Assim ficará a mensagem final")}</span><p>{reminderPreview}</p>{giftText && <p><strong>{t("Datos para regalos", "Gift details", "Dados para presentes")}</strong><br />{giftText}</p>}</div>
@@ -5568,6 +5586,7 @@ function Admin({
               setGuests={setGuests}
               order={order}
               canEdit={order.accessRole !== "viewer"}
+              onOrderChange={onOrderChange}
             />
           )}
           {view === "Agradecimientos" && (
