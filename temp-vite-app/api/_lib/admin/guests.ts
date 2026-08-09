@@ -36,6 +36,7 @@ type GuestRow = {
   }>;
   invited_by: string;
   companion_of_id: string | null;
+  thanked_at?: string | null;
 };
 
 const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
@@ -59,6 +60,7 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
   whatsappStatus,
   invitedBy: row.invited_by || "",
   companionOfId: row.companion_of_id || "",
+  thankedAt: row.thanked_at || "",
 });
 
 const currentGuestCount = async (orderNumber: string) => {
@@ -94,7 +96,11 @@ async function handler(request: Request) {
       });
       return json({
         guests: ((await response.json()) as GuestRow[]).map((guest) =>
-          clientGuest(guest, latestStatus.get(guest.id) || ""),
+          clientGuest(
+            guest,
+            latestStatus.get(guest.id) ||
+              (guest.status === "Confirmado" ? "sent" : ""),
+          ),
         ),
       });
     }
@@ -235,12 +241,18 @@ async function handler(request: Request) {
             order.order_payload["Datos bancarios"] ||
             "Consultá la invitación para ver las opciones de regalo.",
         );
-        const customHtml = String(body.customHtml || "")
-          .slice(0, 8000)
-          .replace(/<script[\s\S]*?<\/script>/gi, "")
-          .replace(/\son\w+\s*=\s*["'][^"']*["']/gi, "");
+        const customHtml = String(body.customHtml || "").slice(0, 8000);
+        const messageText = String(body.message || "").slice(0, 3000);
+        const giftText = String(body.giftText || gifts).slice(0, 1500);
         const bodyHtml =
-          body.template === "custom" && customHtml
+          body.template === "message" && messageText
+            ? `<p>${escapeHtml(messageText)
+                .replaceAll("{{nombre}}", escapeHtml(guest.name))
+                .replaceAll("{{evento}}", escapeHtml(eventTitle))
+                .replaceAll("{{fecha}}", escapeHtml(eventDate))
+                .replaceAll("{{confirmacion}}", `<a href="${confirmationUrl}">Confirmar asistencia</a>`)
+                .replaceAll("\n", "<br>")}</p>${giftText ? `<hr><p><strong>Si querés hacerme un regalo te dejo mis datos:</strong><br>${escapeHtml(giftText).replaceAll("\n", "<br>")}</p>` : ""}`
+            : body.template === "custom" && customHtml
             ? customHtml
                 .replaceAll("{{nombre}}", escapeHtml(guest.name))
                 .replaceAll("{{evento}}", escapeHtml(eventTitle))
@@ -269,7 +281,7 @@ async function handler(request: Request) {
         const rows = (await response.json()) as GuestRow[];
         await logAdminActivity(session, "guest.reminded", "guest", id, {
           channel: "email",
-          template: body.template === "custom" ? "custom" : "predefined",
+          template: body.template === "message" ? "message" : body.template === "custom" ? "custom" : "predefined",
         });
         return json({ guest: clientGuest(rows[0]), mode: "email" });
       }
@@ -288,6 +300,77 @@ async function handler(request: Request) {
         });
         return json({ ok: true, ids });
       }
+      if (body.action === "bulk-update") {
+        const ids = Array.isArray(body.ids)
+          ? body.ids.map(String).filter(Boolean).slice(0, 500)
+          : [];
+        if (!ids.length)
+          return json({ error: "Seleccioná al menos un invitado." }, 400);
+        const changes: Record<string, unknown> = { updated_at: new Date().toISOString() };
+        if (body.status) {
+          const status = String(body.status);
+          if (!["Confirmado", "Pendiente", "No asiste"].includes(status))
+            return json({ error: "El estado seleccionado no es válido." }, 400);
+          changes.status = status;
+          if (status !== "Confirmado") changes.confirmed = 0;
+        }
+        if (body.group !== undefined) changes.group_name = String(body.group).trim();
+        if (body.invitedBy !== undefined)
+          changes.invited_by = String(body.invitedBy).trim();
+        const response = await supabaseRequest(
+          `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&id=in.(${ids.map(encodeURIComponent).join(",")})`,
+          {
+            method: "PATCH",
+            headers: { Prefer: "return=representation" },
+            body: JSON.stringify(changes),
+          },
+        );
+        const rows = (await response.json()) as GuestRow[];
+        await logAdminActivity(session, "guests.bulk_updated", "guest", "", {
+          count: rows.length,
+        });
+        return json({ guests: rows.map((guest) => clientGuest(guest)) });
+      }
+      if (body.action === "thank-you") {
+        if (!id) return json({ error: "Falta identificar al invitado." }, 400);
+        const guestResponse = await supabaseRequest(
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=*&limit=1`,
+        );
+        const guest = ((await guestResponse.json()) as GuestRow[])[0];
+        if (!guest) return json({ error: "No encontramos al invitado." }, 404);
+        const phone = normalizeWhatsAppPhone(guest.phone);
+        if (phone.length < 8)
+          return json({ error: "El invitado no tiene un número de WhatsApp válido." }, 400);
+        const honoree = String(body.honoree || "").trim().slice(0, 160);
+        const attendanceText = guest.status === "Confirmado"
+          ? String(body.attendedText || "").trim().slice(0, 2000)
+          : String(body.absentText || "").trim().slice(0, 2000);
+        const bankDetails = String(body.bankDetails || "").trim().slice(0, 1500);
+        const accountBlock = bankDetails
+          ? `\n\nSi querés hacerme un regalo, te dejo mis datos:\n${bankDetails}`
+          : "";
+        const template = String(body.message || "").trim().slice(0, 3500);
+        const message = (template || "Hola {{nombre}}.\n\n{{asistencia}}\n\nCon cariño, {{homenajeado}}.")
+          .replaceAll("{{nombre}}", guest.name)
+          .replaceAll("{{asistencia}}", attendanceText)
+          .replaceAll("{{homenajeado}}", honoree)
+          .replaceAll("{{cuenta}}", accountBlock);
+        const thankedAt = new Date().toISOString();
+        const response = await supabaseRequest(
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
+          {
+            method: "PATCH",
+            headers: { Prefer: "return=representation" },
+            body: JSON.stringify({ thanked_at: thankedAt, updated_at: thankedAt }),
+          },
+        );
+        const rows = (await response.json()) as GuestRow[];
+        await logAdminActivity(session, "guest.thanked", "guest", id, { channel: "whatsapp" });
+        return json({
+          guest: clientGuest(rows[0]),
+          url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`,
+        });
+      }
       if (body.action === "remind") {
         if (!id) return json({ error: "Falta identificar al invitado." }, 400);
         const guestResponse = await supabaseRequest(
@@ -305,6 +388,8 @@ async function handler(request: Request) {
         const order = await findOrderByNumber(session.order_number);
         if (!order) return json({ error: "No encontramos el evento." }, 404);
         const confirmationUrl = `${appUrl()}/confirmar?token=${encodeURIComponent(guest.invite_token)}`;
+        const reminderText = String(body.message || "").trim().slice(0, 3000);
+        const giftText = String(body.giftText || "").trim().slice(0, 1500);
         const delivery = await sendWhatsAppTemplate({
           phone,
           recipientName: guest.name,
@@ -314,9 +399,21 @@ async function handler(request: Request) {
           confirmationUrl,
         });
         if (!delivery.sent) {
+          const remindedAt = new Date().toISOString();
+          const updateResponse = await supabaseRequest(
+            `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
+            {
+              method: "PATCH",
+              headers: { Prefer: "return=representation" },
+              body: JSON.stringify({ reminded_at: remindedAt, updated_at: remindedAt }),
+            },
+          );
+          const updatedRows = (await updateResponse.json()) as GuestRow[];
+          const manualMessage = reminderText || `Hola ${guest.name}, te recordamos que se acerca ${String(order.order_payload.eventTitle || order.customer_name)}. Si ya confirmaste, ¡muchas gracias! Si todavía no, completá tu confirmación: ${confirmationUrl}${giftText ? `\n\nSi querés hacerme un regalo te dejo mis datos: ${giftText}` : ""}`;
           return json({
             mode: "manual",
-            url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(`Hola ${guest.name}, te recordamos confirmar tu asistencia a ${String(order.order_payload.eventTitle || order.customer_name)}. Podés responder acá: ${confirmationUrl}`)}&type=phone_number&app_absent=0`,
+            guest: clientGuest(updatedRows[0], "sent"),
+            url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(manualMessage.replaceAll("{{nombre}}", guest.name).replaceAll("{{evento}}", String(order.order_payload.eventTitle || order.customer_name)).replaceAll("{{fecha}}", String(order.order_payload.eventDate || "")).replaceAll("{{confirmacion}}", confirmationUrl))}&type=phone_number&app_absent=0`,
           });
         }
         await supabaseRequest("whatsapp_message_log", {
@@ -358,7 +455,7 @@ async function handler(request: Request) {
         );
       }
       const guestResponse = await supabaseRequest(
-        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,phone,phone_country_code,identification_type,identification_number,name,group_name,invited_by,companion_of_id`,
+        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,email,phone,phone_country_code,identification_type,identification_number,name,group_name,invited_by,companion_of_id`,
       );
       const existingGuests = (await guestResponse.json()) as GuestRow[];
       if (!existingGuests[0])
@@ -390,6 +487,12 @@ async function handler(request: Request) {
           body: JSON.stringify({
             status,
             confirmed,
+            seats: body.seats === undefined
+              ? existingGuests[0].seats
+              : Math.max(1, Math.min(20, Number(body.seats) || 1)),
+            email: body.email === undefined
+              ? existingGuests[0].email
+              : String(body.email).trim().toLowerCase(),
             food: String(body.food ?? "—").trim() || "—",
             song: String(body.song ?? "—").trim() || "—",
             phone_country_code: phoneCountryCode,
