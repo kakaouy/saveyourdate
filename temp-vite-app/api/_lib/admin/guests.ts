@@ -162,7 +162,7 @@ async function handler(request: Request) {
         await logAdminActivity(session, "guests.imported", "guest", "", {
           count: createdGuests.length,
         });
-        return json({ guests: createdGuests.map(clientGuest) }, 201);
+        return json({ guests: createdGuests.map((guest) => clientGuest(guest)) }, 201);
       }
       const name = String(body.name || "").trim();
       if (!name) return json({ error: "Ingresá el nombre del invitado." }, 400);
@@ -252,6 +252,7 @@ async function handler(request: Request) {
           to: guest.email,
           subject: `Recordatorio · ${eventTitle}`,
           html: emailShell(`Recordatorio de ${eventTitle}`, bodyHtml),
+          idempotencyKey: `admin-reminder-${guest.id}-${new Date().toISOString().slice(0, 10)}`,
         });
         const remindedAt = new Date().toISOString();
         const response = await supabaseRequest(
