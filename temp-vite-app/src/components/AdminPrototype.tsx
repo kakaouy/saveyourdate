@@ -36,6 +36,7 @@ type Guest = {
   whatsappStatus?: string;
   invitedBy: string;
   companionOfId: string;
+  thankedAt?: string;
 };
 
 type AdminOrder = {
@@ -170,7 +171,9 @@ const readGuestFile = async (file: File) => {
   const extension = file.name.split(".").pop()?.toLowerCase();
   if (extension === "csv") return parseCsv(await file.text());
   if (extension === "xlsx") {
-    return (await readSheet(file)).map((row) => row.map((cell) => String(cell ?? "")));
+    return (await readSheet(file)).map((row: unknown[]) =>
+      row.map((cell: unknown) => String(cell ?? "")),
+    );
   }
   if (extension === "docx") {
     const result = await mammoth.convertToHtml({
@@ -199,6 +202,20 @@ function GuestAvatar({ guest }: { guest: Guest }) {
   );
 }
 
+function GuestNameButton({ guest, children }: { guest: Guest; children?: React.ReactNode }) {
+  const { text: t } = useAdminI18n();
+  return (
+    <button
+      type="button"
+      className="guest-name-button"
+      onClick={() => window.dispatchEvent(new CustomEvent("syd:edit-guest", { detail: guest.id }))}
+      title={t("Editar invitado", "Edit guest", "Editar convidado")}
+    >
+      {children || guest.name}
+    </button>
+  );
+}
+
 const nav = [
   ["Resumen", "⌂"],
   ["Invitados", "♙"],
@@ -206,6 +223,7 @@ const nav = [
   ["Restricciones", "◇"],
   ["Canciones", "♫"],
   ["Recordatorios", "↗"],
+  ["Agradecimientos", "♡"],
   ["Mesas", "▦"],
   ["Accesos", "♢"],
   ["Configuración", "⚙"],
@@ -1203,7 +1221,7 @@ function Dashboard({
                       .slice(0, 2)}
                   </span>
                   <p>
-                    <strong>{activity.title}</strong>
+                    <GuestNameButton guest={guest}>{activity.title}</GuestNameButton>
                     <small>{activity.detail}</small>
                   </p>
                   <time
@@ -1240,8 +1258,10 @@ function Guests({
   const { text: t, language } = useAdminI18n();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("Todos");
-  const [sortBy, setSortBy] = useState<"name" | "group" | "food">("name");
+  const [sortBy, setSortBy] = useState<"name" | "group" | "food" | "status">("name");
   const [selected, setSelected] = useState<string[]>([]);
+  const [bulkField, setBulkField] = useState<"status" | "group" | "invitedBy">("invitedBy");
+  const [bulkValue, setBulkValue] = useState(defaultInviter);
   const [showImportHelp, setShowImportHelp] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -1268,9 +1288,17 @@ function Guests({
         ? a.name
         : sortBy === "group"
           ? a.group
-          : a.food
+          : sortBy === "food"
+            ? a.food
+            : a.status
       ).localeCompare(
-        sortBy === "name" ? b.name : sortBy === "group" ? b.group : b.food,
+        sortBy === "name"
+          ? b.name
+          : sortBy === "group"
+            ? b.group
+            : sortBy === "food"
+              ? b.food
+              : b.status,
         language,
         { sensitivity: "base" },
       ),
@@ -1345,6 +1373,34 @@ function Guests({
           ? deleteError.message
           : "No pudimos eliminar la selección.",
       );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateSelected = async () => {
+    if (!selected.length || !bulkValue.trim()) return;
+    setSaving(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "bulk-update",
+          ids: selected,
+          [bulkField]: bulkValue,
+        }),
+      });
+      const result = (await response.json()) as { guests?: Guest[]; error?: string };
+      if (!response.ok || !result.guests)
+        throw new Error(result.error || "No pudimos editar la selección.");
+      const updated = new Map(result.guests.map((guest) => [guest.id, guest]));
+      setGuests((current) => current.map((guest) => updated.get(guest.id) || guest));
+      setSelected([]);
+      setNotice(t("Selección actualizada.", "Selection updated.", "Seleção atualizada."));
+    } catch (updateError) {
+      setError(updateError instanceof Error ? updateError.message : "No pudimos editar la selección.");
     } finally {
       setSaving(false);
     }
@@ -1492,6 +1548,11 @@ function Guests({
       "_blank",
       "noopener,noreferrer",
     );
+    setGuests((current) =>
+      current.map((item) =>
+        item.id === guest.id ? { ...item, whatsappStatus: "sent" } : item,
+      ),
+    );
   };
 
   const downloadTemplate = () =>
@@ -1543,7 +1604,7 @@ function Guests({
           .replace(/\p{Diacritic}/gu, "")
           .toLowerCase()
           .trim();
-      const headers = rows[0].map(normalize);
+      const headers = rows[0].map((header: string) => normalize(header));
       const column = (...names: string[]) =>
         headers.findIndex((header) => names.includes(header));
       const nameIndex = column("nombre", "invitado", "nombre y apellido");
@@ -1586,7 +1647,7 @@ function Guests({
       );
       const imported = rows
         .slice(1)
-        .map((values) => ({
+        .map((values: string[]) => ({
           name: values[nameIndex],
           group: groupIndex >= 0 ? values[groupIndex] : "",
           phone: phoneIndex >= 0 ? values[phoneIndex] : "",
@@ -1614,7 +1675,7 @@ function Guests({
               ? names.get(normalize(values[companionOfIndex])) || ""
               : "",
         }))
-        .filter((guest) => guest.name);
+        .filter((guest: { name: string }) => guest.name);
       const response = await fetch("/api/admin/guests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1712,7 +1773,7 @@ function Guests({
               </button>
             ))}
           </div>
-          <label className="sort-control">
+          <label className={`sort-control ${sortBy !== "name" ? "is-active" : ""}`}>
             {t("Ordenar", "Sort", "Ordenar")}
             <select
               value={sortBy}
@@ -1727,6 +1788,9 @@ function Guests({
               <option value="food">
                 {t("Por restricción", "By dietary need", "Por restrição")}
               </option>
+              <option value="status">
+                {t("Por estado", "By status", "Por status")}
+              </option>
             </select>
           </label>
           {canEdit && (
@@ -1737,9 +1801,6 @@ function Guests({
                 onClick={() => setShowImportHelp(true)}
               >
                 ?
-              </button>
-              <button className="copy-button" onClick={downloadTemplate}>
-                {t("Plantilla", "Template", "Modelo")}
               </button>
               <button
                 className="outline-button compact"
@@ -1765,6 +1826,35 @@ function Guests({
             <strong>
               {selected.length} {t("seleccionados", "selected", "selecionados")}
             </strong>
+            <select
+              value={bulkField}
+              onChange={(event) => {
+                const field = event.target.value as typeof bulkField;
+                setBulkField(field);
+                setBulkValue(field === "status" ? "Pendiente" : field === "invitedBy" ? defaultInviter : "");
+              }}
+              aria-label={t("Campo a editar", "Field to edit", "Campo para editar")}
+            >
+              <option value="invitedBy">{t("Invitador", "Invited by", "Anfitrião")}</option>
+              <option value="status">{t("Estado", "Status", "Status")}</option>
+              <option value="group">{t("Grupo", "Group", "Grupo")}</option>
+            </select>
+            {bulkField === "status" ? (
+              <select value={bulkValue} onChange={(event) => setBulkValue(event.target.value)}>
+                <option value="Pendiente">{adminStatus(language, "Pendiente")}</option>
+                <option value="Confirmado">{adminStatus(language, "Confirmado")}</option>
+                <option value="No asiste">{adminStatus(language, "No asiste")}</option>
+              </select>
+            ) : (
+              <input
+                value={bulkValue}
+                onChange={(event) => setBulkValue(event.target.value)}
+                placeholder={bulkField === "group" ? t("Nombre del grupo", "Group name", "Nome do grupo") : t("Nombre del invitador", "Host name", "Nome do anfitrião")}
+              />
+            )}
+            <button className="primary-button small" type="button" disabled={saving || !bulkValue.trim()} onClick={updateSelected}>
+              {t("Aplicar", "Apply", "Aplicar")}
+            </button>
             <button
               className="delete-button"
               type="button"
@@ -1809,8 +1899,7 @@ function Guests({
                 <th>{t("Cupos", "Seats", "Vagas")}</th>
                 <th>{t("Estado", "Status", "Status")}</th>
                 <th>{t("Restricción", "Dietary need", "Restrição")}</th>
-                <th>{t("Enlace", "Link", "Link")}</th>
-                {canEdit && <th />}
+                <th>{t("Acciones", "Actions", "Ações")}</th>
               </tr>
             </thead>
             <tbody>
@@ -1835,7 +1924,7 @@ function Guests({
                     <div className="person">
                       <GuestAvatar guest={guest} />
                       <p>
-                        <strong>{guest.name}</strong>
+                        <GuestNameButton guest={guest} />
                         <small>
                           {guest.companionOfId
                             ? `↳ ${t("Acompañante", "Companion", "Acompanhante")}`
@@ -1878,43 +1967,41 @@ function Guests({
                   </td>
                   <td>{guest.food}</td>
                   <td>
-                    <div className="link-actions">
+                    <div className="row-actions icon-actions">
                       <button
-                        className="copy-button"
+                        className="icon-button"
                         onClick={() => copyInviteLink(guest)}
+                        title={t("Copiar enlace", "Copy link", "Copiar link")}
+                        aria-label={t("Copiar enlace", "Copy link", "Copiar link")}
                       >
-                        {copiedId === guest.id
-                          ? t("¡Copiado!", "Copied!", "Copiado!")
-                          : t("Copiar link", "Copy link", "Copiar link")}
+                        {copiedId === guest.id ? "✓" : "⧉"}
                       </button>
                       <button
                         className="whatsapp-button"
                         disabled={!guest.phone}
                         onClick={() => openWhatsAppInvite(guest)}
                       >
-                        WhatsApp
+                        WA
                       </button>
-                    </div>
-                  </td>
-                  {canEdit && (
-                    <td>
-                      <div className="row-actions">
+                      {canEdit && <>
                         <button
-                          className="copy-button"
+                          className="icon-button"
                           onClick={() => setEditingGuest(guest)}
+                          title={t("Editar", "Edit", "Editar")}
+                          aria-label={`${t("Editar", "Edit", "Editar")} ${guest.name}`}
                         >
-                          {t("Editar", "Edit", "Editar")}
+                          ✎
                         </button>
                         <button
-                          className="more-button"
+                          className="icon-button danger"
                           onClick={() => deleteGuest(guest.id)}
                           aria-label={`${t("Eliminar a", "Delete", "Excluir")} ${guest.name}`}
                         >
-                          {t("Eliminar", "Delete", "Excluir")}
+                          ♲
                         </button>
-                      </div>
-                    </td>
-                  )}
+                      </>}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -2328,6 +2415,10 @@ function Guests({
 
 function Confirmations({ guests }: { guests: Guest[] }) {
   const { text: t, locale, language } = useAdminI18n();
+  const [query, setQuery] = useState("");
+  const visibleGuests = guests.filter((guest) =>
+    `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase()),
+  );
   const confirmed = guests.reduce((total, guest) => total + guest.confirmed, 0);
   const pending = guests.filter((guest) => guest.status === "Pendiente").length;
   const declined = guests.filter(
@@ -2419,6 +2510,9 @@ function Confirmations({ guests }: { guests: Guest[] }) {
         />
       </section>
       <section className="panel table-panel">
+        <div className="table-tools">
+          <label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label>
+        </div>
         <div className="table-scroll">
           <table>
             <thead>
@@ -2434,7 +2528,7 @@ function Confirmations({ guests }: { guests: Guest[] }) {
               </tr>
             </thead>
             <tbody>
-              {guests
+              {visibleGuests
                 .filter((guest) => guest.status !== "Pendiente")
                 .map((guest) => (
                   <React.Fragment key={guest.id}>
@@ -2447,7 +2541,7 @@ function Confirmations({ guests }: { guests: Guest[] }) {
                             "Convite principal",
                           )}
                         </span>
-                        <strong>{guest.name}</strong>
+                        <GuestNameButton guest={guest} />
                         <small className="cell-sub">{guest.group}</small>
                       </td>
                       <td>
@@ -2481,7 +2575,7 @@ function Confirmations({ guests }: { guests: Guest[] }) {
                           <span className="guest-role-badge companion-role">
                             {t("Acompañante", "Companion", "Acompanhante")}
                           </span>
-                          <strong>{companion.name}</strong>
+                          <GuestNameButton guest={guest}>{companion.name}</GuestNameButton>
                           <small className="cell-sub">
                             {t("Invitado por", "Invited by", "Convidado por")}{" "}
                             {guest.name}
@@ -2523,6 +2617,9 @@ type EventTable = {
   capacity: number;
   guests: string[];
   note: string;
+  space: string;
+  x: number;
+  y: number;
 };
 
 function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
@@ -2539,6 +2636,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [tableName, setTableName] = useState("Mesa 3");
   const [capacity, setCapacity] = useState(8);
   const [note, setNote] = useState("");
+  const [query, setQuery] = useState("");
+  const [layoutMode, setLayoutMode] = useState(false);
+  const [spaces, setSpaces] = useState(["Espacio 1"]);
+  const [layoutNotice, setLayoutNotice] = useState("");
 
   const assignedIds = tables.flatMap((table) => table.guests);
   const unassigned = confirmedGuests.filter(
@@ -2573,6 +2674,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         if (!response.ok || !result.tables)
           throw new Error(result.error || "No pudimos cargar las mesas.");
         setTables(result.tables);
+        const loadedSpaces = [...new Set(result.tables.map((table) => table.space || "Espacio 1"))];
+        setSpaces(loadedSpaces.length ? loadedSpaces : ["Espacio 1"]);
       })
       .catch((loadError) =>
         setError(
@@ -2703,6 +2806,78 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const unassignGuest = (guestId: string) => assignGuest(guestId, "");
 
+  const moveTable = async (table: EventTable, space: string, x: number, y: number) => {
+    const next = { ...table, space, x: Math.max(0, x), y: Math.max(0, y) };
+    setTables((current) => current.map((item) => item.id === table.id ? next : item));
+    try {
+      const response = await fetch("/api/admin/tables", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "layout", id: table.id, space, x: next.x, y: next.y }),
+      });
+      if (!response.ok) throw new Error("No pudimos guardar la posición.");
+    } catch (moveError) {
+      setError(moveError instanceof Error ? moveError.message : "No pudimos guardar la posición.");
+    }
+  };
+
+  const exportPlan = () => {
+    const width = 1200;
+    const spaceHeight = 520;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = Math.max(spaceHeight, spaces.length * spaceHeight);
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.fillStyle = "#f5f8f9";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    spaces.forEach((space, index) => {
+      const top = index * spaceHeight;
+      context.fillStyle = "#17384b";
+      context.font = "bold 24px sans-serif";
+      context.fillText(space, 24, top + 36);
+      tables.filter((table) => (table.space || "Espacio 1") === space).forEach((table) => {
+        const x = Math.min(width - 190, table.x || 24);
+        const y = top + 58 + Math.min(420, table.y || 24);
+        context.fillStyle = "#ffffff";
+        context.strokeStyle = "#0aabb0";
+        context.lineWidth = 3;
+        context.beginPath();
+        context.roundRect(x, y, 170, 82, 14);
+        context.fill();
+        context.stroke();
+        context.fillStyle = "#17384b";
+        context.font = "bold 18px sans-serif";
+        context.fillText(table.name, x + 14, y + 32);
+        context.font = "14px sans-serif";
+        context.fillText(`${table.capacity} lugares`, x + 14, y + 58);
+      });
+    });
+    const link = document.createElement("a");
+    link.download = "plano-de-mesas.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
+
+  const savePlan = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      const responses = await Promise.all(tables.map((table) => fetch("/api/admin/tables", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "layout", id: table.id, space: table.space || "Espacio 1", x: table.x || 24, y: table.y || 24 }),
+      })));
+      if (responses.some((response) => !response.ok)) throw new Error("No pudimos guardar todo el plano.");
+      setLayoutNotice(t("Plano guardado.", "Layout saved.", "Plano salvo."));
+      window.setTimeout(() => setLayoutNotice(""), 2000);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "No pudimos guardar el plano.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <>
       <div className="page-heading">
@@ -2731,11 +2906,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 )}
           </p>
         </div>
-        {canEdit && (
-          <button className="primary-button small" onClick={openNew}>
-            ＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}
-          </button>
-        )}
+        <div className="heading-actions">
+          <button className={`outline-button ${layoutMode ? "active" : ""}`} onClick={() => setLayoutMode((value) => !value)}>{layoutMode ? t("Ver lista", "View list", "Ver lista") : t("Editar plano", "Edit layout", "Editar plano")}</button>
+          {canEdit && <button className="primary-button small" onClick={openNew}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
+        </div>
       </div>
       <ContextHelp
         title={t("Antes de asignar", "Before assigning", "Antes de atribuir")}
@@ -2795,7 +2969,40 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         </article>
       </section>
 
-      <div className="seating-layout">
+      {layoutMode && (
+        <section className="panel floor-plan-panel">
+          <div className="floor-plan-toolbar">
+            <strong>{t("Plano arrastrable", "Draggable layout", "Plano arrastável")}</strong>
+            <span>{t("Arrastrá cada mesa hasta su posición.", "Drag each table into position.", "Arraste cada mesa para sua posição.")}</span>
+            {canEdit && <button className="outline-button compact" onClick={() => setSpaces((current) => [...current, `Espacio ${current.length + 1}`])}>＋ {t("Agregar espacio", "Add space", "Adicionar espaço")}</button>}
+            {canEdit && <button className="primary-button small" disabled={saving} onClick={savePlan}>{saving ? t("Guardando…", "Saving…", "Salvando…") : t("Guardar modificaciones", "Save changes", "Salvar alterações")}</button>}
+            <button className="outline-button compact" onClick={exportPlan}>⇩ PNG</button>
+            {spaces.length > 1 && canEdit && <button className="delete-button" onClick={() => {
+              const removed = spaces[spaces.length - 1];
+              setSpaces((current) => current.slice(0, -1));
+              setTables((current) => current.map((table) => table.space === removed ? { ...table, space: "Espacio 1", x: 24, y: 24 } : table));
+            }}>{t("Eliminar último espacio", "Remove last space", "Remover último espaço")}</button>}
+          </div>
+          {layoutNotice && <p className="import-success" role="status">{layoutNotice}</p>}
+          {spaces.map((space) => (
+            <div className="floor-space" key={space} onDragOver={(event) => event.preventDefault()} onDrop={(event) => {
+              const table = tables.find((item) => item.id === event.dataTransfer.getData("text/table-id"));
+              if (!table || !canEdit) return;
+              const bounds = event.currentTarget.getBoundingClientRect();
+              void moveTable(table, space, event.clientX - bounds.left - 70, event.clientY - bounds.top - 35);
+            }}>
+              <strong className="space-label">{space}</strong>
+              {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
+                <article className="floor-table" key={table.id} draggable={canEdit} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24 }}>
+                  <strong>{table.name}</strong><small>{table.capacity} {t("lugares", "seats", "lugares")}</small>
+                </article>
+              ))}
+            </div>
+          ))}
+        </section>
+      )}
+
+      {!layoutMode && <div className="seating-layout">
         <aside className="panel unassigned-panel">
           <div className="panel-title">
             <div>
@@ -2817,7 +3024,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             <span className="count-badge">{confirmedGuests.length}</span>
           </div>
           <div className="guest-assign-list">
-            {confirmedGuests.map((guest) => {
+            <label className="search seating-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado…", "Search guest…", "Buscar convidado…")} /></label>
+            {confirmedGuests.filter((guest) => `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase())).map((guest) => {
               const currentTable = tables.find((table) =>
                 table.guests.includes(guest.id),
               );
@@ -2828,7 +3036,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 >
                   <GuestAvatar guest={guest} />
                   <p>
-                    <strong>{guest.name}</strong>
+                    <GuestNameButton guest={guest} />
                     <small>
                       {guest.confirmed}{" "}
                       {guest.confirmed === 1
@@ -2960,7 +3168,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   <div className="seated-guests">
                     {tableGuests.map((guest) => (
                       <div key={guest.id}>
-                        <span>{guest.name}</span>
+                        <GuestNameButton guest={guest} />
                         <small>
                           {guest.confirmed} {t("lugares", "seats", "lugares")}
                         </small>
@@ -3036,7 +3244,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             )}
           </div>
         </section>
-      </div>
+      </div>}
 
       {showModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}>
@@ -3165,12 +3373,11 @@ function SimpleModule({
   const { text: t, locale, language } = useAdminI18n();
   const [remindingId, setRemindingId] = useState("");
   const [moduleError, setModuleError] = useState("");
-  const [reminderTemplate, setReminderTemplate] = useState<
-    "predefined" | "custom"
-  >("predefined");
-  const [customReminderHtml, setCustomReminderHtml] = useState(
-    `<p>Hola <strong>{{nombre}}</strong>.</p>\n<p>Te recordamos que se acerca <strong>{{evento}}</strong>, el {{fecha}}.</p>\n<p>Si ya confirmaste, ¡muchas gracias! Si todavía no, <a href="{{confirmacion}}">completá tu confirmación</a>.</p>\n<hr><p><strong>Regalos</strong><br>{{regalos}}</p>`,
+  const [query, setQuery] = useState("");
+  const [reminderMessage, setReminderMessage] = useState(
+    "Hola {{nombre}}. Te recordamos que se acerca {{evento}}, el {{fecha}}.\n\nSi ya confirmaste, ¡muchas gracias! Si todavía no, completá tu confirmación: {{confirmacion}}",
   );
+  const [giftText, setGiftText] = useState(order.giftDetails);
   const restrictions = guests.flatMap((guest) => [
     ...(guest.food !== "—" && guest.food !== "Ninguna" ? [guest] : []),
     ...guest.companions
@@ -3254,7 +3461,7 @@ function SimpleModule({
           String(pending.length - reminded.length),
         ],
       ],
-      rows: pending,
+      rows: pending.filter((guest) => `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase())),
       headers: [
         t("Invitado", "Guest", "Convidado"),
         "WhatsApp",
@@ -3330,7 +3537,7 @@ function SimpleModule({
       const response = await fetch("/api/admin/guests", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: guest.id, action: "remind" }),
+        body: JSON.stringify({ id: guest.id, action: "remind", message: reminderMessage, giftText }),
       });
       const result = (await response.json()) as {
         guest?: Guest;
@@ -3341,12 +3548,9 @@ function SimpleModule({
       if (!response.ok)
         throw new Error(result.error || "No pudimos enviar el recordatorio.");
       if (result.mode === "manual" && result.url) {
-        const whatsappWindow = window.open(
-          result.url,
-          "_blank",
-          "noopener,noreferrer",
-        );
-        if (!whatsappWindow) window.location.href = result.url;
+        window.open(result.url, "_blank", "noopener,noreferrer");
+        if (result.guest)
+          setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
         return;
       }
       if (!result.guest)
@@ -3375,8 +3579,9 @@ function SimpleModule({
         body: JSON.stringify({
           id: guest.id,
           action: "remind-email",
-          template: reminderTemplate,
-          customHtml: customReminderHtml,
+          template: "message",
+          message: reminderMessage,
+          giftText,
         }),
       });
       const result = (await response.json()) as {
@@ -3492,55 +3697,11 @@ function SimpleModule({
               </p>
             </div>
           </div>
-          <div className="reminder-options">
-            <label>
-              <input
-                type="radio"
-                checked={reminderTemplate === "predefined"}
-                onChange={() => setReminderTemplate("predefined")}
-              />
-              {t(
-                "Formulario predefinido",
-                "Predefined form",
-                "Formulário predefinido",
-              )}
-            </label>
-            <label>
-              <input
-                type="radio"
-                checked={reminderTemplate === "custom"}
-                onChange={() => setReminderTemplate("custom")}
-              />
-              {t(
-                "HTML básico editable",
-                "Editable basic HTML",
-                "HTML básico editável",
-              )}
-            </label>
+          <div className="reminder-form">
+            <label>{t("Mensaje", "Message", "Mensagem")}<textarea value={reminderMessage} onChange={(event) => setReminderMessage(event.target.value)} rows={6} /></label>
+            <label>{t("Datos para regalos", "Gift details", "Dados para presentes")}<textarea value={giftText} onChange={(event) => setGiftText(event.target.value)} rows={3} placeholder={t("Datos de la cuenta que deben ser completados", "Bank details to complete", "Dados bancários a completar")} /></label>
+            <small className="dynamic-help">{t("Variables disponibles", "Available variables", "Variáveis disponíveis")}: <code>{"{{nombre}} · {{evento}} · {{fecha}} · {{confirmacion}}"}</code></small>
           </div>
-          {reminderTemplate === "custom" && (
-            <>
-              <textarea
-                className="html-editor"
-                value={customReminderHtml}
-                onChange={(event) => setCustomReminderHtml(event.target.value)}
-                rows={9}
-              />
-              <small className="dynamic-help">
-                {t(
-                  "Variables disponibles",
-                  "Available variables",
-                  "Variáveis disponíveis",
-                )}
-                :{" "}
-                <code>
-                  {
-                    "{{nombre}} · {{evento}} · {{fecha}} · {{confirmacion}} · {{regalos}}"
-                  }
-                </code>
-              </small>
-            </>
-          )}
         </section>
       )}
       <section className="metrics-grid mini">
@@ -3555,6 +3716,9 @@ function SimpleModule({
         ))}
       </section>
       <section className="panel table-panel">
+        <div className="table-tools">
+          <label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label>
+        </div>
         <div className="table-scroll">
           <table>
             <thead>
@@ -3571,13 +3735,11 @@ function SimpleModule({
                     <div className="person">
                       <GuestAvatar guest={guest} />
                       <p>
-                        <strong>
-                          {view === "Accesos" && index === 0
-                            ? "Ana Pereira"
-                            : view === "Accesos" && index === 1
-                              ? "Martín Costa"
-                              : guest.name}
-                        </strong>
+                        {view === "Accesos" ? (
+                          <strong>{index === 0 ? "Ana Pereira" : index === 1 ? "Martín Costa" : "Sofía Ramos"}</strong>
+                        ) : (
+                          <GuestNameButton guest={guest} />
+                        )}
                         <small>{guest.group}</small>
                       </p>
                     </div>
@@ -3643,7 +3805,7 @@ function SimpleModule({
                             >
                               {remindingId === guest.id
                                 ? t("Enviando…", "Sending…", "Enviando…")
-                                : "Email / HTML"}
+                                : t("Enviar por email", "Send by email", "Enviar por email")}
                             </button>
                           </div>
                         ) : (
@@ -4847,6 +5009,163 @@ function Accesses({ order }: { order: AdminOrder }) {
   );
 }
 
+function GlobalGuestEditor({
+  guest,
+  guests,
+  defaultPhoneCountryCode,
+  defaultInviter,
+  onClose,
+  onSaved,
+}: {
+  guest: Guest;
+  guests: Guest[];
+  defaultPhoneCountryCode: string;
+  defaultInviter: string;
+  onClose: () => void;
+  onSaved: (guest: Guest) => void;
+}) {
+  const { text: t, language } = useAdminI18n();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const save = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    const data = new FormData(event.currentTarget);
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: guest.id, ...Object.fromEntries(data) }),
+      });
+      const result = (await response.json()) as { guest?: Guest; error?: string };
+      if (!response.ok || !result.guest) throw new Error(result.error || "No pudimos guardar los cambios.");
+      onSaved(result.guest);
+      onClose();
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "No pudimos guardar los cambios.");
+    } finally {
+      setSaving(false);
+    }
+  };
+  return (
+    <div className="modal-backdrop" onMouseDown={onClose}>
+      <form className="modal" onSubmit={save} onMouseDown={(event) => event.stopPropagation()}>
+        <button className="modal-close" type="button" onClick={onClose}>×</button>
+        <span className="eyebrow">{t("Información del invitado", "Guest information", "Informações do convidado")}</span>
+        <h2>{t("Editar a", "Edit", "Editar")} {guest.name}</h2>
+        <div className="form-grid">
+          <label>{t("Nombre y apellido", "Full name", "Nome completo")}<input name="name" defaultValue={guest.name} required /></label>
+          <label>{t("Grupo", "Group", "Grupo")}<input name="group" defaultValue={guest.group} /></label>
+          <label>{t("Invitación realizada por", "Invited by", "Convite feito por")}<input name="invitedBy" defaultValue={guest.invitedBy || defaultInviter} /></label>
+          <label>{t("Acompañante de", "Companion of", "Acompanhante de")}<select name="companionOfId" defaultValue={guest.companionOfId}><option value="">{t("Invitación principal", "Primary invitation", "Convite principal")}</option>{guests.filter((item) => item.id !== guest.id && !item.companionOfId).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+          <label>{t("Estado", "Status", "Status")}<select name="status" defaultValue={guest.status}><option value="Confirmado">{adminStatus(language, "Confirmado")}</option><option value="Pendiente">{adminStatus(language, "Pendiente")}</option><option value="No asiste">{adminStatus(language, "No asiste")}</option></select></label>
+          <label>{t("Cupos", "Seats", "Vagas")}<input name="seats" type="number" min="1" max="20" defaultValue={guest.seats} /></label>
+          <label>Email<input name="email" type="email" defaultValue={guest.email} /></label>
+          <label>{t("Código de país", "Country code", "Código do país")}<input name="phoneCountryCode" defaultValue={guest.phoneCountryCode || defaultPhoneCountryCode} required /></label>
+          <label>WhatsApp<input name="phone" inputMode="tel" defaultValue={guest.phone.replace(guest.phoneCountryCode || defaultPhoneCountryCode, "")} /></label>
+          <label>{t("Tipo de identificación", "ID type", "Tipo de identificação")}<select name="identificationType" defaultValue={guest.identificationType}><option value="">{t("Sin identificación", "No ID", "Sem identificação")}</option><option>CI</option><option>DNI</option><option>CPF</option><option>{t("Pasaporte", "Passport", "Passaporte")}</option><option>{t("Otro", "Other", "Outro")}</option></select></label>
+          <label>{t("Identificación", "ID number", "Identificação")}<input name="identificationNumber" defaultValue={guest.identificationNumber} /></label>
+          <label>{t("Restricción alimentaria", "Dietary need", "Restrição alimentar")}<input name="food" defaultValue={guest.food === "—" ? "" : guest.food} /></label>
+          <label>{t("Canción sugerida", "Suggested song", "Música sugerida")}<input name="song" defaultValue={guest.song === "—" ? "" : guest.song} /></label>
+        </div>
+        {error && <p className="login-error">{error}</p>}
+        <div className="modal-actions"><button className="outline-button" type="button" onClick={onClose}>{t("Cancelar", "Cancel", "Cancelar")}</button><button className="primary-button small" disabled={saving}>{saving ? t("Guardando…", "Saving…", "Salvando…") : t("Guardar cambios", "Save changes", "Salvar alterações")}</button></div>
+      </form>
+    </div>
+  );
+}
+
+function ThanksModule({
+  guests,
+  setGuests,
+  order,
+  canEdit,
+}: {
+  guests: Guest[];
+  setGuests: React.Dispatch<React.SetStateAction<Guest[]>>;
+  order: AdminOrder;
+  canEdit: boolean;
+}) {
+  const { text: t, locale } = useAdminI18n();
+  const [query, setQuery] = useState("");
+  const [honoree, setHonoree] = useState(order.customerName);
+  const [message, setMessage] = useState(
+    "Hola {{nombre}}.\n\n{{asistencia}}\n\nCon cariño, {{homenajeado}}.{{cuenta}}",
+  );
+  const [attendedText, setAttendedText] = useState(
+    "Muchas gracias por haber compartido este maravilloso momento con nosotros. Fue muy especial celebrarlo juntos.",
+  );
+  const [absentText, setAbsentText] = useState(
+    "Lamentamos que no hayas podido asistir, pero pronto habrá nuevas oportunidades para encontrarnos y celebrar juntos.",
+  );
+  const [bankDetails, setBankDetails] = useState(order.giftDetails);
+  const [sendingId, setSendingId] = useState("");
+  const [error, setError] = useState("");
+  const visibleGuests = guests.filter((guest) =>
+    `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase()),
+  );
+
+  const sendThanks = async (guest: Guest) => {
+    setSendingId(guest.id);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "thank-you",
+          id: guest.id,
+          honoree,
+          message,
+          attendedText,
+          absentText,
+          bankDetails,
+        }),
+      });
+      const result = (await response.json()) as { guest?: Guest; url?: string; error?: string };
+      if (!response.ok || !result.guest || !result.url)
+        throw new Error(result.error || "No pudimos preparar el agradecimiento.");
+      setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+      window.open(result.url, "_blank", "noopener,noreferrer");
+    } catch (sendError) {
+      setError(sendError instanceof Error ? sendError.message : "No pudimos preparar el agradecimiento.");
+    } finally {
+      setSendingId("");
+    }
+  };
+
+  return (
+    <>
+      <div className="page-heading">
+        <div>
+          <span className="eyebrow">{t("Después del evento", "After the event", "Depois do evento")}</span>
+          <h1>{t("Agradecimientos", "Thank-you messages", "Agradecimentos")}</h1>
+          <p>{t("Personalizá el mensaje y agradecé a cada invitado por WhatsApp.", "Personalize the message and thank each guest via WhatsApp.", "Personalize a mensagem e agradeça cada convidado pelo WhatsApp.")}</p>
+        </div>
+      </div>
+      <section className="panel thanks-composer">
+        <div className="panel-title"><div><h2>{t("Preparar mensaje", "Prepare message", "Preparar mensagem")}</h2><p>{t("El texto cambia automáticamente según la asistencia.", "The text changes automatically based on attendance.", "O texto muda automaticamente conforme a presença.")}</p></div></div>
+        <div className="form-grid">
+          <label>{t("Nombre del homenajeado", "Honoree name", "Nome do homenageado")}<input value={honoree} onChange={(event) => setHonoree(event.target.value)} /></label>
+          <label>{t("Datos bancarios", "Bank details", "Dados bancários")}<textarea rows={3} value={bankDetails} onChange={(event) => setBankDetails(event.target.value)} placeholder={t("Opcional", "Optional", "Opcional")} /></label>
+        </div>
+        <label>{t("Mensaje para quienes asistieron", "Message for attendees", "Mensagem para quem compareceu")}<textarea rows={3} value={attendedText} onChange={(event) => setAttendedText(event.target.value)} /></label>
+        <label>{t("Mensaje para quienes no asistieron", "Message for non-attendees", "Mensagem para quem não compareceu")}<textarea rows={3} value={absentText} onChange={(event) => setAbsentText(event.target.value)} /></label>
+        <label>{t("Formato general", "General format", "Formato geral")}<textarea rows={5} value={message} onChange={(event) => setMessage(event.target.value)} /></label>
+        <small className="dynamic-help">{t("Variables", "Variables", "Variáveis")}: <code>{"{{nombre}} · {{asistencia}} · {{homenajeado}} · {{cuenta}}"}</code></small>
+      </section>
+      <section className="panel table-panel">
+        <div className="table-tools"><label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label></div>
+        <div className="table-scroll"><table><thead><tr><th>{t("Invitado", "Guest", "Convidado")}</th><th>{t("Asistencia", "Attendance", "Presença")}</th><th>{t("Agradecimiento", "Thank-you", "Agradecimento")}</th><th>{t("Acción", "Action", "Ação")}</th></tr></thead>
+          <tbody>{visibleGuests.map((guest) => <tr key={guest.id}><td><div className="person"><GuestAvatar guest={guest} /><p><GuestNameButton guest={guest} /><small>{guest.group}</small></p></div></td><td><Status value={guest.status} /></td><td>{guest.thankedAt ? <span className="status status-confirmado">{t("Enviado", "Sent", "Enviado")} · {reportDate(guest.thankedAt, locale)}</span> : <span className="muted">{t("Pendiente", "Pending", "Pendente")}</span>}</td><td>{canEdit ? <button className="whatsapp-button" disabled={!guest.phone || sendingId === guest.id} onClick={() => sendThanks(guest)}>{sendingId === guest.id ? t("Preparando…", "Preparing…", "Preparando…") : guest.thankedAt ? t("Reenviar por WhatsApp", "Resend via WhatsApp", "Reenviar pelo WhatsApp") : t("Enviar por WhatsApp", "Send via WhatsApp", "Enviar pelo WhatsApp")}</button> : <span className="muted">{t("Solo lectura", "View only", "Somente leitura")}</span>}</td></tr>)}</tbody>
+        </table></div>
+        {error && <p className="table-error" role="alert">{error}</p>}
+      </section>
+    </>
+  );
+}
+
 function Admin({
   onLogout,
   order,
@@ -4865,6 +5184,7 @@ function Admin({
   );
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [globalEditingId, setGlobalEditingId] = useState("");
   const [comfortableText, setComfortableText] = useState(
     () =>
       window.sessionStorage.getItem("syd-admin-font-size") === "comfortable-v2",
@@ -4880,6 +5200,7 @@ function Admin({
           Restricciones: t("Restricciones", "Dietary needs", "Restrições"),
           Canciones: t("Canciones", "Songs", "Músicas"),
           Recordatorios: t("Recordatorios", "Reminders", "Lembretes"),
+          Agradecimientos: t("Agradecimientos", "Thank-you", "Agradecimentos"),
           Accesos: t("Accesos", "Access", "Acessos"),
           Configuración: t("Configuración", "Settings", "Configurações"),
         }) as Record<string, string>
@@ -4919,6 +5240,13 @@ function Admin({
       document.removeEventListener("visibilitychange", refreshVisible);
     };
   }, [refreshGuests]);
+
+  useEffect(() => {
+    const openEditor = (event: Event) =>
+      setGlobalEditingId(String((event as CustomEvent<string>).detail || ""));
+    window.addEventListener("syd:edit-guest", openEditor);
+    return () => window.removeEventListener("syd:edit-guest", openEditor);
+  }, []);
 
   const navigate = (item: string) => {
     setView(item);
@@ -5055,7 +5383,8 @@ function Admin({
             <div className="admin-user">
               <span>{initials(order.loginEmail || order.customerName)}</span>
               <div>
-                <strong>{order.loginEmail || order.customerName}</strong>
+                <strong>{order.customerName}</strong>
+                <span className="admin-email">{order.loginEmail}</span>
                 <small>
                   {order.accessRole === "owner"
                     ? t("Propietario", "Owner", "Proprietário")
@@ -5081,7 +5410,7 @@ function Admin({
               guests={guests}
               setGuests={setGuests}
               defaultPhoneCountryCode={defaultPhoneCountryCode}
-              defaultInviter={order.eventTitle}
+              defaultInviter={order.customerName}
               invitationUrl={order.invitationUrl}
               canEdit={order.accessRole !== "viewer"}
             />
@@ -5093,6 +5422,14 @@ function Admin({
           {["Restricciones", "Canciones", "Recordatorios"].includes(view) && (
             <SimpleModule
               view={view}
+              guests={guests}
+              setGuests={setGuests}
+              order={order}
+              canEdit={order.accessRole !== "viewer"}
+            />
+          )}
+          {view === "Agradecimientos" && (
+            <ThanksModule
               guests={guests}
               setGuests={setGuests}
               order={order}
@@ -5120,6 +5457,10 @@ function Admin({
           </small>
         </footer>
       </section>
+      {globalEditingId && order.accessRole !== "viewer" && (() => {
+        const guest = guests.find((item) => item.id === globalEditingId);
+        return guest ? <GlobalGuestEditor guest={guest} guests={guests} defaultPhoneCountryCode={defaultPhoneCountryCode} defaultInviter={order.customerName} onClose={() => setGlobalEditingId("")} onSaved={(updated) => setGuests((current) => current.map((item) => item.id === updated.id ? updated : item))} /> : null;
+      })()}
     </main>
   );
 }

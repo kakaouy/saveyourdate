@@ -8,6 +8,9 @@ type TableRow = {
   name: string;
   capacity: number;
   note: string;
+  space_name?: string;
+  position_x?: number;
+  position_y?: number;
 };
 
 type AssignmentRow = {
@@ -21,6 +24,9 @@ const clientTable = (row: TableRow, assignments: AssignmentRow[] = []) => ({
   name: row.name,
   capacity: row.capacity,
   note: row.note,
+  space: row.space_name || 'Espacio 1',
+  x: Number(row.position_x ?? 24),
+  y: Number(row.position_y ?? 24),
   guests: assignments.filter((guest) => guest.table_id === row.id).map((guest) => guest.id)
 });
 
@@ -32,7 +38,7 @@ async function handler(request: Request) {
 
     if (request.method === 'GET') {
       const [tablesResponse, assignmentsResponse] = await Promise.all([
-        supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note&order=created_at.asc`),
+        supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y&order=created_at.asc`),
         supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=not.is.null&select=id,table_id`)
       ]);
       const tables = await tablesResponse.json() as TableRow[];
@@ -41,6 +47,25 @@ async function handler(request: Request) {
     }
 
     const body = await request.json() as Record<string, unknown>;
+    if (request.method === 'PATCH' && body.action === 'layout') {
+      const id = String(body.id || '');
+      const response = await supabaseRequest(
+        `event_tables?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
+        {
+          method: 'PATCH',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify({
+            space_name: String(body.space || 'Espacio 1').trim() || 'Espacio 1',
+            position_x: Math.max(0, Math.min(840, Number(body.x) || 0)),
+            position_y: Math.max(0, Math.min(440, Number(body.y) || 0)),
+            updated_at: new Date().toISOString(),
+          }),
+        },
+      );
+      const rows = await response.json() as TableRow[];
+      if (!rows[0]) return json({ error: 'No encontramos esa mesa.' }, 404);
+      return json({ table: clientTable(rows[0]) });
+    }
     if (request.method === 'POST') {
       const name = String(body.name || '').trim();
       const capacity = Math.max(1, Math.min(30, Number(body.capacity) || 8));
