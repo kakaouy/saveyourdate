@@ -77,10 +77,10 @@ async function handler(request: Request) {
           headers: { Prefer: 'return=representation' },
           body: JSON.stringify({
             space_name: String(body.space || 'Espacio 1').trim() || 'Espacio 1',
-            position_x: Math.max(0, Math.min(840, Number(body.x) || 0)),
-            position_y: Math.max(0, Math.min(440, Number(body.y) || 0)),
-            layout_width: Math.max(100, Math.min(300, Number(body.width) || 140)),
-            layout_height: Math.max(60, Math.min(180, Number(body.height) || 70)),
+            position_x: Math.round(Math.max(0, Math.min(840, Number(body.x) || 0))),
+            position_y: Math.round(Math.max(0, Math.min(440, Number(body.y) || 0))),
+            layout_width: Math.round(Math.max(100, Math.min(300, Number(body.width) || 140))),
+            layout_height: Math.round(Math.max(60, Math.min(180, Number(body.height) || 70))),
             updated_at: new Date().toISOString(),
           }),
         },
@@ -94,7 +94,7 @@ async function handler(request: Request) {
         method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
           order_number: session.order_number,
           element_type: String(body.kind || 'custom'), label: String(body.label || 'Texto editable').trim().slice(0, 120), space_name: String(body.space || 'Espacio 1'),
-          position_x: Number(body.x) || 0, position_y: Number(body.y) || 0, element_width: Number(body.width) || 150, element_height: Number(body.height) || 80,
+          position_x: Math.round(Number(body.x) || 0), position_y: Math.round(Number(body.y) || 0), element_width: Math.round(Number(body.width) || 150), element_height: Math.round(Number(body.height) || 80),
         }),
       });
       const row = ((await response.json()) as LayoutElementRow[])[0];
@@ -105,7 +105,7 @@ async function handler(request: Request) {
       const response = await supabaseRequest(`event_layout_elements?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`, {
         method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
           label: String(body.label || '').trim().slice(0, 120) || 'Texto editable', space_name: String(body.space || 'Espacio 1'),
-          position_x: Math.max(0, Number(body.x) || 0), position_y: Math.max(0, Number(body.y) || 0), element_width: Math.max(90, Math.min(420, Number(body.width) || 150)), element_height: Math.max(55, Math.min(260, Number(body.height) || 80)), updated_at: new Date().toISOString(),
+          position_x: Math.round(Math.max(0, Number(body.x) || 0)), position_y: Math.round(Math.max(0, Number(body.y) || 0)), element_width: Math.round(Math.max(90, Math.min(420, Number(body.width) || 150))), element_height: Math.round(Math.max(55, Math.min(260, Number(body.height) || 80))), updated_at: new Date().toISOString(),
         }),
       });
       const row = ((await response.json()) as LayoutElementRow[])[0];
