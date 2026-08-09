@@ -14,6 +14,8 @@ async function handler(request: Request) {
       const order = await findOrderByNumber(session.order_number);
       return json({
         defaultPhoneCountryCode: order?.default_phone_country_code || '+598',
+        eventName: String(order?.customer_name || order?.order_payload.eventTitle || ''),
+        eventDate: String(order?.order_payload.eventDate || ''),
         reminderDaysBefore: Math.max(1, Math.min(60, Number(order?.order_payload.reminderDaysBefore) || 7)),
         automaticRemindersEnabled: order?.order_payload.automaticRemindersEnabled === true
       });
@@ -24,19 +26,24 @@ async function handler(request: Request) {
       const code = String(body.defaultPhoneCountryCode || '').trim();
       const reminderDaysBefore = Math.max(1, Math.min(60, Number(body.reminderDaysBefore) || 7));
       const automaticRemindersEnabled = body.automaticRemindersEnabled === true;
+      const eventName = String(body.eventName || '').trim().slice(0, 160);
+      const eventDate = String(body.eventDate || '').trim();
       if (!validCode(code)) return json({ error: 'El código de país no es válido.' }, 400);
+      if (!eventName) return json({ error: 'Ingresá el nombre que se mostrará en el panel.' }, 400);
+      if (eventDate && !/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) return json({ error: 'La fecha del evento no es válida.' }, 400);
       const order = await findOrderByNumber(session.order_number);
       if (!order) return json({ error: 'No encontramos el evento.' }, 404);
       await supabaseRequest(`orders?order_number=eq.${encodeURIComponent(session.order_number)}`, {
         method: 'PATCH',
         body: JSON.stringify({
           default_phone_country_code: code,
-          order_payload: { ...order.order_payload, reminderDaysBefore, automaticRemindersEnabled },
+          customer_name: eventName,
+          order_payload: { ...order.order_payload, eventTitle: eventName, eventDate, reminderDaysBefore, automaticRemindersEnabled },
           updated_at: new Date().toISOString()
         })
       });
       await logAdminActivity(session, 'settings.updated', 'settings', session.order_number, { defaultPhoneCountryCode: code, reminderDaysBefore, automaticRemindersEnabled });
-      return json({ defaultPhoneCountryCode: code, reminderDaysBefore, automaticRemindersEnabled });
+      return json({ defaultPhoneCountryCode: code, eventName, eventDate, reminderDaysBefore, automaticRemindersEnabled });
     }
 
     return json({ error: 'Método no permitido.' }, 405);

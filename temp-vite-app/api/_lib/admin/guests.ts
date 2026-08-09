@@ -11,6 +11,26 @@ import {
 import { normalizeWhatsAppPhone, sendWhatsAppTemplate } from "../whatsapp.js";
 import { logAdminActivity } from "./audit.js";
 
+const confirmationUrlFor = (
+  body: Record<string, unknown>,
+  inviteToken: string,
+  invitationUrl: string | null,
+) => {
+  const target = String(body.confirmationTarget || "rsvp");
+  if (target === "custom") {
+    const customUrl = String(body.customConfirmationUrl || "").trim();
+    try {
+      const parsed = new URL(customUrl);
+      if (["http:", "https:"].includes(parsed.protocol)) return parsed.toString();
+    } catch { /* handled below */ }
+    throw new Error("El enlace alternativo para confirmar no es válido.");
+  }
+  const base = target === "invitation" && invitationUrl
+    ? invitationUrl
+    : `${appUrl()}/confirmar`;
+  return `${base}${base.includes("?") ? "&" : "?"}token=${encodeURIComponent(inviteToken)}`;
+};
+
 type GuestRow = {
   id: string;
   invite_token: string;
@@ -225,10 +245,10 @@ async function handler(request: Request) {
           return json({ error: "El invitado no tiene un email válido." }, 400);
         const order = await findOrderByNumber(session.order_number);
         if (!order) return json({ error: "No encontramos el evento." }, 404);
-        const confirmationUrl = `${appUrl()}/confirmar?token=${encodeURIComponent(guest.invite_token)}`;
         const eventTitle = String(
           order.order_payload.eventTitle || order.customer_name,
         );
+        const confirmationUrl = confirmationUrlFor(body, guest.invite_token, order.invitation_url);
         const eventDate = String(
           order.order_payload.eventDate || "Fecha a confirmar",
         );
@@ -382,7 +402,7 @@ async function handler(request: Request) {
           );
         const order = await findOrderByNumber(session.order_number);
         if (!order) return json({ error: "No encontramos el evento." }, 404);
-        const confirmationUrl = `${appUrl()}/confirmar?token=${encodeURIComponent(guest.invite_token)}`;
+        const confirmationUrl = confirmationUrlFor(body, guest.invite_token, order.invitation_url);
         const reminderText = String(body.message || "").trim().slice(0, 3000);
         const giftText = String(body.giftText || "").trim().slice(0, 1500);
         const delivery = await sendWhatsAppTemplate({

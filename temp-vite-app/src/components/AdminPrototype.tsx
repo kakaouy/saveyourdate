@@ -3488,6 +3488,8 @@ function SimpleModule({
     `Te recordamos que se acerca ${order.eventTitle}, el ${formatEventDate(order.eventDate)}. Si ya confirmaste, ¡muchas gracias! Si todavía no, nos encantaría recibir tu respuesta.`,
   );
   const [giftText, setGiftText] = useState(order.giftDetails);
+  const [confirmationTarget, setConfirmationTarget] = useState<"invitation" | "rsvp" | "custom">(order.invitationUrl ? "invitation" : "rsvp");
+  const [customConfirmationUrl, setCustomConfirmationUrl] = useState("");
   const restrictions = guests.flatMap((guest) => [
     ...(guest.food !== "—" && guest.food !== "Ninguna" ? [guest] : []),
     ...guest.companions
@@ -3504,7 +3506,16 @@ function SimpleModule({
   const pending = guests.filter((g) => g.status === "Pendiente");
   const reminded = pending.filter((g) => g.reminded !== "—");
   const previewGuest = pending[0];
-  const reminderPreview = `Hola ${previewGuest?.name || t("María", "Mary", "Maria")}.\n\n${reminderMessage}\n\n${t("Confirmar asistencia", "Confirm attendance", "Confirmar presença")}: ${previewGuest ? `${window.location.origin}/confirmar?token=${previewGuest.inviteToken}` : `${window.location.origin}/confirmar`}`;
+  const previewBaseUrl = confirmationTarget === "invitation" && order.invitationUrl
+    ? order.invitationUrl
+    : confirmationTarget === "custom" && customConfirmationUrl
+      ? customConfirmationUrl
+      : `${window.location.origin}/confirmar`;
+  const previewSeparator = previewBaseUrl.includes("?") ? "&" : "?";
+  const previewConfirmationUrl = confirmationTarget === "custom"
+    ? previewBaseUrl
+    : `${previewBaseUrl}${previewSeparator}token=${previewGuest?.inviteToken || "enlace-personal"}`;
+  const reminderPreview = `Hola ${previewGuest?.name || t("María", "Mary", "Maria")}.\n\n${reminderMessage}\n\n${t("Confirmar asistencia", "Confirm attendance", "Confirmar presença")}: ${previewConfirmationUrl}`;
   const content = {
     Restricciones: {
       eyebrow: "",
@@ -3649,7 +3660,7 @@ function SimpleModule({
       const response = await fetch("/api/admin/guests", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: guest.id, action: "remind", message: reminderMessage, giftText }),
+        body: JSON.stringify({ id: guest.id, action: "remind", message: reminderMessage, giftText, confirmationTarget, customConfirmationUrl }),
       });
       const result = (await response.json()) as {
         guest?: Guest;
@@ -3694,6 +3705,8 @@ function SimpleModule({
           template: "message",
           message: reminderMessage,
           giftText,
+          confirmationTarget,
+          customConfirmationUrl,
         }),
       });
       const result = (await response.json()) as {
@@ -3794,8 +3807,14 @@ function SimpleModule({
               </p>
             </div>
           </div>
-          <div className="reminder-form">
-            <label>{t("Contenido del recordatorio", "Reminder content", "Conteúdo do lembrete")}<textarea value={reminderMessage} onChange={(event) => setReminderMessage(event.target.value)} rows={6} /></label>
+          <div className="reminder-form message-composer-body">
+            <label>{t("Contenido del recordatorio", "Reminder content", "Conteúdo do lembrete")}<textarea className="compact-message-textarea" value={reminderMessage} onChange={(event) => setReminderMessage(event.target.value)} rows={3} /></label>
+            <label>{t("Destino para confirmar asistencia", "Attendance confirmation destination", "Destino para confirmar presença")}<select value={confirmationTarget} onChange={(event) => setConfirmationTarget(event.target.value as "invitation" | "rsvp" | "custom")}>
+              <option value="invitation" disabled={!order.invitationUrl}>{t("Invitación del evento", "Event invitation", "Convite do evento")}</option>
+              <option value="rsvp">{t("Pantalla de confirmación", "Confirmation screen", "Tela de confirmação")}</option>
+              <option value="custom">{t("Otro formulario o pantalla", "Another form or page", "Outro formulário ou tela")}</option>
+            </select></label>
+            {confirmationTarget === "custom" && <label>{t("Enlace alternativo", "Alternative link", "Link alternativo")}<input type="url" value={customConfirmationUrl} onChange={(event) => setCustomConfirmationUrl(event.target.value)} placeholder="https://" /></label>}
             <label>{t("Datos de la cuenta", "Account details", "Dados da conta")}<textarea value={giftText} onChange={(event) => setGiftText(event.target.value)} rows={3} placeholder={t("Agregá aquí los datos bancarios si querés incluirlos", "Add bank details here if you want to include them", "Adicione os dados bancários aqui se quiser incluí-los")} /></label>
             <div className="message-preview"><span>{t("Así quedará el mensaje final", "Final message preview", "Assim ficará a mensagem final")}</span><p>{reminderPreview}</p>{giftText && <p><strong>{t("Datos para regalos", "Gift details", "Dados para presentes")}</strong><br />{giftText}</p>}</div>
           </div>
@@ -3957,10 +3976,14 @@ function Settings({
   code,
   onChange,
   orderNumber,
+  order,
+  onEventChange,
 }: {
   code: string;
   onChange: (value: string) => void;
   orderNumber: string;
+  order: AdminOrder;
+  onEventChange: (details: { eventName: string; eventDate: string }) => void;
 }) {
   const { text: t, locale } = useAdminI18n();
   const knownCode = countryCodes.some(([, value]) => value === code);
@@ -3972,6 +3995,8 @@ function Settings({
   const [reminderDaysBefore, setReminderDaysBefore] = useState(7);
   const [automaticRemindersEnabled, setAutomaticRemindersEnabled] =
     useState(false);
+  const [eventName, setEventName] = useState(order.customerName);
+  const [eventDate, setEventDate] = useState(order.eventDate);
   const [testingReminder, setTestingReminder] = useState(false);
   const [healthBusy, setHealthBusy] = useState(true);
   const [health, setHealth] = useState<{
@@ -4002,11 +4027,15 @@ function Settings({
       async (response) => {
         if (!response.ok) return;
         const result = (await response.json()) as {
+          eventName?: string;
+          eventDate?: string;
           reminderDaysBefore?: number;
           automaticRemindersEnabled?: boolean;
         };
         setReminderDaysBefore(result.reminderDaysBefore || 7);
         setAutomaticRemindersEnabled(result.automaticRemindersEnabled === true);
+        setEventName(result.eventName || order.customerName);
+        setEventDate(result.eventDate || order.eventDate);
       },
     );
   }, []);
@@ -4056,12 +4085,16 @@ function Settings({
           defaultPhoneCountryCode: value,
           reminderDaysBefore,
           automaticRemindersEnabled,
+          eventName,
+          eventDate,
         }),
       });
       const result = (await response.json()) as {
         defaultPhoneCountryCode?: string;
         reminderDaysBefore?: number;
         automaticRemindersEnabled?: boolean;
+        eventName?: string;
+        eventDate?: string;
         error?: string;
       };
       if (!response.ok || !result.defaultPhoneCountryCode)
@@ -4069,6 +4102,11 @@ function Settings({
       onChange(result.defaultPhoneCountryCode);
       setReminderDaysBefore(result.reminderDaysBefore || reminderDaysBefore);
       setAutomaticRemindersEnabled(result.automaticRemindersEnabled === true);
+      const savedEventName = result.eventName || eventName;
+      const savedEventDate = result.eventDate ?? eventDate;
+      setEventName(savedEventName);
+      setEventDate(savedEventDate);
+      onEventChange({ eventName: savedEventName, eventDate: savedEventDate });
       setMessage("Configuración guardada correctamente.");
     } catch (error) {
       setMessage(
@@ -4271,6 +4309,16 @@ function Settings({
         )}
       </ContextHelp>
       <section className="panel settings-panel">
+        <div className="panel-title">
+          <div>
+            <h2>{t("Datos del evento", "Event details", "Dados do evento")}</h2>
+            <p>{t("Estos datos se muestran en el panel y en los recordatorios.", "These details appear in the dashboard and reminders.", "Esses dados aparecem no painel e nos lembretes.")}</p>
+          </div>
+        </div>
+        <div className="settings-form event-settings-form">
+          <label>{t("Nombre que se muestra", "Displayed name", "Nome exibido")}<input value={eventName} onChange={(event) => setEventName(event.target.value)} placeholder={t("Ejemplo: Juanita", "Example: Juanita", "Exemplo: Juanita")} /></label>
+          <label>{t("Fecha del evento", "Event date", "Data do evento")}<input type="date" value={eventDate} onChange={(event) => setEventDate(event.target.value)} /></label>
+        </div>
         <div className="panel-title">
           <div>
             <h2>
@@ -5189,13 +5237,10 @@ function ThanksModule({
   const honoree = order.customerName;
   const message =
     "Hola {{nombre}}.\n\n{{asistencia}}\n\nCon cariño, {{homenajeado}}.{{cuenta}}";
-  const [attendedText, setAttendedText] = useState(
+  const [thankText, setThankText] = useState(
     "Muchas gracias por haber compartido este maravilloso momento con nosotros. Fue muy especial celebrarlo juntos.",
   );
-  const [absentText, setAbsentText] = useState(
-    "Lamentamos que no hayas podido asistir, pero pronto habrá nuevas oportunidades para encontrarnos y celebrar juntos.",
-  );
-  const bankDetails = order.giftDetails;
+  const [bankDetails, setBankDetails] = useState(order.giftDetails);
   const [sendingId, setSendingId] = useState("");
   const [error, setError] = useState("");
   const visibleGuests = guests.filter((guest) =>
@@ -5216,8 +5261,8 @@ function ThanksModule({
           id: guest.id,
           honoree,
           message,
-          attendedText,
-          absentText,
+          attendedText: thankText,
+          absentText: thankText,
           bankDetails,
         }),
       });
@@ -5243,11 +5288,12 @@ function ThanksModule({
         </div>
       </div>
       <section className="panel thanks-composer">
-        <div className="panel-title"><div><h2>{t("Preparar mensajes", "Prepare messages", "Preparar mensagens")}</h2><p>{t("Escribí una opción para quienes asistieron y otra para quienes no pudieron venir.", "Write one option for attendees and another for those who could not come.", "Escreva uma opção para quem compareceu e outra para quem não pôde vir.")}</p></div></div>
-        <label>{t("Mensaje para quienes asistieron", "Message for attendees", "Mensagem para quem compareceu")}<textarea rows={3} value={attendedText} onChange={(event) => setAttendedText(event.target.value)} /></label>
-        <div className="message-preview"><span>{t("Ejemplo del mensaje final", "Final message example", "Exemplo da mensagem final")}</span><p>{thanksPreview(attendedText)}</p></div>
-        <label>{t("Mensaje para quienes no asistieron", "Message for non-attendees", "Mensagem para quem não compareceu")}<textarea rows={3} value={absentText} onChange={(event) => setAbsentText(event.target.value)} /></label>
-        <div className="message-preview"><span>{t("Ejemplo del mensaje final", "Final message example", "Exemplo da mensagem final")}</span><p>{thanksPreview(absentText)}</p></div>
+        <div className="panel-title"><div><h2>{t("Preparar mensaje", "Prepare message", "Preparar mensagem")}</h2><p>{t("Este mismo mensaje se enviará a todos los invitados seleccionados.", "The same message will be sent to all selected guests.", "A mesma mensagem será enviada a todos os convidados selecionados.")}</p></div></div>
+        <div className="message-composer-body">
+          <label>{t("Mensaje de agradecimiento", "Thank-you message", "Mensagem de agradecimento")}<textarea rows={3} value={thankText} onChange={(event) => setThankText(event.target.value)} /></label>
+          <label>{t("Datos de la cuenta", "Account details", "Dados da conta")}<textarea rows={3} value={bankDetails} onChange={(event) => setBankDetails(event.target.value)} placeholder={t("Agregá los datos bancarios para recordar el regalo", "Add bank details as a gift reminder", "Adicione os dados bancários para lembrar o presente")} /></label>
+          <div className="message-preview"><span>{t("Ejemplo del mensaje final", "Final message example", "Exemplo da mensagem final")}</span><p>{thanksPreview(thankText)}</p></div>
+        </div>
       </section>
       <section className="panel table-panel">
         <div className="table-tools"><label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label></div>
@@ -5264,10 +5310,12 @@ function Admin({
   onLogout,
   order,
   onLanguageChange,
+  onOrderChange,
 }: {
   onLogout: () => void;
   order: AdminOrder;
   onLanguageChange: (language: AdminLanguage) => void;
+  onOrderChange: (order: AdminOrder) => void;
 }) {
   const { text: t, locale, language } = useAdminI18n();
   const [view, setView] = useState("Resumen");
@@ -5366,9 +5414,9 @@ function Admin({
           </button>
         </div>
         <div className="event-switcher">
-          <span>{initials(order.eventTitle)}</span>
+          <span>{initials(order.customerName)}</span>
           <div>
-            <strong>{order.eventTitle}</strong>
+            <strong>{order.customerName}</strong>
             <small>
               {t("Pedido", "Order", "Pedido")} {order.orderNumber}
             </small>
@@ -5536,6 +5584,8 @@ function Admin({
               code={defaultPhoneCountryCode}
               onChange={setDefaultPhoneCountryCode}
               orderNumber={order.orderNumber}
+              order={order}
+              onEventChange={({ eventName, eventDate }) => onOrderChange({ ...order, customerName: eventName, eventTitle: eventName, eventDate })}
             />
           )}
         </div>
@@ -5605,6 +5655,7 @@ export function AdminPrototype() {
         onLogout={logout}
         order={order}
         onLanguageChange={changePanelLanguage}
+        onOrderChange={setOrder}
       />
     </AdminI18nProvider>
   ) : (
