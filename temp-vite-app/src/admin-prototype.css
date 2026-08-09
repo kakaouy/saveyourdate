@@ -228,6 +228,23 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .copy-button, .more-button, .whatsapp-button { border: 0; background: transparent; color: var(--teal-dark); font-size: 9px; font-weight: 800; cursor: pointer; }
 .whatsapp-button { padding: 8px 11px; border-radius: 8px; color: white; background: #2aa96b; }
 .whatsapp-button:disabled { cursor: wait; opacity: .65; }
+.sort-control { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 9px; font-weight: 750; }
+.sort-control select { height: 34px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: white; }
+.help-circle { width: 30px; height: 30px; border: 1px solid var(--teal); border-radius: 50%; color: var(--teal-dark); background: white; font-weight: 900; cursor: pointer; }
+.bulk-actions { display: flex; align-items: center; gap: 12px; margin: 0 16px 12px; padding: 10px 12px; border-radius: 10px; background: #effafa; }
+.bulk-actions .delete-button { margin-left: auto; }
+.checkbox-cell { width: 42px; text-align: center; }
+.checkbox-cell input { width: 16px; height: 16px; accent-color: var(--teal); }
+.link-actions { display: flex; align-items: center; gap: 7px; }
+.column-help { display: grid; gap: 8px; margin: 18px 0; padding: 16px; border-radius: 12px; background: #f5f8f9; }
+.column-help code { color: var(--teal-dark); white-space: normal; }
+.reminder-composer { display: grid; gap: 16px; margin-bottom: 18px; }
+.reminder-options { display: flex; flex-wrap: wrap; gap: 12px; }
+.reminder-options label { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; font-weight: 750; cursor: pointer; }
+.reminder-options input { accent-color: var(--teal); }
+.html-editor { width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 10px; resize: vertical; color: var(--ink); background: #fbfdfd; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.html-editor:focus { outline: 2px solid rgba(10,171,176,.18); border-color: var(--teal); }
+.reminder-actions { display: flex; gap: 7px; }
 .sync-button { font-size: 18px; cursor: pointer; }
 .sync-button.syncing { animation: admin-spin .8s linear infinite; }
 @keyframes admin-spin { to { transform: rotate(360deg); } }
