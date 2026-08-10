@@ -218,6 +218,9 @@ table { width: 100%; border-collapse: collapse; font-size: 10px; }
 th { padding: 11px 16px; color: var(--muted); background: #f7f9fa; font-size: 8px; letter-spacing: .05em; text-align: left; text-transform: uppercase; white-space: nowrap; }
 td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-space: nowrap; }
 .person { display: flex; align-items: center; gap: 10px; min-width: 170px; }
+.seat-progress { display: grid; gap: 2px; min-width: 92px; }
+.seat-progress strong { color: var(--ink); font-size: 10px; }
+.seat-progress small { color: var(--muted); font-size: 7px; white-space: normal; }
 .guest-name-button { width: fit-content; padding: 0; border: 0; border-bottom: 1px dashed transparent; color: inherit; background: transparent; font: inherit; font-weight: 800; text-align: left; cursor: pointer; }
 .guest-name-button:hover, .guest-name-button:focus-visible { color: var(--teal-dark); border-bottom-color: currentColor; outline: none; }
 .status { display: inline-flex; padding: 6px 9px; border-radius: 999px; font-size: 8px; font-weight: 800; }

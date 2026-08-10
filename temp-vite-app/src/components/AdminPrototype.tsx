@@ -105,6 +105,31 @@ const reportDate = (value: string, locale = "es-UY") =>
       }).format(new Date(value))
     : "—";
 
+const linkedGroupMembers = (guest: Guest, guests: Guest[]) => {
+  const rootId = guest.companionOfId || guest.id;
+  const root = guests.find((item) => item.id === rootId) || guest;
+  return [root, ...guests.filter((item) => item.companionOfId === root.id)];
+};
+
+const confirmedPeopleForGuest = (guest: Guest, guests: Guest[]) => {
+  const usesIndividualRows = guests.some((item) => Boolean(item.companionOfId));
+  return usesIndividualRows ? (guest.status === "Confirmado" ? 1 : 0) : Math.max(0, guest.confirmed);
+};
+
+const confirmedPeopleTotal = (guests: Guest[]) =>
+  guests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
+
+const seatProgress = (guest: Guest, guests: Guest[]) => {
+  const members = linkedGroupMembers(guest, guests);
+  if (members.length === 1) return { used: Math.min(guest.confirmed, guest.seats), total: guest.seats };
+  const root = members[0];
+  const index = members.findIndex((member) => member.id === guest.id);
+  const used = guest.status === "Confirmado"
+    ? members.slice(0, index + 1).filter((member) => member.status === "Confirmado").length
+    : 0;
+  return { used, total: Math.max(root.seats, members.length) };
+};
+
 function ContextHelp({
   title,
   children,
@@ -869,7 +894,7 @@ function Dashboard({
   canEdit: boolean;
 }) {
   const { text: t } = useAdminI18n();
-  const confirmed = guests.reduce((total, guest) => total + guest.confirmed, 0);
+  const confirmed = confirmedPeopleTotal(guests);
   const seats = guests.reduce((total, guest) => total + guest.seats, 0);
   const pending = guests.filter((guest) => guest.status === "Pendiente").length;
   const declined = guests.filter(
@@ -897,7 +922,7 @@ function Dashboard({
     if (guest.status === "Confirmado")
       return {
         title: `${guest.name} confirmó asistencia`,
-        detail: `${guest.confirmed} ${guest.confirmed === 1 ? "persona" : "personas"} confirmadas`,
+        detail: `${confirmedPeopleForGuest(guest, guests)} ${confirmedPeopleForGuest(guest, guests) === 1 ? "persona" : "personas"} confirmadas`,
         tone: "avatar-mint",
       };
     if (guest.status === "No asiste")
@@ -1896,7 +1921,7 @@ function Guests({
                 )}
                 <th>{t("Invitado", "Guest", "Convidado")}</th>
                 <th>{t("Grupo", "Group", "Grupo")}</th>
-                <th>{t("Cupos", "Seats", "Vagas")}</th>
+                <th>{t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}</th>
                 <th>{t("Estado", "Status", "Status")}</th>
                 <th>{t("Restricción", "Dietary need", "Restrição")}</th>
                 <th>{t("Acciones", "Actions", "Ações")}</th>
@@ -1934,9 +1959,7 @@ function Guests({
                     </div>
                   </td>
                   <td>{guest.group}</td>
-                  <td>
-                    {guest.confirmed}/{guest.seats}
-                  </td>
+                  <td>{(() => { const progress = seatProgress(guest, guests); return <span className="seat-progress"><strong>{progress.used}/{progress.total}</strong><small>{t("confirmados / cupos", "confirmed / seats", "confirmados / vagas")}</small></span>; })()}</td>
                   <td>
                     {canEdit ? (
                       <select
@@ -2419,7 +2442,7 @@ function Confirmations({ guests }: { guests: Guest[] }) {
   const visibleGuests = guests.filter((guest) =>
     `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase()),
   );
-  const confirmed = guests.reduce((total, guest) => total + guest.confirmed, 0);
+  const confirmed = confirmedPeopleTotal(guests);
   const pending = guests.filter((guest) => guest.status === "Pendiente").length;
   const declined = guests.filter(
     (guest) => guest.status === "No asiste",
@@ -2446,7 +2469,7 @@ function Confirmations({ guests }: { guests: Guest[] }) {
           guest.group,
           adminStatus(language, guest.status),
           guest.seats,
-          guest.confirmed,
+          confirmedPeopleForGuest(guest, guests),
           guest.phone,
           guest.identificationType,
           guest.identificationNumber,
@@ -2549,8 +2572,8 @@ function Confirmations({ guests }: { guests: Guest[] }) {
                       </td>
                       <td>
                         <strong>
-                          {guest.confirmed}{" "}
-                          {guest.confirmed === 1
+                          {confirmedPeopleForGuest(guest, guests)}{" "}
+                          {confirmedPeopleForGuest(guest, guests) === 1
                             ? t("persona", "person", "pessoa")
                             : t("personas", "people", "pessoas")}
                         </strong>
@@ -2663,16 +2686,15 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     (total, table) =>
       total +
       table.guests.reduce(
-        (sum, id) =>
-          sum + (guests.find((guest) => guest.id === id)?.confirmed ?? 0),
+        (sum, id) => {
+          const guest = guests.find((item) => item.id === id);
+          return sum + (guest ? confirmedPeopleForGuest(guest, guests) : 0);
+        },
         0,
       ),
     0,
   );
-  const totalConfirmed = confirmedGuests.reduce(
-    (total, guest) => total + guest.confirmed,
-    0,
-  );
+  const totalConfirmed = confirmedPeopleTotal(confirmedGuests);
   const totalCapacity = tables.reduce(
     (total, table) => total + table.capacity,
     0,
@@ -2953,6 +2975,25 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     link.click();
   };
 
+  const exportDetailedReport = () => {
+    const safe = (value: unknown) => String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character]!);
+    const spaceSections = spaces.map((space) => {
+      const spaceTables = tables.filter((table) => (table.space || "Espacio 1") === space);
+      const drawingTables = spaceTables.map((table) => `<div class="draw-table" style="left:${Math.min(82, (table.x || 0) / 10)}%;top:${Math.min(82, (table.y || 0) / 5)}%;width:${Math.max(10, (table.width || 140) / 10)}%;height:${Math.max(9, (table.height || 70) / 5)}%"><b>${safe(table.name)}</b><span>${table.capacity} ${safe(t("lugares", "seats", "lugares"))}</span></div>`).join("");
+      const drawingElements = floorElements.filter((element) => element.space === space).map((element) => `<div class="draw-element" style="left:${Math.min(84, element.x / 10)}%;top:${Math.min(84, element.y / 5)}%;width:${Math.max(9, element.width / 10)}%;height:${Math.max(8, element.height / 5)}%">${safe(element.label)}</div>`).join("");
+      const details = spaceTables.map((table) => {
+        const tableGuests = table.guests.map((id) => guests.find((guest) => guest.id === id)).filter(Boolean) as Guest[];
+        const occupied = tableGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
+        return `<article class="table-detail"><h3>${safe(table.name)}</h3><p><b>${occupied}/${table.capacity}</b> ${safe(t("lugares ocupados", "occupied seats", "lugares ocupados"))}${table.note ? ` · ${safe(table.note)}` : ""}</p><ul>${tableGuests.length ? tableGuests.map((guest) => `<li>${safe(guest.name)} <span>${safe(guest.group)}</span></li>`).join("") : `<li>${safe(t("Sin invitados asignados", "No assigned guests", "Sem convidados atribuídos"))}</li>`}</ul></article>`;
+      }).join("");
+      return `<section><h2>${safe(space)}</h2><div class="drawing">${drawingElements}${drawingTables}</div><div class="details">${details || `<p>${safe(t("Sin mesas en este espacio", "No tables in this space", "Sem mesas neste espaço"))}</p>`}</div></section>`;
+    }).join("");
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${safe(t("Reporte de mesas", "Table report", "Relatório de mesas"))}</title><style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font:12px Arial;color:#19354d;margin:0}header{display:flex;justify-content:space-between;border-bottom:2px solid #0aabb0;padding-bottom:10px;margin-bottom:18px}h1{margin:0;font:28px Georgia}header p{margin:6px 0 0;color:#718292}section{page-break-after:always}section:last-child{page-break-after:auto}h2{font:22px Georgia}.drawing{position:relative;height:360px;border:2px dashed #b9d9dc;border-radius:12px;background:#f8fbfc;overflow:hidden}.draw-table,.draw-element{position:absolute;display:grid;place-items:center;text-align:center;padding:6px;border-radius:9px}.draw-table{border:2px solid #0aabb0;background:#fff}.draw-table b{font-size:11px}.draw-table span,.draw-element{font-size:9px}.draw-element{border:1px solid #dde6ea;background:#dff5f2;color:#078f96;font-weight:bold}.details{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.table-detail{border:1px solid #dde6ea;border-radius:10px;padding:12px;break-inside:avoid}.table-detail h3{margin:0 0 5px}.table-detail p{margin:0 0 8px;color:#718292}.table-detail ul{margin:0;padding-left:18px}.table-detail li{margin:4px 0}.table-detail li span{color:#718292}footer{position:fixed;bottom:0;right:0;color:#718292;font-size:9px}@media print{.print-action{display:none}}</style></head><body><header><div><h1>${safe(t("Plano y reporte de mesas", "Table plan and report", "Plano e relatório de mesas"))}</h1><p>${safe(t("Distribución completa del evento", "Complete event layout", "Distribuição completa do evento"))}</p></div><button class="print-action" onclick="window.print()">${safe(t("Guardar como PDF o imprimir", "Save as PDF or print", "Salvar como PDF ou imprimir"))}</button></header>${spaceSections}<footer>${new Date().toLocaleDateString()}</footer></body></html>`;
+    const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+    window.open(url, "_blank", "noopener,noreferrer");
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  };
+
   const savePlan = async () => {
     setSaving(true);
     setError("");
@@ -3000,6 +3041,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           </p>
         </div>
         <div className="heading-actions">
+          <button className="outline-button" onClick={exportDetailedReport}>⇩ {t("Exportar reporte", "Export report", "Exportar relatório")}</button>
           <button className={`outline-button ${layoutMode ? "active" : ""}`} onClick={() => setLayoutMode((value) => !value)}>{layoutMode ? t("Ver lista", "View list", "Ver lista") : t("Editar plano", "Edit layout", "Editar plano")}</button>
           {canEdit && <button className="primary-button small" onClick={openNew}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
         </div>
@@ -3148,8 +3190,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   <p>
                     <GuestNameButton guest={guest} />
                     <small>
-                      {guest.confirmed}{" "}
-                      {guest.confirmed === 1
+                      {confirmedPeopleForGuest(guest, guests)}{" "}
+                      {confirmedPeopleForGuest(guest, guests) === 1
                         ? t("persona", "person", "pessoa")
                         : t("personas", "people", "pessoas")}{" "}
                       · {guest.group}
@@ -3172,14 +3214,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       const occupied = table.guests.reduce(
                         (total, id) =>
                           total +
-                          (guests.find((item) => item.id === id)?.confirmed ??
-                            0),
+                          (() => { const assigned = guests.find((item) => item.id === id); return assigned ? confirmedPeopleForGuest(assigned, guests) : 0; })(),
                         0,
                       );
                       const available = table.capacity - occupied;
                       const lacksSpace =
                         table.id !== currentTable?.id &&
-                        available < guest.confirmed;
+                        available < confirmedPeopleForGuest(guest, guests);
                       return (
                         <option
                           key={table.id}
@@ -3188,7 +3229,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         >
                           {table.name}
                           {lacksSpace
-                            ? ` · ${t("faltan", "needs", "faltam")} ${guest.confirmed - available} ${t("lugares", "seats", "lugares")}`
+                            ? ` · ${t("faltan", "needs", "faltam")} ${confirmedPeopleForGuest(guest, guests) - available} ${t("lugares", "seats", "lugares")}`
                             : ` · ${available} ${t("libres", "free", "livres")}`}
                         </option>
                       );
@@ -3226,7 +3267,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 .map((id) => guests.find((guest) => guest.id === id))
                 .filter(Boolean) as Guest[];
               const occupied = tableGuests.reduce(
-                (total, guest) => total + guest.confirmed,
+                (total, guest) => total + confirmedPeopleForGuest(guest, guests),
                 0,
               );
               const remaining = table.capacity - occupied;
@@ -3280,7 +3321,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       <div key={guest.id}>
                         <GuestNameButton guest={guest} />
                         <small>
-                          {guest.confirmed} {t("lugares", "seats", "lugares")}
+                          {confirmedPeopleForGuest(guest, guests)} {t("lugares", "seats", "lugares")}
                         </small>
                         {canEdit && (
                           <button
@@ -3402,7 +3443,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                           (total, id) =>
                             total +
                             (guests.find((guest) => guest.id === id)
-                              ?.confirmed ?? 0),
+                              ? confirmedPeopleForGuest(guests.find((guest) => guest.id === id)!, guests) : 0),
                           0,
                         ) || 1
                       : 1
