@@ -205,7 +205,16 @@ const FEATURE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'Organizador': 'Organizer',
     'Agenda': 'Schedule',
     'Código de Vestimenta': 'Dress code',
-    'Menú': 'Menu'
+    'Menú': 'Menu',
+    'Apertura con sello de lacre': 'Wax-seal opening',
+    'Portada floral editorial': 'Editorial floral cover',
+    'Agregar al calendario': 'Add to calendar',
+    'Alojamiento': 'Accommodation',
+    'Álbum colaborativo': 'Collaborative album',
+    'Instagram': 'Instagram',
+    'Sugerencia de canciones': 'Song suggestions',
+    'Pase QR': 'QR pass',
+    'Multiidioma': 'Multilingual'
   },
   pt: {
     'Galería de fotos': 'Galeria de fotos',
@@ -226,7 +235,16 @@ const FEATURE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'Organizador': 'Organizador',
     'Agenda': 'Agenda',
     'Código de Vestimenta': 'Código de vestimenta',
-    'Menú': 'Menu'
+    'Menú': 'Menu',
+    'Apertura con sello de lacre': 'Abertura com selo de cera',
+    'Portada floral editorial': 'Capa floral editorial',
+    'Agregar al calendario': 'Adicionar ao calendário',
+    'Alojamiento': 'Hospedagem',
+    'Álbum colaborativo': 'Álbum colaborativo',
+    'Instagram': 'Instagram',
+    'Sugerencia de canciones': 'Sugestões de músicas',
+    'Pase QR': 'Passe QR',
+    'Multiidioma': 'Multilíngue'
   }
 };
 
@@ -256,7 +274,7 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'bordo-calida': 'Warm burgundy',
     'verde-agua': 'Aqua green',
     'verde-azulado': 'Blue green'
-    , 'marron-arena': 'Brown & sand', 'lavanda-ciruela': 'Lavender & plum', 'azul-polvo-champagne': 'Dusty blue & champagne', 'rosa-viejo-borgona': 'Antique rose & burgundy', 'rosa-salvia': 'Rose & sage', 'petroleo-champagne': 'Petrol blue & champagne', 'azul-champagne': 'Blue & champagne', 'oliva-marfil': 'Olive & ivory', 'borgona-rosa': 'Burgundy & rose', 'ciruela-lavanda': 'Plum & lavender', 'verde-dorado': 'Green & gold'
+    , 'marron-arena': 'Brown & sand', 'lavanda-ciruela': 'Lavender & plum', 'azul-polvo-champagne': 'Dusty blue & champagne', 'rosa-viejo-borgona': 'Antique rose & burgundy', 'rosa-salvia': 'Rose & sage', 'petroleo-champagne': 'Petrol blue & champagne', 'azul-champagne': 'Blue & champagne', 'oliva-marfil': 'Olive & ivory', 'borgona-rosa': 'Burgundy & rose', 'ciruela-lavanda': 'Plum & lavender', 'verde-dorado': 'Green & gold', 'menta-ciruela': 'Mint & plum', 'lavanda-petroleo': 'Lavender & petrol blue', 'aqua-borgona': 'Aqua & burgundy'
   },
   pt: {
     rosa: 'Rosa',
@@ -279,7 +297,7 @@ const PALETTE_TRANSLATIONS: Record<SiteLanguage, Record<string, string>> = {
     'rosa-antiguo': 'Rosa antigo',
     salvia: 'Verde sálvia',
     lavanda: 'Lavanda',
-    'marron-arena': 'Marrom e areia', 'lavanda-ciruela': 'Lavanda e ameixa', 'azul-polvo-champagne': 'Azul suave e champanhe', 'rosa-viejo-borgona': 'Rosa antigo e bordô', 'rosa-salvia': 'Rosa e sálvia', 'petroleo-champagne': 'Azul petróleo e champanhe', 'azul-champagne': 'Azul e champanhe', 'oliva-marfil': 'Oliva e marfim', 'borgona-rosa': 'Bordô e rosa', 'ciruela-lavanda': 'Ameixa e lavanda', 'verde-dorado': 'Verde e dourado',
+    'marron-arena': 'Marrom e areia', 'lavanda-ciruela': 'Lavanda e ameixa', 'azul-polvo-champagne': 'Azul suave e champanhe', 'rosa-viejo-borgona': 'Rosa antigo e bordô', 'rosa-salvia': 'Rosa e sálvia', 'petroleo-champagne': 'Azul petróleo e champanhe', 'azul-champagne': 'Azul e champanhe', 'oliva-marfil': 'Oliva e marfim', 'borgona-rosa': 'Bordô e rosa', 'ciruela-lavanda': 'Ameixa e lavanda', 'verde-dorado': 'Verde e dourado', 'menta-ciruela': 'Menta e ameixa', 'lavanda-petroleo': 'Lavanda e azul petróleo', 'aqua-borgona': 'Água e bordô',
     'bordo-calida': 'Bordô quente',
     'verde-agua': 'Verde água',
     'verde-azulado': 'Verde azulado'

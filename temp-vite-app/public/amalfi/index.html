@@ -561,7 +561,7 @@ h1,h2,h3,p{margin-top:0}.schedule__title,.modal__title,.footer__signature{font-f
     <section id="sec-schedule" class="tone-white reveal" data-section="schedule">
       <div class="container">
         <div class="section-icon" aria-hidden="true">
-          <img src="images/icon-cronograma.png" alt="" onerror="this.parentElement.hidden=true">
+          <img src="images/icon-music.png" alt="">
         </div>
         <h2 class="section-title">Cronograma</h2>
         <div id="schedule-list" class="schedule"></div>
@@ -664,7 +664,7 @@ h1,h2,h3,p{margin-top:0}.schedule__title,.modal__title,.footer__signature{font-f
         <div class="section-icon" aria-hidden="true">
           <img src="images/icon-music.png" alt="" onerror="this.parentElement.hidden=true">
         </div>
-        <h2 class="section-title">Spoty</h2>
+        <h2 class="section-title">Spotify</h2>
         <p class="section-copy">¿Qué canción no puede faltar?</p>
         <button class="btn" type="button" data-open-modal="modal-spoty">SUGERÍ MÚSICA</button>
       </div>
@@ -874,7 +874,7 @@ const PALETTE_PRESETS = {
 
     const TRANSLATIONS = {
       es: {
-        locale: "es-UY", skip: "Saltar al contenido", loading: "CARGANDO EXPERIENCIA...",
+        locale: "es-UY", skip: "Saltar al contenido", loading: "CARGANDO EXPERIENCIA...", nextSection: "Ir a la siguiente sección", countdownAria: "Cuenta regresiva para el evento", galleryPrevious: "Ver foto anterior", galleryNext: "Ver foto siguiente", gallerySelector: "Selector de fotografías", galleryDot: "Ver fotografía",
         eventTitle: "Mis Quince", countdownEyebrow: "Falta muy poco", countdownTitle: "Cuenta regresiva",
         units: ["Días", "Horas", "Minutos", "Segundos"], countdownDone: "¡Llegó el gran día!",
         locationTitle: "¿Cuándo y dónde?", mapButton: "Cómo llegar", calendarButton: "Agendar evento",
@@ -889,8 +889,8 @@ const PALETTE_PRESETS = {
         ],
         parallaxTitle: "¡Te espero para celebrar!", galleryTitle: "Galería de fotos",
         galleryCopy: "Un recorrido por momentos inolvidables", galleryAlts: [
-          "Retrato de Paz con corona de flores", "Retrato de Paz al aire libre",
-          "Paz sonriendo con flores rosadas", "Retrato de Paz en un campo de flores", "Retrato de Paz sentada"
+          "Retrato floral de Micaela", "Micaela al aire libre",
+          "Micaela entre flores", "Momento especial de Micaela", "Retrato editorial de Micaela"
         ],
         hotelsTitle: "Alojamiento cercano", hotelsCopy: "Opciones recomendadas para quienes vienen de lejos.",
         hotelsButton: "Ver hoteles", hotelsModalTitle: "Hoteles recomendados",
@@ -900,6 +900,7 @@ const PALETTE_PRESETS = {
         copyAlias: "Copiar alias", copied: "Alias copiado.", copyFallback: "Copiá manualmente:",
         photosTitle: "Compartí tus fotos", photosCopy: "Subí tus fotos del evento a nuestra carpeta compartida.", photosButton: "Subir fotos",
         socialTitle: "Instagram y redes", socialCopy: "Etiquetanos usando nuestro hashtag:", socialButton: "Ver Instagram",
+        spotyTitle: "Spotify", spotyCopy: "¿Qué canción no puede faltar?", spotyButton: "Sugerí música", spotyModalTitle: "Sugerencias de música",
         qrTitle: "Tu pase", qrCopy: "Presentá tu código QR en la entrada del salón.", qrButton: "Ver mi pase QR",
         qrModalTitle: "Tu entrada digital", qrModalCopy: "Vista de referencia. Codex deberá generar el QR seguro correspondiente al invitado o grupo.", qrDemo: "QR DEMO",
         rsvpTitle: "Confirmación de asistencia", rsvpDeadline: "Por favor confirmá tu asistencia antes del 1 de noviembre.", rsvpButton: "Confirmar asistencia",
@@ -916,7 +917,7 @@ const PALETTE_PRESETS = {
         previewInstagram: "El enlace de Instagram será provisto por la configuración del evento."
       },
       pt: {
-        locale: "pt-BR", skip: "Ir para o conteúdo", loading: "CARREGANDO EXPERIÊNCIA...",
+        locale: "pt-BR", skip: "Ir para o conteúdo", loading: "CARREGANDO EXPERIÊNCIA...", nextSection: "Ir para a próxima seção", countdownAria: "Contagem regressiva para o evento", galleryPrevious: "Ver foto anterior", galleryNext: "Ver próxima foto", gallerySelector: "Seletor de fotografias", galleryDot: "Ver fotografia",
         eventTitle: "Meus 15 Anos", countdownEyebrow: "Falta muito pouco", countdownTitle: "Contagem regressiva",
         units: ["Dias", "Horas", "Minutos", "Segundos"], countdownDone: "O grande dia chegou!",
         locationTitle: "Quando e onde?", mapButton: "Como chegar", calendarButton: "Adicionar à agenda",
@@ -931,8 +932,8 @@ const PALETTE_PRESETS = {
         ],
         parallaxTitle: "Espero você para comemorar!", galleryTitle: "Galeria de fotos",
         galleryCopy: "Um passeio por momentos inesquecíveis", galleryAlts: [
-          "Retrato de Paz com coroa de flores", "Retrato de Paz ao ar livre",
-          "Paz sorrindo com flores cor-de-rosa", "Retrato de Paz em um campo de flores", "Retrato de Paz sentada"
+          "Retrato floral de Micaela", "Micaela ao ar livre",
+          "Micaela entre flores", "Momento especial de Micaela", "Retrato editorial de Micaela"
         ],
         hotelsTitle: "Hospedagem próxima", hotelsCopy: "Opções recomendadas para quem vem de longe.",
         hotelsButton: "Ver hotéis", hotelsModalTitle: "Hotéis recomendados",
@@ -942,6 +943,7 @@ const PALETTE_PRESETS = {
         copyAlias: "Copiar alias", copied: "Alias copiado.", copyFallback: "Copie manualmente:",
         photosTitle: "Compartilhe suas fotos", photosCopy: "Envie as fotos do evento para a nossa pasta compartilhada.", photosButton: "Enviar fotos",
         socialTitle: "Instagram e redes", socialCopy: "Marque a gente usando a nossa hashtag:", socialButton: "Ver Instagram",
+        spotyTitle: "Spotify", spotyCopy: "Qual música não pode faltar?", spotyButton: "Sugira uma música", spotyModalTitle: "Sugestões de música",
         qrTitle: "Seu convite", qrCopy: "Apresente o código QR na entrada do salão.", qrButton: "Ver meu QR code",
         qrModalTitle: "Seu convite digital", qrModalCopy: "Visual de referência. O Codex deverá gerar o QR seguro do convidado ou grupo.", qrDemo: "QR DEMO",
         rsvpTitle: "Confirmação de presença", rsvpDeadline: "Confirme sua presença até 1º de novembro.", rsvpButton: "Confirmar presença",
@@ -958,7 +960,7 @@ const PALETTE_PRESETS = {
         previewInstagram: "O link do Instagram será fornecido pela configuração do evento."
       },
       en: {
-        locale: "en-US", skip: "Skip to content", loading: "LOADING EXPERIENCE...",
+        locale: "en-US", skip: "Skip to content", loading: "LOADING EXPERIENCE...", nextSection: "Go to the next section", countdownAria: "Countdown to the event", galleryPrevious: "View previous photo", galleryNext: "View next photo", gallerySelector: "Photo selector", galleryDot: "View photo",
         eventTitle: "My 15th Birthday", countdownEyebrow: "Almost time", countdownTitle: "Countdown",
         units: ["Days", "Hours", "Minutes", "Seconds"], countdownDone: "The big day is here!",
         locationTitle: "When and where?", mapButton: "Get directions", calendarButton: "Add to calendar",
@@ -973,8 +975,8 @@ const PALETTE_PRESETS = {
         ],
         parallaxTitle: "I can’t wait to celebrate with you!", galleryTitle: "Photo gallery",
         galleryCopy: "A collection of unforgettable moments", galleryAlts: [
-          "Portrait of Paz wearing a flower crown", "Outdoor portrait of Paz",
-          "Paz smiling with pink flowers", "Portrait of Paz in a flower field", "Portrait of Paz seated"
+          "Floral portrait of Micaela", "Outdoor portrait of Micaela",
+          "Micaela among flowers", "A special moment with Micaela", "Editorial portrait of Micaela"
         ],
         hotelsTitle: "Nearby accommodation", hotelsCopy: "Recommended options for guests traveling from out of town.",
         hotelsButton: "View hotels", hotelsModalTitle: "Recommended hotels",
@@ -984,6 +986,7 @@ const PALETTE_PRESETS = {
         copyAlias: "Copy alias", copied: "Alias copied.", copyFallback: "Copy manually:",
         photosTitle: "Share your photos", photosCopy: "Upload your event photos to our shared folder.", photosButton: "Upload photos",
         socialTitle: "Instagram and social", socialCopy: "Tag us using our hashtag:", socialButton: "View Instagram",
+        spotyTitle: "Spotify", spotyCopy: "Which song cannot be missed?", spotyButton: "Suggest a song", spotyModalTitle: "Song suggestions",
         qrTitle: "Your pass", qrCopy: "Show your QR code at the venue entrance.", qrButton: "View my QR pass",
         qrModalTitle: "Your digital pass", qrModalCopy: "Preview only. Codex must generate the secure QR code assigned to the guest or group.", qrDemo: "QR DEMO",
         rsvpTitle: "RSVP", rsvpDeadline: "Please reply by November 1.", rsvpButton: "Respond to invitation",
@@ -1002,7 +1005,7 @@ const PALETTE_PRESETS = {
     };
 
     const previewParams = new URLSearchParams(window.location.search);
-    const siteConfig = window.VERONA_SITE_CONFIG || {};
+    const siteConfig = window.AMALFI_SITE_CONFIG || {};
     const requestedLocale = siteConfig.locale || previewParams.get("lang") || "es";
     const requestedPalette = siteConfig.palettePreset || previewParams.get("palette") || "menta-ciruela";
 
@@ -1013,7 +1016,7 @@ const PALETTE_PRESETS = {
         name: "Micaela",
         typeLabel: "",
         dateTime: "2027-11-13T21:00:00-03:00",
-        endDateTime: "2027-11-13T05:00:00-03:00",
+        endDateTime: "2027-11-14T05:00:00-03:00",
         timezone: "America/Montevideo",
         venue: "Salón Eventos Premium",
         address: "Av. Principal 1234, Montevideo",
@@ -1038,6 +1041,7 @@ const PALETTE_PRESETS = {
         gifts: true,
         photoUpload: true,
         social: true,
+        spoty: true,
         qrPass: true,
         rsvp: true,
         ...(siteConfig.sections || {})
@@ -1135,6 +1139,12 @@ const PALETTE_PRESETS = {
       document.querySelectorAll("#rsvp-attendance option").forEach((element, index) => { element.textContent = t.attendanceOptions[index]; });
       document.querySelectorAll("#rsvp-food option").forEach((element, index) => { element.textContent = t.foodOptions[index]; });
       document.querySelectorAll("[data-close-modal]").forEach((button) => { button.setAttribute("aria-label", t.close); });
+      document.querySelector(".hero-scroll").setAttribute("aria-label", t.nextSection);
+      byId("countdown").setAttribute("aria-label", t.countdownAria);
+      document.querySelector("[data-carousel-prev]").setAttribute("aria-label", t.galleryPrevious);
+      document.querySelector("[data-carousel-next]").setAttribute("aria-label", t.galleryNext);
+      document.querySelector("[data-carousel-dots]").setAttribute("aria-label", t.gallerySelector);
+      document.querySelectorAll(".gallery-carousel__slide img").forEach((image, index) => { image.alt = t.galleryAlts[index] || `${t.galleryTitle} ${index + 1}`; });
       byId("modal-lightbox").setAttribute("aria-label", t.photoDialog);
       byId("footer-year").parentElement.lastChild.textContent = ` Save Your Date · ${t.rights}`;
       byId("modal-gifts").querySelector(".modal__copy").innerHTML = `<strong>${t.giftAliasLabel}</strong> ${EVENT_CONFIG.gifts.copyValue}`;
@@ -1186,7 +1196,7 @@ const PALETTE_PRESETS = {
 
       const heroDateCard = document.querySelector(".hero-date-card");
       if (heroDateCard) {
-        heroDateCard.setAttribute("aria-label", `${weekday}, ${day} de ${month} de ${year}, ${time} horas`);
+        heroDateCard.setAttribute("aria-label", new Intl.DateTimeFormat(heroLocale, { dateStyle: "full", timeStyle: "short", timeZone: EVENT_CONFIG.event.timezone }).format(heroDate));
       }
 
       const heroEventTitle = byId("hero-event-title");
@@ -1428,6 +1438,7 @@ const PALETTE_PRESETS = {
 
     
     function setupGalleryCarousel() {
+      const t = TRANSLATIONS[EVENT_CONFIG.locale];
       const carousel = document.querySelector("[data-carousel]");
       if (!carousel) return;
 
@@ -1446,7 +1457,7 @@ const PALETTE_PRESETS = {
         const dot = document.createElement("button");
         dot.type = "button";
         dot.className = "gallery-carousel__dot";
-        dot.setAttribute("aria-label", `Ver fotografía ${index + 1}`);
+        dot.setAttribute("aria-label", `${t.galleryDot} ${index + 1}`);
         dot.addEventListener("click", () => showSlide(index));
         dotsContainer?.append(dot);
         return dot;
