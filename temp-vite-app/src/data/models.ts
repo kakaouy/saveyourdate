@@ -675,7 +675,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
     badge: 'Nuevo',
     demoName1: 'Micaela',
     date: '13 de Noviembre, 2027',
-    previewImage: '/siena/images/foto-portada.png',
+    previewImage: '/previews/siena.png',
     demoPath: '/siena/index.html',
     active: true,
     order: 31,
