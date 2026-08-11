@@ -703,7 +703,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
     badge: 'Nuevo',
     demoName1: 'Micaela',
     date: '13 de Noviembre, 2027',
-    previewImage: '/amalfi/images/foto-03.png',
+    previewImage: '/previews/amalfi.png',
     demoPath: '/amalfi/index.html',
     active: true,
     order: 32,
