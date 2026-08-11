@@ -3,6 +3,7 @@ export interface InvitationModel {
   title: string;
   category: 'wedding' | '15years' | 'other';
   description: string;
+  descriptions?: Partial<Record<'es' | 'en' | 'pt', string>>;
   badge?: string;
   demoName1: string;
   demoName2?: string;
@@ -660,6 +661,62 @@ export const INVITATION_MODELS: InvitationModel[] = [
     palettes: [
       { id: 'rosa-salvia', name: 'Rosa y salvia', color: '#9f6f7b' },
       { id: 'verde-dorado', name: 'Verde y dorado', color: '#2f5d50' }
+    ]
+  },
+  {
+    id: 'siena',
+    title: 'Siena',
+    category: '15years',
+    description: 'Una invitación editorial y orgánica, con papel texturado, apertura con sello de lacre y fotografía protagonista para una experiencia cálida y elegante.',
+    descriptions: {
+      en: 'An editorial, organic invitation with textured paper, a wax-seal opening and statement photography for a warm, elegant experience.',
+      pt: 'Um convite editorial e orgânico, com papel texturizado, abertura com selo de cera e fotografia protagonista para uma experiência acolhedora e elegante.'
+    },
+    badge: 'Nuevo',
+    demoName1: 'Micaela',
+    date: '13 de Noviembre, 2027',
+    previewImage: '/siena/images/foto-portada.png',
+    demoPath: '/siena/index.html',
+    active: true,
+    order: 31,
+    features: ['Apertura con sello de lacre', 'Cuenta Regresiva', 'Ubicación', 'Agregar al calendario', 'Frase', 'Código de Vestimenta', 'Foto destacada con efecto parallax', 'Galería de fotos', 'Alojamiento', 'Regalos / datos de pago', 'Álbum colaborativo', 'Instagram', 'Sugerencia de canciones', 'Pase QR', 'Confirmación RSVP', 'Multiidioma'],
+    themeClass: 'mock-theme-siena',
+    illustrationType: 'crown',
+    location: 'Salón Eventos Premium, Montevideo',
+    includedSections: ['countdown', 'location', 'quote', 'dresscode', 'featuredPhoto', 'gallery', 'gifts', 'playlist', 'instagram', 'rsvp'],
+    palettes: [
+      { id: 'rosa-viejo-borgona', name: 'Rosa viejo y borgoña', color: '#7b4a53' },
+      { id: 'oliva-marfil', name: 'Oliva y marfil', color: '#4f5942' },
+      { id: 'azul-polvo-champagne', name: 'Azul polvo y champagne', color: '#4f6c79' },
+      { id: 'ciruela-lavanda', name: 'Ciruela y lavanda', color: '#59405f' }
+    ]
+  },
+  {
+    id: 'amalfi',
+    title: 'Amalfi',
+    category: '15years',
+    description: 'Una invitación floral, luminosa y contemporánea, con portada editorial, acuarelas vibrantes y una composición fresca para celebrar tus 15 años.',
+    descriptions: {
+      en: 'A bright, contemporary floral invitation with an editorial cover, vibrant watercolor artwork and a fresh composition for a quinceañera celebration.',
+      pt: 'Um convite floral, luminoso e contemporâneo, com capa editorial, aquarelas vibrantes e uma composição fresca para celebrar seus 15 anos.'
+    },
+    badge: 'Nuevo',
+    demoName1: 'Micaela',
+    date: '13 de Noviembre, 2027',
+    previewImage: '/amalfi/images/foto-03.png',
+    demoPath: '/amalfi/index.html',
+    active: true,
+    order: 32,
+    features: ['Portada floral editorial', 'Cuenta Regresiva', 'Ubicación', 'Agregar al calendario', 'Frase', 'Código de Vestimenta', 'Foto destacada con efecto parallax', 'Galería de fotos', 'Alojamiento', 'Regalos / datos de pago', 'Álbum colaborativo', 'Instagram', 'Sugerencia de canciones', 'Pase QR', 'Confirmación RSVP', 'Multiidioma'],
+    themeClass: 'mock-theme-amalfi',
+    illustrationType: 'crown',
+    location: 'Salón Eventos Premium, Montevideo',
+    includedSections: ['countdown', 'location', 'quote', 'dresscode', 'featuredPhoto', 'gallery', 'gifts', 'playlist', 'instagram', 'rsvp'],
+    palettes: [
+      { id: 'menta-ciruela', name: 'Menta y ciruela', color: '#4d3457' },
+      { id: 'lavanda-petroleo', name: 'Lavanda y petróleo', color: '#244f52' },
+      { id: 'aqua-borgona', name: 'Aqua y borgoña', color: '#682e50' },
+      { id: 'azul-polvo-champagne', name: 'Azul polvo y champagne', color: '#4f6c79' }
     ]
   }
 ];

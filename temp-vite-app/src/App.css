@@ -2771,6 +2771,44 @@ html, body, .app-wrapper {
   box-shadow: 0 0 0 3px rgba(255,111,145,.10);
 }
 
+.order-model-summary {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid rgba(57,46,59,.1);
+  border-radius: 14px;
+  background: #fff8fa;
+}
+
+.order-model-summary strong {
+  color: #392e3b;
+  font: 700 19px/1.1 var(--font-serif);
+}
+
+.order-model-summary p {
+  margin: 6px 0 12px;
+  color: #625866;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.order-model-summary ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-model-summary li {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #fff;
+  color: #625866;
+  font-size: 10px;
+  font-weight: 700;
+}
+
 .order-sections-grid { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .basic-template-summary { margin-top: 18px; padding: 18px; border-radius: 14px; background: #eef9f7; color: #392e3b; }
 .basic-template-summary strong { display: block; margin-bottom: 6px; font-size: 14px; }

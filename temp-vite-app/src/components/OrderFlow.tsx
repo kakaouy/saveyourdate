@@ -23,6 +23,48 @@ const SECTION_OPTIONS = [
   { id: 'messages', title: 'Muro de saludos', description: 'Mensajes y buenos deseos para los anfitriones.' }
 ];
 
+const ORDER_FEATURE_TRANSLATIONS: Record<Language, Record<string, string>> = {
+  es: {},
+  en: {
+    'Apertura con sello de lacre': 'Wax-seal opening',
+    'Portada floral editorial': 'Editorial floral cover',
+    'Cuenta Regresiva': 'Countdown',
+    'Ubicación': 'Location',
+    'Agregar al calendario': 'Add to calendar',
+    'Frase': 'Quote',
+    'Código de Vestimenta': 'Dress code',
+    'Foto destacada con efecto parallax': 'Featured photo with parallax effect',
+    'Galería de fotos': 'Photo gallery',
+    'Alojamiento': 'Accommodation',
+    'Regalos / datos de pago': 'Gifts / payment details',
+    'Álbum colaborativo': 'Collaborative album',
+    'Instagram': 'Instagram',
+    'Sugerencia de canciones': 'Song suggestions',
+    'Pase QR': 'QR pass',
+    'Confirmación RSVP': 'RSVP confirmation',
+    'Multiidioma': 'Multilingual'
+  },
+  pt: {
+    'Apertura con sello de lacre': 'Abertura com selo de cera',
+    'Portada floral editorial': 'Capa floral editorial',
+    'Cuenta Regresiva': 'Contagem regressiva',
+    'Ubicación': 'Localização',
+    'Agregar al calendario': 'Adicionar ao calendário',
+    'Frase': 'Frase',
+    'Código de Vestimenta': 'Código de vestimenta',
+    'Foto destacada con efecto parallax': 'Foto destacada com efeito parallax',
+    'Galería de fotos': 'Galeria de fotos',
+    'Alojamiento': 'Hospedagem',
+    'Regalos / datos de pago': 'Presentes / dados de pagamento',
+    'Álbum colaborativo': 'Álbum colaborativo',
+    'Instagram': 'Instagram',
+    'Sugerencia de canciones': 'Sugestões de músicas',
+    'Pase QR': 'Passe QR',
+    'Confirmación RSVP': 'Confirmação de presença',
+    'Multiidioma': 'Multilíngue'
+  }
+};
+
 interface OrderFlowProps {
   models: InvitationModel[];
   initialModelId: string;
@@ -134,6 +176,9 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
       'borgona-rosa': ['Borgoña y rosa', 'Burgundy & rose', 'Bordô e rosa'],
       'ciruela-lavanda': ['Ciruela y lavanda', 'Plum & lavender', 'Ameixa e lavanda'],
       'verde-dorado': ['Verde y dorado', 'Green & gold', 'Verde e dourado']
+      , 'menta-ciruela': ['Menta y ciruela', 'Mint & plum', 'Menta e ameixa']
+      , 'lavanda-petroleo': ['Lavanda y petróleo', 'Lavender & petrol blue', 'Lavanda e azul petróleo']
+      , 'aqua-borgona': ['Aqua y borgoña', 'Aqua & burgundy', 'Água e bordô']
     };
     const translated = names[option.id];
     return translated ? l(translated[0], translated[1], translated[2]) : option.name;
@@ -453,6 +498,17 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
               <select id="order-model" className="form-select" value={modelId} onChange={(event) => setModelId(event.target.value)}>
                 {filteredModels.map((model) => <option key={model.id} value={model.id}>{model.title}</option>)}
               </select>
+              {selectedModel && (
+                <div className="order-model-summary" data-testid="order-model-summary">
+                  <div>
+                    <strong>{selectedModel.title}</strong>
+                    <p>{selectedModel.descriptions?.[lang] || selectedModel.description}</p>
+                  </div>
+                  <ul aria-label={l('Contenido incluido', 'Included content', 'Conteúdo incluído')}>
+                    {selectedModel.features.map((feature) => <li key={feature}>{ORDER_FEATURE_TRANSLATIONS[lang][feature] || feature}</li>)}
+                  </ul>
+                </div>
+              )}
               <div className="order-color-field">
                 <span className="form-label">{l('Color principal de la invitación', 'Main invitation color', 'Cor principal do convite')}</span>
                 <p>{l('Elegilo cuando el modelo admita cambio de paleta. Lo confirmaremos al revisar el pedido.', 'Choose it when the model supports palette changes. We will confirm it when reviewing the order.', 'Escolha quando o modelo permitir mudança de paleta. Confirmaremos ao revisar o pedido.')}</p>
@@ -506,7 +562,7 @@ export default function OrderFlow({ models, initialModelId, initialPaletteColor,
 
               {activeSections.has('rsvp') && <div className="dynamic-section-fields"><h4>RSVP</h4><div className="form-row-2col"><div className="form-group"><label className="form-label">{l('Fecha límite para confirmar', 'RSVP deadline', 'Prazo para confirmação')}</label><input name="rsvpDeadline" className="form-input" type="date" required /></div><div className="form-group"><label className="form-label">{l('Cantidad máxima por invitación', 'Maximum guests per invitation', 'Máximo de convidados por convite')}</label><input name="rsvpMaxGuests" className="form-input" type="number" min="1" required /></div></div><div className="form-group"><label className="form-label">{l('Texto o indicaciones para confirmar', 'RSVP instructions', 'Instruções para confirmação')}</label><textarea name="rsvpInstructions" className="form-textarea" required /></div><p className="dynamic-help">{l('El panel organizará nombres, asistencia, acompañantes y restricciones alimentarias.', 'The dashboard organizes names, attendance, companions and dietary restrictions.', 'O painel organiza nomes, presença, acompanhantes e restrições alimentares.')}</p></div>}
 
-              {activeSections.has('gifts') && <div className="dynamic-section-fields"><h4>Regalos</h4><p>Podés agregar hasta 3 cuentas bancarias, listas o lugares de compra.</p>{[1, 2, 3].map((item) => <div className="gift-row" key={item}><select name={`gift${item}Type`} className="form-select" required={item === 1}><option value="">Tipo {item}</option><option>Cuenta bancaria</option><option>Link de compra</option><option>Lista de regalos</option><option>Otro</option></select><input name={`gift${item}Label`} className="form-input" required={item === 1} placeholder={`Banco, tienda o título${item > 1 ? ' (opcional)' : ''}`} /><input name={`gift${item}Detail`} className="form-input" required={item === 1} placeholder="Alias, número de cuenta o link" /></div>)}</div>}
+              {activeSections.has('gifts') && <div className="dynamic-section-fields"><h4>{l('Regalos', 'Gifts', 'Presentes')}</h4><p>{l('Podés agregar hasta 3 cuentas bancarias, listas o lugares de compra.', 'You may add up to 3 bank accounts, registries or stores.', 'Você pode adicionar até 3 contas bancárias, listas ou lojas.')}</p>{[1, 2, 3].map((item) => <div className="gift-row" key={item}><select name={`gift${item}Type`} className="form-select" required={item === 1}><option value="">{l('Tipo', 'Type', 'Tipo')} {item}</option><option>{l('Cuenta bancaria', 'Bank account', 'Conta bancária')}</option><option>{l('Link de compra', 'Purchase link', 'Link de compra')}</option><option>{l('Lista de regalos', 'Gift registry', 'Lista de presentes')}</option><option>{l('Otro', 'Other', 'Outro')}</option></select><input name={`gift${item}Label`} className="form-input" required={item === 1} placeholder={`${l('Banco, tienda o título', 'Bank, store or title', 'Banco, loja ou título')}${item > 1 ? ` (${l('opcional', 'optional', 'opcional')})` : ''}`} /><input name={`gift${item}Detail`} className="form-input" required={item === 1} placeholder={l('Alias, número de cuenta o link', 'Alias, account number or link', 'Chave, número da conta ou link')} /></div>)}</div>}
 
               {activeSections.has('dresscode') && <div className="dynamic-section-fields"><h4>{l('Código de vestimenta', 'Dress code', 'Código de vestimenta')}</h4><div className="form-group"><label className="form-label">{l('Tipo de vestimenta', 'Attire', 'Tipo de traje')}</label><input name="dressCode" className="form-input" required /></div><div className="form-group"><label className="form-label">{l('Aclaraciones', 'Additional details', 'Observações')}</label><textarea name="dressCodeDetails" className="form-textarea" required /></div></div>}
 
