@@ -1,0 +1,16 @@
+temp-vite-app/public/siena/index.html
+  h_978362ea3daf54 1-3446
+temp-vite-app/public/amalfi/index.html
+  h_978362ea3daf54 1-1565
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1eb5dcf2ba0425698d042accc222091a9867568a",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
