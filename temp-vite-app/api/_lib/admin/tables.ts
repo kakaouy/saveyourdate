@@ -165,7 +165,7 @@ async function handler(request: Request) {
       const tableId = String(body.tableId || '');
       const seatNumber = Math.max(0, Math.round(Number(body.seatNumber) || 0));
       if (tableId) {
-        const [tableResponse, guestResponse, occupantsResponse] = await Promise.all([
+        const [tableResponse, guestResponse, occupantsResponse, individualRowsResponse] = await Promise.all([
           supabaseRequest(
             `event_tables?id=eq.${encodeURIComponent(tableId)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=id,capacity&limit=1`
           ),
@@ -174,6 +174,9 @@ async function handler(request: Request) {
           ),
           supabaseRequest(
             `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=eq.${encodeURIComponent(tableId)}&status=eq.Confirmado&select=id,confirmed,seat_number`
+          ),
+          supabaseRequest(
+            `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&companion_of_id=not.is.null&select=id&limit=1`
           )
         ]);
         const table = (await tableResponse.json() as Pick<TableRow, 'id' | 'capacity'>[])[0];
@@ -184,13 +187,18 @@ async function handler(request: Request) {
         if (!guest) {
           return json({ error: 'El invitado debe estar confirmado para asignarle una mesa.' }, 400);
         }
-        const occupants = await occupantsResponse.json() as AssignmentRow[];
+        const usesIndividualRows = (await individualRowsResponse.json() as Array<{ id: string }>).length > 0;
+        const occupants = (await occupantsResponse.json() as AssignmentRow[]).map((occupant) => ({
+          ...occupant,
+          confirmed: usesIndividualRows ? 1 : occupant.confirmed,
+        }));
+        const guestSize = usesIndividualRows ? 1 : Number(guest.confirmed || 0);
         const occupied = occupiedSeats(occupants, guestId);
-        if (!canAssignGuest(table.capacity, occupants, guestId, Number(guest.confirmed || 0))) {
+        if (!canAssignGuest(table.capacity, occupants, guestId, guestSize)) {
           return json({ error: `No hay lugar suficiente en esta mesa. Quedan ${Math.max(0, table.capacity - occupied)} lugares.` }, 409);
         }
         if (seatNumber) {
-          const guestSeats = Math.max(1, Number(guest.confirmed || 0));
+          const guestSeats = Math.max(1, guestSize);
           if (seatNumber + guestSeats - 1 > table.capacity) {
             return json({ error: `El grupo necesita ${guestSeats} asientos consecutivos desde esa posición.` }, 409);
           }

@@ -3965,6 +3965,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               );
               const canDrop = alreadyHere || remaining >= draggedPeople;
               const seatGuests: Array<{ guest: Guest; label: string; personName: string } | undefined> = Array(table.capacity).fill(undefined);
+              const effectiveSeatByGuest = new Map<string, number>();
               const placeGuest = (guest: Guest, preferredSeat = 0) => {
                 const people = confirmedPeopleForGuest(guest, guests);
                 const members = [guest.name, ...guest.companions.map((companion) => companion.name).filter(Boolean)];
@@ -3972,6 +3973,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 let start = preferredSeat > 0 && fitsAt(preferredSeat - 1) ? preferredSeat - 1 : -1;
                 if (start < 0) start = Array.from({ length: table.capacity }, (_, index) => index).find(fitsAt) ?? -1;
                 if (start < 0) return;
+                effectiveSeatByGuest.set(guest.id, start + 1);
                 Array.from({ length: people }, (_, personIndex) => {
                   const personName = members[personIndex] || `${t("Acompañante de", "Companion of", "Acompanhante de")} ${guest.name}`;
                   seatGuests[start + personIndex] = { guest, personName, label: initials(personName) };
@@ -4073,7 +4075,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                             const guestId = event.dataTransfer.getData("text/guest-id");
                             if (canEdit && guestId && (!person || person.guest.id === guestId)) void assignGuest(guestId, table.id, true, seatIndex + 1);
                           }}
-                        >{person?.label || "♧"}</span>
+                        ><b className="seat-number">{seatIndex + 1}</b><em>{person?.label || "♧"}</em></span>
                       );
                     })}
                   </div>
@@ -4093,7 +4095,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   <div className="seated-guests">
                     {tableGuests.map((guest) => {
                       const people = confirmedPeopleForGuest(guest, guests);
-                      const assignedSeat = table.seatAssignments?.[guest.id] || 0;
+                      const assignedSeat = effectiveSeatByGuest.get(guest.id) || 1;
                       const availableStarts = Array.from({ length: table.capacity }, (_, seatIndex) => seatIndex + 1).filter((start) =>
                         start + people - 1 <= table.capacity &&
                         Array.from({ length: people }, (_, offset) => seatGuests[start - 1 + offset]).every(
@@ -4113,7 +4115,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                             aria-label={`${t("Asiento inicial de", "Starting seat for", "Assento inicial de")} ${guest.name}`}
                             title={t("Elegir asiento inicial", "Choose starting seat", "Escolher assento inicial")}
                           >
-                            <option value={0}>{t("Asiento automático", "Automatic seat", "Assento automático")}</option>
                             {availableStarts.map((seat) => <option key={seat} value={seat}>{t("Asiento", "Seat", "Assento")} {seat}</option>)}
                           </select>
                         )}

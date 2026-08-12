@@ -232,10 +232,16 @@ test('los filtros no comprimen sus etiquetas y las restricciones sociales son vi
 });
 
 test('la categoría y el asiento se pueden cambiar sin depender del arrastre', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
   assert.match(source, /Categoría de edad/);
   assert.match(source, /className="seat-position-select"/);
   assert.match(source, /availableStarts/);
-  assert.match(source, /Asiento automático/);
+  assert.doesNotMatch(source, /Asiento automático/);
+  assert.match(source, /const effectiveSeatByGuest = new Map/);
+  assert.match(source, /className="seat-number"/);
+  assert.match(source, /- Math\.PI \/ 2/);
   assert.match(source, /fromTableId === tableId && fromSeatNumber === seatNumber/);
   assert.doesNotMatch(source, /Parada o zona/);
+  assert.match(tablesApi, /companion_of_id=not\.is\.null/);
+  assert.match(tablesApi, /const guestSize = usesIndividualRows \? 1/);
 });
