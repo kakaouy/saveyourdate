@@ -185,3 +185,13 @@ test('el plano ajusta a cuadrícula, detecta solapamientos y duplica mesas', () 
   assert.match(source, /const duplicateTable = async/);
   assert.match(source, /void duplicateTable\(table\)/);
 });
+
+test('el reporte de catering exporta personas con mesa, asiento y necesidades', () => {
+  assert.match(source, /function seatingRowsForTable/);
+  assert.match(source, /const exportCateringReport =/);
+  assert.match(source, /catering-por-mesa\.csv/);
+  assert.match(source, /row\.seat/);
+  assert.match(source, /row\.accessibility/);
+  assert.match(source, /onClick=\{exportCateringReport\}/);
+  assert.match(source, /Asiento.*\$\{seat\.seat\}/s);
+});

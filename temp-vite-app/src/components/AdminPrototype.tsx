@@ -3529,7 +3529,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           ...[...menuSummary].map(([menu, count]) => `${count}× ${menu}`),
           ...tableGuests.filter((guest) => meaningfulGuestValue(guest.accessibilityNeeds)).map((guest) => `${guest.name}: ${guest.accessibilityNeeds}`),
         ];
-        return `<article class="table-detail"><h3>${safe(table.name)}</h3><p><b>${occupied}/${table.capacity}</b> ${safe(t("lugares ocupados", "occupied seats", "lugares ocupados"))}${table.note ? ` · ${safe(table.note)}` : ""}</p>${operationalSummary.length ? `<div class="ops"><b>${safe(t("Operativa", "Operations", "Operação"))}:</b> ${operationalSummary.map(safe).join(" · ")}</div>` : ""}<ul>${tableGuests.length ? tableGuests.map((guest) => { const needs = [guest.menuChoice, guest.food, guest.accessibilityNeeds].filter(meaningfulGuestValue); return `<li>${safe(guest.name)} <span>${safe(guest.group)}${needs.length ? ` · ${needs.map(safe).join(" · ")}` : ""}</span></li>`; }).join("") : `<li>${safe(t("Sin invitados asignados", "No assigned guests", "Sem convidados atribuídos"))}</li>`}</ul></article>`;
+        const seats = seatingRowsForTable(table);
+        return `<article class="table-detail"><h3>${safe(table.name)}</h3><p><b>${occupied}/${table.capacity}</b> ${safe(t("lugares ocupados", "occupied seats", "lugares ocupados"))}${table.note ? ` · ${safe(table.note)}` : ""}</p>${operationalSummary.length ? `<div class="ops"><b>${safe(t("Operativa", "Operations", "Operação"))}:</b> ${operationalSummary.map(safe).join(" · ")}</div>` : ""}<ul>${seats.length ? seats.map((seat) => { const needs = [seat.menu, seat.food, seat.accessibility].filter(meaningfulGuestValue); return `<li><b>${safe(t("Asiento", "Seat", "Assento"))} ${seat.seat}</b> · ${safe(seat.name)} <span>${safe(seat.category)}${needs.length ? ` · ${needs.map(safe).join(" · ")}` : ""}</span></li>`; }).join("") : `<li>${safe(t("Sin invitados asignados", "No assigned guests", "Sem convidados atribuídos"))}</li>`}</ul></article>`;
       }).join("");
       return `<section><h2>${safe(space)}</h2><div class="drawing">${drawingElements}${drawingTables}</div><div class="details">${details || `<p>${safe(t("Sin mesas en este espacio", "No tables in this space", "Sem mesas neste espaço"))}</p>`}</div></section>`;
     }).join("");
@@ -3537,6 +3538,41 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
     window.open(url, "_blank", "noopener,noreferrer");
     window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  };
+
+  function seatingRowsForTable(table: EventTable) {
+    const slots: Array<{ guest: Guest; name: string } | undefined> = Array(table.capacity).fill(undefined);
+    const tableGuests = table.guests.map((id) => guests.find((guest) => guest.id === id)).filter(Boolean) as Guest[];
+    const place = (guest: Guest, preferredSeat = 0) => {
+      const people = confirmedPeopleForGuest(guest, guests);
+      const names = [guest.name, ...guest.companions.map((companion) => companion.name).filter(Boolean)];
+      const fits = (start: number) => start >= 0 && start + people <= slots.length && Array.from({ length: people }, (_, index) => !slots[start + index]).every(Boolean);
+      let start = preferredSeat && fits(preferredSeat - 1) ? preferredSeat - 1 : -1;
+      if (start < 0) start = Array.from({ length: slots.length }, (_, index) => index).find(fits) ?? -1;
+      if (start < 0) return;
+      Array.from({ length: people }, (_, index) => { slots[start + index] = { guest, name: names[index] || `${t("Acompañante de", "Companion of", "Acompanhante de")} ${guest.name}` }; });
+    };
+    tableGuests.filter((guest) => table.seatAssignments?.[guest.id]).forEach((guest) => place(guest, table.seatAssignments[guest.id]));
+    tableGuests.filter((guest) => !table.seatAssignments?.[guest.id]).forEach((guest) => place(guest));
+    return slots.flatMap((slot, index) => slot ? [{
+      table: table.name,
+      seat: index + 1,
+      name: slot.name,
+      category: slot.guest.guestType === "child" ? t("Niño/a", "Child", "Criança") : t("Adulto", "Adult", "Adulto"),
+      menu: slot.guest.menuChoice || "",
+      food: meaningfulGuestValue(slot.guest.food) ? slot.guest.food : "",
+      accessibility: slot.guest.accessibilityNeeds || "",
+      notes: slot.guest.guestNotes || "",
+    }] : []);
+  }
+
+  const exportCateringReport = () => {
+    const rows = tables.flatMap(seatingRowsForTable);
+    exportCsv(
+      "catering-por-mesa.csv",
+      [t("Mesa", "Table", "Mesa"), t("Asiento", "Seat", "Assento"), t("Nombre", "Name", "Nome"), t("Categoría", "Category", "Categoria"), t("Menú", "Menu", "Menu"), t("Alergias / restricciones", "Allergies / dietary needs", "Alergias / restrições"), t("Accesibilidad", "Accessibility", "Acessibilidade"), t("Observaciones", "Notes", "Observações")],
+      rows.map((row) => [row.table, row.seat, row.name, row.category, row.menu, row.food, row.accessibility, row.notes]),
+    );
   };
 
   const savePlan = async () => {
@@ -3587,6 +3623,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         </div>
         <div className="heading-actions">
           <button className="outline-button" onClick={exportDetailedReport}>⇩ {t("Exportar reporte", "Export report", "Exportar relatório")}</button>
+          <button className="outline-button" onClick={exportCateringReport}>⇩ {t("Catering", "Catering", "Catering")}</button>
           <button className={`outline-button ${layoutMode ? "active" : ""}`} onClick={() => setLayoutMode((value) => !value)}>{layoutMode ? t("Ver lista", "View list", "Ver lista") : t("Editar plano", "Edit layout", "Editar plano")}</button>
           {canEdit && <button className="primary-button small" onClick={() => openNew()}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
         </div>
