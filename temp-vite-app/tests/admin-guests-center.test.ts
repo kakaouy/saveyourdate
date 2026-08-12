@@ -9,6 +9,7 @@ const source = readFileSync(
   path.join(appRoot, 'src', 'components', 'AdminPrototype.tsx'),
   'utf8',
 );
+const styles = readFileSync(path.join(appRoot, 'src', 'admin-prototype.css'), 'utf8');
 
 test('Invitados concentra confirmaciones y seguimiento operativo', () => {
   const navBlock = source.match(/const nav = \[[\s\S]*?\n\];/)?.[0] || '';
@@ -214,4 +215,27 @@ test('la revisión visual incorpora adolescentes, arrastre de elementos y tamañ
   assert.match(tablesApi, /event_layout_spaces/);
   assert.match(teenMigration, /'adult', 'teen', 'child'/);
   assert.match(spaceMigration, /canvas_width/);
+});
+
+test('los filtros no comprimen sus etiquetas y las restricciones sociales son visibles', () => {
+  const guestsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812090000_guest_social_preferences.sql'), 'utf8');
+  assert.match(styles, /grid-template-columns: repeat\(5, minmax\(105px, 1fr\)\)/);
+  assert.match(styles, /\.filter-pills button[^}]*white-space: nowrap/);
+  assert.match(source, /socialTogetherWith/);
+  assert.match(source, /socialSeparateFrom/);
+  assert.match(source, /preferredTableName/);
+  assert.match(source, /className="restriction-chips"/);
+  assert.match(guestsApi, /social_together_with/);
+  assert.match(guestsApi, /social_separate_from/);
+  assert.match(migration, /preferred_table_name/);
+});
+
+test('la categoría y el asiento se pueden cambiar sin depender del arrastre', () => {
+  assert.match(source, /Categoría de edad/);
+  assert.match(source, /className="seat-position-select"/);
+  assert.match(source, /availableStarts/);
+  assert.match(source, /Asiento automático/);
+  assert.match(source, /fromTableId === tableId && fromSeatNumber === seatNumber/);
+  assert.doesNotMatch(source, /Parada o zona/);
 });

@@ -41,6 +41,9 @@ type Guest = {
   menuChoice: string;
   accessibilityNeeds: string;
   guestNotes: string;
+  socialTogetherWith: string;
+  socialSeparateFrom: string;
+  preferredTableName: string;
   guestType: "adult" | "teen" | "child";
   updatedAt: string;
   whatsappStatus?: string;
@@ -1343,9 +1346,10 @@ function Guests({
   const confirmedPeople = confirmedPeopleTotal(activeGuests);
   const pendingInvitations = activeGuests.filter((guest) => guest.status === "Pendiente").length;
   const declinedInvitations = activeGuests.filter((guest) => guest.status === "No asiste").length;
-  const dietaryInvitations = activeGuests.filter(
-    (guest) => guest.food && guest.food !== "—" && !/^(ninguna|none|nenhuma)/i.test(guest.food),
-  ).length;
+  const hasGuestRestriction = (guest: Guest) =>
+    (guest.food && guest.food !== "—" && !/^(ninguna|none|nenhuma)/i.test(guest.food)) ||
+    Boolean(guest.socialTogetherWith || guest.socialSeparateFrom || guest.preferredTableName);
+  const dietaryInvitations = activeGuests.filter(hasGuestRestriction).length;
   const unsentInvitations = activeGuests.filter(
     (guest) => guest.status === "Pendiente" && !guest.invitationSentAt,
   ).length;
@@ -1364,10 +1368,7 @@ function Guests({
         filter === "Sin enviar" ||
         filter === "Enviadas pendientes" ||
         guest.status === filter ||
-        (filter === "Restricciones" &&
-          Boolean(guest.food) &&
-          guest.food !== "—" &&
-          !/^(ninguna|none|nenhuma)/i.test(guest.food)) ||
+        (filter === "Restricciones" && hasGuestRestriction(guest)) ||
         (filter === "Respondieron" && guest.status !== "Pendiente");
       const matchesLogistics =
         filter !== "Logística" ||
@@ -1595,6 +1596,9 @@ function Guests({
           accessibilityNeeds: data.get("accessibilityNeeds"),
           guestNotes: data.get("guestNotes"),
           guestType: data.get("guestType"),
+          socialTogetherWith: data.get("socialTogetherWith"),
+          socialSeparateFrom: data.get("socialSeparateFrom"),
+          preferredTableName: data.get("preferredTableName"),
         }),
       });
       const result = (await response.json()) as {
@@ -2267,7 +2271,15 @@ function Guests({
                       <Status value={guest.status} />
                     )}
                   </td>
-                  <td>{guest.food}</td>
+                  <td>
+                    <div className="restriction-chips">
+                      {meaningfulGuestValue(guest.food) && <span className="is-food">⚠ {guest.food}</span>}
+                      {guest.socialTogetherWith && <span className="is-together">↔ {guest.socialTogetherWith}</span>}
+                      {guest.socialSeparateFrom && <span className="is-separate">⇥ {guest.socialSeparateFrom}</span>}
+                      {guest.preferredTableName && <span className="is-preferred">⌖ {guest.preferredTableName}</span>}
+                      {!hasGuestRestriction(guest) && <span className="is-empty">—</span>}
+                    </div>
+                  </td>
                   <td>
                     <span className={`delivery-status ${guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
                       {guest.respondedAt
@@ -2784,6 +2796,9 @@ function Guests({
               <label>Parada del transporte <small className="field-help">Sólo si usa el traslado del evento.</small><input name="transportStop" defaultValue={editingGuest.transportStop} placeholder="Ej. Terminal Tres Cruces" /></label>
               <label>Preferencia de menú<input name="menuChoice" defaultValue={editingGuest.menuChoice} /></label>
               <label>Accesibilidad<input name="accessibilityNeeds" defaultValue={editingGuest.accessibilityNeeds} /></label>
+              <label>Sentar junto a<input name="socialTogetherWith" defaultValue={editingGuest.socialTogetherWith} placeholder="Nombre o grupo" /></label>
+              <label>Sentar separado de<input name="socialSeparateFrom" defaultValue={editingGuest.socialSeparateFrom} placeholder="Nombre o grupo" /></label>
+              <label>Mesa preferida<input name="preferredTableName" defaultValue={editingGuest.preferredTableName} placeholder="Ej. Mesa familiar" /></label>
               <label className="form-span-2">Observaciones<textarea name="guestNotes" rows={3} defaultValue={editingGuest.guestNotes} /></label>
             </div>
             {error && <p className="login-error">{error}</p>}
@@ -3221,7 +3236,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const fromTable = tables.find((table) => table.guests.includes(guestId));
     const fromTableId = fromTable?.id || "";
     const fromSeatNumber = fromTable?.seatAssignments?.[guestId] || 0;
-    if (fromTableId === tableId && (!seatNumber || fromSeatNumber === seatNumber)) return true;
+    if (fromTableId === tableId && fromSeatNumber === seatNumber) return true;
     try {
       const response = await fetch("/api/admin/tables", {
         method: "PATCH",
@@ -4076,12 +4091,32 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                     </div>
                   )}
                   <div className="seated-guests">
-                    {tableGuests.map((guest) => (
-                      <div key={guest.id}>
+                    {tableGuests.map((guest) => {
+                      const people = confirmedPeopleForGuest(guest, guests);
+                      const assignedSeat = table.seatAssignments?.[guest.id] || 0;
+                      const availableStarts = Array.from({ length: table.capacity }, (_, seatIndex) => seatIndex + 1).filter((start) =>
+                        start + people - 1 <= table.capacity &&
+                        Array.from({ length: people }, (_, offset) => seatGuests[start - 1 + offset]).every(
+                          (slot) => !slot || slot.guest.id === guest.id,
+                        ),
+                      );
+                      return <div key={guest.id}>
                         <GuestNameButton guest={guest} />
                         <small>
-                          {confirmedPeopleForGuest(guest, guests)} {t("lugares", "seats", "lugares")}
+                          {people} {t("lugares", "seats", "lugares")}
                         </small>
+                        {canEdit && (
+                          <select
+                            className="seat-position-select"
+                            value={assignedSeat}
+                            onChange={(event) => void assignGuest(guest.id, table.id, true, Number(event.target.value))}
+                            aria-label={`${t("Asiento inicial de", "Starting seat for", "Assento inicial de")} ${guest.name}`}
+                            title={t("Elegir asiento inicial", "Choose starting seat", "Escolher assento inicial")}
+                          >
+                            <option value={0}>{t("Asiento automático", "Automatic seat", "Assento automático")}</option>
+                            {availableStarts.map((seat) => <option key={seat} value={seat}>{t("Asiento", "Seat", "Assento")} {seat}</option>)}
+                          </select>
+                        )}
                         {canEdit && (
                           <button
                             onClick={() => unassignGuest(guest.id)}
@@ -4090,8 +4125,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                             ×
                           </button>
                         )}
-                      </div>
-                    ))}
+                      </div>;
+                    })}
                     {!tableGuests.length &&
                       (canEdit ? (
                         <button
@@ -6033,6 +6068,7 @@ function GlobalGuestEditor({
           <label>{t("Invitación realizada por", "Invited by", "Convite feito por")}<input name="invitedBy" defaultValue={guest.invitedBy || defaultInviter} /></label>
           <label>{t("Acompañante de", "Companion of", "Acompanhante de")}<select name="companionOfId" defaultValue={guest.companionOfId}><option value="">{t("Invitación principal", "Primary invitation", "Convite principal")}</option>{guests.filter((item) => item.id !== guest.id && !item.companionOfId).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
           <label>{t("Estado", "Status", "Status")}<select name="status" defaultValue={guest.status}><option value="Confirmado">{adminStatus(language, "Confirmado")}</option><option value="Pendiente">{adminStatus(language, "Pendiente")}</option><option value="No asiste">{adminStatus(language, "No asiste")}</option></select></label>
+          <label>{t("Categoría de edad", "Age category", "Categoria etária")}<select name="guestType" defaultValue={guest.guestType || "adult"}><option value="adult">{t("Adulto", "Adult", "Adulto")}</option><option value="teen">{t("Adolescente", "Teenager", "Adolescente")}</option><option value="child">{t("Niño/a", "Child", "Criança")}</option></select></label>
           <label>{t("Cupos", "Seats", "Vagas")}<input name="seats" type="number" min="1" max="20" defaultValue={guest.seats} /></label>
           <label>Email<input name="email" type="email" defaultValue={guest.email} /></label>
           <label>{t("Código de país", "Country code", "Código do país")}<input name="phoneCountryCode" defaultValue={guest.phoneCountryCode || defaultPhoneCountryCode} required /></label>
@@ -6042,9 +6078,12 @@ function GlobalGuestEditor({
           <label>{t("Restricción alimentaria", "Dietary need", "Restrição alimentar")}<input name="food" defaultValue={guest.food === "—" ? "" : guest.food} /></label>
           <label>{t("Canción sugerida", "Suggested song", "Música sugerida")}<input name="song" defaultValue={guest.song === "—" ? "" : guest.song} /></label>
           <label>{t("Transporte", "Transport", "Transporte")}<select name="transportOption" defaultValue={guest.transportOption}><option value="">{t("No necesita", "Not needed", "Não precisa")}</option><option value="Ida">{t("Ida", "Outbound", "Ida")}</option><option value="Regreso">{t("Regreso", "Return", "Volta")}</option><option value="Ida y regreso">{t("Ida y regreso", "Outbound and return", "Ida e volta")}</option></select></label>
-          <label>{t("Parada o zona", "Stop or area", "Parada ou região")}<input name="transportStop" defaultValue={guest.transportStop} /></label>
+          <label>{t("Parada del transporte", "Transport stop", "Parada do transporte")}<small className="field-help">{t("Sólo si usa el traslado del evento.", "Only when using event transport.", "Somente se usar o transporte do evento.")}</small><input name="transportStop" defaultValue={guest.transportStop} placeholder={t("Ej. Terminal Tres Cruces", "E.g. Central station", "Ex. Terminal central")} /></label>
           <label>{t("Preferencia de menú", "Menu preference", "Preferência de menu")}<input name="menuChoice" defaultValue={guest.menuChoice} /></label>
           <label>{t("Accesibilidad", "Accessibility", "Acessibilidade")}<input name="accessibilityNeeds" defaultValue={guest.accessibilityNeeds} /></label>
+          <label>{t("Sentar junto a", "Seat together with", "Sentar junto com")}<input name="socialTogetherWith" defaultValue={guest.socialTogetherWith} placeholder={t("Nombre o grupo", "Name or group", "Nome ou grupo")} /></label>
+          <label>{t("Mantener separado de", "Keep separate from", "Manter separado de")}<input name="socialSeparateFrom" defaultValue={guest.socialSeparateFrom} placeholder={t("Nombre o grupo", "Name or group", "Nome ou grupo")} /></label>
+          <label>{t("Mesa preferida", "Preferred table", "Mesa preferida")}<input name="preferredTableName" defaultValue={guest.preferredTableName} placeholder={t("Ej. Mesa familia", "E.g. Family table", "Ex. Mesa família")} /></label>
           <label className="form-span-2">{t("Observaciones", "Notes", "Observações")}<textarea name="guestNotes" rows={3} defaultValue={guest.guestNotes} /></label>
         </div>
         {error && <p className="login-error">{error}</p>}

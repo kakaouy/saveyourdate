@@ -66,6 +66,9 @@ type GuestRow = {
   accessibility_needs: string;
   guest_notes: string;
   guest_type: "adult" | "teen" | "child";
+  social_together_with: string;
+  social_separate_from: string;
+  preferred_table_name: string;
   updated_at: string;
   companions: Array<{
     name: string;
@@ -105,6 +108,9 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
   accessibilityNeeds: row.accessibility_needs || "",
   guestNotes: row.guest_notes || "",
   guestType: ["adult", "teen", "child"].includes(row.guest_type) ? row.guest_type : "adult",
+  socialTogetherWith: row.social_together_with || "",
+  socialSeparateFrom: row.social_separate_from || "",
+  preferredTableName: row.preferred_table_name || "",
   updatedAt: row.updated_at,
   whatsappStatus,
   invitedBy: row.invited_by || "",
@@ -291,6 +297,9 @@ async function handler(request: Request) {
           accessibility_needs: String(body.accessibilityNeeds || "").trim().slice(0, 500),
           guest_notes: String(body.guestNotes || "").trim().slice(0, 1000),
           guest_type: ["teen", "child"].includes(String(body.guestType)) ? body.guestType : "adult",
+          social_together_with: String(body.socialTogetherWith || "").trim().slice(0, 240),
+          social_separate_from: String(body.socialSeparateFrom || "").trim().slice(0, 240),
+          preferred_table_name: String(body.preferredTableName || "").trim().slice(0, 120),
         }),
       });
       const createdGuest = ((await response.json()) as GuestRow[])[0];
@@ -595,7 +604,7 @@ async function handler(request: Request) {
         );
       }
       const guestResponse = await supabaseRequest(
-        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,email,phone,phone_country_code,identification_type,identification_number,name,group_name,invited_by,companion_of_id,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes,guest_type`,
+        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,email,phone,phone_country_code,identification_type,identification_number,name,group_name,invited_by,companion_of_id,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes,guest_type,social_together_with,social_separate_from,preferred_table_name`,
       );
       const existingGuests = (await guestResponse.json()) as GuestRow[];
       if (!existingGuests[0])
@@ -690,6 +699,9 @@ async function handler(request: Request) {
               body.guestType === undefined
                 ? existingGuests[0].guest_type || "adult"
                 : ["teen", "child"].includes(String(body.guestType)) ? body.guestType : "adult",
+            social_together_with: body.socialTogetherWith === undefined ? existingGuests[0].social_together_with || "" : String(body.socialTogetherWith).trim().slice(0, 240),
+            social_separate_from: body.socialSeparateFrom === undefined ? existingGuests[0].social_separate_from || "" : String(body.socialSeparateFrom).trim().slice(0, 240),
+            preferred_table_name: body.preferredTableName === undefined ? existingGuests[0].preferred_table_name || "" : String(body.preferredTableName).trim().slice(0, 120),
             updated_at: new Date().toISOString(),
           }),
         },

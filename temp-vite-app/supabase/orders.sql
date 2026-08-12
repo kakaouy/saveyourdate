@@ -166,6 +166,9 @@ create table if not exists public.event_guests (
   accessibility_needs text not null default '',
   guest_notes text not null default '',
   guest_type text not null default 'adult' check (guest_type in ('adult', 'teen', 'child')),
+  social_together_with text not null default '',
+  social_separate_from text not null default '',
+  preferred_table_name text not null default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
