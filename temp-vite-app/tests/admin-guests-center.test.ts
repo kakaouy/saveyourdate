@@ -133,3 +133,14 @@ test('el plano admite mesas redondas, rectangulares y cuadradas con asientos vis
   assert.match(tablesApi, /table_shape/);
   assert.match(migration, /check \(table_shape in \('round', 'rectangular', 'square'\)\)/);
 });
+
+test('los grupos pueden ubicarse en un asiento concreto sin solaparse', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812040000_guest_seat_positions.sql'), 'utf8');
+  assert.match(source, /seatAssignments: Record<string, number>/);
+  assert.match(source, /void assignGuest\(guestId, table\.id, true, seatIndex \+ 1\)/);
+  assert.match(source, /const placeGuest =/);
+  assert.match(tablesApi, /Uno o más asientos seleccionados ya están ocupados/);
+  assert.match(tablesApi, /seat_number: tableId && seatNumber/);
+  assert.match(migration, /event_guests_seat_number_check/);
+});

@@ -3002,6 +3002,7 @@ type EventTable = {
   width: number;
   height: number;
   shape: "round" | "rectangular" | "square";
+  seatAssignments: Record<string, number>;
 };
 
 type FloorElement = {
@@ -3136,7 +3137,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         editing
           ? current.map((table) =>
               table.id === editing.id
-                ? { ...result.table!, guests: table.guests }
+                ? { ...result.table!, guests: table.guests, seatAssignments: table.seatAssignments || {} }
                 : table,
             )
           : [...current, result.table!],
@@ -3188,6 +3189,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     guestId: string,
     tableId: string,
     remember = true,
+    seatNumber = 0,
   ) => {
     setError("");
     const fromTableId =
@@ -3197,19 +3199,25 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       const response = await fetch("/api/admin/tables", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "assign", guestId, tableId }),
+        body: JSON.stringify({ action: "assign", guestId, tableId, seatNumber }),
       });
       const result = (await response.json()) as { error?: string };
       if (!response.ok)
         throw new Error(result.error || "No pudimos asignar el invitado.");
       setTables((current) =>
-        current.map((table) => ({
-          ...table,
-          guests:
-            table.id === tableId
-              ? [...table.guests.filter((id) => id !== guestId), guestId]
-              : table.guests.filter((id) => id !== guestId),
-        })),
+        current.map((table) => {
+          const nextAssignments = { ...(table.seatAssignments || {}) };
+          delete nextAssignments[guestId];
+          if (table.id === tableId && seatNumber) nextAssignments[guestId] = seatNumber;
+          return {
+            ...table,
+            seatAssignments: nextAssignments,
+            guests:
+              table.id === tableId
+                ? [...table.guests.filter((id) => id !== guestId), guestId]
+                : table.guests.filter((id) => id !== guestId),
+          };
+        }),
       );
       if (remember) setLastAssignment({ guestId, fromTableId, toTableId: tableId });
       setDragGuestId("");
@@ -3826,15 +3834,25 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 dragGuestId && table.guests.includes(dragGuestId),
               );
               const canDrop = alreadyHere || remaining >= draggedPeople;
-              const seatGuests = tableGuests.flatMap((guest) =>
-                Array.from(
-                  { length: confirmedPeopleForGuest(guest, guests) },
-                  (_, personIndex) => ({
-                    guest,
-                    label: personIndex === 0 ? initials(guest.name) : `+${personIndex}`,
-                  }),
-                ),
-              );
+              const seatGuests: Array<{ guest: Guest; label: string; personName: string } | undefined> = Array(table.capacity).fill(undefined);
+              const placeGuest = (guest: Guest, preferredSeat = 0) => {
+                const people = confirmedPeopleForGuest(guest, guests);
+                const members = [guest.name, ...guest.companions.map((companion) => companion.name).filter(Boolean)];
+                const fitsAt = (start: number) => start >= 0 && start + people <= table.capacity && Array.from({ length: people }, (_, index) => !seatGuests[start + index]).every(Boolean);
+                let start = preferredSeat > 0 && fitsAt(preferredSeat - 1) ? preferredSeat - 1 : -1;
+                if (start < 0) start = Array.from({ length: table.capacity }, (_, index) => index).find(fitsAt) ?? -1;
+                if (start < 0) return;
+                Array.from({ length: people }, (_, personIndex) => {
+                  const personName = members[personIndex] || `${t("Acompañante de", "Companion of", "Acompanhante de")} ${guest.name}`;
+                  seatGuests[start + personIndex] = { guest, personName, label: initials(personName) };
+                });
+              };
+              tableGuests
+                .filter((guest) => table.seatAssignments?.[guest.id])
+                .forEach((guest) => placeGuest(guest, table.seatAssignments[guest.id]));
+              tableGuests
+                .filter((guest) => !table.seatAssignments?.[guest.id])
+                .forEach((guest) => placeGuest(guest));
               return (
                 <article
                   className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""}`}
@@ -3906,7 +3924,16 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                           className={`seat-marker ${person ? "is-occupied" : ""} ${person && meaningfulGuestValue(person.guest.food) ? "has-alert" : ""}`}
                           key={seatIndex}
                           style={{ left: `${50 + Math.cos(angle) * radiusX}%`, top: `${50 + Math.sin(angle) * radiusY}%` }}
-                          title={person ? `${person.guest.name}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
+                          title={person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
+                          onDragOver={(event) => {
+                            if (canEdit && dragGuestId && !person) event.preventDefault();
+                          }}
+                          onDrop={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            const guestId = event.dataTransfer.getData("text/guest-id");
+                            if (canEdit && guestId && !person) void assignGuest(guestId, table.id, true, seatIndex + 1);
+                          }}
                         >{person?.label || "♧"}</span>
                       );
                     })}

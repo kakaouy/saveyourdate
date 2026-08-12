@@ -247,6 +247,9 @@ create index if not exists event_tables_order_idx
 alter table public.event_guests
   add column if not exists table_id uuid references public.event_tables(id) on delete set null;
 
+alter table public.event_guests
+  add column if not exists seat_number integer check (seat_number between 1 and 30);
+
 create index if not exists event_guests_table_idx
   on public.event_guests(table_id);
 
