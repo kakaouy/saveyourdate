@@ -3167,6 +3167,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const focusSpecificTable = (tableId: string) => document.getElementById(`table-card-${tableId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
   const exportSocialConflicts = () => exportCsv("conflictos-de-mesas.csv", [t("Mesa", "Table", "Mesa"), t("Conflicto", "Conflict", "Conflito")], socialConflicts.map((conflict) => [tables.find((table) => table.id === conflict.tableId)?.name || "—", conflict.message]));
+  const selectedGuest = confirmedGuests.find((guest) => guest.id === selectedGuestId);
+  const suggestedGroupTable = selectedGuest
+    ? tables.find((table) => table.guests.some((guestId) => {
+        const seatedGuest = guests.find((guest) => guest.id === guestId);
+        return seatedGuest && seatedGuest.id !== selectedGuest.id && normalizedReference(seatedGuest.group) === normalizedReference(selectedGuest.group);
+      }))
+    : undefined;
 
   const focusTable = (direction: -1 | 1) => {
     if (!visibleTables.length) return;
@@ -4025,7 +4032,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </span>
             </div>
           </div>
-          {selectedGuestId && <div className="seat-selection-banner"><strong>{guests.find((guest) => guest.id === selectedGuestId)?.name}</strong><span>{t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span><button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
+          {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${t("junto a su grupo", "next to their group", "junto ao seu grupo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
           {tableQuery && <div className="active-table-filter"><span>{t("Resultados para", "Results for", "Resultados para")} “{tableQuery}”</span><button onClick={() => setTableQuery("")}>× {t("Limpiar", "Clear", "Limpar")}</button></div>}
           <div className={`tables-grid ${compactTables ? "is-compact" : ""}`}>
             {!visibleTables.length && <div className="tables-empty-state"><strong>{t("No encontramos mesas", "No tables found", "Nenhuma mesa encontrada")}</strong><span>{t("Probá con otro nombre de mesa o invitado.", "Try another table or guest name.", "Tente outro nome de mesa ou convidado.")}</span><button onClick={() => setTableQuery("")}>{t("Ver todas las mesas", "View all tables", "Ver todas as mesas")}</button></div>}
@@ -4095,10 +4102,19 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               tableGuests
                 .filter((guest) => !table.seatAssignments?.[guest.id])
                 .forEach((guest) => placeGuest(guest));
+              const selectedPeople = selectedGuest ? confirmedPeopleForGuest(selectedGuest, guests) : 0;
+              const groupSeatIndexes = selectedGuest
+                ? seatGuests.flatMap((slot, seatIndex) => slot && slot.guest.id !== selectedGuest.id && normalizedReference(slot.guest.group) === normalizedReference(selectedGuest.group) ? [seatIndex] : [])
+                : [];
+              const suggestedSeatIndex = suggestedGroupTable?.id === table.id && groupSeatIndexes.length
+                ? Array.from({ length: table.capacity }, (_, offset) => (Math.max(...groupSeatIndexes) + 1 + offset) % table.capacity).find((start) =>
+                    start + selectedPeople <= table.capacity && Array.from({ length: selectedPeople }, (_, personIndex) => !seatGuests[start + personIndex]).every(Boolean),
+                  ) ?? -1
+                : -1;
               return (
                 <article
                   id={`table-card-${table.id}`}
-                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""} ${selectedGuestId && table.guests.includes(selectedGuestId) ? "has-selected-guest" : ""} ${assignmentSavingId && table.guests.includes(assignmentSavingId) ? "is-saving" : ""}`}
+                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""} ${selectedGuestId && table.guests.includes(selectedGuestId) ? "has-selected-guest" : ""} ${suggestedGroupTable?.id === table.id ? "is-group-suggestion" : ""} ${assignmentSavingId && table.guests.includes(assignmentSavingId) ? "is-saving" : ""}`}
                   key={table.id}
                   onDragOver={(event) => {
                     if (canEdit && dragGuestId && canDrop) {
@@ -4165,10 +4181,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       const radiusY = table.shape === "rectangular" ? 34 : table.shape === "square" ? 39 : 42;
                       return (
                         <span
-                          className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "teen" ? "is-teen" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person?.guest.id === selectedGuestId ? "is-selected" : ""} ${selectedGuestId && (!person || person.guest.id === selectedGuestId) ? "is-click-target" : ""} ${person && guestHasRestriction(person.guest) ? "has-alert" : ""}`}
+                          className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "teen" ? "is-teen" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person?.guest.id === selectedGuestId ? "is-selected" : ""} ${selectedGuestId && (!person || person.guest.id === selectedGuestId) ? "is-click-target" : ""} ${seatIndex === suggestedSeatIndex ? "is-suggested" : ""} ${person && guestHasRestriction(person.guest) ? "has-alert" : ""}`}
                           key={seatIndex}
                           style={{ left: `${50 + Math.cos(angle) * radiusX}%`, top: `${50 + Math.sin(angle) * radiusY}%` }}
-                          title={person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}${person.guest.socialTogetherWith ? ` · ${t("Junto a", "Together with", "Junto a")} ${person.guest.socialTogetherWith}` : ""}${person.guest.socialSeparateFrom ? ` · ${t("Separado de", "Separate from", "Separado de")} ${person.guest.socialSeparateFrom}` : ""}${person.guest.preferredTableName ? ` · ${t("Mesa preferida", "Preferred table", "Mesa preferida")}: ${person.guest.preferredTableName}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
+                          title={seatIndex === suggestedSeatIndex ? `${t("Asiento sugerido junto al grupo", "Suggested seat next to group", "Assento sugerido junto ao grupo")} · ${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}` : person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}${person.guest.socialTogetherWith ? ` · ${t("Junto a", "Together with", "Junto a")} ${person.guest.socialTogetherWith}` : ""}${person.guest.socialSeparateFrom ? ` · ${t("Separado de", "Separate from", "Separado de")} ${person.guest.socialSeparateFrom}` : ""}${person.guest.preferredTableName ? ` · ${t("Mesa preferida", "Preferred table", "Mesa preferida")}: ${person.guest.preferredTableName}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
                           draggable={Boolean(canEdit && person)}
                           onDragStart={(event) => {
                             if (!person) return;

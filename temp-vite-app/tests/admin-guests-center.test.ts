@@ -302,3 +302,14 @@ test('el segundo paquete agrega restricciones, referencias, exportación y tecla
   assert.match(source, /event\.key === "Enter" \|\| event\.key === " "/);
   assert.match(source, /focusSpecificTable\(conflict\.tableId\)/);
 });
+
+test('sugiere una silla cercana cuando el grupo ya tiene mesa', () => {
+  assert.match(source, /const suggestedGroupTable =/);
+  assert.match(source, /normalizedReference\(seatedGuest\.group\)/);
+  assert.match(source, /const groupSeatIndexes =/);
+  assert.match(source, /const suggestedSeatIndex =/);
+  assert.match(source, /seatIndex === suggestedSeatIndex \? "is-suggested"/);
+  assert.match(source, /Asiento sugerido junto al grupo/);
+  assert.match(styles, /\.seat-marker\.is-suggested/);
+  assert.match(styles, /\.table-card\.is-group-suggestion/);
+});

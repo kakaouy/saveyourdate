@@ -489,6 +489,7 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .tables-grid.is-compact .table-operations, .tables-grid.is-compact .seated-guests, .tables-grid.is-compact .table-card-top p { display: none; }
 .tables-grid.is-compact .capacity-row { margin-top: 10px; }
 .table-card.has-selected-guest { border-color: #48bec2; box-shadow: 0 0 0 3px rgba(10,171,176,.12); }
+.table-card.is-group-suggestion { border-color: #9a7abb; box-shadow: 0 0 0 3px rgba(154,122,187,.14); }
 .table-card, .add-table-card { min-height: 245px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 4px 14px rgba(25,53,77,.035); }
 .table-card.drop-compatible { border-color: var(--teal); background: #f4fbfb; box-shadow: 0 0 0 3px rgba(10,171,176,.12); }
 .table-card.drop-blocked { opacity: .55; border-style: dashed; cursor: not-allowed; }
@@ -545,9 +546,12 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .seat-marker em { font-style: normal; }
 .seat-marker.is-click-target { cursor: pointer; box-shadow: 0 0 0 4px rgba(10,171,176,.14); animation: seat-target-pulse 1.4s ease-in-out infinite; }
 .seat-marker.is-selected { color: white; border-color: #087e82; background: #0aabb0; box-shadow: 0 0 0 4px rgba(10,171,176,.18); }
+.seat-marker.is-suggested { color: #4f346d; border: 2px solid #8d67b1; background: #f1e8fa; box-shadow: 0 0 0 6px rgba(141,103,177,.16); animation: suggested-seat-pulse 1.2s ease-in-out infinite; }
+.seat-marker.is-suggested::after { content: "★"; position: absolute; right: -8px; bottom: -7px; color: #7a55a0; font-size: 10px; }
 .seat-marker.has-alert { color: #8d2f2a; border-color: #df655d; background: #ffe0dd; box-shadow: 0 0 0 4px rgba(223,101,93,.18); }
 .seat-marker.has-alert .seat-number { color: #8d2f2a; border-color: #df655d; background: #fff0ee; }
 @keyframes seat-target-pulse { 50% { box-shadow: 0 0 0 7px rgba(10,171,176,.06); } }
+@keyframes suggested-seat-pulse { 50% { box-shadow: 0 0 0 9px rgba(141,103,177,.07); } }
 .seated-guests button { border: 0; color: var(--muted); background: transparent; font-size: 16px; cursor: pointer; }
 .empty-table { min-height: 55px; border: 1px dashed #b9d8dc; border-radius: 8px; color: var(--teal-dark); background: #f5fbfb; font-size: 9px; font-weight: 750; cursor: pointer; }
 .table-full { border-color: #a9ddca; }
