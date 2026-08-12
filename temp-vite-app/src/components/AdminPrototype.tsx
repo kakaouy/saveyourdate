@@ -3089,6 +3089,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [assignmentStatus, setAssignmentStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "teen" | "child">("all");
+  const [guestRestrictionFilter, setGuestRestrictionFilter] = useState(false);
   const [lastAssignment, setLastAssignment] = useState<{
     guestId: string;
     fromTableId: string;
@@ -3128,7 +3129,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       return normalized
         ? confirmedGuests.find((candidate) => candidate.id !== guestId && (
             normalizedReference(candidate.name).includes(normalized) ||
-            normalized.includes(normalizedReference(candidate.name))
+            normalized.includes(normalizedReference(candidate.name)) ||
+            normalizedReference(candidate.group) === normalized
           ))
         : undefined;
     };
@@ -3141,11 +3143,19 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         const id = `together-${[guest.id, together.id].sort().join("-")}`;
         conflicts.set(id, { id, tableId: table.id, message: `${guest.name} ${t("debe sentarse junto a", "should sit with", "deve sentar junto a")} ${together.name}` });
       }
+      if (guest.socialTogetherWith && !together) {
+        const id = `unresolved-together-${guest.id}`;
+        conflicts.set(id, { id, tableId: table.id, message: `${guest.name}: ${t("no encontramos a", "could not find", "não encontramos")} “${guest.socialTogetherWith}”` });
+      }
       const separate = findReferencedGuest(guest.socialSeparateFrom, guest.id);
       const separateTable = separate && tables.find((candidate) => candidate.guests.includes(separate.id));
       if (separate && separateTable?.id === table.id) {
         const id = `separate-${[guest.id, separate.id].sort().join("-")}`;
         conflicts.set(id, { id, tableId: table.id, message: `${guest.name} ${t("debe sentarse separado de", "should sit separately from", "deve sentar separado de")} ${separate.name}` });
+      }
+      if (guest.socialSeparateFrom && !separate) {
+        const id = `unresolved-separate-${guest.id}`;
+        conflicts.set(id, { id, tableId: table.id, message: `${guest.name}: ${t("no encontramos a", "could not find", "não encontramos")} “${guest.socialSeparateFrom}”` });
       }
       if (guest.preferredTableName && !normalizedReference(table.name).includes(normalizedReference(guest.preferredTableName))) {
         const id = `preferred-${guest.id}`;
@@ -3154,6 +3164,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     });
     return [...conflicts.values()];
   })();
+
+  const focusSpecificTable = (tableId: string) => document.getElementById(`table-card-${tableId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  const exportSocialConflicts = () => exportCsv("conflictos-de-mesas.csv", [t("Mesa", "Table", "Mesa"), t("Conflicto", "Conflict", "Conflito")], socialConflicts.map((conflict) => [tables.find((table) => table.id === conflict.tableId)?.name || "—", conflict.message]));
 
   const focusTable = (direction: -1 | 1) => {
     if (!visibleTables.length) return;
@@ -3718,6 +3731,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         <section className="social-conflict-summary" role="status">
           <strong>⚠ {socialConflicts.length} {socialConflicts.length === 1 ? t("conflicto de distribución", "seating conflict", "conflito de distribuição") : t("conflictos de distribución", "seating conflicts", "conflitos de distribuição")}</strong>
           <span>{t("Revisá las preferencias sociales marcadas dentro de cada mesa.", "Review the social preferences marked on each table.", "Revise as preferências sociais marcadas em cada mesa.")}</span>
+          <button onClick={exportSocialConflicts}>⇩ CSV</button>
         </section>
       )}
 
@@ -3872,7 +3886,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 </button>
               ))}
             </div>
-            {(query || assignmentFilter !== "all" || guestCategoryFilter !== "all") && <button className="clear-seating-filters" onClick={() => { setQuery(""); setAssignmentFilter("all"); setGuestCategoryFilter("all"); }}>× {t("Limpiar filtros", "Clear filters", "Limpar filtros")}</button>}
+            <button className={`restriction-filter ${guestRestrictionFilter ? "active" : ""}`} onClick={() => setGuestRestrictionFilter((current) => !current)}>⚠ {t("Sólo con restricciones", "Restrictions only", "Somente com restrições")}</button>
+            {(query || assignmentFilter !== "all" || guestCategoryFilter !== "all" || guestRestrictionFilter) && <button className="clear-seating-filters" onClick={() => { setQuery(""); setAssignmentFilter("all"); setGuestCategoryFilter("all"); setGuestRestrictionFilter(false); }}>× {t("Limpiar filtros", "Clear filters", "Limpar filtros")}</button>}
             {canEdit && (
               <div
                 className={`unassign-drop-zone ${dragGuestId ? "is-active" : ""}`}
@@ -3890,7 +3905,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               const matchesQuery = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
               const isAssigned = assignedIds.includes(guest.id);
               const matchesCategory = guestCategoryFilter === "all" || (guest.guestType || "adult") === guestCategoryFilter;
-              return matchesQuery && matchesCategory && (assignmentFilter === "all" || (assignmentFilter === "assigned" ? isAssigned : !isAssigned));
+              const matchesRestriction = !guestRestrictionFilter || guestHasRestriction(guest);
+              return matchesQuery && matchesCategory && matchesRestriction && (assignmentFilter === "all" || (assignmentFilter === "assigned" ? isAssigned : !isAssigned));
             }).map((guest) => {
               const currentTable = tables.find((table) =>
                 table.guests.includes(guest.id),
@@ -3900,9 +3916,14 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   key={guest.id}
                   className={`${currentTable ? "guest-assigned" : ""} ${dragGuestId === guest.id ? "is-dragging" : ""} ${selectedGuestId === guest.id ? "is-selected" : ""}`}
                   draggable={canEdit}
+                  role={canEdit ? "button" : undefined}
+                  tabIndex={canEdit ? 0 : undefined}
                   onClick={(event) => {
                     if (!canEdit || (event.target as HTMLElement).closest("button, select")) return;
                     selectGuestForSeat(guest.id);
+                  }}
+                  onKeyDown={(event) => {
+                    if (canEdit && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); selectGuestForSeat(guest.id); }
                   }}
                   onDragStart={(event) => {
                     event.dataTransfer.setData("text/guest-id", guest.id);
@@ -4134,7 +4155,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       }}
                     />
                   </div>
-                  {tableSocialConflicts.length > 0 && <div className="table-social-conflicts" aria-label={t("Conflictos sociales", "Social conflicts", "Conflitos sociais")}>{tableSocialConflicts.map((conflict) => <span key={conflict.id}>⚠ {conflict.message}</span>)}</div>}
+                  {tableSocialConflicts.length > 0 && <div className="table-social-conflicts" aria-label={t("Conflictos sociales", "Social conflicts", "Conflitos sociais")}>{tableSocialConflicts.map((conflict) => <button key={conflict.id} onClick={() => focusSpecificTable(conflict.tableId)}>⚠ {conflict.message}</button>)}</div>}
                   <div className={`table-seat-map is-${table.shape || "round"}`}>
                     <div className="table-surface"><strong>{table.name}</strong></div>
                     {Array.from({ length: table.capacity }, (_, seatIndex) => {

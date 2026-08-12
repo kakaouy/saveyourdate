@@ -291,3 +291,14 @@ test('el paquete de usabilidad agrupa densidad, guardado, vacíos y adaptación 
   assert.match(styles, /\.table-card\.is-saving/);
   assert.match(styles, /\.guest-assign-list \{ max-height: 62vh/);
 });
+
+test('el segundo paquete agrega restricciones, referencias, exportación y teclado', () => {
+  assert.match(source, /const \[guestRestrictionFilter, setGuestRestrictionFilter\]/);
+  assert.match(source, /normalizedReference\(candidate\.group\) === normalized/);
+  assert.match(source, /unresolved-together/);
+  assert.match(source, /unresolved-separate/);
+  assert.match(source, /conflictos-de-mesas\.csv/);
+  assert.match(source, /className=\{`restriction-filter/);
+  assert.match(source, /event\.key === "Enter" \|\| event\.key === " "/);
+  assert.match(source, /focusSpecificTable\(conflict\.tableId\)/);
+});
