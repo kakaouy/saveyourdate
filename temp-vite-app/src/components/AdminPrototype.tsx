@@ -3056,6 +3056,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [floorElements, setFloorElements] = useState<FloorElement[]>([]);
   const [floorZoom, setFloorZoom] = useState(1);
   const [snapToGrid, setSnapToGrid] = useState(true);
+  const [layoutUndoStack, setLayoutUndoStack] = useState<Array<{ before: EventTable; after: EventTable }>>([]);
+  const [layoutRedoStack, setLayoutRedoStack] = useState<Array<{ before: EventTable; after: EventTable }>>([]);
   const [dragGuestId, setDragGuestId] = useState("");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "child">("all");
@@ -3351,6 +3353,42 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     if (!response.ok) throw new Error("No pudimos guardar el plano.");
   };
 
+  const rememberLayoutChange = (before: EventTable, after: EventTable) => {
+    setLayoutUndoStack((current) => [...current.slice(-29), { before, after }]);
+    setLayoutRedoStack([]);
+  };
+
+  const restoreLayoutVersion = async (table: EventTable) => {
+    setTables((current) => current.map((item) => item.id === table.id ? table : item));
+    await saveTableLayout(table);
+  };
+
+  const undoLayoutChange = async () => {
+    const change = layoutUndoStack.at(-1);
+    if (!change) return;
+    setSaving(true);
+    try {
+      await restoreLayoutVersion(change.before);
+      setLayoutUndoStack((current) => current.slice(0, -1));
+      setLayoutRedoStack((current) => [...current.slice(-29), change]);
+    } catch (undoError) {
+      setError(undoError instanceof Error ? undoError.message : "No pudimos deshacer el cambio.");
+    } finally { setSaving(false); }
+  };
+
+  const redoLayoutChange = async () => {
+    const change = layoutRedoStack.at(-1);
+    if (!change) return;
+    setSaving(true);
+    try {
+      await restoreLayoutVersion(change.after);
+      setLayoutRedoStack((current) => current.slice(0, -1));
+      setLayoutUndoStack((current) => [...current.slice(-29), change]);
+    } catch (redoError) {
+      setError(redoError instanceof Error ? redoError.message : "No pudimos rehacer el cambio.");
+    } finally { setSaving(false); }
+  };
+
   const moveTable = async (table: EventTable, space: string, x: number, y: number) => {
     if (table.locked) return;
     const grid = snapToGrid ? 16 : 1;
@@ -3358,6 +3396,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     setTables((current) => current.map((item) => item.id === table.id ? next : item));
     try {
       await saveTableLayout(next);
+      rememberLayoutChange(table, next);
     } catch (moveError) {
       setError(moveError instanceof Error ? moveError.message : "No pudimos guardar la posición.");
     }
@@ -3368,6 +3407,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     setTables((current) => current.map((item) => item.id === table.id ? next : item));
     try {
       await saveTableLayout(next);
+      rememberLayoutChange(table, next);
     } catch (layoutError) {
       setError(layoutError instanceof Error ? layoutError.message : "No pudimos actualizar la mesa.");
     }
@@ -3414,7 +3454,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const onEnd = () => {
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerup", onEnd);
-      void saveTableLayout(resized).catch(() => setError("No pudimos guardar el nuevo tamaño."));
+      void saveTableLayout(resized)
+        .then(() => rememberLayoutChange(table, resized))
+        .catch(() => setError("No pudimos guardar el nuevo tamaño."));
     };
     document.addEventListener("pointermove", onMove);
     document.addEventListener("pointerup", onEnd);
@@ -3701,6 +3743,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               <button onClick={() => setFloorZoom(1)}>↺</button>
             </div>
             <button className={`outline-button compact ${snapToGrid ? "active" : ""}`} onClick={() => setSnapToGrid((value) => !value)}>⠿ {snapToGrid ? t("Cuadrícula activa", "Grid on", "Grade ativa") : t("Cuadrícula libre", "Free movement", "Movimento livre")}</button>
+            <div className="layout-history-actions" aria-label={t("Historial del plano", "Layout history", "Histórico do plano")}>
+              <button disabled={!layoutUndoStack.length || saving} onClick={undoLayoutChange}>↶ {t("Deshacer", "Undo", "Desfazer")}</button>
+              <button disabled={!layoutRedoStack.length || saving} onClick={redoLayoutChange}>↷ {t("Rehacer", "Redo", "Refazer")}</button>
+            </div>
             {spaces.length > 1 && canEdit && <button className="delete-button" onClick={() => {
               const removed = spaces[spaces.length - 1];
               setSpaces((current) => current.slice(0, -1));

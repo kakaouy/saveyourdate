@@ -296,6 +296,10 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .floor-zoom { display: inline-flex; align-items: center; gap: 5px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 999px; background: white; }
 .floor-zoom span { min-width: 32px; color: var(--muted); font-size: 8px; text-align: center; }
 .layout-overlap-warning { margin: 0 0 10px; padding: 9px 12px; border-radius: 8px; color: #944a44; background: #fff0ee; font-size: 9px; font-weight: 750; }
+.layout-history-actions { display: inline-flex; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: white; }
+.layout-history-actions button { min-height: 31px; padding: 0 9px; border: 0; border-right: 1px solid var(--line); color: var(--ink); background: transparent; font-size: 8px; cursor: pointer; }
+.layout-history-actions button:last-child { border-right: 0; }
+.layout-history-actions button:disabled { color: #abb6bc; cursor: not-allowed; }
 .floor-table:active { cursor: grabbing; }
 .floor-table > strong { font-size: 10px; line-height: 1.2; }
 .floor-table small { color: var(--muted); font-size: 8px; }

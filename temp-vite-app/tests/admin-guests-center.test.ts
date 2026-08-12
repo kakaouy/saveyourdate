@@ -195,3 +195,13 @@ test('el reporte de catering exporta personas con mesa, asiento y necesidades', 
   assert.match(source, /onClick=\{exportCateringReport\}/);
   assert.match(source, /Asiento.*\$\{seat\.seat\}/s);
 });
+
+test('el plano mantiene un historial persistente de deshacer y rehacer', () => {
+  assert.match(source, /layoutUndoStack/);
+  assert.match(source, /layoutRedoStack/);
+  assert.match(source, /current\.slice\(-29\)/);
+  assert.match(source, /const undoLayoutChange = async/);
+  assert.match(source, /const redoLayoutChange = async/);
+  assert.match(source, /await restoreLayoutVersion\(change\.before\)/);
+  assert.match(source, /await restoreLayoutVersion\(change\.after\)/);
+});
