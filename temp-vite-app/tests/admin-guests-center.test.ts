@@ -167,3 +167,12 @@ test('el plano permite girar, bloquear y ampliar la sala', () => {
   assert.match(tablesApi, /is_locked/);
   assert.match(migration, /is_locked boolean/);
 });
+
+test('los invitados se mueven entre sillas o vuelven a sin mesa mediante arrastre', () => {
+  assert.match(source, /draggable=\{Boolean\(canEdit && person\)\}/);
+  assert.match(source, /event\.dataTransfer\.setData\("text\/guest-id", person\.guest\.id\)/);
+  assert.match(source, /className=\{`unassign-drop-zone/);
+  assert.match(source, /void unassignGuest\(guestId\)/);
+  assert.match(source, /guestCategoryFilter/);
+  assert.match(source, /matchesCategory/);
+});

@@ -3057,6 +3057,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [floorZoom, setFloorZoom] = useState(1);
   const [dragGuestId, setDragGuestId] = useState("");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
+  const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "child">("all");
   const [suggestedAssignments, setSuggestedAssignments] = useState<
     { guestId: string; tableId: string }[] | null
   >(null);
@@ -3064,6 +3065,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     guestId: string;
     fromTableId: string;
     toTableId: string;
+    fromSeatNumber: number;
   } | null>(null);
 
   const assignedIds = tables.flatMap((table) => table.guests);
@@ -3211,9 +3213,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     seatNumber = 0,
   ) => {
     setError("");
-    const fromTableId =
-      tables.find((table) => table.guests.includes(guestId))?.id || "";
-    if (fromTableId === tableId) return true;
+    const fromTable = tables.find((table) => table.guests.includes(guestId));
+    const fromTableId = fromTable?.id || "";
+    const fromSeatNumber = fromTable?.seatAssignments?.[guestId] || 0;
+    if (fromTableId === tableId && (!seatNumber || fromSeatNumber === seatNumber)) return true;
     try {
       const response = await fetch("/api/admin/tables", {
         method: "PATCH",
@@ -3238,7 +3241,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           };
         }),
       );
-      if (remember) setLastAssignment({ guestId, fromTableId, toTableId: tableId });
+      if (remember) setLastAssignment({ guestId, fromTableId, toTableId: tableId, fromSeatNumber });
       setDragGuestId("");
       return true;
     } catch (assignError) {
@@ -3259,6 +3262,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       lastAssignment.guestId,
       lastAssignment.fromTableId,
       false,
+      lastAssignment.fromSeatNumber,
     );
     if (restored) setLastAssignment(null);
   };
@@ -3718,6 +3722,26 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 </button>
               ))}
             </div>
+            <div className="category-filters" role="group" aria-label={t("Filtrar por categoría", "Filter by category", "Filtrar por categoria")}>
+              {(["all", "adult", "child"] as const).map((value) => (
+                <button key={value} className={guestCategoryFilter === value ? "active" : ""} onClick={() => setGuestCategoryFilter(value)}>
+                  {value === "all" ? t("Todas las edades", "All ages", "Todas as idades") : value === "adult" ? t("Adultos", "Adults", "Adultos") : t("Niños", "Children", "Crianças")}
+                </button>
+              ))}
+            </div>
+            {canEdit && (
+              <div
+                className={`unassign-drop-zone ${dragGuestId ? "is-active" : ""}`}
+                onDragOver={(event) => { if (dragGuestId) event.preventDefault(); }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const guestId = event.dataTransfer.getData("text/guest-id");
+                  if (guestId) void unassignGuest(guestId);
+                }}
+              >
+                ↙ {t("Soltá aquí para dejar sin mesa", "Drop here to remove from table", "Solte aqui para remover da mesa")}
+              </div>
+            )}
             {canEdit && unassigned.length > 0 && (
               <button className="auto-assign-button" onClick={previewAutomaticAssignment}>
                 ✦ {t("Sugerir distribución", "Suggest seating", "Sugerir distribuição")}
@@ -3726,7 +3750,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             {confirmedGuests.filter((guest) => {
               const matchesQuery = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
               const isAssigned = assignedIds.includes(guest.id);
-              return matchesQuery && (assignmentFilter === "all" || (assignmentFilter === "assigned" ? isAssigned : !isAssigned));
+              const matchesCategory = guestCategoryFilter === "all" || (guest.guestType || "adult") === guestCategoryFilter;
+              return matchesQuery && matchesCategory && (assignmentFilter === "all" || (assignmentFilter === "assigned" ? isAssigned : !isAssigned));
             }).map((guest) => {
               const currentTable = tables.find((table) =>
                 table.guests.includes(guest.id),
@@ -3968,6 +3993,15 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                           key={seatIndex}
                           style={{ left: `${50 + Math.cos(angle) * radiusX}%`, top: `${50 + Math.sin(angle) * radiusY}%` }}
                           title={person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
+                          draggable={Boolean(canEdit && person)}
+                          onDragStart={(event) => {
+                            if (!person) return;
+                            event.stopPropagation();
+                            event.dataTransfer.setData("text/guest-id", person.guest.id);
+                            event.dataTransfer.effectAllowed = "move";
+                            setDragGuestId(person.guest.id);
+                          }}
+                          onDragEnd={() => setDragGuestId("")}
                           onDragOver={(event) => {
                             if (canEdit && dragGuestId && !person) event.preventDefault();
                           }}
