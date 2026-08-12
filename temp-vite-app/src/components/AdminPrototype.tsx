@@ -1331,8 +1331,9 @@ function Guests({
   const [filter, setFilter] = useState("Todos");
   const [sortBy, setSortBy] = useState<"name" | "group" | "food" | "status">("name");
   const [selected, setSelected] = useState<string[]>([]);
-  const [bulkField, setBulkField] = useState<"status" | "group" | "invitedBy">("invitedBy");
+  const [bulkField, setBulkField] = useState<"status" | "group" | "invitedBy" | "guestType" | "transportOption" | "menuChoice" | "food" | "socialTogetherWith" | "socialSeparateFrom" | "preferredTableName">("invitedBy");
   const [bulkValue, setBulkValue] = useState(defaultInviter);
+  const bulkAllowsEmpty = ["transportOption", "menuChoice", "food", "socialTogetherWith", "socialSeparateFrom", "preferredTableName"].includes(bulkField);
   const [showImportHelp, setShowImportHelp] = useState(false);
   const [importPreview, setImportPreview] = useState<GuestImportPreview | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -1482,7 +1483,12 @@ function Guests({
   };
 
   const updateSelected = async () => {
-    if (!selected.length || !bulkValue.trim()) return;
+    if (!selected.length || (!bulkAllowsEmpty && !bulkValue.trim())) return;
+    if (selected.length >= 25 && !window.confirm(t(
+      `¿Aplicar este cambio a ${selected.length} invitados?`,
+      `Apply this change to ${selected.length} guests?`,
+      `Aplicar esta alteração a ${selected.length} convidados?`,
+    ))) return;
     setSaving(true);
     setError("");
     try {
@@ -2141,13 +2147,20 @@ function Guests({
               onChange={(event) => {
                 const field = event.target.value as typeof bulkField;
                 setBulkField(field);
-                setBulkValue(field === "status" ? "Pendiente" : field === "invitedBy" ? defaultInviter : "");
+                setBulkValue(field === "status" ? "Pendiente" : field === "guestType" ? "adult" : field === "transportOption" ? "" : field === "invitedBy" ? defaultInviter : "");
               }}
               aria-label={t("Campo a editar", "Field to edit", "Campo para editar")}
             >
               <option value="invitedBy">{t("Invitador", "Invited by", "Anfitrião")}</option>
               <option value="status">{t("Estado", "Status", "Status")}</option>
+              <option value="guestType">{t("Categoría de edad", "Age category", "Categoria etária")}</option>
               <option value="group">{t("Grupo", "Group", "Grupo")}</option>
+              <option value="transportOption">{t("Transporte", "Transport", "Transporte")}</option>
+              <option value="menuChoice">{t("Preferencia de menú", "Menu preference", "Preferência de menu")}</option>
+              <option value="food">{t("Restricción alimentaria", "Dietary need", "Restrição alimentar")}</option>
+              <option value="socialTogetherWith">{t("Sentar junto a", "Seat together with", "Sentar junto com")}</option>
+              <option value="socialSeparateFrom">{t("Mantener separado de", "Keep separate from", "Manter separado de")}</option>
+              <option value="preferredTableName">{t("Mesa preferida", "Preferred table", "Mesa preferida")}</option>
             </select>}
             {filter !== "Archivados" && (bulkField === "status" ? (
               <select value={bulkValue} onChange={(event) => setBulkValue(event.target.value)}>
@@ -2155,14 +2168,29 @@ function Guests({
                 <option value="Confirmado">{adminStatus(language, "Confirmado")}</option>
                 <option value="No asiste">{adminStatus(language, "No asiste")}</option>
               </select>
+            ) : bulkField === "guestType" ? (
+              <select value={bulkValue} onChange={(event) => setBulkValue(event.target.value)}>
+                <option value="adult">{t("Adultos", "Adults", "Adultos")}</option>
+                <option value="teen">{t("Adolescentes", "Teenagers", "Adolescentes")}</option>
+                <option value="child">{t("Niños", "Children", "Crianças")}</option>
+              </select>
+            ) : bulkField === "transportOption" ? (
+              <select value={bulkValue} onChange={(event) => setBulkValue(event.target.value)}>
+                <option value="">{t("No necesita", "Not needed", "Não precisa")}</option>
+                <option value="Ida">{t("Ida", "Outbound", "Ida")}</option>
+                <option value="Regreso">{t("Regreso", "Return", "Volta")}</option>
+                <option value="Ida y regreso">{t("Ida y regreso", "Outbound and return", "Ida e volta")}</option>
+              </select>
             ) : (
               <input
                 value={bulkValue}
                 onChange={(event) => setBulkValue(event.target.value)}
-                placeholder={bulkField === "group" ? t("Nombre del grupo", "Group name", "Nome do grupo") : t("Nombre del invitador", "Host name", "Nome do anfitrião")}
+                list={["socialTogetherWith", "socialSeparateFrom"].includes(bulkField) ? "bulk-social-references" : undefined}
+                placeholder={bulkField === "group" ? t("Nombre del grupo", "Group name", "Nome do grupo") : bulkField === "invitedBy" ? t("Nombre del invitador", "Host name", "Nome do anfitrião") : t("Valor para toda la selección", "Value for the selection", "Valor para toda a seleção")}
               />
             ))}
-            {filter !== "Archivados" && <button className="primary-button small" type="button" disabled={saving || !bulkValue.trim()} onClick={updateSelected}>
+            <datalist id="bulk-social-references">{[...new Set(guests.flatMap((guest) => [guest.name, guest.group]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
+            {filter !== "Archivados" && <button className="primary-button small" type="button" disabled={saving || (!bulkAllowsEmpty && !bulkValue.trim())} onClick={updateSelected}>
               {t("Aplicar", "Apply", "Aplicar")}
             </button>}
             <button

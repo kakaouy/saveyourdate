@@ -463,6 +463,24 @@ async function handler(request: Request) {
         if (body.group !== undefined) changes.group_name = String(body.group).trim();
         if (body.invitedBy !== undefined)
           changes.invited_by = String(body.invitedBy).trim();
+        if (body.guestType !== undefined) {
+          const guestType = String(body.guestType);
+          if (!["adult", "teen", "child"].includes(guestType))
+            return json({ error: "La categoría de edad no es válida." }, 400);
+          changes.guest_type = guestType;
+        }
+        if (body.transportOption !== undefined)
+          changes.transport_option = String(body.transportOption).trim().slice(0, 80);
+        if (body.menuChoice !== undefined)
+          changes.menu_choice = String(body.menuChoice).trim().slice(0, 120);
+        if (body.food !== undefined)
+          changes.food = String(body.food).trim().slice(0, 240) || "—";
+        if (body.socialTogetherWith !== undefined)
+          changes.social_together_with = String(body.socialTogetherWith).trim().slice(0, 240);
+        if (body.socialSeparateFrom !== undefined)
+          changes.social_separate_from = String(body.socialSeparateFrom).trim().slice(0, 240);
+        if (body.preferredTableName !== undefined)
+          changes.preferred_table_name = String(body.preferredTableName).trim().slice(0, 120);
         const response = await supabaseRequest(
           `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&id=in.(${ids.map(encodeURIComponent).join(",")})`,
           {

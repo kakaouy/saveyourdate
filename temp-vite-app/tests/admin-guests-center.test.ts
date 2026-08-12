@@ -340,3 +340,16 @@ test('la sugerencia permanece visible y se reinicia después de cada movimiento'
   assert.match(source, /Sugerencia pendiente: ubicá primero a alguien de su grupo/);
   assert.match(source, /mesa correcta/);
 });
+
+test('las acciones masivas actualizan edad, logística y restricciones sin tocar otros campos', () => {
+  const guestsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  for (const field of ['guestType', 'transportOption', 'menuChoice', 'food', 'socialTogetherWith', 'socialSeparateFrom', 'preferredTableName']) {
+    assert.match(source, new RegExp(`value="${field}"`));
+    assert.match(guestsApi, new RegExp(field));
+  }
+  assert.match(source, /bulkField === "guestType"/);
+  assert.match(source, /value="teen"/);
+  assert.match(source, /selected\.length >= 25/);
+  assert.match(source, /bulk-social-references/);
+  assert.match(guestsApi, /changes\.guest_type = guestType/);
+});
