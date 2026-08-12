@@ -176,3 +176,12 @@ test('los invitados se mueven entre sillas o vuelven a sin mesa mediante arrastr
   assert.match(source, /guestCategoryFilter/);
   assert.match(source, /matchesCategory/);
 });
+
+test('el plano ajusta a cuadrícula, detecta solapamientos y duplica mesas', () => {
+  assert.match(source, /const \[snapToGrid, setSnapToGrid\]/);
+  assert.match(source, /Math\.round\(x \/ grid\) \* grid/);
+  assert.match(source, /const overlappingTableIds = new Set/);
+  assert.match(source, /className="layout-overlap-warning"/);
+  assert.match(source, /const duplicateTable = async/);
+  assert.match(source, /void duplicateTable\(table\)/);
+});

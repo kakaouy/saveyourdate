@@ -3055,6 +3055,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [layoutNotice, setLayoutNotice] = useState("");
   const [floorElements, setFloorElements] = useState<FloorElement[]>([]);
   const [floorZoom, setFloorZoom] = useState(1);
+  const [snapToGrid, setSnapToGrid] = useState(true);
   const [dragGuestId, setDragGuestId] = useState("");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "child">("all");
@@ -3352,7 +3353,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const moveTable = async (table: EventTable, space: string, x: number, y: number) => {
     if (table.locked) return;
-    const next = { ...table, space, x: Math.max(0, x), y: Math.max(0, y) };
+    const grid = snapToGrid ? 16 : 1;
+    const next = { ...table, space, x: Math.max(0, Math.round(x / grid) * grid), y: Math.max(0, Math.round(y / grid) * grid) };
     setTables((current) => current.map((item) => item.id === table.id ? next : item));
     try {
       await saveTableLayout(next);
@@ -3370,6 +3372,32 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       setError(layoutError instanceof Error ? layoutError.message : "No pudimos actualizar la mesa.");
     }
   };
+
+  const duplicateTable = async (table: EventTable) => {
+    setSaving(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/tables", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: `${table.name} ${t("copia", "copy", "cópia")}`, capacity: table.capacity, note: table.note, shape: table.shape }) });
+      const result = (await response.json()) as { table?: EventTable; error?: string };
+      if (!response.ok || !result.table) throw new Error(result.error || "No pudimos duplicar la mesa.");
+      const duplicate = { ...result.table, guests: [], seatAssignments: {}, space: table.space, x: Math.min(840, (table.x || 24) + 32), y: Math.min(440, (table.y || 24) + 32), width: table.width, height: table.height, rotation: table.rotation || 0, locked: false };
+      await saveTableLayout(duplicate);
+      setTables((current) => [...current, duplicate]);
+    } catch (duplicateError) {
+      setError(duplicateError instanceof Error ? duplicateError.message : "No pudimos duplicar la mesa.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const overlappingTableIds = new Set(tables.flatMap((table, index) =>
+    tables.slice(index + 1).flatMap((other) => {
+      if ((table.space || "Espacio 1") !== (other.space || "Espacio 1")) return [];
+      const margin = 8;
+      const overlaps = (table.x || 24) < (other.x || 24) + (other.width || 140) + margin && (table.x || 24) + (table.width || 140) + margin > (other.x || 24) && (table.y || 24) < (other.y || 24) + (other.height || 70) + margin && (table.y || 24) + (table.height || 70) + margin > (other.y || 24);
+      return overlaps ? [table.id, other.id] : [];
+    })
+  ));
 
   const resizeTable = (table: EventTable, event: React.PointerEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -3635,6 +3663,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               <button onClick={() => setFloorZoom((value) => Math.min(1.5, Number((value + .1).toFixed(1))))}>＋</button>
               <button onClick={() => setFloorZoom(1)}>↺</button>
             </div>
+            <button className={`outline-button compact ${snapToGrid ? "active" : ""}`} onClick={() => setSnapToGrid((value) => !value)}>⠿ {snapToGrid ? t("Cuadrícula activa", "Grid on", "Grade ativa") : t("Cuadrícula libre", "Free movement", "Movimento livre")}</button>
             {spaces.length > 1 && canEdit && <button className="delete-button" onClick={() => {
               const removed = spaces[spaces.length - 1];
               setSpaces((current) => current.slice(0, -1));
@@ -3642,6 +3671,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             }}>{t("Eliminar último espacio", "Remove last space", "Remover último espaço")}</button>}
           </div>
           {layoutNotice && <p className="import-success" role="status">{layoutNotice}</p>}
+          {overlappingTableIds.size > 0 && <p className="layout-overlap-warning" role="alert">⚠ {t(`${overlappingTableIds.size} mesas están superpuestas o demasiado juntas.`, `${overlappingTableIds.size} tables overlap or are too close.`, `${overlappingTableIds.size} mesas estão sobrepostas ou muito próximas.`)}</p>}
           <div className="floor-editor">
             {canEdit && <aside className="floor-elements-menu">
               <strong>{t("Elementos del salón", "Venue elements", "Elementos do salão")}</strong>
@@ -3661,10 +3691,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             }}>
               <strong className="space-label">{space}</strong>
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
                   <strong>{table.name}</strong><small>{table.capacity} {t("lugares", "seats", "lugares")}</small>
-                  {canEdit && <div className="floor-table-actions"><button onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { locked: !table.locked }); }} aria-label={table.locked ? t("Desbloquear mesa", "Unlock table", "Desbloquear mesa") : t("Bloquear mesa", "Lock table", "Bloquear mesa")}>{table.locked ? "🔒" : "🔓"}</button><button disabled={table.locked} onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { rotation: ((table.rotation || 0) + 45) % 360 }); }} aria-label={t("Girar mesa", "Rotate table", "Girar mesa")}>↻</button><button onClick={(event) => { event.stopPropagation(); void deleteTable(table.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${table.name}`}>×</button></div>}
+                  {canEdit && <div className="floor-table-actions"><button onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { locked: !table.locked }); }} aria-label={table.locked ? t("Desbloquear mesa", "Unlock table", "Desbloquear mesa") : t("Bloquear mesa", "Lock table", "Bloquear mesa")}>{table.locked ? "🔒" : "🔓"}</button><button disabled={table.locked} onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { rotation: ((table.rotation || 0) + 45) % 360 }); }} aria-label={t("Girar mesa", "Rotate table", "Girar mesa")}>↻</button><button onClick={(event) => { event.stopPropagation(); void duplicateTable(table); }} aria-label={`${t("Duplicar", "Duplicate", "Duplicar")} ${table.name}`}>⧉</button><button onClick={(event) => { event.stopPropagation(); void deleteTable(table.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${table.name}`}>×</button></div>}
                   {canEdit && !table.locked && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
                 </article>
               ))}
