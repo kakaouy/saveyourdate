@@ -164,6 +164,9 @@ const guestHasRestriction = (guest: Guest) =>
   meaningfulGuestValue(guest.food) ||
   Boolean(guest.socialTogetherWith || guest.socialSeparateFrom || guest.preferredTableName);
 
+const normalizedReference = (value: string) =>
+  value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+
 const seatProgress = (guest: Guest, guests: Guest[]) => {
   const members = linkedGroupMembers(guest, guests);
   if (members.length === 1) return { used: Math.min(guest.confirmed, guest.seats), total: guest.seats };
@@ -3115,6 +3118,39 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const guestNames = table.guests.map((id) => guests.find((guest) => guest.id === id)?.name || "").join(" ");
     return `${table.name} ${guestNames}`.toLowerCase().includes(tableQuery.toLowerCase());
   });
+  const socialConflicts = (() => {
+    const conflicts = new Map<string, { id: string; tableId: string; message: string }>();
+    const findReferencedGuest = (reference: string, guestId: string) => {
+      const normalized = normalizedReference(reference);
+      return normalized
+        ? confirmedGuests.find((candidate) => candidate.id !== guestId && (
+            normalizedReference(candidate.name).includes(normalized) ||
+            normalized.includes(normalizedReference(candidate.name))
+          ))
+        : undefined;
+    };
+    confirmedGuests.forEach((guest) => {
+      const table = tables.find((candidate) => candidate.guests.includes(guest.id));
+      if (!table) return;
+      const together = findReferencedGuest(guest.socialTogetherWith, guest.id);
+      const togetherTable = together && tables.find((candidate) => candidate.guests.includes(together.id));
+      if (together && togetherTable?.id !== table.id) {
+        const id = `together-${[guest.id, together.id].sort().join("-")}`;
+        conflicts.set(id, { id, tableId: table.id, message: `${guest.name} ${t("debe sentarse junto a", "should sit with", "deve sentar junto a")} ${together.name}` });
+      }
+      const separate = findReferencedGuest(guest.socialSeparateFrom, guest.id);
+      const separateTable = separate && tables.find((candidate) => candidate.guests.includes(separate.id));
+      if (separate && separateTable?.id === table.id) {
+        const id = `separate-${[guest.id, separate.id].sort().join("-")}`;
+        conflicts.set(id, { id, tableId: table.id, message: `${guest.name} ${t("debe sentarse separado de", "should sit separately from", "deve sentar separado de")} ${separate.name}` });
+      }
+      if (guest.preferredTableName && !normalizedReference(table.name).includes(normalizedReference(guest.preferredTableName))) {
+        const id = `preferred-${guest.id}`;
+        conflicts.set(id, { id, tableId: table.id, message: `${guest.name}: ${t("mesa preferida", "preferred table", "mesa preferida")} “${guest.preferredTableName}”` });
+      }
+    });
+    return [...conflicts.values()];
+  })();
 
   const focusTable = (direction: -1 | 1) => {
     if (!visibleTables.length) return;
@@ -3668,6 +3704,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           {error}
         </p>
       )}
+      {socialConflicts.length > 0 && (
+        <section className="social-conflict-summary" role="status">
+          <strong>⚠ {socialConflicts.length} {socialConflicts.length === 1 ? t("conflicto de distribución", "seating conflict", "conflito de distribuição") : t("conflictos de distribución", "seating conflicts", "conflitos de distribuição")}</strong>
+          <span>{t("Revisá las preferencias sociales marcadas dentro de cada mesa.", "Review the social preferences marked on each table.", "Revise as preferências sociais marcadas em cada mesa.")}</span>
+        </section>
+      )}
 
       <section className="seating-summary">
         <article>
@@ -3992,6 +4034,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               const accessibilityAlerts = tableGuests.filter((guest) =>
                 meaningfulGuestValue(guest.accessibilityNeeds),
               );
+              const tableSocialConflicts = socialConflicts.filter((conflict) => conflict.tableId === table.id);
               const draggedGuest = guests.find((guest) => guest.id === dragGuestId);
               const draggedPeople = draggedGuest
                 ? confirmedPeopleForGuest(draggedGuest, guests)
@@ -4081,6 +4124,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       }}
                     />
                   </div>
+                  {tableSocialConflicts.length > 0 && <div className="table-social-conflicts" aria-label={t("Conflictos sociales", "Social conflicts", "Conflitos sociais")}>{tableSocialConflicts.map((conflict) => <span key={conflict.id}>⚠ {conflict.message}</span>)}</div>}
                   <div className={`table-seat-map is-${table.shape || "round"}`}>
                     <div className="table-surface"><strong>{table.name}</strong></div>
                     {Array.from({ length: table.capacity }, (_, seatIndex) => {

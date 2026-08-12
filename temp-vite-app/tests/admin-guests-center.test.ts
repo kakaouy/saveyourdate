@@ -267,3 +267,14 @@ test('cada silla muestra categoría y prioriza las restricciones', () => {
   assert.match(styles, /\.seat-marker\.has-alert \.seat-number/);
   assert.ok(styles.lastIndexOf('.seat-marker.has-alert') > styles.lastIndexOf('.seat-marker.is-selected'));
 });
+
+test('las preferencias sociales generan conflictos accionables por mesa', () => {
+  assert.match(source, /const socialConflicts =/);
+  assert.match(source, /findReferencedGuest/);
+  assert.match(source, /t\("debe sentarse junto a"/);
+  assert.match(source, /t\("debe sentarse separado de"/);
+  assert.match(source, /className="social-conflict-summary"/);
+  assert.match(source, /className="table-social-conflicts"/);
+  assert.match(styles, /\.social-conflict-summary/);
+  assert.match(styles, /\.table-social-conflicts/);
+});
