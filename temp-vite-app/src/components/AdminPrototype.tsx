@@ -3934,6 +3934,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 table.guests.includes(guest.id),
               );
               const guestSuggestion = suggestedTableForGuest(guest);
+              const hasConfirmedGroupPeers = Boolean(normalizedReference(guest.group)) && confirmedGuests.some((candidate) => candidate.id !== guest.id && normalizedReference(candidate.group) === normalizedReference(guest.group));
               return (
                 <div
                   key={guest.id}
@@ -3965,7 +3966,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         : t("personas", "people", "pessoas")}{" "}
                       · {guest.group}
                     </small>
-                    {guestSuggestion && guestSuggestion.table.id !== currentTable?.id && <small className="guest-seat-suggestion">★ {t("Sugerencia", "Suggestion", "Sugestão")}: {guestSuggestion.table.name} · {guestSuggestion.explicit ? `${t("junto a", "next to", "junto a")} ${guestSuggestion.reason}` : t("junto a su grupo", "next to their group", "junto ao seu grupo")}</small>}
+                    {guestSuggestion ? <small className={`guest-seat-suggestion ${guestSuggestion.table.id === currentTable?.id ? "is-current" : ""}`}>★ {t("Sugerencia", "Suggestion", "Sugestão")}: {guestSuggestion.table.name} · {guestSuggestion.explicit ? `${t("junto a", "next to", "junto a")} ${guestSuggestion.reason}` : t("junto a su grupo", "next to their group", "junto ao seu grupo")}{guestSuggestion.table.id === currentTable?.id ? ` · ${t("mesa correcta", "correct table", "mesa correta")}` : ""}</small> : hasConfirmedGroupPeers && <small className="guest-seat-suggestion is-waiting">☆ {t("Sugerencia pendiente: ubicá primero a alguien de su grupo", "Pending suggestion: seat someone from their group first", "Sugestão pendente: coloque primeiro alguém do grupo")}</small>}
                   </p>
                   <select
                     value={currentTable?.id ?? ""}

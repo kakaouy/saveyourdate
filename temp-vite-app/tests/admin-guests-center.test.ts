@@ -331,8 +331,12 @@ test('la sugerencia permanece visible y se reinicia después de cada movimiento'
   assert.match(source, /if \(explicitTable\) return/);
   assert.match(source, /if \(!normalizedGroup\) return null/);
   assert.match(source, /const guestSuggestion = suggestedTableForGuest\(guest\)/);
-  assert.match(source, /className="guest-seat-suggestion"/);
+  assert.match(source, /guest-seat-suggestion/);
   assert.match(source, /setDragGuestId\(""\);\s*setSelectedGuestId\(""\);/);
   assert.match(source, /const seatedExplicitTargetIds =/);
   assert.match(styles, /\.guest-assign-list \.guest-seat-suggestion/);
+  assert.doesNotMatch(source, /guestSuggestion && guestSuggestion\.table\.id !== currentTable/);
+  assert.match(source, /hasConfirmedGroupPeers/);
+  assert.match(source, /Sugerencia pendiente: ubicá primero a alguien de su grupo/);
+  assert.match(source, /mesa correcta/);
 });
