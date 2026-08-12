@@ -3019,6 +3019,8 @@ type EventTable = {
   height: number;
   shape: "round" | "rectangular" | "square";
   seatAssignments: Record<string, number>;
+  rotation: number;
+  locked: boolean;
 };
 
 type FloorElement = {
@@ -3052,6 +3054,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [spaces, setSpaces] = useState(["Espacio 1"]);
   const [layoutNotice, setLayoutNotice] = useState("");
   const [floorElements, setFloorElements] = useState<FloorElement[]>([]);
+  const [floorZoom, setFloorZoom] = useState(1);
   const [dragGuestId, setDragGuestId] = useState("");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [suggestedAssignments, setSuggestedAssignments] = useState<
@@ -3338,18 +3341,29 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const response = await fetch("/api/admin/tables", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "layout", id: table.id, space: table.space, x: table.x, y: table.y, width: table.width, height: table.height }),
+      body: JSON.stringify({ action: "layout", id: table.id, space: table.space, x: table.x, y: table.y, width: table.width, height: table.height, rotation: table.rotation || 0, locked: Boolean(table.locked) }),
     });
     if (!response.ok) throw new Error("No pudimos guardar el plano.");
   };
 
   const moveTable = async (table: EventTable, space: string, x: number, y: number) => {
+    if (table.locked) return;
     const next = { ...table, space, x: Math.max(0, x), y: Math.max(0, y) };
     setTables((current) => current.map((item) => item.id === table.id ? next : item));
     try {
       await saveTableLayout(next);
     } catch (moveError) {
       setError(moveError instanceof Error ? moveError.message : "No pudimos guardar la posición.");
+    }
+  };
+
+  const updateTableLayout = async (table: EventTable, changes: Partial<EventTable>) => {
+    const next = { ...table, ...changes };
+    setTables((current) => current.map((item) => item.id === table.id ? next : item));
+    try {
+      await saveTableLayout(next);
+    } catch (layoutError) {
+      setError(layoutError instanceof Error ? layoutError.message : "No pudimos actualizar la mesa.");
     }
   };
 
@@ -3498,7 +3512,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     setError("");
     try {
       const responses = await Promise.all([
-        ...tables.map((table) => fetch("/api/admin/tables", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "layout", id: table.id, space: table.space || "Espacio 1", x: table.x || 24, y: table.y || 24, width: table.width || 140, height: table.height || 70 }) })),
+        ...tables.map((table) => fetch("/api/admin/tables", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "layout", id: table.id, space: table.space || "Espacio 1", x: table.x || 24, y: table.y || 24, width: table.width || 140, height: table.height || 70, rotation: table.rotation || 0, locked: Boolean(table.locked) }) })),
         ...floorElements.map((element) => fetch("/api/admin/tables", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "layout-element", ...element }) })),
       ]);
       if (responses.some((response) => !response.ok)) throw new Error("No pudimos guardar todo el plano.");
@@ -3611,6 +3625,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             {canEdit && <button className="outline-button compact" onClick={() => setSpaces((current) => [...current, `Espacio ${current.length + 1}`])}>＋ {t("Agregar espacio", "Add space", "Adicionar espaço")}</button>}
             {canEdit && <button className="primary-button small" disabled={saving} onClick={savePlan}>{saving ? t("Guardando…", "Saving…", "Salvando…") : t("Guardar modificaciones", "Save changes", "Salvar alterações")}</button>}
             <button className="outline-button compact" onClick={exportPlan}>⇩ PNG</button>
+            <div className="floor-zoom" aria-label={t("Zoom del plano", "Layout zoom", "Zoom do plano")}>
+              <button onClick={() => setFloorZoom((value) => Math.max(.6, Number((value - .1).toFixed(1))))}>−</button>
+              <span>{Math.round(floorZoom * 100)}%</span>
+              <button onClick={() => setFloorZoom((value) => Math.min(1.5, Number((value + .1).toFixed(1))))}>＋</button>
+              <button onClick={() => setFloorZoom(1)}>↺</button>
+            </div>
             {spaces.length > 1 && canEdit && <button className="delete-button" onClick={() => {
               const removed = spaces[spaces.length - 1];
               setSpaces((current) => current.slice(0, -1));
@@ -3625,7 +3645,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               {([["entrance", "Entrada"], ["dance-floor", "Pista"], ["gourmet", "Zona Gourmet"], ["hydration", "Zona Hidratación"]] as const).map(([kind, label]) => <button key={kind} onClick={() => void addFloorElement(kind, label)}>＋ {label}</button>)}
               <button onClick={() => void addFloorElement("custom", t("Texto editable", "Editable text", "Texto editável"))}>＋ {t("Caja con texto", "Text box", "Caixa de texto")}</button>
             </aside>}
-            <div className="floor-spaces">
+            <div className="floor-spaces" style={{ zoom: floorZoom }}>
           {spaces.map((space) => (
             <div className="floor-space" key={space} onDragOver={(event) => event.preventDefault()} onDrop={(event) => {
               if (!canEdit) return;
@@ -3637,9 +3657,11 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             }}>
               <strong className="space-label">{space}</strong>
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className="floor-table" key={table.id} draggable={canEdit} onClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                  <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
                   <strong>{table.name}</strong><small>{table.capacity} {t("lugares", "seats", "lugares")}</small>
-                  {canEdit && <><button className="element-delete" onClick={(event) => { event.stopPropagation(); void deleteTable(table.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${table.name}`}>×</button><button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} /></>}
+                  {canEdit && <div className="floor-table-actions"><button onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { locked: !table.locked }); }} aria-label={table.locked ? t("Desbloquear mesa", "Unlock table", "Desbloquear mesa") : t("Bloquear mesa", "Lock table", "Bloquear mesa")}>{table.locked ? "🔒" : "🔓"}</button><button disabled={table.locked} onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { rotation: ((table.rotation || 0) + 45) % 360 }); }} aria-label={t("Girar mesa", "Rotate table", "Girar mesa")}>↻</button><button onClick={(event) => { event.stopPropagation(); void deleteTable(table.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${table.name}`}>×</button></div>}
+                  {canEdit && !table.locked && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
                 </article>
               ))}
               {floorElements.filter((element) => element.space === space).map((element) => <article className={`floor-element is-${element.kind}`} key={element.id} draggable={canEdit} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height }}>

@@ -14,6 +14,8 @@ type TableRow = {
   layout_width?: number;
   layout_height?: number;
   table_shape?: 'round' | 'rectangular' | 'square';
+  rotation_degrees?: number;
+  is_locked?: boolean;
 };
 
 type LayoutElementRow = {
@@ -45,6 +47,8 @@ const clientTable = (row: TableRow, assignments: AssignmentRow[] = []) => ({
   width: Number(row.layout_width ?? 140),
   height: Number(row.layout_height ?? 70),
   shape: row.table_shape || 'round',
+  rotation: Number(row.rotation_degrees || 0),
+  locked: Boolean(row.is_locked),
   guests: assignments.filter((guest) => guest.table_id === row.id).map((guest) => guest.id)
   ,seatAssignments: Object.fromEntries(
     assignments
@@ -63,7 +67,7 @@ async function handler(request: Request) {
 
     if (request.method === 'GET') {
       const [tablesResponse, assignmentsResponse, elementsResponse] = await Promise.all([
-        supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y,layout_width,layout_height,table_shape&order=created_at.asc`),
+        supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y,layout_width,layout_height,table_shape,rotation_degrees,is_locked&order=created_at.asc`),
         supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=not.is.null&select=id,table_id,seat_number`),
         supabaseRequest(`event_layout_elements?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc`),
       ]);
@@ -89,6 +93,8 @@ async function handler(request: Request) {
             position_y: Math.round(Math.max(0, Math.min(440, Number(body.y) || 0))),
             layout_width: Math.round(Math.max(100, Math.min(300, Number(body.width) || 140))),
             layout_height: Math.round(Math.max(60, Math.min(180, Number(body.height) || 70))),
+            rotation_degrees: Math.round(Number(body.rotation) || 0) % 360,
+            is_locked: Boolean(body.locked),
             updated_at: new Date().toISOString(),
           }),
         },

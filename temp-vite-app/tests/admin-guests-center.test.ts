@@ -155,3 +155,15 @@ test('el admin distingue adultos y niños en la lista y los asientos', () => {
   assert.match(guestsApi, /guest_type/);
   assert.match(migration, /check \(guest_type in \('adult', 'child'\)\)/);
 });
+
+test('el plano permite girar, bloquear y ampliar la sala', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812060000_table_rotation_lock.sql'), 'utf8');
+  assert.match(source, /const \[floorZoom, setFloorZoom\]/);
+  assert.match(source, /rotation: \(\(table\.rotation \|\| 0\) \+ 45\) % 360/);
+  assert.match(source, /locked: !table\.locked/);
+  assert.match(source, /draggable=\{canEdit && !table\.locked\}/);
+  assert.match(tablesApi, /rotation_degrees/);
+  assert.match(tablesApi, /is_locked/);
+  assert.match(migration, /is_locked boolean/);
+});
