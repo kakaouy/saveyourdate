@@ -270,7 +270,7 @@ test('cada silla muestra categoría y prioriza las restricciones', () => {
 
 test('las preferencias sociales generan conflictos accionables por mesa', () => {
   assert.match(source, /const socialConflicts =/);
-  assert.match(source, /findReferencedGuest/);
+  assert.match(source, /findSocialReferences/);
   assert.match(source, /t\("debe sentarse junto a"/);
   assert.match(source, /t\("debe sentarse separado de"/);
   assert.match(source, /className="social-conflict-summary"/);
@@ -305,11 +305,23 @@ test('el segundo paquete agrega restricciones, referencias, exportación y tecla
 
 test('sugiere una silla cercana cuando el grupo ya tiene mesa', () => {
   assert.match(source, /const suggestedGroupTable =/);
-  assert.match(source, /normalizedReference\(seatedGuest\.group\)/);
+  assert.match(source, /const suggestedTargetIds =/);
   assert.match(source, /const groupSeatIndexes =/);
   assert.match(source, /const suggestedSeatIndex =/);
   assert.match(source, /seatIndex === suggestedSeatIndex \? "is-suggested"/);
   assert.match(source, /Asiento sugerido junto al grupo/);
   assert.match(styles, /\.seat-marker\.is-suggested/);
   assert.match(styles, /\.table-card\.is-group-suggestion/);
+});
+
+test('busca por grupo y prioriza la condición explícita de sentar junto', () => {
+  assert.match(source, /guestTerms.*guest\.name.*guest\.group/);
+  assert.match(source, /const findSocialReferences =/);
+  assert.match(source, /const explicitTogetherGuests =/);
+  assert.match(source, /const suggestedTargetIds = explicitTogetherGuests\.length/);
+  assert.match(source, /hasTogetherMatchAtTable/);
+  assert.match(source, /hasSeparateMatchAtTable/);
+  assert.match(source, /list="global-social-references"/);
+  assert.match(source, /list="local-social-references"/);
+  assert.match(source, /aparecerá como sugerencia en Mesas/);
 });

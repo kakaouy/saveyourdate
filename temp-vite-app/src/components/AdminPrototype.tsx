@@ -2801,8 +2801,9 @@ function Guests({
               <label>Parada del transporte <small className="field-help">Sólo si usa el traslado del evento.</small><input name="transportStop" defaultValue={editingGuest.transportStop} placeholder="Ej. Terminal Tres Cruces" /></label>
               <label>Preferencia de menú<input name="menuChoice" defaultValue={editingGuest.menuChoice} /></label>
               <label>Accesibilidad<input name="accessibilityNeeds" defaultValue={editingGuest.accessibilityNeeds} /></label>
-              <label>Sentar junto a<input name="socialTogetherWith" defaultValue={editingGuest.socialTogetherWith} placeholder="Nombre o grupo" /></label>
-              <label>Sentar separado de<input name="socialSeparateFrom" defaultValue={editingGuest.socialSeparateFrom} placeholder="Nombre o grupo" /></label>
+              <label>Sentar junto a<small className="field-help">Elegí una persona o grupo para recibir sugerencias en Mesas.</small><input name="socialTogetherWith" list="local-social-references" defaultValue={editingGuest.socialTogetherWith} placeholder="Nombre o grupo" /></label>
+              <label>Sentar separado de<input name="socialSeparateFrom" list="local-social-references" defaultValue={editingGuest.socialSeparateFrom} placeholder="Nombre o grupo" /></label>
+              <datalist id="local-social-references">{[...new Set(guests.flatMap((guest) => [guest.name, guest.group]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
               <label>Mesa preferida<input name="preferredTableName" defaultValue={editingGuest.preferredTableName} placeholder="Ej. Mesa familiar" /></label>
               <label className="form-span-2">Observaciones<textarea name="guestNotes" rows={3} defaultValue={editingGuest.guestNotes} /></label>
             </div>
@@ -3119,37 +3120,37 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     0,
   );
   const visibleTables = tables.filter((table) => {
-    const guestNames = table.guests.map((id) => guests.find((guest) => guest.id === id)?.name || "").join(" ");
-    return `${table.name} ${guestNames}`.toLowerCase().includes(tableQuery.toLowerCase());
+    const guestTerms = table.guests.map((id) => { const guest = guests.find((item) => item.id === id); return guest ? `${guest.name} ${guest.group}` : ""; }).join(" ");
+    return `${table.name} ${guestTerms}`.toLowerCase().includes(tableQuery.toLowerCase());
   });
+  const findSocialReferences = (reference: string, guestId: string) => {
+    const normalized = normalizedReference(reference);
+    return normalized ? confirmedGuests.filter((candidate) => candidate.id !== guestId && (
+      normalizedReference(candidate.name).includes(normalized) ||
+      normalized.includes(normalizedReference(candidate.name)) ||
+      normalizedReference(candidate.group) === normalized
+    )) : [];
+  };
   const socialConflicts = (() => {
     const conflicts = new Map<string, { id: string; tableId: string; message: string }>();
-    const findReferencedGuest = (reference: string, guestId: string) => {
-      const normalized = normalizedReference(reference);
-      return normalized
-        ? confirmedGuests.find((candidate) => candidate.id !== guestId && (
-            normalizedReference(candidate.name).includes(normalized) ||
-            normalized.includes(normalizedReference(candidate.name)) ||
-            normalizedReference(candidate.group) === normalized
-          ))
-        : undefined;
-    };
     confirmedGuests.forEach((guest) => {
       const table = tables.find((candidate) => candidate.guests.includes(guest.id));
       if (!table) return;
-      const together = findReferencedGuest(guest.socialTogetherWith, guest.id);
-      const togetherTable = together && tables.find((candidate) => candidate.guests.includes(together.id));
-      if (together && togetherTable?.id !== table.id) {
-        const id = `together-${[guest.id, together.id].sort().join("-")}`;
-        conflicts.set(id, { id, tableId: table.id, message: `${guest.name} ${t("debe sentarse junto a", "should sit with", "deve sentar junto a")} ${together.name}` });
+      const togetherMatches = findSocialReferences(guest.socialTogetherWith, guest.id);
+      const together = togetherMatches[0];
+      const hasTogetherMatchAtTable = togetherMatches.some((match) => table.guests.includes(match.id));
+      if (together && !hasTogetherMatchAtTable) {
+        const id = `together-${guest.id}`;
+        conflicts.set(id, { id, tableId: table.id, message: `${guest.name} ${t("debe sentarse junto a", "should sit with", "deve sentar junto a")} ${guest.socialTogetherWith}` });
       }
       if (guest.socialTogetherWith && !together) {
         const id = `unresolved-together-${guest.id}`;
         conflicts.set(id, { id, tableId: table.id, message: `${guest.name}: ${t("no encontramos a", "could not find", "não encontramos")} “${guest.socialTogetherWith}”` });
       }
-      const separate = findReferencedGuest(guest.socialSeparateFrom, guest.id);
-      const separateTable = separate && tables.find((candidate) => candidate.guests.includes(separate.id));
-      if (separate && separateTable?.id === table.id) {
+      const separateMatches = findSocialReferences(guest.socialSeparateFrom, guest.id);
+      const separate = separateMatches[0];
+      const hasSeparateMatchAtTable = separateMatches.some((match) => table.guests.includes(match.id));
+      if (separate && hasSeparateMatchAtTable) {
         const id = `separate-${[guest.id, separate.id].sort().join("-")}`;
         conflicts.set(id, { id, tableId: table.id, message: `${guest.name} ${t("debe sentarse separado de", "should sit separately from", "deve sentar separado de")} ${separate.name}` });
       }
@@ -3168,11 +3169,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const focusSpecificTable = (tableId: string) => document.getElementById(`table-card-${tableId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
   const exportSocialConflicts = () => exportCsv("conflictos-de-mesas.csv", [t("Mesa", "Table", "Mesa"), t("Conflicto", "Conflict", "Conflito")], socialConflicts.map((conflict) => [tables.find((table) => table.id === conflict.tableId)?.name || "—", conflict.message]));
   const selectedGuest = confirmedGuests.find((guest) => guest.id === selectedGuestId);
+  const explicitTogetherGuests = selectedGuest ? findSocialReferences(selectedGuest.socialTogetherWith, selectedGuest.id) : [];
+  const suggestedTargetIds = explicitTogetherGuests.length
+    ? explicitTogetherGuests.map((guest) => guest.id)
+    : selectedGuest ? confirmedGuests.filter((guest) => guest.id !== selectedGuest.id && normalizedReference(guest.group) === normalizedReference(selectedGuest.group)).map((guest) => guest.id) : [];
   const suggestedGroupTable = selectedGuest
-    ? tables.find((table) => table.guests.some((guestId) => {
-        const seatedGuest = guests.find((guest) => guest.id === guestId);
-        return seatedGuest && seatedGuest.id !== selectedGuest.id && normalizedReference(seatedGuest.group) === normalizedReference(selectedGuest.group);
-      }))
+    ? tables.find((table) => table.guests.some((guestId) => suggestedTargetIds.includes(guestId)))
     : undefined;
 
   const focusTable = (direction: -1 | 1) => {
@@ -4032,7 +4034,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </span>
             </div>
           </div>
-          {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${t("junto a su grupo", "next to their group", "junto ao seu grupo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
+          {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${explicitTogetherGuests.length ? `${t("junto a", "next to", "junto a")} ${selectedGuest?.socialTogetherWith}` : t("junto a su grupo", "next to their group", "junto ao seu grupo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
           {tableQuery && <div className="active-table-filter"><span>{t("Resultados para", "Results for", "Resultados para")} “{tableQuery}”</span><button onClick={() => setTableQuery("")}>× {t("Limpiar", "Clear", "Limpar")}</button></div>}
           <div className={`tables-grid ${compactTables ? "is-compact" : ""}`}>
             {!visibleTables.length && <div className="tables-empty-state"><strong>{t("No encontramos mesas", "No tables found", "Nenhuma mesa encontrada")}</strong><span>{t("Probá con otro nombre de mesa o invitado.", "Try another table or guest name.", "Tente outro nome de mesa ou convidado.")}</span><button onClick={() => setTableQuery("")}>{t("Ver todas las mesas", "View all tables", "Ver todas as mesas")}</button></div>}
@@ -4104,7 +4106,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 .forEach((guest) => placeGuest(guest));
               const selectedPeople = selectedGuest ? confirmedPeopleForGuest(selectedGuest, guests) : 0;
               const groupSeatIndexes = selectedGuest
-                ? seatGuests.flatMap((slot, seatIndex) => slot && slot.guest.id !== selectedGuest.id && normalizedReference(slot.guest.group) === normalizedReference(selectedGuest.group) ? [seatIndex] : [])
+                ? seatGuests.flatMap((slot, seatIndex) => slot && suggestedTargetIds.includes(slot.guest.id) ? [seatIndex] : [])
                 : [];
               const suggestedSeatIndex = suggestedGroupTable?.id === table.id && groupSeatIndexes.length
                 ? Array.from({ length: table.capacity }, (_, offset) => (Math.max(...groupSeatIndexes) + 1 + offset) % table.capacity).find((start) =>
@@ -6214,8 +6216,9 @@ function GlobalGuestEditor({
           <label>{t("Parada del transporte", "Transport stop", "Parada do transporte")}<small className="field-help">{t("Sólo si usa el traslado del evento.", "Only when using event transport.", "Somente se usar o transporte do evento.")}</small><input name="transportStop" defaultValue={guest.transportStop} placeholder={t("Ej. Terminal Tres Cruces", "E.g. Central station", "Ex. Terminal central")} /></label>
           <label>{t("Preferencia de menú", "Menu preference", "Preferência de menu")}<input name="menuChoice" defaultValue={guest.menuChoice} /></label>
           <label>{t("Accesibilidad", "Accessibility", "Acessibilidade")}<input name="accessibilityNeeds" defaultValue={guest.accessibilityNeeds} /></label>
-          <label>{t("Sentar junto a", "Seat together with", "Sentar junto com")}<input name="socialTogetherWith" defaultValue={guest.socialTogetherWith} placeholder={t("Nombre o grupo", "Name or group", "Nome ou grupo")} /></label>
-          <label>{t("Mantener separado de", "Keep separate from", "Manter separado de")}<input name="socialSeparateFrom" defaultValue={guest.socialSeparateFrom} placeholder={t("Nombre o grupo", "Name or group", "Nome ou grupo")} /></label>
+          <label>{t("Sentar junto a", "Seat together with", "Sentar junto com")}<small className="field-help">{t("Elegí una persona o grupo; aparecerá como sugerencia en Mesas.", "Choose a person or group; it will appear as a seating suggestion.", "Escolha uma pessoa ou grupo; aparecerá como sugestão nas mesas.")}</small><input name="socialTogetherWith" list="global-social-references" defaultValue={guest.socialTogetherWith} placeholder={t("Nombre o grupo", "Name or group", "Nome ou grupo")} /></label>
+          <label>{t("Mantener separado de", "Keep separate from", "Manter separado de")}<input name="socialSeparateFrom" list="global-social-references" defaultValue={guest.socialSeparateFrom} placeholder={t("Nombre o grupo", "Name or group", "Nome ou grupo")} /></label>
+          <datalist id="global-social-references">{[...new Set(guests.flatMap((item) => [item.name, item.group]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
           <label>{t("Mesa preferida", "Preferred table", "Mesa preferida")}<input name="preferredTableName" defaultValue={guest.preferredTableName} placeholder={t("Ej. Mesa familia", "E.g. Family table", "Ex. Mesa família")} /></label>
           <label className="form-span-2">{t("Observaciones", "Notes", "Observações")}<textarea name="guestNotes" rows={3} defaultValue={guest.guestNotes} /></label>
         </div>
