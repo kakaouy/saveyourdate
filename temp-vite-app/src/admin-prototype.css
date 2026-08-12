@@ -516,9 +516,14 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .seat-position-select { width: 116px; min-height: 30px; padding: 0 6px; border: 1px solid #c9dde0; border-radius: 7px; color: var(--ink); background: white; font-size: 8px; }
 .seat-marker { overflow: visible; }
 .seat-marker .seat-number { position: absolute; top: -8px; left: -5px; z-index: 2; display: grid; place-items: center; width: 15px; height: 15px; border: 1px solid #b7d8db; border-radius: 50%; color: var(--teal-dark); background: white; font-size: 7px; line-height: 1; }
+.seat-marker.is-occupied .seat-number { color: #315f86; border-color: #83afd8; background: #eef6ff; }
+.seat-marker.is-teen .seat-number { color: #584275; border-color: #a88ac8; background: #f6f0fc; }
+.seat-marker.is-child .seat-number { color: #7a4a12; border-color: #e7aa61; background: #fff4df; }
 .seat-marker em { font-style: normal; }
 .seat-marker.is-click-target { cursor: pointer; box-shadow: 0 0 0 4px rgba(10,171,176,.14); animation: seat-target-pulse 1.4s ease-in-out infinite; }
 .seat-marker.is-selected { color: white; border-color: #087e82; background: #0aabb0; box-shadow: 0 0 0 4px rgba(10,171,176,.18); }
+.seat-marker.has-alert { color: #8d2f2a; border-color: #df655d; background: #ffe0dd; box-shadow: 0 0 0 4px rgba(223,101,93,.18); }
+.seat-marker.has-alert .seat-number { color: #8d2f2a; border-color: #df655d; background: #fff0ee; }
 @keyframes seat-target-pulse { 50% { box-shadow: 0 0 0 7px rgba(10,171,176,.06); } }
 .seated-guests button { border: 0; color: var(--muted); background: transparent; font-size: 16px; cursor: pointer; }
 .empty-table { min-height: 55px; border: 1px dashed #b9d8dc; border-radius: 8px; color: var(--teal-dark); background: #f5fbfb; font-size: 9px; font-weight: 750; cursor: pointer; }

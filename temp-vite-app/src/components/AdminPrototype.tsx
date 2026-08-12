@@ -160,6 +160,10 @@ const meaningfulGuestValue = (value: string) => {
   return Boolean(normalized && !["ninguna", "ninguno", "none", "nenhuma", "nenhum", "no"].includes(normalized));
 };
 
+const guestHasRestriction = (guest: Guest) =>
+  meaningfulGuestValue(guest.food) ||
+  Boolean(guest.socialTogetherWith || guest.socialSeparateFrom || guest.preferredTableName);
+
 const seatProgress = (guest: Guest, guests: Guest[]) => {
   const members = linkedGroupMembers(guest, guests);
   if (members.length === 1) return { used: Math.min(guest.confirmed, guest.seats), total: guest.seats };
@@ -1346,9 +1350,7 @@ function Guests({
   const confirmedPeople = confirmedPeopleTotal(activeGuests);
   const pendingInvitations = activeGuests.filter((guest) => guest.status === "Pendiente").length;
   const declinedInvitations = activeGuests.filter((guest) => guest.status === "No asiste").length;
-  const hasGuestRestriction = (guest: Guest) =>
-    (guest.food && guest.food !== "—" && !/^(ninguna|none|nenhuma)/i.test(guest.food)) ||
-    Boolean(guest.socialTogetherWith || guest.socialSeparateFrom || guest.preferredTableName);
+  const hasGuestRestriction = guestHasRestriction;
   const dietaryInvitations = activeGuests.filter(hasGuestRestriction).length;
   const unsentInvitations = activeGuests.filter(
     (guest) => guest.status === "Pendiente" && !guest.invitationSentAt,
@@ -3789,7 +3791,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 <span><i className="adult-dot" />{t("Adultos", "Adults", "Adultos")}</span>
                 <span><i className="teen-dot" />{t("Adolescentes", "Teenagers", "Adolescentes")}</span>
                 <span><i className="child-dot" />{t("Niños", "Children", "Crianças")}</span>
-                <span><i className="alert-dot" />{t("Con alerta", "With alert", "Com alerta")}</span>
+                <span><i className="alert-dot" />{t("Restricciones", "Restrictions", "Restrições")}</span>
               </div>
             </div>
             <span className="count-badge">{confirmedGuests.length}</span>
@@ -4088,10 +4090,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       const radiusY = table.shape === "rectangular" ? 34 : table.shape === "square" ? 39 : 42;
                       return (
                         <span
-                          className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "teen" ? "is-teen" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person && meaningfulGuestValue(person.guest.food) ? "has-alert" : ""} ${person?.guest.id === selectedGuestId ? "is-selected" : ""} ${selectedGuestId && (!person || person.guest.id === selectedGuestId) ? "is-click-target" : ""}`}
+                          className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "teen" ? "is-teen" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person?.guest.id === selectedGuestId ? "is-selected" : ""} ${selectedGuestId && (!person || person.guest.id === selectedGuestId) ? "is-click-target" : ""} ${person && guestHasRestriction(person.guest) ? "has-alert" : ""}`}
                           key={seatIndex}
                           style={{ left: `${50 + Math.cos(angle) * radiusX}%`, top: `${50 + Math.sin(angle) * radiusY}%` }}
-                          title={person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
+                          title={person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}${person.guest.socialTogetherWith ? ` · ${t("Junto a", "Together with", "Junto a")} ${person.guest.socialTogetherWith}` : ""}${person.guest.socialSeparateFrom ? ` · ${t("Separado de", "Separate from", "Separado de")} ${person.guest.socialSeparateFrom}` : ""}${person.guest.preferredTableName ? ` · ${t("Mesa preferida", "Preferred table", "Mesa preferida")}: ${person.guest.preferredTableName}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
                           draggable={Boolean(canEdit && person)}
                           onDragStart={(event) => {
                             if (!person) return;

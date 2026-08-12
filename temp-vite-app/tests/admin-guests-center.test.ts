@@ -256,3 +256,14 @@ test('la navegación permite buscar mesas y asignar por selección y clic', () =
   assert.match(source, /void assignGuest\(selectedGuestId, table\.id, true, seatIndex \+ 1\)/);
   assert.match(styles, /\.seat-marker\.is-click-target/);
 });
+
+test('cada silla muestra categoría y prioriza las restricciones', () => {
+  assert.match(source, /const guestHasRestriction =/);
+  assert.match(source, /t\("Restricciones", "Restrictions", "Restrições"\)/);
+  assert.match(source, /person && guestHasRestriction\(person\.guest\) \? "has-alert"/);
+  assert.match(styles, /\.seat-marker\.is-occupied \.seat-number/);
+  assert.match(styles, /\.seat-marker\.is-teen \.seat-number/);
+  assert.match(styles, /\.seat-marker\.is-child \.seat-number/);
+  assert.match(styles, /\.seat-marker\.has-alert \.seat-number/);
+  assert.ok(styles.lastIndexOf('.seat-marker.has-alert') > styles.lastIndexOf('.seat-marker.is-selected'));
+});
