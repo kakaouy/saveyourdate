@@ -233,9 +233,13 @@ create table if not exists public.event_tables (
   name text not null,
   capacity integer not null default 8 check (capacity between 1 and 30),
   note text not null default '',
+  table_shape text not null default 'round' check (table_shape in ('round', 'rectangular', 'square')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.event_tables
+  add column if not exists table_shape text not null default 'round';
 
 create index if not exists event_tables_order_idx
   on public.event_tables(order_number, created_at);

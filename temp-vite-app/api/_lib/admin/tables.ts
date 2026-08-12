@@ -13,6 +13,7 @@ type TableRow = {
   position_y?: number;
   layout_width?: number;
   layout_height?: number;
+  table_shape?: 'round' | 'rectangular' | 'square';
 };
 
 type LayoutElementRow = {
@@ -42,6 +43,7 @@ const clientTable = (row: TableRow, assignments: AssignmentRow[] = []) => ({
   y: Number(row.position_y ?? 24),
   width: Number(row.layout_width ?? 140),
   height: Number(row.layout_height ?? 70),
+  shape: row.table_shape || 'round',
   guests: assignments.filter((guest) => guest.table_id === row.id).map((guest) => guest.id)
 });
 
@@ -55,7 +57,7 @@ async function handler(request: Request) {
 
     if (request.method === 'GET') {
       const [tablesResponse, assignmentsResponse, elementsResponse] = await Promise.all([
-        supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y,layout_width,layout_height&order=created_at.asc`),
+        supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y,layout_width,layout_height,table_shape&order=created_at.asc`),
         supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=not.is.null&select=id,table_id`),
         supabaseRequest(`event_layout_elements?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc`),
       ]);
@@ -124,6 +126,7 @@ async function handler(request: Request) {
           name,
           capacity,
           note: String(body.note || '').trim()
+          ,table_shape: ['round', 'rectangular', 'square'].includes(String(body.shape)) ? String(body.shape) : 'round'
         })
       });
       const createdTable = ((await response.json()) as TableRow[])[0];
@@ -223,6 +226,7 @@ async function handler(request: Request) {
             name,
             capacity,
             note: String(body.note || '').trim(),
+            table_shape: ['round', 'rectangular', 'square'].includes(String(body.shape)) ? String(body.shape) : 'round',
             updated_at: new Date().toISOString()
           })
         }

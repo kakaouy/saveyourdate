@@ -3001,6 +3001,7 @@ type EventTable = {
   y: number;
   width: number;
   height: number;
+  shape: "round" | "rectangular" | "square";
 };
 
 type FloorElement = {
@@ -3028,6 +3029,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [tableName, setTableName] = useState("Mesa 3");
   const [capacity, setCapacity] = useState(8);
   const [note, setNote] = useState("");
+  const [tableShape, setTableShape] = useState<EventTable["shape"]>("round");
   const [query, setQuery] = useState("");
   const [layoutMode, setLayoutMode] = useState(false);
   const [spaces, setSpaces] = useState(["Espacio 1"]);
@@ -3091,11 +3093,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const openNew = () => {
+  const openNew = (shape: EventTable["shape"] = "round") => {
     setEditing(null);
     setTableName(`Mesa ${tables.length + 1}`);
     setCapacity(8);
     setNote("");
+    setTableShape(shape);
     setShowModal(true);
   };
 
@@ -3104,6 +3107,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     setTableName(table.name);
     setCapacity(table.capacity);
     setNote(table.note);
+    setTableShape(table.shape || "round");
     setShowModal(true);
   };
 
@@ -3119,6 +3123,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           name: tableName,
           capacity,
           note,
+          shape: tableShape,
         }),
       });
       const result = (await response.json()) as {
@@ -3513,7 +3518,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         <div className="heading-actions">
           <button className="outline-button" onClick={exportDetailedReport}>⇩ {t("Exportar reporte", "Export report", "Exportar relatório")}</button>
           <button className={`outline-button ${layoutMode ? "active" : ""}`} onClick={() => setLayoutMode((value) => !value)}>{layoutMode ? t("Ver lista", "View list", "Ver lista") : t("Editar plano", "Edit layout", "Editar plano")}</button>
-          {canEdit && <button className="primary-button small" onClick={openNew}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
+          {canEdit && <button className="primary-button small" onClick={() => openNew()}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
         </div>
       </div>
       <ContextHelp
@@ -3743,6 +3748,14 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         </aside>
 
         <section className="tables-workspace">
+          {canEdit && (
+            <div className="table-shape-tools" aria-label={t("Añadir mesas", "Add tables", "Adicionar mesas")}>
+              <strong>{t("Añadir mesa", "Add table", "Adicionar mesa")}</strong>
+              <button onClick={() => openNew("round")}><i className="shape-icon is-round" />{t("Redonda", "Round", "Redonda")}</button>
+              <button onClick={() => openNew("rectangular")}><i className="shape-icon is-rectangular" />{t("Rectangular", "Rectangular", "Retangular")}</button>
+              <button onClick={() => openNew("square")}><i className="shape-icon is-square" />{t("Cuadrada", "Square", "Quadrada")}</button>
+            </div>
+          )}
           <div className="workspace-heading">
             <div>
               <h2>{t("Plano de mesas", "Table layout", "Plano de mesas")}</h2>
@@ -3813,6 +3826,15 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 dragGuestId && table.guests.includes(dragGuestId),
               );
               const canDrop = alreadyHere || remaining >= draggedPeople;
+              const seatGuests = tableGuests.flatMap((guest) =>
+                Array.from(
+                  { length: confirmedPeopleForGuest(guest, guests) },
+                  (_, personIndex) => ({
+                    guest,
+                    label: personIndex === 0 ? initials(guest.name) : `+${personIndex}`,
+                  }),
+                ),
+              );
               return (
                 <article
                   className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""}`}
@@ -3871,6 +3893,23 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         width: `${Math.min(100, (occupied / table.capacity) * 100)}%`,
                       }}
                     />
+                  </div>
+                  <div className={`table-seat-map is-${table.shape || "round"}`}>
+                    <div className="table-surface"><strong>{table.name}</strong></div>
+                    {Array.from({ length: table.capacity }, (_, seatIndex) => {
+                      const person = seatGuests[seatIndex];
+                      const angle = (Math.PI * 2 * seatIndex) / table.capacity - Math.PI / 2;
+                      const radiusX = table.shape === "rectangular" ? 43 : table.shape === "square" ? 37 : 42;
+                      const radiusY = table.shape === "rectangular" ? 34 : table.shape === "square" ? 39 : 42;
+                      return (
+                        <span
+                          className={`seat-marker ${person ? "is-occupied" : ""} ${person && meaningfulGuestValue(person.guest.food) ? "has-alert" : ""}`}
+                          key={seatIndex}
+                          style={{ left: `${50 + Math.cos(angle) * radiusX}%`, top: `${50 + Math.sin(angle) * radiusY}%` }}
+                          title={person ? `${person.guest.name}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
+                        >{person?.label || "♧"}</span>
+                      );
+                    })}
                   </div>
                   {(menuSummary.size > 0 || dietaryAlerts.length > 0 || accessibilityAlerts.length > 0) && (
                     <div className="table-operations" aria-label={t("Datos operativos", "Operational details", "Dados operacionais")}>
@@ -3944,7 +3983,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               );
             })}
             {canEdit && (
-              <button className="add-table-card" onClick={openNew}>
+              <button className="add-table-card" onClick={() => openNew()}>
                 <span>＋</span>
                 <strong>
                   {t(
@@ -4025,6 +4064,15 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 />
               </label>
             </div>
+            <fieldset className="table-shape-picker">
+              <legend>{t("Forma de la mesa", "Table shape", "Formato da mesa")}</legend>
+              {(["round", "rectangular", "square"] as const).map((shape) => (
+                <button type="button" key={shape} className={tableShape === shape ? "active" : ""} onClick={() => setTableShape(shape)}>
+                  <i className={`shape-icon is-${shape}`} />
+                  {shape === "round" ? t("Redonda", "Round", "Redonda") : shape === "rectangular" ? t("Rectangular", "Rectangular", "Retangular") : t("Cuadrada", "Square", "Quadrada")}
+                </button>
+              ))}
+            </fieldset>
             <label className="modal-note">
               {t(
                 "Ubicación u observaciones",

@@ -121,3 +121,15 @@ test('cada mesa resume menús y alertas operativas también en el reporte', () =
   assert.match(source, /class="ops"/);
   assert.match(source, /guest\.companions/);
 });
+
+test('el plano admite mesas redondas, rectangulares y cuadradas con asientos visibles', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812030000_table_shapes.sql'), 'utf8');
+  assert.match(source, /type EventTable =/);
+  assert.match(source, /shape: "round" \| "rectangular" \| "square"/);
+  assert.match(source, /className=\{`table-seat-map is-/);
+  assert.match(source, /className=\{`seat-marker/);
+  assert.match(source, /table-shape-picker/);
+  assert.match(tablesApi, /table_shape/);
+  assert.match(migration, /check \(table_shape in \('round', 'rectangular', 'square'\)\)/);
+});
