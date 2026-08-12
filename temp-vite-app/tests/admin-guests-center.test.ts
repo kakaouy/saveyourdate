@@ -245,3 +245,14 @@ test('la categoría y el asiento se pueden cambiar sin depender del arrastre', (
   assert.match(tablesApi, /companion_of_id=not\.is\.null/);
   assert.match(tablesApi, /const guestSize = usesIndividualRows \? 1/);
 });
+
+test('la navegación permite buscar mesas y asignar por selección y clic', () => {
+  assert.match(source, /const \[selectedGuestId, setSelectedGuestId\]/);
+  assert.match(source, /const \[tableQuery, setTableQuery\]/);
+  assert.match(source, /const visibleTables = tables\.filter/);
+  assert.match(source, /const focusTable =/);
+  assert.match(source, /className="table-navigation"/);
+  assert.match(source, /Ahora elegí una silla libre/);
+  assert.match(source, /void assignGuest\(selectedGuestId, table\.id, true, seatIndex \+ 1\)/);
+  assert.match(styles, /\.seat-marker\.is-click-target/);
+});

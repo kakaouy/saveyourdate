@@ -3077,6 +3077,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [layoutUndoStack, setLayoutUndoStack] = useState<Array<{ before: EventTable; after: EventTable }>>([]);
   const [layoutRedoStack, setLayoutRedoStack] = useState<Array<{ before: EventTable; after: EventTable }>>([]);
   const [dragGuestId, setDragGuestId] = useState("");
+  const [selectedGuestId, setSelectedGuestId] = useState("");
+  const [tableQuery, setTableQuery] = useState("");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "teen" | "child">("all");
   const [lastAssignment, setLastAssignment] = useState<{
@@ -3107,6 +3109,26 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     (total, table) => total + table.capacity,
     0,
   );
+  const visibleTables = tables.filter((table) => {
+    const guestNames = table.guests.map((id) => guests.find((guest) => guest.id === id)?.name || "").join(" ");
+    return `${table.name} ${guestNames}`.toLowerCase().includes(tableQuery.toLowerCase());
+  });
+
+  const focusTable = (direction: -1 | 1) => {
+    if (!visibleTables.length) return;
+    const currentIndex = visibleTables.findIndex((table) => {
+      const rect = document.getElementById(`table-card-${table.id}`)?.getBoundingClientRect();
+      return Boolean(rect && rect.top >= 70 && rect.top < window.innerHeight * 0.7);
+    });
+    const nextIndex = Math.min(visibleTables.length - 1, Math.max(0, (currentIndex < 0 ? (direction > 0 ? -1 : 1) : currentIndex) + direction));
+    document.getElementById(`table-card-${visibleTables[nextIndex].id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const selectGuestForSeat = (guestId: string) => {
+    setSelectedGuestId((current) => current === guestId ? "" : guestId);
+    const currentTable = tables.find((table) => table.guests.includes(guestId));
+    if (currentTable) requestAnimationFrame(() => document.getElementById(`table-card-${currentTable.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }));
+  };
 
   useEffect(() => {
     fetch("/api/admin/tables")
@@ -3758,9 +3780,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </h2>
               <p>
                 {t(
-                  "Arrastrá cada grupo a una mesa o usá el selector",
-                  "Drag each group to a table or use the selector",
-                  "Arraste cada grupo para uma mesa ou use o seletor",
+                  "Seleccioná un invitado y después una silla, o arrastralo",
+                  "Select a guest and then a seat, or drag them",
+                  "Selecione um convidado e depois um assento, ou arraste",
                 )}
               </p>
               <div className="seat-category-legend">
@@ -3821,8 +3843,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               return (
                 <div
                   key={guest.id}
-                  className={`${currentTable ? "guest-assigned" : ""} ${dragGuestId === guest.id ? "is-dragging" : ""}`}
+                  className={`${currentTable ? "guest-assigned" : ""} ${dragGuestId === guest.id ? "is-dragging" : ""} ${selectedGuestId === guest.id ? "is-selected" : ""}`}
                   draggable={canEdit}
+                  onClick={(event) => {
+                    if (!canEdit || (event.target as HTMLElement).closest("button, select")) return;
+                    selectGuestForSeat(guest.id);
+                  }}
                   onDragStart={(event) => {
                     event.dataTransfer.setData("text/guest-id", guest.id);
                     event.dataTransfer.effectAllowed = "move";
@@ -3906,6 +3932,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </p>
             </div>
             <div className="workspace-actions">
+              <label className="table-search"><span>⌕</span><input value={tableQuery} onChange={(event) => setTableQuery(event.target.value)} placeholder={t("Buscar mesa o invitado…", "Search table or guest…", "Buscar mesa ou convidado…")} /></label>
+              <div className="table-navigation" aria-label={t("Recorrer mesas", "Browse tables", "Navegar mesas")}>
+                <button onClick={() => focusTable(-1)} disabled={!visibleTables.length} aria-label={t("Mesa anterior", "Previous table", "Mesa anterior")}>←</button>
+                <span>{visibleTables.length} {t("mesas", "tables", "mesas")}</span>
+                <button onClick={() => focusTable(1)} disabled={!visibleTables.length} aria-label={t("Mesa siguiente", "Next table", "Próxima mesa")}>→</button>
+              </div>
               {lastAssignment && (
                 <button className="outline-button compact" onClick={undoLastAssignment}>
                   ↶ {t("Deshacer movimiento", "Undo move", "Desfazer movimento")}
@@ -3920,8 +3952,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </span>
             </div>
           </div>
+          {selectedGuestId && <div className="seat-selection-banner"><strong>{guests.find((guest) => guest.id === selectedGuestId)?.name}</strong><span>{t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span><button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
           <div className="tables-grid">
-            {tables.map((table, index) => {
+            {visibleTables.map((table) => {
+              const index = tables.findIndex((item) => item.id === table.id);
               const tableGuests = table.guests
                 .map((id) => guests.find((guest) => guest.id === id))
                 .filter(Boolean) as Guest[];
@@ -3987,7 +4021,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 .forEach((guest) => placeGuest(guest));
               return (
                 <article
-                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""}`}
+                  id={`table-card-${table.id}`}
+                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""} ${selectedGuestId && table.guests.includes(selectedGuestId) ? "has-selected-guest" : ""}`}
                   key={table.id}
                   onDragOver={(event) => {
                     if (canEdit && dragGuestId && canDrop) {
@@ -4053,7 +4088,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       const radiusY = table.shape === "rectangular" ? 34 : table.shape === "square" ? 39 : 42;
                       return (
                         <span
-                          className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "teen" ? "is-teen" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person && meaningfulGuestValue(person.guest.food) ? "has-alert" : ""}`}
+                          className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "teen" ? "is-teen" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person && meaningfulGuestValue(person.guest.food) ? "has-alert" : ""} ${person?.guest.id === selectedGuestId ? "is-selected" : ""} ${selectedGuestId && (!person || person.guest.id === selectedGuestId) ? "is-click-target" : ""}`}
                           key={seatIndex}
                           style={{ left: `${50 + Math.cos(angle) * radiusX}%`, top: `${50 + Math.sin(angle) * radiusY}%` }}
                           title={person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
@@ -4074,6 +4109,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                             event.stopPropagation();
                             const guestId = event.dataTransfer.getData("text/guest-id");
                             if (canEdit && guestId && (!person || person.guest.id === guestId)) void assignGuest(guestId, table.id, true, seatIndex + 1);
+                          }}
+                          onClick={() => {
+                            if (canEdit && selectedGuestId && (!person || person.guest.id === selectedGuestId)) void assignGuest(selectedGuestId, table.id, true, seatIndex + 1);
                           }}
                         ><b className="seat-number">{seatIndex + 1}</b><em>{person?.label || "♧"}</em></span>
                       );
