@@ -3084,6 +3084,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [dragGuestId, setDragGuestId] = useState("");
   const [selectedGuestId, setSelectedGuestId] = useState("");
   const [tableQuery, setTableQuery] = useState("");
+  const [compactTables, setCompactTables] = useState(false);
+  const [assignmentSavingId, setAssignmentSavingId] = useState("");
+  const [assignmentStatus, setAssignmentStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "teen" | "child">("all");
   const [lastAssignment, setLastAssignment] = useState<{
@@ -3297,6 +3300,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const fromTableId = fromTable?.id || "";
     const fromSeatNumber = fromTable?.seatAssignments?.[guestId] || 0;
     if (fromTableId === tableId && fromSeatNumber === seatNumber) return true;
+    setAssignmentSavingId(guestId);
+    setAssignmentStatus("saving");
     try {
       const response = await fetch("/api/admin/tables", {
         method: "PATCH",
@@ -3323,6 +3328,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       );
       if (remember) setLastAssignment({ guestId, fromTableId, toTableId: tableId, fromSeatNumber });
       setDragGuestId("");
+      setAssignmentStatus("saved");
+      window.setTimeout(() => setAssignmentStatus((current) => current === "saved" ? "idle" : current), 1800);
       return true;
     } catch (assignError) {
       setError(
@@ -3330,7 +3337,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           ? assignError.message
           : "No pudimos asignar el invitado.",
       );
+      setAssignmentStatus("error");
       return false;
+    } finally {
+      setAssignmentSavingId("");
     }
   };
 
@@ -3862,6 +3872,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 </button>
               ))}
             </div>
+            {(query || assignmentFilter !== "all" || guestCategoryFilter !== "all") && <button className="clear-seating-filters" onClick={() => { setQuery(""); setAssignmentFilter("all"); setGuestCategoryFilter("all"); }}>× {t("Limpiar filtros", "Clear filters", "Limpar filtros")}</button>}
             {canEdit && (
               <div
                 className={`unassign-drop-zone ${dragGuestId ? "is-active" : ""}`}
@@ -3982,22 +3993,21 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 <span>{visibleTables.length} {t("mesas", "tables", "mesas")}</span>
                 <button onClick={() => focusTable(1)} disabled={!visibleTables.length} aria-label={t("Mesa siguiente", "Next table", "Próxima mesa")}>→</button>
               </div>
+              <button className={`outline-button compact view-density-toggle ${compactTables ? "active" : ""}`} onClick={() => setCompactTables((current) => !current)}>{compactTables ? t("Vista detallada", "Detailed view", "Vista detalhada") : t("Vista compacta", "Compact view", "Vista compacta")}</button>
               {lastAssignment && (
                 <button className="outline-button compact" onClick={undoLastAssignment}>
                   ↶ {t("Deshacer movimiento", "Undo move", "Desfazer movimento")}
                 </button>
               )}
-              <span>
-                {t(
-                  "Actualización automática",
-                  "Automatic updates",
-                  "Atualização automática",
-                )}
+              <span className={`assignment-save-status is-${assignmentStatus}`} role="status">
+                {assignmentStatus === "saving" ? t("Guardando…", "Saving…", "Salvando…") : assignmentStatus === "saved" ? `✓ ${t("Guardado", "Saved", "Salvo")}` : assignmentStatus === "error" ? t("No se guardó", "Not saved", "Não foi salvo") : t("Actualización automática", "Automatic updates", "Atualização automática")}
               </span>
             </div>
           </div>
           {selectedGuestId && <div className="seat-selection-banner"><strong>{guests.find((guest) => guest.id === selectedGuestId)?.name}</strong><span>{t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span><button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
-          <div className="tables-grid">
+          {tableQuery && <div className="active-table-filter"><span>{t("Resultados para", "Results for", "Resultados para")} “{tableQuery}”</span><button onClick={() => setTableQuery("")}>× {t("Limpiar", "Clear", "Limpar")}</button></div>}
+          <div className={`tables-grid ${compactTables ? "is-compact" : ""}`}>
+            {!visibleTables.length && <div className="tables-empty-state"><strong>{t("No encontramos mesas", "No tables found", "Nenhuma mesa encontrada")}</strong><span>{t("Probá con otro nombre de mesa o invitado.", "Try another table or guest name.", "Tente outro nome de mesa ou convidado.")}</span><button onClick={() => setTableQuery("")}>{t("Ver todas las mesas", "View all tables", "Ver todas as mesas")}</button></div>}
             {visibleTables.map((table) => {
               const index = tables.findIndex((item) => item.id === table.id);
               const tableGuests = table.guests
@@ -4067,7 +4077,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               return (
                 <article
                   id={`table-card-${table.id}`}
-                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""} ${selectedGuestId && table.guests.includes(selectedGuestId) ? "has-selected-guest" : ""}`}
+                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""} ${selectedGuestId && table.guests.includes(selectedGuestId) ? "has-selected-guest" : ""} ${assignmentSavingId && table.guests.includes(assignmentSavingId) ? "is-saving" : ""}`}
                   key={table.id}
                   onDragOver={(event) => {
                     if (canEdit && dragGuestId && canDrop) {
@@ -4157,7 +4167,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                             if (canEdit && guestId && (!person || person.guest.id === guestId)) void assignGuest(guestId, table.id, true, seatIndex + 1);
                           }}
                           onClick={() => {
-                            if (canEdit && selectedGuestId && (!person || person.guest.id === selectedGuestId)) void assignGuest(selectedGuestId, table.id, true, seatIndex + 1);
+                            if (canEdit && !assignmentSavingId && selectedGuestId && (!person || person.guest.id === selectedGuestId)) void assignGuest(selectedGuestId, table.id, true, seatIndex + 1);
                           }}
                         ><b className="seat-number">{seatIndex + 1}</b><em>{person?.label || "♧"}</em></span>
                       );
@@ -4195,6 +4205,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                           <select
                             className="seat-position-select"
                             value={assignedSeat}
+                            disabled={Boolean(assignmentSavingId)}
                             onChange={(event) => void assignGuest(guest.id, table.id, true, Number(event.target.value))}
                             aria-label={`${t("Asiento inicial de", "Starting seat for", "Assento inicial de")} ${guest.name}`}
                             title={t("Elegir asiento inicial", "Choose starting seat", "Escolher assento inicial")}

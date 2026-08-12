@@ -278,3 +278,16 @@ test('las preferencias sociales generan conflictos accionables por mesa', () => 
   assert.match(styles, /\.social-conflict-summary/);
   assert.match(styles, /\.table-social-conflicts/);
 });
+
+test('el paquete de usabilidad agrupa densidad, guardado, vacíos y adaptación móvil', () => {
+  assert.match(source, /const \[compactTables, setCompactTables\]/);
+  assert.match(source, /const \[assignmentSavingId, setAssignmentSavingId\]/);
+  assert.match(source, /setAssignmentStatus\("saving"\)/);
+  assert.match(source, /setAssignmentStatus\("saved"\)/);
+  assert.match(source, /className="tables-empty-state"/);
+  assert.match(source, /Vista compacta/);
+  assert.match(source, /className="clear-seating-filters"/);
+  assert.match(styles, /\.tables-grid\.is-compact/);
+  assert.match(styles, /\.table-card\.is-saving/);
+  assert.match(styles, /\.guest-assign-list \{ max-height: 62vh/);
+});
