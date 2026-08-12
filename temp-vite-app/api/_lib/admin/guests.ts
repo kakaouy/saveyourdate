@@ -56,6 +56,15 @@ type GuestRow = {
   food: string;
   song: string;
   reminded_at: string | null;
+  invitation_sent_at: string | null;
+  invitation_opened_at: string | null;
+  responded_at: string | null;
+  archived_at: string | null;
+  transport_option: string;
+  transport_stop: string;
+  menu_choice: string;
+  accessibility_needs: string;
+  guest_notes: string;
   updated_at: string;
   companions: Array<{
     name: string;
@@ -85,6 +94,15 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
   song: row.song,
   companions: Array.isArray(row.companions) ? row.companions : [],
   reminded: row.reminded_at || "—",
+  invitationSentAt: row.invitation_sent_at || "",
+  invitationOpenedAt: row.invitation_opened_at || "",
+  respondedAt: row.responded_at || "",
+  archivedAt: row.archived_at || "",
+  transportOption: row.transport_option || "",
+  transportStop: row.transport_stop || "",
+  menuChoice: row.menu_choice || "",
+  accessibilityNeeds: row.accessibility_needs || "",
+  guestNotes: row.guest_notes || "",
   updatedAt: row.updated_at,
   whatsappStatus,
   invitedBy: row.invited_by || "",
@@ -94,7 +112,7 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
 
 const currentGuestCount = async (orderNumber: string) => {
   const response = await supabaseRequest(
-    `event_guests?order_number=eq.${encodeURIComponent(orderNumber)}&select=id`,
+    `event_guests?order_number=eq.${encodeURIComponent(orderNumber)}&archived_at=is.null&select=id`,
   );
   return ((await response.json()) as Array<{ id: string }>).length;
 };
@@ -186,8 +204,42 @@ async function handler(request: Request) {
             invited_by: String(guest.invitedBy || "").trim(),
             companion_of_id: String(guest.companionOfId || "").trim() || null,
             food: String(guest.food || "").trim() || "—",
+            transport_option: String(guest.transportOption || "").trim().slice(0, 80),
+            transport_stop: String(guest.transportStop || "").trim().slice(0, 160),
+            menu_choice: String(guest.menuChoice || "").trim().slice(0, 120),
+            accessibility_needs: String(guest.accessibilityNeeds || "").trim().slice(0, 500),
+            guest_notes: String(guest.guestNotes || "").trim().slice(0, 1000),
           };
         });
+        const existingResponse = await supabaseRequest(
+          `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&select=name,group_name,email,phone&limit=500`,
+        );
+        const existing = (await existingResponse.json()) as Array<{
+          name: string;
+          group_name: string;
+          email: string;
+          phone: string;
+        }>;
+        const normalizeKey = (value: string) =>
+          value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+        const nameKeys = new Set(existing.map((guest) => normalizeKey(`${guest.name}|${guest.group_name}`)));
+        const emailKeys = new Set(existing.map((guest) => guest.email.toLowerCase()).filter(Boolean));
+        const phoneKeys = new Set(existing.map((guest) => guest.phone.replace(/\D/g, "")).filter(Boolean));
+        const hasDuplicate = rows.some((guest) => {
+          const nameKey = normalizeKey(`${guest.name}|${guest.group_name}`);
+          const emailKey = guest.email.toLowerCase();
+          const phoneKey = guest.phone.replace(/\D/g, "");
+          const duplicate = nameKeys.has(nameKey) || Boolean(emailKey && emailKeys.has(emailKey)) || Boolean(phoneKey && phoneKeys.has(phoneKey));
+          nameKeys.add(nameKey);
+          if (emailKey) emailKeys.add(emailKey);
+          if (phoneKey) phoneKeys.add(phoneKey);
+          return duplicate;
+        });
+        if (hasDuplicate)
+          return json(
+            { error: "La lista cambió o contiene duplicados. Volvé a revisar el archivo antes de importar." },
+            409,
+          );
         const response = await supabaseRequest("event_guests", {
           method: "POST",
           headers: { Prefer: "return=representation" },
@@ -230,6 +282,11 @@ async function handler(request: Request) {
           seats: Math.max(1, Math.min(20, Number(body.seats) || 1)),
           invited_by: String(body.invitedBy || "").trim(),
           companion_of_id: String(body.companionOfId || "").trim() || null,
+          transport_option: String(body.transportOption || "").trim().slice(0, 80),
+          transport_stop: String(body.transportStop || "").trim().slice(0, 160),
+          menu_choice: String(body.menuChoice || "").trim().slice(0, 120),
+          accessibility_needs: String(body.accessibilityNeeds || "").trim().slice(0, 500),
+          guest_notes: String(body.guestNotes || "").trim().slice(0, 1000),
         }),
       });
       const createdGuest = ((await response.json()) as GuestRow[])[0];
@@ -245,9 +302,61 @@ async function handler(request: Request) {
     if (request.method === "PATCH") {
       const body = (await request.json()) as Record<string, unknown>;
       const id = String(body.id || "");
+      if (body.action === "mark-invitation-sent") {
+        if (!id) return json({ error: "Falta identificar al invitado." }, 400);
+        const sentAt = new Date().toISOString();
+        const response = await supabaseRequest(
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
+          {
+            method: "PATCH",
+            headers: { Prefer: "return=representation" },
+            body: JSON.stringify({ invitation_sent_at: sentAt, updated_at: sentAt }),
+          },
+        );
+        const rows = (await response.json()) as GuestRow[];
+        if (!rows[0]) return json({ error: "No encontramos al invitado." }, 404);
+        await logAdminActivity(session, "guest.invitation_sent", "guest", id, {
+          channel: String(body.channel || "manual"),
+        });
+        return json({ guest: clientGuest(rows[0], "sent") });
+      }
+      if (["archive", "restore"].includes(String(body.action))) {
+        if (!id) return json({ error: "Falta identificar al invitado." }, 400);
+        const archivedAt = body.action === "archive" ? new Date().toISOString() : null;
+        const response = await supabaseRequest(
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
+          {
+            method: "PATCH",
+            headers: { Prefer: "return=representation" },
+            body: JSON.stringify({ archived_at: archivedAt, updated_at: new Date().toISOString() }),
+          },
+        );
+        const rows = (await response.json()) as GuestRow[];
+        if (!rows[0]) return json({ error: "No encontramos al invitado." }, 404);
+        await logAdminActivity(session, body.action === "archive" ? "guest.archived" : "guest.restored", "guest", id);
+        return json({ guest: clientGuest(rows[0]) });
+      }
+      if (["bulk-archive", "bulk-restore"].includes(String(body.action))) {
+        const ids = Array.isArray(body.ids)
+          ? body.ids.map(String).filter(Boolean).slice(0, 500)
+          : [];
+        if (!ids.length) return json({ error: "Seleccioná al menos un invitado." }, 400);
+        const archivedAt = body.action === "bulk-archive" ? new Date().toISOString() : null;
+        const response = await supabaseRequest(
+          `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&id=in.(${ids.map(encodeURIComponent).join(",")})`,
+          {
+            method: "PATCH",
+            headers: { Prefer: "return=representation" },
+            body: JSON.stringify({ archived_at: archivedAt, updated_at: new Date().toISOString() }),
+          },
+        );
+        const rows = (await response.json()) as GuestRow[];
+        await logAdminActivity(session, body.action === "bulk-archive" ? "guests.bulk_archived" : "guests.bulk_restored", "guest", "", { count: rows.length });
+        return json({ guests: rows.map((guest) => clientGuest(guest)) });
+      }
       if (body.action === "remind-email") {
         const guestResponse = await supabaseRequest(
-          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=*&limit=1`,
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&archived_at=is.null&select=*&limit=1`,
         );
         const guest = ((await guestResponse.json()) as GuestRow[])[0];
         if (!guest?.email)
@@ -358,7 +467,7 @@ async function handler(request: Request) {
       if (body.action === "thank-you") {
         if (!id) return json({ error: "Falta identificar al invitado." }, 400);
         const guestResponse = await supabaseRequest(
-          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=*&limit=1`,
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&archived_at=is.null&select=*&limit=1`,
         );
         const guest = ((await guestResponse.json()) as GuestRow[])[0];
         if (!guest) return json({ error: "No encontramos al invitado." }, 404);
@@ -398,7 +507,7 @@ async function handler(request: Request) {
       if (body.action === "remind") {
         if (!id) return json({ error: "Falta identificar al invitado." }, 400);
         const guestResponse = await supabaseRequest(
-          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&status=eq.Pendiente&select=*&limit=1`,
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&status=eq.Pendiente&archived_at=is.null&select=*&limit=1`,
         );
         const guest = ((await guestResponse.json()) as GuestRow[])[0];
         if (!guest)
@@ -454,7 +563,7 @@ async function handler(request: Request) {
         });
         const remindedAt = new Date().toISOString();
         const response = await supabaseRequest(
-          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&status=eq.Pendiente`,
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&status=eq.Pendiente&archived_at=is.null`,
           {
             method: "PATCH",
             headers: { Prefer: "return=representation" },
@@ -482,7 +591,7 @@ async function handler(request: Request) {
         );
       }
       const guestResponse = await supabaseRequest(
-        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,email,phone,phone_country_code,identification_type,identification_number,name,group_name,invited_by,companion_of_id`,
+        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,email,phone,phone_country_code,identification_type,identification_number,name,group_name,invited_by,companion_of_id,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes`,
       );
       const existingGuests = (await guestResponse.json()) as GuestRow[];
       if (!existingGuests[0])
@@ -553,6 +662,26 @@ async function handler(request: Request) {
               body.companionOfId === undefined
                 ? existingGuests[0].companion_of_id
                 : String(body.companionOfId).trim() || null,
+            transport_option:
+              body.transportOption === undefined
+                ? existingGuests[0].transport_option
+                : String(body.transportOption).trim().slice(0, 80),
+            transport_stop:
+              body.transportStop === undefined
+                ? existingGuests[0].transport_stop
+                : String(body.transportStop).trim().slice(0, 160),
+            menu_choice:
+              body.menuChoice === undefined
+                ? existingGuests[0].menu_choice
+                : String(body.menuChoice).trim().slice(0, 120),
+            accessibility_needs:
+              body.accessibilityNeeds === undefined
+                ? existingGuests[0].accessibility_needs
+                : String(body.accessibilityNeeds).trim().slice(0, 500),
+            guest_notes:
+              body.guestNotes === undefined
+                ? existingGuests[0].guest_notes
+                : String(body.guestNotes).trim().slice(0, 1000),
             updated_at: new Date().toISOString(),
           }),
         },

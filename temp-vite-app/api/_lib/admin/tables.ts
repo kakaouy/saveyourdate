@@ -175,6 +175,34 @@ async function handler(request: Request) {
       return json({ ok: true });
     }
 
+    if (request.method === 'PATCH' && body.action === 'assign-batch') {
+      const assignments = Array.isArray(body.assignments)
+        ? body.assignments.map((item) => ({
+            guest_id: String((item as Record<string, unknown>).guestId || ''),
+            table_id: String((item as Record<string, unknown>).tableId || ''),
+          }))
+        : [];
+      if (!assignments.length || assignments.some((item) => !item.guest_id || !item.table_id)) {
+        return json({ error: 'La distribución sugerida está vacía o contiene datos inválidos.' }, 400);
+      }
+      const response = await supabaseRequest('rpc/assign_event_guests_batch', {
+        method: 'POST',
+        body: JSON.stringify({
+          p_order_number: session.order_number,
+          p_assignments: assignments,
+        }),
+      });
+      if (!response.ok) {
+        const detail = await response.json() as { message?: string };
+        const message = String(detail.message || 'No pudimos aplicar la distribución completa.');
+        return json({ error: message }, message.includes('capacidad') ? 409 : 400);
+      }
+      await logAdminActivity(session, 'table.guests_batch_assigned', 'table', session.order_number, {
+        assignments: assignments.length,
+      });
+      return json({ ok: true, assigned: assignments.length });
+    }
+
     if (request.method === 'PATCH') {
       const id = String(body.id || '');
       const name = String(body.name || '').trim();

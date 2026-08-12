@@ -1,0 +1,123 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import test from 'node:test';
+import { fileURLToPath } from 'node:url';
+
+const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const source = readFileSync(
+  path.join(appRoot, 'src', 'components', 'AdminPrototype.tsx'),
+  'utf8',
+);
+
+test('Invitados concentra confirmaciones y seguimiento operativo', () => {
+  const navBlock = source.match(/const nav = \[[\s\S]*?\n\];/)?.[0] || '';
+
+  assert.doesNotMatch(navBlock, /\["Confirmaciones"/);
+  assert.match(source, /className="guest-operation-summary"/);
+  assert.match(source, /filter === "Respondieron"/);
+  assert.match(source, /filter === "Restricciones"/);
+  assert.match(source, /const exportGuestReport =/);
+  assert.match(source, /filter === "Sin enviar"/);
+  assert.match(source, /filter === "Enviadas pendientes"/);
+  assert.match(source, /className=\{`delivery-status/);
+});
+
+test('el ciclo de invitación registra envío, apertura y respuesta', () => {
+  const api = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  const rsvp = readFileSync(path.join(appRoot, 'api', 'rsvp.ts'), 'utf8');
+  const migration = readFileSync(
+    path.join(appRoot, 'supabase', 'migrations', '20260812010000_guest_invitation_lifecycle.sql'),
+    'utf8',
+  );
+
+  assert.match(api, /mark-invitation-sent/);
+  assert.match(rsvp, /invitation_opened_at/);
+  assert.match(rsvp, /responded_at/);
+  assert.match(migration, /invitation_sent_at/);
+  assert.match(migration, /invitation_opened_at/);
+  assert.match(migration, /responded_at/);
+});
+
+test('la importación exige revisar duplicados y errores antes de guardar', () => {
+  assert.match(source, /type GuestImportPreview =/);
+  assert.match(source, /setImportPreview\(\{ fileName: file\.name, rows: previewRows \}\)/);
+  assert.match(source, /const confirmGuestImport = async/);
+  assert.match(source, /className="modal import-preview-modal"/);
+  assert.match(source, /!row\.duplicate && row\.errors\.length === 0/);
+  const api = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  assert.match(api, /La lista cambió o contiene duplicados/);
+});
+
+test('archivar es recuperable y excluye al invitado de la operación', () => {
+  const api = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  const rsvp = readFileSync(path.join(appRoot, 'api', 'rsvp.ts'), 'utf8');
+  const cron = readFileSync(path.join(appRoot, 'api', 'cron-reminders.ts'), 'utf8');
+
+  assert.match(source, /filter === "Archivados"/);
+  assert.match(source, /action: archived \? "archive" : "restore"/);
+  assert.match(api, /guests\.bulk_archived/);
+  assert.match(api, /guests\.bulk_restored/);
+  assert.match(rsvp, /archived_at=is\.null/);
+  assert.match(cron, /archived_at=is\.null/);
+});
+
+test('el RSVP y el admin comparten los datos de logística', () => {
+  const rsvpPage = readFileSync(path.join(appRoot, 'src', 'components', 'GuestRsvpPage.tsx'), 'utf8');
+  const rsvpApi = readFileSync(path.join(appRoot, 'api', 'rsvp.ts'), 'utf8');
+
+  for (const field of ['transportOption', 'transportStop', 'menuChoice', 'accessibilityNeeds', 'guestNotes']) {
+    assert.match(rsvpPage, new RegExp(field));
+    assert.match(source, new RegExp(field));
+  }
+  assert.match(rsvpApi, /transport_option/);
+  assert.match(rsvpApi, /menu_choice/);
+  assert.match(rsvpApi, /accessibility_needs/);
+  assert.match(source, /filter === "Logística"/);
+});
+
+test('los accesos del resumen llevan al centro de invitados', () => {
+  assert.doesNotMatch(source, /onNavigate\("Confirmaciones"\)/);
+  assert.match(source, /onNavigate\("Invitados"\)/);
+});
+
+test('las mesas aceptan grupos por arrastre, validan capacidad y permiten deshacer', () => {
+  assert.match(source, /event\.dataTransfer\.setData\("text\/guest-id", guest\.id\)/);
+  assert.match(source, /remaining >= draggedPeople/);
+  assert.match(source, /drop-compatible/);
+  assert.match(source, /drop-blocked/);
+  assert.match(source, /const undoLastAssignment = async/);
+  assert.match(source, /Deshacer movimiento/);
+});
+
+test('la asignación asistida se previsualiza y conserva los grupos completos', () => {
+  assert.match(source, /const previewAutomaticAssignment =/);
+  assert.match(source, /confirmedPeopleForGuest\(b, guests\) - confirmedPeopleForGuest\(a, guests\)/);
+  assert.match(source, /setSuggestedAssignments\(suggestions\)/);
+  assert.match(source, /className="modal assignment-preview-modal"/);
+  assert.match(source, /const applyAutomaticAssignment = async/);
+  assert.match(source, /action: "assign-batch"/);
+  assert.match(source, /assignmentFilter === "assigned"/);
+});
+
+test('la asignación asistida se aplica como una única transacción', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  const migration = readFileSync(
+    path.join(appRoot, 'supabase', 'migrations', '20260812020000_atomic_table_assignments.sql'),
+    'utf8',
+  );
+  assert.match(tablesApi, /rpc\/assign_event_guests_batch/);
+  assert.match(tablesApi, /table\.guests_batch_assigned/);
+  assert.match(migration, /create or replace function public\.assign_event_guests_batch/);
+  assert.match(migration, /if over_capacity_count > 0/);
+  assert.match(migration, /update event_guests guest/);
+});
+
+test('cada mesa resume menús y alertas operativas también en el reporte', () => {
+  assert.match(source, /const menuSummary = new Map<string, number>/);
+  assert.match(source, /className="table-operations"/);
+  assert.match(source, /dietaryAlerts/);
+  assert.match(source, /accessibilityAlerts/);
+  assert.match(source, /class="ops"/);
+  assert.match(source, /guest\.companions/);
+});

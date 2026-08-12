@@ -73,7 +73,16 @@ async function handler(request: Request) {
           song: String(guest.song || '—').trim().slice(0, 250),
           companions: Array.isArray(guest.companions) ? guest.companions : [],
           table_id: guest.table_id ? String(guest.table_id) : null,
-          reminded_at: guest.reminded_at || null
+          reminded_at: guest.reminded_at || null,
+          invitation_sent_at: guest.invitation_sent_at || null,
+          invitation_opened_at: guest.invitation_opened_at || null,
+          responded_at: guest.responded_at || null,
+          archived_at: guest.archived_at || null,
+          transport_option: String(guest.transport_option || '').slice(0, 80),
+          transport_stop: String(guest.transport_stop || '').slice(0, 160),
+          menu_choice: String(guest.menu_choice || '').slice(0, 120),
+          accessibility_needs: String(guest.accessibility_needs || '').slice(0, 500),
+          guest_notes: String(guest.guest_notes || '').slice(0, 1000)
         })))
       });
     }

@@ -156,6 +156,15 @@ create table if not exists public.event_guests (
   food text not null default '—',
   song text not null default '—',
   reminded_at timestamptz,
+  invitation_sent_at timestamptz,
+  invitation_opened_at timestamptz,
+  responded_at timestamptz,
+  archived_at timestamptz,
+  transport_option text not null default '',
+  transport_stop text not null default '',
+  menu_choice text not null default '',
+  accessibility_needs text not null default '',
+  guest_notes text not null default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -169,6 +178,17 @@ alter table public.event_guests
 alter table public.event_guests
   add column if not exists identification_type text not null default '',
   add column if not exists identification_number text not null default '';
+
+alter table public.event_guests
+  add column if not exists invitation_sent_at timestamptz,
+  add column if not exists invitation_opened_at timestamptz,
+  add column if not exists responded_at timestamptz,
+  add column if not exists archived_at timestamptz,
+  add column if not exists transport_option text not null default '',
+  add column if not exists transport_stop text not null default '',
+  add column if not exists menu_choice text not null default '',
+  add column if not exists accessibility_needs text not null default '',
+  add column if not exists guest_notes text not null default '';
 
 create index if not exists event_guests_order_idx
   on public.event_guests(order_number, created_at);

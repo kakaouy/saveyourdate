@@ -15,6 +15,8 @@ type RsvpData = {
     status: 'Confirmado' | 'Pendiente' | 'No asiste'; food: string; song: string;
     identificationType: string; identificationNumber: string;
     companions: Companion[];
+    transportOption: string; transportStop: string; menuChoice: string;
+    accessibilityNeeds: string; guestNotes: string;
   };
 };
 
@@ -28,6 +30,11 @@ export default function GuestRsvpPage() {
   const [identificationType, setIdentificationType] = useState('');
   const [identificationNumber, setIdentificationNumber] = useState('');
   const [companions, setCompanions] = useState<Companion[]>([]);
+  const [transportOption, setTransportOption] = useState('');
+  const [transportStop, setTransportStop] = useState('');
+  const [menuChoice, setMenuChoice] = useState('');
+  const [accessibilityNeeds, setAccessibilityNeeds] = useState('');
+  const [guestNotes, setGuestNotes] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -43,6 +50,11 @@ export default function GuestRsvpPage() {
         setSong(result.guest.song === '—' ? '' : result.guest.song);
         setIdentificationType(result.guest.identificationType || '');
         setIdentificationNumber(result.guest.identificationNumber || '');
+        setTransportOption(result.guest.transportOption || '');
+        setTransportStop(result.guest.transportStop || '');
+        setMenuChoice(result.guest.menuChoice || '');
+        setAccessibilityNeeds(result.guest.accessibilityNeeds || '');
+        setGuestNotes(result.guest.guestNotes || '');
         setCompanions(Array.from({ length: Math.max(0, (result.guest.confirmed || 1) - 1) }, (_, index) => result.guest.companions?.[index] || {
           name: '', food: '', identificationType: '', identificationNumber: ''
         }));
@@ -58,7 +70,7 @@ export default function GuestRsvpPage() {
       const response = await fetch(`/api/rsvp?token=${encodeURIComponent(token)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, confirmed, food, song, identificationType, identificationNumber, companions })
+        body: JSON.stringify({ status, confirmed, food, song, identificationType, identificationNumber, companions, transportOption, transportStop, menuChoice, accessibilityNeeds, guestNotes })
       });
       const result = await response.json() as { error?: string };
       if (!response.ok) throw new Error(result.error || 'No pudimos guardar tu respuesta.');
@@ -93,6 +105,11 @@ export default function GuestRsvpPage() {
           {status === 'Confirmado' && <label>Personas que asistirán<select value={confirmed} onChange={(event) => changeConfirmed(Number(event.target.value))}>{Array.from({ length: data.guest.seats }, (_, index) => <option key={index + 1}>{index + 1}</option>)}</select></label>}
           {status === 'Confirmado' && <label>Restricciones alimentarias<input value={food} onChange={(event) => setFood(event.target.value)} placeholder="Ej. vegetariano, celíaco…" /></label>}
           {status === 'Confirmado' && <label>Canción sugerida<input value={song} onChange={(event) => setSong(event.target.value)} placeholder="Canción — Artista" /></label>}
+          {status === 'Confirmado' && <label>Transporte<select value={transportOption} onChange={(event) => setTransportOption(event.target.value)}><option value="">No necesito transporte</option><option value="Ida">Necesito transporte de ida</option><option value="Regreso">Necesito transporte de regreso</option><option value="Ida y regreso">Necesito ida y regreso</option></select></label>}
+          {status === 'Confirmado' && transportOption && <label>Parada o zona preferida<input value={transportStop} onChange={(event) => setTransportStop(event.target.value)} placeholder="Ej. Centro, Tres Cruces…" /></label>}
+          {status === 'Confirmado' && <label>Preferencia de menú<input value={menuChoice} onChange={(event) => setMenuChoice(event.target.value)} placeholder="Ej. estándar, infantil, vegetariano…" /></label>}
+          {status === 'Confirmado' && <label>Accesibilidad o movilidad<input value={accessibilityNeeds} onChange={(event) => setAccessibilityNeeds(event.target.value)} placeholder="Ej. acceso sin escalones, espacio para silla…" /></label>}
+          {status === 'Confirmado' && <label>Otra información para la organización<textarea value={guestNotes} onChange={(event) => setGuestNotes(event.target.value)} rows={3} placeholder="Contanos cualquier detalle que debamos considerar" /></label>}
           {status === 'Confirmado' && <label>Tipo de identificación (opcional)<select value={identificationType} onChange={(event) => setIdentificationType(event.target.value)}><option value="">No completar</option><option>CI</option><option>DNI</option><option>CPF</option><option>Pasaporte</option><option>Otro</option></select></label>}
           {status === 'Confirmado' && identificationType && <label>Número de identificación<input value={identificationNumber} onChange={(event) => setIdentificationNumber(event.target.value)} placeholder="Ingresá el número" /></label>}
           {status === 'Confirmado' && companions.map((companion, index) => <fieldset className="companion-card" key={index}>

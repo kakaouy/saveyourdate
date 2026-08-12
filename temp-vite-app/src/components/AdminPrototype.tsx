@@ -32,11 +32,43 @@ type Guest = {
     identificationNumber: string;
   }>;
   reminded: string;
+  invitationSentAt?: string;
+  invitationOpenedAt?: string;
+  respondedAt?: string;
+  archivedAt?: string;
+  transportOption: string;
+  transportStop: string;
+  menuChoice: string;
+  accessibilityNeeds: string;
+  guestNotes: string;
   updatedAt: string;
   whatsappStatus?: string;
   invitedBy: string;
   companionOfId: string;
   thankedAt?: string;
+};
+
+type GuestImportDraft = {
+  name: string;
+  group: string;
+  phone: string;
+  phoneCountryCode: string;
+  seats: string;
+  email: string;
+  identificationType: string;
+  identificationNumber: string;
+  food: string;
+  invitedBy: string;
+  companionOfId: string;
+};
+
+type GuestImportPreview = {
+  fileName: string;
+  rows: Array<{
+    guest: GuestImportDraft;
+    duplicate: string;
+    errors: string[];
+  }>;
 };
 
 type AdminOrder = {
@@ -118,6 +150,11 @@ const confirmedPeopleForGuest = (guest: Guest, guests: Guest[]) => {
 
 const confirmedPeopleTotal = (guests: Guest[]) =>
   guests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
+
+const meaningfulGuestValue = (value: string) => {
+  const normalized = value.trim().toLowerCase();
+  return Boolean(normalized && !["ninguna", "ninguno", "none", "nenhuma", "nenhum", "no"].includes(normalized));
+};
 
 const seatProgress = (guest: Guest, guests: Guest[]) => {
   const members = linkedGroupMembers(guest, guests);
@@ -244,7 +281,6 @@ function GuestNameButton({ guest, children }: { guest: Guest; children?: React.R
 const nav = [
   ["Resumen", "⌂"],
   ["Invitados", "♙"],
-  ["Confirmaciones", "✓"],
   ["Restricciones", "◇"],
   ["Canciones", "♫"],
   ["Recordatorios", "↗"],
@@ -970,7 +1006,6 @@ function Dashboard({
     ),
     [
       t("Invitados", "Guests", "Convidados"),
-      t("Confirmaciones", "Confirmations", "Confirmações"),
       t("Mesas", "Tables", "Mesas"),
       t("Recordatorios", "Reminders", "Lembretes"),
       t("Respaldo", "Backup", "Backup"),
@@ -990,9 +1025,9 @@ function Dashboard({
               key={label}
               onClick={() =>
                 onNavigate(
-                  index === 4
+                  index === 3
                     ? "Configuración"
-                    : ["Invitados", "Confirmaciones", "Mesas", "Recordatorios"][
+                    : ["Invitados", "Mesas", "Recordatorios"][
                         index
                       ],
                 )
@@ -1209,7 +1244,7 @@ function Dashboard({
               )}
             </p>
           </div>
-          <button onClick={() => onNavigate("Confirmaciones")}>
+          <button onClick={() => onNavigate("Invitados")}>
             {t("Ver todas", "View all", "Ver todas")} →
           </button>
         </div>
@@ -1288,6 +1323,7 @@ function Guests({
   const [bulkField, setBulkField] = useState<"status" | "group" | "invitedBy">("invitedBy");
   const [bulkValue, setBulkValue] = useState(defaultInviter);
   const [showImportHelp, setShowImportHelp] = useState(false);
+  const [importPreview, setImportPreview] = useState<GuestImportPreview | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
@@ -1301,12 +1337,48 @@ function Guests({
   );
   const [customGuestCode, setCustomGuestCode] = useState("");
   const importInput = useRef<HTMLInputElement>(null);
+  const activeGuests = guests.filter((guest) => !guest.archivedAt);
+  const archivedInvitations = guests.length - activeGuests.length;
+  const confirmedPeople = confirmedPeopleTotal(activeGuests);
+  const pendingInvitations = activeGuests.filter((guest) => guest.status === "Pendiente").length;
+  const declinedInvitations = activeGuests.filter((guest) => guest.status === "No asiste").length;
+  const dietaryInvitations = activeGuests.filter(
+    (guest) => guest.food && guest.food !== "—" && !/^(ninguna|none|nenhuma)/i.test(guest.food),
+  ).length;
+  const unsentInvitations = activeGuests.filter(
+    (guest) => guest.status === "Pendiente" && !guest.invitationSentAt,
+  ).length;
+  const sentPendingInvitations = activeGuests.filter(
+    (guest) => guest.status === "Pendiente" && Boolean(guest.invitationSentAt),
+  ).length;
   const filtered = guests
     .filter((guest) => {
       const matches = `${guest.name} ${guest.group}`
         .toLowerCase()
         .includes(query.toLowerCase());
-      return matches && (filter === "Todos" || guest.status === filter);
+      const matchesView =
+        filter === "Todos" ||
+        filter === "Archivados" ||
+        filter === "Logística" ||
+        filter === "Sin enviar" ||
+        filter === "Enviadas pendientes" ||
+        guest.status === filter ||
+        (filter === "Restricciones" &&
+          Boolean(guest.food) &&
+          guest.food !== "—" &&
+          !/^(ninguna|none|nenhuma)/i.test(guest.food)) ||
+        (filter === "Respondieron" && guest.status !== "Pendiente");
+      const matchesLogistics =
+        filter !== "Logística" ||
+        Boolean(guest.transportOption || guest.transportStop || guest.menuChoice || guest.accessibilityNeeds || guest.guestNotes);
+      const matchesDelivery =
+        filter === "Sin enviar"
+          ? guest.status === "Pendiente" && !guest.invitationSentAt
+          : filter === "Enviadas pendientes"
+            ? guest.status === "Pendiente" && Boolean(guest.invitationSentAt)
+            : true;
+      const matchesArchive = filter === "Archivados" ? Boolean(guest.archivedAt) : !guest.archivedAt;
+      return matches && matchesView && matchesDelivery && matchesArchive && matchesLogistics;
     })
     .sort((a, b) =>
       (sortBy === "name"
@@ -1365,14 +1437,14 @@ function Guests({
     }
   };
 
-  const deleteSelected = async () => {
+  const setSelectedArchived = async (archived: boolean) => {
     if (
       !selected.length ||
-      !window.confirm(
+      archived && !window.confirm(
         t(
-          `¿Eliminar ${selected.length} invitados seleccionados?`,
-          `Delete ${selected.length} selected guests?`,
-          `Excluir ${selected.length} convidados selecionados?`,
+          `¿Archivar ${selected.length} invitados seleccionados? Podrás restaurarlos después.`,
+          `Archive ${selected.length} selected guests? You can restore them later.`,
+          `Arquivar ${selected.length} convidados selecionados? Você poderá restaurá-los depois.`,
         ),
       )
     )
@@ -1383,20 +1455,19 @@ function Guests({
       const response = await fetch("/api/admin/guests", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "bulk-delete", ids: selected }),
+        body: JSON.stringify({ action: archived ? "bulk-archive" : "bulk-restore", ids: selected }),
       });
-      const result = (await response.json()) as { error?: string };
-      if (!response.ok)
-        throw new Error(result.error || "No pudimos eliminar la selección.");
-      setGuests((current) =>
-        current.filter((guest) => !selected.includes(guest.id)),
-      );
+      const result = (await response.json()) as { guests?: Guest[]; error?: string };
+      if (!response.ok || !result.guests)
+        throw new Error(result.error || (archived ? "No pudimos archivar la selección." : "No pudimos restaurar la selección."));
+      const archivedGuests = new Map(result.guests.map((guest) => [guest.id, guest]));
+      setGuests((current) => current.map((guest) => archivedGuests.get(guest.id) || guest));
       setSelected([]);
     } catch (deleteError) {
       setError(
         deleteError instanceof Error
           ? deleteError.message
-          : "No pudimos eliminar la selección.",
+          : archived ? "No pudimos archivar la selección." : "No pudimos restaurar la selección.",
       );
     } finally {
       setSaving(false);
@@ -1431,24 +1502,26 @@ function Guests({
     }
   };
 
-  const deleteGuest = async (id: string) => {
-    const guest = guests.find((item) => item.id === id);
-    if (
+  const setGuestArchived = async (guest: Guest, archived: boolean) => {
+    if (archived &&
       !window.confirm(
         t(
-          `¿Eliminar a ${guest?.name || "este invitado"}? Esta acción también quitará su enlace personalizado.`,
-          `Delete ${guest?.name || "this guest"}? Their personalized link will also be removed.`,
-          `Excluir ${guest?.name || "este convidado"}? O link personalizado também será removido.`,
+          `¿Archivar a ${guest.name}? Dejará de aparecer en mesas, métricas y recordatorios.`,
+          `Archive ${guest.name}? They will no longer appear in tables, metrics or reminders.`,
+          `Arquivar ${guest.name}? Não aparecerá mais em mesas, métricas ou lembretes.`,
         ),
       )
-    )
-      return;
-    const response = await fetch(
-      `/api/admin/guests?id=${encodeURIComponent(id)}`,
-      { method: "DELETE" },
-    );
-    if (response.ok)
-      setGuests((current) => current.filter((guest) => guest.id !== id));
+    ) return;
+    setError("");
+    const response = await fetch("/api/admin/guests", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: archived ? "archive" : "restore", id: guest.id }),
+    });
+    const result = (await response.json()) as { guest?: Guest; error?: string };
+    if (!response.ok || !result.guest)
+      return setError(result.error || "No pudimos actualizar el archivo.");
+    setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
   };
 
   const updateStatus = async (guest: Guest, status: Guest["status"]) => {
@@ -1515,6 +1588,11 @@ function Guests({
           phoneCountryCode: data.get("phoneCountryCode"),
           identificationType: data.get("identificationType"),
           identificationNumber: data.get("identificationNumber"),
+          transportOption: data.get("transportOption"),
+          transportStop: data.get("transportStop"),
+          menuChoice: data.get("menuChoice"),
+          accessibilityNeeds: data.get("accessibilityNeeds"),
+          guestNotes: data.get("guestNotes"),
         }),
       });
       const result = (await response.json()) as {
@@ -1573,11 +1651,38 @@ function Guests({
       "_blank",
       "noopener,noreferrer",
     );
+    const invitationSentAt = new Date().toISOString();
     setGuests((current) =>
       current.map((item) =>
-        item.id === guest.id ? { ...item, whatsappStatus: "sent" } : item,
+        item.id === guest.id
+          ? { ...item, whatsappStatus: "sent", invitationSentAt }
+          : item,
       ),
     );
+    void fetch("/api/admin/guests", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "mark-invitation-sent",
+        id: guest.id,
+        channel: "whatsapp",
+      }),
+    })
+      .then(async (response) => {
+        const result = (await response.json()) as { guest?: Guest; error?: string };
+        if (!response.ok || !result.guest)
+          throw new Error(result.error || "No pudimos registrar el envío.");
+        setGuests((current) =>
+          current.map((item) => (item.id === guest.id ? result.guest! : item)),
+        );
+      })
+      .catch((sendError) =>
+        setError(
+          sendError instanceof Error
+            ? sendError.message
+            : "No pudimos registrar el envío.",
+        ),
+      );
   };
 
   const downloadTemplate = () =>
@@ -1611,6 +1716,49 @@ function Guests({
           "",
         ],
       ],
+    );
+
+  const exportGuestReport = () =>
+    exportCsv(
+      `invitados-${new Date().toISOString().slice(0, 10)}.csv`,
+      [
+        t("Invitado", "Guest", "Convidado"),
+        t("Grupo", "Group", "Grupo"),
+        t("Estado", "Status", "Status"),
+        t("Cupos", "Seats", "Vagas"),
+        t("Personas confirmadas", "Confirmed people", "Pessoas confirmadas"),
+        "WhatsApp",
+        "Email",
+        t("Restricción", "Dietary need", "Restrição"),
+        t("Invitación enviada", "Invitation sent", "Convite enviado"),
+        t("Invitación abierta", "Invitation opened", "Convite aberto"),
+        t("Respuesta recibida", "Response received", "Resposta recebida"),
+        t("Transporte", "Transport", "Transporte"),
+        t("Parada", "Stop", "Parada"),
+        t("Menú", "Menu", "Menu"),
+        t("Accesibilidad", "Accessibility", "Acessibilidade"),
+        t("Observaciones", "Notes", "Observações"),
+        t("Última actualización", "Last update", "Última atualização"),
+      ],
+      activeGuests.map((guest) => [
+        guest.name,
+        guest.group,
+        adminStatus(language, guest.status),
+        guest.seats,
+        confirmedPeopleForGuest(guest, guests),
+        guest.phone,
+        guest.email,
+        guest.food,
+        guest.invitationSentAt ? reportDate(guest.invitationSentAt, language) : "",
+        guest.invitationOpenedAt ? reportDate(guest.invitationOpenedAt, language) : "",
+        guest.respondedAt ? reportDate(guest.respondedAt, language) : "",
+        guest.transportOption,
+        guest.transportStop,
+        guest.menuChoice,
+        guest.accessibilityNeeds,
+        guest.guestNotes,
+        reportDate(guest.updatedAt, language === "es" ? "es-UY" : language === "pt" ? "pt-BR" : "en-US"),
+      ]),
     );
 
   const importGuests = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1670,7 +1818,7 @@ function Guests({
       const names = new Map(
         guests.map((guest) => [normalize(guest.name), guest.id]),
       );
-      const imported = rows
+      const imported: GuestImportDraft[] = rows
         .slice(1)
         .map((values: string[]) => ({
           name: values[nameIndex],
@@ -1701,10 +1849,72 @@ function Guests({
               : "",
         }))
         .filter((guest: { name: string }) => guest.name);
+      if (!imported.length)
+        throw new Error(t("No encontramos filas con nombre.", "We found no rows with a name.", "Não encontramos linhas com nome."));
+      const existingNames = new Set(
+        guests.map((guest) => normalize(`${guest.name}|${guest.group}`)),
+      );
+      const existingPhones = new Set(
+        guests.map((guest) => guest.phone.replace(/\D/g, "")).filter(Boolean),
+      );
+      const existingEmails = new Set(
+        guests.map((guest) => guest.email.trim().toLowerCase()).filter(Boolean),
+      );
+      const seenNames = new Set<string>();
+      const seenPhones = new Set<string>();
+      const seenEmails = new Set<string>();
+      const previewRows = imported.map((guest) => {
+        const nameKey = normalize(`${guest.name}|${guest.group}`);
+        const phoneKey = `${guest.phoneCountryCode}${guest.phone}`.replace(/\D/g, "");
+        const emailKey = guest.email.trim().toLowerCase();
+        const duplicate = existingPhones.has(phoneKey) && phoneKey
+          ? t("WhatsApp ya registrado", "WhatsApp already exists", "WhatsApp já cadastrado")
+          : existingEmails.has(emailKey) && emailKey
+            ? t("Email ya registrado", "Email already exists", "Email já cadastrado")
+            : existingNames.has(nameKey) || seenNames.has(nameKey)
+              ? t("Nombre y grupo repetidos", "Duplicate name and group", "Nome e grupo repetidos")
+              : seenPhones.has(phoneKey) && phoneKey
+                ? t("WhatsApp repetido en el archivo", "Duplicate WhatsApp in file", "WhatsApp repetido no arquivo")
+                : seenEmails.has(emailKey) && emailKey
+                  ? t("Email repetido en el archivo", "Duplicate email in file", "Email repetido no arquivo")
+                  : "";
+        const errors: string[] = [];
+        if (!/^\+\d{1,4}$/.test(guest.phoneCountryCode))
+          errors.push(t("Código de país inválido", "Invalid country code", "Código de país inválido"));
+        const seats = Number(guest.seats);
+        if (!Number.isInteger(seats) || seats < 1 || seats > 20)
+          errors.push(t("Cupos fuera de rango", "Seats out of range", "Vagas fora do limite"));
+        seenNames.add(nameKey);
+        if (phoneKey) seenPhones.add(phoneKey);
+        if (emailKey) seenEmails.add(emailKey);
+        return { guest, duplicate, errors };
+      });
+      setImportPreview({ fileName: file.name, rows: previewRows });
+      setNotice("");
+    } catch (importError) {
+      setError(
+        importError instanceof Error
+          ? importError.message
+          : "No pudimos leer el archivo.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const confirmGuestImport = async () => {
+    if (!importPreview) return;
+    const eligible = importPreview.rows
+      .filter((row) => !row.duplicate && row.errors.length === 0)
+      .map((row) => row.guest);
+    if (!eligible.length) return;
+    setSaving(true);
+    setError("");
+    try {
       const response = await fetch("/api/admin/guests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ guests: imported, defaultPhoneCountryCode }),
+        body: JSON.stringify({ guests: eligible, defaultPhoneCountryCode }),
       });
       const result = (await response.json()) as {
         guests?: Guest[];
@@ -1714,13 +1924,18 @@ function Guests({
         throw new Error(result.error || "No pudimos importar los invitados.");
       setGuests((current) => [...current, ...result.guests!]);
       setNotice(
-        `${result.guests.length} invitados importados correctamente desde ${file.name}.`,
+        t(
+          `${result.guests.length} invitados importados correctamente desde ${importPreview.fileName}.`,
+          `${result.guests.length} guests imported successfully from ${importPreview.fileName}.`,
+          `${result.guests.length} convidados importados com sucesso de ${importPreview.fileName}.`,
+        ),
       );
+      setImportPreview(null);
     } catch (importError) {
       setError(
         importError instanceof Error
           ? importError.message
-          : "No pudimos importar el archivo.",
+          : "No pudimos importar los invitados.",
       );
     } finally {
       setSaving(false);
@@ -1749,14 +1964,19 @@ function Guests({
                 )}
           </p>
         </div>
-        {canEdit && (
-          <button
-            className="primary-button small"
-            onClick={() => setShowModal(true)}
-          >
-            ＋ {t("Agregar invitado", "Add guest", "Adicionar convidado")}
+        <div className="heading-actions">
+          <button className="outline-button" onClick={exportGuestReport}>
+            ⇩ {t("Exportar lista", "Export list", "Exportar lista")}
           </button>
-        )}
+          {canEdit && (
+            <button
+              className="primary-button small"
+              onClick={() => setShowModal(true)}
+            >
+              ＋ {t("Agregar invitado", "Add guest", "Adicionar convidado")}
+            </button>
+          )}
+        </div>
       </div>
       <ContextHelp
         title={t(
@@ -1771,6 +1991,48 @@ function Guests({
           "Cada registro representa um convite. As vagas indicam quantas pessoas podem confirmar pelo mesmo link personalizado.",
         )}
       </ContextHelp>
+      <section className="guest-operation-summary" aria-label={t("Resumen de invitados", "Guest summary", "Resumo de convidados")}>
+        <button className={filter === "Todos" ? "active" : ""} onClick={() => setFilter("Todos")}>
+          <span>{t("Invitaciones", "Invitations", "Convites")}</span>
+          <strong>{activeGuests.length}</strong>
+          <small>{t("lista completa", "full list", "lista completa")}</small>
+        </button>
+        <button className={filter === "Confirmado" ? "active" : ""} onClick={() => setFilter("Confirmado")}>
+          <span>{t("Confirmaron", "Confirmed", "Confirmaram")}</span>
+          <strong>{confirmedPeople}</strong>
+          <small>{t("personas", "people", "pessoas")}</small>
+        </button>
+        <button className={`${filter === "Pendiente" ? "active " : ""}${pendingInvitations ? "needs-attention" : ""}`} onClick={() => setFilter("Pendiente")}>
+          <span>{t("Pendientes", "Pending", "Pendentes")}</span>
+          <strong>{pendingInvitations}</strong>
+          <small>{t("requieren seguimiento", "need follow-up", "requerem acompanhamento")}</small>
+        </button>
+        <button className={`${filter === "Sin enviar" ? "active " : ""}${unsentInvitations ? "needs-attention" : ""}`} onClick={() => setFilter("Sin enviar")}>
+          <span>{t("Sin enviar", "Not sent", "Não enviados")}</span>
+          <strong>{unsentInvitations}</strong>
+          <small>{t("primer contacto pendiente", "awaiting first contact", "primeiro contato pendente")}</small>
+        </button>
+        <button className={filter === "Enviadas pendientes" ? "active" : ""} onClick={() => setFilter("Enviadas pendientes")}>
+          <span>{t("Enviadas", "Sent", "Enviados")}</span>
+          <strong>{sentPendingInvitations}</strong>
+          <small>{t("esperando respuesta", "awaiting response", "aguardando resposta")}</small>
+        </button>
+        <button className={filter === "No asiste" ? "active" : ""} onClick={() => setFilter("No asiste")}>
+          <span>{t("No asisten", "Declined", "Não comparecem")}</span>
+          <strong>{declinedInvitations}</strong>
+          <small>{t("invitaciones", "invitations", "convites")}</small>
+        </button>
+        <button className={filter === "Restricciones" ? "active" : ""} onClick={() => setFilter("Restricciones")}>
+          <span>{t("Restricciones", "Dietary needs", "Restrições")}</span>
+          <strong>{dietaryInvitations}</strong>
+          <small>{t("para catering", "for catering", "para catering")}</small>
+        </button>
+        <button className={filter === "Archivados" ? "active" : ""} onClick={() => setFilter("Archivados")}>
+          <span>{t("Archivados", "Archived", "Arquivados")}</span>
+          <strong>{archivedInvitations}</strong>
+          <small>{t("fuera de la operación", "outside operations", "fora da operação")}</small>
+        </button>
+      </section>
       <section className="panel table-panel">
         <div className="table-tools">
           <label className="search">
@@ -1786,7 +2048,7 @@ function Guests({
             />
           </label>
           <div className="filter-pills">
-            {["Todos", "Confirmado", "Pendiente", "No asiste"].map((item) => (
+            {["Todos", "Sin enviar", "Enviadas pendientes", "Confirmado", "Pendiente", "No asiste", "Respondieron", "Restricciones", "Logística", "Archivados"].map((item) => (
               <button
                 key={item}
                 className={filter === item ? "active" : ""}
@@ -1794,7 +2056,19 @@ function Guests({
               >
                 {item === "Todos"
                   ? t("Todos", "All", "Todos")
-                  : adminStatus(language, item)}
+                  : item === "Sin enviar"
+                    ? t("Sin enviar", "Not sent", "Não enviados")
+                    : item === "Enviadas pendientes"
+                      ? t("Enviadas, sin respuesta", "Sent, no response", "Enviados, sem resposta")
+                  : item === "Respondieron"
+                    ? t("Respondieron", "Responded", "Responderam")
+                    : item === "Restricciones"
+                      ? t("Con restricciones", "With dietary needs", "Com restrições")
+                      : item === "Archivados"
+                        ? t("Archivados", "Archived", "Arquivados")
+                      : item === "Logística"
+                        ? t("Con logística", "With logistics", "Com logística")
+                      : adminStatus(language, item)}
               </button>
             ))}
           </div>
@@ -1851,7 +2125,7 @@ function Guests({
             <strong>
               {selected.length} {t("seleccionados", "selected", "selecionados")}
             </strong>
-            <select
+            {filter !== "Archivados" && <select
               value={bulkField}
               onChange={(event) => {
                 const field = event.target.value as typeof bulkField;
@@ -1863,8 +2137,8 @@ function Guests({
               <option value="invitedBy">{t("Invitador", "Invited by", "Anfitrião")}</option>
               <option value="status">{t("Estado", "Status", "Status")}</option>
               <option value="group">{t("Grupo", "Group", "Grupo")}</option>
-            </select>
-            {bulkField === "status" ? (
+            </select>}
+            {filter !== "Archivados" && (bulkField === "status" ? (
               <select value={bulkValue} onChange={(event) => setBulkValue(event.target.value)}>
                 <option value="Pendiente">{adminStatus(language, "Pendiente")}</option>
                 <option value="Confirmado">{adminStatus(language, "Confirmado")}</option>
@@ -1876,17 +2150,19 @@ function Guests({
                 onChange={(event) => setBulkValue(event.target.value)}
                 placeholder={bulkField === "group" ? t("Nombre del grupo", "Group name", "Nome do grupo") : t("Nombre del invitador", "Host name", "Nome do anfitrião")}
               />
-            )}
-            <button className="primary-button small" type="button" disabled={saving || !bulkValue.trim()} onClick={updateSelected}>
+            ))}
+            {filter !== "Archivados" && <button className="primary-button small" type="button" disabled={saving || !bulkValue.trim()} onClick={updateSelected}>
               {t("Aplicar", "Apply", "Aplicar")}
-            </button>
+            </button>}
             <button
-              className="delete-button"
+              className={filter === "Archivados" ? "primary-button small" : "delete-button"}
               type="button"
               disabled={saving}
-              onClick={deleteSelected}
+              onClick={() => setSelectedArchived(filter !== "Archivados")}
             >
-              {t("Eliminar selección", "Delete selection", "Excluir seleção")}
+              {filter === "Archivados"
+                ? t("Restaurar selección", "Restore selection", "Restaurar seleção")
+                : t("Archivar selección", "Archive selection", "Arquivar seleção")}
             </button>
             <button
               className="copy-button"
@@ -1924,6 +2200,7 @@ function Guests({
                 <th>{t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}</th>
                 <th>{t("Estado", "Status", "Status")}</th>
                 <th>{t("Restricción", "Dietary need", "Restrição")}</th>
+                <th>{t("Seguimiento", "Tracking", "Acompanhamento")}</th>
                 <th>{t("Acciones", "Actions", "Ações")}</th>
               </tr>
             </thead>
@@ -1961,7 +2238,7 @@ function Guests({
                   <td>{guest.group}</td>
                   <td>{(() => { const progress = seatProgress(guest, guests); return <span className="seat-progress"><strong>{progress.used}/{progress.total}</strong><small>{t("confirmados / cupos", "confirmed / seats", "confirmados / vagas")}</small></span>; })()}</td>
                   <td>
-                    {canEdit ? (
+                    {canEdit && !guest.archivedAt ? (
                       <select
                         className={`status-select status-${guest.status.toLowerCase().replace(" ", "-")}`}
                         value={guest.status}
@@ -1990,23 +2267,34 @@ function Guests({
                   </td>
                   <td>{guest.food}</td>
                   <td>
+                    <span className={`delivery-status ${guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
+                      {guest.respondedAt
+                        ? `${t("Respondió", "Responded", "Respondeu")} · ${reportDate(guest.respondedAt, language)}`
+                        : guest.invitationOpenedAt
+                          ? `${t("Abrió", "Opened", "Abriu")} · ${reportDate(guest.invitationOpenedAt, language)}`
+                          : guest.invitationSentAt
+                            ? `${t("Enviada", "Sent", "Enviado")} · ${reportDate(guest.invitationSentAt, language)}`
+                            : t("Sin enviar", "Not sent", "Não enviado")}
+                    </span>
+                  </td>
+                  <td>
                     <div className="row-actions icon-actions">
-                      <button
+                      {!guest.archivedAt && <button
                         className="icon-button"
                         onClick={() => copyInviteLink(guest)}
                         title={t("Copiar enlace", "Copy link", "Copiar link")}
                         aria-label={t("Copiar enlace", "Copy link", "Copiar link")}
                       >
                         {copiedId === guest.id ? "✓" : "⧉"}
-                      </button>
-                      <button
+                      </button>}
+                      {!guest.archivedAt && <button
                         className="whatsapp-button"
                         disabled={!guest.phone}
                         onClick={() => openWhatsAppInvite(guest)}
                       >
                         WA
-                      </button>
-                      {canEdit && <>
+                      </button>}
+                      {canEdit && !guest.archivedAt && <>
                         <button
                           className="icon-button"
                           onClick={() => setEditingGuest(guest)}
@@ -2017,12 +2305,18 @@ function Guests({
                         </button>
                         <button
                           className="icon-button danger"
-                          onClick={() => deleteGuest(guest.id)}
-                          aria-label={`${t("Eliminar a", "Delete", "Excluir")} ${guest.name}`}
+                          onClick={() => setGuestArchived(guest, true)}
+                          aria-label={`${t("Archivar a", "Archive", "Arquivar")} ${guest.name}`}
+                          title={t("Archivar", "Archive", "Arquivar")}
                         >
                           <svg className="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" /></svg>
                         </button>
                       </>}
+                      {canEdit && guest.archivedAt && (
+                        <button className="outline-button compact" onClick={() => setGuestArchived(guest, false)}>
+                          {t("Restaurar", "Restore", "Restaurar")}
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -2043,9 +2337,9 @@ function Guests({
         <div className="table-footer">
           <span>
             {t(
-              `Mostrando ${filtered.length} de ${guests.length} invitados`,
-              `Showing ${filtered.length} of ${guests.length} guests`,
-              `Mostrando ${filtered.length} de ${guests.length} convidados`,
+              `Mostrando ${filtered.length} de ${filter === "Archivados" ? archivedInvitations : activeGuests.length} invitados`,
+              `Showing ${filtered.length} of ${filter === "Archivados" ? archivedInvitations : activeGuests.length} guests`,
+              `Mostrando ${filtered.length} de ${filter === "Archivados" ? archivedInvitations : activeGuests.length} convidados`,
             )}
           </span>
         </div>
@@ -2121,6 +2415,63 @@ function Guests({
           </div>
         </div>
       )}
+      {importPreview && (() => {
+        const eligibleCount = importPreview.rows.filter(
+          (row) => !row.duplicate && row.errors.length === 0,
+        ).length;
+        const duplicateCount = importPreview.rows.filter((row) => row.duplicate).length;
+        const errorCount = importPreview.rows.filter((row) => row.errors.length).length;
+        return (
+          <div className="modal-backdrop" onMouseDown={() => setImportPreview(null)}>
+            <div className="modal import-preview-modal" onMouseDown={(event) => event.stopPropagation()}>
+              <button className="modal-close" type="button" onClick={() => setImportPreview(null)}>×</button>
+              <span className="eyebrow">{t("Revisión previa", "Import review", "Revisão da importação")}</span>
+              <h2>{t("Revisá antes de importar", "Review before importing", "Revise antes de importar")}</h2>
+              <p className="import-preview-file">{importPreview.fileName}</p>
+              <div className="import-preview-summary">
+                <span><strong>{eligibleCount}</strong>{t("listos", "ready", "prontos")}</span>
+                <span className={duplicateCount ? "warning" : ""}><strong>{duplicateCount}</strong>{t("duplicados", "duplicates", "duplicados")}</span>
+                <span className={errorCount ? "danger" : ""}><strong>{errorCount}</strong>{t("con errores", "with errors", "com erros")}</span>
+              </div>
+              <p className="dynamic-help">
+                {t(
+                  "Los duplicados y las filas con errores se omitirán. Nada se guardará hasta que confirmes.",
+                  "Duplicates and invalid rows will be skipped. Nothing is saved until you confirm.",
+                  "Duplicados e linhas inválidas serão ignorados. Nada será salvo até você confirmar.",
+                )}
+              </p>
+              <div className="import-preview-table">
+                <table>
+                  <thead><tr><th>{t("Estado", "Status", "Status")}</th><th>{t("Nombre", "Name", "Nome")}</th><th>{t("Grupo", "Group", "Grupo")}</th><th>WhatsApp</th><th>{t("Cupos", "Seats", "Vagas")}</th></tr></thead>
+                  <tbody>
+                    {importPreview.rows.map((row, index) => {
+                      const issue = row.errors.join(" · ") || row.duplicate;
+                      return (
+                        <tr key={`${row.guest.name}-${index}`} className={row.errors.length ? "invalid" : row.duplicate ? "duplicate" : "valid"}>
+                          <td><span>{issue || t("Listo", "Ready", "Pronto")}</span></td>
+                          <td><strong>{row.guest.name}</strong><small>{row.guest.email}</small></td>
+                          <td>{row.guest.group || "—"}</td>
+                          <td>{row.guest.phone ? `${row.guest.phoneCountryCode} ${row.guest.phone}` : "—"}</td>
+                          <td>{row.guest.seats}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {error && <p className="table-error" role="alert">{error}</p>}
+              <div className="modal-actions">
+                <button className="outline-button" type="button" onClick={() => setImportPreview(null)}>{t("Cancelar", "Cancel", "Cancelar")}</button>
+                <button className="primary-button small" type="button" disabled={saving || eligibleCount === 0} onClick={confirmGuestImport}>
+                  {saving
+                    ? t("Importando…", "Importing…", "Importando…")
+                    : t(`Importar ${eligibleCount} invitados`, `Import ${eligibleCount} guests`, `Importar ${eligibleCount} convidados`)}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       {showModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}>
           <form
@@ -2411,6 +2762,11 @@ function Guests({
                   placeholder="Canción — Artista"
                 />
               </label>
+              <label>Transporte<select name="transportOption" defaultValue={editingGuest.transportOption}><option value="">No necesita</option><option value="Ida">Ida</option><option value="Regreso">Regreso</option><option value="Ida y regreso">Ida y regreso</option></select></label>
+              <label>Parada o zona<input name="transportStop" defaultValue={editingGuest.transportStop} placeholder="Ej. Centro" /></label>
+              <label>Preferencia de menú<input name="menuChoice" defaultValue={editingGuest.menuChoice} /></label>
+              <label>Accesibilidad<input name="accessibilityNeeds" defaultValue={editingGuest.accessibilityNeeds} /></label>
+              <label className="form-span-2">Observaciones<textarea name="guestNotes" rows={3} defaultValue={editingGuest.guestNotes} /></label>
             </div>
             {error && <p className="login-error">{error}</p>}
             <div className="modal-actions">
@@ -2436,7 +2792,7 @@ function Guests({
   );
 }
 
-function Confirmations({ guests }: { guests: Guest[] }) {
+export function Confirmations({ guests }: { guests: Guest[] }) {
   const { text: t, locale, language } = useAdminI18n();
   const [query, setQuery] = useState("");
   const visibleGuests = guests.filter((guest) =>
@@ -2677,6 +3033,16 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [spaces, setSpaces] = useState(["Espacio 1"]);
   const [layoutNotice, setLayoutNotice] = useState("");
   const [floorElements, setFloorElements] = useState<FloorElement[]>([]);
+  const [dragGuestId, setDragGuestId] = useState("");
+  const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
+  const [suggestedAssignments, setSuggestedAssignments] = useState<
+    { guestId: string; tableId: string }[] | null
+  >(null);
+  const [lastAssignment, setLastAssignment] = useState<{
+    guestId: string;
+    fromTableId: string;
+    toTableId: string;
+  } | null>(null);
 
   const assignedIds = tables.flatMap((table) => table.guests);
   const unassigned = confirmedGuests.filter(
@@ -2813,8 +3179,15 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     }
   };
 
-  const assignGuest = async (guestId: string, tableId: string) => {
+  const assignGuest = async (
+    guestId: string,
+    tableId: string,
+    remember = true,
+  ) => {
     setError("");
+    const fromTableId =
+      tables.find((table) => table.guests.includes(guestId))?.id || "";
+    if (fromTableId === tableId) return true;
     try {
       const response = await fetch("/api/admin/tables", {
         method: "PATCH",
@@ -2833,16 +3206,104 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               : table.guests.filter((id) => id !== guestId),
         })),
       );
+      if (remember) setLastAssignment({ guestId, fromTableId, toTableId: tableId });
+      setDragGuestId("");
+      return true;
     } catch (assignError) {
       setError(
         assignError instanceof Error
           ? assignError.message
           : "No pudimos asignar el invitado.",
       );
+      return false;
     }
   };
 
   const unassignGuest = (guestId: string) => assignGuest(guestId, "");
+
+  const undoLastAssignment = async () => {
+    if (!lastAssignment) return;
+    const restored = await assignGuest(
+      lastAssignment.guestId,
+      lastAssignment.fromTableId,
+      false,
+    );
+    if (restored) setLastAssignment(null);
+  };
+
+  const previewAutomaticAssignment = () => {
+    const availableByTable = new Map(
+      tables.map((table) => [
+        table.id,
+        table.capacity - table.guests.reduce((total, id) => {
+          const guest = guests.find((item) => item.id === id);
+          return total + (guest ? confirmedPeopleForGuest(guest, guests) : 0);
+        }, 0),
+      ]),
+    );
+    const suggestions: { guestId: string; tableId: string }[] = [];
+    [...unassigned]
+      .sort(
+        (a, b) =>
+          confirmedPeopleForGuest(b, guests) - confirmedPeopleForGuest(a, guests),
+      )
+      .forEach((guest) => {
+        const people = confirmedPeopleForGuest(guest, guests);
+        const table = tables
+          .filter((item) => (availableByTable.get(item.id) || 0) >= people)
+          .sort(
+            (a, b) =>
+              (availableByTable.get(a.id) || 0) -
+              (availableByTable.get(b.id) || 0),
+          )[0];
+        if (!table) return;
+        suggestions.push({ guestId: guest.id, tableId: table.id });
+        availableByTable.set(
+          table.id,
+          (availableByTable.get(table.id) || 0) - people,
+        );
+      });
+    setSuggestedAssignments(suggestions);
+  };
+
+  const applyAutomaticAssignment = async () => {
+    if (!suggestedAssignments) return;
+    setSaving(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/tables", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "assign-batch",
+          assignments: suggestedAssignments,
+        }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(result.error || "No pudimos aplicar la distribución completa.");
+      setTables((current) =>
+        current.map((table) => ({
+          ...table,
+          guests: [
+            ...table.guests,
+            ...suggestedAssignments
+              .filter((suggestion) => suggestion.tableId === table.id)
+              .map((suggestion) => suggestion.guestId),
+          ],
+        })),
+      );
+      setSuggestedAssignments(null);
+      setLastAssignment(null);
+    } catch (assignmentError) {
+      setError(
+        assignmentError instanceof Error
+          ? assignmentError.message
+          : "No pudimos aplicar la distribución completa.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const saveTableLayout = async (table: EventTable) => {
     const response = await fetch("/api/admin/tables", {
@@ -2984,11 +3445,20 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       const details = spaceTables.map((table) => {
         const tableGuests = table.guests.map((id) => guests.find((guest) => guest.id === id)).filter(Boolean) as Guest[];
         const occupied = tableGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
-        return `<article class="table-detail"><h3>${safe(table.name)}</h3><p><b>${occupied}/${table.capacity}</b> ${safe(t("lugares ocupados", "occupied seats", "lugares ocupados"))}${table.note ? ` · ${safe(table.note)}` : ""}</p><ul>${tableGuests.length ? tableGuests.map((guest) => `<li>${safe(guest.name)} <span>${safe(guest.group)}</span></li>`).join("") : `<li>${safe(t("Sin invitados asignados", "No assigned guests", "Sem convidados atribuídos"))}</li>`}</ul></article>`;
+        const menuSummary = new Map<string, number>();
+        tableGuests.forEach((guest) => {
+          if (!meaningfulGuestValue(guest.menuChoice)) return;
+          menuSummary.set(guest.menuChoice, (menuSummary.get(guest.menuChoice) || 0) + confirmedPeopleForGuest(guest, guests));
+        });
+        const operationalSummary = [
+          ...[...menuSummary].map(([menu, count]) => `${count}× ${menu}`),
+          ...tableGuests.filter((guest) => meaningfulGuestValue(guest.accessibilityNeeds)).map((guest) => `${guest.name}: ${guest.accessibilityNeeds}`),
+        ];
+        return `<article class="table-detail"><h3>${safe(table.name)}</h3><p><b>${occupied}/${table.capacity}</b> ${safe(t("lugares ocupados", "occupied seats", "lugares ocupados"))}${table.note ? ` · ${safe(table.note)}` : ""}</p>${operationalSummary.length ? `<div class="ops"><b>${safe(t("Operativa", "Operations", "Operação"))}:</b> ${operationalSummary.map(safe).join(" · ")}</div>` : ""}<ul>${tableGuests.length ? tableGuests.map((guest) => { const needs = [guest.menuChoice, guest.food, guest.accessibilityNeeds].filter(meaningfulGuestValue); return `<li>${safe(guest.name)} <span>${safe(guest.group)}${needs.length ? ` · ${needs.map(safe).join(" · ")}` : ""}</span></li>`; }).join("") : `<li>${safe(t("Sin invitados asignados", "No assigned guests", "Sem convidados atribuídos"))}</li>`}</ul></article>`;
       }).join("");
       return `<section><h2>${safe(space)}</h2><div class="drawing">${drawingElements}${drawingTables}</div><div class="details">${details || `<p>${safe(t("Sin mesas en este espacio", "No tables in this space", "Sem mesas neste espaço"))}</p>`}</div></section>`;
     }).join("");
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${safe(t("Reporte de mesas", "Table report", "Relatório de mesas"))}</title><style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font:12px Arial;color:#19354d;margin:0}header{display:flex;justify-content:space-between;border-bottom:2px solid #0aabb0;padding-bottom:10px;margin-bottom:18px}h1{margin:0;font:28px Georgia}header p{margin:6px 0 0;color:#718292}section{page-break-after:always}section:last-child{page-break-after:auto}h2{font:22px Georgia}.drawing{position:relative;height:360px;border:2px dashed #b9d9dc;border-radius:12px;background:#f8fbfc;overflow:hidden}.draw-table,.draw-element{position:absolute;display:grid;place-items:center;text-align:center;padding:6px;border-radius:9px}.draw-table{border:2px solid #0aabb0;background:#fff}.draw-table b{font-size:11px}.draw-table span,.draw-element{font-size:9px}.draw-element{border:1px solid #dde6ea;background:#dff5f2;color:#078f96;font-weight:bold}.details{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.table-detail{border:1px solid #dde6ea;border-radius:10px;padding:12px;break-inside:avoid}.table-detail h3{margin:0 0 5px}.table-detail p{margin:0 0 8px;color:#718292}.table-detail ul{margin:0;padding-left:18px}.table-detail li{margin:4px 0}.table-detail li span{color:#718292}footer{position:fixed;bottom:0;right:0;color:#718292;font-size:9px}@media print{.print-action{display:none}}</style></head><body><header><div><h1>${safe(t("Plano y reporte de mesas", "Table plan and report", "Plano e relatório de mesas"))}</h1><p>${safe(t("Distribución completa del evento", "Complete event layout", "Distribuição completa do evento"))}</p></div><button class="print-action" onclick="window.print()">${safe(t("Guardar como PDF o imprimir", "Save as PDF or print", "Salvar como PDF ou imprimir"))}</button></header>${spaceSections}<footer>${new Date().toLocaleDateString()}</footer></body></html>`;
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${safe(t("Reporte de mesas", "Table report", "Relatório de mesas"))}</title><style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font:12px Arial;color:#19354d;margin:0}header{display:flex;justify-content:space-between;border-bottom:2px solid #0aabb0;padding-bottom:10px;margin-bottom:18px}h1{margin:0;font:28px Georgia}header p{margin:6px 0 0;color:#718292}section{page-break-after:always}section:last-child{page-break-after:auto}h2{font:22px Georgia}.drawing{position:relative;height:360px;border:2px dashed #b9d9dc;border-radius:12px;background:#f8fbfc;overflow:hidden}.draw-table,.draw-element{position:absolute;display:grid;place-items:center;text-align:center;padding:6px;border-radius:9px}.draw-table{border:2px solid #0aabb0;background:#fff}.draw-table b{font-size:11px}.draw-table span,.draw-element{font-size:9px}.draw-element{border:1px solid #dde6ea;background:#dff5f2;color:#078f96;font-weight:bold}.details{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.table-detail{border:1px solid #dde6ea;border-radius:10px;padding:12px;break-inside:avoid}.table-detail h3{margin:0 0 5px}.table-detail p{margin:0 0 8px;color:#718292}.table-detail .ops{margin:8px 0;padding:7px;border-radius:6px;background:#fff6dd;color:#694f08;font-size:9px}.table-detail ul{margin:0;padding-left:18px}.table-detail li{margin:4px 0}.table-detail li span{color:#718292}footer{position:fixed;bottom:0;right:0;color:#718292;font-size:9px}@media print{.print-action{display:none}}</style></head><body><header><div><h1>${safe(t("Plano y reporte de mesas", "Table plan and report", "Plano e relatório de mesas"))}</h1><p>${safe(t("Distribución completa del evento", "Complete event layout", "Distribuição completa do evento"))}</p></div><button class="print-action" onclick="window.print()">${safe(t("Guardar como PDF o imprimir", "Save as PDF or print", "Salvar como PDF ou imprimir"))}</button></header>${spaceSections}<footer>${new Date().toLocaleDateString()}</footer></body></html>`;
     const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
     window.open(url, "_blank", "noopener,noreferrer");
     window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
@@ -3167,9 +3637,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </h2>
               <p>
                 {t(
-                  "Asigná cada grupo a una mesa",
-                  "Assign each group to a table",
-                  "Atribua cada grupo a uma mesa",
+                  "Arrastrá cada grupo a una mesa o usá el selector",
+                  "Drag each group to a table or use the selector",
+                  "Arraste cada grupo para uma mesa ou use o seletor",
                 )}
               </p>
             </div>
@@ -3177,14 +3647,45 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           </div>
           <div className="guest-assign-list">
             <label className="search seating-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado…", "Search guest…", "Buscar convidado…")} /></label>
-            {confirmedGuests.filter((guest) => `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase())).map((guest) => {
+            <div className="assignment-filters" role="group" aria-label={t("Filtrar grupos", "Filter groups", "Filtrar grupos")}>
+              {([
+                ["all", t("Todos", "All", "Todos"), confirmedGuests.length],
+                ["unassigned", t("Sin mesa", "No table", "Sem mesa"), unassigned.length],
+                ["assigned", t("Ubicados", "Seated", "Alocados"), confirmedGuests.length - unassigned.length],
+              ] as const).map(([value, label, count]) => (
+                <button
+                  key={value}
+                  className={assignmentFilter === value ? "active" : ""}
+                  onClick={() => setAssignmentFilter(value)}
+                >
+                  {label} <span>{count}</span>
+                </button>
+              ))}
+            </div>
+            {canEdit && unassigned.length > 0 && (
+              <button className="auto-assign-button" onClick={previewAutomaticAssignment}>
+                ✦ {t("Sugerir distribución", "Suggest seating", "Sugerir distribuição")}
+              </button>
+            )}
+            {confirmedGuests.filter((guest) => {
+              const matchesQuery = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
+              const isAssigned = assignedIds.includes(guest.id);
+              return matchesQuery && (assignmentFilter === "all" || (assignmentFilter === "assigned" ? isAssigned : !isAssigned));
+            }).map((guest) => {
               const currentTable = tables.find((table) =>
                 table.guests.includes(guest.id),
               );
               return (
                 <div
                   key={guest.id}
-                  className={currentTable ? "guest-assigned" : ""}
+                  className={`${currentTable ? "guest-assigned" : ""} ${dragGuestId === guest.id ? "is-dragging" : ""}`}
+                  draggable={canEdit}
+                  onDragStart={(event) => {
+                    event.dataTransfer.setData("text/guest-id", guest.id);
+                    event.dataTransfer.effectAllowed = "move";
+                    setDragGuestId(guest.id);
+                  }}
+                  onDragEnd={() => setDragGuestId("")}
                 >
                   <GuestAvatar guest={guest} />
                   <p>
@@ -3253,13 +3754,20 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 )}
               </p>
             </div>
-            <span>
-              {t(
-                "Actualización automática",
-                "Automatic updates",
-                "Atualização automática",
+            <div className="workspace-actions">
+              {lastAssignment && (
+                <button className="outline-button compact" onClick={undoLastAssignment}>
+                  ↶ {t("Deshacer movimiento", "Undo move", "Desfazer movimento")}
+                </button>
               )}
-            </span>
+              <span>
+                {t(
+                  "Actualización automática",
+                  "Automatic updates",
+                  "Atualização automática",
+                )}
+              </span>
+            </div>
           </div>
           <div className="tables-grid">
             {tables.map((table, index) => {
@@ -3273,10 +3781,58 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               const remaining = table.capacity - occupied;
               const full = remaining === 0;
               const over = remaining < 0;
+              const menuSummary = new Map<string, number>();
+              tableGuests.forEach((guest) => {
+                if (!meaningfulGuestValue(guest.menuChoice)) return;
+                menuSummary.set(
+                  guest.menuChoice,
+                  (menuSummary.get(guest.menuChoice) || 0) +
+                    confirmedPeopleForGuest(guest, guests),
+                );
+              });
+              const dietaryAlerts = tableGuests.flatMap((guest) => [
+                ...(meaningfulGuestValue(guest.food)
+                  ? [{ id: guest.id, name: guest.name, food: guest.food }]
+                  : []),
+                ...guest.companions
+                  .filter((companion) => meaningfulGuestValue(companion.food))
+                  .map((companion, companionIndex) => ({
+                    id: `${guest.id}-${companionIndex}`,
+                    name: companion.name || `${t("Acompañante de", "Companion of", "Acompanhante de")} ${guest.name}`,
+                    food: companion.food,
+                  })),
+              ]);
+              const accessibilityAlerts = tableGuests.filter((guest) =>
+                meaningfulGuestValue(guest.accessibilityNeeds),
+              );
+              const draggedGuest = guests.find((guest) => guest.id === dragGuestId);
+              const draggedPeople = draggedGuest
+                ? confirmedPeopleForGuest(draggedGuest, guests)
+                : 0;
+              const alreadyHere = Boolean(
+                dragGuestId && table.guests.includes(dragGuestId),
+              );
+              const canDrop = alreadyHere || remaining >= draggedPeople;
               return (
                 <article
-                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""}`}
+                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""}`}
                   key={table.id}
+                  onDragOver={(event) => {
+                    if (canEdit && dragGuestId && canDrop) {
+                      event.preventDefault();
+                      event.dataTransfer.dropEffect = "move";
+                    }
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    const guestId = event.dataTransfer.getData("text/guest-id");
+                    if (canEdit && guestId && canDrop) void assignGuest(guestId, table.id);
+                  }}
+                  aria-label={
+                    dragGuestId && !canDrop
+                      ? `${table.name}: ${t("sin capacidad suficiente", "not enough capacity", "sem capacidade suficiente")}`
+                      : undefined
+                  }
                 >
                   <div className="table-card-top">
                     <span className="table-number">{index + 1}</span>
@@ -3316,6 +3872,19 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       }}
                     />
                   </div>
+                  {(menuSummary.size > 0 || dietaryAlerts.length > 0 || accessibilityAlerts.length > 0) && (
+                    <div className="table-operations" aria-label={t("Datos operativos", "Operational details", "Dados operacionais")}>
+                      {[...menuSummary].map(([menu, count]) => (
+                        <span key={menu} title={menu}>🍽 {count}× {menu}</span>
+                      ))}
+                      {dietaryAlerts.map((alert) => (
+                        <span className="is-alert" key={`food-${alert.id}`} title={`${alert.name}: ${alert.food}`}>⚠ {alert.name}: {alert.food}</span>
+                      ))}
+                      {accessibilityAlerts.map((guest) => (
+                        <span className="is-accessibility" key={`access-${guest.id}`} title={`${guest.name}: ${guest.accessibilityNeeds}`}>♿ {guest.name}: {guest.accessibilityNeeds}</span>
+                      ))}
+                    </div>
+                  )}
                   <div className="seated-guests">
                     {tableGuests.map((guest) => (
                       <div key={guest.id}>
@@ -3499,6 +4068,56 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   : editing
                     ? t("Guardar cambios", "Save changes", "Salvar alterações")
                     : t("Crear mesa", "Create table", "Criar mesa")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {suggestedAssignments && (
+        <div className="modal-backdrop" onMouseDown={() => setSuggestedAssignments(null)}>
+          <div className="modal assignment-preview-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" onClick={() => setSuggestedAssignments(null)}>×</button>
+            <span className="eyebrow">{t("Asignación asistida", "Assisted seating", "Atribuição assistida")}</span>
+            <h2>{t("Revisá la distribución sugerida", "Review suggested seating", "Revise a distribuição sugerida")}</h2>
+            <p>{t(
+              "Los grupos más grandes se ubican primero y se aprovecha la capacidad disponible sin separar invitaciones.",
+              "Larger groups are seated first and available capacity is used without splitting invitations.",
+              "Os grupos maiores são alocados primeiro e a capacidade disponível é usada sem separar convites.",
+            )}</p>
+            <div className="assignment-preview-list">
+              {suggestedAssignments.map((suggestion) => {
+                const guest = guests.find((item) => item.id === suggestion.guestId);
+                const table = tables.find((item) => item.id === suggestion.tableId);
+                return guest && table ? (
+                  <div key={guest.id}>
+                    <span><strong>{guest.name}</strong><small>{confirmedPeopleForGuest(guest, guests)} {t("personas", "people", "pessoas")}</small></span>
+                    <b>→</b>
+                    <strong>{table.name}</strong>
+                  </div>
+                ) : null;
+              })}
+              {!suggestedAssignments.length && (
+                <p className="capacity-alert">{t(
+                  "No hay capacidad suficiente para ubicar los grupos pendientes.",
+                  "There is not enough capacity for the remaining groups.",
+                  "Não há capacidade suficiente para alocar os grupos pendentes.",
+                )}</p>
+              )}
+              {suggestedAssignments.length > 0 && suggestedAssignments.length < unassigned.length && (
+                <p className="capacity-alert">
+                  {unassigned.length - suggestedAssignments.length} {t(
+                    "grupos seguirán sin mesa por falta de capacidad.",
+                    "groups will remain without a table due to capacity.",
+                    "grupos continuarão sem mesa por falta de capacidade.",
+                  )}
+                </p>
+              )}
+            </div>
+            <div className="modal-actions">
+              <button className="outline-button" onClick={() => setSuggestedAssignments(null)}>{t("Cancelar", "Cancel", "Cancelar")}</button>
+              <button className="primary-button" disabled={saving || !suggestedAssignments.length} onClick={applyAutomaticAssignment}>
+                {saving ? t("Aplicando…", "Applying…", "Aplicando…") : t("Aplicar distribución", "Apply seating", "Aplicar distribuição")}
               </button>
             </div>
           </div>
@@ -5272,6 +5891,11 @@ function GlobalGuestEditor({
           <label>{t("Identificación", "ID number", "Identificação")}<input name="identificationNumber" defaultValue={guest.identificationNumber} /></label>
           <label>{t("Restricción alimentaria", "Dietary need", "Restrição alimentar")}<input name="food" defaultValue={guest.food === "—" ? "" : guest.food} /></label>
           <label>{t("Canción sugerida", "Suggested song", "Música sugerida")}<input name="song" defaultValue={guest.song === "—" ? "" : guest.song} /></label>
+          <label>{t("Transporte", "Transport", "Transporte")}<select name="transportOption" defaultValue={guest.transportOption}><option value="">{t("No necesita", "Not needed", "Não precisa")}</option><option value="Ida">{t("Ida", "Outbound", "Ida")}</option><option value="Regreso">{t("Regreso", "Return", "Volta")}</option><option value="Ida y regreso">{t("Ida y regreso", "Outbound and return", "Ida e volta")}</option></select></label>
+          <label>{t("Parada o zona", "Stop or area", "Parada ou região")}<input name="transportStop" defaultValue={guest.transportStop} /></label>
+          <label>{t("Preferencia de menú", "Menu preference", "Preferência de menu")}<input name="menuChoice" defaultValue={guest.menuChoice} /></label>
+          <label>{t("Accesibilidad", "Accessibility", "Acessibilidade")}<input name="accessibilityNeeds" defaultValue={guest.accessibilityNeeds} /></label>
+          <label className="form-span-2">{t("Observaciones", "Notes", "Observações")}<textarea name="guestNotes" rows={3} defaultValue={guest.guestNotes} /></label>
         </div>
         {error && <p className="login-error">{error}</p>}
         <div className="modal-actions"><button className="outline-button" type="button" onClick={onClose}>{t("Cancelar", "Cancel", "Cancelar")}</button><button className="primary-button small" disabled={saving}>{saving ? t("Guardando…", "Saving…", "Salvando…") : t("Guardar cambios", "Save changes", "Salvar alterações")}</button></div>
@@ -5379,6 +6003,7 @@ function Admin({
   const { text: t, locale, language } = useAdminI18n();
   const [view, setView] = useState("Resumen");
   const [guests, setGuests] = useState(guestsSeed);
+  const activeGuests = guests.filter((guest) => !guest.archivedAt);
   const [mobileNav, setMobileNav] = useState(false);
   const [defaultPhoneCountryCode, setDefaultPhoneCountryCode] = useState(
     order.defaultPhoneCountryCode || "+598",
@@ -5496,11 +6121,11 @@ function Admin({
                 <span>{icon}</span>
                 {navLabel(item)}
                 {item === "Recordatorios" &&
-                  guests.filter((guest) => guest.status === "Pendiente")
+                  activeGuests.filter((guest) => guest.status === "Pendiente")
                     .length > 0 && (
                     <b>
                       {
-                        guests.filter((guest) => guest.status === "Pendiente")
+                        activeGuests.filter((guest) => guest.status === "Pendiente")
                           .length
                       }
                     </b>
@@ -5600,7 +6225,7 @@ function Admin({
         <div className="admin-content">
           {view === "Resumen" && (
             <Dashboard
-              guests={guests}
+              guests={activeGuests}
               onNavigate={navigate}
               order={order}
               canEdit={order.accessRole !== "viewer"}
@@ -5616,14 +6241,13 @@ function Admin({
               canEdit={order.accessRole !== "viewer"}
             />
           )}
-          {view === "Confirmaciones" && <Confirmations guests={guests} />}
           {view === "Mesas" && (
-            <Seating guests={guests} canEdit={order.accessRole !== "viewer"} />
+            <Seating guests={activeGuests} canEdit={order.accessRole !== "viewer"} />
           )}
           {["Restricciones", "Canciones", "Recordatorios"].includes(view) && (
             <SimpleModule
               view={view}
-              guests={guests}
+              guests={activeGuests}
               setGuests={setGuests}
               order={order}
               canEdit={order.accessRole !== "viewer"}
@@ -5632,7 +6256,7 @@ function Admin({
           )}
           {view === "Agradecimientos" && (
             <ThanksModule
-              guests={guests}
+              guests={activeGuests}
               setGuests={setGuests}
               order={order}
               canEdit={order.accessRole !== "viewer"}

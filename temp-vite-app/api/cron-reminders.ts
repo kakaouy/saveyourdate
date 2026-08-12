@@ -79,7 +79,7 @@ async function handler(request: Request) {
     for (const order of dueOrders) {
       if (sent >= 100) break;
       const guestsResponse = await supabaseRequest(
-        `event_guests?order_number=eq.${encodeURIComponent(order.order_number)}&status=eq.Pendiente&email=neq.&reminded_at=is.null&select=id,invite_token,name,email&order=created_at.asc&limit=${100 - sent}`
+        `event_guests?order_number=eq.${encodeURIComponent(order.order_number)}&status=eq.Pendiente&archived_at=is.null&email=neq.&reminded_at=is.null&select=id,invite_token,name,email&order=created_at.asc&limit=${100 - sent}`
       );
       const guests = await guestsResponse.json() as PendingGuest[];
       const eventTitle = String(order.order_payload.eventTitle || order.customer_name);
@@ -95,7 +95,7 @@ async function handler(request: Request) {
           });
           const remindedAt = new Date().toISOString();
           await supabaseRequest(
-            `event_guests?id=eq.${encodeURIComponent(guest.id)}&order_number=eq.${encodeURIComponent(order.order_number)}&status=eq.Pendiente&reminded_at=is.null`,
+            `event_guests?id=eq.${encodeURIComponent(guest.id)}&order_number=eq.${encodeURIComponent(order.order_number)}&status=eq.Pendiente&archived_at=is.null&reminded_at=is.null`,
             { method: 'PATCH', body: JSON.stringify({ reminded_at: remindedAt, updated_at: remindedAt }) }
           );
           sent += 1;

@@ -14,11 +14,16 @@ type GuestRow = {
   identification_type: string;
   identification_number: string;
   companions: Array<{ name: string; food: string; identificationType: string; identificationNumber: string }>;
+  transport_option: string;
+  transport_stop: string;
+  menu_choice: string;
+  accessibility_needs: string;
+  guest_notes: string;
 };
 
 const findGuest = async (token: string) => {
   const response = await supabaseRequest(
-    `event_guests?invite_token=eq.${encodeURIComponent(token)}&select=id,order_number,name,group_name,seats,confirmed,status,food,song,identification_type,identification_number,companions&limit=1`
+    `event_guests?invite_token=eq.${encodeURIComponent(token)}&archived_at=is.null&select=id,order_number,name,group_name,seats,confirmed,status,food,song,identification_type,identification_number,companions,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes&limit=1`
   );
   const rows = await response.json() as GuestRow[];
   return rows[0] || null;
@@ -40,6 +45,11 @@ async function handler(request: Request) {
     }
 
     if (request.method === 'GET') {
+      const openedAt = new Date().toISOString();
+      await supabaseRequest(
+        `event_guests?id=eq.${encodeURIComponent(guest.id)}&invitation_opened_at=is.null`,
+        { method: 'PATCH', body: JSON.stringify({ invitation_opened_at: openedAt }) }
+      );
       return json({
         event: {
           title: String(order.order_payload.eventTitle || order.customer_name),
@@ -55,7 +65,12 @@ async function handler(request: Request) {
           song: guest.song,
           identificationType: guest.identification_type,
           identificationNumber: guest.identification_number,
-          companions: Array.isArray(guest.companions) ? guest.companions : []
+          companions: Array.isArray(guest.companions) ? guest.companions : [],
+          transportOption: guest.transport_option || '',
+          transportStop: guest.transport_stop || '',
+          menuChoice: guest.menu_choice || '',
+          accessibilityNeeds: guest.accessibility_needs || '',
+          guestNotes: guest.guest_notes || ''
         }
       });
     }
@@ -96,6 +111,12 @@ async function handler(request: Request) {
           identification_type: String(body.identificationType || '').trim(),
           identification_number: String(body.identificationNumber || '').trim(),
           companions,
+          transport_option: String(body.transportOption || '').trim().slice(0, 80),
+          transport_stop: String(body.transportStop || '').trim().slice(0, 160),
+          menu_choice: String(body.menuChoice || '').trim().slice(0, 120),
+          accessibility_needs: String(body.accessibilityNeeds || '').trim().slice(0, 500),
+          guest_notes: String(body.guestNotes || '').trim().slice(0, 1000),
+          responded_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
       });
