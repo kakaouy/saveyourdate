@@ -29,6 +29,8 @@ type LayoutElementRow = {
   element_height: number;
 };
 
+type SpaceSettingRow = { space_name: string; canvas_width: number; canvas_height: number };
+
 type AssignmentRow = {
   id: string;
   table_id: string | null;
@@ -66,15 +68,17 @@ async function handler(request: Request) {
     if (request.method !== 'GET' && session.access_role === 'viewer') return json({ error: 'Tu acceso es de solo lectura.' }, 403);
 
     if (request.method === 'GET') {
-      const [tablesResponse, assignmentsResponse, elementsResponse] = await Promise.all([
+      const [tablesResponse, assignmentsResponse, elementsResponse, spacesResponse] = await Promise.all([
         supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y,layout_width,layout_height,table_shape,rotation_degrees,is_locked&order=created_at.asc`),
         supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=not.is.null&select=id,table_id,seat_number`),
         supabaseRequest(`event_layout_elements?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc`),
+        supabaseRequest(`event_layout_spaces?order_number=eq.${encodeURIComponent(session.order_number)}&select=space_name,canvas_width,canvas_height`),
       ]);
       const tables = await tablesResponse.json() as TableRow[];
       const assignments = await assignmentsResponse.json() as AssignmentRow[];
       const elements = await elementsResponse.json() as LayoutElementRow[];
-      return json({ tables: tables.map((table) => clientTable(table, assignments)), layoutElements: elements.map(clientElement) });
+      const spaces = await spacesResponse.json() as SpaceSettingRow[];
+      return json({ tables: tables.map((table) => clientTable(table, assignments)), layoutElements: elements.map(clientElement), layoutSpaces: spaces.map((space) => ({ name: space.space_name, width: Number(space.canvas_width), height: Number(space.canvas_height) })) });
     }
 
     const body = request.method === 'DELETE'
@@ -102,6 +106,16 @@ async function handler(request: Request) {
       const rows = await response.json() as TableRow[];
       if (!rows[0]) return json({ error: 'No encontramos esa mesa.' }, 404);
       return json({ table: clientTable(rows[0]) });
+    }
+    if (request.method === 'PATCH' && body.action === 'space-settings') {
+      const spaceName = String(body.space || 'Espacio 1').trim() || 'Espacio 1';
+      const response = await supabaseRequest('event_layout_spaces?on_conflict=order_number,space_name', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+        body: JSON.stringify({ order_number: session.order_number, space_name: spaceName, canvas_width: Math.round(Math.max(700, Math.min(2400, Number(body.width) || 1200))), canvas_height: Math.round(Math.max(480, Math.min(1800, Number(body.height) || 700))), updated_at: new Date().toISOString() }),
+      });
+      const row = ((await response.json()) as SpaceSettingRow[])[0];
+      return json({ space: { name: row.space_name, width: Number(row.canvas_width), height: Number(row.canvas_height) } });
     }
     if (body.action === 'layout-element' && request.method === 'POST') {
       const response = await supabaseRequest('event_layout_elements', {

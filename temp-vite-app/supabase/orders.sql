@@ -165,7 +165,7 @@ create table if not exists public.event_guests (
   menu_choice text not null default '',
   accessibility_needs text not null default '',
   guest_notes text not null default '',
-  guest_type text not null default 'adult' check (guest_type in ('adult', 'child')),
+  guest_type text not null default 'adult' check (guest_type in ('adult', 'teen', 'child')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

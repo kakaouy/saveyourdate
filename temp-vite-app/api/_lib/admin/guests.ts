@@ -65,7 +65,7 @@ type GuestRow = {
   menu_choice: string;
   accessibility_needs: string;
   guest_notes: string;
-  guest_type: "adult" | "child";
+  guest_type: "adult" | "teen" | "child";
   updated_at: string;
   companions: Array<{
     name: string;
@@ -104,7 +104,7 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
   menuChoice: row.menu_choice || "",
   accessibilityNeeds: row.accessibility_needs || "",
   guestNotes: row.guest_notes || "",
-  guestType: row.guest_type === "child" ? "child" : "adult",
+  guestType: ["adult", "teen", "child"].includes(row.guest_type) ? row.guest_type : "adult",
   updatedAt: row.updated_at,
   whatsappStatus,
   invitedBy: row.invited_by || "",
@@ -211,7 +211,7 @@ async function handler(request: Request) {
             menu_choice: String(guest.menuChoice || "").trim().slice(0, 120),
             accessibility_needs: String(guest.accessibilityNeeds || "").trim().slice(0, 500),
             guest_notes: String(guest.guestNotes || "").trim().slice(0, 1000),
-            guest_type: guest.guestType === "child" ? "child" : "adult",
+            guest_type: ["teen", "child"].includes(String(guest.guestType)) ? guest.guestType : "adult",
           };
         });
         const existingResponse = await supabaseRequest(
@@ -290,7 +290,7 @@ async function handler(request: Request) {
           menu_choice: String(body.menuChoice || "").trim().slice(0, 120),
           accessibility_needs: String(body.accessibilityNeeds || "").trim().slice(0, 500),
           guest_notes: String(body.guestNotes || "").trim().slice(0, 1000),
-          guest_type: body.guestType === "child" ? "child" : "adult",
+          guest_type: ["teen", "child"].includes(String(body.guestType)) ? body.guestType : "adult",
         }),
       });
       const createdGuest = ((await response.json()) as GuestRow[])[0];
@@ -689,7 +689,7 @@ async function handler(request: Request) {
             guest_type:
               body.guestType === undefined
                 ? existingGuests[0].guest_type || "adult"
-                : body.guestType === "child" ? "child" : "adult",
+                : ["teen", "child"].includes(String(body.guestType)) ? body.guestType : "adult",
             updated_at: new Date().toISOString(),
           }),
         },

@@ -90,13 +90,9 @@ test('las mesas aceptan grupos por arrastre, validan capacidad y permiten deshac
   assert.match(source, /Deshacer movimiento/);
 });
 
-test('la asignación asistida se previsualiza y conserva los grupos completos', () => {
-  assert.match(source, /const previewAutomaticAssignment =/);
-  assert.match(source, /confirmedPeopleForGuest\(b, guests\) - confirmedPeopleForGuest\(a, guests\)/);
-  assert.match(source, /setSuggestedAssignments\(suggestions\)/);
-  assert.match(source, /className="modal assignment-preview-modal"/);
-  assert.match(source, /const applyAutomaticAssignment = async/);
-  assert.match(source, /action: "assign-batch"/);
+test('la interfaz evita sugerencias automáticas y conserva filtros manuales', () => {
+  assert.doesNotMatch(source, /Sugerir distribución/);
+  assert.doesNotMatch(source, /className="modal assignment-preview-modal"/);
   assert.match(source, /assignmentFilter === "assigned"/);
 });
 
@@ -148,12 +144,12 @@ test('los grupos pueden ubicarse en un asiento concreto sin solaparse', () => {
 test('el admin distingue adultos y niños en la lista y los asientos', () => {
   const guestsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
   const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812050000_guest_age_category.sql'), 'utf8');
-  assert.match(source, /guestType: "adult" \| "child"/);
+  assert.match(source, /guestType: "adult" \| "teen" \| "child"/);
   assert.match(source, /name="guestType"/);
   assert.match(source, /person\?\.guest\.guestType === "child"/);
   assert.match(source, /seat-category-legend/);
   assert.match(guestsApi, /guest_type/);
-  assert.match(migration, /check \(guest_type in \('adult', 'child'\)\)/);
+  assert.match(migration, /guest_type/);
 });
 
 test('el plano permite girar, bloquear y ampliar la sala', () => {
@@ -204,4 +200,18 @@ test('el plano mantiene un historial persistente de deshacer y rehacer', () => {
   assert.match(source, /const redoLayoutChange = async/);
   assert.match(source, /await restoreLayoutVersion\(change\.before\)/);
   assert.match(source, /await restoreLayoutVersion\(change\.after\)/);
+});
+
+test('la revisión visual incorpora adolescentes, arrastre de elementos y tamaño de sala', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  const teenMigration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812070000_guest_teen_category.sql'), 'utf8');
+  const spaceMigration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812080000_layout_space_sizes.sql'), 'utf8');
+  assert.match(source, /guestType: "adult" \| "teen" \| "child"/);
+  assert.doesNotMatch(source, /className="auto-assign-button"/);
+  assert.match(source, /text\/new-element-kind/);
+  assert.match(source, /const saveSpaceSize = async/);
+  assert.match(source, /spaceSizes\[space\]/);
+  assert.match(tablesApi, /event_layout_spaces/);
+  assert.match(teenMigration, /'adult', 'teen', 'child'/);
+  assert.match(spaceMigration, /canvas_width/);
 });

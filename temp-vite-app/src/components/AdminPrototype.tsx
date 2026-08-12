@@ -41,7 +41,7 @@ type Guest = {
   menuChoice: string;
   accessibilityNeeds: string;
   guestNotes: string;
-  guestType: "adult" | "child";
+  guestType: "adult" | "teen" | "child";
   updatedAt: string;
   whatsappStatus?: string;
   invitedBy: string;
@@ -2562,6 +2562,7 @@ function Guests({
                 {t("Categoría", "Category", "Categoria")}
                 <select name="guestType" defaultValue="adult">
                   <option value="adult">{t("Adulto", "Adult", "Adulto")}</option>
+                  <option value="teen">{t("Adolescente", "Teenager", "Adolescente")}</option>
                   <option value="child">{t("Niño/a", "Child", "Criança")}</option>
                 </select>
               </label>
@@ -2685,6 +2686,7 @@ function Guests({
                 {t("Categoría", "Category", "Categoria")}
                 <select name="guestType" defaultValue={editingGuest.guestType || "adult"}>
                   <option value="adult">{t("Adulto", "Adult", "Adulto")}</option>
+                  <option value="teen">{t("Adolescente", "Teenager", "Adolescente")}</option>
                   <option value="child">{t("Niño/a", "Child", "Criança")}</option>
                 </select>
               </label>
@@ -2779,7 +2781,7 @@ function Guests({
                 />
               </label>
               <label>Transporte<select name="transportOption" defaultValue={editingGuest.transportOption}><option value="">No necesita</option><option value="Ida">Ida</option><option value="Regreso">Regreso</option><option value="Ida y regreso">Ida y regreso</option></select></label>
-              <label>Parada o zona<input name="transportStop" defaultValue={editingGuest.transportStop} placeholder="Ej. Centro" /></label>
+              <label>Parada del transporte <small className="field-help">Sólo si usa el traslado del evento.</small><input name="transportStop" defaultValue={editingGuest.transportStop} placeholder="Ej. Terminal Tres Cruces" /></label>
               <label>Preferencia de menú<input name="menuChoice" defaultValue={editingGuest.menuChoice} /></label>
               <label>Accesibilidad<input name="accessibilityNeeds" defaultValue={editingGuest.accessibilityNeeds} /></label>
               <label className="form-span-2">Observaciones<textarea name="guestNotes" rows={3} defaultValue={editingGuest.guestNotes} /></label>
@@ -3052,6 +3054,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [query, setQuery] = useState("");
   const [layoutMode, setLayoutMode] = useState(false);
   const [spaces, setSpaces] = useState(["Espacio 1"]);
+  const [spaceSizes, setSpaceSizes] = useState<Record<string, { width: number; height: number }>>({ "Espacio 1": { width: 1200, height: 700 } });
   const [layoutNotice, setLayoutNotice] = useState("");
   const [floorElements, setFloorElements] = useState<FloorElement[]>([]);
   const [floorZoom, setFloorZoom] = useState(1);
@@ -3060,10 +3063,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [layoutRedoStack, setLayoutRedoStack] = useState<Array<{ before: EventTable; after: EventTable }>>([]);
   const [dragGuestId, setDragGuestId] = useState("");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
-  const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "child">("all");
-  const [suggestedAssignments, setSuggestedAssignments] = useState<
-    { guestId: string; tableId: string }[] | null
-  >(null);
+  const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "teen" | "child">("all");
   const [lastAssignment, setLastAssignment] = useState<{
     guestId: string;
     fromTableId: string;
@@ -3099,12 +3099,14 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         const result = (await response.json()) as {
           tables?: EventTable[];
           layoutElements?: FloorElement[];
+          layoutSpaces?: Array<{ name: string; width: number; height: number }>;
           error?: string;
         };
         if (!response.ok || !result.tables)
           throw new Error(result.error || "No pudimos cargar las mesas.");
         setTables(result.tables);
         setFloorElements(result.layoutElements || []);
+        setSpaceSizes((current) => ({ ...current, ...Object.fromEntries((result.layoutSpaces || []).map((space) => [space.name, { width: space.width, height: space.height }])) }));
         const loadedSpaces = [...new Set(result.tables.map((table) => table.space || "Espacio 1"))];
         setSpaces(loadedSpaces.length ? loadedSpaces : ["Espacio 1"]);
       })
@@ -3270,79 +3272,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     if (restored) setLastAssignment(null);
   };
 
-  const previewAutomaticAssignment = () => {
-    const availableByTable = new Map(
-      tables.map((table) => [
-        table.id,
-        table.capacity - table.guests.reduce((total, id) => {
-          const guest = guests.find((item) => item.id === id);
-          return total + (guest ? confirmedPeopleForGuest(guest, guests) : 0);
-        }, 0),
-      ]),
-    );
-    const suggestions: { guestId: string; tableId: string }[] = [];
-    [...unassigned]
-      .sort(
-        (a, b) =>
-          confirmedPeopleForGuest(b, guests) - confirmedPeopleForGuest(a, guests),
-      )
-      .forEach((guest) => {
-        const people = confirmedPeopleForGuest(guest, guests);
-        const table = tables
-          .filter((item) => (availableByTable.get(item.id) || 0) >= people)
-          .sort(
-            (a, b) =>
-              (availableByTable.get(a.id) || 0) -
-              (availableByTable.get(b.id) || 0),
-          )[0];
-        if (!table) return;
-        suggestions.push({ guestId: guest.id, tableId: table.id });
-        availableByTable.set(
-          table.id,
-          (availableByTable.get(table.id) || 0) - people,
-        );
-      });
-    setSuggestedAssignments(suggestions);
-  };
-
-  const applyAutomaticAssignment = async () => {
-    if (!suggestedAssignments) return;
-    setSaving(true);
-    setError("");
-    try {
-      const response = await fetch("/api/admin/tables", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "assign-batch",
-          assignments: suggestedAssignments,
-        }),
-      });
-      const result = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(result.error || "No pudimos aplicar la distribución completa.");
-      setTables((current) =>
-        current.map((table) => ({
-          ...table,
-          guests: [
-            ...table.guests,
-            ...suggestedAssignments
-              .filter((suggestion) => suggestion.tableId === table.id)
-              .map((suggestion) => suggestion.guestId),
-          ],
-        })),
-      );
-      setSuggestedAssignments(null);
-      setLastAssignment(null);
-    } catch (assignmentError) {
-      setError(
-        assignmentError instanceof Error
-          ? assignmentError.message
-          : "No pudimos aplicar la distribución completa.",
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const saveTableLayout = async (table: EventTable) => {
     const response = await fetch("/api/admin/tables", {
@@ -3469,9 +3398,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     return result.element;
   };
 
-  const addFloorElement = async (kind: FloorElement["kind"], label: string) => {
+  const addFloorElement = async (kind: FloorElement["kind"], label: string, position?: { space: string; x: number; y: number }) => {
     try {
-      const element = await saveFloorElement({ id: "", kind, label, space: spaces[0], x: 40, y: 90, width: kind === "dance-floor" ? 220 : 150, height: kind === "dance-floor" ? 130 : 80 }, "POST");
+      const element = await saveFloorElement({ id: "", kind, label, space: position?.space || spaces[0], x: position?.x ?? 40, y: position?.y ?? 90, width: kind === "dance-floor" ? 220 : 150, height: kind === "dance-floor" ? 130 : 80 }, "POST");
       setFloorElements((current) => [...current, element]);
     } catch (addError) { setError(addError instanceof Error ? addError.message : "No pudimos agregar el elemento."); }
   };
@@ -3600,7 +3529,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       table: table.name,
       seat: index + 1,
       name: slot.name,
-      category: slot.guest.guestType === "child" ? t("Niño/a", "Child", "Criança") : t("Adulto", "Adult", "Adulto"),
+      category: slot.guest.guestType === "child" ? t("Niño/a", "Child", "Criança") : slot.guest.guestType === "teen" ? t("Adolescente", "Teenager", "Adolescente") : t("Adulto", "Adult", "Adulto"),
       menu: slot.guest.menuChoice || "",
       food: meaningfulGuestValue(slot.guest.food) ? slot.guest.food : "",
       accessibility: slot.guest.accessibilityNeeds || "",
@@ -3633,6 +3562,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     } finally {
       setSaving(false);
     }
+  };
+
+  const saveSpaceSize = async (space: string, width: number, height: number) => {
+    const next = { width: Math.max(700, Math.min(2400, width)), height: Math.max(480, Math.min(1800, height)) };
+    setSpaceSizes((current) => ({ ...current, [space]: next }));
+    const response = await fetch("/api/admin/tables", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "space-settings", space, ...next }) });
+    if (!response.ok) setError(t("No pudimos guardar el tamaño del espacio.", "Could not save space size.", "Não foi possível salvar o tamanho do espaço."));
   };
 
   return (
@@ -3759,20 +3695,22 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             {canEdit && <aside className="floor-elements-menu">
               <strong>{t("Elementos del salón", "Venue elements", "Elementos do salão")}</strong>
               <p>{t("Agregalos al plano y ubicalos donde quieras.", "Add them to the layout and place them anywhere.", "Adicione-os ao plano e posicione-os onde quiser.")}</p>
-              {([["entrance", "Entrada"], ["dance-floor", "Pista"], ["gourmet", "Zona Gourmet"], ["hydration", "Zona Hidratación"]] as const).map(([kind, label]) => <button key={kind} onClick={() => void addFloorElement(kind, label)}>＋ {label}</button>)}
+              {([["entrance", "Entrada"], ["dance-floor", "Pista"], ["gourmet", "Zona Gourmet"], ["hydration", "Zona Hidratación"]] as const).map(([kind, label]) => <button key={kind} draggable onDragStart={(event) => { event.dataTransfer.setData("text/new-element-kind", kind); event.dataTransfer.setData("text/new-element-label", label); }} onClick={() => void addFloorElement(kind, label)}>⠿ ＋ {label}</button>)}
               <button onClick={() => void addFloorElement("custom", t("Texto editable", "Editable text", "Texto editável"))}>＋ {t("Caja con texto", "Text box", "Caixa de texto")}</button>
             </aside>}
             <div className="floor-spaces" style={{ zoom: floorZoom }}>
           {spaces.map((space) => (
-            <div className="floor-space" key={space} onDragOver={(event) => event.preventDefault()} onDrop={(event) => {
+            <div className="floor-space" key={space} style={{ width: spaceSizes[space]?.width || 1200, height: spaceSizes[space]?.height || 700 }} onDragOver={(event) => event.preventDefault()} onDrop={(event) => {
               if (!canEdit) return;
               const bounds = event.currentTarget.getBoundingClientRect();
               const table = tables.find((item) => item.id === event.dataTransfer.getData("text/table-id"));
               if (table) { void moveTable(table, space, event.clientX - bounds.left - (table.width || 140) / 2, event.clientY - bounds.top - (table.height || 70) / 2); return; }
               const element = floorElements.find((item) => item.id === event.dataTransfer.getData("text/element-id"));
               if (element) { const next = updateFloorElement(element, { space, x: Math.max(0, event.clientX - bounds.left - element.width / 2), y: Math.max(0, event.clientY - bounds.top - element.height / 2) }); persistFloorElement(next); }
+              const newElementKind = event.dataTransfer.getData("text/new-element-kind") as FloorElement["kind"];
+              if (newElementKind) void addFloorElement(newElementKind, event.dataTransfer.getData("text/new-element-label") || t("Elemento", "Element", "Elemento"), { space, x: Math.max(0, event.clientX - bounds.left - 75), y: Math.max(0, event.clientY - bounds.top - 40) });
             }}>
-              <strong className="space-label">{space}</strong>
+              <div className="space-heading"><strong className="space-label">{space}</strong>{canEdit && <span><label>{t("Ancho", "Width", "Largura")}<input type="number" min="700" max="2400" value={spaceSizes[space]?.width || 1200} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: Number(event.target.value), height: current[space]?.height || 700 } }))} onBlur={(event) => void saveSpaceSize(space, Number(event.target.value), spaceSizes[space]?.height || 700)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min="480" max="1800" value={spaceSizes[space]?.height || 700} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: current[space]?.width || 1200, height: Number(event.target.value) } }))} onBlur={(event) => void saveSpaceSize(space, spaceSizes[space]?.width || 1200, Number(event.target.value))} /></label></span>}</div>
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
                 <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
@@ -3812,6 +3750,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </p>
               <div className="seat-category-legend">
                 <span><i className="adult-dot" />{t("Adultos", "Adults", "Adultos")}</span>
+                <span><i className="teen-dot" />{t("Adolescentes", "Teenagers", "Adolescentes")}</span>
                 <span><i className="child-dot" />{t("Niños", "Children", "Crianças")}</span>
                 <span><i className="alert-dot" />{t("Con alerta", "With alert", "Com alerta")}</span>
               </div>
@@ -3836,9 +3775,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               ))}
             </div>
             <div className="category-filters" role="group" aria-label={t("Filtrar por categoría", "Filter by category", "Filtrar por categoria")}>
-              {(["all", "adult", "child"] as const).map((value) => (
+              {(["all", "adult", "teen", "child"] as const).map((value) => (
                 <button key={value} className={guestCategoryFilter === value ? "active" : ""} onClick={() => setGuestCategoryFilter(value)}>
-                  {value === "all" ? t("Todas las edades", "All ages", "Todas as idades") : value === "adult" ? t("Adultos", "Adults", "Adultos") : t("Niños", "Children", "Crianças")}
+                  {value === "all" ? t("Todas", "All", "Todas") : value === "adult" ? t("Adultos", "Adults", "Adultos") : value === "teen" ? t("Adolescentes", "Teenagers", "Adolescentes") : t("Niños", "Children", "Crianças")}
                 </button>
               ))}
             </div>
@@ -3854,11 +3793,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               >
                 ↙ {t("Soltá aquí para dejar sin mesa", "Drop here to remove from table", "Solte aqui para remover da mesa")}
               </div>
-            )}
-            {canEdit && unassigned.length > 0 && (
-              <button className="auto-assign-button" onClick={previewAutomaticAssignment}>
-                ✦ {t("Sugerir distribución", "Suggest seating", "Sugerir distribuição")}
-              </button>
             )}
             {confirmedGuests.filter((guest) => {
               const matchesQuery = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
@@ -4102,7 +4036,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       const radiusY = table.shape === "rectangular" ? 34 : table.shape === "square" ? 39 : 42;
                       return (
                         <span
-                          className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person && meaningfulGuestValue(person.guest.food) ? "has-alert" : ""}`}
+                          className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "teen" ? "is-teen" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person && meaningfulGuestValue(person.guest.food) ? "has-alert" : ""}`}
                           key={seatIndex}
                           style={{ left: `${50 + Math.cos(angle) * radiusX}%`, top: `${50 + Math.sin(angle) * radiusY}%` }}
                           title={person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
@@ -4116,13 +4050,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                           }}
                           onDragEnd={() => setDragGuestId("")}
                           onDragOver={(event) => {
-                            if (canEdit && dragGuestId && !person) event.preventDefault();
+                            if (canEdit && dragGuestId && (!person || person.guest.id === dragGuestId)) event.preventDefault();
                           }}
                           onDrop={(event) => {
                             event.preventDefault();
                             event.stopPropagation();
                             const guestId = event.dataTransfer.getData("text/guest-id");
-                            if (canEdit && guestId && !person) void assignGuest(guestId, table.id, true, seatIndex + 1);
+                            if (canEdit && guestId && (!person || person.guest.id === guestId)) void assignGuest(guestId, table.id, true, seatIndex + 1);
                           }}
                         >{person?.label || "♧"}</span>
                       );
@@ -4339,55 +4273,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         </div>
       )}
 
-      {suggestedAssignments && (
-        <div className="modal-backdrop" onMouseDown={() => setSuggestedAssignments(null)}>
-          <div className="modal assignment-preview-modal" onMouseDown={(event) => event.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSuggestedAssignments(null)}>×</button>
-            <span className="eyebrow">{t("Asignación asistida", "Assisted seating", "Atribuição assistida")}</span>
-            <h2>{t("Revisá la distribución sugerida", "Review suggested seating", "Revise a distribuição sugerida")}</h2>
-            <p>{t(
-              "Los grupos más grandes se ubican primero y se aprovecha la capacidad disponible sin separar invitaciones.",
-              "Larger groups are seated first and available capacity is used without splitting invitations.",
-              "Os grupos maiores são alocados primeiro e a capacidade disponível é usada sem separar convites.",
-            )}</p>
-            <div className="assignment-preview-list">
-              {suggestedAssignments.map((suggestion) => {
-                const guest = guests.find((item) => item.id === suggestion.guestId);
-                const table = tables.find((item) => item.id === suggestion.tableId);
-                return guest && table ? (
-                  <div key={guest.id}>
-                    <span><strong>{guest.name}</strong><small>{confirmedPeopleForGuest(guest, guests)} {t("personas", "people", "pessoas")}</small></span>
-                    <b>→</b>
-                    <strong>{table.name}</strong>
-                  </div>
-                ) : null;
-              })}
-              {!suggestedAssignments.length && (
-                <p className="capacity-alert">{t(
-                  "No hay capacidad suficiente para ubicar los grupos pendientes.",
-                  "There is not enough capacity for the remaining groups.",
-                  "Não há capacidade suficiente para alocar os grupos pendentes.",
-                )}</p>
-              )}
-              {suggestedAssignments.length > 0 && suggestedAssignments.length < unassigned.length && (
-                <p className="capacity-alert">
-                  {unassigned.length - suggestedAssignments.length} {t(
-                    "grupos seguirán sin mesa por falta de capacidad.",
-                    "groups will remain without a table due to capacity.",
-                    "grupos continuarão sem mesa por falta de capacidade.",
-                  )}
-                </p>
-              )}
-            </div>
-            <div className="modal-actions">
-              <button className="outline-button" onClick={() => setSuggestedAssignments(null)}>{t("Cancelar", "Cancel", "Cancelar")}</button>
-              <button className="primary-button" disabled={saving || !suggestedAssignments.length} onClick={applyAutomaticAssignment}>
-                {saving ? t("Aplicando…", "Applying…", "Aplicando…") : t("Aplicar distribución", "Apply seating", "Aplicar distribuição")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
