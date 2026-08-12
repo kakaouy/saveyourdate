@@ -65,6 +65,7 @@ type GuestRow = {
   menu_choice: string;
   accessibility_needs: string;
   guest_notes: string;
+  guest_type: "adult" | "child";
   updated_at: string;
   companions: Array<{
     name: string;
@@ -103,6 +104,7 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
   menuChoice: row.menu_choice || "",
   accessibilityNeeds: row.accessibility_needs || "",
   guestNotes: row.guest_notes || "",
+  guestType: row.guest_type === "child" ? "child" : "adult",
   updatedAt: row.updated_at,
   whatsappStatus,
   invitedBy: row.invited_by || "",
@@ -209,6 +211,7 @@ async function handler(request: Request) {
             menu_choice: String(guest.menuChoice || "").trim().slice(0, 120),
             accessibility_needs: String(guest.accessibilityNeeds || "").trim().slice(0, 500),
             guest_notes: String(guest.guestNotes || "").trim().slice(0, 1000),
+            guest_type: guest.guestType === "child" ? "child" : "adult",
           };
         });
         const existingResponse = await supabaseRequest(
@@ -287,6 +290,7 @@ async function handler(request: Request) {
           menu_choice: String(body.menuChoice || "").trim().slice(0, 120),
           accessibility_needs: String(body.accessibilityNeeds || "").trim().slice(0, 500),
           guest_notes: String(body.guestNotes || "").trim().slice(0, 1000),
+          guest_type: body.guestType === "child" ? "child" : "adult",
         }),
       });
       const createdGuest = ((await response.json()) as GuestRow[])[0];
@@ -591,7 +595,7 @@ async function handler(request: Request) {
         );
       }
       const guestResponse = await supabaseRequest(
-        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,email,phone,phone_country_code,identification_type,identification_number,name,group_name,invited_by,companion_of_id,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes`,
+        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,email,phone,phone_country_code,identification_type,identification_number,name,group_name,invited_by,companion_of_id,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes,guest_type`,
       );
       const existingGuests = (await guestResponse.json()) as GuestRow[];
       if (!existingGuests[0])
@@ -682,6 +686,10 @@ async function handler(request: Request) {
               body.guestNotes === undefined
                 ? existingGuests[0].guest_notes
                 : String(body.guestNotes).trim().slice(0, 1000),
+            guest_type:
+              body.guestType === undefined
+                ? existingGuests[0].guest_type || "adult"
+                : body.guestType === "child" ? "child" : "adult",
             updated_at: new Date().toISOString(),
           }),
         },

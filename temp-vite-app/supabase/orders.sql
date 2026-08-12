@@ -165,6 +165,7 @@ create table if not exists public.event_guests (
   menu_choice text not null default '',
   accessibility_needs text not null default '',
   guest_notes text not null default '',
+  guest_type text not null default 'adult' check (guest_type in ('adult', 'child')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -189,6 +190,9 @@ alter table public.event_guests
   add column if not exists menu_choice text not null default '',
   add column if not exists accessibility_needs text not null default '',
   add column if not exists guest_notes text not null default '';
+
+alter table public.event_guests
+  add column if not exists guest_type text not null default 'adult';
 
 create index if not exists event_guests_order_idx
   on public.event_guests(order_number, created_at);

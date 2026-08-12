@@ -41,6 +41,7 @@ type Guest = {
   menuChoice: string;
   accessibilityNeeds: string;
   guestNotes: string;
+  guestType: "adult" | "child";
   updatedAt: string;
   whatsappStatus?: string;
   invitedBy: string;
@@ -1593,6 +1594,7 @@ function Guests({
           menuChoice: data.get("menuChoice"),
           accessibilityNeeds: data.get("accessibilityNeeds"),
           guestNotes: data.get("guestNotes"),
+          guestType: data.get("guestType"),
         }),
       });
       const result = (await response.json()) as {
@@ -2557,6 +2559,13 @@ function Guests({
                 />
               </label>
               <label>
+                {t("Categoría", "Category", "Categoria")}
+                <select name="guestType" defaultValue="adult">
+                  <option value="adult">{t("Adulto", "Adult", "Adulto")}</option>
+                  <option value="child">{t("Niño/a", "Child", "Criança")}</option>
+                </select>
+              </label>
+              <label>
                 Email
                 <input name="email" type="email" />
               </label>
@@ -2671,6 +2680,13 @@ function Guests({
               <label>
                 Grupo
                 <input name="group" defaultValue={editingGuest.group} />
+              </label>
+              <label>
+                {t("Categoría", "Category", "Categoria")}
+                <select name="guestType" defaultValue={editingGuest.guestType || "adult"}>
+                  <option value="adult">{t("Adulto", "Adult", "Adulto")}</option>
+                  <option value="child">{t("Niño/a", "Child", "Criança")}</option>
+                </select>
               </label>
               <label>
                 Invitación realizada por
@@ -3655,6 +3671,11 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   "Arraste cada grupo para uma mesa ou use o seletor",
                 )}
               </p>
+              <div className="seat-category-legend">
+                <span><i className="adult-dot" />{t("Adultos", "Adults", "Adultos")}</span>
+                <span><i className="child-dot" />{t("Niños", "Children", "Crianças")}</span>
+                <span><i className="alert-dot" />{t("Con alerta", "With alert", "Com alerta")}</span>
+              </div>
             </div>
             <span className="count-badge">{confirmedGuests.length}</span>
           </div>
@@ -3921,7 +3942,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       const radiusY = table.shape === "rectangular" ? 34 : table.shape === "square" ? 39 : 42;
                       return (
                         <span
-                          className={`seat-marker ${person ? "is-occupied" : ""} ${person && meaningfulGuestValue(person.guest.food) ? "has-alert" : ""}`}
+                          className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person && meaningfulGuestValue(person.guest.food) ? "has-alert" : ""}`}
                           key={seatIndex}
                           style={{ left: `${50 + Math.cos(angle) * radiusX}%`, top: `${50 + Math.sin(angle) * radiusY}%` }}
                           title={person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}

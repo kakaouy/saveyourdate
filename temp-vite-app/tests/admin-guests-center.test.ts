@@ -144,3 +144,14 @@ test('los grupos pueden ubicarse en un asiento concreto sin solaparse', () => {
   assert.match(tablesApi, /seat_number: tableId && seatNumber/);
   assert.match(migration, /event_guests_seat_number_check/);
 });
+
+test('el admin distingue adultos y niños en la lista y los asientos', () => {
+  const guestsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812050000_guest_age_category.sql'), 'utf8');
+  assert.match(source, /guestType: "adult" \| "child"/);
+  assert.match(source, /name="guestType"/);
+  assert.match(source, /person\?\.guest\.guestType === "child"/);
+  assert.match(source, /seat-category-legend/);
+  assert.match(guestsApi, /guest_type/);
+  assert.match(migration, /check \(guest_type in \('adult', 'child'\)\)/);
+});
