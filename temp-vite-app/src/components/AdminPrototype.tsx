@@ -3168,14 +3168,26 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const focusSpecificTable = (tableId: string) => document.getElementById(`table-card-${tableId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
   const exportSocialConflicts = () => exportCsv("conflictos-de-mesas.csv", [t("Mesa", "Table", "Mesa"), t("Conflicto", "Conflict", "Conflito")], socialConflicts.map((conflict) => [tables.find((table) => table.id === conflict.tableId)?.name || "—", conflict.message]));
+  const suggestedTableForGuest = (guest: Guest) => {
+    const explicitMatches = findSocialReferences(guest.socialTogetherWith, guest.id);
+    const explicitTable = tables.find((table) => table.guests.some((guestId) => explicitMatches.some((match) => match.id === guestId)));
+    if (explicitTable) return { table: explicitTable, reason: guest.socialTogetherWith, explicit: true };
+    const normalizedGroup = normalizedReference(guest.group);
+    if (!normalizedGroup) return null;
+    const groupTable = tables.find((table) => table.guests.some((guestId) => {
+      const seatedGuest = guests.find((candidate) => candidate.id === guestId);
+      return seatedGuest && seatedGuest.id !== guest.id && normalizedReference(seatedGuest.group) === normalizedGroup;
+    }));
+    return groupTable ? { table: groupTable, reason: guest.group, explicit: false } : null;
+  };
   const selectedGuest = confirmedGuests.find((guest) => guest.id === selectedGuestId);
   const explicitTogetherGuests = selectedGuest ? findSocialReferences(selectedGuest.socialTogetherWith, selectedGuest.id) : [];
-  const suggestedTargetIds = explicitTogetherGuests.length
-    ? explicitTogetherGuests.map((guest) => guest.id)
-    : selectedGuest ? confirmedGuests.filter((guest) => guest.id !== selectedGuest.id && normalizedReference(guest.group) === normalizedReference(selectedGuest.group)).map((guest) => guest.id) : [];
-  const suggestedGroupTable = selectedGuest
-    ? tables.find((table) => table.guests.some((guestId) => suggestedTargetIds.includes(guestId)))
-    : undefined;
+  const selectedSuggestion = selectedGuest ? suggestedTableForGuest(selectedGuest) : null;
+  const suggestedGroupTable = selectedSuggestion?.table;
+  const seatedExplicitTargetIds = suggestedGroupTable ? explicitTogetherGuests.filter((guest) => suggestedGroupTable.guests.includes(guest.id)).map((guest) => guest.id) : [];
+  const suggestedTargetIds = seatedExplicitTargetIds.length
+    ? seatedExplicitTargetIds
+    : selectedGuest && suggestedGroupTable ? confirmedGuests.filter((guest) => guest.id !== selectedGuest.id && suggestedGroupTable.guests.includes(guest.id) && normalizedReference(guest.group) === normalizedReference(selectedGuest.group)).map((guest) => guest.id) : [];
 
   const focusTable = (direction: -1 | 1) => {
     if (!visibleTables.length) return;
@@ -3350,6 +3362,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       );
       if (remember) setLastAssignment({ guestId, fromTableId, toTableId: tableId, fromSeatNumber });
       setDragGuestId("");
+      setSelectedGuestId("");
       setAssignmentStatus("saved");
       window.setTimeout(() => setAssignmentStatus((current) => current === "saved" ? "idle" : current), 1800);
       return true;
@@ -3920,6 +3933,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               const currentTable = tables.find((table) =>
                 table.guests.includes(guest.id),
               );
+              const guestSuggestion = suggestedTableForGuest(guest);
               return (
                 <div
                   key={guest.id}
@@ -3951,6 +3965,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         : t("personas", "people", "pessoas")}{" "}
                       · {guest.group}
                     </small>
+                    {guestSuggestion && guestSuggestion.table.id !== currentTable?.id && <small className="guest-seat-suggestion">★ {t("Sugerencia", "Suggestion", "Sugestão")}: {guestSuggestion.table.name} · {guestSuggestion.explicit ? `${t("junto a", "next to", "junto a")} ${guestSuggestion.reason}` : t("junto a su grupo", "next to their group", "junto ao seu grupo")}</small>}
                   </p>
                   <select
                     value={currentTable?.id ?? ""}
@@ -4034,7 +4049,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </span>
             </div>
           </div>
-          {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${explicitTogetherGuests.length ? `${t("junto a", "next to", "junto a")} ${selectedGuest?.socialTogetherWith}` : t("junto a su grupo", "next to their group", "junto ao seu grupo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
+          {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${selectedSuggestion?.explicit ? `${t("junto a", "next to", "junto a")} ${selectedSuggestion.reason}` : t("junto a su grupo", "next to their group", "junto ao seu grupo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
           {tableQuery && <div className="active-table-filter"><span>{t("Resultados para", "Results for", "Resultados para")} “{tableQuery}”</span><button onClick={() => setTableQuery("")}>× {t("Limpiar", "Clear", "Limpar")}</button></div>}
           <div className={`tables-grid ${compactTables ? "is-compact" : ""}`}>
             {!visibleTables.length && <div className="tables-empty-state"><strong>{t("No encontramos mesas", "No tables found", "Nenhuma mesa encontrada")}</strong><span>{t("Probá con otro nombre de mesa o invitado.", "Try another table or guest name.", "Tente outro nome de mesa ou convidado.")}</span><button onClick={() => setTableQuery("")}>{t("Ver todas las mesas", "View all tables", "Ver todas as mesas")}</button></div>}

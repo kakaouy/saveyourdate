@@ -318,10 +318,21 @@ test('busca por grupo y prioriza la condición explícita de sentar junto', () =
   assert.match(source, /guestTerms.*guest\.name.*guest\.group/);
   assert.match(source, /const findSocialReferences =/);
   assert.match(source, /const explicitTogetherGuests =/);
-  assert.match(source, /const suggestedTargetIds = explicitTogetherGuests\.length/);
+  assert.match(source, /const seatedExplicitTargetIds =/);
   assert.match(source, /hasTogetherMatchAtTable/);
   assert.match(source, /hasSeparateMatchAtTable/);
   assert.match(source, /list="global-social-references"/);
   assert.match(source, /list="local-social-references"/);
   assert.match(source, /aparecerá como sugerencia en Mesas/);
+});
+
+test('la sugerencia permanece visible y se reinicia después de cada movimiento', () => {
+  assert.match(source, /const suggestedTableForGuest =/);
+  assert.match(source, /if \(explicitTable\) return/);
+  assert.match(source, /if \(!normalizedGroup\) return null/);
+  assert.match(source, /const guestSuggestion = suggestedTableForGuest\(guest\)/);
+  assert.match(source, /className="guest-seat-suggestion"/);
+  assert.match(source, /setDragGuestId\(""\);\s*setSelectedGuestId\(""\);/);
+  assert.match(source, /const seatedExplicitTargetIds =/);
+  assert.match(styles, /\.guest-assign-list \.guest-seat-suggestion/);
 });
