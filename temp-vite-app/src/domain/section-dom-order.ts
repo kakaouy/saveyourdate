@@ -9,28 +9,36 @@ export const applySectionDomOrder = (
   main.style.display = 'flex';
   main.style.flexDirection = 'column';
   let previousOrder = sectionOrder.length * 2;
+  const sections = new Map<string, HTMLElement>();
   Array.from(main.children).forEach((child) => {
     if (!(child instanceof HTMLElement)) return;
     const sectionId = child.getAttribute(sectionAttribute);
     if (sectionId) {
       const index = sectionOrder.indexOf(sectionId);
+      sections.set(sectionId, child);
       previousOrder = (index < 0 ? sectionOrder.length : index) * 2;
       child.style.order = String(previousOrder);
-      const previous = sectionOrder[index - 1];
-      const photoGalleryPair = (previous === 'parallax' && sectionId === 'gallery') || (previous === 'gallery' && sectionId === 'parallax');
-      const hasOrnament = index > 1 && !photoGalleryPair;
-      const ornamentSide = index % 2 === 0 ? 'right' : 'left';
       child.classList.remove('modular-ornament-after');
-      child.classList.toggle('modular-ornament-before', hasOrnament);
-      child.classList.toggle('modular-ornament-right', hasOrnament && ornamentSide === 'right');
-      child.classList.toggle('modular-ornament-left', hasOrnament && ornamentSide === 'left');
-      child.style.setProperty('--modular-ornament-image', `var(--modular-ornament-${ornamentSide})`);
-      child.style.setProperty('--modular-ornament-duration', `${8.6 + (index % 4) * 0.7}s`);
-      child.style.setProperty('--modular-ornament-delay', `${-(index * 1.37)}s`);
+      child.classList.remove('modular-ornament-before', 'modular-ornament-host', 'modular-ornament-right', 'modular-ornament-left');
     } else if (child.matches(ornamentSelector)) {
       child.style.order = String(previousOrder + 1);
       child.style.display = 'none';
     }
+  });
+  sectionOrder.forEach((sectionId, index) => {
+    if (index <= 1) return;
+    const previousId = sectionOrder[index - 1];
+    const photoGalleryPair = (previousId === 'parallax' && sectionId === 'gallery') || (previousId === 'gallery' && sectionId === 'parallax');
+    if (photoGalleryPair) return;
+    const placeAfterPrevious = sectionId === 'parallax';
+    const host = sections.get(placeAfterPrevious ? previousId : sectionId);
+    if (!host) return;
+    const ornamentSide = index % 2 === 0 ? 'right' : 'left';
+    host.classList.add('modular-ornament-host', placeAfterPrevious ? 'modular-ornament-after' : 'modular-ornament-before', `modular-ornament-${ornamentSide}`);
+    host.style.setProperty('--modular-ornament-image', `var(--modular-ornament-${ornamentSide})`);
+    host.style.setProperty('--modular-ornament-duration', `${8.6 + (index % 4) * 0.7}s`);
+    host.style.setProperty('--modular-ornament-delay', `${-(index * 1.37)}s`);
+    host.style.setProperty('--modular-ornament-translate', placeAfterPrevious ? '50%' : '-50%');
   });
 };
 
