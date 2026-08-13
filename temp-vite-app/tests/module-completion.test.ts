@@ -105,4 +105,7 @@ test('la revisión evita aprobar o publicar dos veces por accidente', () => {
 test('el acceso al panel tolera respuestas no JSON durante el desarrollo', () => {
   assert.match(admin, /headers\.get\("content-type"\).*includes\("application\/json"\)/);
   assert.match(admin, /\.catch\(\(\) => undefined\)\s*\.finally\(\(\) => setCheckingSession\(false\)\)/);
+  assert.match(admin, /const readLoginResponse = async/);
+  assert.match(admin, /El servicio de acceso no está disponible/);
+  assert.match(admin, /readLoginResponse<\{[\s\S]*challengeId\?: string/);
 });

@@ -453,6 +453,18 @@ function Login({ onLogin }: { onLogin: () => void }) {
   const [recovering, setRecovering] = useState(false);
   const t = (es: string, en: string, pt: string) =>
     adminText(language, es, en, pt);
+  const readLoginResponse = async <T,>(response: Response): Promise<T> => {
+    if (!response.headers.get("content-type")?.includes("application/json")) {
+      throw new Error(
+        t(
+          "El servicio de acceso no está disponible. Intentá nuevamente en unos minutos.",
+          "The access service is unavailable. Please try again in a few minutes.",
+          "O serviço de acesso não está disponível. Tente novamente em alguns minutos.",
+        ),
+      );
+    }
+    return (await response.json()) as T;
+  };
   useEffect(() => {
     document.documentElement.lang = language;
     window.sessionStorage.setItem("syd-admin-language", language);
@@ -473,10 +485,10 @@ function Login({ onLogin }: { onLogin: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: recoveryEmail }),
       });
-      const result = (await response.json()) as {
+      const result = await readLoginResponse<{
         message?: string;
         error?: string;
-      };
+      }>(response);
       if (!response.ok)
         throw new Error(result.error || "No pudimos procesar la solicitud.");
       setRecoveryMessage(result.message || "Revisá tu email.");
@@ -500,12 +512,12 @@ function Login({ onLogin }: { onLogin: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderNumber, contact: contactValue }),
       });
-      const result = (await response.json()) as {
+      const result = await readLoginResponse<{
         challengeId?: string;
         maskedEmail?: string;
         language?: "es" | "en" | "pt";
         error?: string;
-      };
+      }>(response);
       if (!response.ok || !result.challengeId)
         throw new Error(result.error || "No pudimos enviar el código.");
       setChallengeId(result.challengeId);
@@ -532,7 +544,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ challengeId, code }),
       });
-      const result = (await response.json()) as { error?: string };
+      const result = await readLoginResponse<{ error?: string }>(response);
       if (!response.ok)
         throw new Error(result.error || "No pudimos validar el código.");
       onLogin();
