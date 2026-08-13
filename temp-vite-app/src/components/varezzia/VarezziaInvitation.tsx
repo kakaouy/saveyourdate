@@ -3,11 +3,12 @@ import QRCode from 'qrcode';
 import { DEFAULT_CONFIG, DICTIONARIES, PALETTES } from './config';
 import type { VarezziaConfig, VarezziaLocale, VarezziaPalette } from './config';
 import './varezzia.css';
+import { applyInferredSectionDomOrder } from '../../domain/section-dom-order';
 
 type ModalName = 'map' | 'dress' | 'hotels' | 'gifts' | 'songs' | 'qr' | 'rsvp' | 'lightbox';
-type Props = { locale:VarezziaLocale; palette:VarezziaPalette; embedded?:boolean; onClose?:()=>void; config?:Partial<VarezziaConfig> };
+type Props = { locale:VarezziaLocale; palette:VarezziaPalette; embedded?:boolean; onClose?:()=>void; config?:Partial<VarezziaConfig>; sectionOrder?:string[] };
 
-export function VarezziaInvitation({ locale, palette, embedded=false, onClose, config }:Props) {
+export function VarezziaInvitation({ locale, palette, embedded=false, onClose, config, sectionOrder }:Props) {
   const t = DICTIONARIES[locale];
   const data = useMemo(() => ({ ...DEFAULT_CONFIG, ...config, event:{...DEFAULT_CONFIG.event,...config?.event}, links:{...DEFAULT_CONFIG.links,...config?.links}, gifts:{...DEFAULT_CONFIG.gifts,...config?.gifts}, content:{...DEFAULT_CONFIG.content,...config?.content}, songSuggestions:{...DEFAULT_CONFIG.songSuggestions,...config?.songSuggestions}, qrPass:{...DEFAULT_CONFIG.qrPass,...config?.qrPass}, assets:{...DEFAULT_CONFIG.assets,...config?.assets}, theme:{...DEFAULT_CONFIG.theme,...config?.theme}, sections:{...DEFAULT_CONFIG.sections,...config?.sections}, metadata:{...DEFAULT_CONFIG.metadata,...config?.metadata} }), [config]);
   const [loaded,setLoaded] = useState(false); const [modal,setModal] = useState<ModalName|null>(null); const [lightbox,setLightbox] = useState(0);
@@ -24,10 +25,15 @@ export function VarezziaInvitation({ locale, palette, embedded=false, onClose, c
     '--font-title':`"${data.theme.titleFont}", cursive`, '--font-body':`"${data.theme.bodyFont}", sans-serif`,
     '--font-signature':`"${data.theme.signatureFont}", cursive`, '--hero-image':`url("${data.assets.hero}")`,
     '--parallax-image':`url("${data.assets.parallax}")`, '--hero-position-mobile':data.assets.heroPositionMobile,
-    '--hero-position-desktop':data.assets.heroPositionDesktop, '--image-overlay-opacity':data.assets.heroOverlay
+    '--hero-position-desktop':data.assets.heroPositionDesktop, '--image-overlay-opacity':data.assets.heroOverlay,
+    '--modular-ornament-image':`url("${data.assets.ornamentRight}")`
   } as React.CSSProperties;
 
   useEffect(() => { const safety=window.setTimeout(()=>setLoaded(true),2600); const ready=window.setTimeout(()=>setLoaded(true),450); return()=>{clearTimeout(safety);clearTimeout(ready)} },[]);
+  useEffect(() => {
+    const canonical=['hero','countdown','location','quote','dressCode','schedule','parallax','gallery','hotels','gifts','photoUpload','social','songSuggestions','qrPass','rsvp'].filter(id=>data.sections[id as keyof VarezziaConfig['sections']]);
+    applyInferredSectionDomOrder(invitationRef.current?.querySelector<HTMLElement>('#varezzia-main')||null,sectionOrder,canonical,'data-vz-section','.vz-ornament');
+  },[sectionOrder,data.sections]);
   useEffect(() => { const update=()=>{ const delta=Math.max(0,new Date(data.event.dateTime).getTime()-Date.now()); setCountdown([Math.floor(delta/86400000),Math.floor(delta/3600000)%24,Math.floor(delta/60000)%60,Math.floor(delta/1000)%60]) }; update(); const id=setInterval(update,1000); return()=>clearInterval(id) },[data.event.dateTime]);
   useEffect(() => { QRCode.toDataURL(data.qrPass.value,{ width:240, margin:2, color:{dark:colors.texto,light:colors.claro} }).then(setQr).catch(()=>setQr('')) },[data.qrPass.value,colors.texto,colors.claro]);
   useEffect(() => { document.title=data.metadata.title||`${t.eventType} · ${data.event.name}`; const meta=document.querySelector<HTMLMetaElement>('meta[name="description"]'); if(meta)meta.content=data.metadata.description||t.quote.replace(/[“”]/g,''); },[data.metadata,data.event.name,t]);

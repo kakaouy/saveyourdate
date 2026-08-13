@@ -1,9 +1,10 @@
 import { supabaseRequest } from '../orders.js';
+import type { AdminAccessRole } from '../admin-auth.js';
 
 type AuditSession = {
   order_number: string;
   login_email: string;
-  access_role: 'owner' | 'editor' | 'viewer';
+  access_role: AdminAccessRole;
 };
 
 export const logAdminActivity = async (

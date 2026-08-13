@@ -14,6 +14,10 @@ import tables from '../_lib/admin/tables.js';
 import testReminder from '../_lib/admin/test-reminder.js';
 import verifyCode from '../_lib/admin/verify-code.js';
 import whatsappWebhook from '../_lib/admin/whatsapp-webhook.js';
+import invitationBuilder from '../_lib/admin/invitation-builder.js';
+import events from '../_lib/admin/events.js';
+import resources from '../_lib/admin/resources.js';
+import modules from '../_lib/admin/modules.js';
 import { json } from '../_lib/orders.js';
 
 const handlers: Record<string, { fetch: (request: Request) => Promise<Response> }> = {
@@ -33,6 +37,10 @@ const handlers: Record<string, { fetch: (request: Request) => Promise<Response> 
   'test-reminder': testReminder,
   'verify-code': verifyCode,
   'whatsapp-webhook': whatsappWebhook
+  , 'invitation-builder': invitationBuilder
+  , events
+  , resources
+  , modules
 };
 
 async function handler(request: Request) {

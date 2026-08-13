@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { readSheet } from "read-excel-file/browser";
-import mammoth from "mammoth/mammoth.browser";
 import "../admin-prototype.css";
 import {
   AdminI18nProvider,
@@ -86,10 +84,11 @@ type AdminOrder = {
   eventType: string;
   defaultPhoneCountryCode: string;
   language: AdminLanguage;
-  accessRole: "owner" | "editor" | "viewer";
+  accessRole: "owner" | "admin" | "editor" | "viewer";
   loginEmail: string;
   invitationUrl: string;
   giftDetails: string;
+  enabledModules: Array<"invitation" | "guests_rsvp" | "tables" | "check_in" | "messaging" | "collaborative_album" | "suppliers">;
 };
 
 const guestsSeed: Guest[] = [];
@@ -245,11 +244,13 @@ const readGuestFile = async (file: File) => {
   const extension = file.name.split(".").pop()?.toLowerCase();
   if (extension === "csv") return parseCsv(await file.text());
   if (extension === "xlsx") {
+    const { readSheet } = await import("read-excel-file/browser");
     return (await readSheet(file)).map((row: unknown[]) =>
       row.map((cell: unknown) => String(cell ?? "")),
     );
   }
   if (extension === "docx") {
+    const { default: mammoth } = await import("mammoth/mammoth.browser");
     const result = await mammoth.convertToHtml({
       arrayBuffer: await file.arrayBuffer(),
     });
@@ -302,6 +303,16 @@ const nav = [
   ["Accesos", "♢"],
   ["Configuración", "⚙"],
 ];
+
+const moduleForView: Record<string, AdminOrder["enabledModules"][number] | undefined> = {
+  Invitados: "guests_rsvp",
+  Restricciones: "guests_rsvp",
+  Canciones: "invitation",
+  Recordatorios: "messaging",
+  Agradecimientos: "messaging",
+  Mesas: "tables",
+  "Check-in": "check_in",
+};
 
 const countryCodes = [
   ["Uruguay", "+598"],
@@ -5038,12 +5049,14 @@ function Settings({
   orderNumber,
   order,
   onEventChange,
+  onModulesChange,
 }: {
   code: string;
   onChange: (value: string) => void;
   orderNumber: string;
   order: AdminOrder;
   onEventChange: (details: { eventName: string; eventDate: string }) => void;
+  onModulesChange: (modules: AdminOrder["enabledModules"]) => void;
 }) {
   const { text: t, locale } = useAdminI18n();
   const knownCode = countryCodes.some(([, value]) => value === code);
@@ -5057,6 +5070,7 @@ function Settings({
     useState(false);
   const [eventName, setEventName] = useState(order.customerName);
   const [eventDate, setEventDate] = useState(order.eventDate);
+  const [accountModules, setAccountModules] = useState<Array<{ module: AdminOrder["enabledModules"][number]; source: string; enabled: boolean }>>([]);
   const [testingReminder, setTestingReminder] = useState(false);
   const [healthBusy, setHealthBusy] = useState(true);
   const [health, setHealth] = useState<{
@@ -5099,6 +5113,22 @@ function Settings({
       },
     );
   }, []);
+
+  useEffect(() => {
+    fetch('/api/admin/modules', { cache: 'no-store' }).then(async (response) => {
+      if (response.ok) setAccountModules(((await response.json()) as { modules: typeof accountModules }).modules);
+    }).catch(() => undefined);
+  }, []);
+
+  const toggleAccountModule = async (module: AdminOrder["enabledModules"][number], enabled: boolean) => {
+    const response = await fetch('/api/admin/modules', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ module, enabled }) });
+    const result = await response.json() as { error?: string };
+    if (!response.ok) { setMessage(result.error || 'No pudimos actualizar el módulo.'); return; }
+    const next = accountModules.map((item) => item.module === module ? { ...item, enabled } : item);
+    setAccountModules(next);
+    onModulesChange(next.filter((item) => item.enabled).map((item) => item.module));
+    setMessage('Accesos de la cuenta actualizados.');
+  };
 
   const loadHealth = useCallback(async () => {
     setHealthBusy(true);
@@ -5368,6 +5398,10 @@ function Settings({
           "Os backups não incluem senhas nem códigos. Restaurar ou excluir dados sempre exige o número do pedido.",
         )}
       </ContextHelp>
+      <section className="panel settings-panel">
+        <div className="panel-title"><div><h2>Módulos de la cuenta</h2><p>Podés apagar o volver a prender los módulos incluidos en el plan. Los adicionales se contratan por separado.</p></div></div>
+        <div className="settings-module-grid">{accountModules.map((item) => <label key={item.module}><input type="checkbox" checked={item.enabled} disabled={!['owner', 'admin'].includes(order.accessRole)} onChange={(event) => toggleAccountModule(item.module, event.target.checked)} /><span>{({ invitation: 'Invitación', guests_rsvp: 'Invitados y RSVP', tables: 'Mesas', check_in: 'Check-in', messaging: 'Mensajería', collaborative_album: 'Álbum colaborativo', suppliers: 'Proveedores' } as Record<string, string>)[item.module]}</span><small>Incluido por {item.source === 'plan' ? 'plan' : item.source === 'addon' ? 'adicional' : item.source === 'role' ? 'rol' : 'configuración manual'}</small></label>)}</div>
+      </section>
       <section className="panel settings-panel">
         <div className="panel-title">
           <div>
@@ -5779,13 +5813,13 @@ function Settings({
 type AdminAccess = {
   id: string;
   email: string;
-  role: "editor" | "viewer";
+  role: "admin" | "editor" | "viewer";
   created_at: string;
 };
 type AdminActivity = {
   id: string;
   actor_email: string;
-  actor_role: "owner" | "editor" | "viewer";
+  actor_role: "owner" | "admin" | "editor" | "viewer";
   action: string;
   entity_type: string;
   entity_id: string | null;
@@ -5948,7 +5982,7 @@ function Accesses({ order }: { order: AdminOrder }) {
             )}
           </p>
         </div>
-        {order.accessRole === "owner" && (
+        {["owner", "admin"].includes(order.accessRole) && (
           <button
             className="primary-button small"
             onClick={() => setShowModal(true)}
@@ -5970,12 +6004,18 @@ function Accesses({ order }: { order: AdminOrder }) {
         )}
       >
         {t(
-          "Los editores pueden gestionar el evento. Los usuarios de solo lectura pueden consultar la información sin modificarla.",
-          "Editors can manage the event. View-only users can consult information without changing it.",
-          "Editores podem gerenciar o evento. Usuários de somente leitura podem consultar sem fazer alterações.",
+          "Los administradores gestionan el evento y sus colaboradores. Los editores modifican contenido y los usuarios de solo lectura sólo consultan.",
+          "Administrators manage the event and collaborators. Editors change content, while view-only users can only consult it.",
+          "Administradores gerenciam o evento e colaboradores. Editores alteram conteúdo e usuários de leitura apenas consultam.",
         )}
       </ContextHelp>
       <section className="metrics-grid mini">
+        <Metric
+          label={t("Administradores", "Administrators", "Administradores")}
+          value={String(accesses.filter((access) => access.role === "admin").length)}
+          note={t("gestionan accesos", "manage access", "gerenciam acessos")}
+          tone="blue"
+        />
         <Metric
           label={t("Propietarios", "Owners", "Proprietários")}
           value="1"
@@ -6029,7 +6069,7 @@ function Accesses({ order }: { order: AdminOrder }) {
                     <strong>{access.email}</strong>
                   </td>
                   <td>
-                    {order.accessRole === "owner" ? (
+                    {["owner", "admin"].includes(order.accessRole) ? (
                       <select
                         className="status-select"
                         value={access.role}
@@ -6042,11 +6082,14 @@ function Accesses({ order }: { order: AdminOrder }) {
                         }
                         aria-label={`${t("Rol de", "Role for", "Função de")} ${access.email}`}
                       >
+                        <option value="admin">{t("Administrador", "Administrator", "Administrador")}</option>
                         <option value="editor">Editor</option>
                         <option value="viewer">
                           {t("Solo lectura", "View only", "Somente leitura")}
                         </option>
                       </select>
+                    ) : access.role === "admin" ? (
+                      t("Administrador", "Administrator", "Administrador")
                     ) : access.role === "editor" ? (
                       "Editor"
                     ) : (
@@ -6059,7 +6102,7 @@ function Accesses({ order }: { order: AdminOrder }) {
                     </span>
                   </td>
                   <td>
-                    {order.accessRole === "owner" && (
+                    {["owner", "admin"].includes(order.accessRole) && (
                       <button
                         className="more-button"
                         disabled={updatingId === access.id}
@@ -6080,7 +6123,7 @@ function Accesses({ order }: { order: AdminOrder }) {
           </p>
         )}
       </section>
-      {order.accessRole === "owner" && (
+      {["owner", "admin"].includes(order.accessRole) && (
         <section className="panel table-panel audit-panel">
           <div className="panel-title">
             <div>
@@ -6178,6 +6221,7 @@ function Accesses({ order }: { order: AdminOrder }) {
               <label>
                 {t("Rol", "Role", "Função")}
                 <select name="role">
+                  <option value="admin">{t("Administrador", "Administrator", "Administrador")}</option>
                   <option value="editor">Editor</option>
                   <option value="viewer">
                     {t("Solo lectura", "View only", "Somente leitura")}
@@ -6442,10 +6486,28 @@ function Admin({
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [globalEditingId, setGlobalEditingId] = useState("");
+  const [eventPortfolio, setEventPortfolio] = useState<Array<{ id: string; orderNumber: string; name: string; eventDate: string }>>([]);
+  const [switchingEvent, setSwitchingEvent] = useState(false);
   const [comfortableText, setComfortableText] = useState(
     () =>
       window.sessionStorage.getItem("syd-admin-font-size") === "comfortable-v2",
   );
+  const hasViewAccess = useCallback((item: string) => {
+    const requiredModule = moduleForView[item];
+    return !requiredModule || order.enabledModules.includes(requiredModule);
+  }, [order.enabledModules]);
+  useEffect(() => {
+    fetch("/api/admin/events", { cache: "no-store" }).then(async (response) => {
+      if (response.ok) setEventPortfolio(((await response.json()) as { events: typeof eventPortfolio }).events);
+    }).catch(() => undefined);
+  }, []);
+  const switchEvent = async (orderNumber: string) => {
+    if (!orderNumber || orderNumber === order.orderNumber) return;
+    setSwitchingEvent(true);
+    const response = await fetch("/api/admin/events", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderNumber }) });
+    if (response.ok) window.location.reload();
+    else setSwitchingEvent(false);
+  };
   const navLabel = useCallback(
     (item: string) =>
       (
@@ -6507,6 +6569,7 @@ function Admin({
   }, []);
 
   const navigate = (item: string) => {
+    if (!hasViewAccess(item)) return;
     setView(item);
     setMobileNav(false);
   };
@@ -6536,13 +6599,16 @@ function Admin({
             <small>
               {t("Pedido", "Order", "Pedido")} {order.orderNumber}
             </small>
+            {eventPortfolio.length > 1 && <select aria-label={t("Cambiar evento", "Switch event", "Trocar evento")} value={order.orderNumber} disabled={switchingEvent} onChange={(event) => void switchEvent(event.target.value)}>
+              {eventPortfolio.map((item) => <option key={item.id} value={item.orderNumber}>{item.name}</option>)}
+            </select>}
           </div>
         </div>
         <nav>
           {nav
             .filter(
               ([item]) =>
-                item !== "Configuración" || order.accessRole === "owner",
+                hasViewAccess(item) && (item !== "Configuración" || ["owner", "admin"].includes(order.accessRole)),
             )
             .map(([item, icon]) => (
               <button
@@ -6646,6 +6712,8 @@ function Admin({
                 <small>
                   {order.accessRole === "owner"
                     ? t("Propietario", "Owner", "Proprietário")
+                    : order.accessRole === "admin"
+                      ? t("Administrador", "Administrator", "Administrador")
                     : order.accessRole === "editor"
                       ? "Editor"
                       : t("Solo lectura", "Read only", "Somente leitura")}
@@ -6703,6 +6771,7 @@ function Admin({
               orderNumber={order.orderNumber}
               order={order}
               onEventChange={({ eventName, eventDate }) => onOrderChange({ ...order, customerName: eventName, eventTitle: eventName, eventDate })}
+              onModulesChange={(enabledModules) => onOrderChange({ ...order, enabledModules })}
             />
           )}
         </div>

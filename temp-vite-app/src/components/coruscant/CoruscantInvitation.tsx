@@ -4,7 +4,7 @@ import { CORUSCANT_PALETTES, DEFAULT_CORUSCANT_CONFIG } from './config';
 import type { CoruscantPalette } from './config';
 import './coruscant.css';
 
-type Props={locale:AuroraLocale;palette:CoruscantPalette;embedded?:boolean;onClose?:()=>void;config?:Partial<AuroraConfig>};
+type Props={locale:AuroraLocale;palette:CoruscantPalette;embedded?:boolean;onClose?:()=>void;config?:Partial<AuroraConfig>;sectionOrder?:string[]};
 export function CoruscantInvitation(props:Props){
   const localized = {
     es:{calendarTitle:'Mis 15 años de Paz',photo:'Fotografía',distance:'A 10 minutos del salón'},

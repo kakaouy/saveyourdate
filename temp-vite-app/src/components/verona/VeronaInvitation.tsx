@@ -3,11 +3,12 @@ import QRCode from 'qrcode';
 import { DEFAULT_CONFIG, DICTIONARIES, PALETTES } from './config';
 import type { VeronaConfig, VeronaLocale, VeronaPalette } from './config';
 import './verona.css';
+import { applyInferredSectionDomOrder } from '../../domain/section-dom-order';
 
 type ModalName = 'map' | 'dress' | 'hotels' | 'gifts' | 'qr' | 'rsvp' | 'lightbox';
-type Props = { locale:VeronaLocale; palette:VeronaPalette; embedded?:boolean; onClose?:()=>void; config?:Partial<VeronaConfig> };
+type Props = { locale:VeronaLocale; palette:VeronaPalette; embedded?:boolean; onClose?:()=>void; config?:Partial<VeronaConfig>; sectionOrder?:string[] };
 
-export function VeronaInvitation({ locale, palette, embedded=false, onClose, config }:Props) {
+export function VeronaInvitation({ locale, palette, embedded=false, onClose, config, sectionOrder }:Props) {
   const t = DICTIONARIES[locale];
   const data = useMemo(() => ({ ...DEFAULT_CONFIG, ...config, event:{...DEFAULT_CONFIG.event,...config?.event}, links:{...DEFAULT_CONFIG.links,...config?.links}, gifts:{...DEFAULT_CONFIG.gifts,...config?.gifts}, content:{...DEFAULT_CONFIG.content,...config?.content}, qrPass:{...DEFAULT_CONFIG.qrPass,...config?.qrPass}, assets:{...DEFAULT_CONFIG.assets,...config?.assets}, theme:{...DEFAULT_CONFIG.theme,...config?.theme}, sections:{...DEFAULT_CONFIG.sections,...config?.sections}, metadata:{...DEFAULT_CONFIG.metadata,...config?.metadata} }), [config]);
   const [loaded,setLoaded] = useState(false); const [modal,setModal] = useState<ModalName|null>(null); const [lightbox,setLightbox] = useState(0);
@@ -24,10 +25,15 @@ export function VeronaInvitation({ locale, palette, embedded=false, onClose, con
     '--font-title':`"${data.theme.titleFont}", cursive`, '--font-body':`"${data.theme.bodyFont}", sans-serif`,
     '--font-signature':`"${data.theme.signatureFont}", cursive`, '--hero-image':`url("${data.assets.hero}")`,
     '--parallax-image':`url("${data.assets.parallax}")`, '--hero-position-mobile':data.assets.heroPositionMobile,
-    '--hero-position-desktop':data.assets.heroPositionDesktop, '--image-overlay-opacity':data.assets.heroOverlay
+    '--hero-position-desktop':data.assets.heroPositionDesktop, '--image-overlay-opacity':data.assets.heroOverlay,
+    '--modular-ornament-image':`url("${data.assets.ornamentRight}")`
   } as React.CSSProperties;
 
   useEffect(() => { const safety=window.setTimeout(()=>setLoaded(true),2600); const ready=window.setTimeout(()=>setLoaded(true),450); return()=>{clearTimeout(safety);clearTimeout(ready)} },[]);
+  useEffect(() => {
+    const canonical=['hero','countdown','location','quote','dressCode','schedule','parallax','gallery','hotels','gifts','photoUpload','social','qrPass','rsvp'].filter(id=>data.sections[id as keyof VeronaConfig['sections']]);
+    applyInferredSectionDomOrder(invitationRef.current?.querySelector<HTMLElement>('#verona-main')||null,sectionOrder,canonical,'data-v-section','.v-ornament');
+  },[sectionOrder,data.sections]);
   useEffect(() => { const update=()=>{ const delta=Math.max(0,new Date(data.event.dateTime).getTime()-Date.now()); setCountdown([Math.floor(delta/86400000),Math.floor(delta/3600000)%24,Math.floor(delta/60000)%60,Math.floor(delta/1000)%60]) }; update(); const id=setInterval(update,1000); return()=>clearInterval(id) },[data.event.dateTime]);
   useEffect(() => { QRCode.toDataURL(data.qrPass.value,{ width:240, margin:2, color:{dark:colors.texto,light:colors.claro} }).then(setQr).catch(()=>setQr('')) },[data.qrPass.value,colors.texto,colors.claro]);
   useEffect(() => { document.title=data.metadata.title||`${t.eventType} · ${data.event.name}`; const meta=document.querySelector<HTMLMetaElement>('meta[name="description"]'); if(meta)meta.content=data.metadata.description||t.quote.replace(/[“”]/g,''); },[data.metadata,data.event.name,t]);

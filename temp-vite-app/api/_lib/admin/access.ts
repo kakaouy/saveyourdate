@@ -2,7 +2,7 @@ import { findSession, readSessionToken } from '../admin-auth.js';
 import { emailShell, escapeHtml, json, sendEmail, supabaseRequest } from '../orders.js';
 import { logAdminActivity } from './audit.js';
 
-type AccessRow = { id: string; email: string; role: 'editor' | 'viewer'; created_at: string };
+type AccessRow = { id: string; email: string; role: 'admin' | 'editor' | 'viewer'; created_at: string };
 
 async function handler(request: Request) {
   try {
@@ -14,13 +14,13 @@ async function handler(request: Request) {
       );
       return json({ accesses: await response.json(), currentRole: session.access_role });
     }
-    if (session.access_role !== 'owner') return json({ error: 'Sólo el propietario puede administrar accesos.' }, 403);
+    if (!['owner', 'admin'].includes(session.access_role)) return json({ error: 'No tenés permiso para administrar accesos.' }, 403);
 
     if (request.method === 'POST') {
       const body = await request.json() as Record<string, unknown>;
       const email = String(body.email || '').trim().toLowerCase();
       const role = String(body.role || '');
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !['editor', 'viewer'].includes(role)) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !['admin', 'editor', 'viewer'].includes(role)) {
         return json({ error: 'Ingresá un email y un rol válidos.' }, 400);
       }
       const response = await supabaseRequest('event_admins', {
@@ -35,7 +35,7 @@ async function handler(request: Request) {
         idempotencyKey: `admin-access-${access.id}`,
         html: emailShell(
           'Acceso al panel Save Your Date',
-          `<p>Te invitaron como <strong>${role === 'editor' ? 'editor' : 'solo lectura'}</strong> del pedido <strong>${escapeHtml(session.order_number)}</strong>.</p>
+          `<p>Te invitaron como <strong>${role === 'admin' ? 'administrador' : role === 'editor' ? 'editor' : 'solo lectura'}</strong> del pedido <strong>${escapeHtml(session.order_number)}</strong>.</p>
            <p>Ingresá en <a href="https://www.saveyourdate.site/admin">saveyourdate.site/admin</a> usando este email y el número de pedido.</p>`
         )
       });
@@ -47,7 +47,7 @@ async function handler(request: Request) {
       const body = await request.json() as Record<string, unknown>;
       const id = String(body.id || '');
       const role = String(body.role || '');
-      if (!id || !['editor', 'viewer'].includes(role)) {
+      if (!id || !['admin', 'editor', 'viewer'].includes(role)) {
         return json({ error: 'Seleccioná un rol válido.' }, 400);
       }
       const response = await supabaseRequest(

@@ -113,7 +113,7 @@ create table if not exists public.event_admins (
   id uuid primary key default gen_random_uuid(),
   order_number text not null references public.orders(order_number) on delete cascade,
   email text not null,
-  role text not null default 'editor' check (role in ('editor', 'viewer')),
+  role text not null default 'editor' check (role in ('admin', 'editor', 'viewer')),
   created_at timestamptz not null default now(),
   unique(order_number, email)
 );
@@ -223,7 +223,7 @@ create table if not exists public.admin_activity_log (
   id uuid primary key default gen_random_uuid(),
   order_number text not null references public.orders(order_number) on delete cascade,
   actor_email text not null,
-  actor_role text not null check (actor_role in ('owner', 'editor', 'viewer')),
+  actor_role text not null check (actor_role in ('owner', 'admin', 'editor', 'viewer')),
   action text not null,
   entity_type text not null,
   entity_id text,

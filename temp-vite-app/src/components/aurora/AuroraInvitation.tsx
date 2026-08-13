@@ -13,6 +13,7 @@ import type {
   AuroraTone
 } from './config';
 import './aurora.css';
+import { applySectionDomOrder } from '../../domain/section-dom-order';
 
 type ModalName = 'dress' | 'hotels' | 'gifts' | 'songs' | 'qr' | 'rsvp' | 'lightbox';
 type SubmitState = 'idle' | 'loading' | 'success' | 'error';
@@ -28,6 +29,7 @@ type Props = {
   astraeaHero?: boolean;
   globalPetals?: boolean;
   carouselGallery?: boolean;
+  sectionOrder?: string[];
 };
 
 const sectionClass = (tone: AuroraTone = 'light') => `au-section au-tone-${tone}`;
@@ -43,7 +45,8 @@ export function AuroraInvitation({
   editorialHero = false,
   astraeaHero = false,
   globalPetals = false,
-  carouselGallery = false
+  carouselGallery = false,
+  sectionOrder
 }: Props) {
   const t = AURORA_COPY[locale];
   const data = useMemo(() => ({
@@ -95,6 +98,7 @@ export function AuroraInvitation({
     '--hero-position-mobile': data.assets.heroPositionMobile,
     '--hero-position-desktop': data.assets.heroPositionDesktop,
     '--hero-overlay': data.assets.heroOverlay
+    , '--modular-ornament-image': `url("${data.assets.ornamentRight}")`
   } as React.CSSProperties;
 
   useEffect(() => {
@@ -145,6 +149,10 @@ export function AuroraInvitation({
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
   }, [data.sections]);
+
+  useEffect(() => {
+    applySectionDomOrder(rootRef.current?.querySelector<HTMLElement>('#aurora-main') || null, sectionOrder, 'data-au-section', '.au-section-ornament');
+  }, [sectionOrder, data.sections]);
 
   useEffect(() => {
     const scroller = rootRef.current;

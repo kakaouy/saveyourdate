@@ -12,6 +12,7 @@ import type {
   RosewoodTone
 } from './config';
 import './rosewood.css';
+import { applySectionDomOrder } from '../../domain/section-dom-order';
 
 type ModalName = 'dress' | 'hotels' | 'gifts' | 'songs' | 'qr' | 'rsvp' | 'lightbox';
 type SubmitState = 'idle' | 'loading' | 'success' | 'error';
@@ -21,6 +22,7 @@ type Props = {
   embedded?: boolean;
   onClose?: () => void;
   config?: Partial<RosewoodConfig>;
+  sectionOrder?: string[];
 };
 
 const sectionClass = (tone: RosewoodTone = 'light') => `rw-section rw-tone-${tone}`;
@@ -30,7 +32,8 @@ export function RosewoodInvitation({
   palette,
   embedded = false,
   onClose,
-  config
+  config,
+  sectionOrder
 }: Props) {
   const t = ROSEWOOD_COPY[locale];
   const data = useMemo(() => ({
@@ -62,7 +65,12 @@ export function RosewoodInvitation({
   const [rsvpState, setRsvpState] = useState<SubmitState>('idle');
   const [songState, setSongState] = useState<SubmitState>('idle');
 
+  useEffect(() => {
+    applySectionDomOrder(rootRef.current?.querySelector<HTMLElement>('#rosewood-main') || null, sectionOrder, 'data-rw-section', '.rw-section-ornament');
+  }, [sectionOrder, data.sections]);
+
   const cssVars = {
+    '--modular-ornament-image': `url("${data.assets.ornamentRight}")`,
     '--color-fondo': colors.fondo,
     '--color-fondo-alterno': colors.alterno,
     '--color-titulos': colors.titulos,

@@ -1,13 +1,16 @@
 import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
-import OrderStatusPage from './components/OrderStatusPage.tsx'
-import PaymentValidationPage from './components/PaymentValidationPage.tsx'
-import PreparationPreviewPage from './components/PreparationPreviewPage.tsx'
-import OrderLookupPage from './components/OrderLookupPage.tsx'
-import GuestRsvpPage from './components/GuestRsvpPage.tsx'
+import './App.css'
 
+const App = lazy(() => import('./App.tsx'))
+const OrderStatusPage = lazy(() => import('./components/OrderStatusPage.tsx'))
+const PaymentValidationPage = lazy(() => import('./components/PaymentValidationPage.tsx'))
+const PreparationPreviewPage = lazy(() => import('./components/PreparationPreviewPage.tsx'))
+const OrderLookupPage = lazy(() => import('./components/OrderLookupPage.tsx'))
+const GuestRsvpPage = lazy(() => import('./components/GuestRsvpPage.tsx'))
+const PublishedInvitationPage = lazy(() => import('./components/PublishedInvitationPage.tsx'))
+const InvitationReviewPage = lazy(() => import('./components/InvitationReviewPage.tsx'))
 const AdminPrototype = lazy(() => import('./components/AdminPrototype.tsx'))
 
 const pathname = window.location.pathname.replace(/\/+$/, '') || '/'
@@ -23,11 +26,15 @@ const Page = pathname === '/estado'
     ? PaymentValidationPage
     : pathname === '/preparando'
       ? PreparationPreviewPage
+    : pathname.startsWith('/i/')
+      ? PublishedInvitationPage
+    : pathname === '/revision-invitacion'
+      ? InvitationReviewPage
     : App
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Suspense fallback={null}>
+    <Suspense fallback={<main className="route-loading" aria-live="polite">Cargando…</main>}>
       <Page />
     </Suspense>
   </StrictMode>,

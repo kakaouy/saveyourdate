@@ -57,7 +57,7 @@ export const validateBackup = (value: unknown, expectedOrderNumber: string) => {
   }
   for (const collaborator of collaborators) {
     const email = String(collaborator.email || '').trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !['editor', 'viewer'].includes(String(collaborator.role))) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !['admin', 'editor', 'viewer'].includes(String(collaborator.role))) {
       return { error: 'El respaldo contiene un colaborador inválido.' } as const;
     }
   }
