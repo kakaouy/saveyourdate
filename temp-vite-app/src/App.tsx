@@ -1226,7 +1226,7 @@ function App() {
   const pageParams = new URLSearchParams(window.location.search);
   const embeddedPreview = pageParams.get('embeddedPreview') === '1';
   const previewModelId = pageParams.get('previewModel');
-  const builderMode = pageParams.get('builder') === 'aurora';
+  const builderMode = pageParams.has('builder');
   const changeOrderNumber = pageParams.get('pedido') || '';
   // Navigation & Language UI States
   const [lang, setLang] = useState<'es' | 'en' | 'pt'>('es');

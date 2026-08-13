@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { auroraConfigFromBuilder, createAuroraBuilderDocument } from '../aurora/builder';
+import { auroraConfigFromBuilder } from '../aurora/builder';
 import { moveInvitationSection, normalizeSectionOrder } from '../../domain/invitation-builder';
 import type { InvitationBuilderDocument } from '../../domain/invitation-builder';
 import { validateInvitationForReview } from '../../domain/invitation-validation';
@@ -23,7 +23,10 @@ const SECTION_COPY_FIELDS = [
 ] as const;
 
 export default function InvitationBuilderPage() {
-  const [document, setDocument] = useState<InvitationBuilderDocument>(createAuroraBuilderDocument);
+  const [document, setDocument] = useState<InvitationBuilderDocument>(() => {
+    const requestedTemplate = new URLSearchParams(window.location.search).get('builder') || 'aurora';
+    return builderTemplate(requestedTemplate).createDocument();
+  });
   const [viewport, setViewport] = useState<'phone' | 'desktop'>('phone');
   const [mobilePanel, setMobilePanel] = useState<'edit' | 'preview'>('edit');
   const [saved, setSaved] = useState(false);
@@ -91,6 +94,9 @@ export default function InvitationBuilderPage() {
   const changeTemplate = (templateId: string) => {
     const selected = builderTemplate(templateId);
     const next = selected.createDocument();
+    const url = new URL(window.location.href);
+    url.searchParams.set('builder', selected.id);
+    window.history.replaceState(null, '', url);
     setSaved(false);
     setDirty(true);
     setDocument(switchInvitationTemplate(document, next));
