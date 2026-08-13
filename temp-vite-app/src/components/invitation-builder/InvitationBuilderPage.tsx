@@ -50,7 +50,7 @@ export default function InvitationBuilderPage() {
     setSaved(false);
     setDocument((current) => ({ ...current, ...change }));
   };
-  const updateContentGroup = (group: string, field: string, value: string) => updateDocument({
+  const updateContentGroup = (group: string, field: string, value: unknown) => updateDocument({
     content: {
       ...document.content,
       [group]: { ...(document.content[group] as Record<string, unknown>), [field]: value }
@@ -239,6 +239,12 @@ export default function InvitationBuilderPage() {
         <section><h2>Imágenes principales</h2>
           <label>Imagen de portada<input value={assets.hero} onChange={(e) => updateContentGroup('assets', 'hero', e.target.value)} /></label>
           <label>Foto destacada<input value={assets.parallax} onChange={(e) => updateContentGroup('assets', 'parallax', e.target.value)} /></label>
+          <label>Encuadre de portada en celular<input list="builder-image-positions" value={assets.heroPositionMobile} onChange={(e) => updateContentGroup('assets', 'heroPositionMobile', e.target.value)} /></label>
+          <label>Encuadre de portada en escritorio<input list="builder-image-positions" value={assets.heroPositionDesktop} onChange={(e) => updateContentGroup('assets', 'heroPositionDesktop', e.target.value)} /></label>
+          <datalist id="builder-image-positions"><option value="center" /><option value="center top" /><option value="center bottom" /><option value="left top" /><option value="left center" /><option value="left bottom" /><option value="right top" /><option value="right center" /><option value="right bottom" /></datalist>
+          <label>Oscurecimiento de portada<select value={String(assets.heroOverlay)} onChange={(e) => updateContentGroup('assets', 'heroOverlay', Number(e.target.value))}>
+            <option value="0">Sin oscurecer</option><option value="0.16">Suave · 16%</option><option value="0.3">Medio · 30%</option><option value="0.45">Alto · 45%</option><option value="0.6">Muy alto · 60%</option>
+          </select></label>
         </section>
         <section><div className="builder-section-title"><h2>Cronograma</h2><button type="button" onClick={() => addArrayItem('schedule')}>+ Agregar</button></div>{schedule.map((item, index) => <fieldset className="builder-fieldset" key={index}><legend>Momento {index + 1}</legend>
           <label>Hora<input type="time" value={item.time} onChange={(e) => updateArrayItem('schedule', index, 'time', e.target.value)} /></label>
