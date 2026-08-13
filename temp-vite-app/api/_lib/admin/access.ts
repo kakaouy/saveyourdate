@@ -23,22 +23,40 @@ async function handler(request: Request) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !['admin', 'editor', 'viewer'].includes(role)) {
         return json({ error: 'Ingresá un email y un rol válidos.' }, 400);
       }
+      if (email === session.login_email.toLowerCase()) {
+        return json({ error: 'Ese email ya corresponde a tu acceso actual.' }, 409);
+      }
+      const existingResponse = await supabaseRequest(
+        `event_admins?order_number=eq.${encodeURIComponent(session.order_number)}&email=eq.${encodeURIComponent(email)}&select=id&limit=1`
+      );
+      if (((await existingResponse.json()) as Array<{ id: string }>).length) {
+        return json({ error: 'Esa persona ya tiene acceso al evento. Podés cambiar su rol desde la lista.' }, 409);
+      }
       const response = await supabaseRequest('event_admins', {
         method: 'POST',
         headers: { Prefer: 'return=representation' },
         body: JSON.stringify({ order_number: session.order_number, email, role })
       });
       const access = ((await response.json()) as AccessRow[])[0];
-      await sendEmail({
-        to: email,
-        subject: 'Te invitaron a administrar un evento',
-        idempotencyKey: `admin-access-${access.id}`,
-        html: emailShell(
-          'Acceso al panel Save Your Date',
-          `<p>Te invitaron como <strong>${role === 'admin' ? 'administrador' : role === 'editor' ? 'editor' : 'solo lectura'}</strong> del pedido <strong>${escapeHtml(session.order_number)}</strong>.</p>
-           <p>Ingresá en <a href="https://www.saveyourdate.site/admin">saveyourdate.site/admin</a> usando este email y el número de pedido.</p>`
-        )
-      });
+      if (!access) return json({ error: 'No pudimos crear el acceso.' }, 500);
+      try {
+        await sendEmail({
+          to: email,
+          subject: 'Te invitaron a administrar un evento',
+          idempotencyKey: `admin-access-${access.id}`,
+          html: emailShell(
+            'Acceso al panel Save Your Date',
+            `<p>Te invitaron como <strong>${role === 'admin' ? 'administrador' : role === 'editor' ? 'editor' : 'solo lectura'}</strong> del pedido <strong>${escapeHtml(session.order_number)}</strong>.</p>
+             <p>Ingresá en <a href="https://www.saveyourdate.site/admin">saveyourdate.site/admin</a> usando este email y el número de pedido.</p>`
+          )
+        });
+      } catch (emailError) {
+        await supabaseRequest(
+          `event_admins?id=eq.${encodeURIComponent(access.id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
+          { method: 'DELETE' }
+        );
+        throw emailError;
+      }
       await logAdminActivity(session, 'access.created', 'access', access.id, { email: access.email, role: access.role });
       return json({ access }, 201);
     }

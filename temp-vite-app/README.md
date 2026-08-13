@@ -26,6 +26,14 @@ ORDER_ADMIN_EMAIL=saveyourdate.invite@gmail.com
 ORDER_EMAIL_FROM=Save Your Date <hello@saveyourdate.site>
 PUBLIC_APP_URL=https://www.saveyourdate.site
 ORDER_APPROVAL_SECRET=una-cadena-aleatoria-larga-de-al-menos-32-caracteres
+CRON_SECRET=otra-cadena-aleatoria-larga
+WHATSAPP_ACCESS_TOKEN=token-permanente-de-meta
+WHATSAPP_PHONE_NUMBER_ID=id-del-numero
+WHATSAPP_TEMPLATE_NAME=nombre-de-la-plantilla-aprobada
+WHATSAPP_TEMPLATE_LANGUAGE=es
+WHATSAPP_GRAPH_VERSION=vXX.X
+WHATSAPP_APP_SECRET=secreto-de-la-aplicacion-meta
+WHATSAPP_WEBHOOK_VERIFY_TOKEN=token-propio-para-verificar-el-webhook
 ```
 
 En proyectos nuevos, usar la **Secret key** con prefijo `sb_secret_`. El nombre
@@ -33,6 +41,19 @@ de la variable se conserva por compatibilidad con proyectos anteriores.
 
 `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` y `ORDER_APPROVAL_SECRET` son
 secretos: nunca deben usar el prefijo `VITE_` ni incorporarse al frontend.
+
+Las variables `WHATSAPP_*` también son privadas. El token, el identificador del
+número, la plantilla y la versión de Graph habilitan el envío mediante WhatsApp
+Business; el idioma de plantilla es opcional y usa `es` por defecto.
+`WHATSAPP_APP_SECRET` y
+`WHATSAPP_WEBHOOK_VERIFY_TOKEN` habilitan la validación del webhook y permiten
+mostrar si cada mensaje fue enviado, entregado, leído o rechazado. Sin la
+configuración Business, el panel abre WhatsApp manualmente y lo identifica como
+un envío preparado, no como una entrega confirmada.
+
+`CRON_SECRET` protege la ejecución de los recordatorios automáticos. El panel
+privado muestra el estado de base de datos, correo, WhatsApp y automatización
+sin revelar el contenido de estas variables.
 
 En Resend debe verificarse `saveyourdate.site` antes de enviar desde
 `hello@saveyourdate.site`. Las respuestas se dirigen a `ORDER_ADMIN_EMAIL`.

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { INVITATION_MODELS } from './data/models';
 import type { InvitationModel } from './data/models';
 import OrderFlow from './components/OrderFlow';
@@ -1235,7 +1235,18 @@ function App() {
   const [selectedModelColors, setSelectedModelColors] = useState<Record<string, string>>({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showExtrasModal, setShowExtrasModal] = useState(false);
+  const [canScrollModelsLeft, setCanScrollModelsLeft] = useState(false);
+  const [canScrollModelsRight, setCanScrollModelsRight] = useState(false);
   const carouselRef = React.useRef<HTMLDivElement>(null);
+
+  const updateModelCarouselControls = useCallback(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
+    setCanScrollModelsLeft(carousel.scrollLeft > 2);
+    setCanScrollModelsRight(maxScrollLeft - carousel.scrollLeft > 2);
+  }, []);
 
   useEffect(() => {
     setHeroPhraseIndex(0);
@@ -1419,6 +1430,18 @@ function App() {
   const filteredModels = selectedCategory === 'all' 
     ? CATALOG_MODELS
     : CATALOG_MODELS.filter(m => m.category === selectedCategory);
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    carousel.scrollTo({ left: 0 });
+    updateModelCarouselControls();
+
+    const handleResize = () => updateModelCarouselControls();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [selectedCategory, filteredModels.length, updateModelCarouselControls]);
 
   // Handler for Sidebar Toggling
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -2264,15 +2287,15 @@ function App() {
 
           {/* Filter Navigation */}
           <div className="filter-tabs">
-            <button className={`filter-btn ${selectedCategory === 'all' ? 'active' : ''}`} onClick={() => setSelectedCategory('all')}>{t.catalog.filterAll}</button>
-            <button className={`filter-btn ${selectedCategory === 'wedding' ? 'active' : ''}`} onClick={() => setSelectedCategory('wedding')}>{t.catalog.filterWedding}</button>
-            <button className={`filter-btn ${selectedCategory === '15years' ? 'active' : ''}`} onClick={() => setSelectedCategory('15years')}>{t.catalog.filter15}</button>
-            <button className={`filter-btn ${selectedCategory === 'other' ? 'active' : ''}`} onClick={() => setSelectedCategory('other')}>{t.catalog.filterOther}</button>
+            <button className={`filter-btn ${selectedCategory === 'all' ? 'active' : ''}`} aria-pressed={selectedCategory === 'all'} onClick={() => setSelectedCategory('all')}>{t.catalog.filterAll}</button>
+            <button className={`filter-btn ${selectedCategory === 'wedding' ? 'active' : ''}`} aria-pressed={selectedCategory === 'wedding'} onClick={() => setSelectedCategory('wedding')}>{t.catalog.filterWedding}</button>
+            <button className={`filter-btn ${selectedCategory === '15years' ? 'active' : ''}`} aria-pressed={selectedCategory === '15years'} onClick={() => setSelectedCategory('15years')}>{t.catalog.filter15}</button>
+            <button className={`filter-btn ${selectedCategory === 'other' ? 'active' : ''}`} aria-pressed={selectedCategory === 'other'} onClick={() => setSelectedCategory('other')}>{t.catalog.filterOther}</button>
           </div>
 
           {/* Grid of models (now horizontal swimlane carousel) */}
           <div className="models-carousel-wrapper">
-            <div ref={carouselRef} className="models-swimlane-container">
+            <div ref={carouselRef} className="models-swimlane-container" onScroll={updateModelCarouselControls}>
               {filteredModels.map((model) => {
                 const modelPaletteOptions = getModelPaletteOptions(model);
                 const selectedColor = selectedModelColors[model.id] || modelPaletteOptions[0].color;
@@ -2409,10 +2432,10 @@ function App() {
 
             {/* Carousel navigation controls */}
             <div className="carousel-controls">
-              <button className="carousel-control-btn prev" onClick={scrollCarouselLeft} aria-label="Anterior">
+              <button className="carousel-control-btn prev" onClick={scrollCarouselLeft} aria-label={lang === 'es' ? 'Modelos anteriores' : lang === 'en' ? 'Previous models' : 'Modelos anteriores'} disabled={!canScrollModelsLeft}>
                 ←
               </button>
-              <button className="carousel-control-btn more" onClick={scrollCarouselRight}>
+              <button className="carousel-control-btn more" onClick={scrollCarouselRight} disabled={!canScrollModelsRight}>
                 {lang === 'es' ? 'Ver más' : (lang === 'en' ? 'See more' : 'Ver mais')} <span className="arrow">→</span>
               </button>
             </div>

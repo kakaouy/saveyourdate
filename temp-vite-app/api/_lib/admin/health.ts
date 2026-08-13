@@ -2,9 +2,11 @@ import { findSession, readSessionToken } from '../admin-auth.js';
 import { json, supabaseRequest } from '../orders.js';
 
 type ServiceStatus = {
-  status: 'ok' | 'error';
+  status: 'ok' | 'warning' | 'error';
   detail: string;
 };
+
+const hasEnv = (...names: string[]) => names.every((name) => Boolean(process.env[name]));
 
 async function handler(request: Request) {
   if (request.method !== 'GET') return json({ error: 'Método no permitido.' }, 405);
@@ -24,6 +26,19 @@ async function handler(request: Request) {
     database.detail = 'No responde';
   }
 
+  const whatsappSending = hasEnv(
+    'WHATSAPP_ACCESS_TOKEN',
+    'WHATSAPP_PHONE_NUMBER_ID',
+    'WHATSAPP_TEMPLATE_NAME',
+    'WHATSAPP_GRAPH_VERSION'
+  );
+  const whatsappTracking = hasEnv('WHATSAPP_APP_SECRET', 'WHATSAPP_WEBHOOK_VERIFY_TOKEN');
+  const whatsapp: ServiceStatus = !whatsappSending
+    ? { status: 'error', detail: 'Falta configuración' }
+    : !whatsappTracking
+      ? { status: 'warning', detail: 'Envío listo; falta seguimiento' }
+      : { status: 'ok', detail: 'Envío y seguimiento listos' };
+
   return json({
     checkedAt: new Date().toISOString(),
     services: {
@@ -35,7 +50,8 @@ async function handler(request: Request) {
       scheduler: {
         status: process.env.CRON_SECRET ? 'ok' : 'error',
         detail: process.env.CRON_SECRET ? 'Configurado' : 'Falta configuración'
-      }
+      },
+      whatsapp
     }
   });
 }

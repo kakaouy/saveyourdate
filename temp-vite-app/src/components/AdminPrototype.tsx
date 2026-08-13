@@ -1368,9 +1368,9 @@ function Guests({
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
+  const [notice, setNotice] = useState("");
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
   const [copiedId, setCopiedId] = useState("");
   const [newGuestCode, setNewGuestCode] = useState(defaultPhoneCountryCode);
   const [newIdentificationType, setNewIdentificationType] = useState(
@@ -1692,19 +1692,25 @@ function Guests({
       `Hi ${guest.name}, we'd love to invite you to ${defaultInviter}. Details and RSVP: ${link}`,
       `Olá ${guest.name}, queremos convidar você para ${defaultInviter}. Detalhes e confirmação: ${link}`,
     );
-    window.open(
+    const popup = window.open(
       `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
       "_blank",
-      "noopener,noreferrer",
     );
-    const invitationSentAt = new Date().toISOString();
-    setGuests((current) =>
-      current.map((item) =>
-        item.id === guest.id
-          ? { ...item, whatsappStatus: "sent", invitationSentAt }
-          : item,
-      ),
-    );
+    if (!popup) {
+      setError(t(
+        "El navegador bloqueó WhatsApp. Habilitá las ventanas emergentes e intentá nuevamente.",
+        "The browser blocked WhatsApp. Allow pop-ups and try again.",
+        "O navegador bloqueou o WhatsApp. Permita pop-ups e tente novamente.",
+      ));
+      return;
+    }
+    popup.opener = null;
+    setUpdatingId(guest.id);
+    setNotice(t(
+      `WhatsApp quedó abierto para ${guest.name}. Registrando el envío…`,
+      `WhatsApp is open for ${guest.name}. Recording the send…`,
+      `O WhatsApp foi aberto para ${guest.name}. Registrando o envio…`,
+    ));
     void fetch("/api/admin/guests", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -1721,6 +1727,7 @@ function Guests({
         setGuests((current) =>
           current.map((item) => (item.id === guest.id ? result.guest! : item)),
         );
+        setNotice(t("Invitación registrada como enviada.", "Invitation recorded as sent.", "Convite registrado como enviado."));
       })
       .catch((sendError) =>
         setError(
@@ -1728,7 +1735,8 @@ function Guests({
             ? sendError.message
             : "No pudimos registrar el envío.",
         ),
-      );
+      )
+      .finally(() => setUpdatingId(""));
   };
 
   const downloadTemplate = () =>
@@ -2363,12 +2371,12 @@ function Guests({
                       >
                         {copiedId === guest.id ? "✓" : "⧉"}
                       </button>}
-                      {!guest.archivedAt && <button
+                      {canEdit && !guest.archivedAt && <button
                         className="whatsapp-button"
-                        disabled={!guest.phone}
+                        disabled={!guest.phone || updatingId === guest.id}
                         onClick={() => openWhatsAppInvite(guest)}
                       >
-                        WA
+                        {updatingId === guest.id ? "…" : "WA"}
                       </button>}
                       {canEdit && !guest.archivedAt && <>
                         <button
@@ -4547,6 +4555,9 @@ function SimpleModule({
   const [invitationLink, setInvitationLink] = useState(order.invitationUrl);
   const [savingInvitation, setSavingInvitation] = useState(false);
   const [customConfirmationUrl, setCustomConfirmationUrl] = useState("");
+  const [selectedReminderIds, setSelectedReminderIds] = useState<string[]>([]);
+  const [bulkReminderProgress, setBulkReminderProgress] = useState("");
+  const [bulkReminderBusy, setBulkReminderBusy] = useState(false);
   const restrictions = guests.flatMap((guest) => [
     ...(guest.food !== "—" && guest.food !== "Ninguna" ? [guest] : []),
     ...guest.companions
@@ -4573,6 +4584,21 @@ function SimpleModule({
     ? previewBaseUrl
     : `${previewBaseUrl}${previewSeparator}token=${previewGuest?.inviteToken || "enlace-personal"}`;
   const reminderPreview = `Hola ${previewGuest?.name || t("María", "Mary", "Maria")}.\n\n${reminderMessage}\n\n${t("Confirmar asistencia", "Confirm attendance", "Confirmar presença")}: ${previewConfirmationUrl}`;
+  const validateReminderSetup = () => {
+    if (!reminderMessage.trim()) return t("Escribí el contenido del recordatorio.", "Write the reminder message.", "Escreva o conteúdo do lembrete.");
+    const value = confirmationTarget === "invitation" ? invitationLink : confirmationTarget === "custom" ? customConfirmationUrl : "";
+    if (confirmationTarget !== "rsvp") {
+      try {
+        const parsed = new URL(value);
+        if (!["http:", "https:"].includes(parsed.protocol)) throw new Error();
+      } catch {
+        return confirmationTarget === "invitation"
+          ? t("Asociá un enlace válido para la invitación.", "Link a valid invitation URL.", "Associe um link válido para o convite.")
+          : t("Ingresá un enlace alternativo válido.", "Enter a valid alternative URL.", "Insira um link alternativo válido.");
+      }
+    }
+    return "";
+  };
 
   const saveInvitationLink = async () => {
     if (!invitationLink.trim() || invitationLink === order.invitationUrl) return;
@@ -4721,10 +4747,13 @@ function SimpleModule({
         delivered: [adminStatus(language, "delivered"), "delivered"],
         read: [adminStatus(language, "read"), "read"],
         failed: [adminStatus(language, "failed"), "failed"],
+        manual: [t("Preparado manualmente", "Prepared manually", "Preparado manualmente"), "pending"],
       }) as Record<string, [string, string]>
     )[value] || [t("Sin envío", "Not sent", "Não enviado"), "empty"];
 
   const remindGuest = async (guest: Guest) => {
+    const setupError = validateReminderSetup();
+    if (setupError) { setModuleError(setupError); return; }
     setRemindingId(guest.id);
     setModuleError("");
     try {
@@ -4764,6 +4793,8 @@ function SimpleModule({
   };
 
   const emailReminder = async (guest: Guest) => {
+    const setupError = validateReminderSetup();
+    if (setupError) { setModuleError(setupError); return; }
     setRemindingId(guest.id);
     setModuleError("");
     try {
@@ -4800,6 +4831,55 @@ function SimpleModule({
       );
     } finally {
       setRemindingId("");
+    }
+  };
+
+  const emailSelectedReminders = async () => {
+    const setupError = validateReminderSetup();
+    if (setupError) { setModuleError(setupError); return; }
+    const recipients = pending.filter((guest) => selectedReminderIds.includes(guest.id) && guest.email);
+    if (!recipients.length) return;
+    if (!window.confirm(t(
+      `¿Enviar ${recipients.length} recordatorios por email?`,
+      `Send ${recipients.length} email reminders?`,
+      `Enviar ${recipients.length} lembretes por email?`,
+    ))) return;
+    setModuleError("");
+    setBulkReminderBusy(true);
+    let sent = 0;
+    try {
+      for (const guest of recipients) {
+        setBulkReminderProgress(t(
+          `Enviando ${sent + 1} de ${recipients.length}…`,
+          `Sending ${sent + 1} of ${recipients.length}…`,
+          `Enviando ${sent + 1} de ${recipients.length}…`,
+        ));
+        const response = await fetch("/api/admin/guests", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: guest.id, action: "remind-email", template: "message", message: reminderMessage, giftText, confirmationTarget, customConfirmationUrl, invitationUrlOverride: invitationLink }),
+        });
+        const result = await response.json() as { guest?: Guest; error?: string };
+        if (!response.ok || !result.guest) throw new Error(result.error || t("Revisá los datos y volvé a intentar.", "Check the details and try again.", "Revise os dados e tente novamente."));
+        sent += 1;
+        setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+      }
+      setSelectedReminderIds([]);
+      setBulkReminderProgress(t(
+        `${sent} recordatorios enviados correctamente.`,
+        `${sent} reminders sent successfully.`,
+        `${sent} lembretes enviados com sucesso.`,
+      ));
+    } catch (sendError) {
+      const detail = sendError instanceof Error ? sendError.message : t("Revisá los datos y volvé a intentar.", "Check the details and try again.", "Revise os dados e tente novamente.");
+      setModuleError(t(
+        `Se enviaron ${sent} de ${recipients.length}. ${detail}`,
+        `${sent} of ${recipients.length} were sent. ${detail}`,
+        `${sent} de ${recipients.length} foram enviados. ${detail}`,
+      ));
+      setBulkReminderProgress("");
+    } finally {
+      setBulkReminderBusy(false);
     }
   };
 
@@ -4905,11 +4985,14 @@ function SimpleModule({
       <section className="panel table-panel">
         <div className="table-tools">
           <label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label>
+          {view === "Recordatorios" && canEdit && selectedReminderIds.length > 0 && <div className="reminder-bulk-bar"><strong>{selectedReminderIds.length} {t("seleccionados", "selected", "selecionados")}</strong><button className="primary-button small" type="button" disabled={bulkReminderBusy} onClick={() => void emailSelectedReminders()}>{bulkReminderBusy ? bulkReminderProgress : t("Enviar emails", "Send emails", "Enviar emails")}</button><button className="outline-button compact" type="button" disabled={bulkReminderBusy} onClick={() => setSelectedReminderIds([])}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
         </div>
+        {view === "Recordatorios" && bulkReminderProgress && !moduleError && <p className="import-success" role="status">{bulkReminderProgress}</p>}
         <div className="table-scroll">
           <table>
             <thead>
               <tr>
+                {view === "Recordatorios" && canEdit && <th className="checkbox-cell"><input type="checkbox" aria-label={t("Seleccionar pendientes con email", "Select pending guests with email", "Selecionar pendentes com email")} checked={content.rows.filter((guest) => guest.email).length > 0 && content.rows.filter((guest) => guest.email).every((guest) => selectedReminderIds.includes(guest.id))} onChange={(event) => setSelectedReminderIds(event.target.checked ? content.rows.filter((guest) => guest.email).map((guest) => guest.id) : [])} /></th>}
                 {content.headers.map((header) => (
                   <th key={header}>{header}</th>
                 ))}
@@ -4918,6 +5001,7 @@ function SimpleModule({
             <tbody>
               {content.rows.map((guest, index) => (
                 <tr key={guest.id}>
+                  {view === "Recordatorios" && canEdit && <td className="checkbox-cell"><input type="checkbox" disabled={!guest.email} checked={selectedReminderIds.includes(guest.id)} aria-label={`${t("Seleccionar", "Select", "Selecionar")} ${guest.name}`} onChange={(event) => setSelectedReminderIds((current) => event.target.checked ? [...new Set([...current, guest.id])] : current.filter((id) => id !== guest.id))} /></td>}
                   <td>
                     <div className="person">
                       <GuestAvatar guest={guest} />
@@ -5076,8 +5160,8 @@ function Settings({
   const [health, setHealth] = useState<{
     checkedAt: string;
     services: Record<
-      "database" | "email" | "scheduler",
-      { status: "ok" | "error"; detail: string }
+      "database" | "email" | "scheduler" | "whatsapp",
+      { status: "ok" | "warning" | "error"; detail: string }
     >;
   } | null>(null);
   const [retentionDeadline, setRetentionDeadline] = useState("");
@@ -5112,7 +5196,7 @@ function Settings({
         setEventDate(result.eventDate || order.eventDate);
       },
     );
-  }, []);
+  }, [order.customerName, order.eventDate]);
 
   useEffect(() => {
     fetch('/api/admin/modules', { cache: 'no-store' }).then(async (response) => {
@@ -5765,6 +5849,15 @@ function Settings({
                 ),
               ],
               [
+                "whatsapp",
+                "WhatsApp",
+                t(
+                  "Envío y seguimiento de mensajes",
+                  "Message delivery and tracking",
+                  "Envio e acompanhamento de mensagens",
+                ),
+              ],
+              [
                 "scheduler",
                 t("Automatización", "Automation", "Automação"),
                 t(
@@ -5779,7 +5872,7 @@ function Settings({
             return (
               <article key={key}>
                 <span
-                  className={`health-indicator ${service?.status === "ok" ? "is-ok" : service ? "is-error" : "is-pending"}`}
+                  className={`health-indicator ${service?.status === "ok" ? "is-ok" : service?.status === "warning" ? "is-warning" : service ? "is-error" : "is-pending"}`}
                   aria-hidden="true"
                 />
                 <div>
@@ -5787,7 +5880,7 @@ function Settings({
                   <small>{description}</small>
                 </div>
                 <span
-                  className={`health-status ${service?.status === "ok" ? "is-ok" : "is-error"}`}
+                  className={`health-status ${service?.status === "ok" ? "is-ok" : service?.status === "warning" ? "is-warning" : "is-error"}`}
                 >
                   {service
                     ? service.detail
@@ -5835,6 +5928,7 @@ function Accesses({ order }: { order: AdminOrder }) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
+  const [notice, setNotice] = useState("");
 
   const load = useCallback(() => {
     fetch("/api/admin/access").then(async (response) => {
@@ -5845,7 +5939,7 @@ function Accesses({ order }: { order: AdminOrder }) {
     });
   }, []);
   useEffect(load, [load]);
-  useEffect(() => {
+  const loadActivities = useCallback(() => {
     if (order.accessRole !== "owner") return;
     fetch("/api/admin/activity", { cache: "no-store" }).then(
       async (response) => {
@@ -5857,6 +5951,7 @@ function Accesses({ order }: { order: AdminOrder }) {
       },
     );
   }, [order.accessRole]);
+  useEffect(loadActivities, [loadActivities]);
 
   const activityLabel = (action: string) =>
     ({
@@ -5896,6 +5991,8 @@ function Accesses({ order }: { order: AdminOrder }) {
         throw new Error(result.error || "No pudimos invitar al colaborador.");
       setAccesses((current) => [...current, result.access!]);
       setShowModal(false);
+      setNotice(t("Colaborador invitado correctamente.", "Collaborator invited successfully.", "Colaborador convidado com sucesso."));
+      loadActivities();
     } catch (inviteError) {
       setError(
         inviteError instanceof Error
@@ -5926,6 +6023,8 @@ function Accesses({ order }: { order: AdminOrder }) {
       if (!response.ok)
         throw new Error(result.error || "No pudimos revocar el acceso.");
       setAccesses((current) => current.filter((access) => access.id !== id));
+      setNotice(t("Acceso revocado.", "Access revoked.", "Acesso revogado."));
+      loadActivities();
     } catch (removeError) {
       setError(
         removeError instanceof Error
@@ -5955,6 +6054,8 @@ function Accesses({ order }: { order: AdminOrder }) {
       setAccesses((current) =>
         current.map((item) => (item.id === access.id ? result.access! : item)),
       );
+      setNotice(t("Rol actualizado. La sesión anterior fue cerrada por seguridad.", "Role updated. The previous session was closed for security.", "Função atualizada. A sessão anterior foi encerrada por segurança."));
+      loadActivities();
     } catch (roleError) {
       setError(
         roleError instanceof Error
@@ -6009,6 +6110,12 @@ function Accesses({ order }: { order: AdminOrder }) {
           "Administradores gerenciam o evento e colaboradores. Editores alteram conteúdo e usuários de leitura apenas consultam.",
         )}
       </ContextHelp>
+      <section className="access-role-guide" aria-label={t("Permisos por rol", "Permissions by role", "Permissões por função")}>
+        <article><span>◆</span><div><strong>{t("Administrador", "Administrator", "Administrador")}</strong><small>{t("Gestiona invitados, contenido, colaboradores y configuración.", "Manages guests, content, collaborators and settings.", "Gerencia convidados, conteúdo, colaboradores e configurações.")}</small></div></article>
+        <article><span>✎</span><div><strong>Editor</strong><small>{t("Modifica el evento, pero no administra accesos ni configuración sensible.", "Edits the event but cannot manage access or sensitive settings.", "Edita o evento, mas não gerencia acessos nem configurações sensíveis.")}</small></div></article>
+        <article><span>◉</span><div><strong>{t("Solo lectura", "View only", "Somente leitura")}</strong><small>{t("Puede consultar la información sin realizar cambios.", "Can view information without making changes.", "Pode consultar informações sem fazer alterações.")}</small></div></article>
+      </section>
+      {notice && <p className="import-success" role="status">{notice}</p>}
       <section className="metrics-grid mini">
         <Metric
           label={t("Administradores", "Administrators", "Administradores")}

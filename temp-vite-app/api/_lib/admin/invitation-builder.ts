@@ -11,6 +11,15 @@ type DocumentRow = {
 
 const select = 'id,event_id,template_id,schema_version,palette_id,locale,workflow_status,sections,content,updated_at';
 const supportedTemplates = new Set(['aurora', 'astraea', 'coruscant', 'rosewood', 'rivendell', 'verona', 'varezzia']);
+const templateAliases: Record<string, string> = { '15-verona': 'verona' };
+const requestedTemplateFor = (order: Awaited<ReturnType<typeof findOrderByNumber>>) => {
+  const raw = String(order?.order_payload.modelId || order?.model_name || '').trim().toLowerCase();
+  const normalized = templateAliases[raw] || raw;
+  return {
+    requestedModel: String(order?.model_name || order?.order_payload.modelName || raw || 'Modelo sin definir'),
+    suggestedTemplateId: supportedTemplates.has(normalized) ? normalized : null
+  };
+};
 const validSections = new Set(['hero', 'dateStack', 'countdown', 'location', 'quote', 'dressCode', 'schedule', 'parallax', 'gallery', 'hotels', 'gifts', 'photoUpload', 'social', 'songSuggestions', 'qrPass', 'rsvp']);
 
 const ensureEvent = async (orderNumber: string) => {
@@ -52,6 +61,8 @@ async function handler(request: Request) {
     if (!event) return json({ error: 'No encontramos el evento.' }, 404);
 
     if (request.method === 'GET') {
+      const order = await findOrderByNumber(session.order_number);
+      const requestedTemplate = requestedTemplateFor(order);
       const accountResponse = await supabaseRequest(`accounts?id=eq.${event.owner_account_id}&select=can_self_approve,requires_platform_review&limit=1`);
       const account = ((await accountResponse.json()) as Array<{ can_self_approve: boolean; requires_platform_review: boolean }>)[0];
       const document = await getDocument(event.id);
@@ -62,6 +73,7 @@ async function handler(request: Request) {
       }
       return json({
         document,
+        ...requestedTemplate,
         reviewHistory,
         accessRole: session.access_role,
         workflow: {
@@ -82,12 +94,15 @@ async function handler(request: Request) {
       if (!supportedTemplates.has(templateId) || !['es', 'en', 'pt'].includes(locale)) return json({ error: 'El modelo o idioma no es válido.' }, 400);
       if (!sections.length || sections.some((section) => !validSections.has(String(section.id)) || typeof section.enabled !== 'boolean')) return json({ error: 'La configuración de secciones no es válida.' }, 400);
       const current = await getDocument(event.id);
+      if (current && !['draft', 'changes_requested'].includes(current.workflow_status)) {
+        return json({ error: 'La invitación no se puede editar mientras está en revisión, aprobada o publicada.' }, 409);
+      }
       const changes = {
         template_id: templateId, schema_version: 1,
         palette_id: String(body.paletteId || '').slice(0, 80), locale,
         sections,
         content: typeof body.content === 'object' && body.content ? body.content : {},
-        workflow_status: current?.workflow_status === 'published' ? 'published' : 'draft',
+        workflow_status: 'draft',
         updated_at: new Date().toISOString()
       };
       let document: DocumentRow;

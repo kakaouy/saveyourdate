@@ -601,7 +601,7 @@ async function handler(request: Request) {
           const manualMessage = `${baseMessage}${giftText ? `\n\nSi querés hacerme un regalo te dejo mis datos:\n${giftText}` : ""}`;
           return json({
             mode: "manual",
-            guest: clientGuest(updatedRows[0], "sent"),
+            guest: clientGuest(updatedRows[0], "manual"),
             url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(manualMessage)}&type=phone_number&app_absent=0`,
           });
         }

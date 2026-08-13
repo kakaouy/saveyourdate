@@ -662,6 +662,19 @@
   color: white;
 }
 
+.carousel-control-btn:disabled {
+  border-color: var(--color-border);
+  background: #f4f2f3;
+  color: #9b949d;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: .7;
+}
+
+.carousel-control-btn:disabled:hover {
+  transform: none;
+}
+
 .carousel-control-btn.prev {
   padding: 10px;
   width: 44px;
