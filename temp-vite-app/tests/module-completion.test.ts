@@ -82,6 +82,15 @@ test('el constructor respeta el modelo elegido en el pedido', () => {
   assert.match(builder, /setDocument\(suggested\.createDocument\(\)\)/);
 });
 
+test('el panel ofrece acceso visible al constructor para el pedido activo', () => {
+  assert.match(admin, /\["Invitación", "✦"\]/);
+  assert.match(admin, /Invitación: "invitation"/);
+  assert.match(admin, /function InvitationModule/);
+  assert.match(admin, /Abrir constructor/);
+  assert.match(admin, /builder=\$\{encodeURIComponent\(templateId\)\}&pedido=\$\{encodeURIComponent\(order\.orderNumber\)\}/);
+  assert.match(admin, /target="_blank"/);
+});
+
 test('un modelo tradicional no se reemplaza silenciosamente por Aurora', () => {
   assert.match(builder, /unsupportedRequestedModel/);
   assert.match(builder, /Este pedido usa un modelo tradicional/);

@@ -299,6 +299,7 @@ function GuestNameButton({ guest, children }: { guest: Guest; children?: React.R
 
 const nav = [
   ["Resumen", "⌂"],
+  ["Invitación", "✦"],
   ["Invitados", "♙"],
   ["Restricciones", "◇"],
   ["Canciones", "♫"],
@@ -311,6 +312,7 @@ const nav = [
 ];
 
 const moduleForView: Record<string, AdminOrder["enabledModules"][number] | undefined> = {
+  Invitación: "invitation",
   Invitados: "guests_rsvp",
   Restricciones: "guests_rsvp",
   Canciones: "invitation",
@@ -318,6 +320,12 @@ const moduleForView: Record<string, AdminOrder["enabledModules"][number] | undef
   Agradecimientos: "messaging",
   Mesas: "tables",
   "Check-in": "check_in",
+};
+
+const builderTemplateIdForOrder = (modelName: string) => {
+  const normalized = normalizedReference(modelName);
+  return ["aurora", "astraea", "coruscant", "rosewood", "rivendell", "verona", "varezzia"]
+    .find((templateId) => normalized.includes(templateId)) || "aurora";
 };
 
 const countryCodes = [
@@ -6704,6 +6712,34 @@ function CheckInModule({ guests, setGuests, canEdit }: { guests: Guest[]; setGue
   </>;
 }
 
+function InvitationModule({ order }: { order: AdminOrder }) {
+  const { text: t } = useAdminI18n();
+  const templateId = builderTemplateIdForOrder(order.modelName);
+  const builderUrl = `/?builder=${encodeURIComponent(templateId)}&pedido=${encodeURIComponent(order.orderNumber)}`;
+  return <>
+    <div className="page-heading invitation-module-heading">
+      <div>
+        <span className="eyebrow">{t("Diseño y contenido", "Design and content", "Design e conteúdo")}</span>
+        <h1>{t("Invitación", "Invitation", "Convite")}</h1>
+        <p>{t("Editá el diseño, los textos, las fotos y las secciones de tu invitación.", "Edit your invitation design, copy, photos and sections.", "Edite o design, os textos, as fotos e as seções do convite.")}</p>
+      </div>
+    </div>
+    <section className="panel invitation-builder-access">
+      <div className="invitation-builder-icon">✦</div>
+      <div className="invitation-builder-copy">
+        <span>{t("Constructor de invitaciones", "Invitation builder", "Construtor de convites")}</span>
+        <h2>{t("Armá tu invitación paso a paso", "Build your invitation step by step", "Monte seu convite passo a passo")}</h2>
+        <p>{t("El constructor se abre con el pedido actual y conserva el modelo seleccionado. Podés guardar un borrador y continuar después.", "The builder opens with the current order and keeps its selected template. Save a draft and continue later.", "O construtor abre com o pedido atual e mantém o modelo escolhido. Salve um rascunho e continue depois.")}</p>
+        <dl>
+          <div><dt>{t("Pedido", "Order", "Pedido")}</dt><dd>{order.orderNumber}</dd></div>
+          <div><dt>{t("Modelo", "Template", "Modelo")}</dt><dd>{order.modelName || templateId}</dd></div>
+        </dl>
+      </div>
+      <a className="primary-button invitation-builder-button" href={builderUrl} target="_blank" rel="noreferrer">✨ {t("Abrir constructor", "Open builder", "Abrir construtor")}</a>
+    </section>
+  </>;
+}
+
 function Admin({
   onLogout,
   order,
@@ -6753,6 +6789,7 @@ function Admin({
       (
         ({
           Resumen: t("Resumen", "Overview", "Resumo"),
+          Invitación: t("Invitación", "Invitation", "Convite"),
           Invitados: t("Invitados", "Guests", "Convidados"),
           Confirmaciones: t("Confirmaciones", "Confirmations", "Confirmações"),
           Mesas: t("Mesas", "Tables", "Mesas"),
@@ -6971,6 +7008,7 @@ function Admin({
               canEdit={order.accessRole !== "viewer"}
             />
           )}
+          {view === "Invitación" && <InvitationModule order={order} />}
           {view === "Invitados" && (
             <Guests
               guests={guests}
