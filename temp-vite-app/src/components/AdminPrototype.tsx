@@ -3117,7 +3117,7 @@ type EventTable = {
   y: number;
   width: number;
   height: number;
-  shape: "round" | "rectangular" | "square";
+  shape: "round" | "rectangular" | "square" | "living";
   seatAssignments: Record<string, number>;
   rotation: number;
   locked: boolean;
@@ -3164,6 +3164,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [tableQuery, setTableQuery] = useState("");
   const [compactTables, setCompactTables] = useState(false);
   const [assignmentSavingId, setAssignmentSavingId] = useState("");
+  const [groupAssignmentSaving, setGroupAssignmentSaving] = useState("");
+  const [mobileSeatingStep, setMobileSeatingStep] = useState<"guests" | "tables">("guests");
   const [assignmentStatus, setAssignmentStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "teen" | "child">("all");
@@ -3196,6 +3198,11 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     (total, table) => total + table.capacity,
     0,
   );
+  const matchingGroups = query.trim()
+    ? [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
+        .filter((group) => normalizedReference(group).includes(normalizedReference(query)))
+        .sort((a, b) => a.localeCompare(b))
+    : [];
   const visibleTables = tables.filter((table) => {
     const guestTerms = table.guests.map((id) => { const guest = guests.find((item) => item.id === id); return guest ? `${guest.name} ${guest.group}` : ""; }).join(" ");
     return `${table.name} ${guestTerms}`.toLowerCase().includes(tableQuery.toLowerCase());
@@ -3278,6 +3285,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const selectGuestForSeat = (guestId: string) => {
     setSelectedGuestId((current) => current === guestId ? "" : guestId);
+    setMobileSeatingStep("tables");
     const currentTable = tables.find((table) => table.guests.includes(guestId));
     if (currentTable) requestAnimationFrame(() => document.getElementById(`table-card-${currentTable.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }));
   };
@@ -3311,7 +3319,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const openNew = (shape: EventTable["shape"] = "round") => {
     setEditing(null);
-    setTableName(`Mesa ${tables.length + 1}`);
+    setTableName(shape === "living" ? `Living ${tables.filter((table) => table.shape === "living").length + 1}` : `Mesa ${tables.filter((table) => table.shape !== "living").length + 1}`);
     setCapacity(8);
     setNote("");
     setTableShape(shape);
@@ -3457,6 +3465,46 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   };
 
   const unassignGuest = (guestId: string) => assignGuest(guestId, "");
+
+  const assignGroup = async (groupName: string, tableId: string) => {
+    const groupGuests = confirmedGuests.filter(
+      (guest) => normalizedReference(guest.group) === normalizedReference(groupName),
+    );
+    if (!groupGuests.length || !tableId) return;
+    setGroupAssignmentSaving(groupName);
+    setAssignmentStatus("saving");
+    setError("");
+    try {
+      const response = await fetch("/api/admin/tables", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "assign-batch",
+          assignments: groupGuests.map((guest) => ({ guestId: guest.id, tableId })),
+        }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok)
+        throw new Error(result.error || t("No pudimos ubicar el grupo completo.", "Could not seat the entire group.", "Não foi possível alocar o grupo completo."));
+      const groupIds = new Set(groupGuests.map((guest) => guest.id));
+      setTables((current) => current.map((table) => ({
+        ...table,
+        guests: table.id === tableId
+          ? [...table.guests.filter((id) => !groupIds.has(id)), ...groupIds]
+          : table.guests.filter((id) => !groupIds.has(id)),
+        seatAssignments: Object.fromEntries(Object.entries(table.seatAssignments || {}).filter(([id]) => !groupIds.has(id))),
+      })));
+      setAssignmentStatus("saved");
+      setTableQuery(groupName);
+      setMobileSeatingStep("tables");
+      window.setTimeout(() => setAssignmentStatus((current) => current === "saved" ? "idle" : current), 1800);
+    } catch (groupError) {
+      setError(groupError instanceof Error ? groupError.message : t("No pudimos ubicar el grupo completo.", "Could not seat the entire group.", "Não foi possível alocar o grupo completo."));
+      setAssignmentStatus("error");
+    } finally {
+      setGroupAssignmentSaving("");
+    }
+  };
 
   const undoLastAssignment = async () => {
     if (!lastAssignment) return;
@@ -3934,8 +3982,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         </section>
       )}
 
-      {!layoutMode && <div className="seating-layout">
-        <aside className="panel unassigned-panel">
+      {!layoutMode && <>
+      <nav className="mobile-seating-switch" aria-label={t("Pasos para distribuir invitados", "Guest seating steps", "Etapas para distribuir convidados")}>
+        <button className={mobileSeatingStep === "guests" ? "active" : ""} onClick={() => setMobileSeatingStep("guests")}>1 · {t("Buscar invitados", "Find guests", "Buscar convidados")}</button>
+        <button className={mobileSeatingStep === "tables" ? "active" : ""} onClick={() => setMobileSeatingStep("tables")}>2 · {t("Elegir ubicación", "Choose location", "Escolher local")}</button>
+      </nav>
+      <div className="seating-layout">
+        <aside className={`panel unassigned-panel ${mobileSeatingStep === "tables" ? "seating-mobile-hidden" : ""}`}>
           <div className="panel-title">
             <div>
               <h2>
@@ -3962,7 +4015,29 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             <span className="count-badge">{confirmedGuests.length}</span>
           </div>
           <div className="guest-assign-list">
-            <label className="search seating-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado…", "Search guest…", "Buscar convidado…")} /></label>
+            <label className="search seating-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label>
+            {matchingGroups.length > 0 && <section className="group-search-results" aria-label={t("Grupos encontrados", "Matching groups", "Grupos encontrados")}>
+              <strong>{t("Ubicar grupo completo", "Seat entire group", "Alocar grupo completo")}</strong>
+              {matchingGroups.map((groupName) => {
+                const groupGuests = confirmedGuests.filter((guest) => normalizedReference(guest.group) === normalizedReference(groupName));
+                const groupIds = new Set(groupGuests.map((guest) => guest.id));
+                const groupPeople = groupGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
+                return <label key={groupName}>
+                  <span><b>{groupName}</b><small>{groupGuests.length} {t("invitaciones", "invitations", "convites")} · {groupPeople} {t("personas", "people", "pessoas")}</small></span>
+                  <select defaultValue="" disabled={!canEdit || groupAssignmentSaving === groupName} onChange={(event) => { if (event.target.value) void assignGroup(groupName, event.target.value); event.currentTarget.value = ""; }} aria-label={`${t("Ubicar grupo", "Seat group", "Alocar grupo")} ${groupName}`}>
+                    <option value="">{groupAssignmentSaving === groupName ? t("Guardando…", "Saving…", "Salvando…") : t("Elegir mesa o Living…", "Choose table or Living…", "Escolher mesa ou Living…")}</option>
+                    {tables.map((table) => {
+                      const occupiedByOthers = table.guests.filter((id) => !groupIds.has(id)).reduce((total, id) => {
+                        const assigned = guests.find((guest) => guest.id === id);
+                        return total + (assigned ? confirmedPeopleForGuest(assigned, guests) : 0);
+                      }, 0);
+                      const available = table.capacity - occupiedByOthers;
+                      return <option key={table.id} value={table.id} disabled={available < groupPeople}>{table.name} · {available >= groupPeople ? `${available} ${t("libres", "free", "livres")}` : `${t("faltan", "needs", "faltam")} ${groupPeople - available}`}</option>;
+                    })}
+                  </select>
+                </label>;
+              })}
+            </section>}
             <div className="assignment-filters" role="group" aria-label={t("Filtrar grupos", "Filter groups", "Filtrar grupos")}>
               {([
                 ["all", t("Todos", "All", "Todos"), confirmedGuests.length],
@@ -4089,13 +4164,14 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           </div>
         </aside>
 
-        <section className="tables-workspace">
+        <section className={`tables-workspace ${mobileSeatingStep === "guests" ? "seating-mobile-hidden" : ""}`}>
           {canEdit && (
             <div className="table-shape-tools" aria-label={t("Añadir mesas", "Add tables", "Adicionar mesas")}>
               <strong>{t("Añadir mesa", "Add table", "Adicionar mesa")}</strong>
               <button onClick={() => openNew("round")}><i className="shape-icon is-round" />{t("Redonda", "Round", "Redonda")}</button>
               <button onClick={() => openNew("rectangular")}><i className="shape-icon is-rectangular" />{t("Rectangular", "Rectangular", "Retangular")}</button>
               <button onClick={() => openNew("square")}><i className="shape-icon is-square" />{t("Cuadrada", "Square", "Quadrada")}</button>
+              <button onClick={() => openNew("living")}><i className="shape-icon is-living" />Living</button>
             </div>
           )}
           <div className="workspace-heading">
@@ -4417,7 +4493,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             )}
           </div>
         </section>
-      </div>}
+      </div></>}
 
       {showModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}>
@@ -4431,12 +4507,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             <span className="eyebrow">
               {editing
                 ? t("Configuración", "Settings", "Configuração")
-                : t("Nueva mesa", "New table", "Nova mesa")}
+                : tableShape === "living" ? "Nuevo Living" : t("Nueva mesa", "New table", "Nova mesa")}
             </span>
             <h2>
               {editing
-                ? t("Editar mesa", "Edit table", "Editar mesa")
-                : t("Agregar mesa", "Add table", "Adicionar mesa")}
+                ? editing.shape === "living" ? "Editar Living" : t("Editar mesa", "Edit table", "Editar mesa")
+                : tableShape === "living" ? "Agregar Living" : t("Agregar mesa", "Add table", "Adicionar mesa")}
             </h2>
             <div className="form-grid">
               <label>
@@ -4479,11 +4555,11 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </label>
             </div>
             <fieldset className="table-shape-picker">
-              <legend>{t("Forma de la mesa", "Table shape", "Formato da mesa")}</legend>
-              {(["round", "rectangular", "square"] as const).map((shape) => (
+              <legend>{t("Tipo de ubicación", "Seating type", "Tipo de local")}</legend>
+              {(["round", "rectangular", "square", "living"] as const).map((shape) => (
                 <button type="button" key={shape} className={tableShape === shape ? "active" : ""} onClick={() => setTableShape(shape)}>
                   <i className={`shape-icon is-${shape}`} />
-                  {shape === "round" ? t("Redonda", "Round", "Redonda") : shape === "rectangular" ? t("Rectangular", "Rectangular", "Retangular") : t("Cuadrada", "Square", "Quadrada")}
+                  {shape === "round" ? t("Redonda", "Round", "Redonda") : shape === "rectangular" ? t("Rectangular", "Rectangular", "Retangular") : shape === "square" ? t("Cuadrada", "Square", "Quadrada") : "Living"}
                 </button>
               ))}
             </fieldset>

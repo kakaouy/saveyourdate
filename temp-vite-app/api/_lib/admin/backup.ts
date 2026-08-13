@@ -12,10 +12,10 @@ async function handler(request: Request) {
     const [order, guestsResponse, tablesResponse, accessesResponse, activityResponse] = await Promise.all([
       findOrderByNumber(session.order_number),
       supabaseRequest(
-        `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,invite_token,name,group_name,email,phone,phone_country_code,identification_type,identification_number,seats,confirmed,status,food,song,companions,table_id,reminded_at,invitation_sent_at,invitation_opened_at,responded_at,archived_at,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes,created_at,updated_at&order=created_at.asc`
+        `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,invite_token,name,group_name,email,phone,phone_country_code,identification_type,identification_number,seats,confirmed,status,food,song,companions,table_id,seat_number,reminded_at,invitation_sent_at,invitation_opened_at,responded_at,archived_at,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes,created_at,updated_at&order=created_at.asc`
       ),
       supabaseRequest(
-        `event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,created_at,updated_at&order=created_at.asc`
+        `event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y,layout_width,layout_height,table_shape,rotation_degrees,is_locked,created_at,updated_at&order=created_at.asc`
       ),
       supabaseRequest(
         `event_admins?order_number=eq.${encodeURIComponent(session.order_number)}&select=email,role,created_at&order=created_at.asc`

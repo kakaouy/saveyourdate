@@ -244,7 +244,7 @@ create table if not exists public.event_tables (
   name text not null,
   capacity integer not null default 8 check (capacity between 1 and 30),
   note text not null default '',
-  table_shape text not null default 'round' check (table_shape in ('round', 'rectangular', 'square')),
+  table_shape text not null default 'round' check (table_shape in ('round', 'rectangular', 'square', 'living')),
   rotation_degrees integer not null default 0,
   is_locked boolean not null default false,
   created_at timestamptz not null default now(),

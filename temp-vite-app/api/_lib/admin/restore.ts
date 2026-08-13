@@ -48,7 +48,15 @@ async function handler(request: Request) {
           order_number: session.order_number,
           name: String(table.name).trim().slice(0, 120),
           capacity: Number(table.capacity),
-          note: String(table.note || '').trim().slice(0, 500)
+          note: String(table.note || '').trim().slice(0, 500),
+          space_name: String(table.space_name || 'Espacio 1').trim().slice(0, 120),
+          position_x: Math.max(0, Number(table.position_x) || 24),
+          position_y: Math.max(0, Number(table.position_y) || 24),
+          layout_width: Math.max(100, Number(table.layout_width) || 140),
+          layout_height: Math.max(60, Number(table.layout_height) || 70),
+          table_shape: ['round', 'rectangular', 'square', 'living'].includes(String(table.table_shape)) ? table.table_shape : 'round',
+          rotation_degrees: Number(table.rotation_degrees) || 0,
+          is_locked: Boolean(table.is_locked)
         })))
       });
     }
@@ -73,6 +81,7 @@ async function handler(request: Request) {
           song: String(guest.song || '—').trim().slice(0, 250),
           companions: Array.isArray(guest.companions) ? guest.companions : [],
           table_id: guest.table_id ? String(guest.table_id) : null,
+          seat_number: guest.seat_number ? Number(guest.seat_number) : null,
           reminded_at: guest.reminded_at || null,
           invitation_sent_at: guest.invitation_sent_at || null,
           invitation_opened_at: guest.invitation_opened_at || null,
