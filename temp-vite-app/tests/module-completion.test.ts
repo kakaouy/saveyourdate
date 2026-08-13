@@ -101,3 +101,8 @@ test('la revisión evita aprobar o publicar dos veces por accidente', () => {
   assert.match(reviewPage, /disabled=\{busy\}/);
   assert.match(reviewPage, /useCallback/);
 });
+
+test('el acceso al panel tolera respuestas no JSON durante el desarrollo', () => {
+  assert.match(admin, /headers\.get\("content-type"\).*includes\("application\/json"\)/);
+  assert.match(admin, /\.catch\(\(\) => undefined\)\s*\.finally\(\(\) => setCheckingSession\(false\)\)/);
+});

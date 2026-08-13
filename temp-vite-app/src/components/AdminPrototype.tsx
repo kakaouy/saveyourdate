@@ -6915,7 +6915,10 @@ export function AdminPrototype() {
     fetch("/api/admin/session")
       .then(async (response) => {
         if (!response.ok) return;
+        if (!response.headers.get("content-type")?.includes("application/json"))
+          return;
         const result = (await response.json()) as { order: AdminOrder };
+        if (!result.order) return;
         setOrder(result.order);
         const savedLanguage = window.sessionStorage.getItem(
           "syd-admin-language",
@@ -6927,6 +6930,7 @@ export function AdminPrototype() {
         );
         setLoggedIn(true);
       })
+      .catch(() => undefined)
       .finally(() => setCheckingSession(false));
   }, []);
 
