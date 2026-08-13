@@ -174,7 +174,13 @@ export default function InvitationBuilderPage() {
     <div className="builder-layout" data-mobile-panel={mobilePanel}>
       <aside className="builder-panel" id="builder-editor">{message && <p className="builder-message" role="status">{message}</p>}{authenticated && workflow.requiresPlatformReview && document.status === 'approved' && <p className="builder-message">Esta cuenta requiere revisión final de Save Your Date antes de publicar.</p>}
         {reviewHistory.some((event) => event.action === 'changes_requested' && event.comment) && <section className="builder-review-notes"><h2>Comentarios de revisión</h2>{reviewHistory.filter((event) => event.action === 'changes_requested' && event.comment).slice(0, 5).map((event) => <article key={event.id}><p>{event.comment}</p><time>{new Date(event.created_at).toLocaleString('es-UY')}</time></article>)}</section>}
-        <section><h2>Modelo</h2><label>Diseño<select value={document.templateId} onChange={(e) => changeTemplate(e.target.value)}>{BUILDER_TEMPLATES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label></section>
+        <section><h2>Modelo</h2><label>Diseño<select value={document.templateId} onChange={(e) => changeTemplate(e.target.value)}>{BUILDER_TEMPLATES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
+          <label>Idioma<select value={document.locale} onChange={(e) => updateDocument({ locale: e.target.value as InvitationBuilderDocument['locale'] })}>
+            <option value="es">Español</option>
+            <option value="pt">Português</option>
+            <option value="en">English</option>
+          </select></label>
+        </section>
         {authenticated && <section><h2>Biblioteca de la cuenta</h2><p className="builder-help">Reutilizá diseño, secciones, textos generales y cronograma. No se copian nombres, fechas, invitados, fotos ni datos bancarios.</p>
           {savedSetups.length > 0 && <label>Configuración guardada<select defaultValue="" onChange={(e) => { applySetup(e.target.value); e.target.value = ''; }}><option value="">Seleccionar…</option>{savedSetups.map((setup) => <option key={setup.id} value={setup.id}>{setup.name}</option>)}</select></label>}
           {workflow.canEdit && <div className="builder-library-save"><input value={setupName} onChange={(e) => setSetupName(e.target.value)} placeholder="Ej.: Quince clásico del salón" maxLength={100} /><button type="button" onClick={saveSetup}>Guardar como base</button></div>}
