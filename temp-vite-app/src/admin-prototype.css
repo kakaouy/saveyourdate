@@ -391,6 +391,8 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .rsvp-card textarea { padding-block: 11px; resize: vertical; }
 .rsvp-card input:focus, .rsvp-card select:focus, .rsvp-card textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(10,171,176,.12); }
 .rsvp-message { margin: 0; padding: 11px; border-radius: 8px; color: var(--teal-dark); background: var(--mint); text-align: center; font-size: 11px; }
+.rsvp-message.is-error { color: #8f3f3a; background: #fff0ee; }
+.rsvp-message.is-success { color: #28745c; background: #edf9f3; }
 .cell-sub { display: block; margin-top: 3px; color: var(--muted); font-size: 8px; }
 .table-footer { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; }
 .table-footer div { display: flex; gap: 4px; }
