@@ -118,3 +118,11 @@ test('Invitados controla fallas de API y confirma acciones persistidas', () => {
   assert.match(admin, /Selección archivada/);
   assert.match(admin, /Datos del invitado actualizados/);
 });
+
+test('Accesos informa la carga y controla respuestas inesperadas', () => {
+  assert.match(admin, /const \[loadingAccesses, setLoadingAccesses\]/);
+  assert.match(admin, /Cargando colaboradores…/);
+  assert.match(admin, /El servicio de accesos no está disponible/);
+  assert.match(admin, /El historial no está disponible/);
+  assert.match(admin, /readApiJson<\{[\s\S]*?access\?: AdminAccess/);
+});

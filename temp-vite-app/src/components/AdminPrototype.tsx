@@ -6027,7 +6027,7 @@ type AdminActivity = {
 };
 
 function Accesses({ order }: { order: AdminOrder }) {
-  const { text: t, locale } = useAdminI18n();
+  const { text: t, locale, language } = useAdminI18n();
   const [accesses, setAccesses] = useState<AdminAccess[]>([]);
   const [activities, setActivities] = useState<AdminActivity[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -6035,28 +6035,30 @@ function Accesses({ order }: { order: AdminOrder }) {
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
   const [notice, setNotice] = useState("");
+  const [loadingAccesses, setLoadingAccesses] = useState(true);
 
   const load = useCallback(() => {
-    fetch("/api/admin/access").then(async (response) => {
-      if (response.ok)
-        setAccesses(
-          ((await response.json()) as { accesses: AdminAccess[] }).accesses,
-        );
-    });
-  }, []);
+    setLoadingAccesses(true);
+    fetch("/api/admin/access")
+      .then(async (response) => {
+        const result = await readApiJson<{ accesses?: AdminAccess[]; error?: string }>(response, adminText(language, "El servicio de accesos no está disponible.", "The access service is unavailable.", "O serviço de acessos não está disponível."));
+        if (!response.ok || !result.accesses) throw new Error(result.error || adminText(language, "No pudimos cargar los colaboradores.", "Could not load collaborators.", "Não foi possível carregar os colaboradores."));
+        setAccesses(result.accesses);
+      })
+      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : adminText(language, "No pudimos cargar los colaboradores.", "Could not load collaborators.", "Não foi possível carregar os colaboradores.")))
+      .finally(() => setLoadingAccesses(false));
+  }, [language]);
   useEffect(load, [load]);
   const loadActivities = useCallback(() => {
     if (order.accessRole !== "owner") return;
-    fetch("/api/admin/activity", { cache: "no-store" }).then(
-      async (response) => {
-        if (response.ok)
-          setActivities(
-            ((await response.json()) as { activities: AdminActivity[] })
-              .activities,
-          );
-      },
-    );
-  }, [order.accessRole]);
+    fetch("/api/admin/activity", { cache: "no-store" })
+      .then(async (response) => {
+        const result = await readApiJson<{ activities?: AdminActivity[]; error?: string }>(response, adminText(language, "El historial no está disponible.", "The activity log is unavailable.", "O histórico não está disponível."));
+        if (!response.ok || !result.activities) throw new Error(result.error || adminText(language, "No pudimos cargar el historial.", "Could not load activity.", "Não foi possível carregar o histórico."));
+        setActivities(result.activities);
+      })
+      .catch((activityError) => setError(activityError instanceof Error ? activityError.message : adminText(language, "No pudimos cargar el historial.", "Could not load activity.", "Não foi possível carregar o histórico.")));
+  }, [order.accessRole, language]);
   useEffect(loadActivities, [loadActivities]);
 
   const activityLabel = (action: string) =>
@@ -6089,10 +6091,10 @@ function Accesses({ order }: { order: AdminOrder }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Object.fromEntries(data)),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         access?: AdminAccess;
         error?: string;
-      };
+      }>(response, t("El servicio de accesos no está disponible.", "The access service is unavailable.", "O serviço de acessos não está disponível."));
       if (!response.ok || !result.access)
         throw new Error(result.error || "No pudimos invitar al colaborador.");
       setAccesses((current) => [...current, result.access!]);
@@ -6125,7 +6127,7 @@ function Accesses({ order }: { order: AdminOrder }) {
         `/api/admin/access?id=${encodeURIComponent(id)}`,
         { method: "DELETE" },
       );
-      const result = (await response.json()) as { error?: string };
+      const result = await readApiJson<{ error?: string }>(response, t("El servicio de accesos no está disponible.", "The access service is unavailable.", "O serviço de acessos não está disponível."));
       if (!response.ok)
         throw new Error(result.error || "No pudimos revocar el acceso.");
       setAccesses((current) => current.filter((access) => access.id !== id));
@@ -6151,10 +6153,10 @@ function Accesses({ order }: { order: AdminOrder }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: access.id, role }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         access?: AdminAccess;
         error?: string;
-      };
+      }>(response, t("El servicio de accesos no está disponible.", "The access service is unavailable.", "O serviço de acessos não está disponível."));
       if (!response.ok || !result.access)
         throw new Error(result.error || "No pudimos cambiar el rol.");
       setAccesses((current) =>
@@ -6253,6 +6255,7 @@ function Accesses({ order }: { order: AdminOrder }) {
         />
       </section>
       <section className="panel table-panel">
+        {loadingAccesses && <p className="module-notice" role="status">{t("Cargando colaboradores…", "Loading collaborators…", "Carregando colaboradores…")}</p>}
         <div className="table-scroll">
           <table>
             <thead>
