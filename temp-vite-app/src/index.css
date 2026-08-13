@@ -50,14 +50,15 @@ body {
   font-weight: 800;
 }
 
-.modular-section-order > .modular-ornament-after {
+.modular-section-order > .modular-ornament-before {
   position: relative;
+  z-index: 1;
 }
 
-.modular-section-order > .modular-ornament-after::after {
+.modular-section-order > .modular-ornament-before::before {
   position: absolute;
-  z-index: 5;
-  bottom: 0;
+  z-index: 8;
+  top: 0;
   width: 46%;
   height: clamp(86px, 20vw, 180px);
   background-image: var(--modular-ornament-image);
@@ -65,32 +66,30 @@ body {
   background-size: contain;
   content: '';
   pointer-events: none;
-  transform: translateY(50%);
-  animation: modular-ornament-heartbeat 2.4s ease-in-out infinite;
+  transform: translateY(-50%);
+  animation: modular-ornament-breathe var(--modular-ornament-duration, 9.4s) ease-in-out var(--modular-ornament-delay, 0s) infinite;
 }
 
-.modular-section-order > .modular-ornament-left::after {
+.modular-section-order > .modular-ornament-left::before {
   left: 0;
   background-position: left center;
   transform-origin: left center;
 }
 
-.modular-section-order > .modular-ornament-right::after {
+.modular-section-order > .modular-ornament-right::before {
   right: 0;
   background-position: right center;
   transform-origin: right center;
 }
 
-@keyframes modular-ornament-heartbeat {
-  0%, 100% { transform: translateY(50%) scale(1); }
-  18% { transform: translateY(50%) scale(1.055); }
-  34% { transform: translateY(50%) scale(1); }
-  48% { transform: translateY(50%) scale(1.035); }
-  64% { transform: translateY(50%) scale(1); }
+@keyframes modular-ornament-breathe {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  48% { transform: translateY(-50%) scale(1.018); }
+  58% { transform: translateY(-50%) scale(1.012); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .modular-section-order > .modular-ornament-after::after {
+  .modular-section-order > .modular-ornament-before::before {
     animation: none;
   }
 }
