@@ -12,6 +12,7 @@ const RosewoodInvitation = React.lazy(() => import('./components/rosewood/Rosewo
 const AstraeaInvitation = React.lazy(() => import('./components/astraea/AstraeaInvitation').then((module) => ({ default: module.AstraeaInvitation })));
 const CoruscantInvitation = React.lazy(() => import('./components/coruscant/CoruscantInvitation').then((module) => ({ default: module.CoruscantInvitation })));
 const InvitationBuilderPage = React.lazy(() => import('./components/invitation-builder/InvitationBuilderPage'));
+const PlatformLandingConcept = React.lazy(() => import('./components/PlatformLandingConcept'));
 
 
 const MODEL_COLOR_OPTIONS = [
@@ -1227,6 +1228,7 @@ function App() {
   const embeddedPreview = pageParams.get('embeddedPreview') === '1';
   const previewModelId = pageParams.get('previewModel');
   const builderMode = pageParams.has('builder');
+  const platformConceptMode = pageParams.get('concepto') === 'plataforma';
   const changeOrderNumber = pageParams.get('pedido') || '';
   // Navigation & Language UI States
   const [lang, setLang] = useState<'es' | 'en' | 'pt'>('es');
@@ -1727,6 +1729,7 @@ function App() {
   // ==========================================
 
   // 1. ADMIN LOGIN VIEW
+  if (platformConceptMode) return <React.Suspense fallback={<main className="route-loading">Preparando la experiencia…</main>}><PlatformLandingConcept /></React.Suspense>;
   if (builderMode) return <React.Suspense fallback={<main className="route-loading">Preparando tu invitación…</main>}><InvitationBuilderPage /></React.Suspense>;
 
   if (showAdminLogin && !isAdminLoggedIn) {
