@@ -67,17 +67,21 @@ export const normalizeSectionOrder = (
 
 export const composeInvitationSections = (
   definitions: InvitationSectionDefinition[],
-  sections: InvitationSectionState[]
+  sections: InvitationSectionState[],
+  toneSequence: InvitationTone[] = TONE_SEQUENCE
 ): ComposedInvitationSection[] => {
   const definitionById = new Map(definitions.map((definition) => [definition.id, definition]));
   const visible = normalizeSectionOrder(definitions, sections).filter(({ enabled }) => enabled);
+  let dynamicToneIndex = 0;
 
   return visible.map((section, index) => {
     const next = visible[index + 1];
     const fixedTone = definitionById.get(section.id)?.tone;
+    const tone = fixedTone ?? toneSequence[dynamicToneIndex % toneSequence.length];
+    if (!fixedTone) dynamicToneIndex += 1;
     return {
       ...section,
-      tone: fixedTone ?? TONE_SEQUENCE[index % TONE_SEQUENCE.length],
+      tone,
       ornamentAfter: Boolean(next) && !isPhotoGalleryPair(section.id, next.id)
     };
   });

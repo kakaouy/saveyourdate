@@ -25,7 +25,10 @@ test('Aurora recalcula tonos cuando se quita una sección intermedia', () => {
     section.id === 'countdown' ? { ...section, enabled: false } : section
   );
   const config = auroraConfigFromBuilder(document);
-  assert.equal(config.tones?.location, 'accent');
+  assert.equal(config.tones?.location, 'light');
+  assert.equal(config.tones?.quote, 'accent');
+  assert.equal(config.tones?.parallax, 'light');
+  assert.equal(config.tones?.social, 'accentDark');
 });
 
 test('Astraea y Coruscant adoptan el mismo documento sin perder sus valores iniciales', () => {

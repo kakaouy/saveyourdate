@@ -11,12 +11,12 @@ export const AURORA_BUILDER_SECTIONS: InvitationSectionDefinition[] = [
   { id: 'quote', label: 'Frase' },
   { id: 'dressCode', label: 'Código de vestimenta' },
   { id: 'schedule', label: 'Cronograma' },
-  { id: 'parallax', label: 'Foto destacada' },
-  { id: 'gallery', label: 'Galería' },
+  { id: 'parallax', label: 'Foto destacada', tone: 'light' },
+  { id: 'gallery', label: 'Galería', tone: 'alternate' },
   { id: 'hotels', label: 'Alojamiento' },
   { id: 'gifts', label: 'Regalos' },
   { id: 'photoUpload', label: 'Álbum colaborativo' },
-  { id: 'social', label: 'Instagram y hashtag' },
+  { id: 'social', label: 'Instagram y hashtag', tone: 'accentDark' },
   { id: 'songSuggestions', label: 'Sugerencias de canciones' },
   { id: 'qrPass', label: 'Pase QR' },
   { id: 'rsvp', label: 'Confirmación de asistencia', locked: 'last' }
@@ -68,7 +68,11 @@ export const createBuilderDocument = (
 });
 
 export const auroraConfigFromBuilder = (document: InvitationBuilderDocument): Partial<AuroraConfig> => {
-  const composed = composeInvitationSections(AURORA_BUILDER_SECTIONS, document.sections);
+  const composed = composeInvitationSections(
+    AURORA_BUILDER_SECTIONS,
+    document.sections,
+    ['light', 'accent']
+  );
   const visible = new Set(composed.map(({ id }) => id));
   const sections = Object.fromEntries(
     AURORA_BUILDER_SECTIONS.map(({ id }) => [id, visible.has(id)])
