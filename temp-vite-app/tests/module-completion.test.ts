@@ -86,7 +86,7 @@ test('el panel ofrece acceso visible al constructor para el pedido activo', () =
   assert.match(admin, /\["Invitación", "✦"\]/);
   assert.match(admin, /Invitación: "invitation"/);
   assert.match(admin, /function InvitationModule/);
-  assert.match(admin, /Abrir constructor/);
+  assert.match(admin, /Crear mi invitación/);
   assert.match(admin, /builder=\$\{encodeURIComponent\(templateId\)\}&pedido=\$\{encodeURIComponent\(order\.orderNumber\)\}/);
   assert.match(admin, /target="_blank"/);
 });

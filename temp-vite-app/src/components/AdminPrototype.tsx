@@ -6727,15 +6727,15 @@ function InvitationModule({ order }: { order: AdminOrder }) {
     <section className="panel invitation-builder-access">
       <div className="invitation-builder-icon">✦</div>
       <div className="invitation-builder-copy">
-        <span>{t("Constructor de invitaciones", "Invitation builder", "Construtor de convites")}</span>
-        <h2>{t("Armá tu invitación paso a paso", "Build your invitation step by step", "Monte seu convite passo a passo")}</h2>
-        <p>{t("El constructor se abre con el pedido actual y conserva el modelo seleccionado. Podés guardar un borrador y continuar después.", "The builder opens with the current order and keeps its selected template. Save a draft and continue later.", "O construtor abre com o pedido atual e mantém o modelo escolhido. Salve um rascunho e continue depois.")}</p>
+        <span>{t("Tu invitación digital", "Your digital invitation", "Seu convite digital")}</span>
+        <h2>{t("Creá tu invitación paso a paso", "Create your invitation step by step", "Crie seu convite passo a passo")}</h2>
+        <p>{t("Abrila con el pedido actual y el modelo que elegiste. Podés guardar un borrador y continuar cuando quieras.", "Open it with the current order and your chosen template. Save a draft and continue whenever you like.", "Abra com o pedido atual e o modelo escolhido. Salve um rascunho e continue quando quiser.")}</p>
         <dl>
           <div><dt>{t("Pedido", "Order", "Pedido")}</dt><dd>{order.orderNumber}</dd></div>
           <div><dt>{t("Modelo", "Template", "Modelo")}</dt><dd>{order.modelName || templateId}</dd></div>
         </dl>
       </div>
-      <a className="primary-button invitation-builder-button" href={builderUrl} target="_blank" rel="noreferrer">✨ {t("Abrir constructor", "Open builder", "Abrir construtor")}</a>
+      <a className="primary-button invitation-builder-button" href={builderUrl} target="_blank" rel="noreferrer">✨ {t("Crear mi invitación", "Create my invitation", "Criar meu convite")}</a>
     </section>
   </>;
 }
