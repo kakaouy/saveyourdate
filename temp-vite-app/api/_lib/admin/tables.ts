@@ -13,7 +13,7 @@ type TableRow = {
   position_y?: number;
   layout_width?: number;
   layout_height?: number;
-  table_shape?: 'round' | 'rectangular' | 'square';
+  table_shape?: 'round' | 'rectangular' | 'square' | 'living';
   rotation_degrees?: number;
   is_locked?: boolean;
 };
@@ -152,7 +152,7 @@ async function handler(request: Request) {
           name,
           capacity,
           note: String(body.note || '').trim()
-          ,table_shape: ['round', 'rectangular', 'square'].includes(String(body.shape)) ? String(body.shape) : 'round'
+          ,table_shape: ['round', 'rectangular', 'square', 'living'].includes(String(body.shape)) ? String(body.shape) : 'round'
         })
       });
       const createdTable = ((await response.json()) as TableRow[])[0];
@@ -279,7 +279,7 @@ async function handler(request: Request) {
             name,
             capacity,
             note: String(body.note || '').trim(),
-            table_shape: ['round', 'rectangular', 'square'].includes(String(body.shape)) ? String(body.shape) : 'round',
+            table_shape: ['round', 'rectangular', 'square', 'living'].includes(String(body.shape)) ? String(body.shape) : 'round',
             updated_at: new Date().toISOString()
           })
         }

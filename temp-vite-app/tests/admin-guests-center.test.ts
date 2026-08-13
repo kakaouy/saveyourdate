@@ -119,16 +119,42 @@ test('cada mesa resume menús y alertas operativas también en el reporte', () =
   assert.match(source, /guest\.companions/);
 });
 
-test('el plano admite mesas redondas, rectangulares y cuadradas con asientos visibles', () => {
+test('el plano admite mesas y Living con lugares visibles', () => {
   const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
-  const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812030000_table_shapes.sql'), 'utf8');
+  const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260813030000_living_seating_areas.sql'), 'utf8');
   assert.match(source, /type EventTable =/);
-  assert.match(source, /shape: "round" \| "rectangular" \| "square"/);
+  assert.match(source, /shape: "round" \| "rectangular" \| "square" \| "living"/);
   assert.match(source, /className=\{`table-seat-map is-/);
   assert.match(source, /className=\{`seat-marker/);
   assert.match(source, /table-shape-picker/);
   assert.match(tablesApi, /table_shape/);
-  assert.match(migration, /check \(table_shape in \('round', 'rectangular', 'square'\)\)/);
+  assert.match(migration, /check \(table_shape in \('round', 'rectangular', 'square', 'living'\)\)/);
+});
+
+test('la búsqueda permite ubicar un grupo completo de forma atómica', () => {
+  assert.match(source, /const matchingGroups = query\.trim\(\)/);
+  assert.match(source, /const assignGroup = async/);
+  assert.match(source, /action: "assign-batch"/);
+  assert.match(source, /className="group-search-results"/);
+  assert.match(source, /Ubicar grupo completo/);
+});
+
+test('Mesas ofrece un recorrido móvil simple de dos pasos', () => {
+  assert.match(source, /const \[mobileSeatingStep, setMobileSeatingStep\]/);
+  assert.match(source, /className="mobile-seating-switch"/);
+  assert.match(source, /Buscar invitados/);
+  assert.match(source, /Elegir ubicación/);
+  assert.match(styles, /\.mobile-seating-switch/);
+  assert.match(styles, /\.seating-mobile-hidden/);
+});
+
+test('el respaldo conserva Living, el plano y los asientos asignados', () => {
+  const backupApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'backup.ts'), 'utf8');
+  const restoreApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'restore.ts'), 'utf8');
+  assert.match(backupApi, /table_shape/);
+  assert.match(backupApi, /seat_number/);
+  assert.match(restoreApi, /'living'/);
+  assert.match(restoreApi, /seat_number: guest\.seat_number/);
 });
 
 test('los grupos pueden ubicarse en un asiento concreto sin solaparse', () => {
@@ -289,7 +315,7 @@ test('el paquete de usabilidad agrupa densidad, guardado, vacíos y adaptación 
   assert.match(source, /className="clear-seating-filters"/);
   assert.match(styles, /\.tables-grid\.is-compact/);
   assert.match(styles, /\.table-card\.is-saving/);
-  assert.match(styles, /\.guest-assign-list \{ max-height: 62vh/);
+  assert.match(styles, /\.guest-assign-list \{ max-height: none; overflow: visible/);
 });
 
 test('el segundo paquete agrega restricciones, referencias, exportación y teclado', () => {

@@ -15,7 +15,9 @@
     { "source": "/admin", "destination": "/index.html" },
     { "source": "/confirmar", "destination": "/index.html" },
     { "source": "/validar-pago", "destination": "/index.html" },
-    { "source": "/preparando", "destination": "/index.html" }
+    { "source": "/preparando", "destination": "/index.html" },
+    { "source": "/i/:order", "destination": "/index.html" },
+    { "source": "/revision-invitacion", "destination": "/index.html" }
   ],
   "headers": [
     {

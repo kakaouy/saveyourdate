@@ -4,7 +4,7 @@ import { ASTRAEA_PALETTES, DEFAULT_ASTRAEA_CONFIG } from './config';
 import type { AstraeaPalette } from './config';
 import './astraea.css';
 
-type Props={locale:AuroraLocale;palette:AstraeaPalette;embedded?:boolean;onClose?:()=>void;config?:Partial<AuroraConfig>};
+type Props={locale:AuroraLocale;palette:AstraeaPalette;embedded?:boolean;onClose?:()=>void;config?:Partial<AuroraConfig>;sectionOrder?:string[]};
 export function AstraeaInvitation(props:Props){
   const localized = {
     es: {

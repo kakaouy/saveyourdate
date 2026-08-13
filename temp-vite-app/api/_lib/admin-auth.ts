@@ -1,12 +1,13 @@
 import { hashToken, randomToken, supabaseRequest } from './orders.js';
 import { eventAccessExpired } from './event-lifecycle.js';
 
+export type AdminAccessRole = 'owner' | 'admin' | 'editor' | 'viewer';
 export type LoginCode = {
   id: string;
   order_number: string;
   code_hash: string;
   login_email: string;
-  access_role: 'owner' | 'editor' | 'viewer';
+  access_role: AdminAccessRole;
   attempts: number;
   expires_at: string;
   used_at: string | null;
@@ -42,7 +43,7 @@ export const createSixDigitCode = () => {
   return String(100000 + (bytes[0] % 900000));
 };
 
-export const createChallenge = async (orderNumber: string, code: string, loginEmail: string, accessRole: 'owner' | 'editor' | 'viewer') => {
+export const createChallenge = async (orderNumber: string, code: string, loginEmail: string, accessRole: AdminAccessRole) => {
   const id = crypto.randomUUID();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
   await supabaseRequest('admin_login_codes', {
@@ -80,7 +81,7 @@ export const recentChallengeCount = async (orderNumber: string, loginEmail: stri
   return ((await response.json()) as Array<{ id: string }>).length;
 };
 
-export const createSession = async (orderNumber: string, loginEmail: string, accessRole: 'owner' | 'editor' | 'viewer') => {
+export const createSession = async (orderNumber: string, loginEmail: string, accessRole: AdminAccessRole) => {
   const token = randomToken();
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
   await supabaseRequest('admin_sessions', {
@@ -109,7 +110,7 @@ export const findSession = async (token: string) => {
   const response = await supabaseRequest(
     `admin_sessions?token_hash=eq.${await hashToken(token)}&revoked_at=is.null&expires_at=gt.${encodeURIComponent(new Date().toISOString())}&select=id,order_number,login_email,access_role,expires_at&limit=1`
   );
-  const session = ((await response.json()) as Array<{ id: string; order_number: string; login_email: string; access_role: 'owner' | 'editor' | 'viewer'; expires_at: string }>)[0] || null;
+  const session = ((await response.json()) as Array<{ id: string; order_number: string; login_email: string; access_role: AdminAccessRole; expires_at: string }>)[0] || null;
   if (!session) return null;
   const orderResponse = await supabaseRequest(
     `orders?order_number=eq.${encodeURIComponent(session.order_number)}&select=order_payload&limit=1`

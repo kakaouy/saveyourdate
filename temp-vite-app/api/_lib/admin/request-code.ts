@@ -3,6 +3,7 @@ import {
   createSixDigitCode,
   recentChallengeCount
 } from '../admin-auth.js';
+import type { AdminAccessRole } from '../admin-auth.js';
 import {
   emailShell,
   escapeHtml,
@@ -24,12 +25,12 @@ async function handler(request: Request) {
     if (!orderNumber.startsWith('SYD-') || !contact) return json({ error: genericError }, 400);
     let order = await findOrderForLookup(orderNumber, contact);
     let loginEmail = order?.customer_email || '';
-    let accessRole: 'owner' | 'editor' | 'viewer' = 'owner';
+    let accessRole: AdminAccessRole = 'owner';
     if (!order && contact.includes('@')) {
       const response = await supabaseRequest(
         `event_admins?order_number=eq.${encodeURIComponent(orderNumber)}&email=eq.${encodeURIComponent(contact.toLowerCase())}&select=email,role&limit=1`
       );
-      const access = ((await response.json()) as Array<{ email: string; role: 'editor' | 'viewer' }>)[0];
+      const access = ((await response.json()) as Array<{ email: string; role: Exclude<AdminAccessRole, 'owner'> }>)[0];
       if (access) {
         order = await findOrderByNumber(orderNumber);
         loginEmail = access.email;

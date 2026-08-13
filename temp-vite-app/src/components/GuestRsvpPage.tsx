@@ -20,6 +20,13 @@ type RsvpData = {
   };
 };
 
+const readRsvpResponse = async <T,>(response: Response): Promise<T> => {
+  if (!response.headers.get('content-type')?.includes('application/json')) {
+    throw new Error('El servicio de confirmaciones no está disponible. Intentá nuevamente en unos minutos.');
+  }
+  return await response.json() as T;
+};
+
 export default function GuestRsvpPage() {
   const token = new URLSearchParams(window.location.search).get('token') || '';
   const [data, setData] = useState<RsvpData | null>(null);
@@ -36,12 +43,18 @@ export default function GuestRsvpPage() {
   const [accessibilityNeeds, setAccessibilityNeeds] = useState('');
   const [guestNotes, setGuestNotes] = useState('');
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (!token) {
+      setMessage('Este enlace de confirmación está incompleto. Pedile a la persona organizadora que te lo envíe nuevamente.');
+      setMessageType('error');
+      return;
+    }
     fetch(`/api/rsvp?token=${encodeURIComponent(token)}`)
       .then(async (response) => {
-        const result = await response.json() as RsvpData & { error?: string };
+        const result = await readRsvpResponse<RsvpData & { error?: string }>(response);
         if (!response.ok) throw new Error(result.error || 'No pudimos abrir la invitación.');
         setData(result);
         setStatus(result.guest.status === 'No asiste' ? 'No asiste' : 'Confirmado');
@@ -59,24 +72,30 @@ export default function GuestRsvpPage() {
           name: '', food: '', identificationType: '', identificationNumber: ''
         }));
       })
-      .catch((error: Error) => setMessage(error.message));
+      .catch((error: Error) => {
+        setMessage(error.message);
+        setMessageType('error');
+      });
   }, [token]);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setBusy(true);
     setMessage('');
+    setMessageType('');
     try {
       const response = await fetch(`/api/rsvp?token=${encodeURIComponent(token)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, confirmed, food, song, identificationType, identificationNumber, companions, transportOption, transportStop, menuChoice, accessibilityNeeds, guestNotes })
       });
-      const result = await response.json() as { error?: string };
+      const result = await readRsvpResponse<{ error?: string }>(response);
       if (!response.ok) throw new Error(result.error || 'No pudimos guardar tu respuesta.');
-      setMessage('¡Gracias! Tu confirmación quedó guardada.');
+      setMessage(status === 'Confirmado' ? '¡Gracias! Tu asistencia quedó confirmada.' : 'Tu respuesta quedó guardada. Gracias por avisarnos.');
+      setMessageType('success');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No pudimos guardar tu respuesta.');
+      setMessageType('error');
     } finally {
       setBusy(false);
     }
@@ -96,7 +115,7 @@ export default function GuestRsvpPage() {
   return <main className="rsvp-shell">
     <section className="rsvp-card">
       <img src="/logo.svg" alt="Save Your Date" />
-      {!data ? <p role="status">{message || 'Cargando invitación…'}</p> : <>
+      {!data ? <p className={messageType === 'error' ? 'rsvp-message is-error' : ''} role={messageType === 'error' ? 'alert' : 'status'}>{message || 'Cargando invitación…'}</p> : <>
         <span className="eyebrow">{data.event.date || 'Próximo evento'}</span>
         <h1>{data.event.title}</h1>
         <p>Hola, <strong>{data.guest.name}</strong>. Confirmá tu asistencia y completá tus preferencias.</p>
@@ -120,7 +139,7 @@ export default function GuestRsvpPage() {
             {companion.identificationType && <label>Número de identificación<input value={companion.identificationNumber} onChange={(event) => updateCompanion(index, { identificationNumber: event.target.value })} placeholder="Ingresá el número" /></label>}
           </fieldset>)}
           <button className="primary-button" disabled={busy}>{busy ? 'Guardando…' : 'Confirmar respuesta'}</button>
-          {message && <p className="rsvp-message" role="status">{message}</p>}
+          {message && <p className={`rsvp-message ${messageType === 'error' ? 'is-error' : 'is-success'}`} role={messageType === 'error' ? 'alert' : 'status'}>{message}</p>}
         </form>
       </>}
     </section>

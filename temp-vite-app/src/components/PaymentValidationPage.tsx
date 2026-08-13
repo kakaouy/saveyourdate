@@ -127,6 +127,13 @@ export default function PaymentValidationPage() {
                 <button type="button" onClick={() => sendProgress('changes_applied')} disabled={sending}>Modificaciones realizadas</button>
                 {progressSuccess && <p className="private-order-delivery-success">{progressSuccess}</p>}
               </div>
+              <div className="admin-progress-actions">
+                <strong>Revisión de la invitación modular</strong>
+                <p>Abrí el borrador completo para solicitar cambios, aprobarlo y publicarlo.</p>
+                <a className="private-order-review-link" href={`/revision-invitacion?token=${encodeURIComponent(token)}`}>
+                  Revisar invitación
+                </a>
+              </div>
               <form className="delivery-form" onSubmit={deliver}>
                 <div className="delivery-form-heading">
                   <strong>Entrega final</strong>

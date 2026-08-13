@@ -1,5 +1,7 @@
 import { findSession, readSessionToken } from "../admin-auth.js";
-import { findOrderByNumber, json } from "../orders.js";
+import { findOrderByNumber, json, supabaseRequest } from "../orders.js";
+
+const legacyModules = ['invitation', 'guests_rsvp', 'tables', 'check_in', 'messaging', 'collaborative_album', 'suppliers'];
 
 async function handler(request: Request) {
   if (request.method !== "GET")
@@ -9,6 +11,17 @@ async function handler(request: Request) {
     if (!session) return json({ authenticated: false }, 401);
     const order = await findOrderByNumber(session.order_number);
     if (!order) return json({ authenticated: false }, 401);
+    let enabledModules = legacyModules;
+    try {
+      const eventResponse = await supabaseRequest(`events?order_number=eq.${encodeURIComponent(session.order_number)}&select=owner_account_id&limit=1`);
+      const event = ((await eventResponse.json()) as Array<{ owner_account_id: string }>)[0];
+      if (event) {
+        const moduleResponse = await supabaseRequest(`account_modules?account_id=eq.${event.owner_account_id}&enabled=eq.true&select=module`);
+        enabledModules = ((await moduleResponse.json()) as Array<{ module: string }>).map(({ module }) => module);
+      }
+    } catch (error) {
+      console.warn('Usando módulos heredados para el pedido.', error);
+    }
     return json({
       authenticated: true,
       order: {
@@ -30,8 +43,9 @@ async function handler(request: Request) {
           order.order_payload.giftDetails ||
             order.order_payload["Regalos"] ||
             order.order_payload["Datos bancarios"] ||
-            "",
+          "",
         ),
+        enabledModules,
       },
       expiresAt: session.expires_at,
     });

@@ -662,6 +662,19 @@
   color: white;
 }
 
+.carousel-control-btn:disabled {
+  border-color: var(--color-border);
+  background: #f4f2f3;
+  color: #9b949d;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: .7;
+}
+
+.carousel-control-btn:disabled:hover {
+  transform: none;
+}
+
 .carousel-control-btn.prev {
   padding: 10px;
   width: 44px;
@@ -1479,7 +1492,7 @@
 /* Simulated Invitation Elements */
 .sim-cover {
   height: 240px;
-  background: linear-gradient(rgba(244, 166, 182, 0.3), rgba(244, 166, 182, 0.7)), url('placeholder-wedding.jpg') center/cover;
+  background: linear-gradient(rgba(244, 166, 182, 0.3), rgba(244, 166, 182, 0.7)), url('/astraea/images/foto-01.png') center/cover;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -3285,6 +3298,18 @@ html {
   background: #fff;
 }
 
+.demo-preview-loading {
+  height: 100%;
+  display: grid;
+  place-content: center;
+  padding: 20px;
+  color: var(--color-text-secondary);
+  background: var(--color-soft-white);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}
+
 .demo-real-invitation-frame {
   width: 100%;
   height: 100%;
@@ -4773,6 +4798,177 @@ html {
   display: inline-block;
   width: auto;
   text-decoration: none;
+}
+
+.private-order-review-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 18px;
+  border: 1px solid rgba(57, 46, 59, 0.2);
+  border-radius: 999px;
+  color: #392e3b;
+  background: #fff;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.invitation-review-page {
+  min-height: 100vh;
+  background: #e9e6ec;
+}
+
+.invitation-review-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 20px;
+  color: #fff;
+  background: #392e3b;
+  box-shadow: 0 8px 24px rgba(20, 14, 21, 0.2);
+}
+
+.invitation-review-toolbar > div:first-child {
+  display: grid;
+  gap: 2px;
+  margin-right: auto;
+}
+
+.invitation-review-toolbar span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.84rem;
+}
+
+.invitation-review-toolbar > div:nth-child(2) {
+  display: flex;
+  gap: 8px;
+}
+
+.invitation-review-toolbar button {
+  min-height: 38px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  color: #392e3b;
+  background: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.invitation-review-toolbar p {
+  margin: 0;
+  color: #f3d1df;
+}
+
+.invitation-review-preview {
+  max-width: 1440px;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 0 40px rgba(20, 14, 21, 0.12);
+}
+
+.invitation-review-layout {
+  display: grid;
+  grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
+  align-items: start;
+  max-width: 1740px;
+  margin: 0 auto;
+}
+
+.invitation-review-history {
+  position: sticky;
+  top: 76px;
+  max-height: calc(100vh - 76px);
+  overflow: auto;
+  padding: 24px 18px;
+}
+
+.invitation-review-history h2 {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+}
+
+.invitation-review-history article {
+  display: grid;
+  gap: 3px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(57, 46, 59, 0.14);
+}
+
+.invitation-review-history time {
+  color: #756d77;
+  font-size: 0.76rem;
+}
+
+.invitation-review-history p {
+  margin: 5px 0 0;
+  white-space: pre-wrap;
+}
+
+.invitation-review-comment {
+  flex: 1 1 100%;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  gap: 6px 10px;
+}
+
+.invitation-review-comment label {
+  grid-column: 1 / -1;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.invitation-review-comment textarea {
+  min-height: 72px;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.published-invitation-state {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  padding: 24px;
+  text-align: center;
+  background: #f7f2f5;
+}
+
+.published-invitation-state h1,
+.published-invitation-state p {
+  margin: 0.35rem;
+}
+
+@media (max-width: 680px) {
+  .invitation-review-toolbar {
+    position: relative;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .invitation-review-toolbar > div:nth-child(2) {
+    flex-wrap: wrap;
+  }
+
+  .invitation-review-layout {
+    display: block;
+  }
+
+  .invitation-review-history {
+    position: static;
+    max-height: none;
+  }
+
+  .invitation-review-comment {
+    grid-template-columns: 1fr;
+  }
 }
 
 .delivery-form {

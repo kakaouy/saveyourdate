@@ -40,6 +40,76 @@ body {
   color: var(--color-text-main);
 }
 
+.route-loading {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  padding: 24px;
+  color: #625866;
+  background: #f9f9fb;
+  font-weight: 800;
+}
+
+.modular-section-order > .modular-ornament-host {
+  position: relative;
+  z-index: 10;
+}
+
+.modular-section-order > .modular-ornament-before::before,
+.modular-section-order > .modular-ornament-after::after {
+  position: absolute;
+  z-index: 20;
+  width: 46%;
+  height: clamp(86px, 20vw, 180px);
+  background-image: var(--modular-ornament-image);
+  background-repeat: no-repeat;
+  background-size: contain;
+  content: '';
+  pointer-events: none;
+  transform: translateY(var(--modular-ornament-translate)) scaleX(var(--modular-ornament-scale-x, 1));
+  animation: modular-ornament-breathe var(--modular-ornament-duration, 9.4s) ease-in-out var(--modular-ornament-delay, 0s) infinite;
+}
+
+.modular-section-order > .modular-ornament-before::before { top: 0; }
+.modular-section-order > .modular-ornament-after::after { bottom: 0; }
+
+.modular-section-order form {
+  position: relative;
+  z-index: 30;
+}
+
+.modular-section-order form :is(input, select, textarea, button, fieldset) {
+  position: relative;
+  z-index: 31;
+}
+
+.modular-section-order > .modular-ornament-left::before,
+.modular-section-order > .modular-ornament-left::after {
+  left: 0;
+  background-position: left center;
+  transform-origin: left center;
+}
+
+.modular-section-order > .modular-ornament-right::before,
+.modular-section-order > .modular-ornament-right::after {
+  right: 0;
+  background-position: right center;
+  transform-origin: right center;
+}
+
+@keyframes modular-ornament-breathe {
+  0%, 100% { transform: translateY(var(--modular-ornament-translate)) scaleX(var(--modular-ornament-scale-x, 1)) scale(1); }
+  46% { transform: translateY(var(--modular-ornament-translate)) scaleX(var(--modular-ornament-scale-x, 1)) scale(1.032); }
+  58% { transform: translateY(var(--modular-ornament-translate)) scaleX(var(--modular-ornament-scale-x, 1)) scale(1.021); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modular-section-order > .modular-ornament-before::before,
+  .modular-section-order > .modular-ornament-after::after {
+    animation: none;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { readSheet } from "read-excel-file/browser";
-import mammoth from "mammoth/mammoth.browser";
 import "../admin-prototype.css";
 import {
   AdminI18nProvider,
@@ -86,13 +84,20 @@ type AdminOrder = {
   eventType: string;
   defaultPhoneCountryCode: string;
   language: AdminLanguage;
-  accessRole: "owner" | "editor" | "viewer";
+  accessRole: "owner" | "admin" | "editor" | "viewer";
   loginEmail: string;
   invitationUrl: string;
   giftDetails: string;
+  enabledModules: Array<"invitation" | "guests_rsvp" | "tables" | "check_in" | "messaging" | "collaborative_album" | "suppliers">;
 };
 
 const guestsSeed: Guest[] = [];
+
+const readApiJson = async <T,>(response: Response, unavailableMessage: string): Promise<T> => {
+  if (!response.headers.get("content-type")?.includes("application/json"))
+    throw new Error(unavailableMessage);
+  return (await response.json()) as T;
+};
 
 const formatEventDate = (value: string) => {
   if (!value) return "Fecha pendiente";
@@ -245,11 +250,13 @@ const readGuestFile = async (file: File) => {
   const extension = file.name.split(".").pop()?.toLowerCase();
   if (extension === "csv") return parseCsv(await file.text());
   if (extension === "xlsx") {
+    const { readSheet } = await import("read-excel-file/browser");
     return (await readSheet(file)).map((row: unknown[]) =>
       row.map((cell: unknown) => String(cell ?? "")),
     );
   }
   if (extension === "docx") {
+    const { default: mammoth } = await import("mammoth/mammoth.browser");
     const result = await mammoth.convertToHtml({
       arrayBuffer: await file.arrayBuffer(),
     });
@@ -302,6 +309,16 @@ const nav = [
   ["Accesos", "♢"],
   ["Configuración", "⚙"],
 ];
+
+const moduleForView: Record<string, AdminOrder["enabledModules"][number] | undefined> = {
+  Invitados: "guests_rsvp",
+  Restricciones: "guests_rsvp",
+  Canciones: "invitation",
+  Recordatorios: "messaging",
+  Agradecimientos: "messaging",
+  Mesas: "tables",
+  "Check-in": "check_in",
+};
 
 const countryCodes = [
   ["Uruguay", "+598"],
@@ -442,6 +459,18 @@ function Login({ onLogin }: { onLogin: () => void }) {
   const [recovering, setRecovering] = useState(false);
   const t = (es: string, en: string, pt: string) =>
     adminText(language, es, en, pt);
+  const readLoginResponse = async <T,>(response: Response): Promise<T> => {
+    if (!response.headers.get("content-type")?.includes("application/json")) {
+      throw new Error(
+        t(
+          "El servicio de acceso no está disponible. Intentá nuevamente en unos minutos.",
+          "The access service is unavailable. Please try again in a few minutes.",
+          "O serviço de acesso não está disponível. Tente novamente em alguns minutos.",
+        ),
+      );
+    }
+    return (await response.json()) as T;
+  };
   useEffect(() => {
     document.documentElement.lang = language;
     window.sessionStorage.setItem("syd-admin-language", language);
@@ -462,10 +491,10 @@ function Login({ onLogin }: { onLogin: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: recoveryEmail }),
       });
-      const result = (await response.json()) as {
+      const result = await readLoginResponse<{
         message?: string;
         error?: string;
-      };
+      }>(response);
       if (!response.ok)
         throw new Error(result.error || "No pudimos procesar la solicitud.");
       setRecoveryMessage(result.message || "Revisá tu email.");
@@ -489,12 +518,12 @@ function Login({ onLogin }: { onLogin: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderNumber, contact: contactValue }),
       });
-      const result = (await response.json()) as {
+      const result = await readLoginResponse<{
         challengeId?: string;
         maskedEmail?: string;
         language?: "es" | "en" | "pt";
         error?: string;
-      };
+      }>(response);
       if (!response.ok || !result.challengeId)
         throw new Error(result.error || "No pudimos enviar el código.");
       setChallengeId(result.challengeId);
@@ -521,7 +550,7 @@ function Login({ onLogin }: { onLogin: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ challengeId, code }),
       });
-      const result = (await response.json()) as { error?: string };
+      const result = await readLoginResponse<{ error?: string }>(response);
       if (!response.ok)
         throw new Error(result.error || "No pudimos validar el código.");
       onLogin();
@@ -1357,9 +1386,9 @@ function Guests({
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
+  const [notice, setNotice] = useState("");
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
   const [copiedId, setCopiedId] = useState("");
   const [newGuestCode, setNewGuestCode] = useState(defaultPhoneCountryCode);
   const [newIdentificationType, setNewIdentificationType] = useState(
@@ -1444,14 +1473,15 @@ function Guests({
             newGuestCode === "custom" ? customGuestCode : newGuestCode,
         }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         error?: string;
-      };
+      }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guest)
         throw new Error(result.error || "No pudimos guardar el invitado.");
       setGuests((current) => [...current, result.guest!]);
       setShowModal(false);
+      setNotice(t("Invitado agregado correctamente.", "Guest added successfully.", "Convidado adicionado corretamente."));
     } catch (saveError) {
       setError(
         saveError instanceof Error
@@ -1483,12 +1513,13 @@ function Guests({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: archived ? "bulk-archive" : "bulk-restore", ids: selected }),
       });
-      const result = (await response.json()) as { guests?: Guest[]; error?: string };
+      const result = await readApiJson<{ guests?: Guest[]; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guests)
         throw new Error(result.error || (archived ? "No pudimos archivar la selección." : "No pudimos restaurar la selección."));
       const archivedGuests = new Map(result.guests.map((guest) => [guest.id, guest]));
       setGuests((current) => current.map((guest) => archivedGuests.get(guest.id) || guest));
       setSelected([]);
+      setNotice(archived ? t("Selección archivada. Podés restaurarla desde Archivados.", "Selection archived. You can restore it from Archived.", "Seleção arquivada. Você pode restaurá-la em Arquivados.") : t("Selección restaurada.", "Selection restored.", "Seleção restaurada."));
     } catch (deleteError) {
       setError(
         deleteError instanceof Error
@@ -1519,7 +1550,7 @@ function Guests({
           [bulkField]: bulkValue,
         }),
       });
-      const result = (await response.json()) as { guests?: Guest[]; error?: string };
+      const result = await readApiJson<{ guests?: Guest[]; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guests)
         throw new Error(result.error || "No pudimos editar la selección.");
       const updated = new Map(result.guests.map((guest) => [guest.id, guest]));
@@ -1543,16 +1574,25 @@ function Guests({
         ),
       )
     ) return;
+    setUpdatingId(guest.id);
     setError("");
-    const response = await fetch("/api/admin/guests", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: archived ? "archive" : "restore", id: guest.id }),
-    });
-    const result = (await response.json()) as { guest?: Guest; error?: string };
-    if (!response.ok || !result.guest)
-      return setError(result.error || "No pudimos actualizar el archivo.");
-    setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+    setNotice("");
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: archived ? "archive" : "restore", id: guest.id }),
+      });
+      const result = await readApiJson<{ guest?: Guest; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
+      if (!response.ok || !result.guest)
+        throw new Error(result.error || "No pudimos actualizar el archivo.");
+      setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+      setNotice(archived ? t("Invitado archivado. Podés restaurarlo cuando quieras.", "Guest archived. You can restore them anytime.", "Convidado arquivado. Você pode restaurá-lo quando quiser.") : t("Invitado restaurado.", "Guest restored.", "Convidado restaurado."));
+    } catch (archiveError) {
+      setError(archiveError instanceof Error ? archiveError.message : "No pudimos actualizar el archivo.");
+    } finally {
+      setUpdatingId("");
+    }
   };
 
   const updateStatus = async (guest: Guest, status: Guest["status"]) => {
@@ -1573,10 +1613,10 @@ function Guests({
           song: guest.song,
         }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         error?: string;
-      };
+      }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guest)
         throw new Error(
           result.error || "No pudimos actualizar la confirmación.",
@@ -1630,10 +1670,10 @@ function Guests({
           preferredTableName: data.get("preferredTableName"),
         }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         error?: string;
-      };
+      }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guest)
         throw new Error(result.error || "No pudimos guardar los datos.");
       setGuests((current) =>
@@ -1642,6 +1682,7 @@ function Guests({
         ),
       );
       setEditingGuest(null);
+      setNotice(t("Datos del invitado actualizados.", "Guest details updated.", "Dados do convidado atualizados."));
     } catch (updateError) {
       setError(
         updateError instanceof Error
@@ -1681,19 +1722,25 @@ function Guests({
       `Hi ${guest.name}, we'd love to invite you to ${defaultInviter}. Details and RSVP: ${link}`,
       `Olá ${guest.name}, queremos convidar você para ${defaultInviter}. Detalhes e confirmação: ${link}`,
     );
-    window.open(
+    const popup = window.open(
       `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
       "_blank",
-      "noopener,noreferrer",
     );
-    const invitationSentAt = new Date().toISOString();
-    setGuests((current) =>
-      current.map((item) =>
-        item.id === guest.id
-          ? { ...item, whatsappStatus: "sent", invitationSentAt }
-          : item,
-      ),
-    );
+    if (!popup) {
+      setError(t(
+        "El navegador bloqueó WhatsApp. Habilitá las ventanas emergentes e intentá nuevamente.",
+        "The browser blocked WhatsApp. Allow pop-ups and try again.",
+        "O navegador bloqueou o WhatsApp. Permita pop-ups e tente novamente.",
+      ));
+      return;
+    }
+    popup.opener = null;
+    setUpdatingId(guest.id);
+    setNotice(t(
+      `WhatsApp quedó abierto para ${guest.name}. Registrando el envío…`,
+      `WhatsApp is open for ${guest.name}. Recording the send…`,
+      `O WhatsApp foi aberto para ${guest.name}. Registrando o envio…`,
+    ));
     void fetch("/api/admin/guests", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -1704,12 +1751,13 @@ function Guests({
       }),
     })
       .then(async (response) => {
-        const result = (await response.json()) as { guest?: Guest; error?: string };
+        const result = await readApiJson<{ guest?: Guest; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
         if (!response.ok || !result.guest)
           throw new Error(result.error || "No pudimos registrar el envío.");
         setGuests((current) =>
           current.map((item) => (item.id === guest.id ? result.guest! : item)),
         );
+        setNotice(t("Invitación registrada como enviada.", "Invitation recorded as sent.", "Convite registrado como enviado."));
       })
       .catch((sendError) =>
         setError(
@@ -1717,7 +1765,8 @@ function Guests({
             ? sendError.message
             : "No pudimos registrar el envío.",
         ),
-      );
+      )
+      .finally(() => setUpdatingId(""));
   };
 
   const downloadTemplate = () =>
@@ -2352,12 +2401,12 @@ function Guests({
                       >
                         {copiedId === guest.id ? "✓" : "⧉"}
                       </button>}
-                      {!guest.archivedAt && <button
+                      {canEdit && !guest.archivedAt && <button
                         className="whatsapp-button"
-                        disabled={!guest.phone}
+                        disabled={!guest.phone || updatingId === guest.id}
                         onClick={() => openWhatsAppInvite(guest)}
                       >
-                        WA
+                        {updatingId === guest.id ? "…" : "WA"}
                       </button>}
                       {canEdit && !guest.archivedAt && <>
                         <button
@@ -3086,7 +3135,7 @@ type EventTable = {
   y: number;
   width: number;
   height: number;
-  shape: "round" | "rectangular" | "square";
+  shape: "round" | "rectangular" | "square" | "living";
   seatAssignments: Record<string, number>;
   rotation: number;
   locked: boolean;
@@ -3133,6 +3182,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [tableQuery, setTableQuery] = useState("");
   const [compactTables, setCompactTables] = useState(false);
   const [assignmentSavingId, setAssignmentSavingId] = useState("");
+  const [groupAssignmentSaving, setGroupAssignmentSaving] = useState("");
+  const [mobileSeatingStep, setMobileSeatingStep] = useState<"guests" | "tables">("guests");
   const [assignmentStatus, setAssignmentStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "teen" | "child">("all");
@@ -3165,6 +3216,11 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     (total, table) => total + table.capacity,
     0,
   );
+  const matchingGroups = query.trim()
+    ? [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
+        .filter((group) => normalizedReference(group).includes(normalizedReference(query)))
+        .sort((a, b) => a.localeCompare(b))
+    : [];
   const visibleTables = tables.filter((table) => {
     const guestTerms = table.guests.map((id) => { const guest = guests.find((item) => item.id === id); return guest ? `${guest.name} ${guest.group}` : ""; }).join(" ");
     return `${table.name} ${guestTerms}`.toLowerCase().includes(tableQuery.toLowerCase());
@@ -3247,6 +3303,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const selectGuestForSeat = (guestId: string) => {
     setSelectedGuestId((current) => current === guestId ? "" : guestId);
+    setMobileSeatingStep("tables");
     const currentTable = tables.find((table) => table.guests.includes(guestId));
     if (currentTable) requestAnimationFrame(() => document.getElementById(`table-card-${currentTable.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }));
   };
@@ -3280,7 +3337,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const openNew = (shape: EventTable["shape"] = "round") => {
     setEditing(null);
-    setTableName(`Mesa ${tables.length + 1}`);
+    setTableName(shape === "living" ? `Living ${tables.filter((table) => table.shape === "living").length + 1}` : `Mesa ${tables.filter((table) => table.shape !== "living").length + 1}`);
     setCapacity(8);
     setNote("");
     setTableShape(shape);
@@ -3426,6 +3483,46 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   };
 
   const unassignGuest = (guestId: string) => assignGuest(guestId, "");
+
+  const assignGroup = async (groupName: string, tableId: string) => {
+    const groupGuests = confirmedGuests.filter(
+      (guest) => normalizedReference(guest.group) === normalizedReference(groupName),
+    );
+    if (!groupGuests.length || !tableId) return;
+    setGroupAssignmentSaving(groupName);
+    setAssignmentStatus("saving");
+    setError("");
+    try {
+      const response = await fetch("/api/admin/tables", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "assign-batch",
+          assignments: groupGuests.map((guest) => ({ guestId: guest.id, tableId })),
+        }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok)
+        throw new Error(result.error || t("No pudimos ubicar el grupo completo.", "Could not seat the entire group.", "Não foi possível alocar o grupo completo."));
+      const groupIds = new Set(groupGuests.map((guest) => guest.id));
+      setTables((current) => current.map((table) => ({
+        ...table,
+        guests: table.id === tableId
+          ? [...table.guests.filter((id) => !groupIds.has(id)), ...groupIds]
+          : table.guests.filter((id) => !groupIds.has(id)),
+        seatAssignments: Object.fromEntries(Object.entries(table.seatAssignments || {}).filter(([id]) => !groupIds.has(id))),
+      })));
+      setAssignmentStatus("saved");
+      setTableQuery(groupName);
+      setMobileSeatingStep("tables");
+      window.setTimeout(() => setAssignmentStatus((current) => current === "saved" ? "idle" : current), 1800);
+    } catch (groupError) {
+      setError(groupError instanceof Error ? groupError.message : t("No pudimos ubicar el grupo completo.", "Could not seat the entire group.", "Não foi possível alocar o grupo completo."));
+      setAssignmentStatus("error");
+    } finally {
+      setGroupAssignmentSaving("");
+    }
+  };
 
   const undoLastAssignment = async () => {
     if (!lastAssignment) return;
@@ -3903,8 +4000,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         </section>
       )}
 
-      {!layoutMode && <div className="seating-layout">
-        <aside className="panel unassigned-panel">
+      {!layoutMode && <>
+      <nav className="mobile-seating-switch" aria-label={t("Pasos para distribuir invitados", "Guest seating steps", "Etapas para distribuir convidados")}>
+        <button className={mobileSeatingStep === "guests" ? "active" : ""} onClick={() => setMobileSeatingStep("guests")}>1 · {t("Buscar invitados", "Find guests", "Buscar convidados")}</button>
+        <button className={mobileSeatingStep === "tables" ? "active" : ""} onClick={() => setMobileSeatingStep("tables")}>2 · {t("Elegir ubicación", "Choose location", "Escolher local")}</button>
+      </nav>
+      <div className="seating-layout">
+        <aside className={`panel unassigned-panel ${mobileSeatingStep === "tables" ? "seating-mobile-hidden" : ""}`}>
           <div className="panel-title">
             <div>
               <h2>
@@ -3931,7 +4033,29 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             <span className="count-badge">{confirmedGuests.length}</span>
           </div>
           <div className="guest-assign-list">
-            <label className="search seating-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado…", "Search guest…", "Buscar convidado…")} /></label>
+            <label className="search seating-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label>
+            {matchingGroups.length > 0 && <section className="group-search-results" aria-label={t("Grupos encontrados", "Matching groups", "Grupos encontrados")}>
+              <strong>{t("Ubicar grupo completo", "Seat entire group", "Alocar grupo completo")}</strong>
+              {matchingGroups.map((groupName) => {
+                const groupGuests = confirmedGuests.filter((guest) => normalizedReference(guest.group) === normalizedReference(groupName));
+                const groupIds = new Set(groupGuests.map((guest) => guest.id));
+                const groupPeople = groupGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
+                return <label key={groupName}>
+                  <span><b>{groupName}</b><small>{groupGuests.length} {t("invitaciones", "invitations", "convites")} · {groupPeople} {t("personas", "people", "pessoas")}</small></span>
+                  <select defaultValue="" disabled={!canEdit || groupAssignmentSaving === groupName} onChange={(event) => { if (event.target.value) void assignGroup(groupName, event.target.value); event.currentTarget.value = ""; }} aria-label={`${t("Ubicar grupo", "Seat group", "Alocar grupo")} ${groupName}`}>
+                    <option value="">{groupAssignmentSaving === groupName ? t("Guardando…", "Saving…", "Salvando…") : t("Elegir mesa o Living…", "Choose table or Living…", "Escolher mesa ou Living…")}</option>
+                    {tables.map((table) => {
+                      const occupiedByOthers = table.guests.filter((id) => !groupIds.has(id)).reduce((total, id) => {
+                        const assigned = guests.find((guest) => guest.id === id);
+                        return total + (assigned ? confirmedPeopleForGuest(assigned, guests) : 0);
+                      }, 0);
+                      const available = table.capacity - occupiedByOthers;
+                      return <option key={table.id} value={table.id} disabled={available < groupPeople}>{table.name} · {available >= groupPeople ? `${available} ${t("libres", "free", "livres")}` : `${t("faltan", "needs", "faltam")} ${groupPeople - available}`}</option>;
+                    })}
+                  </select>
+                </label>;
+              })}
+            </section>}
             <div className="assignment-filters" role="group" aria-label={t("Filtrar grupos", "Filter groups", "Filtrar grupos")}>
               {([
                 ["all", t("Todos", "All", "Todos"), confirmedGuests.length],
@@ -4058,13 +4182,14 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           </div>
         </aside>
 
-        <section className="tables-workspace">
+        <section className={`tables-workspace ${mobileSeatingStep === "guests" ? "seating-mobile-hidden" : ""}`}>
           {canEdit && (
             <div className="table-shape-tools" aria-label={t("Añadir mesas", "Add tables", "Adicionar mesas")}>
               <strong>{t("Añadir mesa", "Add table", "Adicionar mesa")}</strong>
               <button onClick={() => openNew("round")}><i className="shape-icon is-round" />{t("Redonda", "Round", "Redonda")}</button>
               <button onClick={() => openNew("rectangular")}><i className="shape-icon is-rectangular" />{t("Rectangular", "Rectangular", "Retangular")}</button>
               <button onClick={() => openNew("square")}><i className="shape-icon is-square" />{t("Cuadrada", "Square", "Quadrada")}</button>
+              <button onClick={() => openNew("living")}><i className="shape-icon is-living" />Living</button>
             </div>
           )}
           <div className="workspace-heading">
@@ -4386,7 +4511,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             )}
           </div>
         </section>
-      </div>}
+      </div></>}
 
       {showModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}>
@@ -4400,12 +4525,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             <span className="eyebrow">
               {editing
                 ? t("Configuración", "Settings", "Configuração")
-                : t("Nueva mesa", "New table", "Nova mesa")}
+                : tableShape === "living" ? "Nuevo Living" : t("Nueva mesa", "New table", "Nova mesa")}
             </span>
             <h2>
               {editing
-                ? t("Editar mesa", "Edit table", "Editar mesa")
-                : t("Agregar mesa", "Add table", "Adicionar mesa")}
+                ? editing.shape === "living" ? "Editar Living" : t("Editar mesa", "Edit table", "Editar mesa")
+                : tableShape === "living" ? "Agregar Living" : t("Agregar mesa", "Add table", "Adicionar mesa")}
             </h2>
             <div className="form-grid">
               <label>
@@ -4448,11 +4573,11 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </label>
             </div>
             <fieldset className="table-shape-picker">
-              <legend>{t("Forma de la mesa", "Table shape", "Formato da mesa")}</legend>
-              {(["round", "rectangular", "square"] as const).map((shape) => (
+              <legend>{t("Tipo de ubicación", "Seating type", "Tipo de local")}</legend>
+              {(["round", "rectangular", "square", "living"] as const).map((shape) => (
                 <button type="button" key={shape} className={tableShape === shape ? "active" : ""} onClick={() => setTableShape(shape)}>
                   <i className={`shape-icon is-${shape}`} />
-                  {shape === "round" ? t("Redonda", "Round", "Redonda") : shape === "rectangular" ? t("Rectangular", "Rectangular", "Retangular") : t("Cuadrada", "Square", "Quadrada")}
+                  {shape === "round" ? t("Redonda", "Round", "Redonda") : shape === "rectangular" ? t("Rectangular", "Rectangular", "Retangular") : shape === "square" ? t("Cuadrada", "Square", "Quadrada") : "Living"}
                 </button>
               ))}
             </fieldset>
@@ -4527,6 +4652,7 @@ function SimpleModule({
   const { text: t, locale, language } = useAdminI18n();
   const [remindingId, setRemindingId] = useState("");
   const [moduleError, setModuleError] = useState("");
+  const [moduleNotice, setModuleNotice] = useState("");
   const [query, setQuery] = useState("");
   const [reminderMessage, setReminderMessage] = useState(
     "Te recordamos que se acerca nuestro evento. Si ya confirmaste, ¡muchas gracias! Si todavía no, nos encantaría recibir tu respuesta.",
@@ -4536,6 +4662,9 @@ function SimpleModule({
   const [invitationLink, setInvitationLink] = useState(order.invitationUrl);
   const [savingInvitation, setSavingInvitation] = useState(false);
   const [customConfirmationUrl, setCustomConfirmationUrl] = useState("");
+  const [selectedReminderIds, setSelectedReminderIds] = useState<string[]>([]);
+  const [bulkReminderProgress, setBulkReminderProgress] = useState("");
+  const [bulkReminderBusy, setBulkReminderBusy] = useState(false);
   const restrictions = guests.flatMap((guest) => [
     ...(guest.food !== "—" && guest.food !== "Ninguna" ? [guest] : []),
     ...guest.companions
@@ -4562,6 +4691,21 @@ function SimpleModule({
     ? previewBaseUrl
     : `${previewBaseUrl}${previewSeparator}token=${previewGuest?.inviteToken || "enlace-personal"}`;
   const reminderPreview = `Hola ${previewGuest?.name || t("María", "Mary", "Maria")}.\n\n${reminderMessage}\n\n${t("Confirmar asistencia", "Confirm attendance", "Confirmar presença")}: ${previewConfirmationUrl}`;
+  const validateReminderSetup = () => {
+    if (!reminderMessage.trim()) return t("Escribí el contenido del recordatorio.", "Write the reminder message.", "Escreva o conteúdo do lembrete.");
+    const value = confirmationTarget === "invitation" ? invitationLink : confirmationTarget === "custom" ? customConfirmationUrl : "";
+    if (confirmationTarget !== "rsvp") {
+      try {
+        const parsed = new URL(value);
+        if (!["http:", "https:"].includes(parsed.protocol)) throw new Error();
+      } catch {
+        return confirmationTarget === "invitation"
+          ? t("Asociá un enlace válido para la invitación.", "Link a valid invitation URL.", "Associe um link válido para o convite.")
+          : t("Ingresá un enlace alternativo válido.", "Enter a valid alternative URL.", "Insira um link alternativo válido.");
+      }
+    }
+    return "";
+  };
 
   const saveInvitationLink = async () => {
     if (!invitationLink.trim() || invitationLink === order.invitationUrl) return;
@@ -4569,10 +4713,11 @@ function SimpleModule({
     setModuleError("");
     try {
       const response = await fetch("/api/admin/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "invitation-url", invitationUrl: invitationLink }) });
-      const result = await response.json() as { invitationUrl?: string; error?: string };
+      const result = await readApiJson<{ invitationUrl?: string; error?: string }>(response, t("El servicio de configuración no está disponible.", "The settings service is unavailable.", "O serviço de configuração não está disponível."));
       if (!response.ok || !result.invitationUrl) throw new Error(result.error || "No pudimos asociar la invitación.");
       setInvitationLink(result.invitationUrl);
       onOrderChange({ ...order, invitationUrl: result.invitationUrl });
+      setModuleNotice(t("Enlace de la invitación asociado.", "Invitation link saved.", "Link do convite associado."));
     } catch (saveError) { setModuleError(saveError instanceof Error ? saveError.message : "No pudimos asociar la invitación."); }
     finally { setSavingInvitation(false); }
   };
@@ -4710,30 +4855,37 @@ function SimpleModule({
         delivered: [adminStatus(language, "delivered"), "delivered"],
         read: [adminStatus(language, "read"), "read"],
         failed: [adminStatus(language, "failed"), "failed"],
+        manual: [t("Preparado manualmente", "Prepared manually", "Preparado manualmente"), "pending"],
       }) as Record<string, [string, string]>
     )[value] || [t("Sin envío", "Not sent", "Não enviado"), "empty"];
 
   const remindGuest = async (guest: Guest) => {
+    const setupError = validateReminderSetup();
+    if (setupError) { setModuleError(setupError); return; }
     setRemindingId(guest.id);
     setModuleError("");
+    setModuleNotice("");
     try {
       const response = await fetch("/api/admin/guests", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: guest.id, action: "remind", message: reminderMessage, giftText, confirmationTarget, customConfirmationUrl, invitationUrlOverride: invitationLink }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         mode?: "business" | "manual";
         url?: string;
         error?: string;
-      };
+      }>(response, t("El servicio de recordatorios no está disponible.", "The reminder service is unavailable.", "O serviço de lembretes não está disponível."));
       if (!response.ok)
         throw new Error(result.error || "No pudimos enviar el recordatorio.");
       if (result.mode === "manual" && result.url) {
-        window.open(result.url, "_blank", "noopener,noreferrer");
+        const popup = window.open(result.url, "_blank", "noopener,noreferrer");
+        if (!popup) throw new Error(t("El navegador bloqueó WhatsApp. Habilitá las ventanas emergentes e intentá nuevamente.", "The browser blocked WhatsApp. Allow pop-ups and try again.", "O navegador bloqueou o WhatsApp. Permita pop-ups e tente novamente."));
+        popup.opener = null;
         if (result.guest)
           setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+        setModuleNotice(t("WhatsApp quedó preparado. Revisá el mensaje antes de enviarlo.", "WhatsApp is ready. Review the message before sending it.", "O WhatsApp está pronto. Revise a mensagem antes de enviá-la."));
         return;
       }
       if (!result.guest)
@@ -4741,6 +4893,7 @@ function SimpleModule({
       setGuests((current) =>
         current.map((item) => (item.id === guest.id ? result.guest! : item)),
       );
+      setModuleNotice(t("Recordatorio enviado correctamente.", "Reminder sent successfully.", "Lembrete enviado corretamente."));
     } catch (error) {
       setModuleError(
         error instanceof Error
@@ -4753,8 +4906,11 @@ function SimpleModule({
   };
 
   const emailReminder = async (guest: Guest) => {
+    const setupError = validateReminderSetup();
+    if (setupError) { setModuleError(setupError); return; }
     setRemindingId(guest.id);
     setModuleError("");
+    setModuleNotice("");
     try {
       const response = await fetch("/api/admin/guests", {
         method: "PATCH",
@@ -4770,10 +4926,10 @@ function SimpleModule({
           invitationUrlOverride: invitationLink,
         }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         error?: string;
-      };
+      }>(response, t("El servicio de recordatorios no está disponible.", "The reminder service is unavailable.", "O serviço de lembretes não está disponível."));
       if (!response.ok || !result.guest)
         throw new Error(
           result.error || "No pudimos enviar el recordatorio por email.",
@@ -4781,6 +4937,7 @@ function SimpleModule({
       setGuests((current) =>
         current.map((item) => (item.id === guest.id ? result.guest! : item)),
       );
+      setModuleNotice(t("Recordatorio enviado por email.", "Email reminder sent.", "Lembrete enviado por email."));
     } catch (error) {
       setModuleError(
         error instanceof Error
@@ -4789,6 +4946,57 @@ function SimpleModule({
       );
     } finally {
       setRemindingId("");
+    }
+  };
+
+  const emailSelectedReminders = async () => {
+    const setupError = validateReminderSetup();
+    if (setupError) { setModuleError(setupError); return; }
+    const recipients = pending.filter((guest) => selectedReminderIds.includes(guest.id) && guest.email);
+    if (!recipients.length) return;
+    if (!window.confirm(t(
+      `¿Enviar ${recipients.length} recordatorios por email?`,
+      `Send ${recipients.length} email reminders?`,
+      `Enviar ${recipients.length} lembretes por email?`,
+    ))) return;
+    setModuleError("");
+    setModuleNotice("");
+    setBulkReminderBusy(true);
+    let sent = 0;
+    try {
+      for (const guest of recipients) {
+        setBulkReminderProgress(t(
+          `Enviando ${sent + 1} de ${recipients.length}…`,
+          `Sending ${sent + 1} of ${recipients.length}…`,
+          `Enviando ${sent + 1} de ${recipients.length}…`,
+        ));
+        const response = await fetch("/api/admin/guests", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: guest.id, action: "remind-email", template: "message", message: reminderMessage, giftText, confirmationTarget, customConfirmationUrl, invitationUrlOverride: invitationLink }),
+        });
+        const result = await readApiJson<{ guest?: Guest; error?: string }>(response, t("El servicio de recordatorios no está disponible.", "The reminder service is unavailable.", "O serviço de lembretes não está disponível."));
+        if (!response.ok || !result.guest) throw new Error(result.error || t("Revisá los datos y volvé a intentar.", "Check the details and try again.", "Revise os dados e tente novamente."));
+        sent += 1;
+        setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+      }
+      setSelectedReminderIds([]);
+      setBulkReminderProgress(t(
+        `${sent} recordatorios enviados correctamente.`,
+        `${sent} reminders sent successfully.`,
+        `${sent} lembretes enviados com sucesso.`,
+      ));
+      setModuleNotice(t("El lote terminó correctamente.", "The batch completed successfully.", "O lote foi concluído corretamente."));
+    } catch (sendError) {
+      const detail = sendError instanceof Error ? sendError.message : t("Revisá los datos y volvé a intentar.", "Check the details and try again.", "Revise os dados e tente novamente.");
+      setModuleError(t(
+        `Se enviaron ${sent} de ${recipients.length}. ${detail}`,
+        `${sent} of ${recipients.length} were sent. ${detail}`,
+        `${sent} de ${recipients.length} foram enviados. ${detail}`,
+      ));
+      setBulkReminderProgress("");
+    } finally {
+      setBulkReminderBusy(false);
     }
   };
 
@@ -4892,13 +5100,17 @@ function SimpleModule({
         ))}
       </section>
       <section className="panel table-panel">
+        {moduleNotice && <p className="import-success" role="status">{moduleNotice}</p>}
         <div className="table-tools">
           <label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label>
+          {view === "Recordatorios" && canEdit && selectedReminderIds.length > 0 && <div className="reminder-bulk-bar"><strong>{selectedReminderIds.length} {t("seleccionados", "selected", "selecionados")}</strong><button className="primary-button small" type="button" disabled={bulkReminderBusy} onClick={() => void emailSelectedReminders()}>{bulkReminderBusy ? bulkReminderProgress : t("Enviar emails", "Send emails", "Enviar emails")}</button><button className="outline-button compact" type="button" disabled={bulkReminderBusy} onClick={() => setSelectedReminderIds([])}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
         </div>
+        {view === "Recordatorios" && bulkReminderProgress && !moduleError && <p className="import-success" role="status">{bulkReminderProgress}</p>}
         <div className="table-scroll">
           <table>
             <thead>
               <tr>
+                {view === "Recordatorios" && canEdit && <th className="checkbox-cell"><input type="checkbox" aria-label={t("Seleccionar pendientes con email", "Select pending guests with email", "Selecionar pendentes com email")} checked={content.rows.filter((guest) => guest.email).length > 0 && content.rows.filter((guest) => guest.email).every((guest) => selectedReminderIds.includes(guest.id))} onChange={(event) => setSelectedReminderIds(event.target.checked ? content.rows.filter((guest) => guest.email).map((guest) => guest.id) : [])} /></th>}
                 {content.headers.map((header) => (
                   <th key={header}>{header}</th>
                 ))}
@@ -4907,6 +5119,7 @@ function SimpleModule({
             <tbody>
               {content.rows.map((guest, index) => (
                 <tr key={guest.id}>
+                  {view === "Recordatorios" && canEdit && <td className="checkbox-cell"><input type="checkbox" disabled={!guest.email} checked={selectedReminderIds.includes(guest.id)} aria-label={`${t("Seleccionar", "Select", "Selecionar")} ${guest.name}`} onChange={(event) => setSelectedReminderIds((current) => event.target.checked ? [...new Set([...current, guest.id])] : current.filter((id) => id !== guest.id))} /></td>}
                   <td>
                     <div className="person">
                       <GuestAvatar guest={guest} />
@@ -5038,12 +5251,14 @@ function Settings({
   orderNumber,
   order,
   onEventChange,
+  onModulesChange,
 }: {
   code: string;
   onChange: (value: string) => void;
   orderNumber: string;
   order: AdminOrder;
   onEventChange: (details: { eventName: string; eventDate: string }) => void;
+  onModulesChange: (modules: AdminOrder["enabledModules"]) => void;
 }) {
   const { text: t, locale } = useAdminI18n();
   const knownCode = countryCodes.some(([, value]) => value === code);
@@ -5057,13 +5272,14 @@ function Settings({
     useState(false);
   const [eventName, setEventName] = useState(order.customerName);
   const [eventDate, setEventDate] = useState(order.eventDate);
+  const [accountModules, setAccountModules] = useState<Array<{ module: AdminOrder["enabledModules"][number]; source: string; enabled: boolean }>>([]);
   const [testingReminder, setTestingReminder] = useState(false);
   const [healthBusy, setHealthBusy] = useState(true);
   const [health, setHealth] = useState<{
     checkedAt: string;
     services: Record<
-      "database" | "email" | "scheduler",
-      { status: "ok" | "error"; detail: string }
+      "database" | "email" | "scheduler" | "whatsapp",
+      { status: "ok" | "warning" | "error"; detail: string }
     >;
   } | null>(null);
   const [retentionDeadline, setRetentionDeadline] = useState("");
@@ -5098,7 +5314,23 @@ function Settings({
         setEventDate(result.eventDate || order.eventDate);
       },
     );
+  }, [order.customerName, order.eventDate]);
+
+  useEffect(() => {
+    fetch('/api/admin/modules', { cache: 'no-store' }).then(async (response) => {
+      if (response.ok) setAccountModules(((await response.json()) as { modules: typeof accountModules }).modules);
+    }).catch(() => undefined);
   }, []);
+
+  const toggleAccountModule = async (module: AdminOrder["enabledModules"][number], enabled: boolean) => {
+    const response = await fetch('/api/admin/modules', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ module, enabled }) });
+    const result = await response.json() as { error?: string };
+    if (!response.ok) { setMessage(result.error || 'No pudimos actualizar el módulo.'); return; }
+    const next = accountModules.map((item) => item.module === module ? { ...item, enabled } : item);
+    setAccountModules(next);
+    onModulesChange(next.filter((item) => item.enabled).map((item) => item.module));
+    setMessage('Accesos de la cuenta actualizados.');
+  };
 
   const loadHealth = useCallback(async () => {
     setHealthBusy(true);
@@ -5368,6 +5600,10 @@ function Settings({
           "Os backups não incluem senhas nem códigos. Restaurar ou excluir dados sempre exige o número do pedido.",
         )}
       </ContextHelp>
+      <section className="panel settings-panel">
+        <div className="panel-title"><div><h2>Módulos de la cuenta</h2><p>Podés apagar o volver a prender los módulos incluidos en el plan. Los adicionales se contratan por separado.</p></div></div>
+        <div className="settings-module-grid">{accountModules.map((item) => <label key={item.module}><input type="checkbox" checked={item.enabled} disabled={!['owner', 'admin'].includes(order.accessRole)} onChange={(event) => toggleAccountModule(item.module, event.target.checked)} /><span>{({ invitation: 'Invitación', guests_rsvp: 'Invitados y RSVP', tables: 'Mesas', check_in: 'Check-in', messaging: 'Mensajería', collaborative_album: 'Álbum colaborativo', suppliers: 'Proveedores' } as Record<string, string>)[item.module]}</span><small>Incluido por {item.source === 'plan' ? 'plan' : item.source === 'addon' ? 'adicional' : item.source === 'role' ? 'rol' : 'configuración manual'}</small></label>)}</div>
+      </section>
       <section className="panel settings-panel">
         <div className="panel-title">
           <div>
@@ -5731,6 +5967,15 @@ function Settings({
                 ),
               ],
               [
+                "whatsapp",
+                "WhatsApp",
+                t(
+                  "Envío y seguimiento de mensajes",
+                  "Message delivery and tracking",
+                  "Envio e acompanhamento de mensagens",
+                ),
+              ],
+              [
                 "scheduler",
                 t("Automatización", "Automation", "Automação"),
                 t(
@@ -5745,7 +5990,7 @@ function Settings({
             return (
               <article key={key}>
                 <span
-                  className={`health-indicator ${service?.status === "ok" ? "is-ok" : service ? "is-error" : "is-pending"}`}
+                  className={`health-indicator ${service?.status === "ok" ? "is-ok" : service?.status === "warning" ? "is-warning" : service ? "is-error" : "is-pending"}`}
                   aria-hidden="true"
                 />
                 <div>
@@ -5753,7 +5998,7 @@ function Settings({
                   <small>{description}</small>
                 </div>
                 <span
-                  className={`health-status ${service?.status === "ok" ? "is-ok" : "is-error"}`}
+                  className={`health-status ${service?.status === "ok" ? "is-ok" : service?.status === "warning" ? "is-warning" : "is-error"}`}
                 >
                   {service
                     ? service.detail
@@ -5779,13 +6024,13 @@ function Settings({
 type AdminAccess = {
   id: string;
   email: string;
-  role: "editor" | "viewer";
+  role: "admin" | "editor" | "viewer";
   created_at: string;
 };
 type AdminActivity = {
   id: string;
   actor_email: string;
-  actor_role: "owner" | "editor" | "viewer";
+  actor_role: "owner" | "admin" | "editor" | "viewer";
   action: string;
   entity_type: string;
   entity_id: string | null;
@@ -5794,35 +6039,39 @@ type AdminActivity = {
 };
 
 function Accesses({ order }: { order: AdminOrder }) {
-  const { text: t, locale } = useAdminI18n();
+  const { text: t, locale, language } = useAdminI18n();
   const [accesses, setAccesses] = useState<AdminAccess[]>([]);
   const [activities, setActivities] = useState<AdminActivity[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
+  const [notice, setNotice] = useState("");
+  const [loadingAccesses, setLoadingAccesses] = useState(true);
 
   const load = useCallback(() => {
-    fetch("/api/admin/access").then(async (response) => {
-      if (response.ok)
-        setAccesses(
-          ((await response.json()) as { accesses: AdminAccess[] }).accesses,
-        );
-    });
-  }, []);
+    setLoadingAccesses(true);
+    fetch("/api/admin/access")
+      .then(async (response) => {
+        const result = await readApiJson<{ accesses?: AdminAccess[]; error?: string }>(response, adminText(language, "El servicio de accesos no está disponible.", "The access service is unavailable.", "O serviço de acessos não está disponível."));
+        if (!response.ok || !result.accesses) throw new Error(result.error || adminText(language, "No pudimos cargar los colaboradores.", "Could not load collaborators.", "Não foi possível carregar os colaboradores."));
+        setAccesses(result.accesses);
+      })
+      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : adminText(language, "No pudimos cargar los colaboradores.", "Could not load collaborators.", "Não foi possível carregar os colaboradores.")))
+      .finally(() => setLoadingAccesses(false));
+  }, [language]);
   useEffect(load, [load]);
-  useEffect(() => {
+  const loadActivities = useCallback(() => {
     if (order.accessRole !== "owner") return;
-    fetch("/api/admin/activity", { cache: "no-store" }).then(
-      async (response) => {
-        if (response.ok)
-          setActivities(
-            ((await response.json()) as { activities: AdminActivity[] })
-              .activities,
-          );
-      },
-    );
-  }, [order.accessRole]);
+    fetch("/api/admin/activity", { cache: "no-store" })
+      .then(async (response) => {
+        const result = await readApiJson<{ activities?: AdminActivity[]; error?: string }>(response, adminText(language, "El historial no está disponible.", "The activity log is unavailable.", "O histórico não está disponível."));
+        if (!response.ok || !result.activities) throw new Error(result.error || adminText(language, "No pudimos cargar el historial.", "Could not load activity.", "Não foi possível carregar o histórico."));
+        setActivities(result.activities);
+      })
+      .catch((activityError) => setError(activityError instanceof Error ? activityError.message : adminText(language, "No pudimos cargar el historial.", "Could not load activity.", "Não foi possível carregar o histórico.")));
+  }, [order.accessRole, language]);
+  useEffect(loadActivities, [loadActivities]);
 
   const activityLabel = (action: string) =>
     ({
@@ -5854,14 +6103,16 @@ function Accesses({ order }: { order: AdminOrder }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Object.fromEntries(data)),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         access?: AdminAccess;
         error?: string;
-      };
+      }>(response, t("El servicio de accesos no está disponible.", "The access service is unavailable.", "O serviço de acessos não está disponível."));
       if (!response.ok || !result.access)
         throw new Error(result.error || "No pudimos invitar al colaborador.");
       setAccesses((current) => [...current, result.access!]);
       setShowModal(false);
+      setNotice(t("Colaborador invitado correctamente.", "Collaborator invited successfully.", "Colaborador convidado com sucesso."));
+      loadActivities();
     } catch (inviteError) {
       setError(
         inviteError instanceof Error
@@ -5888,10 +6139,12 @@ function Accesses({ order }: { order: AdminOrder }) {
         `/api/admin/access?id=${encodeURIComponent(id)}`,
         { method: "DELETE" },
       );
-      const result = (await response.json()) as { error?: string };
+      const result = await readApiJson<{ error?: string }>(response, t("El servicio de accesos no está disponible.", "The access service is unavailable.", "O serviço de acessos não está disponível."));
       if (!response.ok)
         throw new Error(result.error || "No pudimos revocar el acceso.");
       setAccesses((current) => current.filter((access) => access.id !== id));
+      setNotice(t("Acceso revocado.", "Access revoked.", "Acesso revogado."));
+      loadActivities();
     } catch (removeError) {
       setError(
         removeError instanceof Error
@@ -5912,15 +6165,17 @@ function Accesses({ order }: { order: AdminOrder }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: access.id, role }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         access?: AdminAccess;
         error?: string;
-      };
+      }>(response, t("El servicio de accesos no está disponible.", "The access service is unavailable.", "O serviço de acessos não está disponível."));
       if (!response.ok || !result.access)
         throw new Error(result.error || "No pudimos cambiar el rol.");
       setAccesses((current) =>
         current.map((item) => (item.id === access.id ? result.access! : item)),
       );
+      setNotice(t("Rol actualizado. La sesión anterior fue cerrada por seguridad.", "Role updated. The previous session was closed for security.", "Função atualizada. A sessão anterior foi encerrada por segurança."));
+      loadActivities();
     } catch (roleError) {
       setError(
         roleError instanceof Error
@@ -5948,7 +6203,7 @@ function Accesses({ order }: { order: AdminOrder }) {
             )}
           </p>
         </div>
-        {order.accessRole === "owner" && (
+        {["owner", "admin"].includes(order.accessRole) && (
           <button
             className="primary-button small"
             onClick={() => setShowModal(true)}
@@ -5970,12 +6225,24 @@ function Accesses({ order }: { order: AdminOrder }) {
         )}
       >
         {t(
-          "Los editores pueden gestionar el evento. Los usuarios de solo lectura pueden consultar la información sin modificarla.",
-          "Editors can manage the event. View-only users can consult information without changing it.",
-          "Editores podem gerenciar o evento. Usuários de somente leitura podem consultar sem fazer alterações.",
+          "Los administradores gestionan el evento y sus colaboradores. Los editores modifican contenido y los usuarios de solo lectura sólo consultan.",
+          "Administrators manage the event and collaborators. Editors change content, while view-only users can only consult it.",
+          "Administradores gerenciam o evento e colaboradores. Editores alteram conteúdo e usuários de leitura apenas consultam.",
         )}
       </ContextHelp>
+      <section className="access-role-guide" aria-label={t("Permisos por rol", "Permissions by role", "Permissões por função")}>
+        <article><span>◆</span><div><strong>{t("Administrador", "Administrator", "Administrador")}</strong><small>{t("Gestiona invitados, contenido, colaboradores y configuración.", "Manages guests, content, collaborators and settings.", "Gerencia convidados, conteúdo, colaboradores e configurações.")}</small></div></article>
+        <article><span>✎</span><div><strong>Editor</strong><small>{t("Modifica el evento, pero no administra accesos ni configuración sensible.", "Edits the event but cannot manage access or sensitive settings.", "Edita o evento, mas não gerencia acessos nem configurações sensíveis.")}</small></div></article>
+        <article><span>◉</span><div><strong>{t("Solo lectura", "View only", "Somente leitura")}</strong><small>{t("Puede consultar la información sin realizar cambios.", "Can view information without making changes.", "Pode consultar informações sem fazer alterações.")}</small></div></article>
+      </section>
+      {notice && <p className="import-success" role="status">{notice}</p>}
       <section className="metrics-grid mini">
+        <Metric
+          label={t("Administradores", "Administrators", "Administradores")}
+          value={String(accesses.filter((access) => access.role === "admin").length)}
+          note={t("gestionan accesos", "manage access", "gerenciam acessos")}
+          tone="blue"
+        />
         <Metric
           label={t("Propietarios", "Owners", "Proprietários")}
           value="1"
@@ -6000,6 +6267,7 @@ function Accesses({ order }: { order: AdminOrder }) {
         />
       </section>
       <section className="panel table-panel">
+        {loadingAccesses && <p className="module-notice" role="status">{t("Cargando colaboradores…", "Loading collaborators…", "Carregando colaboradores…")}</p>}
         <div className="table-scroll">
           <table>
             <thead>
@@ -6029,7 +6297,7 @@ function Accesses({ order }: { order: AdminOrder }) {
                     <strong>{access.email}</strong>
                   </td>
                   <td>
-                    {order.accessRole === "owner" ? (
+                    {["owner", "admin"].includes(order.accessRole) ? (
                       <select
                         className="status-select"
                         value={access.role}
@@ -6042,11 +6310,14 @@ function Accesses({ order }: { order: AdminOrder }) {
                         }
                         aria-label={`${t("Rol de", "Role for", "Função de")} ${access.email}`}
                       >
+                        <option value="admin">{t("Administrador", "Administrator", "Administrador")}</option>
                         <option value="editor">Editor</option>
                         <option value="viewer">
                           {t("Solo lectura", "View only", "Somente leitura")}
                         </option>
                       </select>
+                    ) : access.role === "admin" ? (
+                      t("Administrador", "Administrator", "Administrador")
                     ) : access.role === "editor" ? (
                       "Editor"
                     ) : (
@@ -6059,7 +6330,7 @@ function Accesses({ order }: { order: AdminOrder }) {
                     </span>
                   </td>
                   <td>
-                    {order.accessRole === "owner" && (
+                    {["owner", "admin"].includes(order.accessRole) && (
                       <button
                         className="more-button"
                         disabled={updatingId === access.id}
@@ -6080,7 +6351,7 @@ function Accesses({ order }: { order: AdminOrder }) {
           </p>
         )}
       </section>
-      {order.accessRole === "owner" && (
+      {["owner", "admin"].includes(order.accessRole) && (
         <section className="panel table-panel audit-panel">
           <div className="panel-title">
             <div>
@@ -6178,6 +6449,7 @@ function Accesses({ order }: { order: AdminOrder }) {
               <label>
                 {t("Rol", "Role", "Função")}
                 <select name="role">
+                  <option value="admin">{t("Administrador", "Administrator", "Administrador")}</option>
                   <option value="editor">Editor</option>
                   <option value="viewer">
                     {t("Solo lectura", "View only", "Somente leitura")}
@@ -6442,10 +6714,28 @@ function Admin({
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [globalEditingId, setGlobalEditingId] = useState("");
+  const [eventPortfolio, setEventPortfolio] = useState<Array<{ id: string; orderNumber: string; name: string; eventDate: string }>>([]);
+  const [switchingEvent, setSwitchingEvent] = useState(false);
   const [comfortableText, setComfortableText] = useState(
     () =>
       window.sessionStorage.getItem("syd-admin-font-size") === "comfortable-v2",
   );
+  const hasViewAccess = useCallback((item: string) => {
+    const requiredModule = moduleForView[item];
+    return !requiredModule || order.enabledModules.includes(requiredModule);
+  }, [order.enabledModules]);
+  useEffect(() => {
+    fetch("/api/admin/events", { cache: "no-store" }).then(async (response) => {
+      if (response.ok) setEventPortfolio(((await response.json()) as { events: typeof eventPortfolio }).events);
+    }).catch(() => undefined);
+  }, []);
+  const switchEvent = async (orderNumber: string) => {
+    if (!orderNumber || orderNumber === order.orderNumber) return;
+    setSwitchingEvent(true);
+    const response = await fetch("/api/admin/events", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderNumber }) });
+    if (response.ok) window.location.reload();
+    else setSwitchingEvent(false);
+  };
   const navLabel = useCallback(
     (item: string) =>
       (
@@ -6507,6 +6797,7 @@ function Admin({
   }, []);
 
   const navigate = (item: string) => {
+    if (!hasViewAccess(item)) return;
     setView(item);
     setMobileNav(false);
   };
@@ -6536,13 +6827,16 @@ function Admin({
             <small>
               {t("Pedido", "Order", "Pedido")} {order.orderNumber}
             </small>
+            {eventPortfolio.length > 1 && <select aria-label={t("Cambiar evento", "Switch event", "Trocar evento")} value={order.orderNumber} disabled={switchingEvent} onChange={(event) => void switchEvent(event.target.value)}>
+              {eventPortfolio.map((item) => <option key={item.id} value={item.orderNumber}>{item.name}</option>)}
+            </select>}
           </div>
         </div>
         <nav>
           {nav
             .filter(
               ([item]) =>
-                item !== "Configuración" || order.accessRole === "owner",
+                hasViewAccess(item) && (item !== "Configuración" || ["owner", "admin"].includes(order.accessRole)),
             )
             .map(([item, icon]) => (
               <button
@@ -6646,6 +6940,8 @@ function Admin({
                 <small>
                   {order.accessRole === "owner"
                     ? t("Propietario", "Owner", "Proprietário")
+                    : order.accessRole === "admin"
+                      ? t("Administrador", "Administrator", "Administrador")
                     : order.accessRole === "editor"
                       ? "Editor"
                       : t("Solo lectura", "Read only", "Somente leitura")}
@@ -6703,6 +6999,7 @@ function Admin({
               orderNumber={order.orderNumber}
               order={order}
               onEventChange={({ eventName, eventDate }) => onOrderChange({ ...order, customerName: eventName, eventTitle: eventName, eventDate })}
+              onModulesChange={(enabledModules) => onOrderChange({ ...order, enabledModules })}
             />
           )}
         </div>
@@ -6739,7 +7036,10 @@ export function AdminPrototype() {
     fetch("/api/admin/session")
       .then(async (response) => {
         if (!response.ok) return;
+        if (!response.headers.get("content-type")?.includes("application/json"))
+          return;
         const result = (await response.json()) as { order: AdminOrder };
+        if (!result.order) return;
         setOrder(result.order);
         const savedLanguage = window.sessionStorage.getItem(
           "syd-admin-language",
@@ -6751,6 +7051,7 @@ export function AdminPrototype() {
         );
         setLoggedIn(true);
       })
+      .catch(() => undefined)
       .finally(() => setCheckingSession(false));
   }, []);
 
