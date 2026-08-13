@@ -26,7 +26,8 @@ export function VeronaInvitation({ locale, palette, embedded=false, onClose, con
     '--font-signature':`"${data.theme.signatureFont}", cursive`, '--hero-image':`url("${data.assets.hero}")`,
     '--parallax-image':`url("${data.assets.parallax}")`, '--hero-position-mobile':data.assets.heroPositionMobile,
     '--hero-position-desktop':data.assets.heroPositionDesktop, '--image-overlay-opacity':data.assets.heroOverlay,
-    '--modular-ornament-image':`url("${data.assets.ornamentRight}")`
+    '--modular-ornament-right':`url("${data.assets.ornamentRight}")`,
+    '--modular-ornament-left':`url("${data.assets.ornamentLeft}")`
   } as React.CSSProperties;
 
   useEffect(() => { const safety=window.setTimeout(()=>setLoaded(true),2600); const ready=window.setTimeout(()=>setLoaded(true),450); return()=>{clearTimeout(safety);clearTimeout(ready)} },[]);

@@ -19,19 +19,6 @@
 .builder-review-notes p { margin: 0 0 .25rem; white-space: pre-wrap; font-size: .82rem; }
 .builder-review-notes time { color: #756d77; font-size: .72rem; }
 @media (max-width: 800px) { .builder-header-actions { grid-column: 1 / -1; width: 100%; } .builder-header-actions button { flex: 1; } }
-.builder-preview .modular-ornament-after::after {
-  position: absolute;
-  z-index: 5;
-  bottom: 0;
-  left: 50%;
-  width: min(42%, 190px);
-  height: 68px;
-  background: var(--modular-ornament-image) center / contain no-repeat;
-  content: '';
-  pointer-events: none;
-  transform: translate(-50%, 50%);
-}
-.builder-preview .modular-ornament-after { position: relative; }
 .builder-fieldset { margin: .7rem 0; padding: .65rem; border: 1px solid #e5dce0; border-radius: 9px; }
 .builder-fieldset legend { padding: 0 .3rem; color: #765f69; font-size: .75rem; font-weight: 700; }
 .builder-section-title { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }

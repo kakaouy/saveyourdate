@@ -19,6 +19,7 @@ export const applySectionDomOrder = (
       const next = sectionOrder[index + 1];
       const photoGalleryPair = (sectionId === 'parallax' && next === 'gallery') || (sectionId === 'gallery' && next === 'parallax');
       child.classList.toggle('modular-ornament-after', index >= 0 && index < sectionOrder.length - 1 && !photoGalleryPair);
+      child.style.setProperty('--modular-ornament-image', `var(--modular-ornament-${index % 2 === 0 ? 'right' : 'left'})`);
     } else if (child.matches(ornamentSelector)) {
       child.style.order = String(previousOrder + 1);
       child.style.display = 'none';

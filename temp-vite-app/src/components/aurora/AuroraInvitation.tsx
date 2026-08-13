@@ -98,7 +98,8 @@ export function AuroraInvitation({
     '--hero-position-mobile': data.assets.heroPositionMobile,
     '--hero-position-desktop': data.assets.heroPositionDesktop,
     '--hero-overlay': data.assets.heroOverlay
-    , '--modular-ornament-image': `url("${data.assets.ornamentRight}")`
+    , '--modular-ornament-right': `url("${data.assets.ornamentRight}")`
+    , '--modular-ornament-left': `url("${data.assets.ornamentLeft}")`
   } as React.CSSProperties;
 
   useEffect(() => {

@@ -50,6 +50,23 @@ body {
   font-weight: 800;
 }
 
+.modular-section-order > .modular-ornament-after {
+  position: relative;
+}
+
+.modular-section-order > .modular-ornament-after::after {
+  position: absolute;
+  z-index: 5;
+  bottom: 0;
+  left: 50%;
+  width: min(42%, 190px);
+  height: 68px;
+  background: var(--modular-ornament-image) center / contain no-repeat;
+  content: '';
+  pointer-events: none;
+  transform: translate(-50%, 50%);
+}
+
 * {
   box-sizing: border-box;
 }

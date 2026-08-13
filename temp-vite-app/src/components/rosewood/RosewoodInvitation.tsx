@@ -70,7 +70,8 @@ export function RosewoodInvitation({
   }, [sectionOrder, data.sections]);
 
   const cssVars = {
-    '--modular-ornament-image': `url("${data.assets.ornamentRight}")`,
+    '--modular-ornament-right': `url("${data.assets.ornamentRight}")`,
+    '--modular-ornament-left': `url("${data.assets.ornamentLeft}")`,
     '--color-fondo': colors.fondo,
     '--color-fondo-alterno': colors.alterno,
     '--color-titulos': colors.titulos,
