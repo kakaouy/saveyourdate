@@ -3,6 +3,7 @@ import { auroraConfigFromBuilder, createAuroraBuilderDocument } from '../aurora/
 import { moveInvitationSection, normalizeSectionOrder } from '../../domain/invitation-builder';
 import type { InvitationBuilderDocument } from '../../domain/invitation-builder';
 import { validateInvitationForReview } from '../../domain/invitation-validation';
+import { switchInvitationTemplate } from '../../domain/invitation-template-switch';
 import { BUILDER_TEMPLATES, builderSectionDefinitions, builderTemplate } from './templates';
 import './invitation-builder.css';
 import './builder-persistence.css';
@@ -89,7 +90,7 @@ export default function InvitationBuilderPage() {
     const selected = builderTemplate(templateId);
     const next = selected.createDocument();
     setSaved(false);
-    setDocument({ ...next, locale: document.locale, status: 'draft' });
+    setDocument(switchInvitationTemplate(document, next));
   };
 
   useEffect(() => {
