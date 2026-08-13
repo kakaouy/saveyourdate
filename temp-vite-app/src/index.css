@@ -66,7 +66,7 @@ body {
   background-size: contain;
   content: '';
   pointer-events: none;
-  transform: translateY(var(--modular-ornament-translate));
+  transform: translateY(var(--modular-ornament-translate)) scaleX(var(--modular-ornament-scale-x, 1));
   animation: modular-ornament-breathe var(--modular-ornament-duration, 9.4s) ease-in-out var(--modular-ornament-delay, 0s) infinite;
 }
 
@@ -98,9 +98,9 @@ body {
 }
 
 @keyframes modular-ornament-breathe {
-  0%, 100% { transform: translateY(var(--modular-ornament-translate)) scale(1); }
-  46% { transform: translateY(var(--modular-ornament-translate)) scale(1.032); }
-  58% { transform: translateY(var(--modular-ornament-translate)) scale(1.021); }
+  0%, 100% { transform: translateY(var(--modular-ornament-translate)) scaleX(var(--modular-ornament-scale-x, 1)) scale(1); }
+  46% { transform: translateY(var(--modular-ornament-translate)) scaleX(var(--modular-ornament-scale-x, 1)) scale(1.032); }
+  58% { transform: translateY(var(--modular-ornament-translate)) scaleX(var(--modular-ornament-scale-x, 1)) scale(1.021); }
 }
 
 @media (prefers-reduced-motion: reduce) {
