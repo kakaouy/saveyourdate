@@ -4652,6 +4652,7 @@ function SimpleModule({
   const { text: t, locale, language } = useAdminI18n();
   const [remindingId, setRemindingId] = useState("");
   const [moduleError, setModuleError] = useState("");
+  const [moduleNotice, setModuleNotice] = useState("");
   const [query, setQuery] = useState("");
   const [reminderMessage, setReminderMessage] = useState(
     "Te recordamos que se acerca nuestro evento. Si ya confirmaste, ¡muchas gracias! Si todavía no, nos encantaría recibir tu respuesta.",
@@ -4712,10 +4713,11 @@ function SimpleModule({
     setModuleError("");
     try {
       const response = await fetch("/api/admin/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "invitation-url", invitationUrl: invitationLink }) });
-      const result = await response.json() as { invitationUrl?: string; error?: string };
+      const result = await readApiJson<{ invitationUrl?: string; error?: string }>(response, t("El servicio de configuración no está disponible.", "The settings service is unavailable.", "O serviço de configuração não está disponível."));
       if (!response.ok || !result.invitationUrl) throw new Error(result.error || "No pudimos asociar la invitación.");
       setInvitationLink(result.invitationUrl);
       onOrderChange({ ...order, invitationUrl: result.invitationUrl });
+      setModuleNotice(t("Enlace de la invitación asociado.", "Invitation link saved.", "Link do convite associado."));
     } catch (saveError) { setModuleError(saveError instanceof Error ? saveError.message : "No pudimos asociar la invitación."); }
     finally { setSavingInvitation(false); }
   };
@@ -4862,24 +4864,28 @@ function SimpleModule({
     if (setupError) { setModuleError(setupError); return; }
     setRemindingId(guest.id);
     setModuleError("");
+    setModuleNotice("");
     try {
       const response = await fetch("/api/admin/guests", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: guest.id, action: "remind", message: reminderMessage, giftText, confirmationTarget, customConfirmationUrl, invitationUrlOverride: invitationLink }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         mode?: "business" | "manual";
         url?: string;
         error?: string;
-      };
+      }>(response, t("El servicio de recordatorios no está disponible.", "The reminder service is unavailable.", "O serviço de lembretes não está disponível."));
       if (!response.ok)
         throw new Error(result.error || "No pudimos enviar el recordatorio.");
       if (result.mode === "manual" && result.url) {
-        window.open(result.url, "_blank", "noopener,noreferrer");
+        const popup = window.open(result.url, "_blank", "noopener,noreferrer");
+        if (!popup) throw new Error(t("El navegador bloqueó WhatsApp. Habilitá las ventanas emergentes e intentá nuevamente.", "The browser blocked WhatsApp. Allow pop-ups and try again.", "O navegador bloqueou o WhatsApp. Permita pop-ups e tente novamente."));
+        popup.opener = null;
         if (result.guest)
           setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+        setModuleNotice(t("WhatsApp quedó preparado. Revisá el mensaje antes de enviarlo.", "WhatsApp is ready. Review the message before sending it.", "O WhatsApp está pronto. Revise a mensagem antes de enviá-la."));
         return;
       }
       if (!result.guest)
@@ -4887,6 +4893,7 @@ function SimpleModule({
       setGuests((current) =>
         current.map((item) => (item.id === guest.id ? result.guest! : item)),
       );
+      setModuleNotice(t("Recordatorio enviado correctamente.", "Reminder sent successfully.", "Lembrete enviado corretamente."));
     } catch (error) {
       setModuleError(
         error instanceof Error
@@ -4903,6 +4910,7 @@ function SimpleModule({
     if (setupError) { setModuleError(setupError); return; }
     setRemindingId(guest.id);
     setModuleError("");
+    setModuleNotice("");
     try {
       const response = await fetch("/api/admin/guests", {
         method: "PATCH",
@@ -4918,10 +4926,10 @@ function SimpleModule({
           invitationUrlOverride: invitationLink,
         }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         error?: string;
-      };
+      }>(response, t("El servicio de recordatorios no está disponible.", "The reminder service is unavailable.", "O serviço de lembretes não está disponível."));
       if (!response.ok || !result.guest)
         throw new Error(
           result.error || "No pudimos enviar el recordatorio por email.",
@@ -4929,6 +4937,7 @@ function SimpleModule({
       setGuests((current) =>
         current.map((item) => (item.id === guest.id ? result.guest! : item)),
       );
+      setModuleNotice(t("Recordatorio enviado por email.", "Email reminder sent.", "Lembrete enviado por email."));
     } catch (error) {
       setModuleError(
         error instanceof Error
@@ -4951,6 +4960,7 @@ function SimpleModule({
       `Enviar ${recipients.length} lembretes por email?`,
     ))) return;
     setModuleError("");
+    setModuleNotice("");
     setBulkReminderBusy(true);
     let sent = 0;
     try {
@@ -4965,7 +4975,7 @@ function SimpleModule({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: guest.id, action: "remind-email", template: "message", message: reminderMessage, giftText, confirmationTarget, customConfirmationUrl, invitationUrlOverride: invitationLink }),
         });
-        const result = await response.json() as { guest?: Guest; error?: string };
+        const result = await readApiJson<{ guest?: Guest; error?: string }>(response, t("El servicio de recordatorios no está disponible.", "The reminder service is unavailable.", "O serviço de lembretes não está disponível."));
         if (!response.ok || !result.guest) throw new Error(result.error || t("Revisá los datos y volvé a intentar.", "Check the details and try again.", "Revise os dados e tente novamente."));
         sent += 1;
         setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
@@ -4976,6 +4986,7 @@ function SimpleModule({
         `${sent} reminders sent successfully.`,
         `${sent} lembretes enviados com sucesso.`,
       ));
+      setModuleNotice(t("El lote terminó correctamente.", "The batch completed successfully.", "O lote foi concluído corretamente."));
     } catch (sendError) {
       const detail = sendError instanceof Error ? sendError.message : t("Revisá los datos y volvé a intentar.", "Check the details and try again.", "Revise os dados e tente novamente.");
       setModuleError(t(
@@ -5089,6 +5100,7 @@ function SimpleModule({
         ))}
       </section>
       <section className="panel table-panel">
+        {moduleNotice && <p className="import-success" role="status">{moduleNotice}</p>}
         <div className="table-tools">
           <label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label>
           {view === "Recordatorios" && canEdit && selectedReminderIds.length > 0 && <div className="reminder-bulk-bar"><strong>{selectedReminderIds.length} {t("seleccionados", "selected", "selecionados")}</strong><button className="primary-button small" type="button" disabled={bulkReminderBusy} onClick={() => void emailSelectedReminders()}>{bulkReminderBusy ? bulkReminderProgress : t("Enviar emails", "Send emails", "Enviar emails")}</button><button className="outline-button compact" type="button" disabled={bulkReminderBusy} onClick={() => setSelectedReminderIds([])}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}

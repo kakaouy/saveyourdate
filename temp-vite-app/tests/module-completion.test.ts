@@ -126,3 +126,12 @@ test('Accesos informa la carga y controla respuestas inesperadas', () => {
   assert.match(admin, /El historial no está disponible/);
   assert.match(admin, /readApiJson<\{[\s\S]*?access\?: AdminAccess/);
 });
+
+test('Recordatorios distingue preparación manual, envío y fallas de servicio', () => {
+  assert.match(admin, /const \[moduleNotice, setModuleNotice\]/);
+  assert.match(admin, /El servicio de recordatorios no está disponible/);
+  assert.match(admin, /El navegador bloqueó WhatsApp/);
+  assert.match(admin, /WhatsApp quedó preparado\. Revisá el mensaje antes de enviarlo/);
+  assert.match(admin, /Recordatorio enviado por email/);
+  assert.match(admin, /El lote terminó correctamente/);
+});
