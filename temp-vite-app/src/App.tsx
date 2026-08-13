@@ -1727,7 +1727,7 @@ function App() {
   // ==========================================
 
   // 1. ADMIN LOGIN VIEW
-  if (builderMode) return <React.Suspense fallback={<main className="route-loading">Abriendo el constructor…</main>}><InvitationBuilderPage /></React.Suspense>;
+  if (builderMode) return <React.Suspense fallback={<main className="route-loading">Preparando tu invitación…</main>}><InvitationBuilderPage /></React.Suspense>;
 
   if (showAdminLogin && !isAdminLoggedIn) {
     return (

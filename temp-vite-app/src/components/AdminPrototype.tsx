@@ -299,6 +299,7 @@ function GuestNameButton({ guest, children }: { guest: Guest; children?: React.R
 
 const nav = [
   ["Resumen", "⌂"],
+  ["Invitación", "✦"],
   ["Invitados", "♙"],
   ["Restricciones", "◇"],
   ["Canciones", "♫"],
@@ -311,6 +312,7 @@ const nav = [
 ];
 
 const moduleForView: Record<string, AdminOrder["enabledModules"][number] | undefined> = {
+  Invitación: "invitation",
   Invitados: "guests_rsvp",
   Restricciones: "guests_rsvp",
   Canciones: "invitation",
@@ -318,6 +320,12 @@ const moduleForView: Record<string, AdminOrder["enabledModules"][number] | undef
   Agradecimientos: "messaging",
   Mesas: "tables",
   "Check-in": "check_in",
+};
+
+const builderTemplateIdForOrder = (modelName: string) => {
+  const normalized = normalizedReference(modelName);
+  return ["aurora", "astraea", "coruscant", "rosewood", "rivendell", "verona", "varezzia"]
+    .find((templateId) => normalized.includes(templateId)) || "aurora";
 };
 
 const countryCodes = [
@@ -3213,7 +3221,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   );
   const totalConfirmed = confirmedPeopleTotal(confirmedGuests);
   const totalCapacity = tables.reduce(
-    (total, table) => total + table.capacity,
+    (total, table) => total + (table.shape === "living" ? 0 : table.capacity),
     0,
   );
   const matchingGroups = query.trim()
@@ -3724,7 +3732,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         context.font = "bold 18px sans-serif";
         context.fillText(table.name, x + 14, y + Math.min(32, tableHeight / 2));
         context.font = "14px sans-serif";
-        context.fillText(`${table.capacity} lugares`, x + 14, y + Math.min(58, tableHeight - 10));
+        context.fillText(table.shape === "living" ? "Sin límite" : `${table.capacity} lugares`, x + 14, y + Math.min(58, tableHeight - 10));
       });
       floorElements.filter((element) => element.space === space).forEach((element) => {
         const x = Math.min(width - element.width, element.x);
@@ -3749,7 +3757,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const safe = (value: unknown) => String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character]!);
     const spaceSections = spaces.map((space) => {
       const spaceTables = tables.filter((table) => (table.space || "Espacio 1") === space);
-      const drawingTables = spaceTables.map((table) => `<div class="draw-table" style="left:${Math.min(82, (table.x || 0) / 10)}%;top:${Math.min(82, (table.y || 0) / 5)}%;width:${Math.max(10, (table.width || 140) / 10)}%;height:${Math.max(9, (table.height || 70) / 5)}%"><b>${safe(table.name)}</b><span>${table.capacity} ${safe(t("lugares", "seats", "lugares"))}</span></div>`).join("");
+      const drawingTables = spaceTables.map((table) => `<div class="draw-table" style="left:${Math.min(82, (table.x || 0) / 10)}%;top:${Math.min(82, (table.y || 0) / 5)}%;width:${Math.max(10, (table.width || 140) / 10)}%;height:${Math.max(9, (table.height || 70) / 5)}%"><b>${safe(table.name)}</b><span>${table.shape === "living" ? safe(t("Sin límite", "Unlimited", "Sem limite")) : `${table.capacity} ${safe(t("lugares", "seats", "lugares"))}`}</span></div>`).join("");
       const drawingElements = floorElements.filter((element) => element.space === space).map((element) => `<div class="draw-element" style="left:${Math.min(84, element.x / 10)}%;top:${Math.min(84, element.y / 5)}%;width:${Math.max(9, element.width / 10)}%;height:${Math.max(8, element.height / 5)}%">${safe(element.label)}</div>`).join("");
       const details = spaceTables.map((table) => {
         const tableGuests = table.guests.map((id) => guests.find((guest) => guest.id === id)).filter(Boolean) as Guest[];
@@ -3764,7 +3772,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           ...tableGuests.filter((guest) => meaningfulGuestValue(guest.accessibilityNeeds)).map((guest) => `${guest.name}: ${guest.accessibilityNeeds}`),
         ];
         const seats = seatingRowsForTable(table);
-        return `<article class="table-detail"><h3>${safe(table.name)}</h3><p><b>${occupied}/${table.capacity}</b> ${safe(t("lugares ocupados", "occupied seats", "lugares ocupados"))}${table.note ? ` · ${safe(table.note)}` : ""}</p>${operationalSummary.length ? `<div class="ops"><b>${safe(t("Operativa", "Operations", "Operação"))}:</b> ${operationalSummary.map(safe).join(" · ")}</div>` : ""}<ul>${seats.length ? seats.map((seat) => { const needs = [seat.menu, seat.food, seat.accessibility].filter(meaningfulGuestValue); return `<li><b>${safe(t("Asiento", "Seat", "Assento"))} ${seat.seat}</b> · ${safe(seat.name)} <span>${safe(seat.category)}${needs.length ? ` · ${needs.map(safe).join(" · ")}` : ""}</span></li>`; }).join("") : `<li>${safe(t("Sin invitados asignados", "No assigned guests", "Sem convidados atribuídos"))}</li>`}</ul></article>`;
+        return `<article class="table-detail"><h3>${safe(table.name)}</h3><p><b>${occupied}</b> ${safe(table.shape === "living" ? t("personas · sin límite", "people · unlimited", "pessoas · sem limite") : t(`de ${table.capacity} lugares ocupados`, `of ${table.capacity} occupied seats`, `de ${table.capacity} lugares ocupados`))}${table.note ? ` · ${safe(table.note)}` : ""}</p>${operationalSummary.length ? `<div class="ops"><b>${safe(t("Operativa", "Operations", "Operação"))}:</b> ${operationalSummary.map(safe).join(" · ")}</div>` : ""}<ul>${seats.length ? seats.map((seat) => { const needs = [seat.menu, seat.food, seat.accessibility].filter(meaningfulGuestValue); return `<li><b>${table.shape === "living" ? safe(t("Zona", "Zone", "Zona")) : `${safe(t("Asiento", "Seat", "Assento"))} ${seat.seat}`}</b> · ${safe(seat.name)} <span>${safe(seat.category)}${needs.length ? ` · ${needs.map(safe).join(" · ")}` : ""}</span></li>`; }).join("") : `<li>${safe(t("Sin invitados asignados", "No assigned guests", "Sem convidados atribuídos"))}</li>`}</ul></article>`;
       }).join("");
       return `<section><h2>${safe(space)}</h2><div class="drawing">${drawingElements}${drawingTables}</div><div class="details">${details || `<p>${safe(t("Sin mesas en este espacio", "No tables in this space", "Sem mesas neste espaço"))}</p>`}</div></section>`;
     }).join("");
@@ -3775,8 +3783,14 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   };
 
   function seatingRowsForTable(table: EventTable) {
-    const slots: Array<{ guest: Guest; name: string } | undefined> = Array(table.capacity).fill(undefined);
     const tableGuests = table.guests.map((id) => guests.find((guest) => guest.id === id)).filter(Boolean) as Guest[];
+    if (table.shape === "living") {
+      return tableGuests.flatMap((guest) => [guest.name, ...guest.companions.map((companion) => companion.name).filter(Boolean)].map((name) => ({
+        table: table.name, seat: "", name, category: guest.guestType === "child" ? t("Niño/a", "Child", "Criança") : guest.guestType === "teen" ? t("Adolescente", "Teenager", "Adolescente") : t("Adulto", "Adult", "Adulto"),
+        menu: guest.menuChoice || "", food: meaningfulGuestValue(guest.food) ? guest.food : "", accessibility: guest.accessibilityNeeds || "", notes: guest.guestNotes || "",
+      })));
+    }
+    const slots: Array<{ guest: Guest; name: string } | undefined> = Array(table.capacity).fill(undefined);
     const place = (guest: Guest, preferredSeat = 0) => {
       const people = confirmedPeopleForGuest(guest, guests);
       const names = [guest.name, ...guest.companions.map((companion) => companion.name).filter(Boolean)];
@@ -3790,7 +3804,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     tableGuests.filter((guest) => !table.seatAssignments?.[guest.id]).forEach((guest) => place(guest));
     return slots.flatMap((slot, index) => slot ? [{
       table: table.name,
-      seat: index + 1,
+      seat: String(index + 1),
       name: slot.name,
       category: slot.guest.guestType === "child" ? t("Niño/a", "Child", "Criança") : slot.guest.guestType === "teen" ? t("Adolescente", "Teenager", "Adolescente") : t("Adulto", "Adult", "Adulto"),
       menu: slot.guest.menuChoice || "",
@@ -3906,7 +3920,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           <strong>{tables.length}</strong>
           <small>
             {totalCapacity}{" "}
-            {t("lugares disponibles", "available seats", "lugares disponíveis")}
+            {t("lugares en mesas · Living sin límite", "table seats · unlimited Living", "lugares em mesas · Living sem limite")}
           </small>
         </article>
         <article>
@@ -3984,7 +3998,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
                 <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
-                  <strong>{table.name}</strong><small>{table.capacity} {t("lugares", "seats", "lugares")}</small>
+                  <strong>{table.name}</strong><small>{table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}</small>
                   {canEdit && <div className="floor-table-actions"><button onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { locked: !table.locked }); }} aria-label={table.locked ? t("Desbloquear mesa", "Unlock table", "Desbloquear mesa") : t("Bloquear mesa", "Lock table", "Bloquear mesa")}>{table.locked ? "🔒" : "🔓"}</button><button disabled={table.locked} onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { rotation: ((table.rotation || 0) + 45) % 360 }); }} aria-label={t("Girar mesa", "Rotate table", "Girar mesa")}>↻</button><button onClick={(event) => { event.stopPropagation(); void duplicateTable(table); }} aria-label={`${t("Duplicar", "Duplicate", "Duplicar")} ${table.name}`}>⧉</button><button onClick={(event) => { event.stopPropagation(); void deleteTable(table.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${table.name}`}>×</button></div>}
                   {canEdit && !table.locked && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
                 </article>
@@ -4049,8 +4063,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         const assigned = guests.find((guest) => guest.id === id);
                         return total + (assigned ? confirmedPeopleForGuest(assigned, guests) : 0);
                       }, 0);
+                      const isLiving = table.shape === "living";
                       const available = table.capacity - occupiedByOthers;
-                      return <option key={table.id} value={table.id} disabled={available < groupPeople}>{table.name} · {available >= groupPeople ? `${available} ${t("libres", "free", "livres")}` : `${t("faltan", "needs", "faltam")} ${groupPeople - available}`}</option>;
+                      return <option key={table.id} value={table.id} disabled={!isLiving && available < groupPeople}>{table.name} · {isLiving ? t("sin límite", "unlimited", "sem limite") : available >= groupPeople ? `${available} ${t("libres", "free", "livres")}` : `${t("faltan", "needs", "faltam")} ${groupPeople - available}`}</option>;
                     })}
                   </select>
                 </label>;
@@ -4159,7 +4174,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         0,
                       );
                       const available = table.capacity - occupied;
-                      const lacksSpace =
+                      const lacksSpace = table.shape !== "living" &&
                         table.id !== currentTable?.id &&
                         available < confirmedPeopleForGuest(guest, guests);
                       return (
@@ -4169,7 +4184,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                           disabled={lacksSpace}
                         >
                           {table.name}
-                          {lacksSpace
+                          {table.shape === "living"
+                            ? ` · ${t("sin límite", "unlimited", "sem limite")}`
+                            : lacksSpace
                             ? ` · ${t("faltan", "needs", "faltam")} ${confirmedPeopleForGuest(guest, guests) - available} ${t("lugares", "seats", "lugares")}`
                             : ` · ${available} ${t("libres", "free", "livres")}`}
                         </option>
@@ -4234,9 +4251,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 (total, guest) => total + confirmedPeopleForGuest(guest, guests),
                 0,
               );
+              const isLiving = table.shape === "living";
               const remaining = table.capacity - occupied;
-              const full = remaining === 0;
-              const over = remaining < 0;
+              const full = !isLiving && remaining === 0;
+              const over = !isLiving && remaining < 0;
               const menuSummary = new Map<string, number>();
               tableGuests.forEach((guest) => {
                 if (!meaningfulGuestValue(guest.menuChoice)) return;
@@ -4269,8 +4287,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               const alreadyHere = Boolean(
                 dragGuestId && table.guests.includes(dragGuestId),
               );
-              const canDrop = alreadyHere || remaining >= draggedPeople;
-              const seatGuests: Array<{ guest: Guest; label: string; personName: string } | undefined> = Array(table.capacity).fill(undefined);
+              const canDrop = isLiving || alreadyHere || remaining >= draggedPeople;
+              const seatGuests: Array<{ guest: Guest; label: string; personName: string } | undefined> = Array(isLiving ? 0 : table.capacity).fill(undefined);
               const effectiveSeatByGuest = new Map<string, number>();
               const placeGuest = (guest: Guest, preferredSeat = 0) => {
                 const people = confirmedPeopleForGuest(guest, guests);
@@ -4342,26 +4360,27 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   </div>
                   <div className="capacity-row">
                     <span>
-                      {occupied} {t("de", "of", "de")} {table.capacity}{" "}
-                      {t("lugares", "seats", "lugares")}
+                      {occupied} {isLiving ? t("personas ubicadas", "people assigned", "pessoas alocadas") : <>{t("de", "of", "de")} {table.capacity} {t("lugares", "seats", "lugares")}</>}
                     </span>
                     <strong>
-                      {over
+                      {isLiving
+                        ? t("Sin límite", "Unlimited", "Sem limite")
+                        : over
                         ? `${Math.abs(remaining)} ${t("de más", "over", "a mais")}`
                         : full
                           ? t("Completa", "Full", "Completa")
                           : `${remaining} ${t("libres", "free", "livres")}`}
                     </strong>
                   </div>
-                  <div className="capacity-bar">
+                  {!isLiving && <div className="capacity-bar">
                     <i
                       style={{
                         width: `${Math.min(100, (occupied / table.capacity) * 100)}%`,
                       }}
                     />
-                  </div>
+                  </div>}
                   {tableSocialConflicts.length > 0 && <div className="table-social-conflicts" aria-label={t("Conflictos sociales", "Social conflicts", "Conflitos sociais")}>{tableSocialConflicts.map((conflict) => <button key={conflict.id} onClick={() => focusSpecificTable(conflict.tableId)}>⚠ {conflict.message}</button>)}</div>}
-                  <div className={`table-seat-map is-${table.shape || "round"}`}>
+                  {!isLiving && <div className={`table-seat-map is-${table.shape || "round"}`}>
                     <div className="table-surface"><strong>{table.name}</strong></div>
                     {Array.from({ length: table.capacity }, (_, seatIndex) => {
                       const person = seatGuests[seatIndex];
@@ -4398,7 +4417,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         ><b className="seat-number">{seatIndex + 1}</b><em>{person?.label || "♧"}</em></span>
                       );
                     })}
-                  </div>
+                  </div>}
                   {(menuSummary.size > 0 || dietaryAlerts.length > 0 || accessibilityAlerts.length > 0) && (
                     <div className="table-operations" aria-label={t("Datos operativos", "Operational details", "Dados operacionais")}>
                       {[...menuSummary].map(([menu, count]) => (
@@ -4427,7 +4446,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         <small>
                           {people} {t("lugares", "seats", "lugares")}
                         </small>
-                        {canEdit && (
+                        {canEdit && !isLiving && (
                           <select
                             className="seat-position-select"
                             value={assignedSeat}
@@ -4478,7 +4497,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         </span>
                       ))}
                   </div>
-                  {over && (
+                  {over && !isLiving && (
                     <div className="capacity-alert">
                       {t(
                         "La mesa supera la capacidad configurada.",
@@ -4533,7 +4552,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 : tableShape === "living" ? "Agregar Living" : t("Agregar mesa", "Add table", "Adicionar mesa")}
             </h2>
             <div className="form-grid">
-              <label>
+              {tableShape !== "living" && <label>
                 {t("Nombre o número", "Name or number", "Nome ou número")}
                 <input
                   value={tableName}
@@ -4544,7 +4563,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                     "Ex. Mesa Família",
                   )}
                 />
-              </label>
+              </label>}
+              {tableShape === "living" && <div className="living-unlimited-note"><strong>{t("Zona sin límite", "Unlimited zone", "Zona sem limite")}</strong><span>{t("Podés ubicar todas las personas que necesites. No se asignan sillas numeradas.", "Assign as many people as needed. Numbered seats are not used.", "Aloque quantas pessoas precisar. Não há assentos numerados.")}</span></div>}
               <label>
                 {t(
                   "Cantidad de personas",
@@ -6692,6 +6712,34 @@ function CheckInModule({ guests, setGuests, canEdit }: { guests: Guest[]; setGue
   </>;
 }
 
+function InvitationModule({ order }: { order: AdminOrder }) {
+  const { text: t } = useAdminI18n();
+  const templateId = builderTemplateIdForOrder(order.modelName);
+  const builderUrl = `/?builder=${encodeURIComponent(templateId)}&pedido=${encodeURIComponent(order.orderNumber)}`;
+  return <>
+    <div className="page-heading invitation-module-heading">
+      <div>
+        <span className="eyebrow">{t("Diseño y contenido", "Design and content", "Design e conteúdo")}</span>
+        <h1>{t("Invitación", "Invitation", "Convite")}</h1>
+        <p>{t("Editá el diseño, los textos, las fotos y las secciones de tu invitación.", "Edit your invitation design, copy, photos and sections.", "Edite o design, os textos, as fotos e as seções do convite.")}</p>
+      </div>
+    </div>
+    <section className="panel invitation-builder-access">
+      <div className="invitation-builder-icon">✦</div>
+      <div className="invitation-builder-copy">
+        <span>{t("Tu invitación digital", "Your digital invitation", "Seu convite digital")}</span>
+        <h2>{t("Creá tu invitación paso a paso", "Create your invitation step by step", "Crie seu convite passo a passo")}</h2>
+        <p>{t("Abrila con el pedido actual y el modelo que elegiste. Podés guardar un borrador y continuar cuando quieras.", "Open it with the current order and your chosen template. Save a draft and continue whenever you like.", "Abra com o pedido atual e o modelo escolhido. Salve um rascunho e continue quando quiser.")}</p>
+        <dl>
+          <div><dt>{t("Pedido", "Order", "Pedido")}</dt><dd>{order.orderNumber}</dd></div>
+          <div><dt>{t("Modelo", "Template", "Modelo")}</dt><dd>{order.modelName || templateId}</dd></div>
+        </dl>
+      </div>
+      <a className="primary-button invitation-builder-button" href={builderUrl} target="_blank" rel="noreferrer">✨ {t("Crear mi invitación", "Create my invitation", "Criar meu convite")}</a>
+    </section>
+  </>;
+}
+
 function Admin({
   onLogout,
   order,
@@ -6741,6 +6789,7 @@ function Admin({
       (
         ({
           Resumen: t("Resumen", "Overview", "Resumo"),
+          Invitación: t("Invitación", "Invitation", "Convite"),
           Invitados: t("Invitados", "Guests", "Convidados"),
           Confirmaciones: t("Confirmaciones", "Confirmations", "Confirmações"),
           Mesas: t("Mesas", "Tables", "Mesas"),
@@ -6959,6 +7008,7 @@ function Admin({
               canEdit={order.accessRole !== "viewer"}
             />
           )}
+          {view === "Invitación" && <InvitationModule order={order} />}
           {view === "Invitados" && (
             <Guests
               guests={guests}
