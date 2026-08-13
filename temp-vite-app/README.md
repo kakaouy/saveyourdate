@@ -26,6 +26,7 @@ ORDER_ADMIN_EMAIL=saveyourdate.invite@gmail.com
 ORDER_EMAIL_FROM=Save Your Date <hello@saveyourdate.site>
 PUBLIC_APP_URL=https://www.saveyourdate.site
 ORDER_APPROVAL_SECRET=una-cadena-aleatoria-larga-de-al-menos-32-caracteres
+ADMIN_AUTH_SECRET=otra-cadena-aleatoria-larga-de-al-menos-32-caracteres
 CRON_SECRET=otra-cadena-aleatoria-larga
 WHATSAPP_ACCESS_TOKEN=token-permanente-de-meta
 WHATSAPP_PHONE_NUMBER_ID=id-del-numero
@@ -39,8 +40,12 @@ WHATSAPP_WEBHOOK_VERIFY_TOKEN=token-propio-para-verificar-el-webhook
 En proyectos nuevos, usar la **Secret key** con prefijo `sb_secret_`. El nombre
 de la variable se conserva por compatibilidad con proyectos anteriores.
 
-`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY` y `ORDER_APPROVAL_SECRET` son
+`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `ORDER_APPROVAL_SECRET` y
+`ADMIN_AUTH_SECRET` son
 secretos: nunca deben usar el prefijo `VITE_` ni incorporarse al frontend.
+
+`ADMIN_AUTH_SECRET` firma las sesiones privadas del panel y debe tener al menos
+32 caracteres. Cambiarlo cierra las sesiones administrativas existentes.
 
 Las variables `WHATSAPP_*` también son privadas. El token, el identificador del
 número, la plantilla y la versión de Graph habilitan el envío mediante WhatsApp
@@ -86,3 +91,10 @@ administrativos permanecen en español.
 
 Los archivos adjuntos siguen enviándose al correo mediante FormSubmit; los
 datos principales y el estado quedan persistidos en Supabase.
+
+## Publicación
+
+Antes de desplegar cambios del panel, seguir
+[`PRODUCTION_CHECKLIST.md`](./PRODUCTION_CHECKLIST.md). Las ramas `agent/*` no
+generan despliegues automáticos en Vercel; deben integrarse en una rama con
+deploy habilitado.

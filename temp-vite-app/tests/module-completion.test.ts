@@ -13,6 +13,8 @@ const rsvpApi = readFileSync(path.join(appRoot, 'api', 'rsvp.ts'), 'utf8');
 const healthApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'health.ts'), 'utf8');
 const builderApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'invitation-builder.ts'), 'utf8');
 const reviewPage = readFileSync(path.join(appRoot, 'src', 'components', 'InvitationReviewPage.tsx'), 'utf8');
+const readme = readFileSync(path.join(appRoot, 'README.md'), 'utf8');
+const productionChecklist = readFileSync(path.join(appRoot, 'PRODUCTION_CHECKLIST.md'), 'utf8');
 
 test('el constructor divide el formulario en un recorrido guiado', () => {
   for (const step of ['design', 'event', 'sections', 'copy', 'media', 'extras', 'review']) {
@@ -134,4 +136,13 @@ test('Recordatorios distingue preparación manual, envío y fallas de servicio',
   assert.match(admin, /WhatsApp quedó preparado\. Revisá el mensaje antes de enviarlo/);
   assert.match(admin, /Recordatorio enviado por email/);
   assert.match(admin, /El lote terminó correctamente/);
+});
+
+test('la publicación documenta autenticación, Living y preservación de datos', () => {
+  assert.match(readme, /ADMIN_AUTH_SECRET/);
+  assert.match(readme, /PRODUCTION_CHECKLIST\.md/);
+  assert.match(productionChecklist, /20260813030000_living_seating_areas\.sql/);
+  assert.match(productionChecklist, /No eliminar ni recrear `event_tables` o `event_guests`/);
+  assert.match(productionChecklist, /Check-in queda fuera de esta etapa/);
+  assert.match(productionChecklist, /ramas\s+`agent\/\*`/);
 });
