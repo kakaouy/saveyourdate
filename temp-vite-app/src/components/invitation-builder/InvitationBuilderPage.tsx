@@ -27,6 +27,7 @@ export default function InvitationBuilderPage() {
   const [viewport, setViewport] = useState<'phone' | 'desktop'>('phone');
   const [mobilePanel, setMobilePanel] = useState<'edit' | 'preview'>('edit');
   const [saved, setSaved] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
@@ -52,6 +53,7 @@ export default function InvitationBuilderPage() {
 
   const updateDocument = (change: Partial<InvitationBuilderDocument>) => {
     setSaved(false);
+    setDirty(true);
     setDocument((current) => ({ ...current, ...change }));
   };
   const updateContentGroup = (group: string, field: string, value: unknown) => updateDocument({
@@ -90,8 +92,18 @@ export default function InvitationBuilderPage() {
     const selected = builderTemplate(templateId);
     const next = selected.createDocument();
     setSaved(false);
+    setDirty(true);
     setDocument(switchInvitationTemplate(document, next));
   };
+
+  useEffect(() => {
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => {
+      if (!dirty) return;
+      event.preventDefault();
+    };
+    window.addEventListener('beforeunload', warnBeforeLeaving);
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving);
+  }, [dirty]);
 
   useEffect(() => {
     fetch('/api/admin/invitation-builder').then(async (response) => {
@@ -109,6 +121,7 @@ export default function InvitationBuilderPage() {
         locale: stored.locale as InvitationBuilderDocument['locale'], sections: stored.sections as InvitationBuilderDocument['sections'],
         content: stored.content as InvitationBuilderDocument['content'], status: stored.workflow_status as InvitationBuilderDocument['status'] });
       setSaved(true);
+      setDirty(false);
     }).catch(() => undefined);
   }, []);
 
@@ -119,7 +132,7 @@ export default function InvitationBuilderPage() {
       const response = await fetch('/api/admin/invitation-builder', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(document) });
       const payload = await response.json() as { error?: string };
       if (!response.ok) throw new Error(payload.error || 'No se pudo guardar.');
-      setSaved(true); setMessage('Borrador guardado.'); return true;
+      setSaved(true); setDirty(false); setMessage('Borrador guardado.'); return true;
     } catch (error) { setMessage(error instanceof Error ? error.message : 'No se pudo guardar.'); return false; }
     finally { setSaving(false); }
   };
@@ -184,12 +197,12 @@ export default function InvitationBuilderPage() {
       },
       status: 'draft'
     }));
-    setSaved(false); setMessage(`Aplicaste “${setup.name}”. Revisá los datos del evento antes de guardar.`);
+    setSaved(false); setDirty(true); setMessage(`Aplicaste “${setup.name}”. Revisá los datos del evento antes de guardar.`);
   };
 
   return <main className="builder-page">
     <header className="builder-header">
-      <a href="/">← Volver</a><div><strong>Armá tu invitación</strong><span>{template.label} · {document.status === 'draft' ? 'Borrador' : document.status === 'in_review' ? 'En revisión' : document.status}</span></div>
+      <a href="/">← Volver</a><div><strong>Armá tu invitación</strong><span>{template.label} · {document.status === 'draft' ? 'Borrador' : document.status === 'in_review' ? 'En revisión' : document.status}{dirty ? ' · Cambios sin guardar' : ''}</span></div>
       <div className="builder-header-actions">
         {workflow.canEdit && <button onClick={save} disabled={saving}>{saving ? 'Guardando…' : saved ? 'Guardado ✓' : 'Guardar borrador'}</button>}
         {workflow.canEdit && ['draft','changes_requested'].includes(document.status) && <button onClick={submitForReview} disabled={saving}>Enviar a revisión</button>}
