@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AURORA_BUILDER_SECTIONS, auroraConfigFromBuilder, createAuroraBuilderDocument } from '../aurora/builder';
 import { moveInvitationSection, normalizeSectionOrder } from '../../domain/invitation-builder';
 import type { InvitationBuilderDocument } from '../../domain/invitation-builder';
+import { validateInvitationForReview } from '../../domain/invitation-validation';
 import { BUILDER_TEMPLATES, builderTemplate } from './templates';
 import './invitation-builder.css';
 import './builder-persistence.css';
@@ -45,6 +46,7 @@ export default function InvitationBuilderPage() {
   const qrPass = config.qrPass!;
   const template = builderTemplate(document.templateId);
   const Preview = template.Preview;
+  const validationIssues = useMemo(() => validateInvitationForReview(document), [document]);
 
   const updateDocument = (change: Partial<InvitationBuilderDocument>) => {
     setSaved(false);
@@ -121,6 +123,10 @@ export default function InvitationBuilderPage() {
   };
 
   const submitForReview = async () => {
+    if (validationIssues.length > 0) {
+      setMessage(`Faltan ${validationIssues.length} ${validationIssues.length === 1 ? 'dato' : 'datos'} antes de enviar a revisión.`);
+      return;
+    }
     if (!(await save())) return;
     const response = await fetch('/api/admin/invitation-builder', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submit' }) });
     const payload = await response.json() as { error?: string; document?: { workflow_status: InvitationBuilderDocument['status'] } };
@@ -191,6 +197,7 @@ export default function InvitationBuilderPage() {
     </header>
     <div className="builder-layout" data-mobile-panel={mobilePanel}>
       <aside className="builder-panel" id="builder-editor">{message && <p className="builder-message" role="status">{message}</p>}{authenticated && workflow.requiresPlatformReview && document.status === 'approved' && <p className="builder-message">Esta cuenta requiere revisión final de Save Your Date antes de publicar.</p>}
+        {validationIssues.length > 0 && <section className="builder-validation" aria-labelledby="builder-validation-title"><h2 id="builder-validation-title">Antes de enviar a revisión</h2><ul>{validationIssues.map((issue) => <li key={`${issue.field}-${issue.message}`}>{issue.message}</li>)}</ul></section>}
         {reviewHistory.some((event) => event.action === 'changes_requested' && event.comment) && <section className="builder-review-notes"><h2>Comentarios de revisión</h2>{reviewHistory.filter((event) => event.action === 'changes_requested' && event.comment).slice(0, 5).map((event) => <article key={event.id}><p>{event.comment}</p><time>{new Date(event.created_at).toLocaleString('es-UY')}</time></article>)}</section>}
         <section><h2>Modelo</h2><label>Diseño<select value={document.templateId} onChange={(e) => changeTemplate(e.target.value)}>{BUILDER_TEMPLATES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
           <label>Idioma<select value={document.locale} onChange={(e) => updateDocument({ locale: e.target.value as InvitationBuilderDocument['locale'] })}>

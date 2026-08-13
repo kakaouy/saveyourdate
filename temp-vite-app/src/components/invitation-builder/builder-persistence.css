@@ -15,6 +15,9 @@
 .builder-header-actions button + button { background: #fff; color: #7e3d57; }
 .builder-header-actions button:disabled { opacity: .55; }
 .builder-message { margin: 0 0 .75rem; padding: .65rem; border-radius: 8px; background: #f5e8ee; color: #653248; font-size: .8rem; }
+.builder-validation { margin-bottom: .75rem; padding: .8rem !important; border: 1px solid #d8aab9 !important; border-radius: 10px; background: #fff7f9; }
+.builder-validation h2 { color: #7e3d57; }
+.builder-validation ul { display: grid; gap: .35rem; margin: 0; padding-left: 1.1rem; color: #653248; font-size: .78rem; }
 .builder-review-notes article { padding: .6rem 0; border-top: 1px solid rgba(57, 46, 59, .12); }
 .builder-review-notes p { margin: 0 0 .25rem; white-space: pre-wrap; font-size: .82rem; }
 .builder-review-notes time { color: #756d77; font-size: .72rem; }
