@@ -5,6 +5,7 @@ import type { InvitationBuilderDocument } from '../../domain/invitation-builder'
 import { BUILDER_TEMPLATES, builderTemplate } from './templates';
 import './invitation-builder.css';
 import './builder-persistence.css';
+import './mobile-preview.css';
 
 type WorkflowCapabilities = { canEdit: boolean; canApprove: boolean; canPublish: boolean; requiresPlatformReview: boolean };
 type SavedSetup = { id: string; name: string; payload: Partial<InvitationBuilderDocument>; updated_at: string };
@@ -13,6 +14,7 @@ type ReviewEvent = { id: string; action: string; comment: string | null; actor_t
 export default function InvitationBuilderPage() {
   const [document, setDocument] = useState<InvitationBuilderDocument>(createAuroraBuilderDocument);
   const [viewport, setViewport] = useState<'phone' | 'desktop'>('phone');
+  const [mobilePanel, setMobilePanel] = useState<'edit' | 'preview'>('edit');
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -169,8 +171,8 @@ export default function InvitationBuilderPage() {
         {workflow.canPublish && document.status === 'approved' && <button onClick={() => workflowAction('publish')}>Publicar</button>}
       </div>
     </header>
-    <div className="builder-layout">
-      <aside className="builder-panel">{message && <p className="builder-message" role="status">{message}</p>}{authenticated && workflow.requiresPlatformReview && document.status === 'approved' && <p className="builder-message">Esta cuenta requiere revisión final de Save Your Date antes de publicar.</p>}
+    <div className="builder-layout" data-mobile-panel={mobilePanel}>
+      <aside className="builder-panel" id="builder-editor">{message && <p className="builder-message" role="status">{message}</p>}{authenticated && workflow.requiresPlatformReview && document.status === 'approved' && <p className="builder-message">Esta cuenta requiere revisión final de Save Your Date antes de publicar.</p>}
         {reviewHistory.some((event) => event.action === 'changes_requested' && event.comment) && <section className="builder-review-notes"><h2>Comentarios de revisión</h2>{reviewHistory.filter((event) => event.action === 'changes_requested' && event.comment).slice(0, 5).map((event) => <article key={event.id}><p>{event.comment}</p><time>{new Date(event.created_at).toLocaleString('es-UY')}</time></article>)}</section>}
         <section><h2>Modelo</h2><label>Diseño<select value={document.templateId} onChange={(e) => changeTemplate(e.target.value)}>{BUILDER_TEMPLATES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label></section>
         {authenticated && <section><h2>Biblioteca de la cuenta</h2><p className="builder-help">Reutilizá diseño, secciones, textos generales y cronograma. No se copian nombres, fechas, invitados, fotos ni datos bancarios.</p>
@@ -231,10 +233,16 @@ export default function InvitationBuilderPage() {
           })}</ol>
         </section>
       </aside>
-      <section className="builder-preview-area">
+      <section className="builder-preview-area" id="builder-live-preview">
         <div className="builder-preview-toolbar"><strong>Vista previa en vivo</strong><div><button aria-pressed={viewport === 'phone'} onClick={() => setViewport('phone')}>Celular</button><button aria-pressed={viewport === 'desktop'} onClick={() => setViewport('desktop')}>Escritorio</button></div></div>
         <div className={`builder-preview builder-preview-${viewport}`}><Preview locale={document.locale} palette={document.paletteId as never} embedded config={config} sectionOrder={ordered.filter(({ enabled }) => enabled).map(({ id }) => id)} /></div>
       </section>
     </div>
+    <button
+      className="builder-mobile-switch"
+      type="button"
+      aria-controls={mobilePanel === 'edit' ? 'builder-live-preview' : 'builder-editor'}
+      onClick={() => setMobilePanel((current) => current === 'edit' ? 'preview' : 'edit')}
+    >{mobilePanel === 'edit' ? 'Ver vista previa' : 'Volver a editar'}</button>
   </main>;
 }
