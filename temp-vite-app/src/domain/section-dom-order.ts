@@ -25,6 +25,7 @@ export const applySectionDomOrder = (
       child.style.display = 'none';
     }
   });
+  let visibleOrnamentIndex = 0;
   sectionOrder.forEach((sectionId, index) => {
     if (index <= 1) return;
     const previousId = sectionOrder[index - 1];
@@ -32,12 +33,13 @@ export const applySectionDomOrder = (
     if (photoGalleryPair || sectionId === 'parallax') return;
     const host = sections.get(sectionId);
     if (!host) return;
-    const ornamentSide = sectionId === 'schedule' ? 'right' : index % 2 === 0 ? 'right' : 'left';
+    const ornamentSide = visibleOrnamentIndex % 2 === 0 ? 'right' : 'left';
     host.classList.add('modular-ornament-host', 'modular-ornament-before', `modular-ornament-${ornamentSide}`);
     host.style.setProperty('--modular-ornament-image', `var(--modular-ornament-${ornamentSide})`);
     host.style.setProperty('--modular-ornament-duration', `${8.6 + (index % 4) * 0.7}s`);
     host.style.setProperty('--modular-ornament-delay', `${-(index * 1.37)}s`);
     host.style.setProperty('--modular-ornament-translate', '-50%');
+    visibleOrnamentIndex += 1;
   });
 };
 
