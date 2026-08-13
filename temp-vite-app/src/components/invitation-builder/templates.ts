@@ -1,8 +1,9 @@
 import type { ComponentType } from 'react';
 import type { InvitationBuilderDocument } from '../../domain/invitation-builder';
+import type { InvitationSectionDefinition } from '../../domain/invitation-builder';
 import type { AuroraConfig, AuroraLocale } from '../aurora/config';
 import { AuroraInvitation } from '../aurora/AuroraInvitation';
-import { createAuroraBuilderDocument, createBuilderDocument } from '../aurora/builder';
+import { AURORA_BUILDER_SECTIONS, createAuroraBuilderDocument, createBuilderDocument } from '../aurora/builder';
 import { AstraeaInvitation } from '../astraea/AstraeaInvitation';
 import { ASTRAEA_PALETTES, DEFAULT_ASTRAEA_CONFIG } from '../astraea/config';
 import { CoruscantInvitation } from '../coruscant/CoruscantInvitation';
@@ -65,3 +66,11 @@ export const BUILDER_TEMPLATES: BuilderTemplate[] = [
 ];
 
 export const builderTemplate = (id: string) => BUILDER_TEMPLATES.find((template) => template.id === id) || BUILDER_TEMPLATES[0];
+
+export const builderSectionDefinitions = (
+  templateId: string,
+  sectionIds?: string[]
+): InvitationSectionDefinition[] => {
+  const supported = new Set(sectionIds || builderTemplate(templateId).createDocument().sections.map(({ id }) => id));
+  return AURORA_BUILDER_SECTIONS.filter(({ id }) => supported.has(id));
+};

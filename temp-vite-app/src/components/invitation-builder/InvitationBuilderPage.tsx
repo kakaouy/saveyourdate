@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AURORA_BUILDER_SECTIONS, auroraConfigFromBuilder, createAuroraBuilderDocument } from '../aurora/builder';
+import { auroraConfigFromBuilder, createAuroraBuilderDocument } from '../aurora/builder';
 import { moveInvitationSection, normalizeSectionOrder } from '../../domain/invitation-builder';
 import type { InvitationBuilderDocument } from '../../domain/invitation-builder';
 import { validateInvitationForReview } from '../../domain/invitation-validation';
-import { BUILDER_TEMPLATES, builderTemplate } from './templates';
+import { BUILDER_TEMPLATES, builderSectionDefinitions, builderTemplate } from './templates';
 import './invitation-builder.css';
 import './builder-persistence.css';
 import './mobile-preview.css';
@@ -46,6 +46,7 @@ export default function InvitationBuilderPage() {
   const qrPass = config.qrPass!;
   const template = builderTemplate(document.templateId);
   const Preview = template.Preview;
+  const sectionDefinitions = useMemo(() => builderSectionDefinitions(document.templateId, document.sections.map(({ id }) => id)), [document.templateId, document.sections]);
   const validationIssues = useMemo(() => validateInvitationForReview(document), [document]);
 
   const updateDocument = (change: Partial<InvitationBuilderDocument>) => {
@@ -81,9 +82,9 @@ export default function InvitationBuilderPage() {
     sections: document.sections.map((section) => section.id === id ? { ...section, enabled: !section.enabled } : section)
   });
   const move = (id: string, direction: -1 | 1) => updateDocument({
-    sections: moveInvitationSection(AURORA_BUILDER_SECTIONS, document.sections, id, direction)
+    sections: moveInvitationSection(sectionDefinitions, document.sections, id, direction)
   });
-  const ordered = normalizeSectionOrder(AURORA_BUILDER_SECTIONS, document.sections);
+  const ordered = normalizeSectionOrder(sectionDefinitions, document.sections);
   const changeTemplate = (templateId: string) => {
     const selected = builderTemplate(templateId);
     const next = selected.createDocument();
@@ -276,7 +277,7 @@ export default function InvitationBuilderPage() {
         </fieldset>)}</section>
         <section><h2>Secciones</h2><p className="builder-help">Activá y ordená los bloques. Portada y RSVP tienen posición fija.</p>
           <ol className="builder-sections">{ordered.map((section, index) => {
-            const definition = AURORA_BUILDER_SECTIONS.find(({ id }) => id === section.id)!;
+            const definition = sectionDefinitions.find(({ id }) => id === section.id)!;
             return <li key={section.id}>
               <input type="checkbox" checked={section.enabled} disabled={definition.required} onChange={() => toggle(section.id)} aria-label={`Mostrar ${definition.label}`} />
               <span>{definition.label}</span>

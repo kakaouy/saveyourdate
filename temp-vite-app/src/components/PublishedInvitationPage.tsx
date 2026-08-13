@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { auroraConfigFromBuilder } from './aurora/builder';
 import type { InvitationBuilderDocument } from '../domain/invitation-builder';
 import { normalizeSectionOrder } from '../domain/invitation-builder';
-import { AURORA_BUILDER_SECTIONS } from './aurora/builder';
-import { builderTemplate } from './invitation-builder/templates';
+import { builderSectionDefinitions, builderTemplate } from './invitation-builder/templates';
 
 const orderNumber = decodeURIComponent(window.location.pathname.split('/').filter(Boolean).at(-1) || '').toUpperCase();
 
@@ -25,6 +24,7 @@ export default function PublishedInvitationPage() {
   if (!document || !config) return <main className="published-invitation-state"><p>Cargando invitación…</p></main>;
   const template = builderTemplate(document.templateId);
   const Preview = template.Preview;
-  const order = normalizeSectionOrder(AURORA_BUILDER_SECTIONS, document.sections).filter(({ enabled }) => enabled).map(({ id }) => id);
+  const definitions = builderSectionDefinitions(document.templateId, document.sections.map(({ id }) => id));
+  const order = normalizeSectionOrder(definitions, document.sections).filter(({ enabled }) => enabled).map(({ id }) => id);
   return <Preview locale={document.locale} palette={document.paletteId as never} config={config} sectionOrder={order} />;
 }

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AURORA_BUILDER_SECTIONS, auroraConfigFromBuilder } from './aurora/builder';
+import { auroraConfigFromBuilder } from './aurora/builder';
 import { normalizeSectionOrder } from '../domain/invitation-builder';
 import type { InvitationBuilderDocument } from '../domain/invitation-builder';
-import { builderTemplate } from './invitation-builder/templates';
+import { builderSectionDefinitions, builderTemplate } from './invitation-builder/templates';
 
 type ReviewEvent = { id: string; action: string; comment: string | null; actor_type: string; created_at: string };
 
@@ -43,7 +43,8 @@ export default function InvitationReviewPage() {
   if (error) return <main className="published-invitation-state"><h1>No pudimos abrir la revisión</h1><p>{error}</p></main>;
   if (!document || !config) return <main className="published-invitation-state"><p>Cargando revisión…</p></main>;
   const template = builderTemplate(document.templateId); const Preview = template.Preview;
-  const order = normalizeSectionOrder(AURORA_BUILDER_SECTIONS, document.sections).filter(({ enabled }) => enabled).map(({ id }) => id);
+  const definitions = builderSectionDefinitions(document.templateId, document.sections.map(({ id }) => id));
+  const order = normalizeSectionOrder(definitions, document.sections).filter(({ enabled }) => enabled).map(({ id }) => id);
   return <main className="invitation-review-page"><div className="invitation-review-toolbar"><div><strong>{identity}</strong><span>Estado: {document.status}</span></div><div>
     {document.status === 'in_review' && <><button onClick={() => setShowChanges((value) => !value)}>Solicitar cambios</button><button onClick={() => act('approve')}>Aprobar</button></>}
     {document.status === 'approved' && <button onClick={() => act('publish')}>Publicar</button>}

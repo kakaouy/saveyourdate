@@ -55,10 +55,12 @@ export const createBuilderDocument = (
   templateId,
   paletteId,
   locale: 'es',
-  sections: AURORA_BUILDER_SECTIONS.map(({ id }) => ({
-    id,
-    enabled: Boolean(config.sections[id as keyof AuroraConfig['sections']])
-  })),
+  sections: AURORA_BUILDER_SECTIONS
+    .filter(({ id }) => Object.prototype.hasOwnProperty.call(config.sections, id))
+    .map(({ id }) => ({
+      id,
+      enabled: Boolean(config.sections[id as keyof AuroraConfig['sections']])
+    })),
   content: {
     event: config.event, links: config.links, content: config.content, gifts: config.gifts,
     schedule: config.schedule, gallery: config.gallery, hotels: config.hotels,

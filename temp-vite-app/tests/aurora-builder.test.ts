@@ -53,7 +53,7 @@ test('Verona y Varezzia adoptan el documento común y conservan su contenido', (
   const verona = createBuilderDocument('verona', 'bordo-calida', DEFAULT_VERONA_CONFIG as never);
   const varezzia = createBuilderDocument('varezzia', 'bordo-calida', DEFAULT_VAREZZIA_CONFIG as never);
   assert.equal((verona.content.event as { name: string }).name, 'Leticia');
-  assert.equal(verona.sections.find(({ id }) => id === 'songSuggestions')?.enabled, false);
+  assert.equal(verona.sections.some(({ id }) => id === 'songSuggestions'), false);
   assert.equal((varezzia.content.event as { name: string }).name, 'Martina');
   assert.equal(varezzia.sections.find(({ id }) => id === 'songSuggestions')?.enabled, true);
 });
