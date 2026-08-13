@@ -161,6 +161,17 @@ button { color: inherit; }
 .metric small { color: var(--muted); font-size: 9px; }
 .metric-blue i { background: #63a9d1; }.metric-green i { background: #64b99a; }.metric-amber i { background: #e7bb40; }.metric-coral i { background: var(--coral); }
 .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(320px, .82fr); gap: 18px; margin-bottom: 18px; }
+.pending-center { margin-bottom: 18px; }
+.pending-center-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; padding: 0 20px 20px; }
+.pending-center-grid button { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 11px; min-height: 68px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; color: var(--ink); background: #f8fbfc; text-align: left; cursor: pointer; }
+.pending-center-grid strong { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: var(--teal-dark); background: var(--mint); font-size: 15px; }
+.pending-center-grid span { font-size: 10px; font-weight: 750; line-height: 1.35; }.pending-center-grid i { color: var(--teal-dark); font-style: normal; }
+.checkin-metrics { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.checkin-panel { overflow: hidden; }.checkin-toolbar { display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.checkin-toolbar input { flex: 1; min-width: 220px; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; font: inherit; }
+.checkin-toolbar > div { display: flex; gap: 7px; }.checkin-toolbar button { min-height: 38px; padding: 0 15px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: white; font-weight: 750; cursor: pointer; }.checkin-toolbar button.active { border-color: var(--teal); color: var(--teal-dark); background: var(--mint); }
+.checkin-bulk { display: flex; align-items: center; gap: 9px; padding: 11px 20px; background: #eefafa; }.checkin-bulk strong { margin-right: auto; font-size: 10px; }.checkin-bulk button { padding: 9px 12px; border: 1px solid var(--teal); border-radius: 8px; color: var(--teal-dark); background: white; font-weight: 750; cursor: pointer; }
+.checkin-table td { vertical-align: middle; }.checkin-table td small { display: block; margin-top: 4px; color: var(--muted); }.checkin-table tr.checked-in { background: #f4fcf8; }.arrival-ok { color: #27866b; }.restriction-chip { display: inline-block; max-width: 180px; padding: 5px 8px; border-radius: 999px; color: #8a5b00; background: #fff0bf; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .admin-shell .getting-started-panel { display: grid; grid-template-columns: minmax(0,1fr); gap: 18px; align-items: center; margin-bottom: 24px; padding: 24px; border-color: #cfe7e8; background: linear-gradient(135deg,#fff,#f3fbfb); }
 .getting-started-panel > div { padding-inline: 2px; padding-top: 1px; }
 .getting-started-panel p { max-width: 760px; margin: 6px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; overflow-wrap: anywhere; }
@@ -706,6 +717,7 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
 .font-comfortable .form-grid select { font-size: 15px; }
 
 @media (max-width: 1050px) {
+  .pending-center-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .login-shell { grid-template-columns: .8fr 1.2fr; }
   .login-story { padding: 42px; }
   .story-copy h1 { font-size: 50px; }
@@ -738,6 +750,11 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
 }
 
 @media (max-width: 760px) {
+  .pending-center-grid, .checkin-metrics { grid-template-columns: 1fr; }
+  .checkin-toolbar { align-items: stretch; flex-direction: column; }
+  .checkin-toolbar > div { overflow-x: auto; }
+  .checkin-bulk { align-items: stretch; flex-direction: column; }
+  .checkin-bulk strong { margin-right: 0; }
   .table-panel > .table-tools .filter-pills { display: flex; flex: 1 0 100%; overflow-x: auto; }
   .login-shell { display: block; background: linear-gradient(160deg, var(--mint), white 45%); }
   .login-story { display: none; }

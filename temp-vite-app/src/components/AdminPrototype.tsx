@@ -50,6 +50,7 @@ type Guest = {
   invitedBy: string;
   companionOfId: string;
   thankedAt?: string;
+  checkedInAt?: string;
 };
 
 type GuestImportDraft = {
@@ -297,6 +298,7 @@ const nav = [
   ["Recordatorios", "↗"],
   ["Agradecimientos", "♡"],
   ["Mesas", "▦"],
+  ["Check-in", "✓"],
   ["Accesos", "♢"],
   ["Configuración", "⚙"],
 ];
@@ -958,6 +960,12 @@ function Dashboard({
   const responseRate = guests.length
     ? Math.round(((guests.length - pending) / guests.length) * 100)
     : 0;
+  const pendingTasks = [
+    { label: t("Invitaciones sin enviar", "Invitations not sent", "Convites não enviados"), count: guests.filter((guest) => guest.status === "Pendiente" && !guest.invitationSentAt).length, view: "Invitados" },
+    { label: t("Respuestas pendientes", "Pending responses", "Respostas pendentes"), count: pending, view: "Recordatorios" },
+    { label: t("Restricciones para revisar", "Dietary needs to review", "Restrições para revisar"), count: guests.filter(guestHasRestriction).length, view: "Restricciones" },
+    { label: t("Preferencias de ubicación", "Seating preferences", "Preferências de lugares"), count: guests.filter((guest) => guest.socialTogetherWith || guest.socialSeparateFrom || guest.preferredTableName).length, view: "Mesas" },
+  ];
   const recentGuests = [...guests]
     .filter((guest) => guest.updatedAt)
     .sort(
@@ -1107,6 +1115,16 @@ function Dashboard({
           note={`${responseRate}% ${t("de respuesta total", "total response rate", "de resposta total")}`}
           tone="coral"
         />
+      </section>
+
+      <section className="panel pending-center">
+        <div className="panel-title">
+          <div><h2>{t("Centro de pendientes", "Action center", "Central de pendências")}</h2><p>{t("Lo importante del evento, ordenado para actuar.", "What needs attention, ready to act.", "O que precisa de atenção, pronto para agir.")}</p></div>
+          <button onClick={() => onNavigate("Check-in")}>{t("Abrir check-in", "Open check-in", "Abrir check-in")} →</button>
+        </div>
+        <div className="pending-center-grid">
+          {pendingTasks.map((task) => <button key={task.label} onClick={() => onNavigate(task.view)}><strong>{task.count}</strong><span>{task.label}</span><i>→</i></button>)}
+        </div>
       </section>
 
       <section className="dashboard-grid">
@@ -6358,6 +6376,50 @@ function ThanksModule({
   );
 }
 
+function CheckInModule({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; canEdit: boolean }) {
+  const { text: t, locale } = useAdminI18n();
+  const [tables, setTables] = useState<EventTable[]>([]);
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | "pending" | "arrived">("all");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => { fetch("/api/admin/tables").then(async (response) => { const result = await response.json() as { tables?: EventTable[] }; if (response.ok) setTables(result.tables || []); }).catch(() => undefined); }, []);
+  const confirmed = guests.filter((guest) => guest.status === "Confirmado");
+  const normalized = query.trim().toLocaleLowerCase();
+  const visible = confirmed.filter((guest) => {
+    const matches = !normalized || [guest.name, guest.group, guest.phone, guest.identificationNumber].some((value) => value?.toLocaleLowerCase().includes(normalized));
+    return matches && (filter === "all" || (filter === "arrived" ? Boolean(guest.checkedInAt) : !guest.checkedInAt));
+  });
+  const expected = confirmedPeopleTotal(confirmed);
+  const arrived = confirmed.filter((guest) => guest.checkedInAt).reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
+  const tableFor = (guest: Guest) => tables.find((table) => table.guests.includes(guest.id));
+  const update = async (ids: string[], checked: boolean) => {
+    if (!ids.length || saving) return;
+    setSaving(true); setError("");
+    try {
+      const bulk = ids.length > 1;
+      const response = await fetch("/api/admin/guests", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: `${bulk ? "bulk-" : ""}${checked ? "check-in" : "undo-check-in"}`, ...(bulk ? { ids } : { id: ids[0] }) }) });
+      const result = await response.json() as { guest?: Guest; guests?: Guest[]; error?: string };
+      if (!response.ok) throw new Error(result.error || t("No pudimos registrar la llegada.", "We could not record arrival.", "Não foi possível registrar a chegada."));
+      const changed = new Map((result.guests || (result.guest ? [result.guest] : [])).map((guest) => [guest.id, guest]));
+      setGuests((current) => current.map((guest) => changed.get(guest.id) || guest)); setSelected([]);
+    } catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)); } finally { setSaving(false); }
+  };
+  const allVisibleSelected = visible.length > 0 && visible.every((guest) => selected.includes(guest.id));
+  return <>
+    <div className="page-heading"><div><span className="eyebrow">{t("Recepción del evento", "Event reception", "Recepção do evento")}</span><h1>{t("Check-in de invitados", "Guest check-in", "Check-in de convidados")}</h1><p>{t("Buscá, verificá mesa y registrá llegadas en segundos.", "Search, check the table and record arrivals in seconds.", "Pesquise, confira a mesa e registre chegadas em segundos.")}</p></div></div>
+    <section className="metrics-grid checkin-metrics"><Metric label={t("Esperados", "Expected", "Esperados")} value={String(expected)} note={t("personas confirmadas", "confirmed people", "pessoas confirmadas")} tone="blue" /><Metric label={t("Presentes", "Arrived", "Presentes")} value={String(arrived)} note={`${expected ? Math.round(arrived / expected * 100) : 0}% ${t("del total", "of total", "do total")}`} tone="green" /><Metric label={t("Por llegar", "Not arrived", "Por chegar")} value={String(Math.max(0, expected - arrived))} note={t("personas pendientes", "people pending", "pessoas pendentes")} tone="amber" /></section>
+    <section className="panel checkin-panel">
+      <div className="checkin-toolbar"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar por nombre, grupo, teléfono o documento…", "Search name, group, phone or ID…", "Buscar nome, grupo, telefone ou documento…")} /><div>{(["all", "pending", "arrived"] as const).map((value) => <button key={value} className={filter === value ? "active" : ""} onClick={() => setFilter(value)}>{value === "all" ? t("Todos", "All", "Todos") : value === "pending" ? t("Por llegar", "Not arrived", "Por chegar") : t("Presentes", "Arrived", "Presentes")}</button>)}</div></div>
+      {selected.length > 0 && canEdit && <div className="checkin-bulk"><strong>{selected.length} {t("seleccionados", "selected", "selecionados")}</strong><button disabled={saving} onClick={() => update(selected, true)}>{t("Marcar presentes", "Mark arrived", "Marcar presentes")}</button><button disabled={saving} onClick={() => update(selected, false)}>{t("Deshacer llegada", "Undo arrival", "Desfazer chegada")}</button></div>}
+      {error && <p className="form-error">{error}</p>}
+      <div className="table-wrap"><table className="checkin-table"><thead><tr><th><input type="checkbox" checked={allVisibleSelected} onChange={() => setSelected(allVisibleSelected ? selected.filter((id) => !visible.some((guest) => guest.id === id)) : [...new Set([...selected, ...visible.map((guest) => guest.id)])])} /></th><th>{t("Invitado", "Guest", "Convidado")}</th><th>{t("Grupo", "Group", "Grupo")}</th><th>{t("Mesa / asiento", "Table / seat", "Mesa / assento")}</th><th>{t("Restricciones", "Restrictions", "Restrições")}</th><th>{t("Llegada", "Arrival", "Chegada")}</th><th>{t("Acción", "Action", "Ação")}</th></tr></thead><tbody>{visible.map((guest) => { const table = tableFor(guest); const seat = table?.seatAssignments?.[guest.id]; return <tr key={guest.id} className={guest.checkedInAt ? "checked-in" : ""}><td><input type="checkbox" checked={selected.includes(guest.id)} onChange={() => setSelected((current) => current.includes(guest.id) ? current.filter((id) => id !== guest.id) : [...current, guest.id])} /></td><td><GuestNameButton guest={guest} /><small>{guest.phone || guest.identificationNumber || "—"}</small></td><td>{guest.group || "—"}</td><td><strong>{table?.name || t("Sin mesa", "No table", "Sem mesa")}</strong><small>{seat ? `${t("Asiento", "Seat", "Assento")} ${seat}` : table ? t("Sin asiento fijo", "No fixed seat", "Sem assento fixo") : ""}</small></td><td>{guestHasRestriction(guest) ? <span className="restriction-chip">{guest.food !== "—" ? guest.food : guest.accessibilityNeeds}</span> : "—"}</td><td>{guest.checkedInAt ? <><strong className="arrival-ok">✓ {t("Presente", "Arrived", "Presente")}</strong><small>{reportDate(guest.checkedInAt, locale)}</small></> : <span className="muted">{t("Por llegar", "Not arrived", "Por chegar")}</span>}</td><td>{canEdit ? <button className={guest.checkedInAt ? "outline-button" : "primary-button"} disabled={saving} onClick={() => update([guest.id], !guest.checkedInAt)}>{guest.checkedInAt ? t("Deshacer", "Undo", "Desfazer") : t("Registrar", "Check in", "Registrar")}</button> : "—"}</td></tr>; })}</tbody></table></div>
+      {!visible.length && <div className="empty-state">{t("No encontramos invitados con esos filtros.", "No guests match those filters.", "Nenhum convidado corresponde aos filtros.")}</div>}
+    </section>
+  </>;
+}
+
 function Admin({
   onLogout,
   order,
@@ -6392,6 +6454,7 @@ function Admin({
           Invitados: t("Invitados", "Guests", "Convidados"),
           Confirmaciones: t("Confirmaciones", "Confirmations", "Confirmações"),
           Mesas: t("Mesas", "Tables", "Mesas"),
+          "Check-in": t("Check-in", "Check-in", "Check-in"),
           Restricciones: t("Restricciones", "Dietary needs", "Restrições"),
           Canciones: t("Canciones", "Songs", "Músicas"),
           Recordatorios: t("Recordatorios", "Reminders", "Lembretes"),
@@ -6613,6 +6676,7 @@ function Admin({
           {view === "Mesas" && (
             <Seating guests={activeGuests} canEdit={order.accessRole !== "viewer"} />
           )}
+          {view === "Check-in" && <CheckInModule guests={activeGuests} setGuests={setGuests} canEdit={order.accessRole !== "viewer"} />}
           {["Restricciones", "Canciones", "Recordatorios"].includes(view) && (
             <SimpleModule
               view={view}
