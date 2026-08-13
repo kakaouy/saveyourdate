@@ -29,16 +29,15 @@ export const applySectionDomOrder = (
     if (index <= 1) return;
     const previousId = sectionOrder[index - 1];
     const photoGalleryPair = (previousId === 'parallax' && sectionId === 'gallery') || (previousId === 'gallery' && sectionId === 'parallax');
-    if (photoGalleryPair) return;
-    const placeAfterPrevious = sectionId === 'parallax';
-    const host = sections.get(placeAfterPrevious ? previousId : sectionId);
+    if (photoGalleryPair || sectionId === 'parallax') return;
+    const host = sections.get(sectionId);
     if (!host) return;
-    const ornamentSide = index % 2 === 0 ? 'right' : 'left';
-    host.classList.add('modular-ornament-host', placeAfterPrevious ? 'modular-ornament-after' : 'modular-ornament-before', `modular-ornament-${ornamentSide}`);
+    const ornamentSide = sectionId === 'schedule' ? 'right' : index % 2 === 0 ? 'right' : 'left';
+    host.classList.add('modular-ornament-host', 'modular-ornament-before', `modular-ornament-${ornamentSide}`);
     host.style.setProperty('--modular-ornament-image', `var(--modular-ornament-${ornamentSide})`);
     host.style.setProperty('--modular-ornament-duration', `${8.6 + (index % 4) * 0.7}s`);
     host.style.setProperty('--modular-ornament-delay', `${-(index * 1.37)}s`);
-    host.style.setProperty('--modular-ornament-translate', placeAfterPrevious ? '50%' : '-50%');
+    host.style.setProperty('--modular-ornament-translate', '-50%');
   });
 };
 
