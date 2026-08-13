@@ -10,6 +10,15 @@ import './mobile-preview.css';
 type WorkflowCapabilities = { canEdit: boolean; canApprove: boolean; canPublish: boolean; requiresPlatformReview: boolean };
 type SavedSetup = { id: string; name: string; payload: Partial<InvitationBuilderDocument>; updated_at: string };
 type ReviewEvent = { id: string; action: string; comment: string | null; actor_type: string; created_at: string };
+const SECTION_COPY_FIELDS = [
+  ['Cuenta regresiva', [['countdownEyebrow', 'Texto superior'], ['countdownTitle', 'Título']]],
+  ['Ubicación', [['locationTitle', 'Título'], ['mapLabel', 'Botón del mapa'], ['calendarLabel', 'Botón de calendario']]],
+  ['Vestimenta y cronograma', [['dressTitle', 'Título de vestimenta'], ['dressButton', 'Botón de vestimenta'], ['scheduleTitle', 'Título del cronograma']]],
+  ['Foto, galería y alojamiento', [['parallaxTitle', 'Frase sobre la foto'], ['galleryTitle', 'Título de galería'], ['galleryCopy', 'Descripción de galería'], ['hotelsTitle', 'Título de alojamiento'], ['hotelsCopy', 'Descripción de alojamiento'], ['hotelsButton', 'Botón de alojamiento']]],
+  ['Regalos y fotos', [['giftsTitle', 'Título de regalos'], ['giftsCopy', 'Descripción de regalos'], ['giftsButton', 'Botón de regalos'], ['photosTitle', 'Título del álbum'], ['photosCopy', 'Descripción del álbum'], ['photosButton', 'Botón del álbum']]],
+  ['Redes, canciones y pase', [['socialTitle', 'Título de redes'], ['socialCopy', 'Descripción de redes'], ['socialButton', 'Botón de redes'], ['songsTitle', 'Título de canciones'], ['songsCopy', 'Descripción de canciones'], ['songsButton', 'Botón de canciones'], ['qrTitle', 'Título del pase'], ['qrCopy', 'Descripción del pase'], ['qrButton', 'Botón del pase']]],
+  ['Confirmación', [['rsvpTitle', 'Título'], ['rsvpButton', 'Botón']]]
+] as const;
 
 export default function InvitationBuilderPage() {
   const [document, setDocument] = useState<InvitationBuilderDocument>(createAuroraBuilderDocument);
@@ -26,6 +35,7 @@ export default function InvitationBuilderPage() {
   const config = useMemo(() => auroraConfigFromBuilder(document), [document]);
   const event = config.event!;
   const content = config.content!;
+  const editableContent = content as typeof content & Record<string, string | undefined>;
   const links = config.links!;
   const gifts = config.gifts!;
   const assets = config.assets!;
@@ -203,6 +213,11 @@ export default function InvitationBuilderPage() {
           <label>Enlace del mapa<input type="url" value={links.maps || ''} onChange={(e) => updateContentGroup('links', 'maps', e.target.value)} /></label>
           <label>Instagram<input type="url" value={links.instagram || ''} onChange={(e) => updateContentGroup('links', 'instagram', e.target.value)} /></label>
           <label>Álbum colaborativo<input type="url" value={links.photoUpload || ''} onChange={(e) => updateContentGroup('links', 'photoUpload', e.target.value)} /></label>
+        </section>
+        <section><h2>Textos de las secciones</h2><p className="builder-help">Dejá un campo vacío para usar el texto predeterminado del idioma elegido.</p>
+          {SECTION_COPY_FIELDS.map(([group, fields]) => <details className="builder-copy-group" key={group}><summary>{group}</summary>
+            {fields.map(([field, label]) => <label key={field}>{label}<input value={editableContent[field] || ''} onChange={(e) => updateContentGroup('content', field, e.target.value)} /></label>)}
+          </details>)}
         </section>
         <section><h2>Regalos</h2>
           <label>Banco<input value={gifts.bank} onChange={(e) => updateContentGroup('gifts', 'bank', e.target.value)} /></label>

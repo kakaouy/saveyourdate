@@ -63,6 +63,8 @@ export function AuroraInvitation({
     metadata: { ...DEFAULT_AURORA_CONFIG.metadata, ...config?.metadata }
   }), [config]);
   const colors = paletteTokens || AURORA_PALETTES[palette];
+  const customCopy = data.content as typeof data.content & Record<string, string | undefined>;
+  const copy = (key: string, fallback: string) => customCopy[key] || fallback;
   const rootRef = useRef<HTMLDivElement>(null);
   const parallaxRef = useRef<HTMLElement>(null);
   const parallaxImageRef = useRef<HTMLDivElement>(null);
@@ -382,8 +384,8 @@ export function AuroraInvitation({
         {data.sections.countdown && (
           <section className={sectionClass(data.tones.countdown)} data-au-section="countdown">
             <div className="au-container au-reveal">
-              <small>{t.countdownEyebrow}</small>
-              <h2>{t.countdownTitle}</h2>
+              <small>{copy('countdownEyebrow', t.countdownEyebrow)}</small>
+              <h2>{copy('countdownTitle', t.countdownTitle)}</h2>
               <div className="au-countdown">
                 {countdown.map((value, index) => <div key={t.units[index]}><strong>{value}</strong><span>{t.units[index]}</span></div>)}
               </div>
@@ -395,12 +397,12 @@ export function AuroraInvitation({
         {data.sections.location && (
           <><section className={sectionClass(data.tones.location)} data-au-section="location">
             <div className="au-container au-reveal">
-              <h2>{t.locationTitle}</h2>
+              <h2>{copy('locationTitle', t.locationTitle)}</h2>
               <p><strong>{formatDate(true)}</strong></p>
               <p>{data.event.venue}<br />{data.event.address}</p>
               <div className="au-buttons">
-                <button className="au-btn" onClick={() => external(data.links.maps)}>{t.map}</button>
-                <button className="au-btn au-btn-outline" onClick={downloadCalendar}>{t.calendar}</button>
+                <button className="au-btn" onClick={() => external(data.links.maps)}>{copy('mapLabel', t.map)}</button>
+                <button className="au-btn au-btn-outline" onClick={downloadCalendar}>{copy('calendarLabel', t.calendar)}</button>
               </div>
             </div>
           </section><SectionOrnament prefix="au" side="right" src={data.assets.ornamentRight} /></>
@@ -415,9 +417,9 @@ export function AuroraInvitation({
         {data.sections.dressCode && (
           <section className={sectionClass(data.tones.dressCode)} data-au-section="dressCode">
             <div className="au-container au-reveal">
-              <h2>{t.dressTitle}</h2>
+              <h2>{copy('dressTitle', t.dressTitle)}</h2>
               <p>{data.content.dressSummary || t.dressSummary}</p>
-              <button className="au-btn au-btn-outline" onClick={(event) => openModal('dress', event)}>{t.dressButton}</button>
+              <button className="au-btn au-btn-outline" onClick={(event) => openModal('dress', event)}>{copy('dressButton', t.dressButton)}</button>
             </div>
           </section>
         )}
@@ -425,7 +427,7 @@ export function AuroraInvitation({
         {data.sections.schedule && (
           <><section className={sectionClass(data.tones.schedule)} data-au-section="schedule">
             <div className="au-container au-reveal">
-              <h2>{t.scheduleTitle}</h2>
+              <h2>{copy('scheduleTitle', t.scheduleTitle)}</h2>
               <div className="au-schedule">
                 {schedule.map((item, index) => (
                   <article key={`${item.time}-${index}`}>
@@ -448,7 +450,7 @@ export function AuroraInvitation({
         {data.sections.gallery && (
           <section className={sectionClass(data.tones.gallery)} data-au-section="gallery">
             <div className="au-container au-reveal">
-              <h2>{t.galleryTitle}</h2><p>{t.galleryCopy}</p>
+              <h2>{copy('galleryTitle', t.galleryTitle)}</h2><p>{copy('galleryCopy', t.galleryCopy)}</p>
               {carouselGallery ? <div className="au-gallery-carousel">
                 <button className="au-gallery-control prev" type="button" aria-label="Ver foto anterior" onClick={()=>setGalleryIndex((galleryIndex-1+gallery.length)%gallery.length)}>‹</button>
                 <div className="au-gallery-viewport"><div className="au-gallery-track" style={{'--gallery-index':galleryIndex} as React.CSSProperties}>
@@ -465,37 +467,37 @@ export function AuroraInvitation({
 
         {data.sections.hotels && (
           <section className={sectionClass(data.tones.hotels)} data-au-section="hotels">
-            <div className="au-container au-reveal"><h2>{t.hotelsTitle}</h2><p>{t.hotelsCopy}</p><button className="au-btn au-btn-outline" onClick={(event) => openModal('hotels', event)}>{t.hotelsButton}</button></div>
+            <div className="au-container au-reveal"><h2>{copy('hotelsTitle', t.hotelsTitle)}</h2><p>{copy('hotelsCopy', t.hotelsCopy)}</p><button className="au-btn au-btn-outline" onClick={(event) => openModal('hotels', event)}>{copy('hotelsButton', t.hotelsButton)}</button></div>
           </section>
         )}
         {data.sections.gifts && data.gifts.visible && (
           <><section className={sectionClass(data.tones.gifts)} data-au-section="gifts">
-            <div className="au-container au-reveal"><h2>{t.giftsTitle}</h2><p>{t.giftsCopy}</p><button className="au-btn" onClick={(event) => openModal('gifts', event)}>{t.giftsButton}</button></div>
+            <div className="au-container au-reveal"><h2>{copy('giftsTitle', t.giftsTitle)}</h2><p>{copy('giftsCopy', t.giftsCopy)}</p><button className="au-btn" onClick={(event) => openModal('gifts', event)}>{copy('giftsButton', t.giftsButton)}</button></div>
           </section><SectionOrnament prefix="au" side="left" src={data.assets.ornamentLeft} /></>
         )}
         {data.sections.photoUpload && (
           <section className={sectionClass(data.tones.photoUpload)} data-au-section="photoUpload">
-            <div className="au-container au-reveal"><h2>{t.photosTitle}</h2><p>{t.photosCopy}</p><button className="au-btn" onClick={() => external(data.links.photoUpload)}>{t.photosButton}</button></div>
+            <div className="au-container au-reveal"><h2>{copy('photosTitle', t.photosTitle)}</h2><p>{copy('photosCopy', t.photosCopy)}</p><button className="au-btn" onClick={() => external(data.links.photoUpload)}>{copy('photosButton', t.photosButton)}</button></div>
           </section>
         )}
         {data.sections.social && (
           <><section className={sectionClass(data.tones.social)} data-au-section="social">
-            <div className="au-container au-reveal"><h2>{t.socialTitle}</h2><p>{t.socialCopy}</p><p className="au-hashtag">{data.content.hashtag}</p><button className="au-btn au-btn-outline" onClick={() => external(data.links.instagram)}>{t.socialButton}</button></div>
+            <div className="au-container au-reveal"><h2>{copy('socialTitle', t.socialTitle)}</h2><p>{copy('socialCopy', t.socialCopy)}</p><p className="au-hashtag">{data.content.hashtag}</p><button className="au-btn au-btn-outline" onClick={() => external(data.links.instagram)}>{copy('socialButton', t.socialButton)}</button></div>
           </section><SectionOrnament prefix="au" side="right" src={data.assets.ornamentRight} /></>
         )}
         {data.sections.songSuggestions && (
           <section className={sectionClass(data.tones.songSuggestions)} data-au-section="songSuggestions">
-            <div className="au-container au-reveal"><h2>{t.songsTitle}</h2><p>{t.songsCopy}</p><button className="au-btn" onClick={(event) => openModal('songs', event)}>{t.songsButton}</button></div>
+            <div className="au-container au-reveal"><h2>{copy('songsTitle', t.songsTitle)}</h2><p>{copy('songsCopy', t.songsCopy)}</p><button className="au-btn" onClick={(event) => openModal('songs', event)}>{copy('songsButton', t.songsButton)}</button></div>
           </section>
         )}
         {data.sections.qrPass && (
           <><section className={sectionClass(data.tones.qrPass)} data-au-section="qrPass">
-            <div className="au-container au-reveal"><h2>{t.qrTitle}</h2><p>{t.qrCopy}</p><button className="au-btn" onClick={(event) => openModal('qr', event)}>{t.qrButton}</button></div>
+            <div className="au-container au-reveal"><h2>{copy('qrTitle', t.qrTitle)}</h2><p>{copy('qrCopy', t.qrCopy)}</p><button className="au-btn" onClick={(event) => openModal('qr', event)}>{copy('qrButton', t.qrButton)}</button></div>
           </section><SectionOrnament prefix="au" side="left" src={data.assets.ornamentLeft} /></>
         )}
         {data.sections.rsvp && (
           <section className={sectionClass(data.tones.rsvp)} data-au-section="rsvp">
-            <div className="au-container au-reveal"><h2>{t.rsvpTitle}</h2><p>{data.content.rsvpDeadline || t.rsvpDeadline}</p><button className="au-btn" onClick={(event) => openModal('rsvp', event)}>{t.rsvpButton}</button></div>
+            <div className="au-container au-reveal"><h2>{copy('rsvpTitle', t.rsvpTitle)}</h2><p>{data.content.rsvpDeadline || t.rsvpDeadline}</p><button className="au-btn" onClick={(event) => openModal('rsvp', event)}>{copy('rsvpButton', t.rsvpButton)}</button></div>
           </section>
         )}
       </main>
@@ -512,13 +514,13 @@ export function AuroraInvitation({
             <button className="au-modal-close" onClick={closeModal} aria-label={t.close}>
               <span aria-hidden="true">×</span>
             </button>
-            {modal === 'dress' && <><h2 id="au-modal-title">{t.dressTitle}</h2><p>{data.content.dressDetails || t.dressDetails}</p></>}
-            {modal === 'hotels' && <><h2 id="au-modal-title">{t.hotelsTitle}</h2>{data.hotels.map((hotel) => <article className="au-hotel" key={hotel.name}><h3>{hotel.name}</h3>{hotel.address && <p>{hotel.address}</p>}{hotel.distance && <p>{hotel.distance}</p>}{hotel.discount && <p>{hotel.discount}</p>}{hotel.notes && <p>{hotel.notes}</p>}{hotel.phone && <a href={`tel:${hotel.phone}`}>{hotel.phone}</a>}{hotel.bookingUrl && <button className="au-btn" onClick={() => external(hotel.bookingUrl)}>Reserva</button>}</article>)}</>}
-            {modal === 'gifts' && <><h2 id="au-modal-title">{t.giftsTitle}</h2><dl><dt>Banco</dt><dd>{data.gifts.bank}</dd><dt>Titular</dt><dd>{data.gifts.holder}</dd><dt>{data.gifts.currency}</dt><dd>{data.gifts.account}</dd><dt>Alias</dt><dd>{data.gifts.alias}</dd></dl><button className="au-btn" onClick={copyAlias}>{t.copy}</button><p aria-live="polite">{copyStatus}</p>{data.gifts.link && <button className="au-btn au-btn-outline" onClick={() => external(data.gifts.link)}>Lista</button>}</>}
-            {modal === 'qr' && <><h2 id="au-modal-title">{t.qrTitle}</h2>{qr ? <img className="au-qr" src={qr} alt={t.qrTitle} /> : <p>{t.error}</p>}</>}
-            {modal === 'lightbox' && <><h2 id="au-modal-title" className="au-visually-hidden">{t.galleryTitle}</h2><img className="au-lightbox" src={gallery[lightbox]?.src} alt={gallery[lightbox]?.alt} /></>}
-            {modal === 'songs' && <><h2 id="au-modal-title">{t.songsTitle}</h2>{songState === 'success' ? <p aria-live="polite">{t.songSuccess}</p> : <form className="au-form" onSubmit={(event) => submit('song', event)}><label>{t.name}<input name="name" required /></label><label>{t.song}<input name="song" required /></label><button className="au-btn" disabled={songState === 'loading'}>{songState === 'loading' ? '…' : t.send}</button>{songState === 'error' && <p aria-live="polite">{t.error} <button type="submit">{t.retry}</button></p>}</form>}</>}
-            {modal === 'rsvp' && <><h2 id="au-modal-title">{t.rsvpTitle}</h2>{rsvpState === 'success' ? <p aria-live="polite">{t.success}</p> : <form className="au-form" onSubmit={(event) => submit('rsvp', event)}><label>{t.name}<input name="name" required /></label><label>{t.attendance}<select name="attendance" required defaultValue=""><option value="" disabled>{t.attendanceOptions[0]}</option><option value="yes">{t.attendanceOptions[1]}</option><option value="no">{t.attendanceOptions[2]}</option></select></label><label>{t.food}<select name="food" value={food} onChange={(event) => setFood(event.target.value)}>{['none', 'celiac', 'vegetarian', 'vegan', 'other'].map((value, index) => <option key={value} value={value}>{t.foodOptions[index]}</option>)}</select></label>{food === 'other' && <label>{t.otherFood}<input name="otherFood" required /></label>}<label>{t.message}<textarea name="message" /></label><button className="au-btn" disabled={rsvpState === 'loading'}>{rsvpState === 'loading' ? '…' : t.submit}</button>{rsvpState === 'error' && <p aria-live="polite">{t.error} <button type="submit">{t.retry}</button></p>}</form>}</>}
+            {modal === 'dress' && <><h2 id="au-modal-title">{copy('dressTitle', t.dressTitle)}</h2><p>{data.content.dressDetails || t.dressDetails}</p></>}
+            {modal === 'hotels' && <><h2 id="au-modal-title">{copy('hotelsTitle', t.hotelsTitle)}</h2>{data.hotels.map((hotel) => <article className="au-hotel" key={hotel.name}><h3>{hotel.name}</h3>{hotel.address && <p>{hotel.address}</p>}{hotel.distance && <p>{hotel.distance}</p>}{hotel.discount && <p>{hotel.discount}</p>}{hotel.notes && <p>{hotel.notes}</p>}{hotel.phone && <a href={`tel:${hotel.phone}`}>{hotel.phone}</a>}{hotel.bookingUrl && <button className="au-btn" onClick={() => external(hotel.bookingUrl)}>Reserva</button>}</article>)}</>}
+            {modal === 'gifts' && <><h2 id="au-modal-title">{copy('giftsTitle', t.giftsTitle)}</h2><dl><dt>Banco</dt><dd>{data.gifts.bank}</dd><dt>Titular</dt><dd>{data.gifts.holder}</dd><dt>{data.gifts.currency}</dt><dd>{data.gifts.account}</dd><dt>Alias</dt><dd>{data.gifts.alias}</dd></dl><button className="au-btn" onClick={copyAlias}>{t.copy}</button><p aria-live="polite">{copyStatus}</p>{data.gifts.link && <button className="au-btn au-btn-outline" onClick={() => external(data.gifts.link)}>Lista</button>}</>}
+            {modal === 'qr' && <><h2 id="au-modal-title">{copy('qrTitle', t.qrTitle)}</h2>{qr ? <img className="au-qr" src={qr} alt={copy('qrTitle', t.qrTitle)} /> : <p>{t.error}</p>}</>}
+            {modal === 'lightbox' && <><h2 id="au-modal-title" className="au-visually-hidden">{copy('galleryTitle', t.galleryTitle)}</h2><img className="au-lightbox" src={gallery[lightbox]?.src} alt={gallery[lightbox]?.alt} /></>}
+            {modal === 'songs' && <><h2 id="au-modal-title">{copy('songsTitle', t.songsTitle)}</h2>{songState === 'success' ? <p aria-live="polite">{t.songSuccess}</p> : <form className="au-form" onSubmit={(event) => submit('song', event)}><label>{t.name}<input name="name" required /></label><label>{t.song}<input name="song" required /></label><button className="au-btn" disabled={songState === 'loading'}>{songState === 'loading' ? '…' : t.send}</button>{songState === 'error' && <p aria-live="polite">{t.error} <button type="submit">{t.retry}</button></p>}</form>}</>}
+            {modal === 'rsvp' && <><h2 id="au-modal-title">{copy('rsvpTitle', t.rsvpTitle)}</h2>{rsvpState === 'success' ? <p aria-live="polite">{t.success}</p> : <form className="au-form" onSubmit={(event) => submit('rsvp', event)}><label>{t.name}<input name="name" required /></label><label>{t.attendance}<select name="attendance" required defaultValue=""><option value="" disabled>{t.attendanceOptions[0]}</option><option value="yes">{t.attendanceOptions[1]}</option><option value="no">{t.attendanceOptions[2]}</option></select></label><label>{t.food}<select name="food" value={food} onChange={(event) => setFood(event.target.value)}>{['none', 'celiac', 'vegetarian', 'vegan', 'other'].map((value, index) => <option key={value} value={value}>{t.foodOptions[index]}</option>)}</select></label>{food === 'other' && <label>{t.otherFood}<input name="otherFood" required /></label>}<label>{t.message}<textarea name="message" /></label><button className="au-btn" disabled={rsvpState === 'loading'}>{rsvpState === 'loading' ? '…' : t.submit}</button>{rsvpState === 'error' && <p aria-live="polite">{t.error} <button type="submit">{t.retry}</button></p>}</form>}</>}
           </div>
         </div>
       )}
