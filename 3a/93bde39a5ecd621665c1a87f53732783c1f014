@@ -1,0 +1,21 @@
+temp-vite-app/tests/module-completion.test.ts
+  s_7e134eb59f6c6b::t_f1a373a40a1545 104-108
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7e134eb59f6c6b::t_faf2254bff4f22 6918-6919,6921,6933
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3a93bde39a5ecd621665c1a87f53732783c1f014",
+  "prompts": {},
+  "sessions": {
+    "s_7e134eb59f6c6b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffbfa-bee6-7ff0-8b85-3181a3e5bb50",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
