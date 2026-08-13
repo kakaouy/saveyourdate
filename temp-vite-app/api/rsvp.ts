@@ -29,9 +29,31 @@ const findGuest = async (token: string) => {
   return rows[0] || null;
 };
 
+const findPublishedInvitation = async (orderNumber: string) => {
+  const eventResponse = await supabaseRequest(
+    `events?order_number=eq.${encodeURIComponent(orderNumber)}&select=id&limit=1`
+  );
+  const event = ((await eventResponse.json()) as Array<{ id: string }>)[0];
+  if (!event) return null;
+  const documentResponse = await supabaseRequest(
+    `invitation_documents?event_id=eq.${event.id}&workflow_status=eq.published&select=template_id,schema_version,palette_id,locale,workflow_status,sections,content,updated_at&limit=1`
+  );
+  return ((await documentResponse.json()) as unknown[])[0] || null;
+};
+
 async function handler(request: Request) {
   try {
     const url = new URL(request.url);
+    const orderNumber = String(url.searchParams.get('order') || '').trim().toUpperCase();
+    if (orderNumber) {
+      if (request.method !== 'GET') return json({ error: 'Método no permitido.' }, 405);
+      if (!/^SYD-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(orderNumber)) {
+        return json({ error: 'Invitación inválida.' }, 400);
+      }
+      const document = await findPublishedInvitation(orderNumber);
+      if (!document) return json({ error: 'Invitación no encontrada o todavía no publicada.' }, 404);
+      return json({ document });
+    }
     const token = url.searchParams.get('token') || '';
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(token)) {
       return json({ error: 'El enlace no es válido.' }, 400);

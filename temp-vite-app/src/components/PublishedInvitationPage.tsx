@@ -10,7 +10,7 @@ export default function PublishedInvitationPage() {
   const [document, setDocument] = useState<InvitationBuilderDocument | null>(null);
   const [error, setError] = useState('');
   useEffect(() => {
-    fetch(`/api/invitation?order=${encodeURIComponent(orderNumber)}`).then(async (response) => {
+    fetch(`/api/rsvp?order=${encodeURIComponent(orderNumber)}`).then(async (response) => {
       const payload = await response.json() as { error?: string; document?: Record<string, unknown> };
       if (!response.ok || !payload.document) throw new Error(payload.error || 'Invitación no encontrada.');
       const stored = payload.document;
