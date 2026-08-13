@@ -41,6 +41,8 @@ export default function InvitationBuilderPage() {
   const assets = config.assets!;
   const schedule = config.schedule || [];
   const gallery = config.gallery || [];
+  const hotels = config.hotels || [];
+  const qrPass = config.qrPass!;
   const template = builderTemplate(document.templateId);
   const Preview = template.Preview;
 
@@ -54,17 +56,21 @@ export default function InvitationBuilderPage() {
       [group]: { ...(document.content[group] as Record<string, unknown>), [field]: value }
     }
   });
-  const updateArrayItem = (group: 'schedule' | 'gallery', index: number, field: string, value: string) => {
+  const updateArrayItem = (group: 'schedule' | 'gallery' | 'hotels', index: number, field: string, value: string) => {
     const items = [...((document.content[group] as Array<Record<string, unknown>>) || [])];
     items[index] = { ...items[index], [field]: value };
     updateDocument({ content: { ...document.content, [group]: items } });
   };
-  const addArrayItem = (group: 'schedule' | 'gallery') => {
+  const addArrayItem = (group: 'schedule' | 'gallery' | 'hotels') => {
     const items = [...((document.content[group] as Array<Record<string, unknown>>) || [])];
-    items.push(group === 'schedule' ? { time: '21:00', title: '', description: '' } : { src: assets.parallax, alt: '' });
+    items.push(group === 'schedule'
+      ? { time: '21:00', title: '', description: '' }
+      : group === 'gallery'
+        ? { src: assets.parallax, alt: '' }
+        : { name: '', address: '', distance: '', phone: '', bookingUrl: '', discount: '', notes: '' });
     updateDocument({ content: { ...document.content, [group]: items } });
   };
-  const removeArrayItem = (group: 'schedule' | 'gallery', index: number) => {
+  const removeArrayItem = (group: 'schedule' | 'gallery' | 'hotels', index: number) => {
     const items = [...((document.content[group] as Array<Record<string, unknown>>) || [])];
     items.splice(index, 1);
     updateDocument({ content: { ...document.content, [group]: items } });
@@ -142,6 +148,7 @@ export default function InvitationBuilderPage() {
       content: {
         content: document.content.content,
         schedule: document.content.schedule,
+        hotels: document.content.hotels,
         metadata: document.content.metadata
       }
     };
@@ -164,7 +171,8 @@ export default function InvitationBuilderPage() {
       content: {
         ...base.content,
         content: { ...(base.content.content as object), ...(setup.payload.content?.content as object) },
-        schedule: setup.payload.content?.schedule || base.content.schedule
+        schedule: setup.payload.content?.schedule || base.content.schedule,
+        hotels: setup.payload.content?.hotels || base.content.hotels
       },
       status: 'draft'
     }));
@@ -227,6 +235,7 @@ export default function InvitationBuilderPage() {
           <label>Alias<input value={gifts.alias} onChange={(e) => updateContentGroup('gifts', 'alias', e.target.value)} /></label>
           <label>Lista de regalos<input type="url" value={gifts.link || ''} onChange={(e) => updateContentGroup('gifts', 'link', e.target.value)} /></label>
         </section>
+        <section><h2>Pase QR</h2><label>Contenido del código<input value={qrPass.value} onChange={(e) => updateContentGroup('qrPass', 'value', e.target.value)} /></label><p className="builder-help">Puede ser un identificador, una URL o el código asignado al invitado.</p></section>
         <section><h2>Imágenes principales</h2>
           <label>Imagen de portada<input value={assets.hero} onChange={(e) => updateContentGroup('assets', 'hero', e.target.value)} /></label>
           <label>Foto destacada<input value={assets.parallax} onChange={(e) => updateContentGroup('assets', 'parallax', e.target.value)} /></label>
@@ -241,6 +250,16 @@ export default function InvitationBuilderPage() {
           <label>Imagen<input value={image.src} onChange={(e) => updateArrayItem('gallery', index, 'src', e.target.value)} /></label>
           <label>Texto alternativo<input value={image.alt || ''} onChange={(e) => updateArrayItem('gallery', index, 'alt', e.target.value)} /></label>
           <button className="builder-remove" type="button" onClick={() => removeArrayItem('gallery', index)}>Eliminar foto</button>
+        </fieldset>)}</section>
+        <section><div className="builder-section-title"><h2>Alojamiento</h2><button type="button" onClick={() => addArrayItem('hotels')}>+ Agregar</button></div>{hotels.map((hotel, index) => <fieldset className="builder-fieldset" key={index}><legend>Opción {index + 1}</legend>
+          <label>Nombre<input value={hotel.name} onChange={(e) => updateArrayItem('hotels', index, 'name', e.target.value)} /></label>
+          <label>Dirección<input value={hotel.address || ''} onChange={(e) => updateArrayItem('hotels', index, 'address', e.target.value)} /></label>
+          <label>Distancia<input value={hotel.distance || ''} onChange={(e) => updateArrayItem('hotels', index, 'distance', e.target.value)} /></label>
+          <label>Teléfono<input type="tel" value={hotel.phone || ''} onChange={(e) => updateArrayItem('hotels', index, 'phone', e.target.value)} /></label>
+          <label>Enlace de reserva<input type="url" value={hotel.bookingUrl || ''} onChange={(e) => updateArrayItem('hotels', index, 'bookingUrl', e.target.value)} /></label>
+          <label>Beneficio o descuento<input value={hotel.discount || ''} onChange={(e) => updateArrayItem('hotels', index, 'discount', e.target.value)} /></label>
+          <label>Notas<textarea value={hotel.notes || ''} onChange={(e) => updateArrayItem('hotels', index, 'notes', e.target.value)} /></label>
+          <button className="builder-remove" type="button" onClick={() => removeArrayItem('hotels', index)}>Eliminar opción</button>
         </fieldset>)}</section>
         <section><h2>Secciones</h2><p className="builder-help">Activá y ordená los bloques. Portada y RSVP tienen posición fija.</p>
           <ol className="builder-sections">{ordered.map((section, index) => {
