@@ -160,6 +160,7 @@ create table if not exists public.event_guests (
   invitation_opened_at timestamptz,
   responded_at timestamptz,
   archived_at timestamptz,
+  checked_in_at timestamptz,
   transport_option text not null default '',
   transport_stop text not null default '',
   menu_choice text not null default '',
@@ -193,6 +194,9 @@ alter table public.event_guests
   add column if not exists menu_choice text not null default '',
   add column if not exists accessibility_needs text not null default '',
   add column if not exists guest_notes text not null default '';
+
+alter table public.event_guests
+  add column if not exists checked_in_at timestamptz;
 
 alter table public.event_guests
   add column if not exists guest_type text not null default 'adult';

@@ -79,6 +79,7 @@ type GuestRow = {
   invited_by: string;
   companion_of_id: string | null;
   thanked_at?: string | null;
+  checked_in_at?: string | null;
 };
 
 const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
@@ -116,6 +117,7 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
   invitedBy: row.invited_by || "",
   companionOfId: row.companion_of_id || "",
   thankedAt: row.thanked_at || "",
+  checkedInAt: row.checked_in_at || "",
 });
 
 const currentGuestCount = async (orderNumber: string) => {
@@ -332,6 +334,26 @@ async function handler(request: Request) {
           channel: String(body.channel || "manual"),
         });
         return json({ guest: clientGuest(rows[0], "sent") });
+      }
+      if (["check-in", "undo-check-in", "bulk-check-in", "bulk-undo-check-in"].includes(String(body.action))) {
+        const ids = String(body.action).startsWith("bulk-")
+          ? (Array.isArray(body.ids) ? body.ids.map(String).filter(Boolean).slice(0, 500) : [])
+          : (id ? [id] : []);
+        if (!ids.length) return json({ error: "Seleccioná al menos un invitado." }, 400);
+        const checkedInAt = String(body.action).includes("undo") ? null : new Date().toISOString();
+        const response = await supabaseRequest(
+          `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&id=in.(${ids.map(encodeURIComponent).join(",")})&status=eq.Confirmado&archived_at=is.null`,
+          {
+            method: "PATCH",
+            headers: { Prefer: "return=representation" },
+            body: JSON.stringify({ checked_in_at: checkedInAt, updated_at: new Date().toISOString() }),
+          },
+        );
+        const rows = (await response.json()) as GuestRow[];
+        await logAdminActivity(session, checkedInAt ? "guests.checked_in" : "guests.check_in_undone", "guest", id, { count: rows.length });
+        return json(String(body.action).startsWith("bulk-")
+          ? { guests: rows.map((guest) => clientGuest(guest)) }
+          : { guest: rows[0] ? clientGuest(rows[0]) : null });
       }
       if (["archive", "restore"].includes(String(body.action))) {
         if (!id) return json({ error: "Falta identificar al invitado." }, 400);
