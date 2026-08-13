@@ -109,3 +109,12 @@ test('el acceso al panel tolera respuestas no JSON durante el desarrollo', () =>
   assert.match(admin, /El servicio de acceso no está disponible/);
   assert.match(admin, /readLoginResponse<\{[\s\S]*challengeId\?: string/);
 });
+
+test('Invitados controla fallas de API y confirma acciones persistidas', () => {
+  assert.match(admin, /const readApiJson = async/);
+  assert.match(admin, /El servicio de invitados no está disponible/);
+  assert.match(admin, /const setGuestArchived = async[\s\S]*try \{[\s\S]*finally \{\s*setUpdatingId\(""\)/);
+  assert.match(admin, /Invitado agregado correctamente/);
+  assert.match(admin, /Selección archivada/);
+  assert.match(admin, /Datos del invitado actualizados/);
+});

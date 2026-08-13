@@ -93,6 +93,12 @@ type AdminOrder = {
 
 const guestsSeed: Guest[] = [];
 
+const readApiJson = async <T,>(response: Response, unavailableMessage: string): Promise<T> => {
+  if (!response.headers.get("content-type")?.includes("application/json"))
+    throw new Error(unavailableMessage);
+  return (await response.json()) as T;
+};
+
 const formatEventDate = (value: string) => {
   if (!value) return "Fecha pendiente";
   return new Intl.DateTimeFormat("es-UY", {
@@ -1467,14 +1473,15 @@ function Guests({
             newGuestCode === "custom" ? customGuestCode : newGuestCode,
         }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         error?: string;
-      };
+      }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guest)
         throw new Error(result.error || "No pudimos guardar el invitado.");
       setGuests((current) => [...current, result.guest!]);
       setShowModal(false);
+      setNotice(t("Invitado agregado correctamente.", "Guest added successfully.", "Convidado adicionado corretamente."));
     } catch (saveError) {
       setError(
         saveError instanceof Error
@@ -1506,12 +1513,13 @@ function Guests({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: archived ? "bulk-archive" : "bulk-restore", ids: selected }),
       });
-      const result = (await response.json()) as { guests?: Guest[]; error?: string };
+      const result = await readApiJson<{ guests?: Guest[]; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guests)
         throw new Error(result.error || (archived ? "No pudimos archivar la selección." : "No pudimos restaurar la selección."));
       const archivedGuests = new Map(result.guests.map((guest) => [guest.id, guest]));
       setGuests((current) => current.map((guest) => archivedGuests.get(guest.id) || guest));
       setSelected([]);
+      setNotice(archived ? t("Selección archivada. Podés restaurarla desde Archivados.", "Selection archived. You can restore it from Archived.", "Seleção arquivada. Você pode restaurá-la em Arquivados.") : t("Selección restaurada.", "Selection restored.", "Seleção restaurada."));
     } catch (deleteError) {
       setError(
         deleteError instanceof Error
@@ -1542,7 +1550,7 @@ function Guests({
           [bulkField]: bulkValue,
         }),
       });
-      const result = (await response.json()) as { guests?: Guest[]; error?: string };
+      const result = await readApiJson<{ guests?: Guest[]; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guests)
         throw new Error(result.error || "No pudimos editar la selección.");
       const updated = new Map(result.guests.map((guest) => [guest.id, guest]));
@@ -1566,16 +1574,25 @@ function Guests({
         ),
       )
     ) return;
+    setUpdatingId(guest.id);
     setError("");
-    const response = await fetch("/api/admin/guests", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: archived ? "archive" : "restore", id: guest.id }),
-    });
-    const result = (await response.json()) as { guest?: Guest; error?: string };
-    if (!response.ok || !result.guest)
-      return setError(result.error || "No pudimos actualizar el archivo.");
-    setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+    setNotice("");
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: archived ? "archive" : "restore", id: guest.id }),
+      });
+      const result = await readApiJson<{ guest?: Guest; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
+      if (!response.ok || !result.guest)
+        throw new Error(result.error || "No pudimos actualizar el archivo.");
+      setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
+      setNotice(archived ? t("Invitado archivado. Podés restaurarlo cuando quieras.", "Guest archived. You can restore them anytime.", "Convidado arquivado. Você pode restaurá-lo quando quiser.") : t("Invitado restaurado.", "Guest restored.", "Convidado restaurado."));
+    } catch (archiveError) {
+      setError(archiveError instanceof Error ? archiveError.message : "No pudimos actualizar el archivo.");
+    } finally {
+      setUpdatingId("");
+    }
   };
 
   const updateStatus = async (guest: Guest, status: Guest["status"]) => {
@@ -1596,10 +1613,10 @@ function Guests({
           song: guest.song,
         }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         error?: string;
-      };
+      }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guest)
         throw new Error(
           result.error || "No pudimos actualizar la confirmación.",
@@ -1653,10 +1670,10 @@ function Guests({
           preferredTableName: data.get("preferredTableName"),
         }),
       });
-      const result = (await response.json()) as {
+      const result = await readApiJson<{
         guest?: Guest;
         error?: string;
-      };
+      }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
       if (!response.ok || !result.guest)
         throw new Error(result.error || "No pudimos guardar los datos.");
       setGuests((current) =>
@@ -1665,6 +1682,7 @@ function Guests({
         ),
       );
       setEditingGuest(null);
+      setNotice(t("Datos del invitado actualizados.", "Guest details updated.", "Dados do convidado atualizados."));
     } catch (updateError) {
       setError(
         updateError instanceof Error
@@ -1733,7 +1751,7 @@ function Guests({
       }),
     })
       .then(async (response) => {
-        const result = (await response.json()) as { guest?: Guest; error?: string };
+        const result = await readApiJson<{ guest?: Guest; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
         if (!response.ok || !result.guest)
           throw new Error(result.error || "No pudimos registrar el envío.");
         setGuests((current) =>
