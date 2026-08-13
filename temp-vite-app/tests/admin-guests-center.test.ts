@@ -131,6 +131,18 @@ test('el plano admite mesas y Living con lugares visibles', () => {
   assert.match(migration, /check \(table_shape in \('round', 'rectangular', 'square', 'living'\)\)/);
 });
 
+test('Living funciona como una zona sin límite ni sillas numeradas', () => {
+  const source = readFileSync(path.join(appRoot, 'src', 'components', 'AdminPrototype.tsx'), 'utf8');
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260813040000_unlimited_living_areas.sql'), 'utf8');
+  assert.match(source, /table\.shape === "living"/);
+  assert.match(source, /"Sin límite", "Unlimited", "Sem limite"/);
+  assert.match(source, /!isLiving && <div className={`table-seat-map/);
+  assert.match(tablesApi, /!isLiving && !canAssignGuest/);
+  assert.match(tablesApi, /seatNumber && !targetIsLiving/);
+  assert.match(migration, /event_table\.table_shape <> 'living'/);
+});
+
 test('la búsqueda permite ubicar un grupo completo de forma atómica', () => {
   assert.match(source, /const matchingGroups = query\.trim\(\)/);
   assert.match(source, /const assignGroup = async/);
