@@ -55,10 +55,36 @@ export function VeronaInvitation({ locale, palette, embedded=false, onClose, con
   const external=(url?:string)=>url?window.open(url,'_blank','noopener,noreferrer'):window.alert(t.missingLink);
   const calendar=()=>{const clean=(date:string)=>new Date(date).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');const esc=(v:string)=>v.replace(/[\\;,]/g,m=>`\\${m}`);const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Save Your Date//Verona//EN','BEGIN:VEVENT',`DTSTART:${clean(data.event.dateTime)}`,`DTEND:${clean(data.event.endDateTime)}`,`SUMMARY:${esc(data.event.calendarTitle)}`,`LOCATION:${esc(`${data.event.venue}, ${data.event.address}`)}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');const url=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));const a=document.createElement('a');a.href=url;a.download='verona.ics';a.click();URL.revokeObjectURL(url)};
   const submitRsvp=async(e:React.FormEvent<HTMLFormElement>)=>{e.preventDefault();setRsvpState('loading');const payload=Object.fromEntries(new FormData(e.currentTarget));try{if(data.links.rsvpEndpoint){const res=await fetch(data.links.rsvpEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!res.ok)throw new Error()}else await new Promise(resolve=>setTimeout(resolve,700));setRsvpState('success')}catch{setRsvpState('error')}};
+  const scrollPreview = (top:number) => invitationRef.current?.scrollBy({ top, behavior:'smooth' });
+  const handlePreviewKeyDown = (event:React.KeyboardEvent<HTMLDivElement>) => {
+    if (!embedded || !invitationRef.current) return;
+    const page = invitationRef.current.clientHeight * .82;
+    const amounts:Partial<Record<string,number>> = { ArrowDown:72, ArrowUp:-72, PageDown:page, PageUp:-page };
+    if (event.key === 'Home') { event.preventDefault(); invitationRef.current.scrollTo({ top:0, behavior:'smooth' }); return; }
+    if (event.key === 'End') { event.preventDefault(); invitationRef.current.scrollTo({ top:invitationRef.current.scrollHeight, behavior:'smooth' }); return; }
+    const amount = amounts[event.key];
+    if (amount !== undefined) { event.preventDefault(); scrollPreview(amount); }
+  };
+  const handlePreviewWheel = (event:React.WheelEvent<HTMLDivElement>) => {
+    if (!embedded) return;
+    event.preventDefault();
+    event.stopPropagation();
+    invitationRef.current?.scrollBy({ top:event.deltaY, behavior:'auto' });
+  };
   const section=(tone:string,title:string,copy:string,children?:React.ReactNode)=><section className={`v-section v-${tone} v-reveal`}><div className="v-container"><h2>{title}</h2><p>{copy}</p>{children}</div></section>;
 
   const gallery=data.gallery;
-  return <div ref={invitationRef} className={`verona${embedded?' v-embedded':''}`} lang={locale} data-palette={palette} style={cssVars}>
+  return <div
+    ref={invitationRef}
+    className={`verona${embedded?' v-embedded':''}`}
+    lang={locale}
+    data-palette={palette}
+    style={cssVars}
+    tabIndex={embedded ? 0 : undefined}
+    aria-label={embedded ? `${data.event.name} · ${data.event.type || t.eventType}` : undefined}
+    onKeyDown={handlePreviewKeyDown}
+    onWheel={handlePreviewWheel}
+  >
     <a className="v-skip" href="#verona-main">{t.skip}</a>{!embedded&&onClose&&<button className="v-site-close" onClick={onClose} aria-label={t.close}>×</button>}
     <div className={`v-loader ${loaded?'hidden':''}`} role="status"><span/><p>{t.loading}</p></div>
     <main id="verona-main">
