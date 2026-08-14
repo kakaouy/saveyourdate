@@ -1233,9 +1233,16 @@ function App() {
   const builderModelId = pageParams.get('builder') || '';
   const builderComingSoon = INVITATION_MODELS.find((model) => model.id === builderModelId)?.comingSoon;
   const catalogMode = pageParams.has('catalogo');
-  const platformConceptMode = pageParams.get('concepto') === 'plataforma';
   const platformDemoMode = pageParams.get('demo') === 'panel';
   const changeOrderNumber = pageParams.get('pedido') || '';
+  const platformConceptMode = pageParams.get('concepto') === 'plataforma'
+    || (!embeddedPreview
+      && !previewModelId
+      && !builderMode
+      && !catalogMode
+      && !platformDemoMode
+      && !changeOrderNumber
+      && pageParams.get('sitio') !== 'anterior');
   // Navigation & Language UI States
   const [lang, setLang] = useState<'es' | 'en' | 'pt'>('es');
   const [heroPhraseIndex, setHeroPhraseIndex] = useState(0);
