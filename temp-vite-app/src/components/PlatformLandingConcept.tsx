@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import './platform-landing-concept.css';
 
 const invitationPreviews = [
@@ -45,6 +45,29 @@ export default function PlatformLandingConcept() {
   const [plansOpen, setPlansOpen] = useState(false);
   const [eventsInQuarter, setEventsInQuarter] = useState('3');
   const [legalOpen, setLegalOpen] = useState<'privacy' | 'terms' | null>(null);
+  const [contactStatus, setContactStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+
+  const submitContact = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    setContactStatus('sending');
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.get('name'), email: data.get('email'),
+          message: data.get('message'), company: data.get('company')
+        })
+      });
+      if (!response.ok) throw new Error('No se pudo enviar');
+      form.reset();
+      setContactStatus('success');
+    } catch {
+      setContactStatus('error');
+    }
+  };
 
   return <main className="platform-concept">
     <header className="concept-nav">
@@ -127,7 +150,7 @@ export default function PlatformLandingConcept() {
     </section>
 
     <section className="concept-final" id="empezar"><span>Save the date. Save your time.</span><h2>Tu evento puede ser hermoso<br /><em>y fácil de organizar.</em></h2><p>Ingresá al caso real con los datos de tu evento, o recorré una demostración sin guardar información.</p><div><a href="/admin">Crear o ingresar a mi evento</a><a href="/?demo=panel">Probar la plataforma</a><a href="#contacto">Hablar con el equipo</a></div></section>
-    <section className="concept-contact" id="contacto"><div><span>CONVERSEMOS</span><h2>Contanos qué estás organizando.</h2><p>Te ayudamos a elegir la mejor forma de gestionar tu evento.</p></div><form action="mailto:hola@saveyourdate.site" method="post" encType="text/plain"><label>Nombre<input name="nombre" required /></label><label>Email<input name="email" type="email" required /></label><label>Mensaje<textarea name="mensaje" rows={4} required /></label><button type="submit">Enviar consulta →</button></form></section>
+    <section className="concept-contact" id="contacto"><div><span>CONVERSEMOS</span><h2>Contanos qué estás organizando.</h2><p>Te ayudamos a elegir la mejor forma de gestionar tu evento.</p></div><form onSubmit={submitContact}><label>Nombre<input name="name" autoComplete="name" required /></label><label>Email<input name="email" type="email" autoComplete="email" required /></label><label>Mensaje<textarea name="message" rows={4} required /></label><label className="concept-contact-trap" aria-hidden="true">Empresa<input name="company" tabIndex={-1} autoComplete="off" /></label><button type="submit" disabled={contactStatus === 'sending'}>{contactStatus === 'sending' ? 'Enviando…' : 'Enviar consulta →'}</button>{contactStatus === 'success' && <p className="concept-contact-status is-success" role="status">¡Gracias! Tu consulta fue enviada correctamente.</p>}{contactStatus === 'error' && <p className="concept-contact-status is-error" role="alert">No pudimos enviarla. Revisá tu conexión e intentá nuevamente.</p>}</form></section>
     <footer className="concept-footer"><img src="/logo.svg" alt="Save Your Date" /><nav aria-label="Pie de página"><a href="#como-funciona">Cómo funciona</a><a href="/?catalogo=1">Invitaciones</a><a href="#preguntas">Preguntas</a><a href="/consultar">Consultar pedido</a><a href="/admin">Ingresar</a><button onClick={() => setLegalOpen('privacy')}>Privacidad</button><button onClick={() => setLegalOpen('terms')}>Condiciones</button></nav><span>Invitaciones que emocionan. Gestión que simplifica.</span></footer>
     {plansOpen && <div className="concept-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setPlansOpen(false); }}><section className="concept-plans-modal" role="dialog" aria-modal="true" aria-labelledby="plans-title"><button className="concept-modal-close" type="button" aria-label="Cerrar planes" onClick={() => setPlansOpen(false)}>×</button><header><span>PLANES</span><h2 id="plans-title">Una forma para cada manera de organizar.</h2><p>Elegí un evento propio o una operación profesional con varios eventos.</p></header><div className="concept-plan-grid"><article><span>PARA UN EVENTO</span><h3>Plan Anfitrión</h3><p>Un evento con control completo para novios, quinceañeras y anfitriones.</p><ul><li>Invitación digital y galería</li><li>Invitados, grupos y confirmaciones</li><li>Restricciones, regalos y canciones</li><li>Mesas y zonas Living</li><li>Comunicados y recordatorios</li><li>Accesos específicos para proveedores</li></ul><div className="concept-plan-status"><b>Incluidos</b><span>Los módulos activos indicados arriba</span><b>Próximamente</b><span>Check-in y álbum colaborativo</span></div><div className="concept-payment-note"><b>Pago y vigencia</b><span>Se informan antes de confirmar el evento. No se realiza ningún cobro desde este modal.</span></div><div className="concept-plan-actions"><a href="/admin">Crear mi evento</a><a href="/?demo=panel">Probar antes</a></div></article><article className="concept-plan-pro"><span>PARA ORGANIZADORES</span><h3>Plan Profesional</h3><p>Varios eventos, equipos y proveedores dentro de una misma operación.</p><ul><li>Todo lo incluido para cada evento</li><li>Vista de múltiples eventos</li><li>Roles para equipo y proveedores</li><li>Procesos reutilizables y seguimiento</li></ul><label>¿Cuántos eventos querés gestionar en 3 meses?<select value={eventsInQuarter} onChange={(event) => setEventsInQuarter(event.target.value)}><option value="1">1 evento</option><option value="3">2 a 3 eventos</option><option value="6">4 a 6 eventos</option><option value="10">7 a 10 eventos</option><option value="more">Más de 10 eventos</option></select></label><div className="concept-payment-note"><b>Propuesta por volumen</b><span>El valor se consulta según la cantidad seleccionada y las necesidades del equipo.</span></div><div className="concept-plan-actions"><a href={`mailto:hola@saveyourdate.site?subject=Consulta plan organizadores&body=Quiero gestionar ${eventsInQuarter} eventos en 3 meses.`}>Consultar propuesta</a><a href="/?demo=panel">Ver la demo</a></div></article></div><p className="concept-plans-footnote">Las funciones marcadas como próximas no forman parte de las funcionalidades activas actuales.</p></section></div>}
     {legalOpen && <div className="concept-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setLegalOpen(null); }}><section className="concept-legal-modal" role="dialog" aria-modal="true"><button className="concept-modal-close" onClick={() => setLegalOpen(null)} aria-label="Cerrar">×</button><span>{legalOpen === 'privacy' ? 'PRIVACIDAD' : 'CONDICIONES DE USO'}</span><h2>{legalOpen === 'privacy' ? 'Tu información merece cuidado.' : 'Un servicio claro desde el comienzo.'}</h2>{legalOpen === 'privacy' ? <><p>El acceso real utiliza datos asociados al pedido y un código de seguridad. La demostración trabaja únicamente con información ficticia.</p><ul><li>Los accesos se limitan según el rol asignado.</li><li>No uses la demo para cargar datos personales reales.</li><li>Las solicitudes sobre datos del evento se gestionan mediante soporte.</li></ul></> : <><p>Este resumen explica el funcionamiento general y no reemplaza las condiciones contractuales definitivas que se informarán antes de contratar.</p><ul><li>Las funciones “Próximamente” no se consideran activas.</li><li>Precio, vigencia, forma de pago y alcance se confirman antes del alta.</li><li>La publicación de la invitación requiere completar el circuito de revisión.</li></ul></>}<a href="mailto:hola@saveyourdate.site">Consultar al equipo →</a></section></div>}
