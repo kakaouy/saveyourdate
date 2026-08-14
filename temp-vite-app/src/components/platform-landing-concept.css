@@ -25,6 +25,12 @@
 @media(max-width:1180px){.concept-nav{gap:18px;padding-inline:28px}.concept-nav nav{gap:17px}.concept-nav-actions{gap:10px!important}.concept-login{display:none}.concept-collaboration{grid-template-columns:1fr}.concept-collaboration h2>span,.concept-collaboration h2 em{white-space:normal}.concept-permission-list{margin-top:30px}}
 @media(max-width:980px){.concept-nav{grid-template-columns:auto 1fr}.concept-brand img{width:66px}.concept-hero-logo{width:220px}.concept-contact{grid-template-columns:1fr}.concept-invite-stack figure:nth-child(1),.concept-invite-stack figure:nth-child(7){left:-3%}.concept-invite-stack figure:nth-child(3),.concept-invite-stack figure:nth-child(6),.concept-invite-stack figure:nth-child(9){right:-3%}}
 @media(max-width:680px){.concept-brand img{width:58px}.concept-language select{width:52px;padding-left:10px}.concept-hero-logo{width:190px;margin-bottom:28px}.concept-less{background:#9ebeb8}.concept-invite-stack figure:nth-child(1),.concept-invite-stack figure:nth-child(7){left:-4%}.concept-invite-stack figure:nth-child(3),.concept-invite-stack figure:nth-child(6),.concept-invite-stack figure:nth-child(9){right:-4%}.concept-contact{padding:70px 20px}.concept-contact form{padding:24px}}
+
+.concept-contact button:disabled{cursor:wait;opacity:.65}
+.concept-contact-trap{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+.concept-contact-status{margin:0;max-width:none!important;font-size:14px;font-weight:700}
+.concept-contact-status.is-success{color:#24745f}
+.concept-contact-status.is-error{color:#a43f4f}
 @media(prefers-reduced-motion:reduce){.concept-hero-slides i{animation:none}.concept-hero-slides i:first-child{opacity:1}.concept-nav-cta:before,.concept-nav-cta:after,.concept-worktable span{animation:none}}
 
 /* Expanded scenes, dense invitation table and plans */

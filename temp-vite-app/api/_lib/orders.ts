@@ -219,12 +219,14 @@ export const sendEmail = async ({
   to,
   subject,
   html,
-  idempotencyKey
+  idempotencyKey,
+  replyTo
 }: {
   to: string;
   subject: string;
   html: string;
   idempotencyKey: string;
+  replyTo?: string;
 }) => {
   const apiKey = requiredEnv('RESEND_API_KEY');
   const response = await fetch('https://api.resend.com/emails', {
@@ -236,7 +238,7 @@ export const sendEmail = async ({
     },
     body: JSON.stringify({
       from: process.env.ORDER_EMAIL_FROM || 'Save Your Date <hello@saveyourdate.site>',
-      reply_to: process.env.ORDER_ADMIN_EMAIL || 'saveyourdate.invite@gmail.com',
+      reply_to: replyTo || process.env.ORDER_ADMIN_EMAIL || 'saveyourdate.invite@gmail.com',
       to: [to],
       subject,
       html
