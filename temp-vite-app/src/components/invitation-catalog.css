@@ -182,3 +182,7 @@
   backdrop-filter:blur(3px);
   animation:none !important;
 }
+
+.catalog-modal-viewer > .invitation-scroll-instruction{
+  margin:14px auto 2px;
+}
