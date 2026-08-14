@@ -186,3 +186,119 @@
 .catalog-modal-viewer > .invitation-scroll-instruction{
   margin:14px auto 2px;
 }
+
+/* El modal tiene que comportarse como un visor, no como una imagen que se
+   ensancha. La pantalla amplia representa un lienzo de escritorio completo y
+   se reduce proporcionalmente dentro del marco disponible. */
+.catalog-modal{
+  width:min(1180px,calc(100vw - 32px));
+  max-width:100%;
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+.catalog-modal-viewer{
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+}
+.catalog-device{
+  flex:0 0 auto;
+  max-width:100%;
+  overflow:hidden;
+}
+.catalog-device-desktop{
+  width:min(760px,100%);
+  height:min(560px,calc(100dvh - 190px));
+  min-height:360px;
+}
+.catalog-device-phone{
+  height:min(650px,calc(100dvh - 190px));
+  min-height:420px;
+}
+.catalog-device-desktop .catalog-live-preview > *,
+.catalog-device-desktop .catalog-static-preview > *{
+  width:138.889% !important;
+  height:138.889% !important;
+  max-width:none;
+  transform:scale(.72);
+  transform-origin:top left;
+}
+
+@media(max-width:850px){
+  .catalog-modal-backdrop{
+    align-items:start;
+    padding:8px;
+    overflow-y:auto;
+  }
+  .catalog-modal{
+    display:flex;
+    width:100%;
+    height:calc(100dvh - 16px);
+    max-height:none;
+    min-height:0;
+    overflow-x:hidden;
+    overflow-y:auto;
+    flex-direction:column;
+  }
+  .catalog-modal-viewer{
+    order:1;
+    width:100%;
+    min-height:0;
+    padding:64px 12px 24px;
+    overflow:hidden;
+  }
+  .catalog-modal-info{
+    order:2;
+    width:100%;
+  }
+  .catalog-device-phone{
+    width:min(340px,calc(100vw - 40px));
+    height:min(650px,72dvh);
+    min-height:380px;
+  }
+  .catalog-device-desktop{
+    width:100%;
+    max-width:720px;
+    height:min(60dvh,500px);
+    min-height:300px;
+  }
+}
+
+@media(max-width:600px){
+  .catalog-modal-backdrop{padding:0}
+  .catalog-modal{
+    width:100vw;
+    height:100dvh;
+    border-radius:0;
+  }
+  .catalog-modal-close{
+    position:fixed;
+    right:12px;
+    top:12px;
+  }
+  .catalog-modal-viewer{
+    padding:62px 8px 22px;
+  }
+  .catalog-view-switch{
+    max-width:calc(100vw - 24px);
+    margin-bottom:14px;
+  }
+  .catalog-view-switch button{
+    padding:9px 12px;
+    font-size:12px;
+  }
+  .catalog-device-phone{
+    width:min(310px,calc(100vw - 28px));
+    height:min(590px,70dvh);
+    min-height:340px;
+  }
+  .catalog-device-desktop{
+    width:calc(100vw - 20px);
+    height:min(58dvh,420px);
+    min-height:260px;
+    padding:7px;
+    border-width:3px;
+    border-radius:14px;
+  }
+  .catalog-modal-info{padding:28px 20px}
+}
