@@ -1,0 +1,315 @@
+temp-vite-app/src/components/paper-floral/paper-floral.css
+  s_7e134eb59f6c6b::t_f1f70fd950c33e 5-7,9
+  s_7e134eb59f6c6b::t_b20dd9cf7f4460 4
+  s_7e134eb59f6c6b::t_ee48da1a7730db 8
+  s_7e134eb59f6c6b::t_ba8e0b4221490f 1-3
+  s_7e134eb59f6c6b::t_ff8f0c6f955395 11
+  s_7e134eb59f6c6b::t_b6c8adc22c172e 10
+temp-vite-app/src/components/PlatformDemoPanel.tsx
+  s_7e134eb59f6c6b::t_12cb5414f7ca5c 19-25,28
+  s_7e134eb59f6c6b::t_58aefe1e7339df 1-2,4-15,26-27,29
+  s_7e134eb59f6c6b::t_ecb7d115cf2747 3
+  s_7e134eb59f6c6b::t_9e41675f2d50cf 16-18
+temp-vite-app/src/components/aurora/config.ts
+  s_7e134eb59f6c6b::t_ab382c261d50bb 20
+temp-vite-app/src/components/rivendell/rivendell.css
+  s_7e134eb59f6c6b::t_69f91fefe0760a 30-43
+temp-vite-app/src/components/noir/NoirInvitation.tsx
+  s_7e134eb59f6c6b::t_a0de26fdaf54fc 60-70,73-79
+  s_7e134eb59f6c6b::t_c7399516667760 1-2,25-38,84,88
+  s_7e134eb59f6c6b::t_e901ee72e9e8f3 71-72,86-87
+  s_7e134eb59f6c6b::t_f5f92c4d6c5ac9 3-20,22-23,39-59,80-83,85,89-90,120,126-130,132,134-145,147-149
+  s_7e134eb59f6c6b::t_4a50588d315e0c 131,133
+  s_7e134eb59f6c6b::t_8b438c7fbd5d28 21,24,91-119,121-125,146
+temp-vite-app/src/components/platform-demo-panel.css
+  s_7e134eb59f6c6b::t_58aefe1e7339df 1
+temp-vite-app/src/App.tsx
+  s_7e134eb59f6c6b::t_58aefe1e7339df 17,1237,1739
+  s_7e134eb59f6c6b::t_d8184434b4d086 16,1235,1740
+  s_7e134eb59f6c6b::t_9b18e486232ecd 1233-1234,1741
+  s_7e134eb59f6c6b::t_c5f8543909ebc7 3431
+temp-vite-app/src/components/noir/noir.css
+  s_7e134eb59f6c6b::t_8b438c7fbd5d28 7-8,12-13,15-16,18,20-23
+  s_7e134eb59f6c6b::t_669374b58f1920 4-5
+  s_7e134eb59f6c6b::t_f5f92c4d6c5ac9 1-3,6
+  s_7e134eb59f6c6b::t_8842c489b9ea96 9-10
+  s_7e134eb59f6c6b::t_f154c2815c73c4 14
+  s_7e134eb59f6c6b::t_ff8f0c6f955395 30
+  s_7e134eb59f6c6b::t_e901ee72e9e8f3 11,17,19,24-25,28
+  s_7e134eb59f6c6b::t_4a50588d315e0c 26-27,29
+temp-vite-app/src/components/paper-floral/PaperFloralInvitation.tsx
+  s_7e134eb59f6c6b::t_4124ca11e21e65 19
+  s_7e134eb59f6c6b::t_ba8e0b4221490f 1-13,15-18,21-22,25-29,31-33,35
+  s_7e134eb59f6c6b::t_9c2708f1533a5d 14,20,23-24,30,34
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7e134eb59f6c6b::t_b85e9224f136d7 310,324,327-328,6805,6897,6902-6905,6909
+  s_7e134eb59f6c6b::t_4db0b7678d3042 626-629
+temp-vite-app/src/components/rosewood/rosewood.css
+  s_7e134eb59f6c6b::t_89969a6e2ae39c 52-67
+temp-vite-app/src/components/InvitationCatalogPage.tsx
+  s_7e134eb59f6c6b::t_5554b2e89667c2 20
+  s_7e134eb59f6c6b::t_37155011c2ead5 19,36
+  s_7e134eb59f6c6b::t_0ab2b93883dd64 9,11-16,47
+  s_7e134eb59f6c6b::t_09335cd1185928 4
+  s_7e134eb59f6c6b::t_e4035d9f45c5e5 44
+  s_7e134eb59f6c6b::t_c4d86a67ea8356 2-3,8,10,31-32,35,37-41,45
+  s_7e134eb59f6c6b::t_623ba778eabd8d 18,21-29,46
+  s_7e134eb59f6c6b::t_d8184434b4d086 1,5-7,17,30,33-34,42-43,48-49
+temp-vite-app/index.html
+  s_7e134eb59f6c6b::t_c22930713a13d6 11
+temp-vite-app/src/data/models.ts
+  s_7e134eb59f6c6b::t_0a44508ac77bf3 51
+  s_7e134eb59f6c6b::t_2a1d7a23d00665 434,555
+  s_7e134eb59f6c6b::t_75b7d042cd62ee 615-618
+  s_7e134eb59f6c6b::t_4464faeb3e4d3c 14,418
+  s_7e134eb59f6c6b::t_4887a3117957e0 37
+temp-vite-app/src/components/invitation-catalog.css
+  s_7e134eb59f6c6b::t_014139b5175102 2
+  s_7e134eb59f6c6b::t_543ecf5e6a8281 3
+  s_7e134eb59f6c6b::t_d8184434b4d086 1
+  s_7e134eb59f6c6b::t_8dbda3291b340f 4-8,10-11,21-41
+  s_7e134eb59f6c6b::t_89969a6e2ae39c 9,12-20
+  s_7e134eb59f6c6b::t_623ba778eabd8d 42-53
+  s_7e134eb59f6c6b::t_a6056d3e17fcee 54-58
+temp-vite-app/src/components/PlatformLandingConcept.tsx
+  s_7e134eb59f6c6b::t_4db0b7678d3042 66
+  s_7e134eb59f6c6b::t_ae9f3990330481 14,16-28,120-121,124,126
+  s_7e134eb59f6c6b::t_460c392f63d3b9 80-92
+  s_7e134eb59f6c6b::t_78328405f9aed6 62,98,130
+  s_7e134eb59f6c6b::t_a3e5da0be8dbbc 110,125
+  s_7e134eb59f6c6b::t_45dcfaca2bb48e 1,8-13,43-44,48,52-53,55-56,77
+  s_7e134eb59f6c6b::t_c5dd8ca1316ec4 108
+  s_7e134eb59f6c6b::t_7845b88d5e1e03 45-46,60,111
+  s_7e134eb59f6c6b::t_ec704b098c8f1e 54,99,103,129
+  s_7e134eb59f6c6b::t_26b877232bb33c 47,122-123,131-133
+  s_7e134eb59f6c6b::t_80b43ed8dfaf0b 107
+  s_7e134eb59f6c6b::t_775cc874900cc7 51,114-119
+  s_7e134eb59f6c6b::t_853a39fbb416c0 29-39
+  s_7e134eb59f6c6b::t_a26fae23a9c340 70
+  s_7e134eb59f6c6b::t_2c9121aa808b5e 71
+  s_7e134eb59f6c6b::t_3701419e883901 15
+temp-vite-app/src/components/platform-demo-data.css
+  s_7e134eb59f6c6b::t_ecb7d115cf2747 1
+temp-vite-app/src/components/catalog-template/CatalogInvitation.tsx
+  s_7e134eb59f6c6b::t_294465c94d2fd1 101-104,118,130-131,150-151,181-185,276,279
+  s_7e134eb59f6c6b::t_e1b9efe3b2162c 113,172-175,216,274
+  s_7e134eb59f6c6b::t_2c60f10f10857c 42
+  s_7e134eb59f6c6b::t_18e2eff2296803 187-211
+  s_7e134eb59f6c6b::t_31dc827f2d298f 10,257-261
+  s_7e134eb59f6c6b::t_ccfd8364e39ede 9,254-256,262-263
+  s_7e134eb59f6c6b::t_f6d89cb5eebd61 8,109,249-252
+  s_7e134eb59f6c6b::t_fbbcf52ced9b48 85-96,280
+  s_7e134eb59f6c6b::t_26d6a08e8bdc9e 123-124,179
+  s_7e134eb59f6c6b::t_3b81a739177f6a 217-228
+  s_7e134eb59f6c6b::t_343838b05d562d 97-100,176-178,180,275
+  s_7e134eb59f6c6b::t_0cfd3f01c89151 1-6,11-33,44-47,49-66,68,105-108,110-112,114-117,122,126-128,135-138,141,156-166,230-247,266-271,281-288
+  s_7e134eb59f6c6b::t_c6d87b4f1415d6 48,147,152-155
+  s_7e134eb59f6c6b::t_fffd2f6f1e19dd 39-41,43,186,212-215,277
+  s_7e134eb59f6c6b::t_8c0b46b0540c86 34-35,38,167-171
+  s_7e134eb59f6c6b::t_ab382c261d50bb 120-121
+  s_7e134eb59f6c6b::t_76c721fb20d4b6 69-72,272
+  s_7e134eb59f6c6b::t_c7399516667760 7,129,133-134,139,248,253,264-265
+  s_7e134eb59f6c6b::t_f25ccca5187343 132
+  s_7e134eb59f6c6b::t_057818a7dd245b 148-149
+  s_7e134eb59f6c6b::t_0bec2f19bfc6d4 273
+  s_7e134eb59f6c6b::t_186eb5073a2c76 142-146
+  s_7e134eb59f6c6b::t_875a15027afd3c 278
+  s_7e134eb59f6c6b::t_01a4dfb5313ec2 36-37,73-78
+  s_7e134eb59f6c6b::t_bfec8c389d5505 229
+  s_7e134eb59f6c6b::t_87c710a0caa9a7 67,79-84,119,125,140
+temp-vite-app/src/components/invitation-builder/InvitationBuilderPage.tsx
+  s_7e134eb59f6c6b::t_3f118db71d4d05 394
+  s_7e134eb59f6c6b::t_e6797a4769e879 392-393,395
+temp-vite-app/src/components/aurora/builder.ts
+  s_7e134eb59f6c6b::t_299cffe2b742ed 73,76-79,81
+  s_7e134eb59f6c6b::t_186eb5073a2c76 74-75,83
+temp-vite-app/src/components/aurora/AuroraInvitation.tsx
+  s_7e134eb59f6c6b::t_186eb5073a2c76 34,57,371,377-380,384-387,478-483
+  s_7e134eb59f6c6b::t_42079ed0b0ecde 429,523,549,594,619
+  s_7e134eb59f6c6b::t_4f52dbd29c5129 33,56,157,160
+  s_7e134eb59f6c6b::t_c6d87b4f1415d6 411,485-493
+  s_7e134eb59f6c6b::t_d8d534eb4babeb 78-82,121-122,525,531,558,595,605,615,649-651
+  s_7e134eb59f6c6b::t_f008bc86304919 158-159,161,604,609
+  s_7e134eb59f6c6b::t_9a75909717cf78 484,516-518,520-522,524,550,553
+  s_7e134eb59f6c6b::t_bd5bde7230b636 571-572
+  s_7e134eb59f6c6b::t_343838b05d562d 32,55,401-409
+  s_7e134eb59f6c6b::t_15d337eb02b9a4 88,188-206,626-627
+  s_7e134eb59f6c6b::t_06faf37f77586f 388-390,396-400
+  s_7e134eb59f6c6b::t_19ff1354e1fac5 123-124
+  s_7e134eb59f6c6b::t_63cbcece4e38ec 391-395
+  s_7e134eb59f6c6b::t_76c721fb20d4b6 29,52,426-428,430-434
+  s_7e134eb59f6c6b::t_1772947580f8e9 625
+  s_7e134eb59f6c6b::t_2c60f10f10857c 381-383,512-515,536-541,547,557,564
+  s_7e134eb59f6c6b::t_0bec2f19bfc6d4 30,53,417-425
+  s_7e134eb59f6c6b::t_e1b9efe3b2162c 31,54,410,412-416
+  s_7e134eb59f6c6b::t_67a6f2e4eb2127 622
+  s_7e134eb59f6c6b::t_ab382c261d50bb 437,446,450,461
+  s_7e134eb59f6c6b::t_f57f19625dd0c2 156
+  s_7e134eb59f6c6b::t_0e46f078140526 186-187
+temp-vite-app/src/components/catalog-template/catalog-invitation.css
+  s_7e134eb59f6c6b::t_41114349d319d8 685,688,694-697,700,814-820,895,897-907,909
+  s_7e134eb59f6c6b::t_a93892919fbdeb 699,701-702
+  s_7e134eb59f6c6b::t_be4e2f442e35c3 29,60
+  s_7e134eb59f6c6b::t_fee6fb99a169b9 750,1110
+  s_7e134eb59f6c6b::t_76c721fb20d4b6 634,638-652,667-684,686-687,689-693,698,703-717,720-721,727-729
+  s_7e134eb59f6c6b::t_056bd53e399d50 203-204
+  s_7e134eb59f6c6b::t_15d337eb02b9a4 718-719,722-726
+  s_7e134eb59f6c6b::t_a88bd223b0dda3 274-279,284,286-314
+  s_7e134eb59f6c6b::t_d81a6998045670 1189,1191,1196-1199
+  s_7e134eb59f6c6b::t_284f34aef5f562 739,742,755-766
+  s_7e134eb59f6c6b::t_8c0b46b0540c86 912-913,919-924,927-942,1034-1035,1041,1046,1048-1050,1053
+  s_7e134eb59f6c6b::t_26cc7209fe4859 1123-1124,1153
+  s_7e134eb59f6c6b::t_3ebcf8dd14a9b9 99-100,102-106
+  s_7e134eb59f6c6b::t_9e5163ee42715b 328,331,335,343-348
+  s_7e134eb59f6c6b::t_b8a57a09bb3efb 985,994
+  s_7e134eb59f6c6b::t_c1abe35c498fdd 280-283,285,362-363,389-395,399-400
+  s_7e134eb59f6c6b::t_5554b2e89667c2 9-22,28,30-36,57-59,61-62
+  s_7e134eb59f6c6b::t_2d65128e69b231 1194-1195
+  s_7e134eb59f6c6b::t_aedb883f4b1795 96
+  s_7e134eb59f6c6b::t_f035ce21abc159 653-666
+  s_7e134eb59f6c6b::t_f25ccca5187343 635-637,749,751-754,850-853,868,878-879,888,1108-1109,1111-1113
+  s_7e134eb59f6c6b::t_625c26b80c749c 1038,1042,1062
+  s_7e134eb59f6c6b::t_bd5bde7230b636 415-416,430
+  s_7e134eb59f6c6b::t_4e037a39e9ed0b 1185
+  s_7e134eb59f6c6b::t_19ff1354e1fac5 1193
+  s_7e134eb59f6c6b::t_889c59d41f9a59 1027,1036,1039,1043
+  s_7e134eb59f6c6b::t_9af862a3d4f38d 590
+  s_7e134eb59f6c6b::t_b5fba2997855d1 23-27,37-53
+  s_7e134eb59f6c6b::t_05a2a897c31fa0 1184,1186,1188
+  s_7e134eb59f6c6b::t_3c975b64e6d20b 1005,1008-1009,1028-1032
+  s_7e134eb59f6c6b::t_c22930713a13d6 1157-1162
+  s_7e134eb59f6c6b::t_a405bfdbd7a55d 474-546
+  s_7e134eb59f6c6b::t_0bec2f19bfc6d4 911,914-918,999-1004,1006-1007,1010-1021,1055-1060,1064-1065
+  s_7e134eb59f6c6b::t_67a6f2e4eb2127 1163-1183
+  s_7e134eb59f6c6b::t_08edb8759293c3 63-68,76,78-84,87-93,97,119
+  s_7e134eb59f6c6b::t_8666bb86d7b098 69-75,77
+  s_7e134eb59f6c6b::t_8026de3b5338db 154-155,160-165,246-247,255-257,267-268,271,332-333,349,378-388,396-398,401-413,420-422,428-429,431-466
+  s_7e134eb59f6c6b::t_8e34c3972fa04c 547-589,591-621,624,626-627,630-633
+  s_7e134eb59f6c6b::t_589eab25dd12e9 730-738,740-741,745-748,767-813,821-849,854-867,869-877,880-887,889-894,896,908,910
+  s_7e134eb59f6c6b::t_b0fce65e98e52d 951-953,969-984
+  s_7e134eb59f6c6b::t_104f8dcd636a3d 1061,1063
+  s_7e134eb59f6c6b::t_cf59ca93ed58a7 1187,1190
+  s_7e134eb59f6c6b::t_01367dc3bd5342 101
+  s_7e134eb59f6c6b::t_0cfd3f01c89151 1-8,1066-1102,1156
+  s_7e134eb59f6c6b::t_fdb2c1723a80fb 241
+  s_7e134eb59f6c6b::t_a17b77761f69c0 743-744
+  s_7e134eb59f6c6b::t_c1cd424c60b41a 925-926
+  s_7e134eb59f6c6b::t_f5ce63c0ca8285 85-86,94-95,98
+  s_7e134eb59f6c6b::t_0824a354c1cef3 350-361,364-377
+  s_7e134eb59f6c6b::t_b9af3b8be98c9f 1023-1026,1037,1044,1047,1051
+  s_7e134eb59f6c6b::t_3d60201bbc3c7f 120-136,138-145,189-202,205-240,242-243,467-473
+  s_7e134eb59f6c6b::t_1e511ce717dd11 166-180
+  s_7e134eb59f6c6b::t_b59bf6fb8f6772 622-623,625,628-629
+  s_7e134eb59f6c6b::t_945d14cdcebdbb 1022,1033,1040,1045,1052,1054
+  s_7e134eb59f6c6b::t_d9faa1e8ac165f 54-56
+  s_7e134eb59f6c6b::t_01a4dfb5313ec2 943-950,954-968,986-993,995-998
+  s_7e134eb59f6c6b::t_ae63f6ec709c58 1192
+  s_7e134eb59f6c6b::t_bcbc5dd3766f4e 137,146-153,156-159,181-188,244-245,248-254,258-266,269-270,272-273,315-327,329-330,334,336-342
+  s_7e134eb59f6c6b::t_5f919a3ca0a501 414,417-419,423-427
+  s_7e134eb59f6c6b::t_6ab38183342ff1 107-118
+  s_7e134eb59f6c6b::t_82b6cb5dd9f2ef 1103-1107,1114-1122,1125-1152,1154-1155
+temp-vite-app/src/components/verona/verona.css
+  s_7e134eb59f6c6b::t_3a6fcf7eadaa9e 19-26
+  s_7e134eb59f6c6b::t_d69de7ccea7ebb 9,11-18,27-39
+temp-vite-app/src/index.css
+  s_7e134eb59f6c6b::t_647e4e24114157 217-218
+  s_7e134eb59f6c6b::t_df8426f5ebbdf7 71-86
+  s_7e134eb59f6c6b::t_ccc7c48c152059 219-220
+temp-vite-app/src/components/amalfi/AmalfiInvitation.tsx
+  s_7e134eb59f6c6b::t_18e2eff2296803 24,43
+  s_7e134eb59f6c6b::t_4214814e46b7da 31,41
+  s_7e134eb59f6c6b::t_153bd632057e39 15,21,42
+  s_7e134eb59f6c6b::t_685019bf9abbca 8,29
+  s_7e134eb59f6c6b::t_c7f2a442ae546c 20,30
+  s_7e134eb59f6c6b::t_9092b4e0567b84 27
+  s_7e134eb59f6c6b::t_47b553a43062ba 1-7,9-14,16-19,22-23,25-26,28,32-40,44-49
+temp-vite-app/src/components/coruscant/coruscant.css
+  s_7e134eb59f6c6b::t_4e13fedf35d311 43-56
+  s_7e134eb59f6c6b::t_64a7c24e6eebe1 15-16
+temp-vite-app/src/components/invitation-builder/templates.ts
+  s_7e134eb59f6c6b::t_0cfd3f01c89151 19-20,33,70-86
+  s_7e134eb59f6c6b::t_0162195b8c143f 87
+temp-vite-app/src/components/invitation-builder/invitation-builder.css
+  s_7e134eb59f6c6b::t_b3f356e11858c4 11
+  s_7e134eb59f6c6b::t_3f118db71d4d05 10
+  s_7e134eb59f6c6b::t_89969a6e2ae39c 13
+  s_7e134eb59f6c6b::t_e6fc43bf7af458 7-8
+  s_7e134eb59f6c6b::t_358b31d89af267 4-6
+  s_7e134eb59f6c6b::t_fc5f253e3f9f60 9,12
+temp-vite-app/src/components/siena/siena.css
+  s_7e134eb59f6c6b::t_e7a862347c7ba6 25-27
+  s_7e134eb59f6c6b::t_8d1d1d6b6ef98f 34-37
+  s_7e134eb59f6c6b::t_b7cd7d58b44235 5-8
+  s_7e134eb59f6c6b::t_5676eb9f99ddd4 20,28-33
+  s_7e134eb59f6c6b::t_ccfd8364e39ede 2-4
+  s_7e134eb59f6c6b::t_74c9fcb7685158 13,18-19
+  s_7e134eb59f6c6b::t_a57ddbe4c6e956 38
+  s_7e134eb59f6c6b::t_3ac9ca2edc86fa 1
+  s_7e134eb59f6c6b::t_b8b0bb80c60c2a 9-10
+  s_7e134eb59f6c6b::t_ff8f0c6f955395 39
+  s_7e134eb59f6c6b::t_fdd5aecd45578a 11-12,14-17,21-24
+temp-vite-app/src/components/aurora/aurora.css
+  s_7e134eb59f6c6b::t_0a31dcedf8d2cf 60-77
+  s_7e134eb59f6c6b::t_d8d534eb4babeb 18
+  s_7e134eb59f6c6b::t_15d337eb02b9a4 10,34
+temp-vite-app/src/components/amalfi/amalfi.css
+  s_7e134eb59f6c6b::t_17fe1de2c33373 1,27-32
+  s_7e134eb59f6c6b::t_b152c82f14df25 2-5
+  s_7e134eb59f6c6b::t_18e2eff2296803 11,41-42
+  s_7e134eb59f6c6b::t_98977cd81b01e2 23-24
+  s_7e134eb59f6c6b::t_ca34c783886cec 7-8
+  s_7e134eb59f6c6b::t_35c2911d5091c2 9-10,12-22
+  s_7e134eb59f6c6b::t_7c03a31467b719 6
+  s_7e134eb59f6c6b::t_597b1b868773c1 25-26
+  s_7e134eb59f6c6b::t_153bd632057e39 34
+  s_7e134eb59f6c6b::t_6c628f4c8308a5 36-40
+  s_7e134eb59f6c6b::t_8d2ffbdb470f8b 43-63
+  s_7e134eb59f6c6b::t_ff8f0c6f955395 33,35
+temp-vite-app/src/admin-prototype.css
+  s_7e134eb59f6c6b::t_4db0b7678d3042 45
+  s_7e134eb59f6c6b::t_b85e9224f136d7 104-106
+temp-vite-app/src/components/coruscant/config.ts
+  s_7e134eb59f6c6b::t_75b7d042cd62ee 3,6-9
+  s_7e134eb59f6c6b::t_64a7c24e6eebe1 17
+temp-vite-app/src/components/varezzia/varezzia.css
+  s_7e134eb59f6c6b::t_5ec9db00284da3 51-68
+temp-vite-app/src/domain/section-dom-order.ts
+  s_7e134eb59f6c6b::t_19ff1354e1fac5 33-34,40
+temp-vite-app/src/components/platform-landing-concept.css
+  s_7e134eb59f6c6b::t_7b66a1592a5026 29-32,34
+  s_7e134eb59f6c6b::t_ae9f3990330481 53-57
+  s_7e134eb59f6c6b::t_853a39fbb416c0 58-63
+  s_7e134eb59f6c6b::t_2c9121aa808b5e 45-52
+  s_7e134eb59f6c6b::t_a26fae23a9c340 3,9-10
+  s_7e134eb59f6c6b::t_775cc874900cc7 68-72
+  s_7e134eb59f6c6b::t_f132c8be4bbbb0 35-39
+  s_7e134eb59f6c6b::t_4a04c4743cd758 33
+  s_7e134eb59f6c6b::t_4db0b7678d3042 40-44
+  s_7e134eb59f6c6b::t_49647c8f223fb0 12-20
+  s_7e134eb59f6c6b::t_d716dfb56f0663 21-28
+  s_7e134eb59f6c6b::t_c5dd8ca1316ec4 79-82
+  s_7e134eb59f6c6b::t_29093fce3b6406 83
+  s_7e134eb59f6c6b::t_c2f42ec495068c 64-67
+  s_7e134eb59f6c6b::t_61446ebc9244e3 73-78
+temp-vite-app/src/components/siena/SienaInvitation.tsx
+  s_7e134eb59f6c6b::t_b7cd7d58b44235 14,24
+  s_7e134eb59f6c6b::t_0e3f4aad0c06cd 29,36,41-42
+  s_7e134eb59f6c6b::t_2aa6b11022fdf6 21,27-28,30-35,37-39
+  s_7e134eb59f6c6b::t_ccfd8364e39ede 1-13,15-20,22-23,25-26,40,43-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "b55336f57cae5b7d45378989ccf4c03a7cddd4fe",
+  "prompts": {},
+  "sessions": {
+    "s_7e134eb59f6c6b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffbfa-bee6-7ff0-8b85-3181a3e5bb50",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
