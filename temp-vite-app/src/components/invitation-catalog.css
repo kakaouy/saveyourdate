@@ -136,6 +136,25 @@
   object-fit:cover;
   object-position:center top;
 }
+/* Estas portadas son deliberadamente más altas que el teléfono del catálogo.
+   Se muestran completas y centradas, en lugar de recortar su composición. */
+.catalog-phone-screen:is(
+  .catalog-preview-amalfi,
+  .catalog-preview-astraea,
+  .catalog-preview-15-jardin-floral,
+  .catalog-preview-boda-eucalipto
+){
+  background:#f8f4ec;
+}
+.catalog-phone-screen:is(
+  .catalog-preview-amalfi,
+  .catalog-preview-astraea,
+  .catalog-preview-15-jardin-floral,
+  .catalog-preview-boda-eucalipto
+) > img{
+  object-fit:contain;
+  object-position:center center;
+}
 .catalog-card-live-preview,
 .catalog-card-live-preview > .aurora{
   overflow:hidden !important;
