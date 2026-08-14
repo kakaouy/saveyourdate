@@ -12,7 +12,8 @@
 .coruscant-model .au-navigate img{opacity:.55}
 .coruscant-model [data-au-section="countdown"]{margin-top:-1px;padding-top:3.6rem;background:var(--color-secundario)}
 .coruscant-model .au-countdown{max-width:760px;margin-inline:auto}.coruscant-model .au-gallery button{border-radius:clamp(12px,5vw,32px)}
-.coruscant-model .au-section-ornament.left img{transform:translateY(-50%) scaleX(-1)}
+.coruscant-model .au-section-ornament.left img{transform:translateY(-50%)}
+.coruscant-model .au-section-ornament.left.is-mirrored img{transform:translateY(-50%) scaleX(-1)}
 
 .coruscant-model [data-au-section]>.au-container::before{display:block;width:clamp(64px,14vw,85px);aspect-ratio:1;margin:0 auto 1.15rem;background-position:center;background-repeat:no-repeat;background-size:contain;content:"";opacity:.84;animation:coruscant-icon-pulse 10.2s ease-in-out infinite}
 .coruscant-model [data-au-section="countdown"]>.au-container::before,.coruscant-model [data-au-section="dateStack"]>.au-container::before{display:none}
@@ -39,4 +40,18 @@
 @media(max-width:560px){.coruscant-model .au-hero{min-height:64svh;padding:0 1.5rem 0 6vw}.coruscant-model .au-hero-content{padding:0 0 0 7vw}.coruscant-model .au-editorial-intro{width:min(100%,330px)}.coruscant-model .au-hero-ornament-top{width:min(115vw,715px);max-height:56vh}.coruscant-model .au-hero-ornament-bottom{bottom:-15px;width:68vw;max-height:50%}.coruscant-model .au-name{font-size:clamp(3.15rem,15vw,4.75rem)}.coruscant-model .au-hero::before,.coruscant-model .au-hero::after{height:135px}.coruscant-model [data-au-section="countdown"]{padding-top:5.25rem}}
 @media(min-width:900px){.coruscant-model .au-hero-content{padding-left:14vw}}
 .au-embedded.coruscant-model .au-hero{min-height:100cqh;padding-right:.75rem;padding-left:.75rem}.au-embedded.coruscant-model .au-hero-content{padding-bottom:0;padding-left:7cqw}.au-embedded.coruscant-model .au-editorial-date{font-size:clamp(.7rem,4cqw,1rem)}.au-embedded.coruscant-model .au-name{font-size:clamp(3rem,17cqw,4.75rem)}.au-embedded.coruscant-model .au-editorial-title{font-size:clamp(1rem,6.5cqw,1.7rem)}.au-embedded.coruscant-model .au-hero::before,.au-embedded.coruscant-model .au-hero::after{height:22cqh}.au-embedded.coruscant-model .au-hero-ornament-top{width:80.5cqw}.au-embedded.coruscant-model .au-hero-ornament-bottom{width:68cqw}
+
+/* La versión embebida responde al dispositivo simulado, no al viewport del panel. */
+@container (min-aspect-ratio:1/1){
+  .au-embedded.coruscant-model .au-hero{min-height:100cqh;padding:1rem 2.5cqw}
+  .au-embedded.coruscant-model .au-hero-content{padding-left:11cqw}
+  .au-embedded.coruscant-model .au-editorial-intro{width:min(40cqw,430px)}
+  .au-embedded.coruscant-model .au-editorial-date{font-size:clamp(.85rem,1.6cqw,1.3rem)}
+  .au-embedded.coruscant-model .au-name{font-size:clamp(3.25rem,7.2cqw,5.8rem)}
+  .au-embedded.coruscant-model .au-editorial-title{font-size:clamp(1.15rem,2.5cqw,2rem)}
+  .au-embedded.coruscant-model .au-hero::before,
+  .au-embedded.coruscant-model .au-hero::after{height:16cqh}
+  .au-embedded.coruscant-model .au-hero-ornament-top{width:min(63cqw,860px);max-height:76cqh}
+  .au-embedded.coruscant-model .au-hero-ornament-bottom{width:min(45cqw,640px);max-height:56cqh}
+}
 @media(prefers-reduced-motion:reduce){.coruscant-model [data-au-section]>.au-container::before{animation:none;transform:none}}

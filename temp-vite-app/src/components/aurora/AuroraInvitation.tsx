@@ -26,6 +26,12 @@ type Props = {
   modelClass?: string;
   paletteTokens?: AuroraPaletteTokens;
   editorialHero?: boolean;
+  marfilHero?: boolean;
+  votoHero?: boolean;
+  oliviaHero?: boolean;
+  sweetJaneHero?: boolean;
+  gardenHero?: boolean;
+  eucaliptoHero?: boolean;
   astraeaHero?: boolean;
   globalPetals?: boolean;
   carouselGallery?: boolean;
@@ -43,6 +49,12 @@ export function AuroraInvitation({
   modelClass = '',
   paletteTokens,
   editorialHero = false,
+  marfilHero = false,
+  votoHero = false,
+  oliviaHero = false,
+  sweetJaneHero = false,
+  gardenHero = false,
+  eucaliptoHero = false,
   astraeaHero = false,
   globalPetals = false,
   carouselGallery = false,
@@ -63,11 +75,17 @@ export function AuroraInvitation({
     metadata: { ...DEFAULT_AURORA_CONFIG.metadata, ...config?.metadata }
   }), [config]);
   const colors = paletteTokens || AURORA_PALETTES[palette];
+  const ornamentLeft = data.assets.ornamentLeft || data.assets.ornamentRight;
+  const ornamentRight = data.assets.ornamentRight || data.assets.ornamentLeft;
+  const mirrorLeftOrnament = !data.assets.ornamentLeft && Boolean(data.assets.ornamentRight);
+  const mirrorRightOrnament = (!data.assets.ornamentRight && Boolean(data.assets.ornamentLeft)) ||
+    (Boolean(ornamentLeft) && ornamentLeft === ornamentRight);
   const customCopy = data.content as typeof data.content & Record<string, string | undefined>;
   const copy = (key: string, fallback: string) => customCopy[key] || fallback;
   const rootRef = useRef<HTMLDivElement>(null);
   const parallaxRef = useRef<HTMLElement>(null);
   const parallaxImageRef = useRef<HTMLDivElement>(null);
+  const musicButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -100,8 +118,10 @@ export function AuroraInvitation({
     '--hero-position-mobile': data.assets.heroPositionMobile,
     '--hero-position-desktop': data.assets.heroPositionDesktop,
     '--hero-overlay': data.assets.heroOverlay
-    , '--modular-ornament-right': `url("${data.assets.ornamentRight}")`
-    , '--modular-ornament-left': `url("${data.assets.ornamentLeft}")`
+    , '--modular-ornament-right': `url("${ornamentRight}")`
+    , '--modular-ornament-left': `url("${ornamentLeft}")`
+    , '--modular-ornament-right-scale-x': mirrorRightOrnament ? '-1' : '1'
+    , '--modular-ornament-left-scale-x': mirrorLeftOrnament ? '-1' : '1'
   } as React.CSSProperties;
 
   useEffect(() => {
@@ -134,6 +154,12 @@ export function AuroraInvitation({
   }, [data.qrPass.value, colors.claro, colors.texto]);
 
   useEffect(() => {
+    if (!(sweetJaneHero || gardenHero) || !data.sections.gallery || data.gallery.length < 2) return;
+    const timer = window.setInterval(() => setGalleryIndex((current) => (current + 1) % data.gallery.length), 4200);
+    return () => window.clearInterval(timer);
+  }, [sweetJaneHero, gardenHero, data.sections.gallery, data.gallery.length]);
+
+  useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
     const nodes = [...root.querySelectorAll<HTMLElement>('.au-reveal')];
@@ -156,6 +182,27 @@ export function AuroraInvitation({
   useEffect(() => {
     applySectionDomOrder(rootRef.current?.querySelector<HTMLElement>('#aurora-main') || null, sectionOrder, 'data-au-section', '.au-section-ornament');
   }, [sectionOrder, data.sections]);
+
+  useEffect(() => {
+    const scroller = rootRef.current;
+    const button = musicButtonRef.current;
+    if (!marfilHero || !embedded || !scroller || !button) return;
+    let frame = 0;
+    const update = () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        button.style.top = `${scroller.scrollTop + scroller.clientHeight - button.offsetHeight - 14}px`;
+      });
+    };
+    scroller.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+    return () => {
+      scroller.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [embedded, marfilHero]);
 
   useEffect(() => {
     const scroller = rootRef.current;
@@ -321,16 +368,73 @@ export function AuroraInvitation({
       <main id="aurora-main">
         {data.sections.hero && (
           <section className="au-hero" data-au-section="hero">
-            {!astraeaHero && <><img className="au-hero-ornament au-hero-ornament-top" src={data.assets.ornamentTop} alt="" aria-hidden="true" /><img className="au-hero-ornament au-hero-ornament-bottom" src={data.assets.ornamentBottom} alt="" aria-hidden="true" /></>}
+            {!astraeaHero && !marfilHero && !votoHero && !oliviaHero && !sweetJaneHero && !gardenHero && !eucaliptoHero && <><img className="au-hero-ornament au-hero-ornament-top" src={data.assets.ornamentTop} alt="" aria-hidden="true" /><img className="au-hero-ornament au-hero-ornament-bottom" src={data.assets.ornamentBottom} alt="" aria-hidden="true" /></>}
             <div className="au-particles" aria-hidden="true">
               {[1, 2, 3, 4, 5].map((number) => <i className={`au-spark au-spark-${number}`} key={`spark-${number}`} />)}
               {[1, 2, 3, 4].map((number) => <i className={`au-petal au-petal-${number}`} key={`petal-${number}`} />)}
             </div>
             <div className="au-hero-content">
-              {astraeaHero ? (
+              {eucaliptoHero ? (
+                <div className="au-eucalipto-intro">
+                  <img className="au-eucalipto-hero-decoration" src="/desarrollo/boda/invite_004/assets/portada-esquina.png" alt="" aria-hidden="true" />
+                  <div className="au-eucalipto-copy">
+                    <p className="au-eucalipto-kicker au-reveal">¡Nos casamos!</p>
+                    <h1 className="au-eucalipto-names au-reveal">{data.event.name.split(/\s*&\s*/).map((name, index) => <span key={name}>{index > 0 && <i>&amp;</i>}{name}</span>)}</h1>
+                    <p className="au-eucalipto-message au-reveal">Junto a nuestras familias tenemos la alegría de invitarte a celebrar nuestro matrimonio</p>
+                  </div>
+                  <span className="au-eucalipto-discover">Deslizá para descubrir</span>
+                </div>
+              ) : gardenHero ? (
+                <div className="au-garden-intro">
+                  <img className="au-garden-ornament au-garden-ornament-top" src={data.assets.ornamentTop} alt="" aria-hidden="true" />
+                  <div className="au-garden-copy">
+                    <h1>{data.event.name}</h1>
+                    <div className="au-garden-details">
+                      <div className="au-garden-identity"><p><span>{heroDate.day}</span> {heroDate.month} {heroDate.year}</p><strong>Mis 15</strong></div>
+                      <p className="au-garden-message">Quiero invitarte a una noche épica, llena de magia y alegría.</p>
+                    </div>
+                  </div>
+                  <img className="au-garden-ornament au-garden-ornament-bottom" src={data.assets.ornamentBottom} alt="" aria-hidden="true" />
+                  <button className="au-navigate au-garden-navigate" type="button" onClick={nextSection} aria-label={t.navigate}><img src={data.assets.navigationIcon} alt="" /></button>
+                </div>
+              ) : sweetJaneHero ? (
+                <div className="au-sweet-intro">
+                  <p className="au-sweet-date">{heroDate.day} • {String(new Date(data.event.dateTime).getMonth() + 1).padStart(2, '0')} • {heroDate.year}</p>
+                  <h1 className="au-sweet-name">{data.event.name}</h1>
+                  <p className="au-sweet-event"><span>Mis 15 años</span></p>
+                  <p className="au-sweet-message">Llegó esta gran noche,<br />¡y quiero compartirla con vos!</p>
+                  <span className="au-sweet-flourish" aria-hidden="true">♡</span>
+                  <button className="au-btn au-sweet-open" type="button" onClick={nextSection}>Ver invitación</button>
+                </div>
+              ) : oliviaHero ? (
+                <div className="au-olivia-intro">
+                  <div className="au-olivia-branches" aria-hidden="true">{[1, 2, 3, 4, 5].map((number) => <i className={`au-olivia-branch au-olivia-branch-${number}`} key={number} />)}</div>
+                  <div className="au-olivia-photo" aria-hidden="true"><img src={data.assets.hero} alt="" /></div>
+                  <h1 className="au-olivia-names">{data.event.name.split(/\s*&\s*/).map((name, index) => <span key={name}>{index > 0 && <i>&amp;</i>}{name}</span>)}</h1>
+                  <p className="au-olivia-message">¡Nos casamos!<br />Con mucha alegría queremos invitarte a ser parte de nuestro matrimonio</p>
+                </div>
+              ) : votoHero ? (
+                <div className="au-voto-intro">
+                  <p className="au-voto-kicker">{copy('heroKicker', 'NOS CASAMOS')}</p>
+                  <h1 className="au-voto-names">{data.event.name.split(/\s*&\s*/).map((name, index) => <span key={name}>{index > 0 && <i>y</i>}{name}</span>)}</h1>
+                  <p className="au-voto-message">Nos encantaría que nos acompañaras a celebrar nuestro casamiento</p>
+                  <p className="au-voto-date">{heroDate.day} · {String(new Date(data.event.dateTime).getMonth() + 1).padStart(2, '0')} · {heroDate.year}</p>
+                  <p className="au-voto-place"><span>A las {heroDate.time}</span><span>{data.event.venue} · {data.event.address}</span></p>
+                  <span className="au-voto-discover">Descubrí la invitación</span>
+                </div>
+              ) : marfilHero ? (
+                <div className="au-marfil-intro">
+                  <p className="au-marfil-kicker">{copy('heroKicker', 'NOS CASAMOS')}</p>
+                  <h1 className="au-marfil-names">{data.event.name.split(/\s*&\s*/).map((name, index) => <span key={name}>{index > 0 && <i>&amp;</i>}{name}</span>)}</h1>
+                  <p className="au-marfil-meta"><span>Montevideo</span><span aria-hidden="true" className="au-marfil-meta-line" /><span>2026</span></p>
+                  <div className="au-marfil-polaroids" aria-hidden="true">
+                    {(data.gallery.length ? data.gallery : [{ src: data.assets.hero }, { src: data.assets.parallax }]).slice(0, 4).map((image, index) => <img key={`${image.src}-${index}`} src={image.src} alt="" />)}
+                  </div>
+                </div>
+              ) : astraeaHero ? (
                 <div className="au-astraea-intro">
                   <p className="au-name">{data.event.name}</p>
-                  <h1 className="au-astraea-title">{t.heroKicker}</h1>
+                  <h1 className="au-astraea-title">{copy('heroKicker', t.heroKicker)}</h1>
                   <p className="au-astraea-quote">{data.content.heroQuote || data.content.quote || t.quote}</p>
                   <div className="au-astraea-divider au-reveal" aria-hidden="true" />
                   <div className="au-astraea-date au-reveal" aria-label={formatDate(true)}><span>{heroDate.day}</span><span>{String(new Date(data.event.dateTime).getMonth() + 1).padStart(2, '0')}</span><span>{heroDate.year.slice(-2)}</span></div>
@@ -339,11 +443,11 @@ export function AuroraInvitation({
                 <div className="au-editorial-intro">
                   <p className="au-editorial-date" aria-label={formatDate(true)}>{heroDate.day} · {String(new Date(data.event.dateTime).getMonth() + 1).padStart(2, '0')} · {heroDate.year}</p>
                   <p className="au-name">{data.event.name}</p>
-                  <h1 className="au-editorial-title">¡{t.heroKicker}!</h1>
+                  <h1 className="au-editorial-title">¡{copy('heroKicker', t.heroKicker)}!</h1>
                 </div>
               ) : (
                 <>
-                  <p className="au-kicker">{t.heroKicker}</p>
+                  <p className="au-kicker">{copy('heroKicker', t.heroKicker)}</p>
                   <p
                     className="au-name"
                     style={{
@@ -354,7 +458,7 @@ export function AuroraInvitation({
                   >
                     {data.event.name}
                   </p>
-                  <h1 className="au-visually-hidden">{t.eventType}</h1>
+                  <h1 className="au-visually-hidden">{copy('eventType', t.eventType)}</h1>
                   <div className="au-date-card" aria-label={formatDate(true)}>
                     <div><span />{heroDate.weekday}<span /></div>
                     <div><b>{heroDate.month}</b><strong>{heroDate.day}</strong><b>{heroDate.year}</b></div>
@@ -371,13 +475,22 @@ export function AuroraInvitation({
 
         {data.sections.dateStack && (
           <section className={`${sectionClass(data.tones.dateStack)} au-date-stack-section`} data-au-section="dateStack">
-            <div className="au-date-wave au-date-wave-top au-reveal" aria-hidden="true"><svg viewBox="0 0 40 140"><path d="M20 0 C5 18 35 32 20 50 C5 68 35 82 20 100 C8 116 28 126 20 140"/></svg></div>
-            <div className="au-date-stack au-reveal" aria-label={formatDate(true)}>
-              <span>{heroDate.day}</span>
-              <span>{String(new Date(data.event.dateTime).getMonth() + 1).padStart(2, '0')}</span>
-              <span>{heroDate.year.slice(-2)}</span>
-            </div>
-            <div className="au-date-wave au-date-wave-bottom au-reveal" aria-hidden="true"><svg viewBox="0 0 40 140"><path d="M20 0 C5 18 35 32 20 50 C5 68 35 82 20 100 C8 116 28 126 20 140"/></svg></div>
+            {eucaliptoHero ? <div className="au-eucalipto-date au-reveal" aria-label={formatDate(true)}>
+              <div className="au-eucalipto-date-heading"><span>{heroDate.weekday}</span><strong>{heroDate.month}</strong><span>{heroDate.year}</span></div>
+              <div className="au-eucalipto-day">{heroDate.day}</div>
+              <div className="au-eucalipto-time"><span>A las</span><strong>{heroDate.time}</strong><span>horas</span></div>
+              <div className="au-eucalipto-countdown">{countdown.map((value, index) => <div key={t.units[index]}><strong>{value}</strong><span>{t.units[index]}</span></div>)}</div>
+            </div> : oliviaHero ? <div className="au-olivia-calendar au-reveal" aria-label={formatDate(true)}>
+              <img className="au-olivia-calendar-icon" src="/catalog/boda-boho/calendar-icon.png" alt="" aria-hidden="true" />
+              <h2>{heroDate.month}</h2>
+              <div className="au-olivia-week">{['L','M','M','J','V','S','D'].map((day, index) => <span key={`${day}-${index}`}>{day}</span>)}</div>
+              <div className="au-olivia-days">{[0,0,0,0,0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30].map((day, index) => <span className={day === Number(heroDate.day) ? 'is-chosen' : ''} key={index}>{day || ''}</span>)}</div>
+              <p>{formatDate(true)}</p>
+            </div> : <>
+              <div className="au-date-wave au-date-wave-top au-reveal" aria-hidden="true"><svg viewBox="0 0 40 140"><path d="M20 0 C5 18 35 32 20 50 C5 68 35 82 20 100 C8 116 28 126 20 140"/></svg></div>
+              <div className="au-date-stack au-reveal" aria-label={formatDate(true)}><span>{heroDate.day}</span><span>{String(new Date(data.event.dateTime).getMonth() + 1).padStart(2, '0')}</span><span>{heroDate.year.slice(-2)}</span></div>
+              <div className="au-date-wave au-date-wave-bottom au-reveal" aria-hidden="true"><svg viewBox="0 0 40 140"><path d="M20 0 C5 18 35 32 20 50 C5 68 35 82 20 100 C8 116 28 126 20 140"/></svg></div>
+            </>}
           </section>
         )}
 
@@ -396,61 +509,67 @@ export function AuroraInvitation({
 
         {data.sections.location && (
           <><section className={sectionClass(data.tones.location)} data-au-section="location">
-            <div className="au-container au-reveal">
-              <h2>{copy('locationTitle', t.locationTitle)}</h2>
-              <p><strong>{formatDate(true)}</strong></p>
-              <p>{data.event.venue}<br />{data.event.address}</p>
-              <div className="au-buttons">
-                <button className="au-btn" onClick={() => external(data.links.maps)}>{copy('mapLabel', t.map)}</button>
-                <button className="au-btn au-btn-outline" onClick={downloadCalendar}>{copy('calendarLabel', t.calendar)}</button>
+            {eucaliptoHero ? <div className="au-eucalipto-events">
+              <article className="au-eucalipto-event-card au-reveal"><i aria-hidden="true" /><img src="/desarrollo/boda/invite_004/assets/icon-church-gd.png" alt="" /><small>Ceremonia</small><h2>Basílica Nuestra Señora<br />del Pilar</h2><p>Junín 1904, Recoleta<br />Ciudad Autónoma de Buenos Aires · 18:30 hs</p><button className="au-btn" onClick={() => external('https://maps.google.com/?q=Bas%C3%ADlica+Nuestra+Se%C3%B1ora+del+Pilar+Buenos+Aires')}>Cómo llegar</button></article>
+              <article className="au-eucalipto-event-card au-reveal"><i aria-hidden="true" /><img src="/desarrollo/boda/invite_004/assets/icon-wine-gd.png" alt="" /><small>Recepción</small><h2>Palacio Duhau</h2><p>Av. Alvear 1661, Recoleta<br />Ciudad Autónoma de Buenos Aires · 20:30 hs</p><button className="au-btn" onClick={() => external('https://maps.google.com/?q=Palacio+Duhau+Buenos+Aires')}>Cómo llegar</button></article>
+            </div> : oliviaHero ? <div className="au-container au-olivia-locations au-reveal">
+              <div className="au-olivia-location-grid">
+                <article><img src="/catalog/boda-boho/location-ceremony.png" alt="" /><h3>Ceremonia religiosa</h3><p>Basílica del Santísimo Sacramento<br />San Martín 1035, Ciudad de Buenos Aires</p><button className="au-btn" onClick={() => external(data.links.maps)}>Ver ubicación</button></article>
+                <article><img src="/catalog/boda-boho/location-reception.png" alt="" /><h3>Recepción</h3><p>Palacio Sans Souci<br />Paz 705, Victoria, Buenos Aires</p><button className="au-btn" onClick={() => external(data.links.maps)}>Ver ubicación</button></article>
               </div>
-            </div>
-          </section><SectionOrnament prefix="au" side="right" src={data.assets.ornamentRight} /></>
+              <button className="au-btn au-btn-outline au-olivia-calendar-button" onClick={downloadCalendar}>{copy('calendarLabel', t.calendar)}</button>
+            </div> : <div className="au-container au-reveal">
+              <h2>{copy('locationTitle', t.locationTitle)}</h2><p><strong>{formatDate(true)}</strong></p><p>{data.event.venue}<br />{data.event.address}</p>
+              <div className="au-buttons"><button className="au-btn" onClick={() => external(data.links.maps)}>{marfilHero ? 'Google Maps' : copy('mapLabel', t.map)}</button><button className="au-btn au-btn-outline" onClick={marfilHero ? () => external('https://waze.com/') : downloadCalendar}>{marfilHero ? 'Waze' : copy('calendarLabel', t.calendar)}</button></div>
+            </div>}
+          </section><SectionOrnament prefix="au" side="right" src={ornamentRight} mirrored={mirrorRightOrnament} /></>
         )}
 
         {data.sections.quote && (
           <><section className={sectionClass(data.tones.quote)} data-au-section="quote">
             <div className="au-container au-reveal"><blockquote>{data.content.quote || t.quote}</blockquote></div>
-          </section><SectionOrnament prefix="au" side="left" src={data.assets.ornamentLeft} /></>
+          </section><SectionOrnament prefix="au" side="left" src={ornamentLeft} mirrored={mirrorLeftOrnament} /></>
         )}
 
         {data.sections.dressCode && (
           <section className={sectionClass(data.tones.dressCode)} data-au-section="dressCode">
-            <div className="au-container au-reveal">
-              <h2>{copy('dressTitle', t.dressTitle)}</h2>
-              <p>{data.content.dressSummary || t.dressSummary}</p>
-              <button className="au-btn au-btn-outline" onClick={(event) => openModal('dress', event)}>{copy('dressButton', t.dressButton)}</button>
-            </div>
+            {eucaliptoHero ? <div className="au-container au-eucalipto-details"><small className="au-reveal">Detalles de la celebración</small><h2 className="au-reveal">Todo lo que necesitás saber</h2><div className="au-eucalipto-detail-grid">
+              <article className="au-reveal"><img src="/desarrollo/boda/invite_004/assets/icon-dress-gd.png" alt="" /><h3>Dress code</h3><p>Formal elegante<br />Tonos libres</p></article>
+              <article className="au-reveal"><img src="/desarrollo/boda/invite_004/assets/icon-gift-gd.png" alt="" /><h3>Regalos</h3><p>Tu presencia es nuestro mejor regalo</p><button className="au-btn" onClick={(event)=>openModal('gifts',event)}>Ver datos</button></article>
+              <article className="au-reveal"><img src="/desarrollo/boda/invite_004/assets/icon-camera-gd.png" alt="" /><h3>Fotos</h3><p>Compartí tus recuerdos<br />#MartinySofia</p></article>
+              <article className="au-reveal"><img src="/desarrollo/boda/invite_004/assets/icon-date-gd.png" alt="" /><h3>Agendalo</h3><p>14 de noviembre<br />de 2026</p><button className="au-btn" onClick={downloadCalendar}>Agendar</button></article>
+            </div></div> : <div className="au-container au-reveal"><h2>{sweetJaneHero ? 'Dress code' : copy('dressTitle', t.dressTitle)}</h2><p>{sweetJaneHero ? 'Orientación para tu vestuario: Elegante. Reservamos el blanco para la cumpleañera.' : data.content.dressSummary || t.dressSummary}</p><button className="au-btn au-btn-outline" onClick={(event) => openModal('dress', event)}>{copy('dressButton', t.dressButton)}</button></div>}
           </section>
         )}
 
         {data.sections.schedule && (
           <><section className={sectionClass(data.tones.schedule)} data-au-section="schedule">
-            <div className="au-container au-reveal">
+            {eucaliptoHero ? <div className="au-container au-eucalipto-menu"><img className="au-reveal" src="/desarrollo/boda/invite_004/assets/icon-cake-gd.png" alt="" /><small className="au-reveal">Nuestro menú</small><h2 className="au-reveal">Una noche para disfrutar</h2><ul className="au-reveal"><li><strong>Recepción</strong><span>Bocados de estación y espumante</span></li><li><strong>Principal</strong><span>Lomo braseado con vegetales de huerta</span></li><li><strong>Postre</strong><span>Texturas de chocolate y frutos rojos</span></li></ul><p className="au-reveal">Si tenés alguna restricción alimentaria, podés indicarla al confirmar tu asistencia.</p></div> : <div className="au-container au-reveal">
               <h2>{copy('scheduleTitle', t.scheduleTitle)}</h2>
-              <div className="au-schedule">
+              {marfilHero && <p className="au-marfil-schedule-date">Sábado 22 de agosto de 2026</p>}
+              <div className={`au-schedule${oliviaHero ? ' au-olivia-schedule' : ''}`}>
                 {schedule.map((item, index) => (
                   <article key={`${item.time}-${index}`}>
-                    <time>{item.time}</time><i aria-hidden="true" />
-                    <div><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}</div>
+                    {oliviaHero ? <><div className="au-olivia-moment"><img src={`/catalog/boda-boho/schedule-${index + 1}.png`} alt="" /><time>{item.time}</time><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}</div><i aria-hidden="true" /></> : <><time>{item.time}</time><i aria-hidden="true" /><div><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}</div></>}
                   </article>
                 ))}
               </div>
-            </div>
-          </section><SectionOrnament prefix="au" side="right" src={data.assets.ornamentRight} /></>
+            </div>}
+          </section><SectionOrnament prefix="au" side="right" src={ornamentRight} mirrored={mirrorRightOrnament} /></>
         )}
 
         {data.sections.parallax && (
           <section ref={parallaxRef} className="au-parallax" data-au-section="parallax">
             <div ref={parallaxImageRef} className="au-parallax-image" aria-hidden="true" />
-            <h2 className="au-reveal">{data.content.parallaxTitle || t.parallax}</h2>
+            <h2 className="au-reveal">{eucaliptoHero ? 'Nuestro lugar favorito es juntos' : data.content.parallaxTitle || t.parallax}</h2>
           </section>
         )}
 
         {data.sections.gallery && (
           <section className={sectionClass(data.tones.gallery)} data-au-section="gallery">
             <div className="au-container au-reveal">
-              <h2>{copy('galleryTitle', t.galleryTitle)}</h2><p>{copy('galleryCopy', t.galleryCopy)}</p>
+              {oliviaHero && <img className="au-olivia-gallery-icon" src="/catalog/boda-boho/gallery-icon.png" alt="" />}
+              <h2>{oliviaHero ? 'Galería' : copy('galleryTitle', t.galleryTitle)}</h2><p>{oliviaHero ? 'Un recorrido por momentos inolvidables' : copy('galleryCopy', t.galleryCopy)}</p>
               {carouselGallery ? <div className="au-gallery-carousel">
                 <button className="au-gallery-control prev" type="button" aria-label="Ver foto anterior" onClick={()=>setGalleryIndex((galleryIndex-1+gallery.length)%gallery.length)}>‹</button>
                 <div className="au-gallery-viewport"><div className="au-gallery-track" style={{'--gallery-index':galleryIndex} as React.CSSProperties}>
@@ -472,8 +591,8 @@ export function AuroraInvitation({
         )}
         {data.sections.gifts && data.gifts.visible && (
           <><section className={sectionClass(data.tones.gifts)} data-au-section="gifts">
-            <div className="au-container au-reveal"><h2>{copy('giftsTitle', t.giftsTitle)}</h2><p>{copy('giftsCopy', t.giftsCopy)}</p><button className="au-btn" onClick={(event) => openModal('gifts', event)}>{copy('giftsButton', t.giftsButton)}</button></div>
-          </section><SectionOrnament prefix="au" side="left" src={data.assets.ornamentLeft} /></>
+            <div className="au-container au-reveal">{marfilHero && <small>Un detalle</small>}<h2>{marfilHero ? 'Regalos' : copy('giftsTitle', t.giftsTitle)}</h2><p>{marfilHero ? 'Tu presencia es nuestro mejor regalo.' : copy('giftsCopy', t.giftsCopy)}</p><button className="au-btn" onClick={(event) => openModal('gifts', event)}>{marfilHero ? 'Ver información' : copy('giftsButton', t.giftsButton)}</button></div>
+          </section><SectionOrnament prefix="au" side="left" src={ornamentLeft} mirrored={mirrorLeftOrnament} /></>
         )}
         {data.sections.photoUpload && (
           <section className={sectionClass(data.tones.photoUpload)} data-au-section="photoUpload">
@@ -482,31 +601,30 @@ export function AuroraInvitation({
         )}
         {data.sections.social && (
           <><section className={sectionClass(data.tones.social)} data-au-section="social">
-            <div className="au-container au-reveal"><h2>{copy('socialTitle', t.socialTitle)}</h2><p>{copy('socialCopy', t.socialCopy)}</p><p className="au-hashtag">{data.content.hashtag}</p><button className="au-btn au-btn-outline" onClick={() => external(data.links.instagram)}>{copy('socialButton', t.socialButton)}</button></div>
-          </section><SectionOrnament prefix="au" side="right" src={data.assets.ornamentRight} /></>
+            <div className="au-container au-reveal"><h2>{sweetJaneHero ? 'Una gran fiesta junto a vos' : copy('socialTitle', t.socialTitle)}</h2><p>{sweetJaneHero ? 'Subí tus fotos y etiquetame en Instagram.' : copy('socialCopy', t.socialCopy)}</p><p className="au-hashtag">{sweetJaneHero ? '@emma.15' : data.content.hashtag}</p><button className="au-btn au-btn-outline" onClick={() => external(data.links.instagram)}>{copy('socialButton', t.socialButton)}</button></div>
+          </section><SectionOrnament prefix="au" side="right" src={ornamentRight} mirrored={mirrorRightOrnament} /></>
         )}
         {data.sections.songSuggestions && (
           <section className={sectionClass(data.tones.songSuggestions)} data-au-section="songSuggestions">
-            <div className="au-container au-reveal"><h2>{copy('songsTitle', t.songsTitle)}</h2><p>{copy('songsCopy', t.songsCopy)}</p><button className="au-btn" onClick={(event) => openModal('songs', event)}>{copy('songsButton', t.songsButton)}</button></div>
+            <div className="au-container au-reveal"><h2>{sweetJaneHero ? '¡Cumple Emma!' : copy('songsTitle', t.songsTitle)}</h2><p>{sweetJaneHero ? '¿Qué canción no puede faltar?' : copy('songsCopy', t.songsCopy)}</p><button className="au-btn" onClick={(event) => openModal('songs', event)}>{copy('songsButton', t.songsButton)}</button>{sweetJaneHero && <div className="au-sweet-playlist"><p>Así va quedando la playlist:</p><iframe title="Playlist de Emma" src="https://open.spotify.com/embed/playlist/19A5kIBEEw2MNgSqqsyOr7?utm_source=generator&theme=0" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" /></div>}</div>
           </section>
         )}
         {data.sections.qrPass && (
           <><section className={sectionClass(data.tones.qrPass)} data-au-section="qrPass">
             <div className="au-container au-reveal"><h2>{copy('qrTitle', t.qrTitle)}</h2><p>{copy('qrCopy', t.qrCopy)}</p><button className="au-btn" onClick={(event) => openModal('qr', event)}>{copy('qrButton', t.qrButton)}</button></div>
-          </section><SectionOrnament prefix="au" side="left" src={data.assets.ornamentLeft} /></>
+          </section><SectionOrnament prefix="au" side="left" src={ornamentLeft} mirrored={mirrorLeftOrnament} /></>
         )}
         {data.sections.rsvp && (
           <section className={sectionClass(data.tones.rsvp)} data-au-section="rsvp">
-            <div className="au-container au-reveal"><h2>{copy('rsvpTitle', t.rsvpTitle)}</h2><p>{data.content.rsvpDeadline || t.rsvpDeadline}</p><button className="au-btn" onClick={(event) => openModal('rsvp', event)}>{copy('rsvpButton', t.rsvpButton)}</button></div>
+            {eucaliptoHero ? <div className="au-container au-eucalipto-rsvp"><img className="au-reveal" src="/desarrollo/boda/invite_004/assets/icon-rsvp-gd.png" alt="" /><small className="au-reveal">Queremos que nos acompañes</small><h2 className="au-reveal">Confirmá tu asistencia</h2><p className="au-reveal">Por favor, respondé antes del 14 de octubre de 2026.</p>{rsvpState==='success'?<p className="au-eucalipto-success">¡Gracias por confirmar!<br /><small>Tu respuesta quedó registrada para la muestra.</small></p>:<form className="au-form au-eucalipto-rsvp-form au-reveal" onSubmit={(event)=>submit('rsvp',event)}><input name="name" placeholder="Nombre y apellido" required/><select name="attendance" required defaultValue=""><option value="" disabled>¿Vas a asistir?</option><option value="yes">Sí, confirmo mi asistencia</option><option value="no">No podré asistir</option></select><select name="food" value={food} onChange={(event)=>setFood(event.target.value)}><option value="none">Sin restricciones alimentarias</option><option value="celiac">Celíaco/a - sin TACC</option><option value="vegetarian">Vegetariano/a</option><option value="vegan">Vegano/a</option><option value="other">Otra restricción</option></select>{food==='other'&&<input name="otherFood" placeholder="Indicá tu restricción" required/>}<textarea name="message" rows={3} placeholder="Mensaje para los novios (opcional)"/><button className="au-btn" disabled={rsvpState==='loading'}>{rsvpState==='loading'?'…':'Enviar confirmación'}</button></form>}</div> : <div className="au-container au-reveal">{marfilHero && <small>Queremos contar contigo</small>}<h2>{marfilHero ? 'Confirmar asistencia' : copy('rsvpTitle', t.rsvpTitle)}</h2><p>{marfilHero ? 'Por favor, confirmá tu asistencia.' : data.content.rsvpDeadline || t.rsvpDeadline}</p><button className="au-btn" onClick={(event) => openModal('rsvp', event)}>{copy('rsvpButton', t.rsvpButton)}</button></div>}
           </section>
         )}
+        {eucaliptoHero && <section className="au-section au-eucalipto-closing" data-au-section="closing"><div className="au-container"><img className="au-reveal" src="/desarrollo/boda/invite_004/assets/icon-heart-gd.png" alt="" /><h2 className="au-reveal">Martín &amp; Sofía</h2><p className="au-reveal">Gracias por ser parte de nuestra historia.<br />¡Te esperamos!</p></div></section>}
       </main>
 
-      <footer className="au-footer">
-        <strong>Save Your Date</strong>
-        <p>{t.footer}</p><hr />
-        <p>© {new Date().getFullYear()} Save Your Date · {t.rights}</p>
-      </footer>
+      {eucaliptoHero ? <footer className="au-footer au-eucalipto-footer"><strong>Save Your Date</strong><p>Invitaciones digitales para momentos inolvidables</p><p>© 2026 Save Your Date · Todos los derechos reservados</p></footer> : oliviaHero ? <footer className="au-footer au-olivia-footer"><img src="/catalog/boda-boho/footer-icon.png" alt="" /><strong>Te esperamos</strong><span>Save Your Date</span></footer> : marfilHero ? <footer className="au-footer au-marfil-footer"><strong>{data.event.name}</strong><p>Invitación creada por <span>Save Your Date</span></p></footer> : <footer className="au-footer"><strong>Save Your Date</strong><p>{t.footer}</p><hr /><p>© {new Date().getFullYear()} Save Your Date · {t.rights}</p></footer>}
+
+      {marfilHero && <button ref={musicButtonRef} className="au-music-float" type="button" aria-label="Música">♪</button>}
 
       {modal && (
         <div className="au-modal" style={embedded ? { top: modalTop, bottom: 'auto', height: rootRef.current?.clientHeight || '100%' } : undefined} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal(); }}>
@@ -528,6 +646,7 @@ export function AuroraInvitation({
   );
 }
 
-function SectionOrnament({ prefix, side, src }:{ prefix:string; side:'left'|'right'; src:string }) {
-  return <div className={`${prefix}-section-ornament ${side}`} aria-hidden="true"><img src={src} alt="" loading="lazy" /></div>;
+function SectionOrnament({ prefix, side, src, mirrored = false }:{ prefix:string; side:'left'|'right'; src:string; mirrored?:boolean }) {
+  if (!src) return null;
+  return <div className={`${prefix}-section-ornament ${side}${mirrored ? ' is-mirrored' : ''}`} aria-hidden="true"><img src={src} alt="" loading="lazy" /></div>;
 }

@@ -27,4 +27,18 @@
 @media(min-width:768px){.rv-hero{background-position:var(--hero-position-desktop)}}
 @media(max-width:360px){.rv-section{padding-inline:.9rem}.rv-countdown span{letter-spacing:-.02em}.rv-name{font-size:clamp(3.5rem,20vw,5rem)}}
 @container (max-width:390px){.rv-embedded .rv-countdown{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem .75rem}.rv-embedded .rv-countdown strong{font-size:clamp(1.75rem,12cqw,2.75rem)}}
+/* La vista horizontal tiene una composición propia y no agranda el diseño móvil. */
+@container (min-aspect-ratio:1/1){
+  .rv-embedded .rv-hero{padding:3cqh 5cqw;background-position:var(--hero-position-desktop)}
+  .rv-embedded .rv-hero-content{width:min(50cqw,650px);margin-top:0;margin-right:7cqw;margin-left:auto;text-align:right}
+  .rv-embedded .rv-name{font-size:clamp(4.2rem,9.5cqw,7.8rem)!important;line-height:.9}
+  .rv-embedded .rv-date{justify-content:flex-end;margin-right:0;font-size:clamp(.7rem,1.35cqw,1rem)}
+  .rv-embedded .rv-hero h1{font-size:clamp(1.6rem,3.1cqw,2.8rem)}
+  .rv-embedded .rv-hero-ornament{width:min(34cqw,370px)}
+  .rv-embedded .rv-section{padding:clamp(3rem,9cqh,6rem) 5cqw}
+  .rv-embedded .rv-section h2,.rv-embedded .rv-parallax h2{font-size:clamp(2.5rem,5cqw,4.4rem)}
+  .rv-embedded .rv-section p{font-size:clamp(.78rem,1.25cqw,1rem)}
+  .rv-embedded .rv-section blockquote{font-size:clamp(1.8rem,3.2cqw,2.7rem)}
+  .rv-embedded .rv-countdown strong{font-size:clamp(2.2rem,4.5cqw,3.4rem)}
+}
 @media(prefers-reduced-motion:reduce){.rivendell{scroll-behavior:auto}.rivendell *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.rv-particles{display:none}.rv-reveal{opacity:1;transform:none}.rv-parallax-image{transform:none}}

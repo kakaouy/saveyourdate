@@ -49,3 +49,19 @@
 .rw-footer,.rw-footer strong,.rw-footer p,.rw-footer hr{text-align:center}.rw-footer strong,.rw-footer p{display:block;margin-right:auto;margin-left:auto}
 .rw-embedded .rw-hero-ornament-top{width:66.666cqw;max-width:none}.rw-embedded .rw-hero-ornament-bottom{width:auto;max-width:none;height:66.666cqh}
 .rw-embedded .rw-section-ornament img{width:46cqw;max-width:46cqw}
+
+/* Composición propia para la vista horizontal del constructor y del catálogo. */
+@container (min-aspect-ratio:1/1){
+  .rw-embedded .rw-hero{padding:2.5cqh 5cqw}
+  .rw-embedded .rw-hero-content{width:min(48cqw,620px);margin-right:auto;margin-left:7cqw;text-align:left}
+  .rw-embedded .rw-name{font-size:clamp(4rem,9cqw,7.5rem)!important;line-height:.9}
+  .rw-embedded .rw-date{justify-content:flex-start;margin-left:0;font-size:clamp(.7rem,1.35cqw,1rem)}
+  .rw-embedded .rw-hero h1{font-size:clamp(1.6rem,3.1cqw,2.8rem)}
+  .rw-embedded .rw-hero-ornament-top{width:min(48cqw,650px)}
+  .rw-embedded .rw-hero-ornament-bottom{height:min(56cqh,440px)}
+  .rw-embedded .rw-section{padding:clamp(3rem,9cqh,6rem) 5cqw}
+  .rw-embedded .rw-section h2,.rw-embedded .rw-parallax h2{font-size:clamp(2.5rem,5cqw,4.4rem)}
+  .rw-embedded .rw-section p{font-size:clamp(.78rem,1.25cqw,1rem)}
+  .rw-embedded .rw-section blockquote{font-size:clamp(1.8rem,3.2cqw,2.7rem)}
+  .rw-embedded .rw-section-ornament img{width:min(28cqw,300px);max-width:28cqw}
+}

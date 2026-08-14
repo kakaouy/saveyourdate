@@ -11,6 +11,7 @@ export interface InvitationModel {
   previewImage?: string;
   demoPath?: string;
   active?: boolean;
+  comingSoon?: boolean;
   order?: number;
   features: string[];
   themeClass: string;
@@ -33,11 +34,9 @@ export const INVITATION_MODELS: InvitationModel[] = [
     category: 'wedding',
     description: '',
     badge: 'Más Elegido',
-    demoName1: 'Matias & Sofía',
+    demoName1: 'Ana & Juan',
     date: '14 de Noviembre, 2026',
     features: [
-      'Galería de fotos',
-      'Música',
       'Frase',
       'Cronograma',
       'Ubicación',
@@ -49,10 +48,8 @@ export const INVITATION_MODELS: InvitationModel[] = [
     illustrationType: 'rings',
     musicTitle: 'Perfect',
     musicArtist: 'Ed Sheeran',
-    location: 'Estancia La Linda, Pilar, Buenos Aires',
+    location: 'Salón del Lago, Camino de los Aromos 2150',
     includedSections: [
-      'gallery',
-      'music',
       'quote',
       'agenda',
       'location',
@@ -418,6 +415,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
     id: 'otros-baby',
     title: 'Baby Shower Especial',
     category: 'other',
+    comingSoon: true,
     description: 'Diseño ultra tierno con animales de acuarela ilustrados, nubes de algodón y globos aerostáticos. Perfecto para celebrar la dulce espera.',
     badge: 'Nuevo',
     demoName1: 'Baby Benjamín',
@@ -433,6 +431,7 @@ export const INVITATION_MODELS: InvitationModel[] = [
     id: 'otros-aniversario',
     title: 'Aniversario de Oro',
     category: 'other',
+    comingSoon: true,
     description: 'Una celebración de amor inquebrantable. Tipografías en oro mate combinadas con fondos blancos limpios y marcos elegantes.',
     demoName1: 'Elena & Roberto',
     demoName2: '50 Años de Amor',
@@ -550,57 +549,10 @@ export const INVITATION_MODELS: InvitationModel[] = [
     ]
   },
   {
-    id: 'boda-brindis-papel',
-    previewImage: '/previews/brindis-papel.webp',
-    title: 'Brindis de Papel',
-    category: 'wedding',
-    description: 'Trazos de manos alzadas, textura de papel y bloques de color para una boda alegre, artística y contemporánea.',
-    badge: 'Nuevo',
-    demoName1: 'Valentina & Matías',
-    date: '14 de Febrero, 2027',
-    features: [
-      'Música',
-      'Cuenta Regresiva',
-      'Ceremonia y celebración en una ubicación',
-      'Foto destacada con efecto parallax',
-      'Código de Vestimenta',
-      'Regalos / datos de pago',
-      'Mensajes',
-      'Menú',
-      'Confirmación RSVP'
-    ],
-    themeClass: 'mock-theme-wedding',
-    illustrationType: 'rings',
-    musicTitle: 'Brillas',
-    musicArtist: 'León Larregui',
-    location: 'Estancia Villa María, Buenos Aires',
-    includedSections: ['music','countdown','agenda','location','featuredPhoto','dresscode','gifts','messages','menu','rsvp'],
-    palettes: [
-      { id: 'azul', name: 'Azul vivo', color: '#2f7cf4' },
-      { id: 'coral', name: 'Coral terracota', color: '#df735f' },
-      { id: 'verde', name: 'Verde jardín', color: '#5f8f6d' }
-    ]
-  },
-  {
-    id: '15-neon',
-    title: 'Neon Party',
-    category: '15years',
-    active: false,
-    description: 'Estilo vibrante y moderno con luces de neón rosa, azul y morado sobre fondo oscuro. Diseñado para una fiesta llena de ritmo, baile y diversión.',
-    badge: 'Tendencia',
-    demoName1: 'Sofía',
-    date: '07 de Noviembre, 2026',
-    features: ['Cuenta Regresiva', 'Playlist Spotify', 'Confirmación RSVP', 'Dress Code'],
-    themeClass: 'mock-theme-15years',
-    illustrationType: 'crown',
-    musicTitle: 'Levitating',
-    musicArtist: 'Dua Lipa',
-    location: 'Espacio Black, San Isidro'
-  },
-  {
     id: 'otros-graduacion',
     title: 'Graduación Elegante',
     category: 'other',
+    comingSoon: true,
     description: 'Celebrá el fin de una gran etapa con un diseño en negro y dorado brillante. Marcos elegantes y detalles de confeti para destacar tus logros.',
     badge: 'Popular',
     demoName1: 'Graduación de Lucía',
@@ -660,7 +612,10 @@ export const INVITATION_MODELS: InvitationModel[] = [
     includedSections: ['countdown','location','dresscode','featuredPhoto','gallery','hotels','gifts','photoUpload','instagram','songSuggestions','qr','rsvp'],
     palettes: [
       { id: 'rosa-salvia', name: 'Rosa y salvia', color: '#9f6f7b' },
-      { id: 'verde-dorado', name: 'Verde y dorado', color: '#2f5d50' }
+      { id: 'lavanda-ciruela', name: 'Lavanda y ciruela', color: '#674c6d' },
+      { id: 'azul-polvo-champagne', name: 'Azul polvo y champagne', color: '#4f6c79' },
+      { id: 'rosa-viejo-borgona', name: 'Rosa viejo y borgoña', color: '#7b4a53' },
+      { id: 'petroleo-champagne', name: 'Petróleo y champagne', color: '#32666a' }
     ]
   },
   {

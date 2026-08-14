@@ -6,8 +6,37 @@
 @media(hover:none),(pointer:coarse){.v-parallax{background-attachment:scroll}}@media(prefers-reduced-motion:reduce){.verona *{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.v-reveal{opacity:1;transform:none}}
 
 /* Verona uses the shared catalog demo frame; palette controls live in the parent modal. */
-.verona.v-embedded{position:absolute;z-index:1;inset:0;width:100%;height:100%}
+.verona.v-embedded{position:absolute;z-index:1;inset:0;width:100%;height:100%;container-type:size}
 .verona.v-embedded .v-loader,.verona.v-embedded .v-modal,.verona.v-embedded .v-skip{position:absolute}
+.verona.v-embedded .v-hero{height:100cqh;min-height:100cqh;max-height:none}
+.verona.v-embedded .v-hero>div{width:min(100%,680px);margin-top:18cqh}
+.verona.v-embedded .v-name{font-size:clamp(3.2rem,18cqw,6rem)}
+.verona.v-embedded .v-date{font-size:clamp(.55rem,2.6cqw,.8rem)}
+.verona.v-embedded .v-hero h1{font-size:clamp(1.7rem,8cqw,3rem)}
+.verona.v-embedded .v-section{padding:3rem .9rem}.verona.v-embedded .v-section p{font-size:.72rem;line-height:1.55}.verona.v-embedded .v-section h2,.verona.v-embedded .v-parallax h2{font-size:clamp(2rem,11cqw,3.2rem)}
+.verona.v-embedded .v-corner{width:min(43cqw,180px)}.verona.v-embedded .v-ornament img{width:min(28cqw,100px)}
+.verona.v-embedded .v-btn{min-height:36px;padding:.5rem .9rem;font-size:.58rem}.verona.v-embedded .v-countdown strong{font-size:clamp(1.6rem,10cqw,2.8rem)}
+.verona.v-embedded .v-modal{padding:clamp(.65rem,3cqw,1rem)}
+.verona.v-embedded .v-modal-box{width:min(88%,420px);max-height:84cqh;padding:2.5rem clamp(.9rem,5cqw,1.35rem) 1.25rem;border-radius:14px}
+.verona.v-embedded .v-modal h2{margin-bottom:.55rem;font-size:clamp(1.8rem,9cqw,2.65rem)}
+.verona.v-embedded .v-form{gap:.58rem;font-size:clamp(.62rem,2.8cqw,.78rem)}
+.verona.v-embedded .v-form label{gap:.22rem}
+.verona.v-embedded .v-form input,.verona.v-embedded .v-form select,.verona.v-embedded .v-form textarea{min-height:38px;padding:.48rem .62rem;border-radius:8px}
+.verona.v-embedded .v-form textarea{min-height:64px}
+.verona.v-embedded .v-form .v-btn{min-height:36px;margin-top:.15rem}
+@container (min-aspect-ratio:1/1){
+  .verona.v-embedded .v-hero{padding:3cqh 5cqw;background-position:var(--hero-position-desktop)}
+  .verona.v-embedded .v-hero>div{width:min(48cqw,620px);margin:0 auto 0 8cqw;text-align:left}
+  .verona.v-embedded .v-name{font-size:clamp(4.5rem,10cqw,8rem);line-height:.92}
+  .verona.v-embedded .v-date{justify-content:flex-start;margin-left:0;font-size:clamp(.72rem,1.3cqw,1rem)}
+  .verona.v-embedded .v-hero h1{font-size:clamp(2rem,4cqw,3.6rem)}
+  .verona.v-embedded .v-corner{width:min(29cqw,310px)}
+  .verona.v-embedded .v-section{padding:clamp(3rem,9cqh,6rem) 5cqw}
+  .verona.v-embedded .v-section h2,.verona.v-embedded .v-parallax h2{font-size:clamp(3rem,5.4cqw,4.8rem)}
+  .verona.v-embedded .v-section p{font-size:clamp(.8rem,1.25cqw,1rem)}
+  .verona.v-embedded .v-quote{font-size:clamp(2rem,3.8cqw,3.4rem)}
+  .verona.v-embedded .v-ornament img{width:min(24cqw,240px)}
+}
 .v-parallax{position:relative;isolation:isolate;overflow:hidden;background-image:none;background-attachment:scroll}
 .v-parallax-image{position:absolute;z-index:-2;inset:-90px 0;background-image:var(--parallax-image);background-position:center 35%;background-size:cover;transform:translate3d(0,var(--parallax-y,0),0);will-change:transform}
 .v-parallax:after{position:absolute;z-index:-1;inset:0;background:rgb(0 0 0 / .18);content:''}

@@ -1,0 +1,1199 @@
+.catalog-generated .au-hero::after {
+  background: linear-gradient(180deg, rgba(8, 15, 18, .08), rgba(8, 15, 18, .42));
+}
+
+.catalog-generated .au-hero-content {
+  text-shadow: 0 2px 20px rgba(0, 0, 0, .2);
+}
+
+.catalog-15-sweet-jane {
+  font-family: "Quicksand", sans-serif;
+  color: #5d4a42;
+}
+.catalog-15-sweet-jane .au-hero {
+  min-height: 100cqh;
+  background-image: linear-gradient(rgba(60,35,20,.16),rgba(60,35,20,.22)),var(--hero-image);
+  background-position: center;
+  background-size: cover;
+  color: #fff;
+}
+.catalog-15-sweet-jane .au-hero::after { background: linear-gradient(rgba(60,35,20,.08),rgba(60,35,20,.2)); }
+.catalog-15-sweet-jane .au-particles { display: none; }
+.catalog-15-sweet-jane .au-hero-content { width: 100%; text-shadow: 0 5px 12px rgba(0,0,0,.48); }
+.au-sweet-intro { position:relative; isolation:isolate; display: flex; min-height: 88cqh; flex-direction: column; align-items: center; justify-content: center; padding: 4cqh 5cqw; overflow:hidden; }
+.au-sweet-intro>*{position:relative;z-index:4}
+.au-sweet-intro::before,.au-sweet-intro::after{position:absolute;z-index:3;width:clamp(170px,42cqw,330px);height:clamp(300px,70cqw,540px);background:#89939a;content:"";opacity:.24;pointer-events:none;animation:olivia-section-branch 13s ease-in-out infinite;mask-position:center;mask-repeat:no-repeat;mask-size:contain}
+.au-sweet-intro::before{left:-17%;bottom:-9%;mask-image:url('/catalog/boda-boho/ornament-left.png')}
+.au-sweet-intro::after{right:-17%;top:-7%;animation-delay:-6.5s;mask-image:url('/catalog/boda-boho/ornament-right.png')}
+.au-sweet-date { margin: 0 0 2.5cqh; color: rgba(255,255,255,.88); font-size: clamp(.75rem,3.4cqw,1.1rem); letter-spacing: .28em; }
+.catalog-15-sweet-jane .au-hero .au-sweet-name { width:100%; margin:0; color:#fff; font-family:"Qwitcher Grypen",cursive; font-size:clamp(7rem,34cqw,12rem); font-weight:700; line-height:.68; white-space:nowrap; }
+.au-sweet-event { display: flex; align-items: center; gap: 1rem; width: min(100%,380px); margin: 2cqh 0; color: #fff; font: 400 clamp(1.6rem,7cqw,2.5rem)/1 Georgia,serif; }
+.au-sweet-event::before,.au-sweet-event::after { height: 1px; flex: 1; background: rgba(255,255,255,.9); content: ""; }
+.au-sweet-message { margin: 0; color: #fff; font: 400 clamp(.8rem,3.2cqw,1rem)/1.55 Georgia,serif; }
+.au-sweet-flourish { margin: 1.8cqh 0; color: #fff; font-size: 2.2rem; }
+.catalog-15-sweet-jane .au-sweet-open { border-color: #fff; background: transparent; color: #fff; }
+.catalog-15-sweet-jane .au-navigate { display: none; }
+.catalog-15-sweet-jane .au-section h2,.catalog-15-sweet-jane .au-modal h2 { font-family: Georgia,serif; font-weight: 400; }
+.catalog-15-sweet-jane .au-gallery-carousel{position:relative;width:100%;margin-top:2rem;overflow:hidden}
+.catalog-15-sweet-jane .au-gallery-viewport{overflow:hidden;border:0;border-radius:0;background:transparent}
+.catalog-15-sweet-jane .au-gallery-track{display:flex;align-items:center;gap:0;transform:translateX(calc(var(--gallery-index) * -100%));transition:transform .8s cubic-bezier(.22,.61,.36,1)}
+.catalog-15-sweet-jane .au-gallery-slide{flex:0 0 100%;padding:0 5%;border:0;background:transparent;cursor:zoom-in}
+.catalog-15-sweet-jane .au-gallery-slide img{display:block;width:100%;height:auto;max-height:68cqh;border:0;border-radius:24px;box-shadow:0 16px 34px rgba(88,64,57,.14);object-fit:cover}
+.catalog-15-sweet-jane .au-gallery-control{position:absolute;top:46%;z-index:6;display:grid;width:42px;height:42px;place-items:center;padding:0 0 .15rem;border:1px solid rgba(255,255,255,.82);border-radius:50%;background:rgba(143,111,104,.82);color:#fff;font:2rem/1 Arial,sans-serif;cursor:pointer;transform:translateY(-50%)}
+.catalog-15-sweet-jane .au-gallery-control.prev{left:7%}.catalog-15-sweet-jane .au-gallery-control.next{right:7%}
+.catalog-15-sweet-jane .au-gallery-dots{display:flex;justify-content:center;gap:.65rem;margin-top:1.15rem}
+.catalog-15-sweet-jane .au-gallery-dots button{width:9px;height:9px;padding:0;border:1px solid #9a746c;border-radius:50%;background:transparent;cursor:pointer;transition:transform .3s,background .3s}
+.catalog-15-sweet-jane .au-gallery-dots button.is-active{background:#9a746c;transform:scale(1.25)}
+.catalog-15-sweet-jane .au-tone-accent .au-btn,.catalog-15-sweet-jane .au-tone-accentDark .au-btn{border:1.5px solid #fff;background:transparent;color:#fff}
+.catalog-15-sweet-jane .au-tone-accent .au-btn:hover,.catalog-15-sweet-jane .au-tone-accentDark .au-btn:hover{background:#fff;color:#8f6f68}
+.catalog-15-sweet-jane .au-tone-light .au-btn,.catalog-15-sweet-jane .au-tone-alternate .au-btn{border:1.5px solid #8f6f68;background:#9a746c;color:#fff}
+.catalog-15-sweet-jane .au-sweet-playlist{width:min(100%,430px);margin:2rem auto 0}
+.catalog-15-sweet-jane .au-sweet-playlist p{margin:0 0 .8rem;font-weight:600}.catalog-15-sweet-jane .au-sweet-playlist iframe{display:block;width:100%;border:0;border-radius:14px}
+.catalog-15-sweet-jane .au-section-ornament{display:none}
+.catalog-15-sweet-jane .modular-section-order>.modular-ornament-host{z-index:30;overflow:visible}
+.catalog-15-sweet-jane .modular-section-order>.modular-ornament-host::before{z-index:40;top:-32%;bottom:auto;width:clamp(190px,47cqw,360px);height:164%;min-height:clamp(390px,90cqw,650px);background:#89939a;background-image:none;opacity:0;animation:olivia-section-branch 13s ease-in-out infinite;-webkit-mask-image:var(--modular-ornament-image);mask-image:var(--modular-ornament-image);-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:contain;mask-size:contain;transform:none}
+.catalog-15-sweet-jane .modular-section-order>.modular-ornament-left::before{left:-10%;right:auto;-webkit-mask-position:left center;mask-position:left center}
+.catalog-15-sweet-jane .modular-section-order>.modular-ornament-right::before{right:-10%;left:auto;-webkit-mask-position:right center;mask-position:right center}
+
+@container invitation-preview (min-width:680px) {
+  .catalog-15-sweet-jane .au-hero-content { max-width: 900px; }
+  .catalog-15-sweet-jane .au-hero .au-sweet-name { font-size:clamp(11rem,22cqw,16rem); }
+}
+
+@font-face{font-family:"Garden Sofia";src:url('/desarrollo/quince/invite_002/assets/sofia-regular.ttf') format('truetype');font-display:swap}
+.catalog-15-jardin-floral{font-family:"Trebuchet MS","Segoe UI",sans-serif;color:#526b63}
+.catalog-15-jardin-floral .au-hero{min-height:100cqh;padding:0;background:#fdfcf8;color:#526b63;overflow:hidden}
+.catalog-15-jardin-floral .au-hero::after,.catalog-15-jardin-floral .au-particles{display:none}
+.catalog-15-jardin-floral .au-hero-content{width:100%;max-width:none;color:inherit;text-shadow:none}
+.au-garden-intro{position:relative;display:grid;min-height:100cqh;place-items:center;padding:20cqh 9cqw;overflow:hidden}
+.au-garden-copy{position:relative;z-index:4;display:flex;width:min(86%,680px);flex-direction:column;align-items:center}
+.catalog-15-jardin-floral .au-hero .au-garden-copy>h1{margin:0 0 clamp(1.6rem,6cqh,3.5rem);color:#6f877f;font:400 clamp(5.5rem,24cqw,10rem)/.75 "Garden Sofia",cursive;text-align:center}
+.au-garden-details{position:relative;display:grid;width:100%;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);align-items:start;gap:clamp(1.4rem,7cqw,4rem)}
+.au-garden-details::before{position:absolute;top:.15rem;bottom:.15rem;left:48%;width:1px;background:rgba(82,107,99,.36);content:""}
+.au-garden-identity{padding-right:clamp(.6rem,2cqw,1.2rem);text-align:right}
+.au-garden-identity p{margin:0 0 .6rem;font-family:Georgia,serif;font-size:clamp(.72rem,3cqw,1.1rem);letter-spacing:.1em;text-transform:uppercase}
+.au-garden-identity p span{font-size:1.28em}
+.au-garden-identity strong{font-size:clamp(.68rem,2.8cqw,1rem);letter-spacing:.13em;text-transform:uppercase}
+.au-garden-message{margin:0;padding-left:clamp(.15rem,1cqw,.6rem);color:#526b63;font:400 clamp(.9rem,3.8cqw,1.35rem)/1.45 Georgia,serif;text-align:left}
+.au-garden-ornament{position:absolute;z-index:3;left:0;width:105%;max-width:none;pointer-events:none;animation:garden-float 11s ease-in-out infinite}
+.au-garden-ornament-top{top:-1%;transform-origin:center top}.au-garden-ornament-bottom{right:0;bottom:-1%;left:auto;animation-delay:-5.5s;transform-origin:center bottom}
+.catalog-15-jardin-floral .au-hero>.au-navigate{display:none}.catalog-15-jardin-floral .au-garden-navigate{position:absolute;z-index:6;bottom:4cqh;display:grid}
+.catalog-15-jardin-floral .au-section h2,.catalog-15-jardin-floral .au-modal h2{font-family:"Garden Sofia",cursive;font-size:clamp(2.8rem,12cqw,5.5rem);font-weight:400;line-height:1}
+.catalog-15-jardin-floral .au-tone-accent h2,.catalog-15-jardin-floral .au-tone-accentDark h2{color:#fff}
+.catalog-15-jardin-floral .au-tone-accent .au-btn,.catalog-15-jardin-floral .au-tone-accentDark .au-btn{border:1.5px solid #fff;background:transparent;color:#fff}
+.catalog-15-jardin-floral .au-tone-light .au-btn,.catalog-15-jardin-floral .au-tone-alternate .au-btn{border:1.5px solid #6f8f85;background:#6f8f85;color:#fff}
+.catalog-15-jardin-floral main>.au-hero+.au-section{background:#9ed1aa;color:#fff}
+.catalog-15-jardin-floral main>.au-hero+.au-section h2{color:#fff}
+.catalog-15-jardin-floral .au-gallery-carousel{position:relative;margin-top:2rem;overflow:hidden}
+.catalog-15-jardin-floral .au-gallery-viewport{overflow:hidden}.catalog-15-jardin-floral .au-gallery-track{display:flex;transform:translateX(calc(var(--gallery-index) * -100%));transition:transform .8s cubic-bezier(.22,.61,.36,1)}
+.catalog-15-jardin-floral .au-gallery-slide{flex:0 0 100%;padding:0 8%;border:0;background:transparent}.catalog-15-jardin-floral .au-gallery-slide img{width:100%;height:min(64cqh,580px);border-radius:18px;box-shadow:0 14px 35px rgba(64,91,81,.14);object-fit:cover}
+.catalog-15-jardin-floral .au-gallery-control{position:absolute;z-index:6;top:48%;display:grid;width:42px;height:42px;place-items:center;border:1px solid #fff;border-radius:50%;background:rgba(111,143,133,.86);color:#fff;font-size:2rem;transform:translateY(-50%)}.catalog-15-jardin-floral .au-gallery-control.prev{left:8%}.catalog-15-jardin-floral .au-gallery-control.next{right:8%}
+.catalog-15-jardin-floral .au-gallery-dots{display:flex;justify-content:center;gap:.6rem;margin-top:1rem}.catalog-15-jardin-floral .au-gallery-dots button{width:9px;height:9px;padding:0;border:1px solid #6f8f85;border-radius:50%;background:transparent}.catalog-15-jardin-floral .au-gallery-dots button.is-active{background:#6f8f85}
+.catalog-15-jardin-floral .au-section-ornament{display:none}
+.catalog-15-jardin-floral .modular-section-order>.modular-ornament-host{z-index:30;overflow:visible}
+.catalog-15-jardin-floral .modular-section-order>.modular-ornament-host::before{z-index:40;top:0;right:0;left:0;width:100%;height:clamp(105px,25cqw,220px);background-image:var(--modular-ornament-image);background-position:center top;background-repeat:no-repeat;background-size:100% auto;opacity:.72;transform:translateY(-4%);transform-origin:center top;animation:garden-ornament-pulse var(--modular-ornament-duration,11s) ease-in-out var(--modular-ornament-delay,0s) infinite}
+.catalog-15-jardin-floral .modular-section-order>.modular-ornament-left::before,.catalog-15-jardin-floral .modular-section-order>.modular-ornament-right::before{right:0;left:0;transform:translateY(-4%)}
+.catalog-15-jardin-floral .modular-section-order>.modular-ornament-host:not(.au-tone-light)::before{display:none;content:none}
+@keyframes garden-float{0%,100%{opacity:.92;translate:0 0}50%{opacity:.78;translate:0 5px}}
+@keyframes garden-ornament-pulse{0%,100%{opacity:.7;transform:translateY(-4%) scale(1)}50%{opacity:.78;transform:translateY(-4%) scale(1.018)}}
+@container (max-width:679px){
+  .catalog-15-jardin-floral .au-garden-copy{width:82%;margin-inline:auto}
+  .catalog-15-jardin-floral .au-hero .au-garden-copy>h1{width:100%;font-size:clamp(5rem,20cqw,7.25rem);text-align:center;transform:translateX(-8cqw)}
+  .catalog-15-jardin-floral .au-garden-details{grid-template-columns:repeat(2,minmax(0,1fr));gap:2rem}
+  .catalog-15-jardin-floral .au-garden-details::before{left:50%}
+  .catalog-15-jardin-floral .au-garden-identity{padding-right:0}
+  .catalog-15-jardin-floral .au-garden-message{padding-left:0}
+}
+@container (min-width:680px){
+  .catalog-15-jardin-floral .au-garden-copy{width:min(33%,680px)}
+  .catalog-15-jardin-floral .au-hero .au-garden-copy>h1{font-size:clamp(5rem,8cqw,7rem)}
+  .catalog-15-jardin-floral .au-garden-details{gap:clamp(1.25rem,2.5cqw,2.5rem)}
+  .catalog-15-jardin-floral .au-garden-identity p,.catalog-15-jardin-floral .au-garden-message{font-size:clamp(.78rem,1.25cqw,1rem)}
+}
+@media (min-width:900px){
+  .catalog-15-jardin-floral:not(.au-embedded) .au-garden-copy{width:min(33%,680px)}
+  .catalog-15-jardin-floral:not(.au-embedded) .au-hero .au-garden-copy>h1{font-size:clamp(5rem,8vw,7rem)}
+  .catalog-15-jardin-floral:not(.au-embedded) .au-garden-details{gap:clamp(1.25rem,2.5vw,2.5rem)}
+  .catalog-15-jardin-floral:not(.au-embedded) .au-garden-identity p,.catalog-15-jardin-floral:not(.au-embedded) .au-garden-message{font-size:clamp(.78rem,1.25vw,1rem)}
+}
+
+.catalog-boda-boho {
+  font-family: "Montserrat", Arial, sans-serif;
+  font-weight: 300;
+}
+
+.catalog-boda-boho .au-hero {
+  min-height: 100cqh;
+  padding: 3.5cqh 4cqw 7cqh;
+  background: #f7f4ed;
+  color: #25281f;
+}
+
+.catalog-boda-boho .au-hero::after,
+.catalog-boda-boho .au-particles { display: none; }
+.catalog-boda-boho .au-hero-content { width: 100%; color: inherit; text-shadow: none; }
+
+.au-olivia-intro {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 88cqh;
+  text-align: center;
+}
+
+.au-olivia-intro > :not(.au-olivia-branches) { position: relative; z-index: 2; }
+.au-olivia-branches { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.au-olivia-branch {
+  position: absolute;
+  display: block;
+  width: clamp(105px, 29cqw, 235px);
+  aspect-ratio: .48;
+  background: var(--color-acento-oscuro);
+  -webkit-mask: url("/catalog/boda-boho/ornament-left.png") center/contain no-repeat;
+  mask: url("/catalog/boda-boho/ornament-left.png") center/contain no-repeat;
+  opacity: 0;
+  clip-path: inset(100% 0 0);
+  animation: olivia-branch-reveal 19s cubic-bezier(.25,.72,.2,1) infinite;
+}
+.au-olivia-branch-1,
+.au-olivia-branch-3,
+.au-olivia-branch-5 {
+  -webkit-mask-image: url("/catalog/boda-boho/ornament-right.png");
+  mask-image: url("/catalog/boda-boho/ornament-right.png");
+}
+.au-olivia-branch-1 {
+  right: -7cqw;
+  bottom: -5cqh;
+  transform: none;
+  animation-delay: -1s;
+}
+.au-olivia-branch-2 {
+  left: -7cqw;
+  top: -4cqh;
+  transform: scaleY(-1);
+  animation-delay: -9s;
+}
+.au-olivia-branch-3,
+.au-olivia-branch-4,
+.au-olivia-branch-5 { display: none; }
+
+@keyframes olivia-branch-reveal {
+  0%, 7% { clip-path: inset(100% 0 0); opacity: 0; }
+  16% { opacity: .24; }
+  31%, 48% { clip-path: inset(0); opacity: .24; }
+  62%, 100% { clip-path: inset(0 0 100%); opacity: 0; }
+}
+
+.au-olivia-photo {
+  width: min(84cqw, 430px);
+  height: 55cqh;
+  overflow: hidden;
+  border-radius: 999px 999px 0 0;
+  background: #e8e8e2;
+  filter: grayscale(1);
+}
+
+.au-olivia-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transform: scale(1.28);
+  transform-origin: center top;
+}
+
+.au-olivia-names {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 3.2cqh 0 0;
+  font: 400 clamp(2.45rem, 11cqw, 5.2rem)/.9 "Cormorant Garamond", Georgia, serif;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+.au-olivia-names span { display: flex; align-items: center; }
+.au-olivia-names i {
+  margin: .05em .22em 0;
+  color: var(--color-acento-oscuro);
+  font: 400 .78em/1 "Allura", cursive;
+  letter-spacing: 0;
+}
+
+.au-olivia-message {
+  max-width: 35em;
+  margin: 3.2cqh auto 0;
+  font-size: clamp(.58rem, 2.45cqw, .83rem);
+  line-height: 2;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.catalog-boda-boho .au-section h2,
+.catalog-boda-boho .au-modal h2,
+.catalog-boda-boho blockquote {
+  font-family: "Allura", cursive;
+  font-weight: 400;
+}
+
+.catalog-boda-boho .au-section-ornament { display: none; }
+.catalog-boda-boho .au-btn { border-radius: 0; letter-spacing: .12em; text-transform: uppercase; }
+.catalog-boda-boho .au-navigate { color: #25281f; }
+
+.catalog-boda-boho .au-section { position: relative; overflow: hidden; }
+.catalog-boda-boho #aurora-main > section:nth-of-type(odd):not(.au-hero) { background: #f7f4ed !important; color: #25281f !important; }
+.catalog-boda-boho #aurora-main > section:nth-of-type(even) { background: var(--color-acento) !important; color: #fff !important; }
+.catalog-boda-boho .au-section::after {
+  position: absolute;
+  top: -3rem;
+  right: -2.5rem;
+  z-index: 1;
+  width: clamp(110px, 27cqw, 235px);
+  aspect-ratio: .48;
+  background: #74786a;
+  -webkit-mask: url("/catalog/boda-boho/ornament-right.png") center/contain no-repeat;
+  mask: url("/catalog/boda-boho/ornament-right.png") center/contain no-repeat;
+  clip-path: inset(100% 0 0);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  animation: olivia-section-branch 15s cubic-bezier(.25,.7,.2,1) infinite;
+}
+.catalog-boda-boho .au-section:nth-of-type(even)::after {
+  right: auto;
+  left: -2.5rem;
+  -webkit-mask-image: url("/catalog/boda-boho/ornament-left.png");
+  mask-image: url("/catalog/boda-boho/ornament-left.png");
+  animation-delay: -7.5s;
+}
+.catalog-boda-boho .au-section:nth-of-type(3n)::after { top: auto; bottom: -4.5rem; animation-delay: -11s; }
+.catalog-boda-boho .au-section > * { position: relative; z-index: 2; }
+
+/* El orden modular agrega su propio ornamento. En Olivia reemplaza la imagen
+   blanca por la misma rama gris de gran formato y anula el duplicado local. */
+.catalog-boda-boho .modular-section-order > .au-section::after {
+  display: none;
+  content: none;
+}
+.catalog-boda-boho .modular-section-order > .modular-ornament-host {
+  z-index: 30;
+  overflow: visible;
+}
+.catalog-boda-boho .modular-section-order > .modular-ornament-host::before {
+  z-index: 40;
+  width: clamp(155px, 39cqw, 300px);
+  height: clamp(260px, 58cqw, 480px);
+  background: #74786a;
+  background-image: none;
+  -webkit-mask-image: var(--modular-ornament-image);
+  mask-image: var(--modular-ornament-image);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  clip-path: inset(100% 0 0);
+  opacity: 0;
+  animation: olivia-section-branch var(--modular-ornament-duration, 10s) cubic-bezier(.25,.7,.2,1) var(--modular-ornament-delay, 0s) infinite;
+}
+.catalog-boda-boho .modular-section-order > .modular-ornament-left::before {
+  left: -2.4rem;
+  right: auto;
+  -webkit-mask-position: left center;
+  mask-position: left center;
+}
+.catalog-boda-boho .modular-section-order > .modular-ornament-right::before {
+  right: -2.4rem;
+  left: auto;
+  -webkit-mask-position: right center;
+  mask-position: right center;
+}
+
+@keyframes olivia-section-branch {
+  0%, 9% { clip-path: inset(100% 0 0); opacity: 0; }
+  23% { opacity: .16; }
+  42%, 58% { clip-path: inset(0); opacity: .16; }
+  74%, 100% { clip-path: inset(0 0 100%); opacity: 0; }
+}
+
+.catalog-boda-boho .au-date-stack-section {
+  min-height: auto;
+  padding: clamp(4.5rem, 11cqh, 7rem) 1.5rem;
+}
+.au-olivia-calendar { width: min(100%, 350px); margin: 0 auto; color: #fff; text-align: center; }
+.au-olivia-calendar-icon {
+  display: block;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 1.25rem;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.au-olivia-calendar h2 { margin: 0 0 1.4rem; color: #fff !important; font-size: clamp(3.2rem, 14cqw, 5.5rem); line-height: .8; }
+.au-olivia-week,
+.au-olivia-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.au-olivia-week { font-size: .58rem; font-weight: 500; letter-spacing: .08em; }
+.au-olivia-days { margin-top: 12px; font: 400 1.05rem/1 "Cormorant Garamond", serif; }
+.au-olivia-days span { display: grid; height: 30px; place-items: center; }
+.au-olivia-days .is-chosen { position: relative; border: 1px solid currentColor; border-radius: 50%; }
+.au-olivia-calendar p { margin: 1.75rem 0 0; font-size: .7rem; line-height: 1.8; letter-spacing: .08em; text-transform: uppercase; }
+
+.catalog-boda-boho [data-au-section="countdown"],
+.catalog-boda-boho [data-au-section="countdown"] * { color: #25281f !important; }
+.catalog-boda-boho [data-au-section="countdown"] h2,
+.catalog-boda-boho [data-au-section="countdown"] strong { color: var(--color-acento-oscuro) !important; }
+.catalog-boda-boho [data-au-section="countdown"]::after { display: none; content: none; }
+
+.catalog-boda-boho :is(
+  [data-au-section="location"],
+  [data-au-section="schedule"],
+  [data-au-section="gifts"],
+  [data-au-section="songSuggestions"]
+)::after { display: none; content: none; }
+
+.catalog-boda-boho #aurora-main > section:nth-of-type(odd) .au-btn {
+  border-color: var(--color-acento-oscuro);
+  background: var(--color-acento-oscuro);
+  color: #fff;
+}
+.catalog-boda-boho #aurora-main > section:nth-of-type(odd) h2 { color: #25281f !important; }
+.catalog-boda-boho #aurora-main > section:nth-of-type(even) h2 { color: #fff !important; }
+.catalog-boda-boho #aurora-main > section:nth-of-type(odd) .au-btn:hover {
+  background: transparent;
+  color: var(--color-acento-oscuro);
+}
+.catalog-boda-boho #aurora-main > section:nth-of-type(even) .au-btn {
+  border-color: #fff;
+  background: transparent;
+  color: #fff;
+}
+.catalog-boda-boho #aurora-main > section:nth-of-type(even) .au-btn:hover {
+  background: #fff;
+  color: var(--color-acento-oscuro);
+}
+
+.au-olivia-location-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.75rem; }
+.au-olivia-location-grid article {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 31rem;
+  padding: clamp(2.2rem, 7cqw, 3.5rem) clamp(1.2rem, 4cqw, 2rem);
+  border: 1px solid var(--color-bordes);
+  text-align: center;
+}
+.au-olivia-location-grid img { width: 58px; height: 58px; margin-bottom: 1.8rem; object-fit: contain; filter: brightness(0); }
+.au-olivia-location-grid h3 {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  font: 400 clamp(2rem, 7.5cqw, 4.25rem)/.88 "Allura", cursive;
+  overflow-wrap: normal;
+}
+.au-olivia-location-grid p { margin: 2rem auto; font-size: clamp(.66rem, 2.6cqw, .84rem); line-height: 1.85; letter-spacing: .08em; text-transform: uppercase; }
+.au-olivia-location-grid .au-btn { width: min(100%, 220px); margin-top: auto; }
+.au-olivia-calendar-button { margin-top: 2rem; }
+.catalog-boda-boho #aurora-main > section:nth-of-type(even) .au-olivia-location-grid img { filter: brightness(0) invert(1); }
+.catalog-boda-boho #aurora-main > section:nth-of-type(odd) .au-olivia-location-grid img { filter: brightness(0); }
+
+.catalog-boda-boho .au-olivia-schedule { position: relative; width: min(100%, 560px); margin: 3.5rem auto 0; }
+.catalog-boda-boho .au-olivia-schedule::before { position: absolute; top: 1rem; bottom: 3rem; left: 50%; width: 1px; background: currentColor; content: ""; opacity: .5; }
+.catalog-boda-boho .au-olivia-schedule article {
+  position: relative;
+  display: block;
+  width: 50%;
+  min-height: 185px;
+  padding: 0 2.2rem 2.5rem 0;
+  border: 0;
+  text-align: right;
+}
+.catalog-boda-boho .au-olivia-schedule article:nth-child(even) { margin-left: 50%; padding-right: 0; padding-left: 2.2rem; text-align: left; }
+.catalog-boda-boho .au-olivia-schedule article > i { display: none; }
+.catalog-boda-boho .au-olivia-schedule article > i::before,
+.catalog-boda-boho .au-olivia-schedule article > i::after { display: none; content: none; }
+.catalog-boda-boho .au-olivia-moment { display: flex; flex-direction: column; align-items: flex-end; color: inherit; }
+.catalog-boda-boho .au-olivia-schedule article:nth-child(even) .au-olivia-moment { align-items: flex-start; }
+.catalog-boda-boho .au-olivia-moment img { display: block; width: 34px; height: 34px; margin-bottom: .45rem; object-fit: contain; }
+.catalog-boda-boho .au-olivia-moment time { display: block; padding: 0; font: 400 1.45rem/1 "Cormorant Garamond", serif; }
+.catalog-boda-boho .au-olivia-moment h3 { margin: .5rem 0 0; font: 500 .66rem/1.4 "Montserrat", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.catalog-boda-boho .au-olivia-moment p { margin: .55rem 0 0; font-size: .68rem; line-height: 1.6; opacity: .82; }
+.catalog-boda-boho .au-olivia-moment :is(time, h3, p) { color: inherit !important; }
+.catalog-boda-boho #aurora-main > section:nth-of-type(even) .au-olivia-schedule { color: #fff; }
+.catalog-boda-boho #aurora-main > section:nth-of-type(even) .au-olivia-moment img { filter: brightness(0) invert(1); }
+.catalog-boda-boho #aurora-main > section:nth-of-type(odd) .au-olivia-schedule { color: #25281f; }
+.catalog-boda-boho #aurora-main > section:nth-of-type(odd) .au-olivia-moment img { filter: brightness(0) saturate(100%) invert(44%) sepia(10%) saturate(760%) hue-rotate(26deg) brightness(91%); }
+
+.catalog-boda-boho .au-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 2.5rem; }
+.catalog-boda-boho .au-olivia-gallery-icon { display: block; width: 52px; height: 52px; margin: 0 auto 1.5rem; object-fit: contain; }
+.catalog-boda-boho .au-gallery button:first-child { grid-column: 1 / -1; }
+.catalog-boda-boho .au-gallery img { width: 100%; height: 330px; object-fit: cover; }
+.catalog-boda-boho .au-gallery button:first-child img { height: 380px; }
+
+.catalog-boda-boho .au-olivia-footer {
+  position: relative;
+  display: grid;
+  min-height: 390px;
+  place-content: center;
+  overflow: hidden;
+  background: var(--color-acento);
+  color: #fff;
+  text-align: center;
+}
+.catalog-boda-boho .au-olivia-footer::before {
+  position: absolute;
+  left: -3rem;
+  bottom: -8rem;
+  width: min(62%, 330px);
+  aspect-ratio: .48;
+  background: #74786a;
+  -webkit-mask: url("/catalog/boda-boho/ornament-left.png") center/contain no-repeat;
+  mask: url("/catalog/boda-boho/ornament-left.png") center/contain no-repeat;
+  content: "";
+  opacity: .28;
+}
+.catalog-boda-boho .au-olivia-footer img { position: relative; z-index: 1; width: 46px; margin: 0 auto 1rem; filter: brightness(0) invert(1); }
+.catalog-boda-boho .au-olivia-footer strong { position: relative; z-index: 1; font: 400 clamp(3.5rem, 14cqw, 6rem)/1 "Allura", cursive; }
+.catalog-boda-boho .au-olivia-footer span { position: relative; z-index: 1; margin-top: 1.5rem; font-size: .56rem; letter-spacing: .18em; text-transform: uppercase; }
+
+@container invitation-preview (max-width: 520px) {
+  .au-olivia-location-grid { grid-template-columns: 1fr; }
+  .au-olivia-location-grid article { min-height: 29rem; }
+  .catalog-boda-boho .au-gallery img { height: 260px; }
+  .catalog-boda-boho .au-gallery button:first-child img { height: 310px; }
+}
+
+@container invitation-preview (min-width: 680px) {
+  .catalog-boda-boho .au-hero-content { max-width: 900px; }
+  .au-olivia-photo { width: min(45cqw, 470px); height: 57cqh; }
+  .au-olivia-names { font-size: clamp(3.6rem, 7cqw, 5.4rem); }
+}
+
+/* Eucalipto: acabado fiel a la muestra original. */
+.catalog-boda-eucalipto { font-family:Montserrat,sans-serif;font-weight:300; }
+.catalog-boda-eucalipto .au-hero { padding:0!important; }
+.catalog-boda-eucalipto .au-hero-content { width:100%!important;max-width:none!important;margin:0!important;text-align:center!important; }
+.catalog-boda-eucalipto .au-eucalipto-intro { width:100%; }
+.catalog-boda-eucalipto .au-eucalipto-hero-decoration { top:0;left:0;margin:0; }
+.catalog-boda-eucalipto .au-eucalipto-copy { font-family:Montserrat,sans-serif; }
+.catalog-boda-eucalipto :is(.au-section,.au-parallax) h2 { font-family:Italiana,"Cormorant Garamond",Georgia,serif;font-weight:400; }
+.catalog-boda-eucalipto .au-reveal { transform:translateY(22px);transition:opacity .8s ease,transform .8s ease; }
+.catalog-boda-eucalipto .au-reveal.is-visible { transform:none; }
+
+.catalog-boda-eucalipto [data-au-section="location"] { padding:0!important;background:var(--euca-ivory); }
+.au-eucalipto-events { display:grid;width:100%;background:rgba(154,117,64,.34);gap:1px; }
+.au-eucalipto-event-card { position:relative;isolation:isolate;display:flex;min-height:clamp(410px,72cqh,620px);align-items:center;justify-content:center;flex-direction:column;overflow:hidden;padding:clamp(3.5rem,9cqh,5rem) clamp(1.4rem,6cqw,4rem);background:var(--euca-ivory); }
+.au-eucalipto-event-card>i { position:absolute;z-index:-2;inset:-25%;background:linear-gradient(115deg,transparent 38%,rgba(154,117,64,.7) 48%,rgba(200,169,111,.96) 52%,transparent 62%);animation:euca-gold-glow 8s ease-in-out infinite; }
+.au-eucalipto-event-card::after { position:absolute;z-index:-1;inset:1px;background:var(--euca-ivory);content:""; }
+.au-eucalipto-event-card:nth-child(2)>i { animation-delay:-4s; }
+@keyframes euca-gold-glow { 0%,25%,100%{transform:translateX(-80%) rotate(6deg);opacity:.18} 45%,58%{transform:translateX(80%) rotate(6deg);opacity:.9} }
+.au-eucalipto-event-card img { width:clamp(44px,12cqw,68px);height:clamp(44px,12cqw,68px);margin-bottom:1.3rem;object-fit:contain; }
+.au-eucalipto-event-card small { margin-bottom:1.3rem;color:var(--euca-ink);font:500 clamp(.55rem,2cqw,.72rem)/1 Montserrat,sans-serif;letter-spacing:.3em;text-transform:uppercase; }
+.au-eucalipto-event-card h2 { margin:0!important;color:var(--euca-green)!important;font-size:clamp(2rem,8cqw,3.6rem)!important;line-height:1.08!important; }
+.au-eucalipto-event-card p { margin:1.4rem auto 0!important;font-size:clamp(.58rem,2.35cqw,.8rem)!important;line-height:1.8!important; }
+.au-eucalipto-event-card .au-btn { margin-top:1.8rem;border-radius:999px; }
+
+.catalog-boda-eucalipto .au-parallax { min-height:56cqh; }
+.catalog-boda-eucalipto .au-parallax-image { filter:saturate(.78) contrast(.95); }
+.catalog-boda-eucalipto .au-parallax::after { background:linear-gradient(180deg,transparent 48%,rgba(23,37,30,.68)); }
+.catalog-boda-eucalipto .au-parallax h2 { align-self:end;margin:0 0 5cqh;color:#fff;font-family:Parisienne,"Allura",cursive;font-size:clamp(2.5rem,11cqw,5.5rem)!important;line-height:1; }
+
+.catalog-boda-eucalipto [data-au-section="dressCode"] { min-height:650px;padding-block:clamp(5rem,12cqh,8rem);background:var(--euca-mint);color:var(--euca-ink); }
+.au-eucalipto-details>small,.au-eucalipto-menu>small,.au-eucalipto-rsvp>small { margin-bottom:1.25rem;color:inherit;font:500 clamp(.55rem,2cqw,.72rem)/1 Montserrat,sans-serif;letter-spacing:.3em;text-transform:uppercase; }
+.au-eucalipto-details>h2 { color:var(--euca-green)!important; }
+.au-eucalipto-detail-grid { display:grid;grid-template-columns:1fr;gap:1rem;margin-top:3.2rem; }
+.au-eucalipto-detail-grid article { padding:2.2rem 1.2rem;border:1px solid rgba(73,98,87,.22);background:rgba(255,255,255,.34); }
+.au-eucalipto-detail-grid img,.au-eucalipto-menu>img,.au-eucalipto-rsvp>img,.au-eucalipto-closing img { display:block;width:clamp(44px,12cqw,60px);height:clamp(44px,12cqw,60px);margin:0 auto 1.35rem;object-fit:contain; }
+.au-eucalipto-detail-grid h3 { margin:0;color:var(--euca-green);font:400 clamp(1.5rem,6cqw,2rem)/1.2 Italiana,serif; }
+.au-eucalipto-detail-grid p { margin:.8rem auto 0!important;font-size:clamp(.53rem,2cqw,.68rem)!important;line-height:1.7!important;letter-spacing:.08em;text-transform:uppercase; }
+.au-eucalipto-detail-grid .au-btn { margin-top:1.1rem;border-radius:999px; }
+
+.catalog-boda-eucalipto [data-au-section="schedule"] { min-height:650px;background:var(--euca-green);color:#fff; }
+.au-eucalipto-menu>img { filter:brightness(0) invert(1); }
+.au-eucalipto-menu>h2 { color:#fff!important; }
+.au-eucalipto-menu ul { width:min(100%,560px);margin:2.4rem auto 0;padding:0;list-style:none; }
+.au-eucalipto-menu li { padding:1.25rem 0;border-bottom:1px solid rgba(255,255,255,.25); }
+.au-eucalipto-menu li strong { display:block;font:400 clamp(1.25rem,5cqw,1.7rem)/1.2 Italiana,serif; }
+.au-eucalipto-menu li span { display:block;margin-top:.55rem;font-size:clamp(.55rem,2.1cqw,.72rem);letter-spacing:.08em; }
+.au-eucalipto-menu>p { margin-top:2.2rem!important;font-size:clamp(.58rem,2.2cqw,.78rem)!important;line-height:1.9!important; }
+
+.catalog-boda-eucalipto [data-au-section="rsvp"] { min-height:700px;background:var(--euca-ivory);color:var(--euca-ink); }
+.au-eucalipto-rsvp>h2 { color:var(--euca-green)!important; }
+.au-eucalipto-rsvp>p { margin-top:1.2rem!important;font-size:clamp(.6rem,2.3cqw,.8rem)!important; }
+.au-eucalipto-rsvp-form { width:min(100%,520px);margin:2.4rem auto 0;text-align:left; }
+.au-eucalipto-rsvp-form :is(input,select,textarea) { width:100%;min-height:46px;margin:0;padding:.9rem;border:0;border-bottom:1px solid rgba(36,48,43,.28);border-radius:0;background:rgba(255,255,255,.55);color:var(--euca-ink);font-size:clamp(.62rem,2.4cqw,.78rem); }
+.au-eucalipto-rsvp-form textarea { resize:vertical; }
+.au-eucalipto-rsvp-form .au-btn { width:auto;margin:1rem auto 0;border-radius:999px; }
+.au-eucalipto-success { margin-top:2rem!important;color:var(--euca-green);font-family:Italiana,serif;font-size:1.5rem!important; }
+
+.catalog-boda-eucalipto .au-eucalipto-closing { min-height:520px;background:var(--euca-mint);color:var(--euca-ink); }
+.au-eucalipto-closing h2 { margin:0!important;color:var(--euca-green)!important;font-family:Parisienne,"Allura",cursive!important;font-size:clamp(4rem,16cqw,7.5rem)!important;line-height:.9!important; }
+.au-eucalipto-closing p { margin-top:1.8rem!important;font:400 clamp(.72rem,2.8cqw,.95rem)/1.8 Italiana,serif!important;letter-spacing:.08em; }
+.catalog-boda-eucalipto .au-eucalipto-footer { padding:2.3rem 1.5rem;background:var(--euca-ink);color:rgba(255,255,255,.82); }
+.au-eucalipto-footer strong { color:#fff;font:400 clamp(1.5rem,6cqw,2.2rem)/1 Italiana,serif;letter-spacing:.08em; }
+.au-eucalipto-footer p { margin:.7rem 0 0;font-size:clamp(.46rem,1.9cqw,.62rem);letter-spacing:.18em;text-transform:uppercase; }
+.au-eucalipto-footer p:last-child { margin-top:1.25rem;opacity:.62;letter-spacing:.1em;text-transform:none; }
+
+/* Estos iconos se agregan dentro de las composiciones propias; no repetirlos. */
+.catalog-boda-eucalipto [data-au-section]>.au-container::before { display:none!important;content:none!important; }
+
+@container invitation-preview (min-width:680px) {
+  .au-eucalipto-events { grid-template-columns:1fr 1fr; }
+  .au-eucalipto-detail-grid { grid-template-columns:repeat(4,1fr); }
+}
+
+/* Boda Eucalipto — composición editorial fiel a invite_004. */
+.catalog-boda-eucalipto {
+  --euca-ivory: #f7f4ed;
+  --euca-mint: #dce4dd;
+  --euca-green: #496257;
+  --euca-ink: #24302b;
+  --euca-gold: #9a7540;
+}
+.catalog-boda-eucalipto .au-hero {
+  min-height: 100cqh;
+  background: var(--euca-ivory);
+  color: var(--euca-ink);
+}
+.catalog-boda-eucalipto .au-hero::before,
+.catalog-boda-eucalipto .au-hero::after,
+.catalog-boda-eucalipto .au-particles { display: none; }
+.catalog-boda-eucalipto .au-hero-content { width: 100%; max-width: none; padding: 0; }
+.au-eucalipto-intro {
+  position: relative;
+  display: flex;
+  min-height: 100cqh;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+  padding: clamp(11rem,29cqh,18rem) clamp(1.2rem,7cqw,4rem) clamp(4.5rem,10cqh,7rem);
+}
+.au-eucalipto-hero-decoration {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: min(100%,760px);
+  height: auto;
+  max-height: 48cqh;
+  object-fit: contain;
+  object-position: top left;
+  animation:euca-canopy 14s ease-in-out infinite;
+  transform-origin: top left;
+}
+.au-eucalipto-copy { position: relative; z-index: 1; width: min(100%,42rem); text-align: center; }
+.au-eucalipto-kicker { margin: 0 0 3cqh; font: 400 clamp(.65rem,2.8cqw,.95rem)/1.2 Montserrat,sans-serif; letter-spacing: .28em; text-transform: uppercase; }
+.au-eucalipto-names { display:flex;align-items:center;flex-direction:column;margin:0;font:400 clamp(4.7rem,21cqw,8.8rem)/.72 Parisienne,"Allura",cursive;letter-spacing:-.035em; }
+.aurora.au-embedded.catalog-boda-eucalipto .au-hero .au-eucalipto-names { font-size:clamp(4.5rem,21cqw,8.8rem);line-height:.72; }
+.au-eucalipto-names span { display:flex;align-items:center;flex-direction:column;white-space:nowrap; }
+.au-eucalipto-names i { margin:.12em 0 .08em;color:var(--euca-gold);font:400 .46em/1 "Cormorant Garamond",serif; }
+.au-eucalipto-message { max-width:34em!important;margin:7cqh auto 0!important;font:300 clamp(.64rem,2.75cqw,.94rem)/2 Montserrat,sans-serif;letter-spacing:.16em;text-transform:uppercase; }
+.au-eucalipto-discover { position:absolute;z-index:2;bottom:4cqh;left:50%;font:400 clamp(.55rem,2.4cqw,.75rem)/1 Montserrat,sans-serif;letter-spacing:.2em;text-transform:uppercase;transform:translateX(-50%);white-space:nowrap; }
+.catalog-boda-eucalipto .au-navigate { display:none; }
+@keyframes euca-canopy { 0%,100%{transform:scale(1)} 50%{transform:scale(1.025) translate3d(-.4%,.4%,0)} }
+
+.catalog-boda-eucalipto .au-date-stack-section { min-height:100cqh;padding:0;background:var(--euca-mint);color:var(--euca-ink); }
+.au-eucalipto-date { display:grid;min-height:100cqh;align-content:space-between;padding:clamp(4rem,10cqh,7rem) clamp(1rem,5cqw,3rem) clamp(5rem,12cqh,8rem);text-align:center; }
+.au-eucalipto-date-heading { display:flex;align-items:center;flex-direction:column;gap:1.2cqh;font:300 clamp(.65rem,2.8cqw,.92rem)/1.2 Montserrat,sans-serif;letter-spacing:.3em;text-transform:uppercase; }
+.au-eucalipto-date-heading strong { color:var(--euca-green);font:400 clamp(2.5rem,11cqw,5.2rem)/1 Parisienne,"Allura",cursive;letter-spacing:0;text-transform:lowercase; }
+.au-eucalipto-day { margin-block:2cqh;font:300 clamp(7.5rem,34cqw,14rem)/.72 "Cormorant Garamond",Georgia,serif;letter-spacing:-.08em; }
+.au-eucalipto-time { display:flex;align-items:center;flex-direction:column;gap:1cqh;font:300 clamp(.62rem,2.6cqw,.9rem)/1.2 Montserrat,sans-serif;letter-spacing:.28em;text-transform:uppercase; }
+.au-eucalipto-time strong { font:300 clamp(3.2rem,14cqw,6.5rem)/.9 "Cormorant Garamond",Georgia,serif;letter-spacing:-.045em; }
+.au-eucalipto-countdown { display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;margin-top:6cqh;color:var(--euca-green); }
+.au-eucalipto-countdown div { display:flex;align-items:center;flex-direction:column;gap:.55rem; }
+.au-eucalipto-countdown strong { font:300 clamp(1.8rem,8cqw,3.7rem)/1 "Cormorant Garamond",Georgia,serif; }
+.au-eucalipto-countdown span { color:var(--euca-ink);font:400 clamp(.44rem,1.9cqw,.7rem)/1 Montserrat,sans-serif;text-transform:uppercase; }
+
+.catalog-boda-eucalipto .au-section-ornament { display:none!important; }
+
+.catalog-boda-eucalipto .au-tone-accent .au-btn { border-color:#fff;background:transparent;color:#fff; }
+.catalog-boda-eucalipto .au-tone-light .au-btn,.catalog-boda-eucalipto .au-tone-alternate .au-btn { border-color:var(--euca-green);background:transparent;color:var(--euca-green); }
+.catalog-boda-eucalipto [data-au-section]>.au-container::before { display:block;width:clamp(42px,10cqw,70px);height:clamp(42px,10cqw,70px);margin:0 auto 1.2rem;background:center/contain no-repeat;content:""; }
+.catalog-boda-eucalipto [data-au-section="location"]>.au-container::before { background-image:url('/desarrollo/boda/invite_004/assets/icon-church-gd.png'); }
+.catalog-boda-eucalipto [data-au-section="dressCode"]>.au-container::before { background-image:url('/desarrollo/boda/invite_004/assets/icon-dress-gd.png'); }
+.catalog-boda-eucalipto [data-au-section="schedule"]>.au-container::before { background-image:url('/desarrollo/boda/invite_004/assets/icon-date-gd.png'); }
+.catalog-boda-eucalipto [data-au-section="gifts"]>.au-container::before { background-image:url('/desarrollo/boda/invite_004/assets/icon-gift-gd.png'); }
+.catalog-boda-eucalipto [data-au-section="songSuggestions"]>.au-container::before { background-image:url('/desarrollo/boda/invite_004/assets/icon-heart-gd.png'); }
+.catalog-boda-eucalipto [data-au-section="rsvp"]>.au-container::before { background-image:url('/desarrollo/boda/invite_004/assets/icon-rsvp-gd.png'); }
+
+@container (min-width:680px) {
+  .au-eucalipto-intro { padding:clamp(6rem,17cqh,10rem) 5cqw clamp(3rem,7cqh,5rem); }
+  .au-eucalipto-hero-decoration { width:min(58cqw,760px); }
+  .aurora.au-embedded.catalog-boda-eucalipto .au-hero .au-eucalipto-names { flex-direction:row;gap:.25em;font-size:clamp(5.5rem,11cqw,9rem);line-height:.9; }
+  .au-eucalipto-names span { flex-direction:row; }
+  .au-eucalipto-names i { margin:0 .28em; }
+  .au-eucalipto-message { margin-top:3.5cqh!important;line-height:1.6; }
+  .au-eucalipto-discover { bottom:2.5cqh; }
+  .au-eucalipto-date { grid-template-columns:1fr 1.15fr 1fr;align-items:center;align-content:center;gap:4cqw;padding:8cqh 5cqw; }
+  .au-eucalipto-countdown { grid-column:1/-1;width:min(100%,760px);margin:8cqh auto 0; }
+}
+
+.catalog-boda-marfil .au-hero {
+  width:100%;
+  margin:0;
+  box-sizing:border-box;
+  background: #f5f0e7;
+  color: #273127;
+}
+
+.catalog-boda-marfil .au-hero::after,
+.catalog-boda-marfil .au-particles {
+  display: none;
+}
+
+.catalog-boda-marfil .au-hero-content {
+  width: 100%;
+  color: #273127;
+  text-shadow: none;
+}
+
+.aurora.au-embedded.catalog-boda-marfil .au-hero-content {
+  width:100%!important;
+  max-width:none!important;
+  margin-right:0!important;
+  margin-left:0!important;
+  justify-self:center;
+}
+
+.aurora.au-embedded.catalog-boda-marfil .au-marfil-intro {
+  margin-right:auto!important;
+  margin-left:auto!important;
+  transform:none!important;
+}
+
+.au-marfil-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 82cqh;
+  padding-top: 8cqh;
+}
+
+.au-marfil-kicker,
+.au-marfil-meta {
+  margin: 0;
+  font: 500 clamp(.62rem, 2.8cqw, .92rem)/1.2 Arial, sans-serif;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+
+.au-marfil-names {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  gap:.38em;
+  margin: 1.15rem 0;
+  font: 400 clamp(3.2rem, 17cqw, 6.4rem)/.92 "Cormorant Garamond", Georgia, serif;
+  white-space: nowrap;
+}
+
+.au-marfil-names span { display:flex;flex-direction:row;align-items:baseline;gap:.38em; }
+.au-marfil-names i { margin:0;font-size:.42em;font-weight:400;line-height:.65; }
+.au-marfil-meta { display:flex;align-items:center;gap:.7rem; }
+.au-marfil-meta-line { width:28px;height:1px;background:currentColor; }
+
+.catalog-boda-marfil.au-embedded .au-hero .au-marfil-names {
+  font-size:clamp(3rem,15cqw,5rem);
+}
+
+.au-marfil-polaroids {
+  position: relative;
+  width: min(78cqw, 390px);
+  height: 49cqh;
+  margin-top: 7cqh;
+}
+
+.au-marfil-polaroids img {
+  position: absolute;
+  width: 56%;
+  height: 47%;
+  padding: 8px 8px 25px;
+  object-fit: cover;
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(39, 49, 39, .13);
+  cursor:pointer;
+  transition:transform .42s ease,box-shadow .42s ease,filter .42s ease;
+}
+
+.au-marfil-polaroids img:nth-child(1) { --marfil-rotation:-7deg;z-index:3;top:0;left:2%;transform:rotate(var(--marfil-rotation)); }
+.au-marfil-polaroids img:nth-child(2) { --marfil-rotation:6deg;z-index:2;top:-4%;right:2%;transform:rotate(var(--marfil-rotation)); }
+.au-marfil-polaroids img:nth-child(3) { --marfil-rotation:5deg;z-index:2;bottom:2%;left:4%;transform:rotate(var(--marfil-rotation)); }
+.au-marfil-polaroids img:nth-child(4) { --marfil-rotation:-5deg;z-index:3;right:3%;bottom:0;transform:rotate(var(--marfil-rotation)); }
+.au-marfil-polaroids img:hover{z-index:20;transform:translateY(-12px) rotate(calc(var(--marfil-rotation) * .35)) scale(1.075);filter:saturate(1.06);box-shadow:0 20px 38px rgba(39,49,39,.28)}
+
+.catalog-boda-marfil .au-navigate { color: #273127; }
+
+/* Editorial Marfil: continuidad visual de la pieza original. */
+.catalog-boda-marfil {
+  --marfil-ink: #273127;
+  --marfil-paper: #f5f0e7;
+  --marfil-white: #fffefa;
+  --marfil-line: rgba(39,49,39,.28);
+  font-family: Montserrat, Arial, sans-serif;
+}
+
+.catalog-boda-marfil main > :is(.au-section,.au-parallax) { border-top:0; }
+
+.catalog-boda-marfil .au-section {
+  position:relative;
+  min-height:0;
+  padding-block:clamp(3rem,7cqh,4.75rem);
+  background: var(--marfil-paper);
+  color: var(--marfil-ink);
+}
+
+.catalog-boda-marfil .au-section > .au-container {
+  width:min(80cqw,100%);
+  max-width:none;
+  margin-inline:auto;
+}
+
+.catalog-boda-marfil main > .au-section { background:var(--marfil-paper); }
+.catalog-boda-marfil main > .au-section::before {
+  position:absolute;
+  top:0;
+  left:12.5%;
+  width:75%;
+  height:1px;
+  background:var(--marfil-line);
+  content:"";
+}
+.catalog-boda-marfil .au-section-ornament,
+.catalog-boda-marfil .au-section::after { display:none!important;content:none!important; }
+
+.catalog-boda-marfil :is(.au-section,.au-modal,.au-parallax) h2,
+.catalog-boda-marfil .au-schedule h3 {
+  color: var(--marfil-ink);
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight:400;
+}
+
+.catalog-boda-marfil .au-section h2 {
+  font-size:clamp(2.7rem,11cqw,5rem);
+  line-height:.98;
+}
+
+.catalog-boda-marfil .au-section p,
+.catalog-boda-marfil .au-section blockquote {
+  color:var(--marfil-ink);
+  font-weight:300;
+  letter-spacing:.015em;
+}
+
+.catalog-boda-marfil .au-section blockquote {
+  max-width:760px;
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:clamp(2rem,8cqw,4rem);
+  line-height:1.08;
+}
+
+.catalog-boda-marfil .au-btn {
+  min-height:48px;
+  padding:.85rem 1.75rem;
+  border:1px solid var(--marfil-ink);
+  border-radius:5px;
+  background:#fff;
+  color:var(--marfil-ink);
+  font:500 clamp(.62rem,2.3cqw,.78rem)/1 Montserrat,Arial,sans-serif;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  box-shadow:none;
+  transition:background-color .3s ease,color .3s ease,transform .3s ease;
+}
+
+.catalog-boda-marfil .au-btn:hover {
+  background:var(--marfil-ink);
+  color:#fff;
+  transform:translateY(-2px);
+}
+
+.catalog-boda-marfil .au-marfil-schedule-date {
+  margin:-.2rem auto 2.8rem;
+  font-size:clamp(.62rem,2.5cqw,.82rem);
+  font-weight:500;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+.catalog-boda-marfil .au-schedule article > i { border-color:var(--marfil-ink);background:var(--marfil-paper); }
+.catalog-boda-marfil .au-schedule article:not(:last-child) > i::after { background:var(--marfil-line); }
+
+.catalog-boda-marfil .au-parallax {
+  min-height:clamp(390px,68cqh,680px);
+}
+
+.catalog-boda-marfil .au-parallax-image {
+  filter:saturate(.72) contrast(.94);
+  background-position:center 45%;
+}
+
+.catalog-boda-marfil .au-parallax::after {
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 34%,rgba(21,31,24,.58));
+  content:"";
+}
+
+.catalog-boda-marfil .au-parallax h2 {
+  align-self:end;
+  margin-bottom:clamp(2.5rem,8cqh,5rem);
+  color:#fff;
+  font-size:clamp(2.8rem,10cqw,5.5rem);
+  font-weight:400;
+}
+
+.catalog-boda-marfil .au-modal { background:rgba(39,49,39,.72); }
+.catalog-boda-marfil .au-modal-box {
+  width:min(80cqw,520px);
+  max-height:calc(100% - 1rem);
+  overflow:hidden;
+  padding:2.75rem 1rem .9rem;
+  border:1px solid var(--marfil-line);
+  border-radius:6px;
+  background:var(--marfil-paper);
+  color:var(--marfil-ink);
+  box-shadow:0 22px 70px rgba(20,28,22,.25);
+}
+
+.catalog-boda-marfil .au-modal-close span {
+  border:1px solid var(--marfil-ink);
+  border-radius:4px;
+  background:#fff;
+  color:var(--marfil-ink);
+}
+
+.catalog-boda-marfil .au-form { gap:.5rem; }
+.catalog-boda-marfil .au-form label {
+  color:var(--marfil-ink);
+  font-size:.72rem;
+  font-weight:500;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.catalog-boda-marfil .au-form :is(input,select,textarea) {
+  min-height:38px;
+  padding:.5rem .2rem;
+  border:0;
+  border-bottom:1px solid var(--marfil-line);
+  border-radius:0;
+  outline:none;
+  background:transparent;
+  color:var(--marfil-ink);
+  font-family:Montserrat,Arial,sans-serif;
+}
+.catalog-boda-marfil .au-form textarea { min-height:58px;max-height:72px;resize:none; }
+
+.catalog-boda-marfil .au-form :is(input,select,textarea):focus { border-bottom-color:var(--marfil-ink); }
+.catalog-boda-marfil .au-form .au-btn { margin-top:.6rem; }
+
+.catalog-boda-marfil .au-footer {
+  border-top:1px solid var(--marfil-line);
+  background:var(--marfil-paper);
+  color:var(--marfil-ink);
+}
+
+.catalog-boda-marfil .au-marfil-footer strong {
+  font:400 clamp(2rem,8cqw,3.4rem)/1 "Cormorant Garamond",Georgia,serif;
+}
+.catalog-boda-marfil .au-marfil-footer p {
+  margin:.85rem 0 0;
+  color:rgba(39,49,39,.62);
+  font-size:.68rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.catalog-boda-marfil .au-marfil-footer span { border-bottom:1px solid currentColor; }
+
+.catalog-boda-pleno .au-hero {
+  background: var(--color-acento);
+  color: var(--color-texto-claro);
+}
+
+.catalog-boda-pleno .au-hero::after,
+.catalog-boda-pleno .au-particles { display: none; }
+.catalog-boda-pleno .au-hero-content { width: 100%; color: inherit; text-shadow: none; }
+.catalog-boda-pleno {
+  font-family: "Manrope", sans-serif;
+  font-weight: 300;
+}
+.catalog-boda-pleno .au-section-ornament,
+.catalog-boda-pleno .au-hero-ornament { display: none !important; }
+.catalog-boda-pleno .au-section::before,
+.catalog-boda-pleno .au-section::after { display: none !important; content: none !important; }
+.catalog-boda-pleno .au-section h2,
+.catalog-boda-pleno .au-modal h2,
+.catalog-boda-pleno .au-parallax h2,
+.catalog-boda-pleno blockquote,
+.catalog-boda-pleno .au-countdown strong {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 300;
+  letter-spacing: -.055em;
+}
+.catalog-boda-pleno .au-section p,
+.catalog-boda-pleno .au-section small,
+.catalog-boda-pleno .au-btn,
+.catalog-boda-pleno input,
+.catalog-boda-pleno select,
+.catalog-boda-pleno textarea { font-family: "Manrope", sans-serif; }
+.catalog-boda-pleno .au-btn { border-radius: 0; }
+.catalog-boda-pleno .au-schedule {
+  width: min(100%, 680px);
+  margin: clamp(2.5rem, 7cqh, 4.5rem) auto 0;
+  text-align: left;
+}
+.catalog-boda-pleno .au-schedule article {
+  grid-template-columns: 4.5rem 1px minmax(0, 1fr);
+  gap: clamp(1rem, 4cqw, 2rem);
+  min-height: 116px;
+  padding: 0;
+  border: 0;
+}
+.catalog-boda-pleno .au-schedule time {
+  font-family: "Manrope", sans-serif;
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+}
+.catalog-boda-pleno .au-schedule h3 {
+  margin-bottom: .3rem;
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.75rem, 7cqw, 3rem);
+  font-weight: 300;
+  letter-spacing: -.04em;
+}
+.catalog-boda-pleno .au-schedule p { margin: 0; font-weight: 300; }
+.catalog-boda-pleno .au-schedule time,
+.catalog-boda-pleno .au-schedule article > div { padding-top: 1.35rem; }
+.catalog-boda-pleno .au-schedule i::before {
+  top: 1.6rem;
+  width: 8px;
+  height: 8px;
+  border: 0;
+  background: #10100f;
+}
+.catalog-boda-pleno .au-schedule i::after {
+  top: calc(1.6rem + 8px);
+  bottom: -1.6rem;
+  width: 1px;
+  background: #10100f;
+  opacity: 1;
+}
+.catalog-boda-pleno [data-au-section="photoUpload"] .au-container::before {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  margin: 0 auto 2.25rem;
+  background: currentColor;
+  content: "";
+  opacity: .55;
+}
+.catalog-boda-pleno [data-au-section="photoUpload"] h2 {
+  max-width: 8em;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.au-voto-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 89cqh;
+  padding: 5cqh 4cqw 2cqh;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.au-voto-kicker,
+.au-voto-message,
+.au-voto-place,
+.au-voto-discover {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.au-voto-kicker { font-size: clamp(.65rem, 3cqw, 1rem); font-weight: 400; letter-spacing: .3em; }
+.au-voto-names {
+  display: flex;
+  flex-direction: column;
+  gap: .14em;
+  align-self: stretch;
+  width: calc(100% + 8cqw);
+  max-width: none;
+  margin-right: -4cqw;
+  margin-left: -4cqw;
+  margin-top: 4cqh;
+  margin-bottom: 6.5cqh;
+  font: 300 clamp(5.4rem, 24cqw, 9rem)/.68 "Cormorant Garamond", serif;
+  letter-spacing: -.075em;
+  text-align: center;
+}
+.aurora.au-embedded.catalog-boda-pleno .au-hero .au-voto-names {
+  font-size: clamp(5.4rem, 24cqw, 9rem);
+  font-weight: 300;
+  line-height: .68;
+}
+.au-voto-names span { display: flex; flex-direction: column; align-items: center; width: 100%; white-space: nowrap; }
+.au-voto-names i {
+  margin: .24em 0 .2em;
+  font-family: "Allura", cursive;
+  font-size: .46em;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+}
+.au-voto-message { width: min(100%, 29em); padding-inline: .75rem; font-size: clamp(.64rem, 3.05cqw, 1rem); font-weight: 400; line-height: 1.9; }
+.au-voto-date { margin: 6.5cqh 0 5cqh; font: 300 clamp(1.5rem, 7cqw, 2.5rem)/1.05 "Cormorant Garamond", serif; letter-spacing: .04em; }
+.au-voto-place { display: flex; flex-direction: column; gap: .9rem; width: min(100%, 34em); padding-inline: .75rem; font-size: clamp(.58rem, 2.75cqw, .94rem); font-weight: 300; line-height: 1.65; }
+.au-voto-discover { margin-top: auto; color: color-mix(in srgb, currentColor 62%, transparent); font-size: clamp(.54rem, 2.5cqw, .78rem); }
+.catalog-boda-pleno .au-navigate { display: none; }
+
+@container invitation-preview (min-width: 680px) {
+  .catalog-boda-pleno .au-hero-content { width: 100%; max-width: 900px; margin: 0 auto; text-align: center; }
+  .au-voto-intro { min-height: 92cqh; }
+  .au-voto-names { gap: .1em; margin: 3.5cqh 0 5cqh; font-size: clamp(6.4rem, 9.5cqw, 9rem); }
+  .aurora.au-embedded.catalog-boda-pleno .au-hero .au-voto-names { font-size: clamp(6.4rem, 9.5cqw, 9rem); }
+  .au-voto-date { margin: 5cqh 0 4cqh; }
+}
+
+.catalog-generated.catalog-wedding .au-title,
+.catalog-generated.catalog-wedding .au-section-title {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  letter-spacing: -.025em;
+}
+
+.catalog-generated.catalog-15years .au-title {
+  letter-spacing: .025em;
+}
+
+.catalog-generated.catalog-other .au-hero-content {
+  border-radius: 999px 999px 22px 22px;
+}
+
+.catalog-generated:is(.catalog-boda-vinculo-noir, .catalog-15-neon) .au-hero::after {
+  background: linear-gradient(180deg, rgba(4, 4, 8, .18), rgba(4, 4, 8, .72));
+}
+
+.catalog-generated.catalog-boda-pleno .au-section,
+.catalog-generated.catalog-boda-vinculo-noir .au-section {
+  border-radius: 0;
+}
+
+.catalog-generated:is(.catalog-boda-boho, .catalog-boda-eucalipto) .au-section-ornament img,
+.catalog-generated.catalog-15-jardin-floral .au-section-ornament img {
+  filter: saturate(.72) sepia(.08);
+}
+
+.catalog-generated:is(.catalog-boda-flores-papel, .catalog-boda-brindis-papel) {
+  background-image: radial-gradient(rgba(90, 70, 48, .09) .7px, transparent .7px);
+  background-size: 5px 5px;
+}
+
+@container invitation-preview (min-width: 680px) {
+  .catalog-generated .au-hero-content {
+    max-width: 720px;
+  }
+  .catalog-boda-marfil .au-hero-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    text-align: left;
+  }
+  .catalog-boda-marfil .au-section > .au-container {
+    width:min(50cqw,100%);
+  }
+  .catalog-boda-marfil .au-modal-box {
+    width:min(50cqw,620px);
+  }
+  .catalog-boda-marfil .au-marfil-intro {
+    display: grid;
+    grid-template-columns: minmax(270px,.86fr) minmax(390px,1.14fr);
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    align-items: center;
+    column-gap: clamp(2rem,6cqw,6.5rem);
+    width: min(100%,1180px);
+    min-height: 0;
+    height: min(82cqh,720px);
+    margin: 0 auto;
+    padding: clamp(2.5rem,6cqw,6rem);
+    box-sizing: border-box;
+  }
+  .catalog-boda-marfil .au-marfil-kicker {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    align-self: end;
+  }
+  .catalog-boda-marfil .au-marfil-names {
+    grid-column: 1;
+    grid-row: 2;
+    justify-content: flex-start;
+    justify-self: start;
+    margin: clamp(1rem,2cqh,1.75rem) 0;
+    font-size: clamp(4.5rem,8.5cqw,8.5rem);
+  }
+  .catalog-boda-marfil .au-marfil-meta {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: start;
+    align-self: start;
+  }
+  .catalog-boda-marfil .au-marfil-polaroids {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    width: min(100%,560px);
+    height: min(58cqh,500px);
+    margin: 0;
+  }
+}
+
+/* Mantener estos ajustes al final para que prevalezcan sobre la base compartida. */
+.catalog-boda-eucalipto .au-hero{padding:0!important}
+.catalog-boda-eucalipto .au-hero-content{width:100%!important;max-width:none!important;margin:0!important;text-align:center!important}
+.catalog-boda-eucalipto [data-au-section]>.au-container::before{display:none!important;content:none!important}
+.catalog-boda-eucalipto [data-au-section="location"]{padding:0!important}
+
+/* Ajustes de lectura y transiciones solicitados para Eucalipto. */
+.catalog-boda-eucalipto .au-eucalipto-detail-grid .au-btn{
+  border:1.5px solid var(--euca-gold)!important;background:transparent!important;color:var(--euca-gold)!important
+}
+.catalog-boda-eucalipto .au-eucalipto-detail-grid .au-btn:hover{
+  background:var(--euca-gold)!important;color:#fff!important
+}
+.catalog-boda-eucalipto .au-eucalipto-rsvp-form .au-btn{
+  border:1.5px solid var(--euca-green)!important;background:transparent!important;color:var(--euca-green)!important
+}
+.catalog-boda-eucalipto .au-eucalipto-rsvp-form .au-btn:hover{
+  background:var(--euca-green)!important;color:#fff!important
+}
+.catalog-boda-eucalipto [data-au-section="rsvp"]{
+  min-height:0!important;padding-top:clamp(3.8rem,8cqh,5.5rem)!important;padding-bottom:clamp(3.8rem,8cqh,5.5rem)!important
+}
+.catalog-boda-eucalipto .au-eucalipto-rsvp-form{margin-top:1.7rem;gap:.2rem}
+.catalog-boda-eucalipto .au-eucalipto-rsvp-form :is(input,select,textarea){min-height:40px;padding:.68rem .8rem}
+.catalog-boda-eucalipto .au-eucalipto-rsvp-form textarea{min-height:70px}
+
+.catalog-boda-eucalipto .au-eucalipto-closing{
+  min-height:clamp(280px,40cqh,360px)!important;padding-top:clamp(2.4rem,5cqh,3.4rem)!important;padding-bottom:clamp(2.4rem,5cqh,3.4rem)!important
+}
+.catalog-boda-eucalipto .modular-section-order>.modular-ornament-host{z-index:2147483646!important;overflow:visible!important;isolation:isolate}
+.catalog-boda-eucalipto .modular-section-order>.modular-ornament-host::before{
+  z-index:2147483647!important;top:0!important;width:min(33cqw,230px)!important;height:auto!important;aspect-ratio:1593/1311;
+  background-image:var(--modular-ornament-image)!important;background-repeat:no-repeat!important;background-size:100% 100%!important;
+  content:""!important;opacity:.8!important;transform:translateY(-50%)!important;
+  animation:euca-ornament-presence 19s ease-in-out var(--modular-ornament-delay,0s) infinite!important;pointer-events:none
+}
+.catalog-boda-eucalipto .modular-section-order>.modular-ornament-left::before{right:auto!important;left:-3%!important;background-position:left center!important;transform:translateY(-50%)!important}
+.catalog-boda-eucalipto .modular-section-order>.modular-ornament-right::before{right:-3%!important;left:auto!important;background-position:right center!important;transform:translateY(-50%) rotateY(180deg)!important;transform-origin:center!important}
+@keyframes euca-ornament-presence{0%,100%{opacity:.74}50%{opacity:.86}}
+@container (min-width:680px){
+  .catalog-boda-eucalipto .modular-section-order>.modular-ornament-host::before{width:min(25cqw,320px)!important}
+}

@@ -16,6 +16,8 @@ import { VeronaInvitation } from '../verona/VeronaInvitation';
 import { DEFAULT_CONFIG as DEFAULT_VERONA_CONFIG, PALETTES as VERONA_PALETTES } from '../verona/config';
 import { VarezziaInvitation } from '../varezzia/VarezziaInvitation';
 import { DEFAULT_CONFIG as DEFAULT_VAREZZIA_CONFIG, PALETTES as VAREZZIA_PALETTES } from '../varezzia/config';
+import { INVITATION_MODELS } from '../../data/models';
+import { createCatalogConfig, createCatalogPreview } from '../catalog-template/CatalogInvitation';
 
 type PreviewProps = { locale: AuroraLocale; palette: never; embedded?: boolean; config?: Partial<AuroraConfig>; sectionOrder?: string[] };
 export interface BuilderTemplate {
@@ -28,7 +30,7 @@ export interface BuilderTemplate {
 
 const labels = (ids: string[]) => ids.map((id) => ({ id, label: id.split('-').map((part) => part[0].toUpperCase() + part.slice(1)).join(' ') }));
 
-export const BUILDER_TEMPLATES: BuilderTemplate[] = [
+const ORIGINAL_TEMPLATES: BuilderTemplate[] = [
   {
     id: 'aurora', label: 'Aurora', Preview: AuroraInvitation as ComponentType<PreviewProps>, createDocument: createAuroraBuilderDocument,
     palettes: labels(['verde-dorado', 'rosa-champagne', 'azul-plata', 'lavanda-dorado'])
@@ -64,6 +66,24 @@ export const BUILDER_TEMPLATES: BuilderTemplate[] = [
     palettes: labels(Object.keys(VAREZZIA_PALETTES))
   }
 ];
+
+const originalIds = new Set(ORIGINAL_TEMPLATES.map(({ id }) => id));
+const GENERATED_TEMPLATES: BuilderTemplate[] = INVITATION_MODELS
+  .filter(({ id }) => !originalIds.has(id))
+  .map((model) => {
+    const palettes = model.palettes?.length
+      ? model.palettes.map(({ id, name }) => ({ id, label: name }))
+      : [{ id: 'original', label: 'Original' }];
+    return {
+      id: model.id,
+      label: model.title,
+      Preview: createCatalogPreview(model.id) as ComponentType<PreviewProps>,
+      createDocument: () => createBuilderDocument(model.id, palettes[0].id, createCatalogConfig(model)),
+      palettes
+    };
+  });
+
+export const BUILDER_TEMPLATES: BuilderTemplate[] = [...ORIGINAL_TEMPLATES, ...GENERATED_TEMPLATES];
 
 export const builderTemplate = (id: string) => BUILDER_TEMPLATES.find((template) => template.id === id) || BUILDER_TEMPLATES[0];
 

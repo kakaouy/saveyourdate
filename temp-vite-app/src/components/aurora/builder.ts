@@ -70,10 +70,17 @@ export const createBuilderDocument = (
 });
 
 export const auroraConfigFromBuilder = (document: InvitationBuilderDocument): Partial<AuroraConfig> => {
+  const gardenFloral = document.templateId === '15-jardin-floral';
+  const eucalipto = document.templateId === 'boda-eucalipto';
+  const sectionDefinitions = gardenFloral || eucalipto
+    ? AURORA_BUILDER_SECTIONS.map((definition) => definition.id === 'hero'
+      ? { ...definition, tone: 'light' as const }
+      : { ...definition, tone: undefined })
+    : AURORA_BUILDER_SECTIONS;
   const composed = composeInvitationSections(
-    AURORA_BUILDER_SECTIONS,
+    sectionDefinitions,
     document.sections,
-    ['light', 'accent']
+    gardenFloral ? ['accent', 'alternate', 'light'] : eucalipto ? ['alternate', 'light', 'accent'] : ['light', 'accent']
   );
   const visible = new Set(composed.map(({ id }) => id));
   const sections = Object.fromEntries(

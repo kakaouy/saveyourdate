@@ -307,6 +307,7 @@ const nav = [
   ["Agradecimientos", "♡"],
   ["Mesas", "▦"],
   ["Check-in", "✓"],
+  ["Álbum colaborativo", "▣"],
   ["Accesos", "♢"],
   ["Configuración", "⚙"],
 ];
@@ -320,7 +321,10 @@ const moduleForView: Record<string, AdminOrder["enabledModules"][number] | undef
   Agradecimientos: "messaging",
   Mesas: "tables",
   "Check-in": "check_in",
+  "Álbum colaborativo": "collaborative_album",
 };
+
+const upcomingViews = new Set(["Check-in", "Álbum colaborativo"]);
 
 const builderTemplateIdForOrder = (modelName: string) => {
   const normalized = normalizedReference(modelName);
@@ -619,6 +623,10 @@ function Login({ onLogin }: { onLogin: () => void }) {
             <Logo compact />
           </div>
           <div className="login-card">
+            <div className="login-flow-links">
+              <a href="/?concepto=plataforma">← {t("Volver al inicio", "Back to home", "Voltar ao início")}</a>
+              <a href="/?demo=panel">{t("Ver la demostración", "View demo", "Ver demonstração")} →</a>
+            </div>
             <div className="login-step">
               {t("Paso", "Step", "Etapa")}{" "}
               {step === "credentials" ? "1 / 2" : "2 / 2"}
@@ -6794,6 +6802,7 @@ function Admin({
           Confirmaciones: t("Confirmaciones", "Confirmations", "Confirmações"),
           Mesas: t("Mesas", "Tables", "Mesas"),
           "Check-in": t("Check-in", "Check-in", "Check-in"),
+          "Álbum colaborativo": t("Álbum colaborativo", "Collaborative album", "Álbum colaborativo"),
           Restricciones: t("Restricciones", "Dietary needs", "Restrições"),
           Canciones: t("Canciones", "Songs", "Músicas"),
           Recordatorios: t("Recordatorios", "Reminders", "Lembretes"),
@@ -6885,16 +6894,19 @@ function Admin({
           {nav
             .filter(
               ([item]) =>
-                hasViewAccess(item) && (item !== "Configuración" || ["owner", "admin"].includes(order.accessRole)),
+                (upcomingViews.has(item) || hasViewAccess(item)) && (item !== "Configuración" || ["owner", "admin"].includes(order.accessRole)),
             )
             .map(([item, icon]) => (
               <button
                 key={item}
-                className={view === item ? "active" : ""}
-                onClick={() => navigate(item)}
+                className={`${view === item ? "active" : ""}${upcomingViews.has(item) ? " upcoming" : ""}`}
+                onClick={() => { if (!upcomingViews.has(item)) navigate(item); }}
+                disabled={upcomingViews.has(item)}
+                title={upcomingViews.has(item) ? t("Próximamente", "Coming soon", "Em breve") : undefined}
               >
                 <span>{icon}</span>
                 {navLabel(item)}
+                {upcomingViews.has(item) && <em>{t("Próximamente", "Coming soon", "Em breve")}</em>}
                 {item === "Recordatorios" &&
                   activeGuests.filter((guest) => guest.status === "Pendiente")
                     .length > 0 && (
