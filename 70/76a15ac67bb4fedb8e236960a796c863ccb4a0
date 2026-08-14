@@ -1,0 +1,22 @@
+temp-vite-app/src/components/verona/verona.css
+  s_7e134eb59f6c6b::t_5495ef92783bf4 9-10
+temp-vite-app/src/components/verona/VeronaInvitation.tsx
+  s_7e134eb59f6c6b::t_5495ef92783bf4 77-84,87
+  s_7e134eb59f6c6b::t_1088e24626d0e1 58-73,85-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "7076a15ac67bb4fedb8e236960a796c863ccb4a0",
+  "prompts": {},
+  "sessions": {
+    "s_7e134eb59f6c6b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffbfa-bee6-7ff0-8b85-3181a3e5bb50",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
