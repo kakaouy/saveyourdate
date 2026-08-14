@@ -6,7 +6,17 @@ import { BUILDER_TEMPLATES } from './invitation-builder/templates';
 import './invitation-catalog.css';
 
 type Category = 'all' | InvitationModel['category'];
-const models = INVITATION_MODELS.filter((model) => model.active !== false);
+const categoryOrder: Record<InvitationModel['category'], number> = {
+  wedding: 0,
+  '15years': 1,
+  other: 2
+};
+const models = INVITATION_MODELS
+  .filter((model) => model.active !== false)
+  .map((model, originalIndex) => ({ model, originalIndex }))
+  .sort((left, right) => categoryOrder[left.model.category] - categoryOrder[right.model.category]
+    || (left.model.order ?? left.originalIndex) - (right.model.order ?? right.originalIndex))
+  .map(({ model }) => model);
 const fallbackPalette = [{ id: 'original', name: 'Original', color: '#a6b9b3' }];
 const fallbackPreview: Record<InvitationModel['category'], string> = {
   wedding: '/previews/minimalista-eucalipto.webp',
