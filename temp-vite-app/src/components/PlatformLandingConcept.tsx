@@ -53,10 +53,11 @@ export default function PlatformLandingConcept() {
     const data = new FormData(form);
     setContactStatus('sending');
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch('/api/orders/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          requestType: 'contact',
           name: data.get('name'), email: data.get('email'),
           message: data.get('message'), company: data.get('company')
         })
