@@ -389,7 +389,10 @@ export default function InvitationBuilderPage() {
       </aside>
       <section className="builder-preview-area" id="builder-live-preview">
         <div className="builder-preview-toolbar"><strong>Vista previa en vivo</strong><div><button aria-pressed={viewport === 'phone'} onClick={() => setViewport('phone')}>Celular</button><button aria-pressed={viewport === 'desktop'} onClick={() => setViewport('desktop')}>Escritorio</button></div></div>
-        <div className={`builder-preview builder-preview-${viewport}`}><Preview locale={document.locale} palette={document.paletteId as never} embedded config={config} sectionOrder={ordered.filter(({ enabled }) => enabled).map(({ id }) => id)} /></div>
+        <div className="builder-preview-stage">
+          <div className={`builder-preview builder-preview-${viewport} builder-preview-template-${document.templateId}`} data-template={document.templateId}><Preview locale={document.locale} palette={document.paletteId as never} embedded config={config} sectionOrder={ordered.filter(({ enabled }) => enabled).map(({ id }) => id)} /></div>
+          <div className="builder-scroll-hint" aria-hidden="true"><img src="/scroll-mouse.png" alt="" /><span>Deslizá con el dedo<small>o usá las flechas</small></span></div>
+        </div>
       </section>
     </div>
     <button

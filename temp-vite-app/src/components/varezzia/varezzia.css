@@ -48,6 +48,24 @@
 .varezzia .vz-corner{width:min(50.6667vw,240px);animation:vz-hero-heartbeat 25.5s ease-in-out infinite}
 .varezzia .vz-corner.bottom{animation-name:vz-hero-heartbeat-flipped}
 
+/* Composición específica de la simulación horizontal. */
+@container (min-aspect-ratio:1/1){
+  .varezzia.vz-embedded .vz-hero{padding:3cqh 5cqw;background-position:var(--hero-position-desktop)}
+  .varezzia.vz-embedded .vz-hero>div{width:min(50cqw,650px);margin:0 8cqw 0 auto;text-align:right}
+  .varezzia.vz-embedded .vz-name{font-size:clamp(4rem,8.7cqw,7rem);line-height:.94}
+  .varezzia.vz-embedded .vz-date{justify-content:flex-end;margin-right:0;font-size:clamp(.72rem,1.3cqw,1rem)}
+  .varezzia.vz-embedded .vz-date:before,.varezzia.vz-embedded .vz-date:after{width:clamp(1.5rem,4cqw,3rem)}
+  .varezzia.vz-embedded .vz-hero h1{font-size:clamp(1.7rem,3.4cqw,3rem)}
+  .varezzia.vz-embedded .vz-corner{width:min(32cqw,350px)}
+  .varezzia.vz-embedded .vz-section{padding:clamp(3rem,9cqh,6rem) 5cqw}
+  .varezzia.vz-embedded .vz-section h2,.varezzia.vz-embedded .vz-parallax h2{font-size:clamp(2.7rem,5.2cqw,4.6rem)}
+  .varezzia.vz-embedded .vz-section p{font-size:clamp(.8rem,1.25cqw,1rem)}
+  .varezzia.vz-embedded .vz-quote{font-size:clamp(2rem,3.8cqw,3.4rem)}
+  .varezzia.vz-embedded .vz-countdown strong{font-size:clamp(2.2rem,4.5cqw,3.5rem)}
+  .varezzia.vz-embedded .vz-ornament img{width:min(24cqw,240px)}
+  .varezzia.vz-embedded .vz-btn{min-height:42px;padding:.65rem 1.25rem;font-size:.68rem}
+}
+
 @keyframes vz-hero-heartbeat{
   0%,28%,70%,100%{transform:scale(1)}
   14%,42%{transform:scale(1.08)}

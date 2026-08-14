@@ -13,6 +13,8 @@ const AstraeaInvitation = React.lazy(() => import('./components/astraea/AstraeaI
 const CoruscantInvitation = React.lazy(() => import('./components/coruscant/CoruscantInvitation').then((module) => ({ default: module.CoruscantInvitation })));
 const InvitationBuilderPage = React.lazy(() => import('./components/invitation-builder/InvitationBuilderPage'));
 const PlatformLandingConcept = React.lazy(() => import('./components/PlatformLandingConcept'));
+const InvitationCatalogPage = React.lazy(() => import('./components/InvitationCatalogPage'));
+const PlatformDemoPanel = React.lazy(() => import('./components/PlatformDemoPanel'));
 
 
 const MODEL_COLOR_OPTIONS = [
@@ -1228,7 +1230,11 @@ function App() {
   const embeddedPreview = pageParams.get('embeddedPreview') === '1';
   const previewModelId = pageParams.get('previewModel');
   const builderMode = pageParams.has('builder');
+  const builderModelId = pageParams.get('builder') || '';
+  const builderComingSoon = INVITATION_MODELS.find((model) => model.id === builderModelId)?.comingSoon;
+  const catalogMode = pageParams.has('catalogo');
   const platformConceptMode = pageParams.get('concepto') === 'plataforma';
+  const platformDemoMode = pageParams.get('demo') === 'panel';
   const changeOrderNumber = pageParams.get('pedido') || '';
   // Navigation & Language UI States
   const [lang, setLang] = useState<'es' | 'en' | 'pt'>('es');
@@ -1730,6 +1736,9 @@ function App() {
 
   // 1. ADMIN LOGIN VIEW
   if (platformConceptMode) return <React.Suspense fallback={<main className="route-loading">Preparando la experiencia…</main>}><PlatformLandingConcept /></React.Suspense>;
+  if (platformDemoMode) return <React.Suspense fallback={<main className="route-loading">Preparando la demostración…</main>}><PlatformDemoPanel /></React.Suspense>;
+  if (catalogMode) return <React.Suspense fallback={<main className="route-loading">Preparando el catálogo…</main>}><InvitationCatalogPage /></React.Suspense>;
+  if (builderMode && builderComingSoon) return <main className="builder-coming-soon"><a href="/?catalogo=1">← Volver al catálogo</a><div><img src="/logo.svg" alt="Save Your Date" /><span>OTROS EVENTOS</span><h1>Próximamente</h1><p>Estamos preparando una invitación especial para celebrar este momento.</p></div></main>;
   if (builderMode) return <React.Suspense fallback={<main className="route-loading">Preparando tu invitación…</main>}><InvitationBuilderPage /></React.Suspense>;
 
   if (showAdminLogin && !isAdminLoggedIn) {
@@ -3419,7 +3428,7 @@ function App() {
                       palette={getPaletteIdFromColor(
                         demoModel,
                         selectedModelColors[demoModel.id]
-                      ) as 'rosa-salvia' | 'verde-dorado'}
+                      ) as 'rosa-salvia' | 'lavanda-ciruela' | 'azul-polvo-champagne' | 'rosa-viejo-borgona' | 'petroleo-champagne'}
                     />
                   ) : demoModel.id === '15-verona' ? (
                     <iframe
