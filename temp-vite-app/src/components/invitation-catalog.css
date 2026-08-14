@@ -111,3 +111,52 @@
   font-size:.62rem;
   line-height:1.45;
 }
+
+/* Las tarjetas del catálogo son miniaturas: muestran una portada completa y
+   limpia. El scroll y los controles completos permanecen disponibles al abrir
+   el modelo en el modal o en el constructor. */
+.catalog-phone-screen{
+  overflow:hidden !important;
+  overscroll-behavior:none;
+  touch-action:manipulation;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.catalog-phone-screen::-webkit-scrollbar,
+.catalog-card-live-preview::-webkit-scrollbar,
+.catalog-card-live-preview > .aurora::-webkit-scrollbar{
+  display:none !important;
+  width:0 !important;
+  height:0 !important;
+}
+.catalog-phone-screen > img{
+  width:100%;
+  height:100%;
+  min-height:100%;
+  object-fit:cover;
+  object-position:center top;
+}
+.catalog-card-live-preview,
+.catalog-card-live-preview > .aurora{
+  overflow:hidden !important;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.catalog-card-live-preview .au-navigate,
+.catalog-card-live-preview .au-garden-navigate,
+.catalog-card-live-preview [class*="scroll-hint"],
+.catalog-card-live-preview [class*="scroll-cue"]{
+  display:none !important;
+}
+.catalog-card-live-preview .au-music-float{
+  right:8px !important;
+  bottom:auto !important;
+  width:30px !important;
+  height:30px !important;
+  border-width:1px !important;
+  font-size:.82rem !important;
+  opacity:.24 !important;
+  box-shadow:none !important;
+  backdrop-filter:blur(3px);
+  animation:none !important;
+}
