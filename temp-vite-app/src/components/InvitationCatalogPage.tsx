@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { INVITATION_MODELS } from '../data/models';
 import type { InvitationModel } from '../data/models';
 import { auroraConfigFromBuilder } from './aurora/builder';
 import { BUILDER_TEMPLATES } from './invitation-builder/templates';
+import ApprovedInvitationPreview, { InvitationScrollHint } from './invitation-builder/ApprovedInvitationPreview';
 import './invitation-catalog.css';
 
 type Category = 'all' | InvitationModel['category'];
@@ -43,12 +44,9 @@ export default function InvitationCatalogPage() {
   const [viewport, setViewport] = useState<'phone' | 'desktop'>('phone');
   const [paletteByModel, setPaletteByModel] = useState<Record<string, string>>({});
   const filtered = category === 'all' ? models : models.filter((model) => model.category === category);
-  const template = selected && !selected.comingSoon ? BUILDER_TEMPLATES.find(({ id }) => id === selected.id) : undefined;
+  const template = selected && !selected.comingSoon ? BUILDER_TEMPLATES.find(({ id }) => id === selected.id || (selected.id === '15-verona' && id === 'verona')) : undefined;
   const paletteOptions = selected?.palettes || fallbackPalette;
   const palette = selected ? paletteByModel[selected.id] || paletteOptions[0].id : '';
-  const document = useMemo(() => template?.createDocument(), [template]);
-  const config = useMemo(() => document ? auroraConfigFromBuilder({ ...document, paletteId: palette }) : undefined, [document, palette]);
-  const Preview = template?.Preview;
 
   return <main className="catalog-page" onContextMenu={(event) => event.preventDefault()}>
     <header className="catalog-header"><a href="/?concepto=plataforma">← Volver</a><img src="/logo.svg" alt="Save Your Date" /><a className="catalog-create" href="/?builder=aurora">Simular edición</a></header>
@@ -66,6 +64,6 @@ export default function InvitationCatalogPage() {
         </article>;
       })}
     </section>
-    {selected && <div className="catalog-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}><section className="catalog-modal" role="dialog" aria-modal="true" aria-labelledby="catalog-modal-title"><button className="catalog-modal-close" onClick={() => setSelected(null)} aria-label="Cerrar">×</button><aside className="catalog-modal-info"><span>{selected.category === 'wedding' ? 'BODA' : selected.category === '15years' ? 'QUINCE' : 'OTRO EVENTO'}</span><h2 id="catalog-modal-title">{selected.title}</h2><p>{selected.description || 'Una invitación completa para compartir cada detalle de tu evento.'}</p><h3>Incluye</h3><ul>{selected.features.map((feature) => <li key={feature}>✓ {feature}</li>)}</ul><h3>Colores disponibles</h3><div className="catalog-modal-palettes">{paletteOptions.map((option) => <button key={option.id} className={palette === option.id ? 'active' : ''} onClick={() => setPaletteByModel((current) => ({ ...current, [selected.id]: option.id }))}><i style={{ background: option.color }} /><span>{option.name}</span></button>)}</div>{template ? <a href={`/?builder=${encodeURIComponent(selected.id)}`}>Simular edición →</a> : <button disabled>Disponible próximamente</button>}<small>Vista protegida · imágenes de muestra · sin descarga</small></aside><div className="catalog-modal-viewer"><div className="catalog-view-switch"><button className={viewport === 'phone' ? 'active' : ''} onClick={() => setViewport('phone')}>▯ Celular</button><button className={viewport === 'desktop' ? 'active' : ''} onClick={() => setViewport('desktop')}>▭ Pantalla amplia</button></div><div className={`catalog-device catalog-device-${viewport}`}>{Preview && document && config ? <div className="catalog-live-preview"><Preview locale="es" palette={palette as never} embedded config={config} sectionOrder={document.sections.filter(({ enabled }) => enabled).map(({ id }) => id)} /></div> : <div className="catalog-static-preview"><img src={previewFor(selected)} alt={`Invitación ${selected.title}`} /></div>}</div><p>Deslizá dentro de la invitación para recorrerla.</p></div></section></div>}
+    {selected && <div className="catalog-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}><section className="catalog-modal" role="dialog" aria-modal="true" aria-labelledby="catalog-modal-title"><button className="catalog-modal-close" onClick={() => setSelected(null)} aria-label="Cerrar">×</button><aside className="catalog-modal-info"><span>{selected.category === 'wedding' ? 'BODA' : selected.category === '15years' ? 'QUINCE' : 'OTRO EVENTO'}</span><h2 id="catalog-modal-title">{selected.title}</h2><p>{selected.description || 'Una invitación completa para compartir cada detalle de tu evento.'}</p><h3>Incluye</h3><ul>{selected.features.map((feature) => <li key={feature}>✓ {feature}</li>)}</ul><h3>Colores disponibles</h3><div className="catalog-modal-palettes">{paletteOptions.map((option) => <button key={option.id} className={palette === option.id ? 'active' : ''} onClick={() => setPaletteByModel((current) => ({ ...current, [selected.id]: option.id }))}><i style={{ background: option.color }} /><span>{option.name}</span></button>)}</div>{template ? <a href={`/?builder=${encodeURIComponent(selected.id)}`}>Simular edición →</a> : <button disabled>Disponible próximamente</button>}<small>Vista protegida · imágenes de muestra · sin descarga</small></aside><div className="catalog-modal-viewer"><div className="catalog-view-switch"><button className={viewport === 'phone' ? 'active' : ''} onClick={() => setViewport('phone')}>▯ Celular</button><button className={viewport === 'desktop' ? 'active' : ''} onClick={() => setViewport('desktop')}>▭ Pantalla amplia</button></div><div className={`catalog-device catalog-device-${viewport}`}>{template ? <div className="catalog-live-preview"><ApprovedInvitationPreview modelId={selected.id} paletteId={palette} /></div> : <div className="catalog-static-preview"><img src={previewFor(selected)} alt={`Invitación ${selected.title}`} /></div>}</div>{template && <InvitationScrollHint />}</div></section></div>}
   </main>;
 }

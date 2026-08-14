@@ -4,6 +4,7 @@ import type { InvitationModel } from './data/models';
 import OrderFlow from './components/OrderFlow';
 import { PAYMENT_LINKS, PLAN_PRICES } from './config/plans';
 import type { AstraeaPalette } from './components/astraea/config';
+import ApprovedInvitationPreview, { InvitationScrollHint } from './components/invitation-builder/ApprovedInvitationPreview';
 
 const VarezziaInvitation = React.lazy(() => import('./components/varezzia/VarezziaInvitation').then((module) => ({ default: module.VarezziaInvitation })));
 const RivendellInvitation = React.lazy(() => import('./components/rivendell/RivendellInvitation').then((module) => ({ default: module.RivendellInvitation })));
@@ -3383,7 +3384,13 @@ function App() {
                 <div className="demo-phone-speaker"></div>
                 <div className="demo-phone-screen">
                   <React.Suspense fallback={<div className="demo-preview-loading">Cargando modelo…</div>}>
-                  {demoModel.id === 'varezzia' ? (
+                  {demoModel.id === demoModel.id ? (
+                    <ApprovedInvitationPreview
+                      modelId={demoModel.id}
+                      locale={lang}
+                      paletteId={getPaletteIdFromColor(demoModel, selectedModelColors[demoModel.id])}
+                    />
+                  ) : demoModel.id === 'varezzia' ? (
                     <VarezziaInvitation
                       embedded
                       locale={lang}
@@ -3619,6 +3626,7 @@ function App() {
                   )}
                   </React.Suspense>
                 </div>
+                <InvitationScrollHint />
               </div>
               <p className="demo-phone-caption">{DEMO_COPY[lang].interactive}</p>
             </div>

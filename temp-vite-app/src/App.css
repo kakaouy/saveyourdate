@@ -3318,6 +3318,27 @@ html {
   background: #fff;
 }
 
+/* La misma ayuda de navegación acompaña todas las vistas completas. */
+.invitation-scroll-instruction {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.55rem;
+  color:#17384b;
+  font-size:.62rem;
+  font-weight:850;
+  letter-spacing:.12em;
+  line-height:1.15;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.invitation-scroll-instruction span { display:grid; gap:.2rem; text-align:left; }
+.invitation-scroll-instruction small { color:#667d87; font-size:.52rem; font-weight:750; letter-spacing:.1em; }
+.invitation-scroll-instruction img { width:38px; height:38px; object-fit:contain; opacity:.72; animation:builder-scroll-hint 2.8s ease-in-out infinite; }
+.demo-phone > .invitation-scroll-instruction { position:absolute; top:calc(100% + 18px); left:50%; transform:translateX(-50%); }
+@media(max-width:700px){.invitation-scroll-instruction img{width:34px;height:34px}}
+@media(prefers-reduced-motion:reduce){.invitation-scroll-instruction img{animation:none}}
+
 .demo-invitation-scroll {
   height: 100%;
   overflow-y: auto;
