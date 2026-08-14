@@ -55,10 +55,10 @@ export default function InvitationCatalogPage() {
       {filtered.map((model) => {
         const colors = model.palettes || fallbackPalette;
         return <article className="catalog-card" key={model.id}>
-          <button className="catalog-phone" type="button" onClick={() => { setSelected(model); setViewport('phone'); }} aria-label={`Ver detalles de ${model.title}`}>
+          <div className="catalog-phone" role="button" tabIndex={0} onClick={() => { setSelected(model); setViewport('phone'); }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setSelected(model); setViewport('phone'); } }} aria-label={`Ver detalles de ${model.title}`}>
             <span className="catalog-speaker" />
             <span className={'catalog-phone-screen catalog-preview-' + model.id}><CatalogCardPreview model={model} /></span>
-          </button>
+          </div>
           <div className="catalog-card-meta"><div><span>{model.category === 'wedding' ? 'BODA' : model.category === '15years' ? 'QUINCE' : 'OTRO EVENTO'}</span><h2>{model.title}</h2></div><div className="catalog-card-colors" aria-label={`${colors.length} colores`}>{colors.map((option) => <i key={option.id} style={{ background: option.color }} title={option.name} />)}</div></div>
           <button className="catalog-card-open" onClick={() => setSelected(model)}>Ver modelo y colores →</button>
         </article>;
