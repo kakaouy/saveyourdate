@@ -68,8 +68,11 @@ const ORIGINAL_TEMPLATES: BuilderTemplate[] = [
 ];
 
 const originalIds = new Set(ORIGINAL_TEMPLATES.map(({ id }) => id));
+const TEMPLATE_ALIASES: Record<string, string> = {
+  '15-verona': 'verona'
+};
 const GENERATED_TEMPLATES: BuilderTemplate[] = INVITATION_MODELS
-  .filter(({ id }) => !originalIds.has(id))
+  .filter(({ id }) => !originalIds.has(id) && !TEMPLATE_ALIASES[id])
   .map((model) => {
     const palettes = model.palettes?.length
       ? model.palettes.map(({ id, name }) => ({ id, label: name }))
@@ -85,7 +88,10 @@ const GENERATED_TEMPLATES: BuilderTemplate[] = INVITATION_MODELS
 
 export const BUILDER_TEMPLATES: BuilderTemplate[] = [...ORIGINAL_TEMPLATES, ...GENERATED_TEMPLATES];
 
-export const builderTemplate = (id: string) => BUILDER_TEMPLATES.find((template) => template.id === id) || BUILDER_TEMPLATES[0];
+export const builderTemplate = (id: string) => {
+  const resolvedId = TEMPLATE_ALIASES[id] || id;
+  return BUILDER_TEMPLATES.find((template) => template.id === resolvedId) || BUILDER_TEMPLATES[0];
+};
 
 export const builderSectionDefinitions = (
   templateId: string,

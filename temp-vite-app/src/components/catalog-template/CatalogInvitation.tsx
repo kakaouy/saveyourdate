@@ -8,6 +8,8 @@ import { NoirInvitation } from '../noir/NoirInvitation';
 import { PaperFloralInvitation } from '../paper-floral/PaperFloralInvitation';
 import { SienaInvitation } from '../siena/SienaInvitation';
 import { AmalfiInvitation } from '../amalfi/AmalfiInvitation';
+import { VeronaInvitation } from '../verona/VeronaInvitation';
+import type { VeronaConfig, VeronaPalette } from '../verona/config';
 import './catalog-invitation.css';
 
 type CatalogPreviewProps = {
@@ -245,6 +247,13 @@ const paletteTokens = (model: InvitationModel, paletteId: string): AuroraPalette
 
 function CatalogInvitation({ modelId, palette, ...props }: CatalogPreviewProps & { modelId: string }) {
   const model = INVITATION_MODELS.find(({ id }) => id === modelId) || INVITATION_MODELS[0];
+  if (model.id === '15-verona') return <VeronaInvitation
+    locale={props.locale}
+    embedded={props.embedded}
+    palette={(String(palette || 'bordo-calida')) as VeronaPalette}
+    config={props.config as Partial<VeronaConfig> | undefined}
+    sectionOrder={props.sectionOrder}
+  />;
   if (model.id === 'boda-vinculo-noir') return <NoirInvitation
     {...props}
     paletteTokens={paletteTokens(model, String(palette))}
