@@ -193,8 +193,16 @@
 .catalog-modal{
   width:min(1180px,calc(100vw - 32px));
   max-width:100%;
+  padding:0;
   overflow-x:hidden;
   overflow-y:auto;
+}
+.catalog-modal-close{
+  position:fixed;
+  z-index:110;
+  top:37px;
+  right:max(33px,calc((100vw - 1180px)/2 + 17px));
+  box-shadow:0 8px 24px rgba(10,31,43,.14);
 }
 .catalog-modal-viewer{
   min-width:0;
