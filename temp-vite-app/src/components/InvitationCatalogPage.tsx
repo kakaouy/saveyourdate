@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { INVITATION_MODELS } from '../data/models';
 import type { InvitationModel } from '../data/models';
-import { auroraConfigFromBuilder } from './aurora/builder';
 import { BUILDER_TEMPLATES } from './invitation-builder/templates';
 import ApprovedInvitationPreview, { InvitationScrollHint } from './invitation-builder/ApprovedInvitationPreview';
 import './invitation-catalog.css';
@@ -28,31 +27,21 @@ const previewFor = (model: InvitationModel) => model.previewImage || fallbackPre
 
 function CatalogCardPreview({ model }: { model: InvitationModel }) {
   if (model.comingSoon) return <div className="catalog-coming-soon"><img src="/logo.svg" alt="Save Your Date" /><strong>Próximamente</strong><span>Nuevos momentos están por llegar</span></div>;
-  if (!['boda-marfil', 'boda-pleno', 'boda-boho', '15-sweet-jane'].includes(model.id)) return <img src={previewFor(model)} alt={`Vista previa de ${model.title}`} draggable={false} />;
-  const template = BUILDER_TEMPLATES.find(({ id }) => id === model.id);
-  if (!template) return null;
-  const document = template.createDocument();
-  const Preview = template.Preview;
   return <ScaledCatalogPreview label={`Vista previa de ${model.title}`}>
-    <Preview locale="es" palette={document.paletteId as never} embedded config={auroraConfigFromBuilder(document)} sectionOrder={document.sections.filter(({ enabled }) => enabled).map(({ id }) => id)} />
+    <ApprovedInvitationPreview modelId={model.id} />
   </ScaledCatalogPreview>;
 }
 
 const CARD_CANVAS_WIDTH = 390;
-const CARD_CANVAS_HEIGHT = 820;
 
 function ScaledCatalogPreview({ label, children }: { label: string; children: React.ReactNode }) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const [layout, setLayout] = useState({ scale: 1, left: 0 });
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    const update = () => {
-      const { width, height } = host.getBoundingClientRect();
-      const scale = Math.min(width / CARD_CANVAS_WIDTH, height / CARD_CANVAS_HEIGHT);
-      setLayout({ scale, left: Math.max(0, (width - CARD_CANVAS_WIDTH * scale) / 2) });
-    };
+    const update = () => setScale(host.getBoundingClientRect().width / CARD_CANVAS_WIDTH);
     update();
     const observer = new ResizeObserver(update);
     observer.observe(host);
@@ -60,7 +49,7 @@ function ScaledCatalogPreview({ label, children }: { label: string; children: Re
   }, []);
 
   return <div ref={hostRef} className="catalog-card-live-preview" aria-label={label}>
-    <div className="catalog-card-preview-canvas" style={{ left: layout.left, transform: `scale(${layout.scale})` }}>
+    <div className="catalog-card-preview-canvas" style={{ transform: `scale(${scale})` }}>
       {children}
     </div>
   </div>;

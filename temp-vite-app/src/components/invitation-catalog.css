@@ -44,7 +44,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .catalog-card-live-preview > .aurora {
@@ -71,15 +71,6 @@
 .catalog-card-live-preview{
   width:100%;
   height:100%;
-}
-.catalog-card-live-preview > *{
-  position:absolute;
-  inset:0;
-  width:185.185% !important;
-  height:185.185% !important;
-  max-width:none;
-  transform:scale(.54);
-  transform-origin:top left;
 }
 .catalog-device-phone .catalog-live-preview > *{
   width:122.7% !important;
@@ -364,6 +355,7 @@
 }
 .catalog-card-preview-canvas{
   position:absolute;
+  left:0;
   top:0;
   width:390px;
   height:820px;
@@ -377,4 +369,13 @@
   height:820px !important;
   max-width:none !important;
   transform:none !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+  scrollbar-width:thin !important;
+  scrollbar-color:rgba(23,56,75,.42) transparent;
 }
+.catalog-card-preview-canvas > *::-webkit-scrollbar{display:block!important;width:5px!important;height:5px!important}
+.catalog-card-preview-canvas > *::-webkit-scrollbar-track{background:transparent}
+.catalog-card-preview-canvas > *::-webkit-scrollbar-thumb{border-radius:999px;background:rgba(23,56,75,.42)}
