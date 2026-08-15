@@ -342,9 +342,13 @@
 .catalog-grid .catalog-phone{
   height:auto;
   aspect-ratio:230/470;
+  /* El vidrio llega casi hasta el borde inferior. El marco anterior reservaba
+     demasiado espacio y dejaba una franja vacía debajo de todas las portadas. */
+  padding:8px 6px 4px;
 }
 .catalog-grid .catalog-phone-screen{
   background:#f8f4ec;
+  border-radius:27px 27px 29px 29px;
 }
 .catalog-grid .catalog-phone-screen > img{
   width:100%;
