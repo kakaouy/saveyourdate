@@ -203,10 +203,11 @@
    se reduce proporcionalmente dentro del marco disponible. */
 .catalog-modal{
   width:min(1180px,calc(100vw - 32px));
+  height:calc(100dvh - 44px);
   max-width:100%;
   padding:0;
   overflow-x:hidden;
-  overflow-y:auto;
+  overflow-y:hidden;
 }
 .catalog-modal-close{
   position:fixed;
@@ -220,6 +221,14 @@
   min-height:0;
   overflow:hidden;
 }
+.catalog-modal-info{min-height:0;padding:28px 26px;overflow:hidden}
+.catalog-modal-info h2{margin:5px 0 8px;font-size:36px}
+.catalog-modal-info h3{margin:15px 0 7px}
+.catalog-modal-info ul{gap:5px}
+.catalog-modal-info>small{margin-top:auto;padding-top:10px}
+.catalog-view-switch{align-items:center}
+.catalog-view-switch a{padding:10px 15px;border-radius:999px;color:#687b81;font-weight:750;white-space:nowrap;transition:background-color .2s,color .2s}
+.catalog-view-switch a:hover{color:#fff;background:var(--navy)}
 .catalog-device{
   flex:0 0 auto;
   max-width:100%;
@@ -269,6 +278,7 @@
   .catalog-modal-info{
     order:2;
     width:100%;
+    overflow:visible;
   }
   .catalog-device-phone{
     width:min(340px,calc(100vw - 40px));
@@ -306,6 +316,7 @@
     padding:9px 12px;
     font-size:12px;
   }
+  .catalog-view-switch a{padding:9px 12px;font-size:12px}
   .catalog-device-phone{
     width:min(310px,calc(100vw - 28px));
     height:min(590px,70dvh);
