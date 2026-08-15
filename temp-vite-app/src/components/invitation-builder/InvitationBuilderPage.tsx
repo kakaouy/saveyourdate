@@ -255,13 +255,15 @@ export default function InvitationBuilderPage() {
 
   return <main className="builder-page">
     <header className="builder-header">
-      <a href="/">← Volver</a><div><strong>Armá tu invitación</strong><span>{template.label} · {document.status === 'draft' ? 'Borrador' : document.status === 'in_review' ? 'En revisión' : document.status}{dirty ? ' · Cambios sin guardar' : ''}</span></div>
+      <a className="builder-back" href="/" aria-label="Volver al sitio">← <span>Volver</span></a>
+      <div className="builder-heading"><strong>Armá tu invitación</strong><span>{template.label} · {document.status === 'draft' ? 'Borrador' : document.status === 'in_review' ? 'En revisión' : document.status}{dirty ? ' · Cambios sin guardar' : ''}</span></div>
       <div className="builder-header-actions">
         {workflow.canEdit && <button onClick={save} disabled={saving || !canEditDocument}>{saving ? 'Guardando…' : saved ? 'Guardado ✓' : 'Guardar borrador'}</button>}
         {workflow.canEdit && ['draft','changes_requested'].includes(document.status) && <button onClick={submitForReview} disabled={saving || Boolean(unsupportedRequestedModel)}>Enviar a revisión</button>}
         {workflow.canApprove && document.status === 'in_review' && <><button onClick={() => workflowAction('request-changes')}>Solicitar cambios</button><button onClick={() => workflowAction('approve')}>Aprobar</button></>}
         {workflow.canPublish && document.status === 'approved' && <button onClick={() => workflowAction('publish')}>Publicar</button>}
       </div>
+      <a className="builder-close" href="/" aria-label="Cerrar y volver">×</a>
     </header>
     <div className="builder-layout" data-mobile-panel={mobilePanel}>
       <aside className={`builder-panel ${!canEditDocument && !unsupportedRequestedModel ? 'is-readonly' : ''}`} id="builder-editor">
