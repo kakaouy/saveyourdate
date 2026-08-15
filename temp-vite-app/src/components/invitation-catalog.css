@@ -256,6 +256,7 @@
   .catalog-modal-backdrop{
     align-items:start;
     padding:8px;
+    overflow-x:hidden;
     overflow-y:auto;
   }
   .catalog-modal{
@@ -270,25 +271,32 @@
   }
   .catalog-modal-viewer{
     order:1;
+    flex:0 0 auto;
     width:100%;
+    max-width:100%;
     min-height:0;
     padding:64px 12px 24px;
-    overflow:hidden;
+    overflow:visible;
   }
   .catalog-modal-info{
     order:2;
+    flex:0 0 auto;
     width:100%;
+    max-width:100%;
     overflow:visible;
   }
+  .catalog-modal-info h2,
+  .catalog-modal-info p,
+  .catalog-modal-info li{overflow-wrap:anywhere}
   .catalog-device-phone{
     width:min(340px,calc(100vw - 40px));
-    height:min(650px,72dvh);
+    height:min(650px,calc(100vw * 1.72));
     min-height:380px;
   }
   .catalog-device-desktop{
     width:100%;
     max-width:720px;
-    height:min(60dvh,500px);
+    height:min(500px,calc((100vw - 56px) * .68));
     min-height:300px;
   }
 }
@@ -309,26 +317,31 @@
     padding:62px 8px 22px;
   }
   .catalog-view-switch{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    width:calc(100vw - 24px);
     max-width:calc(100vw - 24px);
     margin-bottom:14px;
   }
   .catalog-view-switch button{
-    padding:9px 12px;
-    font-size:12px;
+    min-width:0;
+    padding:9px 6px;
+    font-size:11px;
   }
-  .catalog-view-switch a{padding:9px 12px;font-size:12px}
+  .catalog-view-switch a{min-width:0;padding:9px 6px;overflow:hidden;font-size:11px;text-align:center;text-overflow:ellipsis;white-space:nowrap}
   .catalog-device-phone{
     width:min(310px,calc(100vw - 28px));
-    height:min(590px,70dvh);
+    height:min(590px,calc((100vw - 28px) * 1.78));
     min-height:340px;
   }
   .catalog-device-desktop{
     width:calc(100vw - 20px);
-    height:min(58dvh,420px);
+    height:min(420px,calc((100vw - 20px) * .68));
     min-height:260px;
     padding:7px;
     border-width:3px;
     border-radius:14px;
   }
   .catalog-modal-info{padding:28px 20px}
+  .catalog-modal-info h2{font-size:clamp(31px,11vw,40px);line-height:1.05}
 }
