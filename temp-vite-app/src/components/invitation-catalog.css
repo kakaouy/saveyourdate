@@ -379,3 +379,75 @@
 .catalog-card-preview-canvas > *::-webkit-scrollbar{display:block!important;width:5px!important;height:5px!important}
 .catalog-card-preview-canvas > *::-webkit-scrollbar-track{background:transparent}
 .catalog-card-preview-canvas > *::-webkit-scrollbar-thumb{border-radius:999px;background:rgba(23,56,75,.42)}
+
+/* El visor reserva siempre una fila para los controles y otra para la ayuda.
+   El dispositivo usa únicamente el espacio central disponible. */
+.catalog-modal-viewer{
+  display:grid;
+  height:100%;
+  min-height:0;
+  grid-template-rows:auto minmax(0,1fr) 52px;
+  justify-items:center;
+  align-items:center;
+}
+.catalog-modal-viewer .catalog-view-switch{align-self:start;margin-bottom:0}
+.catalog-modal-viewer .catalog-device{align-self:center;max-height:100%}
+.catalog-modal-viewer .catalog-device-phone{
+  width:auto;
+  height:100%;
+  max-width:100%;
+  min-height:0;
+  aspect-ratio:340/650;
+}
+.catalog-modal-viewer .catalog-device-desktop{
+  width:100%;
+  height:100%;
+  min-height:0;
+}
+.catalog-modal-viewer>.invitation-scroll-instruction{
+  align-self:end;
+  margin:0 auto;
+}
+
+@media(max-width:850px){
+  /* Un solo scroll general: el del modal. Evita la barra visible pero inerte
+     que producía la combinación de backdrop y modal desplazables. */
+  .catalog-modal-backdrop{overflow:hidden}
+  .catalog-modal{
+    height:calc(100dvh - 16px);
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+  }
+  .catalog-modal-viewer{
+    display:grid;
+    height:min(820px,calc(100dvh - 16px));
+    min-height:560px;
+    flex:0 0 min(820px,calc(100dvh - 16px));
+    grid-template-rows:auto minmax(0,1fr) 50px;
+    padding:62px 12px 10px;
+    overflow:hidden;
+  }
+  .catalog-modal-viewer .catalog-device-phone{
+    width:auto;
+    height:100%;
+    max-width:min(340px,100%);
+    min-height:0;
+    max-height:calc(100dvh - 132px);
+  }
+  .catalog-modal-info{overflow:visible}
+}
+
+@media(max-width:600px){
+  .catalog-modal{
+    height:100dvh;
+  }
+  .catalog-modal-viewer{
+    height:100dvh;
+    min-height:500px;
+    flex-basis:100dvh;
+    padding:58px 8px 8px;
+    grid-template-rows:auto minmax(0,1fr) 48px;
+  }
+}
