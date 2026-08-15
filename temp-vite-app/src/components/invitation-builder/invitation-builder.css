@@ -66,3 +66,61 @@
   .builder-mobile-switch{min-height:42px;border:1px solid #76c9c5;background:linear-gradient(135deg,#0ba6aa,#17384b);box-shadow:0 8px 24px #17384b35;font-family:'DM Sans',Inter,sans-serif}
   .builder-mobile-switch:hover{background:#0b969a}
 }
+
+/* El dispositivo y su ayuda forman una sola unidad que siempre entra en el
+   alto disponible del constructor. El marco conserva la proporción real del
+   teléfono y reduce ancho y alto juntos cuando la ventana es más baja. */
+.builder-preview-area{
+  display:flex;
+  min-height:0;
+  flex-direction:column;
+}
+.builder-preview-toolbar{
+  flex:0 0 auto;
+}
+.builder-preview-stage{
+  display:grid;
+  flex:1 1 auto;
+  width:100%;
+  min-height:0;
+  container-type:size;
+  grid-template-rows:minmax(0,1fr) 48px;
+  padding-bottom:0;
+}
+.builder-preview-stage .builder-preview{
+  align-self:center;
+  justify-self:center;
+  max-height:100%;
+}
+.builder-preview-stage .builder-preview-phone{
+  width:min(390px,100cqw,calc((100cqh - 48px) * .5625));
+  height:auto;
+  max-width:none;
+  aspect-ratio:9/16;
+}
+.builder-preview-stage .builder-preview-desktop{
+  width:100%;
+  height:100%;
+}
+.builder-scroll-hint{
+  position:static;
+  align-self:center;
+  justify-self:center;
+  transform:none;
+}
+
+@media(max-width:800px){
+  .builder-preview-stage{
+    grid-template-rows:minmax(0,1fr) 46px;
+    padding-bottom:0;
+  }
+  .builder-preview-stage .builder-preview-phone{
+    width:auto;
+    height:100%;
+    max-width:100%;
+    min-height:0;
+  }
+  .builder-preview-stage .builder-preview-desktop{
+    height:100%;
+  }
+}
