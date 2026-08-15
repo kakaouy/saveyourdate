@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { INVITATION_MODELS } from '../data/models';
 import type { InvitationModel } from '../data/models';
 import { auroraConfigFromBuilder } from './aurora/builder';
@@ -33,8 +33,36 @@ function CatalogCardPreview({ model }: { model: InvitationModel }) {
   if (!template) return null;
   const document = template.createDocument();
   const Preview = template.Preview;
-  return <div className="catalog-card-live-preview" aria-label={`Vista previa de ${model.title}`}>
+  return <ScaledCatalogPreview label={`Vista previa de ${model.title}`}>
     <Preview locale="es" palette={document.paletteId as never} embedded config={auroraConfigFromBuilder(document)} sectionOrder={document.sections.filter(({ enabled }) => enabled).map(({ id }) => id)} />
+  </ScaledCatalogPreview>;
+}
+
+const CARD_CANVAS_WIDTH = 390;
+const CARD_CANVAS_HEIGHT = 820;
+
+function ScaledCatalogPreview({ label, children }: { label: string; children: React.ReactNode }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [layout, setLayout] = useState({ scale: 1, left: 0 });
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const update = () => {
+      const { width, height } = host.getBoundingClientRect();
+      const scale = Math.min(width / CARD_CANVAS_WIDTH, height / CARD_CANVAS_HEIGHT);
+      setLayout({ scale, left: Math.max(0, (width - CARD_CANVAS_WIDTH * scale) / 2) });
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, []);
+
+  return <div ref={hostRef} className="catalog-card-live-preview" aria-label={label}>
+    <div className="catalog-card-preview-canvas" style={{ left: layout.left, transform: `scale(${layout.scale})` }}>
+      {children}
+    </div>
   </div>;
 }
 
