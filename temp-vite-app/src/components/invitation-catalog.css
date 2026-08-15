@@ -187,6 +187,17 @@
   margin:14px auto 2px;
 }
 
+/* La navegación del catálogo acompaña el recorrido de las tarjetas. */
+.catalog-header{
+  position:sticky;
+  z-index:80;
+  top:0;
+  background:rgba(230,240,236,.92);
+  box-shadow:0 8px 28px rgba(23,56,75,.08);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
 /* El modal tiene que comportarse como un visor, no como una imagen que se
    ensancha. La pantalla amplia representa un lienzo de escritorio completo y
    se reduce proporcionalmente dentro del marco disponible. */
