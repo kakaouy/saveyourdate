@@ -1795,7 +1795,7 @@ function Guests({
       "plantilla-invitados.csv",
       [
         t("Nombre", "Name", "Nome"),
-        t("Grupo", "Group", "Grupo"),
+        t("Círculo", "Circle", "Círculo"),
         "WhatsApp",
         t("Código país", "Country code", "Código do país"),
         t("Cupos", "Seats", "Vagas"),
@@ -1885,7 +1885,7 @@ function Guests({
       const nameIndex = column("nombre", "invitado", "nombre y apellido");
       if (nameIndex < 0)
         throw new Error('La plantilla debe incluir una columna "Nombre".');
-      const groupIndex = column("grupo", "familia");
+      const groupIndex = column("circulo", "círculo", "grupo", "familia");
       const phoneIndex = column("whatsapp", "telefono", "celular");
       const codeIndex = column(
         "codigo pais",
@@ -2263,7 +2263,7 @@ function Guests({
               <option value="invitedBy">{t("Invitador", "Invited by", "Anfitrião")}</option>
               <option value="status">{t("Estado", "Status", "Status")}</option>
               <option value="guestType">{t("Categoría de edad", "Age category", "Categoria etária")}</option>
-              <option value="group">{t("Grupo", "Group", "Grupo")}</option>
+              <option value="group">{t("Círculo", "Circle", "Círculo")}</option>
               <option value="transportOption">{t("Transporte", "Transport", "Transporte")}</option>
               <option value="menuChoice">{t("Preferencia de menú", "Menu preference", "Preferência de menu")}</option>
               <option value="food">{t("Restricción alimentaria", "Dietary need", "Restrição alimentar")}</option>
@@ -2295,7 +2295,7 @@ function Guests({
                 value={bulkValue}
                 onChange={(event) => setBulkValue(event.target.value)}
                 list={["socialTogetherWith", "socialSeparateFrom"].includes(bulkField) ? "bulk-social-references" : undefined}
-                placeholder={bulkField === "group" ? t("Nombre del grupo", "Group name", "Nome do grupo") : bulkField === "invitedBy" ? t("Nombre del invitador", "Host name", "Nome do anfitrião") : t("Valor para toda la selección", "Value for the selection", "Valor para toda a seleção")}
+                placeholder={bulkField === "group" ? t("Ej. Familia de ella, amigos del colegio…", "E.g. Her family, school friends…", "Ex. Família dela, amigos da escola…") : bulkField === "invitedBy" ? t("Nombre del invitador", "Host name", "Nome do anfitrião") : t("Valor para toda la selección", "Value for the selection", "Valor para toda a seleção")}
               />
             ))}
             <datalist id="bulk-social-references">{[...new Set(guests.flatMap((guest) => [guest.name, guest.group]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
@@ -2344,7 +2344,7 @@ function Guests({
                   </th>
                 )}
                 <th>{t("Invitado", "Guest", "Convidado")}</th>
-                <th>{t("Grupo", "Group", "Grupo")}</th>
+                <th>{t("Círculo", "Circle", "Círculo")}</th>
                 <th>{t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}</th>
                 <th>{t("Estado", "Status", "Status")}</th>
                 <th>{t("Restricción", "Dietary need", "Restrição")}</th>
@@ -2537,7 +2537,7 @@ function Guests({
             <div className="guest-add-options">
               <button className="guest-template-option" type="button" onClick={downloadTemplate}>
                 <span className="guest-add-icon">↓</span>
-                <span><strong>{t("Descargar planilla tipo", "Download spreadsheet template", "Baixar planilha modelo")}</strong><small>{t("Incluye encabezados y una fila de ejemplo para completar sin dudas.", "Includes headers and an example row so it is easy to complete.", "Inclui cabeçalhos e uma linha de exemplo para preencher sem dúvidas.")}</small><code>{t("Nombre · Grupo · WhatsApp · Cupos · Email · Documento · Restricción", "Name · Group · WhatsApp · Seats · Email · ID · Dietary need", "Nome · Grupo · WhatsApp · Vagas · Email · Documento · Restrição")}</code></span>
+                <span><strong>{t("Descargar planilla tipo", "Download spreadsheet template", "Baixar planilha modelo")}</strong><small>{t("Incluye encabezados y una fila de ejemplo para completar sin dudas.", "Includes headers and an example row so it is easy to complete.", "Inclui cabeçalhos e uma linha de exemplo para preencher sem dúvidas.")}</small><code>{t("Nombre · Círculo · WhatsApp · Cupos · Email · Documento · Restricción", "Name · Circle · WhatsApp · Seats · Email · ID · Dietary need", "Nome · Círculo · WhatsApp · Vagas · Email · Documento · Restrição")}</code></span>
                 <b aria-hidden="true">↓ CSV</b>
               </button>
               <button type="button" onClick={() => { setShowAddGuests(false); setShowModal(true); }}>
@@ -2588,7 +2588,7 @@ function Guests({
               {inspectingGuest.identificationNumber && <div><dt>{inspectingGuest.identificationType || t("Documento", "ID", "Documento")}</dt><dd>{inspectingGuest.identificationNumber}</dd></div>}
               {inspectingGuest.email && <div><dt>Email</dt><dd>{inspectingGuest.email}</dd></div>}
               {inspectingGuest.phone && <div><dt>WhatsApp</dt><dd>{inspectingGuest.phoneCountryCode} {inspectingGuest.phone}</dd></div>}
-              {inspectingGuest.group && <div><dt>{t("Grupo", "Group", "Grupo")}</dt><dd>{inspectingGuest.group}</dd></div>}
+              {inspectingGuest.group && <div><dt>{t("Círculo", "Circle", "Círculo")}</dt><dd>{inspectingGuest.group}</dd></div>}
               {inspectingGuest.invitedBy && <div><dt>{t("Invitado por", "Invited by", "Convidado por")}</dt><dd>{inspectingGuest.invitedBy}</dd></div>}
               {meaningfulGuestValue(inspectingGuest.food) && <div><dt>{t("Restricción alimentaria", "Dietary requirement", "Restrição alimentar")}</dt><dd>{inspectingGuest.food}</dd></div>}
               {meaningfulGuestValue(inspectingGuest.menuChoice) && <div><dt>{t("Menú", "Menu", "Menu")}</dt><dd>{inspectingGuest.menuChoice}</dd></div>}
@@ -2753,11 +2753,14 @@ function Guests({
                 <input name="name" required />
               </label>
               <label>
-                {t("Grupo", "Group", "Grupo")}
+                {t("Círculo social", "Social circle", "Círculo social")}
+                <small className="field-help">{t("Ayuda a sentar juntas a personas afines y a acercar sus mesas.", "Helps seat related people together and keep their tables nearby.", "Ajuda a sentar pessoas próximas juntas e manter suas mesas perto.")}</small>
                 <input
                   name="group"
-                  placeholder={t("Ej. Familia", "E.g. Family", "Ex. Família")}
+                  list="guest-circle-options"
+                  placeholder={t("Ej. Familia de ella", "E.g. Her family", "Ex. Família dela")}
                 />
+                <datalist id="guest-circle-options">{[...new Set(guests.map((guest) => guest.group).filter(Boolean))].map((circle) => <option key={circle} value={circle} />)}</datalist>
               </label>
               <label>
                 {t("País de WhatsApp", "WhatsApp country", "País do WhatsApp")}
@@ -2934,8 +2937,10 @@ function Guests({
                 <input name="name" defaultValue={editingGuest.name} required />
               </label>
               <label>
-                Grupo
-                <input name="group" defaultValue={editingGuest.group} />
+                {t("Círculo social", "Social circle", "Círculo social")}
+                <small className="field-help">{t("Se usa para sugerir la misma mesa o una mesa cercana.", "Used to suggest the same table or a nearby table.", "Usado para sugerir a mesma mesa ou uma mesa próxima.")}</small>
+                <input name="group" list="edit-guest-circle-options" defaultValue={editingGuest.group} />
+                <datalist id="edit-guest-circle-options">{[...new Set(guests.map((guest) => guest.group).filter(Boolean))].map((circle) => <option key={circle} value={circle} />)}</datalist>
               </label>
               <label>
                 {t("Categoría", "Category", "Categoria")}
@@ -3350,6 +3355,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "teen" | "child">("all");
   const [guestRestrictionFilter, setGuestRestrictionFilter] = useState(false);
+  const [socialCircleFilter, setSocialCircleFilter] = useState("");
   const [lastAssignment, setLastAssignment] = useState<{
     guestId: string;
     fromTableId: string;
@@ -3382,11 +3388,15 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const guest = confirmedGuests.find((candidate) => candidate.id === id);
     return total + (guest ? confirmedPeopleForGuest(guest, guests) : 0);
   }, 0) > table.capacity);
-  const matchingGroups = query.trim()
-    ? [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
+  const matchingGroups = socialCircleFilter
+    ? [socialCircleFilter]
+    : query.trim()
+      ? [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
         .filter((group) => normalizedReference(group).includes(normalizedReference(query)))
         .sort((a, b) => a.localeCompare(b))
-    : [];
+      : [];
+  const socialCircleOptions = [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b));
   const visibleTables = tables.filter((table) => {
     const guestTerms = table.guests.map((id) => { const guest = guests.find((item) => item.id === id); return guest ? `${guest.name} ${guest.group}` : ""; }).join(" ");
     return `${table.name} ${guestTerms}`.toLowerCase().includes(tableQuery.toLowerCase());
@@ -3431,6 +3441,20 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         conflicts.set(id, { id, tableId: table.id, message: `${guest.name}: ${t("mesa preferida", "preferred table", "mesa preferida")} “${guest.preferredTableName}”` });
       }
     });
+    socialCircleOptions.forEach((circle) => {
+      const circleTables = tables.filter((table) => table.guests.some((guestId) => {
+        const guest = confirmedGuests.find((candidate) => candidate.id === guestId);
+        return normalizedReference(guest?.group || "") === normalizedReference(circle);
+      }));
+      circleTables.forEach((table, index) => {
+        const distantPeer = circleTables.slice(index + 1).find((peer) =>
+          peer.space === table.space && Math.hypot((peer.x || 0) - (table.x || 0), (peer.y || 0) - (table.y || 0)) > 380,
+        );
+        if (!distantPeer) return;
+        const id = `circle-distance-${normalizedReference(circle)}-${table.id}-${distantPeer.id}`;
+        conflicts.set(id, { id, tableId: table.id, message: `${t("Círculo disperso", "Spread-out circle", "Círculo disperso")}: ${circle} · ${table.name} / ${distantPeer.name}` });
+      });
+    });
     return [...conflicts.values()];
   })();
 
@@ -3439,14 +3463,29 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const suggestedTableForGuest = (guest: Guest) => {
     const explicitMatches = findSocialReferences(guest.socialTogetherWith, guest.id);
     const explicitTable = tables.find((table) => table.guests.some((guestId) => explicitMatches.some((match) => match.id === guestId)));
-    if (explicitTable) return { table: explicitTable, reason: guest.socialTogetherWith, explicit: true };
+    if (explicitTable) return { table: explicitTable, reason: guest.socialTogetherWith, explicit: true, nearby: false };
     const normalizedGroup = normalizedReference(guest.group);
     if (!normalizedGroup) return null;
-    const groupTable = tables.find((table) => table.guests.some((guestId) => {
+    const people = confirmedPeopleForGuest(guest, guests);
+    const circleTables = tables.filter((table) => table.guests.some((guestId) => {
       const seatedGuest = guests.find((candidate) => candidate.id === guestId);
       return seatedGuest && seatedGuest.id !== guest.id && normalizedReference(seatedGuest.group) === normalizedGroup;
     }));
-    return groupTable ? { table: groupTable, reason: guest.group, explicit: false } : null;
+    const availableCapacity = (table: EventTable) => table.shape === "living" || table.capacity - table.guests.reduce((total, guestId) => {
+      const seatedGuest = confirmedGuests.find((candidate) => candidate.id === guestId);
+      return total + (seatedGuest ? confirmedPeopleForGuest(seatedGuest, guests) : 0);
+    }, 0) >= people;
+    const sameCircleTable = circleTables
+      .filter(availableCapacity)
+      .sort((left, right) => right.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.group || "") === normalizedGroup).length - left.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.group || "") === normalizedGroup).length)[0];
+    if (sameCircleTable) return { table: sameCircleTable, reason: guest.group, explicit: false, nearby: false };
+    const nearbyTable = tables
+      .filter((table) => !circleTables.includes(table) && availableCapacity(table) && circleTables.some((circleTable) => circleTable.space === table.space))
+      .sort((left, right) => {
+        const distance = (table: EventTable) => Math.min(...circleTables.map((circleTable) => Math.hypot((table.x || 0) - (circleTable.x || 0), (table.y || 0) - (circleTable.y || 0))));
+        return distance(left) - distance(right);
+      })[0];
+    return nearbyTable ? { table: nearbyTable, reason: guest.group, explicit: false, nearby: true } : null;
   };
   const selectedGuest = confirmedGuests.find((guest) => guest.id === selectedGuestId);
   const explicitTogetherGuests = selectedGuest ? findSocialReferences(selectedGuest.socialTogetherWith, selectedGuest.id) : [];
@@ -4226,10 +4265,16 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 )}
           </p>
         </div>
-        <div className="heading-actions">
-          <button className={`outline-button ${showExportCenter ? "active" : ""}`} onClick={() => setShowExportCenter((current) => !current)}>⇩ {t("Compartir e imprimir", "Share and print", "Compartilhar e imprimir")}</button>
-          <button className={`outline-button ${layoutMode ? "active" : ""}`} onClick={() => setLayoutMode((value) => !value)}>{layoutMode ? t("Ver lista", "View list", "Ver lista") : t("Editar plano", "Edit layout", "Editar plano")}</button>
-          {canEdit && <button className="primary-button small" onClick={() => openNew()}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
+        <div className="seating-heading-controls">
+          <nav className="seating-mode-tabs" aria-label={t("Vistas de organización", "Planning views", "Vistas de organização")}>
+            <button aria-pressed={!layoutMode} onClick={() => setLayoutMode(false)}>♙ {t("Personas y mesas", "People and tables", "Pessoas e mesas")}</button>
+            <button aria-pressed={layoutMode} onClick={() => setLayoutMode(true)}>▦ {t("Plano del salón", "Venue layout", "Plano do salão")}</button>
+          </nav>
+          <div className="heading-actions">
+            <button className={`outline-button ${showExportCenter ? "active" : ""}`} onClick={() => setShowExportCenter((current) => !current)}>⇩ {t("Compartir e imprimir", "Share and print", "Compartilhar e imprimir")}</button>
+            <button className={`outline-button ${layoutMode ? "active" : ""}`} onClick={() => setLayoutMode((value) => !value)}>{layoutMode ? t("Ver lista", "View list", "Ver lista") : t("Editar plano", "Edit layout", "Editar plano")}</button>
+            {canEdit && <button className="primary-button small" onClick={() => openNew()}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
+          </div>
         </div>
       </div>
       {loading && (
@@ -4255,10 +4300,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       )}
 
       <section className="seating-overview">
-      <nav className="seating-mode-tabs" aria-label={t("Vistas de organización", "Planning views", "Vistas de organização")}>
-        <button aria-pressed={!layoutMode} onClick={() => setLayoutMode(false)}>♙ {t("Personas y mesas", "People and tables", "Pessoas e mesas")}</button>
-        <button aria-pressed={layoutMode} onClick={() => setLayoutMode(true)}>▦ {t("Plano del salón", "Venue layout", "Plano do salão")}</button>
-      </nav>
       <div className="seating-summary">
         <article>
           <span>{t("Mesas creadas", "Tables created", "Mesas criadas")}</span>
@@ -4392,7 +4433,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               {floorDropTarget === space && draggedNewFloorElement && <span className="floor-drop-message">＋ {t(`Soltá para agregar ${draggedNewFloorElement.label}`, `Drop to add ${draggedNewFloorElement.label}`, `Solte para adicionar ${draggedNewFloorElement.label}`)}</span>}
               <div className="space-heading"><strong className="space-label">{space}</strong>{canEdit && <span title={t("Estas medidas definen el lienzo visual; mantené la proporción del plano real", "These values define the visual canvas; preserve the real layout proportions", "Estas medidas definem a tela visual; mantenha a proporção do plano real")}><label>{t("Ancho", "Width", "Largura")}<input type="number" min="700" max="2400" value={spaceSizes[space]?.width || 1200} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: Number(event.target.value), height: current[space]?.height || 700 } }))} onBlur={(event) => void saveSpaceSize(space, Number(event.target.value), spaceSizes[space]?.height || 700)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min="480" max="1800" value={spaceSizes[space]?.height || 700} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: current[space]?.width || 1200, height: Number(event.target.value) } }))} onBlur={(event) => void saveSpaceSize(space, spaceSizes[space]?.width || 1200, Number(event.target.value))} /></label></span>}</div>
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""} ${socialCircleFilter && table.guests.some((guestId) => normalizedReference(confirmedGuests.find((guest) => guest.id === guestId)?.group || "") === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
                   <strong>{table.name}</strong><small>{table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}</small>
                   {canEdit && !table.locked && selectedLayoutTableId === table.id && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
@@ -4468,6 +4509,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           </div>
           <div className="guest-assign-list">
             <label className="search seating-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label>
+            <label className="social-circle-filter"><span>{t("Círculo social", "Social circle", "Círculo social")}</span><select value={socialCircleFilter} onChange={(event) => setSocialCircleFilter(event.target.value)}><option value="">{t("Todos los círculos", "All circles", "Todos os círculos")}</option>{socialCircleOptions.map((circle) => <option key={circle} value={circle}>{circle}</option>)}</select></label>
             {matchingGroups.length > 0 && <section className="group-search-results" aria-label={t("Grupos encontrados", "Matching groups", "Grupos encontrados")}>
               <strong>{t("Ubicar grupo completo", "Seat entire group", "Alocar grupo completo")}</strong>
               {matchingGroups.map((groupName) => {
@@ -4514,7 +4556,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               ))}
             </div>
             <button className={`restriction-filter ${guestRestrictionFilter ? "active" : ""}`} onClick={() => setGuestRestrictionFilter((current) => !current)}>⚠ {t("Sólo con restricciones", "Restrictions only", "Somente com restrições")}</button>
-            {(query || assignmentFilter !== "all" || guestCategoryFilter !== "all" || guestRestrictionFilter) && <button className="clear-seating-filters" onClick={() => { setQuery(""); setAssignmentFilter("all"); setGuestCategoryFilter("all"); setGuestRestrictionFilter(false); }}>× {t("Limpiar filtros", "Clear filters", "Limpar filtros")}</button>}
+            {(query || socialCircleFilter || assignmentFilter !== "all" || guestCategoryFilter !== "all" || guestRestrictionFilter) && <button className="clear-seating-filters" onClick={() => { setQuery(""); setSocialCircleFilter(""); setAssignmentFilter("all"); setGuestCategoryFilter("all"); setGuestRestrictionFilter(false); }}>× {t("Limpiar filtros", "Clear filters", "Limpar filtros")}</button>}
             {canEdit && (
               <div
                 className={`unassign-drop-zone ${dragGuestId ? "is-active" : ""}`}
@@ -4530,10 +4572,11 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             )}
             {confirmedGuests.filter((guest) => {
               const matchesQuery = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
+              const matchesCircle = !socialCircleFilter || normalizedReference(guest.group) === normalizedReference(socialCircleFilter);
               const isAssigned = assignedIds.includes(guest.id);
               const matchesCategory = guestCategoryFilter === "all" || (guest.guestType || "adult") === guestCategoryFilter;
               const matchesRestriction = !guestRestrictionFilter || guestHasRestriction(guest);
-              return matchesQuery && matchesCategory && matchesRestriction && (assignmentFilter === "all" || (assignmentFilter === "assigned" ? isAssigned : !isAssigned));
+              return matchesQuery && matchesCircle && matchesCategory && matchesRestriction && (assignmentFilter === "all" || (assignmentFilter === "assigned" ? isAssigned : !isAssigned));
             }).map((guest) => {
               const currentTable = tables.find((table) =>
                 table.guests.includes(guest.id),
@@ -4564,6 +4607,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   <GuestAvatar guest={guest} />
                   <p>
                     <GuestNameButton guest={guest} />
+                    {guest.group && <span className="guest-circle-tag">{guest.group}</span>}
                     <small>
                       {confirmedPeopleForGuest(guest, guests)}{" "}
                       {confirmedPeopleForGuest(guest, guests) === 1
@@ -4571,7 +4615,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         : t("personas", "people", "pessoas")}{" "}
                       · {guest.group}
                     </small>
-                    {guestSuggestion ? <small className={`guest-seat-suggestion ${guestSuggestion.table.id === currentTable?.id ? "is-current" : ""}`}>★ {t("Sugerencia", "Suggestion", "Sugestão")}: {guestSuggestion.table.name} · {guestSuggestion.explicit ? `${t("junto a", "next to", "junto a")} ${guestSuggestion.reason}` : t("junto a su grupo", "next to their group", "junto ao seu grupo")}{guestSuggestion.table.id === currentTable?.id ? ` · ${t("mesa correcta", "correct table", "mesa correta")}` : ""}</small> : hasConfirmedGroupPeers && <small className="guest-seat-suggestion is-waiting">☆ {t("Sugerencia pendiente: ubicá primero a alguien de su grupo", "Pending suggestion: seat someone from their group first", "Sugestão pendente: coloque primeiro alguém do grupo")}</small>}
+                    {guestSuggestion ? <small className={`guest-seat-suggestion ${guestSuggestion.table.id === currentTable?.id ? "is-current" : ""}`}>★ {t("Sugerencia", "Suggestion", "Sugestão")}: {guestSuggestion.table.name} · {guestSuggestion.explicit ? `${t("junto a", "next to", "junto a")} ${guestSuggestion.reason}` : guestSuggestion.nearby ? t("mesa cercana a su círculo", "table near their circle", "mesa próxima ao seu círculo") : t("junto a su círculo", "next to their circle", "junto ao seu círculo")}{guestSuggestion.table.id === currentTable?.id ? ` · ${t("mesa correcta", "correct table", "mesa correta")}` : ""}</small> : hasConfirmedGroupPeers && <small className="guest-seat-suggestion is-waiting">☆ {t("Sugerencia pendiente: ubicá primero a alguien de su círculo", "Pending suggestion: seat someone from their circle first", "Sugestão pendente: coloque primeiro alguém do círculo")}</small>}
                   </p>
                   <select
                     value={currentTable?.id ?? ""}
@@ -4666,7 +4710,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </span>
             </div>
           </div>
-          {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${selectedSuggestion?.explicit ? `${t("junto a", "next to", "junto a")} ${selectedSuggestion.reason}` : t("junto a su grupo", "next to their group", "junto ao seu grupo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
+          {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${selectedSuggestion?.explicit ? `${t("junto a", "next to", "junto a")} ${selectedSuggestion.reason}` : selectedSuggestion?.nearby ? t("mesa cercana a su círculo", "table near their circle", "mesa próxima ao seu círculo") : t("junto a su círculo", "next to their circle", "junto ao seu círculo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
           {tableQuery && <div className="active-table-filter"><span>{t("Resultados para", "Results for", "Resultados para")} “{tableQuery}”</span><button onClick={() => setTableQuery("")}>× {t("Limpiar", "Clear", "Limpar")}</button></div>}
           <div className={`tables-grid ${compactTables ? "is-compact" : ""}`}>
             {!visibleTables.length && <div className="tables-empty-state"><strong>{t("No encontramos mesas", "No tables found", "Nenhuma mesa encontrada")}</strong><span>{t("Probá con otro nombre de mesa o invitado.", "Try another table or guest name.", "Tente outro nome de mesa ou convidado.")}</span><button onClick={() => setTableQuery("")}>{t("Ver todas las mesas", "View all tables", "Ver todas as mesas")}</button></div>}
@@ -4737,7 +4781,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               return (
                 <article
                   id={`table-card-${table.id}`}
-                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""} ${selectedGuestId && table.guests.includes(selectedGuestId) ? "has-selected-guest" : ""} ${suggestedGroupTable?.id === table.id ? "is-group-suggestion" : ""} ${assignmentSavingId && table.guests.includes(assignmentSavingId) ? "is-saving" : ""}`}
+                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""} ${selectedGuestId && table.guests.includes(selectedGuestId) ? "has-selected-guest" : ""} ${suggestedGroupTable?.id === table.id ? "is-group-suggestion" : ""} ${socialCircleFilter && tableGuests.some((guest) => normalizedReference(guest.group) === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""} ${assignmentSavingId && table.guests.includes(assignmentSavingId) ? "is-saving" : ""}`}
                   key={table.id}
                   onDragOver={(event) => {
                     if (canEdit && dragGuestId && canDrop) {
@@ -4855,6 +4899,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       );
                       return <div className={`is-${guest.guestType || "adult"}`} key={guest.id}>
                         <GuestNameButton guest={guest} />
+                        {guest.group && <span className="seated-circle-tag">{guest.group}</span>}
                         {guestHasRestriction(guest) && <span className="restriction-mark context-tip" data-help={`${t("Restricción", "Restriction", "Restrição")}: ${restrictionDetails}`} aria-label={`${t("Restricción de", "Restriction for", "Restrição de")} ${guest.name}`} role="img">⚠</span>}
                         {people > 1 && <small>{people} {t("lugares", "seats", "lugares")}</small>}
                         {canEdit && !isLiving && (

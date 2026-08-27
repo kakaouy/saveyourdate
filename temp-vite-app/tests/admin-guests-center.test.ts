@@ -201,6 +201,8 @@ test('el nombre guardado se impone en la tarjeta y no puede volver al valor ante
   assert.match(source, /\.\.\.result\.table!, name: normalizedTableName, guests: table\.guests/);
   assert.match(source, /\.\.\.result\.table!, name, guests: item\.guests/);
   assert.match(source, /table\.id === previousTable\.id \? previousTable : table/);
+  assert.match(styles, /\.tables-workspace \.table-card-top \.table-name-edit/);
+  assert.match(styles, /\.table-seat-map\.is-round \.table-surface \{ top: 50%; left: 50%; width: 82px; height: 82px/);
 });
 
 test('la leyenda de mesas pasa a una ayuda contextual compacta', () => {
@@ -270,7 +272,7 @@ test('Living funciona como una zona sin límite ni sillas numeradas', () => {
 });
 
 test('la búsqueda permite ubicar un grupo completo de forma atómica', () => {
-  assert.match(source, /const matchingGroups = query\.trim\(\)/);
+  assert.match(source, /const matchingGroups = socialCircleFilter/);
   assert.match(source, /const assignGroup = async/);
   assert.match(source, /action: "assign-batch"/);
   assert.match(source, /className="group-search-results"/);
@@ -291,8 +293,15 @@ test('el respaldo conserva Living, el plano y los asientos asignados', () => {
   const restoreApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'restore.ts'), 'utf8');
   assert.match(backupApi, /table_shape/);
   assert.match(backupApi, /seat_number/);
+  assert.match(backupApi, /group_name.*guest_type.*social_together_with.*preferred_table_name/);
+  assert.match(backupApi, /event_layout_elements/);
+  assert.match(backupApi, /event_layout_spaces/);
   assert.match(restoreApi, /'living'/);
   assert.match(restoreApi, /seat_number: guest\.seat_number/);
+  assert.match(restoreApi, /social_together_with: String\(guest\.social_together_with/);
+  assert.match(restoreApi, /companion_of_id: guest\.companion_of_id/);
+  assert.match(restoreApi, /validation\.layoutElements/);
+  assert.match(restoreApi, /validation\.layoutSpaces/);
 });
 
 test('los grupos pueden ubicarse en un asiento concreto sin solaparse', () => {
@@ -594,6 +603,27 @@ test('busca por grupo y prioriza la condición explícita de sentar junto', () =
   assert.match(source, /aparecerá como sugerencia en Mesas/);
 });
 
+test('los círculos sociales alimentan la carga y las sugerencias de proximidad', () => {
+  assert.match(source, /Círculo social/);
+  assert.match(source, /guest-circle-options/);
+  assert.match(source, /column\("circulo", "círculo", "grupo", "familia"\)/);
+  assert.match(source, /const circleTables = tables\.filter/);
+  assert.match(source, /Math\.hypot/);
+  assert.match(source, /mesa cercana a su círculo/);
+  assert.match(source, /const \[socialCircleFilter, setSocialCircleFilter\]/);
+  assert.match(source, /Todos los círculos/);
+  assert.match(source, /const matchesCircle =/);
+  assert.match(source, /Círculo disperso/);
+  assert.match(source, /circle-distance-/);
+  assert.match(source, /assignGroup\(groupName, event\.target\.value\)/);
+  assert.match(source, /guest-circle-tag/);
+  assert.match(source, /has-social-circle/);
+  assert.match(styles, /\.social-circle-filter/);
+  assert.match(styles, /\.guest-circle-tag/);
+  assert.match(styles, /\.table-card\.has-social-circle/);
+  assert.match(styles, /\.floor-table\.has-social-circle/);
+});
+
 test('la sugerencia permanece visible y se reinicia después de cada movimiento', () => {
   assert.match(source, /const suggestedTableForGuest =/);
   assert.match(source, /if \(explicitTable\) return/);
@@ -605,7 +635,7 @@ test('la sugerencia permanece visible y se reinicia después de cada movimiento'
   assert.match(styles, /\.guest-assign-list \.guest-seat-suggestion/);
   assert.doesNotMatch(source, /guestSuggestion && guestSuggestion\.table\.id !== currentTable/);
   assert.match(source, /hasConfirmedGroupPeers/);
-  assert.match(source, /Sugerencia pendiente: ubicá primero a alguien de su grupo/);
+  assert.match(source, /Sugerencia pendiente: ubicá primero a alguien de su círculo/);
   assert.match(source, /mesa correcta/);
 });
 

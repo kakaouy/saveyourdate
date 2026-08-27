@@ -10,6 +10,11 @@ const countRows = async (table: string, orderNumber: string) => {
   return (await response.json() as Array<{ id: string }>).length;
 };
 
+const countLayoutSpaces = async (orderNumber: string) => {
+  const response = await supabaseRequest(`event_layout_spaces?order_number=eq.${encodeURIComponent(orderNumber)}&select=space_name`);
+  return (await response.json() as Array<{ space_name: string }>).length;
+};
+
 async function handler(request: Request) {
   if (request.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
   let restoringOrderNumber = '';
@@ -20,20 +25,24 @@ async function handler(request: Request) {
     const body = await request.json() as Record<string, unknown>;
     const validation = validateBackup(body.backup, session.order_number);
     if ('error' in validation) return json({ error: validation.error }, 400);
-    const [guestCount, tableCount, collaboratorCount] = await Promise.all([
+    const [guestCount, tableCount, elementCount, spaceCount, collaboratorCount] = await Promise.all([
       countRows('event_guests', session.order_number),
       countRows('event_tables', session.order_number),
+      countRows('event_layout_elements', session.order_number),
+      countLayoutSpaces(session.order_number),
       countRows('event_admins', session.order_number)
     ]);
     const summary = {
       guests: validation.guests.length,
       tables: validation.tables.length,
+      layoutElements: validation.layoutElements.length,
+      layoutSpaces: validation.layoutSpaces.length,
       collaborators: validation.collaborators.length
     };
     if (body.apply !== true) {
-      return json({ valid: true, canRestore: guestCount + tableCount + collaboratorCount === 0, current: { guests: guestCount, tables: tableCount, collaborators: collaboratorCount }, summary });
+      return json({ valid: true, canRestore: guestCount + tableCount + elementCount + spaceCount + collaboratorCount === 0, current: { guests: guestCount, tables: tableCount, layoutElements: elementCount, layoutSpaces: spaceCount, collaborators: collaboratorCount }, summary });
     }
-    if (guestCount + tableCount + collaboratorCount > 0) {
+    if (guestCount + tableCount + elementCount + spaceCount + collaboratorCount > 0) {
       return json({ error: 'El evento contiene datos. Para evitar sobrescrituras, la restauración sólo se permite sobre un evento vacío.' }, 409);
     }
     if (String(body.confirmation || '').trim().toUpperCase() !== session.order_number) {
@@ -59,6 +68,12 @@ async function handler(request: Request) {
           is_locked: Boolean(table.is_locked)
         })))
       });
+    }
+    if (validation.layoutSpaces.length) {
+      await supabaseRequest('event_layout_spaces', { method: 'POST', body: JSON.stringify(validation.layoutSpaces.map((space) => ({ order_number: session.order_number, space_name: String(space.space_name).trim().slice(0, 120), canvas_width: Math.max(700, Math.min(2400, Number(space.canvas_width) || 1200)), canvas_height: Math.max(480, Math.min(1800, Number(space.canvas_height) || 700)) }))) });
+    }
+    if (validation.layoutElements.length) {
+      await supabaseRequest('event_layout_elements', { method: 'POST', body: JSON.stringify(validation.layoutElements.map((element) => ({ id: String(element.id), order_number: session.order_number, element_type: String(element.element_type || 'custom'), label: String(element.label).trim().slice(0, 120), space_name: String(element.space_name || 'Espacio 1').trim().slice(0, 120), position_x: Math.max(0, Number(element.position_x) || 0), position_y: Math.max(0, Number(element.position_y) || 0), element_width: Math.max(90, Math.min(420, Number(element.element_width) || 150)), element_height: Math.max(55, Math.min(260, Number(element.element_height) || 80)), rotation_degrees: Number(element.rotation_degrees) || 0 }))) });
     }
     if (validation.guests.length) {
       await supabaseRequest('event_guests', {
@@ -87,11 +102,18 @@ async function handler(request: Request) {
           invitation_opened_at: guest.invitation_opened_at || null,
           responded_at: guest.responded_at || null,
           archived_at: guest.archived_at || null,
+          checked_in_at: guest.checked_in_at || null,
           transport_option: String(guest.transport_option || '').slice(0, 80),
           transport_stop: String(guest.transport_stop || '').slice(0, 160),
           menu_choice: String(guest.menu_choice || '').slice(0, 120),
           accessibility_needs: String(guest.accessibility_needs || '').slice(0, 500),
-          guest_notes: String(guest.guest_notes || '').slice(0, 1000)
+          guest_notes: String(guest.guest_notes || '').slice(0, 1000),
+          guest_type: ['adult', 'teen', 'child'].includes(String(guest.guest_type)) ? guest.guest_type : 'adult',
+          social_together_with: String(guest.social_together_with || '').trim().slice(0, 120),
+          social_separate_from: String(guest.social_separate_from || '').trim().slice(0, 120),
+          preferred_table_name: String(guest.preferred_table_name || '').trim().slice(0, 120),
+          invited_by: String(guest.invited_by || '').trim().slice(0, 120),
+          companion_of_id: guest.companion_of_id ? String(guest.companion_of_id) : null
         })))
       });
     }
@@ -113,6 +135,8 @@ async function handler(request: Request) {
     if (restoringOrderNumber) {
       try {
         await supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(restoringOrderNumber)}`, { method: 'DELETE' });
+        await supabaseRequest(`event_layout_elements?order_number=eq.${encodeURIComponent(restoringOrderNumber)}`, { method: 'DELETE' });
+        await supabaseRequest(`event_layout_spaces?order_number=eq.${encodeURIComponent(restoringOrderNumber)}`, { method: 'DELETE' });
         await supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(restoringOrderNumber)}`, { method: 'DELETE' });
         await supabaseRequest(`event_admins?order_number=eq.${encodeURIComponent(restoringOrderNumber)}`, { method: 'DELETE' });
       } catch (rollbackError) {

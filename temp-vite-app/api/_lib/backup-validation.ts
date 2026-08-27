@@ -15,6 +15,8 @@ export const validateBackup = (value: unknown, expectedOrderNumber: string) => {
   const guests = records(backup.guests);
   const tables = records(backup.tables);
   const collaborators = records(backup.collaborators);
+  const layoutElements = backup.layoutElements === undefined ? [] : records(backup.layoutElements);
+  const layoutSpaces = backup.layoutSpaces === undefined ? [] : records(backup.layoutSpaces);
   if (
     backup.format !== 'save-your-date-admin-backup' ||
     backup.version !== 1 ||
@@ -22,11 +24,11 @@ export const validateBackup = (value: unknown, expectedOrderNumber: string) => {
     String(event.orderNumber || '').toUpperCase() !== expectedOrderNumber.toUpperCase() ||
     !guests ||
     !tables ||
-    !collaborators
+    !collaborators || !layoutElements || !layoutSpaces
   ) {
     return { error: 'El respaldo no corresponde a este pedido o tiene un formato incompatible.' } as const;
   }
-  if (guests.length > 500 || tables.length > 100 || collaborators.length > 20) {
+  if (guests.length > 500 || tables.length > 100 || layoutElements.length > 300 || layoutSpaces.length > 20 || collaborators.length > 20) {
     return { error: 'El respaldo supera los límites permitidos.' } as const;
   }
   for (const table of tables) {
@@ -61,5 +63,13 @@ export const validateBackup = (value: unknown, expectedOrderNumber: string) => {
       return { error: 'El respaldo contiene un colaborador inválido.' } as const;
     }
   }
-  return { backup, event, guests, tables, collaborators } as const;
+  for (const element of layoutElements) {
+    if (!UUID.test(String(element.id || '')) || !String(element.label || '').trim() || !String(element.space_name || '').trim()) {
+      return { error: 'El respaldo contiene un elemento incompleto en el plano.' } as const;
+    }
+  }
+  for (const space of layoutSpaces) {
+    if (!String(space.space_name || '').trim()) return { error: 'El respaldo contiene un espacio incompleto.' } as const;
+  }
+  return { backup, event, guests, tables, layoutElements, layoutSpaces, collaborators } as const;
 };
