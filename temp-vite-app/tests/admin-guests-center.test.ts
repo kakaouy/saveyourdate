@@ -821,3 +821,15 @@ test('las tarjetas de invitados distribuyen datos y acciones sin comprimirlos', 
   assert.match(styles, /\.guest-actions-column \.whatsapp-button \{ min-width: 48px; white-space: nowrap/);
   assert.match(styles, /@media \(max-width: 520px\)/);
 });
+
+test('entregables guía la elección y muestra una vista previa enfocada', () => {
+  assert.match(source, /const \[exportSelection, setExportSelection\]/);
+  assert.match(source, /aria-label=\{t\("Tipo de entregable"/);
+  assert.match(source, /exportSelection === "coordination"/);
+  assert.match(source, /exportSelection === "catering"/);
+  assert.match(source, /exportSelection === "layout"/);
+  assert.match(source, /La descarga incluye los datos reales; esta muestra no\./);
+  assert.match(source, /PLANO SIN DATOS PRIVADOS/);
+  assert.match(styles, /\.export-workspace/);
+  assert.match(styles, /\.export-detail \{ display: grid; grid-template-columns:/);
+});
