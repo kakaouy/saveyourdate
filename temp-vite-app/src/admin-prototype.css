@@ -115,6 +115,9 @@ button { color: inherit; }
 .admin-action-icon { display: inline-block; flex: 0 0 15px; width: 15px; height: 15px; background-color: currentColor; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain; mask-position: center; mask-repeat: no-repeat; mask-size: contain; }
 .admin-action-icon.is-print { -webkit-mask-image: url('/admin-icons/print.png'); mask-image: url('/admin-icons/print.png'); }
 .admin-action-icon.is-logout { -webkit-mask-image: url('/admin-icons/logout.png'); mask-image: url('/admin-icons/logout.png'); }
+.admin-action-icon.is-edit { -webkit-mask-image: url('/admin-icons/edit.png'); mask-image: url('/admin-icons/edit.png'); }
+.admin-action-icon.is-plan { -webkit-mask-image: url('/admin-icons/floor-plan.png'); mask-image: url('/admin-icons/floor-plan.png'); }
+.admin-action-icon.is-guests { -webkit-mask-image: url('/admin-icons/guests.png'); mask-image: url('/admin-icons/guests.png'); }
 
 @media (max-height: 850px) {
   .admin-shell .sidebar { padding: 12px 14px; }
@@ -464,14 +467,24 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .floor-library-items { display: grid; gap: 7px; }
 .floor-library-items > button { display: grid; grid-template-columns: 30px minmax(0,1fr); align-items: center; gap: 9px; min-height: 48px; padding: 7px 9px; }
 .floor-library-items > button > i { display: block; width: 26px; height: 26px; border: 2px solid #79bfc1; border-radius: 7px; background: #eaf5f5; }
-.floor-library-items > button > i:is(.is-kitchen,.is-buffet,.is-hydration,.is-restroom,.is-dance-floor,.is-dj,.is-photo-booth,.is-emergency,.is-entrance,.is-wall,.is-divider,.is-plant,.is-gourmet) { border: 0; border-radius: 0; background-color: currentColor; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: 22px 22px; mask-position: center; mask-repeat: no-repeat; mask-size: 22px 22px; }
+.floor-library-items > button > i { border: 0; border-radius: 0; background-color: currentColor; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: 22px 22px; mask-position: center; mask-repeat: no-repeat; mask-size: 22px 22px; }
 .floor-library-items > button > i:is(.is-kitchen,.is-buffet) { -webkit-mask-image: url('/admin-icons/kitchen.png'); mask-image: url('/admin-icons/kitchen.png'); }
 .floor-library-items > button > i.is-hydration { -webkit-mask-image: url('/admin-icons/bar.png'); mask-image: url('/admin-icons/bar.png'); }
 .floor-library-items > button > i.is-restroom { -webkit-mask-image: url('/admin-icons/restroom.png'); mask-image: url('/admin-icons/restroom.png'); }
-.floor-library-items > button > i:is(.is-dance-floor,.is-dj) { -webkit-mask-image: url('/admin-icons/dance-floor.png'); mask-image: url('/admin-icons/dance-floor.png'); }
+.floor-library-items > button > i.is-dance-floor { -webkit-mask-image: url('/admin-icons/dance-floor.png'); mask-image: url('/admin-icons/dance-floor.png'); }
+.floor-library-items > button > i.is-stage { -webkit-mask-image: url('/admin-icons/stage.png'); mask-image: url('/admin-icons/stage.png'); }
+.floor-library-items > button > i.is-dj { -webkit-mask-image: url('/admin-icons/dj.png'); mask-image: url('/admin-icons/dj.png'); }
+.floor-library-items > button > i.is-cake { -webkit-mask-image: url('/admin-icons/cake.png'); mask-image: url('/admin-icons/cake.png'); }
+.floor-library-items > button > i.is-gifts { -webkit-mask-image: url('/admin-icons/gifts.png'); mask-image: url('/admin-icons/gifts.png'); }
 .floor-library-items > button > i.is-photo-booth { -webkit-mask-image: url('/admin-icons/photo-booth.png'); mask-image: url('/admin-icons/photo-booth.png'); }
 .floor-library-items > button > i:is(.is-emergency,.is-entrance) { -webkit-mask-image: url('/admin-icons/emergency-exit.png'); mask-image: url('/admin-icons/emergency-exit.png'); }
-.floor-library-items > button > i:is(.is-wall,.is-divider) { -webkit-mask-image: url('/admin-icons/wall.png'); mask-image: url('/admin-icons/wall.png'); }
+.floor-library-items > button > i.is-wall { -webkit-mask-image: url('/admin-icons/wall.png'); mask-image: url('/admin-icons/wall.png'); }
+.floor-library-items > button > i.is-window { -webkit-mask-image: url('/admin-icons/window.png'); mask-image: url('/admin-icons/window.png'); }
+.floor-library-items > button > i.is-column { -webkit-mask-image: url('/admin-icons/column.png'); mask-image: url('/admin-icons/column.png'); }
+.floor-library-items > button > i.is-stairs { -webkit-mask-image: url('/admin-icons/stairs.png'); mask-image: url('/admin-icons/stairs.png'); }
+.floor-library-items > button > i.is-fountain { -webkit-mask-image: url('/admin-icons/fountain.png'); mask-image: url('/admin-icons/fountain.png'); }
+.floor-library-items > button > i.is-divider { -webkit-mask-image: url('/admin-icons/divider.png'); mask-image: url('/admin-icons/divider.png'); }
+.floor-library-items > button > i.is-custom { -webkit-mask-image: url('/admin-icons/edit.png'); mask-image: url('/admin-icons/edit.png'); }
 .floor-library-items > button > i.is-plant { -webkit-mask-image: url('/admin-icons/plant.png'); mask-image: url('/admin-icons/plant.png'); }
 .floor-library-items > button > i.is-gourmet { -webkit-mask-image: url('/admin-icons/living.png'); mask-image: url('/admin-icons/living.png'); }
 .floor-library-items > button > span { display: grid; gap: 2px; min-width: 0; }
@@ -524,19 +537,30 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .floor-element > strong { font-size: 10px; line-height: 1.25; text-align: center; }
 .floor-element.is-icon-only { padding: 1px; overflow: visible; }
 .floor-element-icon { display: grid; place-items: center; width: 100%; height: 100%; overflow: hidden; font-size: clamp(9px, 65%, 20px); font-weight: 900; line-height: 1; }
-.floor-element-icon:is(.is-kitchen,.is-buffet,.is-hydration,.is-restroom,.is-dance-floor,.is-dj,.is-photo-booth,.is-emergency,.is-entrance,.is-wall,.is-divider,.is-plant,.is-gourmet) { width: min(70%,22px); height: min(70%,22px); background-color: currentColor; font-size: 0; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain; mask-position: center; mask-repeat: no-repeat; mask-size: contain; }
+.floor-element-icon { width: min(70%,22px); height: min(70%,22px); background-color: currentColor; font-size: 0; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain; mask-position: center; mask-repeat: no-repeat; mask-size: contain; }
 .floor-element-icon:is(.is-kitchen,.is-buffet) { -webkit-mask-image: url('/admin-icons/kitchen.png'); mask-image: url('/admin-icons/kitchen.png'); }
 .floor-element-icon.is-hydration { -webkit-mask-image: url('/admin-icons/bar.png'); mask-image: url('/admin-icons/bar.png'); }
 .floor-element-icon.is-restroom { -webkit-mask-image: url('/admin-icons/restroom.png'); mask-image: url('/admin-icons/restroom.png'); }
-.floor-element-icon:is(.is-dance-floor,.is-dj) { -webkit-mask-image: url('/admin-icons/dance-floor.png'); mask-image: url('/admin-icons/dance-floor.png'); }
+.floor-element-icon.is-dance-floor { -webkit-mask-image: url('/admin-icons/dance-floor.png'); mask-image: url('/admin-icons/dance-floor.png'); }
+.floor-element-icon.is-stage { -webkit-mask-image: url('/admin-icons/stage.png'); mask-image: url('/admin-icons/stage.png'); }
+.floor-element-icon.is-dj { -webkit-mask-image: url('/admin-icons/dj.png'); mask-image: url('/admin-icons/dj.png'); }
+.floor-element-icon.is-cake { -webkit-mask-image: url('/admin-icons/cake.png'); mask-image: url('/admin-icons/cake.png'); }
+.floor-element-icon.is-gifts { -webkit-mask-image: url('/admin-icons/gifts.png'); mask-image: url('/admin-icons/gifts.png'); }
 .floor-element-icon.is-photo-booth { -webkit-mask-image: url('/admin-icons/photo-booth.png'); mask-image: url('/admin-icons/photo-booth.png'); }
 .floor-element-icon:is(.is-emergency,.is-entrance) { -webkit-mask-image: url('/admin-icons/emergency-exit.png'); mask-image: url('/admin-icons/emergency-exit.png'); }
-.floor-element-icon:is(.is-wall,.is-divider) { -webkit-mask-image: url('/admin-icons/wall.png'); mask-image: url('/admin-icons/wall.png'); }
+.floor-element-icon.is-wall { -webkit-mask-image: url('/admin-icons/wall.png'); mask-image: url('/admin-icons/wall.png'); }
+.floor-element-icon.is-window { -webkit-mask-image: url('/admin-icons/window.png'); mask-image: url('/admin-icons/window.png'); }
+.floor-element-icon.is-column { -webkit-mask-image: url('/admin-icons/column.png'); mask-image: url('/admin-icons/column.png'); }
+.floor-element-icon.is-stairs { -webkit-mask-image: url('/admin-icons/stairs.png'); mask-image: url('/admin-icons/stairs.png'); }
+.floor-element-icon.is-fountain { -webkit-mask-image: url('/admin-icons/fountain.png'); mask-image: url('/admin-icons/fountain.png'); }
+.floor-element-icon.is-divider { -webkit-mask-image: url('/admin-icons/divider.png'); mask-image: url('/admin-icons/divider.png'); }
+.floor-element-icon.is-custom { -webkit-mask-image: url('/admin-icons/edit.png'); mask-image: url('/admin-icons/edit.png'); }
 .floor-element-icon.is-plant { -webkit-mask-image: url('/admin-icons/plant.png'); mask-image: url('/admin-icons/plant.png'); }
 .floor-element-icon.is-gourmet { -webkit-mask-image: url('/admin-icons/living.png'); mask-image: url('/admin-icons/living.png'); }
 .floor-element.is-very-small .element-delete { display: none; }
 .floor-element.is-very-small .resize-handle { right: -6px; bottom: -6px; width: 13px; height: 13px; border-width: 1px; border-radius: 4px; }
 .floor-element.is-selected { outline: 2px solid var(--teal); outline-offset: 3px; box-shadow: 0 8px 22px rgba(17,103,107,.18); }
+.floor-table:focus-visible,.floor-element:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; }
 .floor-element.is-dance-floor { color: #58417e; border-color: #9a84c5; border-style: dashed; background: #eee8fa; }
 .floor-element.is-entrance { color: #276a43; border-color: #70b88e; background: #e6f6eb; }
 .floor-element.is-gourmet { color: #8a4d17; border-color: #dc9a55; background: #fff0dd; }
@@ -1346,6 +1370,10 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
 .seating-overview { display: block; width: 100%; margin: 0 0 13px; }
 .seating-mode-tabs { display: grid; grid-template-columns: 1fr 1fr; width: 100%; margin: 0; padding: 5px; border: 1px solid var(--line); border-radius: 999px; background: white; }
 .seating-mode-tabs button { display: block; min-height: 40px; padding: 8px 15px; border: 0; border-radius: 999px; color: var(--muted); background: transparent; font-size: 12px; font-weight: 800; text-align: center; white-space: nowrap; }
+.seating-mode-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.seating-tab-icon { display: inline-block; width: 17px; height: 17px; flex: 0 0 17px; background: currentColor; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain; mask-position: center; mask-repeat: no-repeat; mask-size: contain; }
+.seating-tab-icon.is-guests { -webkit-mask-image: url('/admin-icons/guests.png'); mask-image: url('/admin-icons/guests.png'); }
+.seating-tab-icon.is-plan { -webkit-mask-image: url('/admin-icons/floor-plan.png'); mask-image: url('/admin-icons/floor-plan.png'); }
 .seating-mode-tabs button[aria-pressed="true"] { color: white; background: var(--ink); box-shadow: 0 3px 8px rgba(25,53,77,.14); }
 .seating-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; width: 100%; margin: 0; }
 .seating-summary article { min-width: 0; max-width: none; grid-template-columns: auto minmax(0,1fr); align-items: baseline; gap: 2px 12px; padding: 9px 13px; }
@@ -1399,6 +1427,7 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .admin-email,.guest-operation-summary span,.guest-operation-summary small,
   .delivery-status,.floor-plan-guide small,.floor-plan-legend span,.floor-elements-menu p,
   .floor-library-tabs button,.floor-library-tabs button b,.floor-library-items > button > span strong,
+  .floor-library-items > button > span small,
   .floor-plan-toolbar > span,.floor-drop-message,.space-heading label,.space-heading input,
   .floor-zoom span,.layout-overlap-warning,.floor-save-status,.floor-save-status button,
   .layout-history-actions button,.floor-element-actions button,.export-quality,

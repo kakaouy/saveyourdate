@@ -2539,7 +2539,7 @@ function Guests({
                           title={t("Editar", "Edit", "Editar")}
                           aria-label={`${t("Editar", "Edit", "Editar")} ${guest.name}`}
                         >
-                          ✎
+                          <span className="admin-action-icon is-edit" aria-hidden="true" />
                         </button>
                         <details className="guest-more-menu">
                           <summary aria-label={`${t("Más opciones para", "More options for", "Mais opções para")} ${guest.name}`} title={t("Más opciones", "More options", "Mais opções")}>•••</summary>
@@ -4168,7 +4168,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
   })[kind];
 
   const floorElementIconPath = (kind: FloorElement["kind"]) => ({
-    entrance: "/admin-icons/emergency-exit.png", "dance-floor": "/admin-icons/dance-floor.png", gourmet: "/admin-icons/living.png", hydration: "/admin-icons/bar.png", dj: "/admin-icons/dance-floor.png", buffet: "/admin-icons/kitchen.png", wall: "/admin-icons/wall.png", restroom: "/admin-icons/restroom.png", kitchen: "/admin-icons/kitchen.png", emergency: "/admin-icons/emergency-exit.png", "photo-booth": "/admin-icons/photo-booth.png", plant: "/admin-icons/plant.png", divider: "/admin-icons/wall.png",
+    entrance: "/admin-icons/emergency-exit.png", "dance-floor": "/admin-icons/dance-floor.png", gourmet: "/admin-icons/living.png", hydration: "/admin-icons/bar.png", stage: "/admin-icons/stage.png", dj: "/admin-icons/dj.png", cake: "/admin-icons/cake.png", gifts: "/admin-icons/gifts.png", buffet: "/admin-icons/kitchen.png", wall: "/admin-icons/wall.png", window: "/admin-icons/window.png", column: "/admin-icons/column.png", stairs: "/admin-icons/stairs.png", restroom: "/admin-icons/restroom.png", kitchen: "/admin-icons/kitchen.png", emergency: "/admin-icons/emergency-exit.png", "photo-booth": "/admin-icons/photo-booth.png", fountain: "/admin-icons/fountain.png", plant: "/admin-icons/plant.png", divider: "/admin-icons/divider.png", custom: "/admin-icons/edit.png",
   } as Partial<Record<FloorElement["kind"], string>>)[kind] || "";
 
   const floorElementNeedsIcon = (element: FloorElement) => element.width < 90 || element.height < 46 || element.label.length * 6.2 > element.width - 20;
@@ -4274,6 +4274,20 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     image.src = source;
   });
 
+  const drawTintedPlanIcon = (context: CanvasRenderingContext2D, icon: HTMLImageElement, size: number) => {
+    const iconCanvas = document.createElement("canvas");
+    iconCanvas.width = Math.max(1, Math.round(size));
+    iconCanvas.height = Math.max(1, Math.round(size));
+    const iconContext = iconCanvas.getContext("2d");
+    if (!iconContext) return false;
+    iconContext.drawImage(icon, 0, 0, iconCanvas.width, iconCanvas.height);
+    iconContext.globalCompositeOperation = "source-in";
+    iconContext.fillStyle = "#078f96";
+    iconContext.fillRect(0, 0, iconCanvas.width, iconCanvas.height);
+    context.drawImage(iconCanvas, -size / 2, -size / 2, size, size);
+    return true;
+  };
+
   const createPlanImage = async (scale = planExportScale) => {
     const iconSources = [...new Set(floorElements.map((element) => floorElementIconPath(element.kind)).filter(Boolean))];
     const loadedIcons = new Map(await Promise.all(iconSources.map(async (source) => [source, await loadPlanIcon(source)] as const)));
@@ -4333,7 +4347,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
         const icon = loadedIcons.get(floorElementIconPath(element.kind));
         if (iconOnly && icon) {
           const iconSize = Math.max(8, Math.min(24, element.width - 6, element.height - 6));
-          context.drawImage(icon, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
+          drawTintedPlanIcon(context, icon, iconSize);
         } else {
           context.fillText(iconOnly ? floorElementIcon(element.kind) : element.label, 0, 0, Math.max(8, element.width - 8));
         }
@@ -4561,12 +4575,12 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
         </div>
         <div className="seating-heading-controls">
           <nav className="seating-mode-tabs" aria-label={t("Vistas de organización", "Planning views", "Vistas de organização")}>
-            <button aria-pressed={!layoutMode} onClick={() => setLayoutMode(false)}>♙ {t("Personas y mesas", "People and tables", "Pessoas e mesas")}</button>
-            <button aria-pressed={layoutMode} onClick={() => setLayoutMode(true)}>▦ {t("Plano del salón", "Venue layout", "Plano do salão")}</button>
+            <button aria-pressed={!layoutMode} onClick={() => setLayoutMode(false)}><span className="seating-tab-icon is-guests" aria-hidden="true" />{t("Personas y mesas", "People and tables", "Pessoas e mesas")}</button>
+            <button aria-pressed={layoutMode} onClick={() => setLayoutMode(true)}><span className="seating-tab-icon is-plan" aria-hidden="true" />{t("Plano del salón", "Venue layout", "Plano do salão")}</button>
           </nav>
           <div className="heading-actions">
             <button className={`outline-button ${showExportCenter ? "active" : ""}`} onClick={() => setShowExportCenter((current) => !current)}><span className="admin-action-icon is-print" aria-hidden="true" />{t("Compartir e imprimir", "Share and print", "Compartilhar e imprimir")}</button>
-            <button className={`outline-button ${layoutMode ? "active" : ""}`} onClick={() => setLayoutMode((value) => !value)}>{layoutMode ? t("Ver lista", "View list", "Ver lista") : t("Editar plano", "Edit layout", "Editar plano")}</button>
+            <button className={`outline-button ${layoutMode ? "active" : ""}`} onClick={() => setLayoutMode((value) => !value)}><span className={`admin-action-icon ${layoutMode ? "is-guests" : "is-plan"}`} aria-hidden="true" />{layoutMode ? t("Ver lista", "View list", "Ver lista") : t("Editar plano", "Edit layout", "Editar plano")}</button>
             {canEdit && <button className="primary-button small" onClick={() => openNew()}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
           </div>
         </div>
@@ -4739,13 +4753,13 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
                 return origin && linkedTables.length > 1 ? <svg className="floor-social-connectors" width="100%" height="100%" aria-label={`${t("Proximidad del círculo", "Circle proximity", "Proximidade do círculo")} ${socialCircleFilter}`}>{linkedTables.slice(1).map((table) => <line key={`${origin.id}-${table.id}`} x1={(origin.x || 24) + (origin.width || 140) / 2} y1={(origin.y || 24) + (origin.height || 70) / 2} x2={(table.x || 24) + (table.width || 140) / 2} y2={(table.y || 24) + (table.height || 70) / 2} />)}</svg> : null;
               })()}
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""} ${socialCircleFilter && table.guests.some((guestId) => normalizedReference(confirmedGuests.find((guest) => guest.id === guestId)?.socialCircle || "") === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""} ${socialCircleFilter && table.guests.some((guestId) => normalizedReference(confirmedGuests.find((guest) => guest.id === guestId)?.socialCircle || "") === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""}`} key={table.id} draggable={canEdit && !table.locked} role="button" tabIndex={0} aria-pressed={selectedLayoutTableId === table.id} aria-label={`${table.name}. ${table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}`} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
                   <strong>{table.name}</strong><small>{table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}</small>
                   {canEdit && !table.locked && selectedLayoutTableId === table.id && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
                 </article>
               ))}
-              {floorElements.filter((element) => element.space === space).map((element) => { const iconOnly = floorElementNeedsIcon(element); return <article className={`floor-element is-${element.kind} ${iconOnly ? "is-icon-only" : ""} ${element.width < 44 || element.height < 44 ? "is-very-small" : ""} ${selectedFloorElementId === element.id ? "is-selected" : ""}`} key={element.id} draggable={canEdit} title={element.label} aria-label={element.label} onClick={(event) => { event.stopPropagation(); setSelectedLayoutTableId(""); setSelectedFloorElementId(element.id); setFloorElementLabelDraft(element.label); setShowFloorInspector(true); }} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height, transform: `rotate(${element.rotation || 0}deg)` }}>
+              {floorElements.filter((element) => element.space === space).map((element) => { const iconOnly = floorElementNeedsIcon(element); return <article className={`floor-element is-${element.kind} ${iconOnly ? "is-icon-only" : ""} ${element.width < 44 || element.height < 44 ? "is-very-small" : ""} ${selectedFloorElementId === element.id ? "is-selected" : ""}`} key={element.id} draggable={canEdit} role="button" tabIndex={0} title={element.label} aria-label={element.label} aria-pressed={selectedFloorElementId === element.id} onClick={(event) => { event.stopPropagation(); setSelectedLayoutTableId(""); setSelectedFloorElementId(element.id); setFloorElementLabelDraft(element.label); setShowFloorInspector(true); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height, transform: `rotate(${element.rotation || 0}deg)` }}>
                 {iconOnly ? <span className={`floor-element-icon is-${element.kind}`} aria-hidden="true">{floorElementIcon(element.kind)}</span> : <strong>{element.label}</strong>}
                 {canEdit && selectedFloorElementId === element.id && <><button className="element-delete" onClick={(event) => { event.stopPropagation(); void deleteFloorElement(element.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${element.label}`}>×</button><button className="resize-handle" onPointerDown={(event) => resizeFloorElement(element, event)} aria-label={t("Cambiar tamaño", "Resize", "Redimensionar")} /></>}
               </article>; })}
@@ -5132,7 +5146,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
                   <div className="table-card-top">
                     <span className="table-number">{index + 1}</span>
                     <div>
-                      <button className="table-name-edit" type="button" onClick={() => openEdit(table)} title={t("Editar nombre de la mesa", "Edit table name", "Editar nome da mesa")}><h3>{table.name}</h3><span aria-hidden="true">✎</span></button>
+                      <button className="table-name-edit" type="button" onClick={() => openEdit(table)} title={t("Editar nombre de la mesa", "Edit table name", "Editar nome da mesa")}><h3>{table.name}</h3><span className="admin-action-icon is-edit" aria-hidden="true" /></button>
                     </div>
                     {canEdit && (
                       <button

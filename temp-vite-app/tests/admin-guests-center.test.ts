@@ -480,6 +480,24 @@ test('el plano usa los iconos entregados para sus elementos principales', () => 
   assert.match(source, /floor-element-icon is-\$\{element\.kind\}/);
 });
 
+test('la familia extendida de iconos conserva grosor y significado en todo el plano', () => {
+  const extendedIcons = ['stage.png', 'dj.png', 'cake.png', 'gifts.png', 'window.png', 'column.png', 'stairs.png', 'fountain.png', 'divider.png', 'floor-plan.png', 'guests.png', 'edit.png'];
+  extendedIcons.forEach((icon) => assert.equal(existsSync(path.join(appRoot, 'public', 'admin-icons', icon)), true, `falta ${icon}`));
+  assert.match(source, /stage: "\/admin-icons\/stage\.png"/);
+  assert.match(source, /divider: "\/admin-icons\/divider\.png"/);
+  assert.match(source, /seating-tab-icon is-guests/);
+  assert.match(source, /admin-action-icon is-edit/);
+  assert.match(styles, /mask-image: url\('\/admin-icons\/fountain\.png'\)/);
+  assert.match(styles, /mask-image: url\('\/admin-icons\/floor-plan\.png'\)/);
+});
+
+test('las mesas y elementos del plano se pueden seleccionar con teclado', () => {
+  assert.match(source, /role="button" tabIndex=\{0\} aria-pressed=\{selectedLayoutTableId === table\.id\}/);
+  assert.match(source, /aria-pressed=\{selectedFloorElementId === element\.id\}/);
+  assert.match(source, /event\.key === "Enter" \|\| event\.key === " "/);
+  assert.match(styles, /\.floor-table:focus-visible,\.floor-element:focus-visible/);
+});
+
 test('imprimir y cerrar sesión usan PNG transparentes recoloreables', () => {
   ['print.png', 'logout.png'].forEach((icon) => assert.equal(existsSync(path.join(appRoot, 'public', 'admin-icons', icon)), true, `falta ${icon}`));
   assert.match(source, /admin-action-icon is-print/);
@@ -493,7 +511,9 @@ test('la exportación del plano ofrece calidad y vista previa privada', () => {
   assert.match(source, /const floorElementIconPath =/);
   assert.match(source, /const createPlanImage = async/);
   assert.match(source, /context\.scale\(scale, scale\)/);
-  assert.match(source, /context\.drawImage\(icon/);
+  assert.match(source, /const drawTintedPlanIcon =/);
+  assert.match(source, /globalCompositeOperation = "source-in"/);
+  assert.match(source, /drawTintedPlanIcon\(context, icon/);
   assert.match(source, /await createPlanImage\(\)/);
   assert.match(source, /const previewPlan =/);
   assert.match(source, /draw-element\.icon-only i/);
