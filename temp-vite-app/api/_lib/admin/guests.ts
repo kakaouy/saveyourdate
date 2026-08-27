@@ -363,7 +363,11 @@ async function handler(request: Request) {
           {
             method: "PATCH",
             headers: { Prefer: "return=representation" },
-            body: JSON.stringify({ archived_at: archivedAt, updated_at: new Date().toISOString() }),
+            body: JSON.stringify({
+              archived_at: archivedAt,
+              ...(archivedAt ? { table_id: null, seat_number: null } : {}),
+              updated_at: new Date().toISOString(),
+            }),
           },
         );
         const rows = (await response.json()) as GuestRow[];
@@ -382,7 +386,11 @@ async function handler(request: Request) {
           {
             method: "PATCH",
             headers: { Prefer: "return=representation" },
-            body: JSON.stringify({ archived_at: archivedAt, updated_at: new Date().toISOString() }),
+            body: JSON.stringify({
+              archived_at: archivedAt,
+              ...(archivedAt ? { table_id: null, seat_number: null } : {}),
+              updated_at: new Date().toISOString(),
+            }),
           },
         );
         const rows = (await response.json()) as GuestRow[];
@@ -480,7 +488,11 @@ async function handler(request: Request) {
           if (!["Confirmado", "Pendiente", "No asiste"].includes(status))
             return json({ error: "El estado seleccionado no es válido." }, 400);
           changes.status = status;
-          if (status !== "Confirmado") changes.confirmed = 0;
+          if (status !== "Confirmado") {
+            changes.confirmed = 0;
+            changes.table_id = null;
+            changes.seat_number = null;
+          }
         }
         if (body.group !== undefined) changes.group_name = String(body.group).trim();
         if (body.invitedBy !== undefined)
@@ -742,6 +754,7 @@ async function handler(request: Request) {
             social_together_with: body.socialTogetherWith === undefined ? existingGuests[0].social_together_with || "" : String(body.socialTogetherWith).trim().slice(0, 240),
             social_separate_from: body.socialSeparateFrom === undefined ? existingGuests[0].social_separate_from || "" : String(body.socialSeparateFrom).trim().slice(0, 240),
             preferred_table_name: body.preferredTableName === undefined ? existingGuests[0].preferred_table_name || "" : String(body.preferredTableName).trim().slice(0, 120),
+            ...(status !== "Confirmado" ? { table_id: null, seat_number: null } : {}),
             updated_at: new Date().toISOString(),
           }),
         },

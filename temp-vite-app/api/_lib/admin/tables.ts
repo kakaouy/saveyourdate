@@ -70,7 +70,7 @@ async function handler(request: Request) {
     if (request.method === 'GET') {
       const [tablesResponse, assignmentsResponse, elementsResponse, spacesResponse] = await Promise.all([
         supabaseRequest(`event_tables?order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name,capacity,note,space_name,position_x,position_y,layout_width,layout_height,table_shape,rotation_degrees,is_locked&order=created_at.asc`),
-        supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=not.is.null&select=id,table_id,seat_number`),
+        supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=not.is.null&status=eq.Confirmado&archived_at=is.null&select=id,table_id,seat_number`),
         supabaseRequest(`event_layout_elements?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc`),
         supabaseRequest(`event_layout_spaces?order_number=eq.${encodeURIComponent(session.order_number)}&select=space_name,canvas_width,canvas_height`),
       ]);
@@ -93,8 +93,8 @@ async function handler(request: Request) {
           headers: { Prefer: 'return=representation' },
           body: JSON.stringify({
             space_name: String(body.space || 'Espacio 1').trim() || 'Espacio 1',
-            position_x: Math.round(Math.max(0, Math.min(840, Number(body.x) || 0))),
-            position_y: Math.round(Math.max(0, Math.min(440, Number(body.y) || 0))),
+            position_x: Math.round(Math.max(0, Math.min(2300, Number(body.x) || 0))),
+            position_y: Math.round(Math.max(0, Math.min(1720, Number(body.y) || 0))),
             layout_width: Math.round(Math.max(100, Math.min(300, Number(body.width) || 140))),
             layout_height: Math.round(Math.max(60, Math.min(180, Number(body.height) || 70))),
             rotation_degrees: Math.round(Number(body.rotation) || 0) % 360,
@@ -264,15 +264,28 @@ async function handler(request: Request) {
 
     if (request.method === 'PATCH') {
       const id = String(body.id || '');
-      const name = String(body.name || '').trim();
+      const name = String(body.name || '').trim().slice(0, 120);
+      if (!id) return json({ error: 'Falta identificar la mesa.' }, 400);
+      if (!name) return json({ error: 'Ingresá un nombre o número para la mesa.' }, 400);
       const capacity = Math.max(1, Math.min(30, Number(body.capacity) || 8));
       const shape = ['round', 'rectangular', 'square', 'living'].includes(String(body.shape)) ? String(body.shape) : 'round';
-      const occupantsResponse = await supabaseRequest(
-        `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=eq.${encodeURIComponent(id)}&status=eq.Confirmado&select=confirmed`
-      );
-      const occupied = occupiedSeats(await occupantsResponse.json() as AssignmentRow[]);
+      const [occupantsResponse, currentTableResponse] = await Promise.all([
+        supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=eq.${encodeURIComponent(id)}&status=eq.Confirmado&archived_at=is.null&select=confirmed,seat_number`),
+        supabaseRequest(`event_tables?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name&limit=1`),
+      ]);
+      const currentTable = ((await currentTableResponse.json()) as Pick<TableRow, 'id' | 'name'>[])[0];
+      if (!currentTable) return json({ error: 'No encontramos esa mesa.' }, 404);
+      const occupants = await occupantsResponse.json() as AssignmentRow[];
+      const occupied = occupiedSeats(occupants);
       if (shape !== 'living' && capacity < occupied) {
         return json({ error: `La mesa ya tiene ${occupied} personas. Quitá invitados antes de reducir su capacidad.` }, 409);
+      }
+      const lastAssignedSeat = occupants.reduce((lastSeat, occupant) => {
+        if (!occupant.seat_number) return lastSeat;
+        return Math.max(lastSeat, Number(occupant.seat_number) + Math.max(1, Number(occupant.confirmed || 0)) - 1);
+      }, 0);
+      if (shape !== 'living' && capacity < lastAssignedSeat) {
+        return json({ error: `El asiento ${lastAssignedSeat} está ocupado. Reubicá esa persona antes de reducir la capacidad.` }, 409);
       }
       const response = await supabaseRequest(
         `event_tables?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
@@ -290,6 +303,15 @@ async function handler(request: Request) {
       );
       const rows = await response.json() as TableRow[];
       if (!rows[0]) return json({ error: 'No encontramos esa mesa.' }, 404);
+      if (currentTable.name !== rows[0].name) {
+        await supabaseRequest(
+          `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&preferred_table_name=eq.${encodeURIComponent(currentTable.name)}`,
+          {
+            method: 'PATCH',
+            body: JSON.stringify({ preferred_table_name: rows[0].name, updated_at: new Date().toISOString() }),
+          },
+        );
+      }
       await logAdminActivity(session, 'table.updated', 'table', rows[0].id, { name: rows[0].name, capacity: rows[0].capacity });
       return json({ table: clientTable(rows[0]) });
     }
@@ -302,6 +324,13 @@ async function handler(request: Request) {
         return json({ ok: true });
       }
       const id = url.searchParams.get('id') || '';
+      await supabaseRequest(
+        `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&table_id=eq.${encodeURIComponent(id)}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ table_id: null, seat_number: null, updated_at: new Date().toISOString() }),
+        },
+      );
       await supabaseRequest(
         `event_tables?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
         { method: 'DELETE' }

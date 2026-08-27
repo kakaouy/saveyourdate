@@ -138,6 +138,7 @@ async function handler(request: Request) {
           menu_choice: status === 'Confirmado' ? String(body.menuChoice || '').trim().slice(0, 120) : '',
           accessibility_needs: status === 'Confirmado' ? String(body.accessibilityNeeds || '').trim().slice(0, 500) : '',
           guest_notes: status === 'Confirmado' ? String(body.guestNotes || '').trim().slice(0, 1000) : '',
+          ...(status !== 'Confirmado' ? { table_id: null, seat_number: null } : {}),
           responded_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })

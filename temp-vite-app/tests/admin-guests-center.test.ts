@@ -61,6 +61,22 @@ test('archivar es recuperable y excluye al invitado de la operación', () => {
   assert.match(api, /guests\.bulk_restored/);
   assert.match(rsvp, /archived_at=is\.null/);
   assert.match(cron, /archived_at=is\.null/);
+  assert.match(api, /archivedAt \? \{ table_id: null, seat_number: null \} : \{\}/);
+});
+
+test('los cambios de invitados y mesas no dejan nombres o asientos obsoletos', () => {
+  const guestsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  const rsvpApi = readFileSync(path.join(appRoot, 'api', 'rsvp.ts'), 'utf8');
+
+  assert.match(tablesApi, /status=eq\.Confirmado&archived_at=is\.null&select=id,table_id,seat_number/);
+  assert.match(tablesApi, /preferred_table_name: rows\[0\]\.name/);
+  assert.match(tablesApi, /body: JSON\.stringify\(\{ table_id: null, seat_number: null/);
+  assert.match(guestsApi, /changes\.table_id = null/);
+  assert.match(guestsApi, /changes\.seat_number = null/);
+  assert.match(rsvpApi, /status !== 'Confirmado' \? \{ table_id: null, seat_number: null \}/);
+  assert.match(source, /const normalizedTableName = tableName\.trim\(\)/);
+  assert.match(source, /confirmedGuests\.find\(\(guest\) => guest\.id === id\)/);
 });
 
 test('el RSVP y el admin comparten los datos de logística', () => {
@@ -201,6 +217,39 @@ test('el plano permite girar, bloquear y ampliar la sala', () => {
   assert.match(tablesApi, /rotation_degrees/);
   assert.match(tablesApi, /is_locked/);
   assert.match(migration, /is_locked boolean/);
+});
+
+test('el inspector del plano edita mesas sin dejar asignaciones inconsistentes', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  assert.match(source, /const renameTableInline = async/);
+  assert.match(source, /const updateTableCapacityInline = async/);
+  assert.match(source, /className="capacity-stepper"/);
+  assert.match(source, /const minimumCapacity = Math\.max\(1, occupied, lastAssignedSeat\)/);
+  assert.match(source, /Agregar invitado/);
+  assert.match(source, /floor-inspector-guests/);
+  assert.match(tablesApi, /select=confirmed,seat_number/);
+  assert.match(tablesApi, /El asiento \$\{lastAssignedSeat\} está ocupado/);
+});
+
+test('la navegación del plano permite concentrarse en el lienzo', () => {
+  assert.match(source, /const centerFloorPlan =/);
+  assert.match(source, /const toggleFloorFullscreen = async/);
+  assert.match(source, /document\.exitFullscreen/);
+  assert.match(source, /requestFullscreen/);
+  assert.match(source, /showFloorLibrary/);
+  assert.match(source, /showFloorInspector/);
+  assert.match(styles, /\.floor-plan-panel:fullscreen/);
+  assert.match(styles, /\.floor-editor\.library-hidden/);
+});
+
+test('la exportación del plano ofrece calidad y vista previa privada', () => {
+  assert.match(source, /const \[planExportScale, setPlanExportScale\]/);
+  assert.match(source, /const createPlanImage =/);
+  assert.match(source, /context\.scale\(scale, scale\)/);
+  assert.match(source, /const previewPlan =/);
+  assert.match(source, /Esta versión no incluye datos privados/);
+  assert.match(source, /Abrir PDF imprimible/);
+  assert.match(styles, /\.plan-preview-frame/);
 });
 
 test('los invitados se mueven entre sillas o vuelven a sin mesa mediante arrastre', () => {
