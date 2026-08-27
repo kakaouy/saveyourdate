@@ -1492,4 +1492,24 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
 @media (max-width: 760px) {
   .guests-table { min-width: 0; }
   .guests-table :is(.guest-person-column,.guest-group-column,.guest-circle-column,.guest-seats-column,.guest-status-column,.guest-actions-column) { width: auto; }
+  .guests-table tbody > tr:not(.guest-empty-row) { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px 12px; padding: 16px; }
+  .guests-table tbody > tr:not(.guest-empty-row) > td { display: block; min-width: 0; }
+  .guests-table tbody > tr:not(.guest-empty-row) > td::before { display: block; margin-bottom: 5px; }
+  .guests-table .guest-person-column { grid-column: 1 / 3; grid-row: 1; padding-right: 0!important; }
+  .guests-table .guest-person-column .person { padding-right: 0; }
+  .guests-table .guest-status-column { grid-column: 3; grid-row: 1; align-self: center; padding-right: 36px!important; text-align: right; }
+  .guests-table .guest-status-column .status-select,.guests-table .guest-status-column .status { max-width: 100%; }
+  .guests-table .guest-group-column,.guests-table .guest-circle-column,.guests-table .guest-seats-column { grid-column: auto; grid-row: 2; }
+  .guests-table .guest-actions-column { grid-column: 1 / -1; grid-row: 3; padding-top: 12px!important; }
+  .guests-table .guest-actions-column::before { display: none; }
+  .guests-table .guest-actions-column .row-actions { justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
+  .guests-table .guest-actions-column .whatsapp-button { min-width: 48px; white-space: nowrap; }
+  .guests-table .guest-select-column { top: 17px; right: 16px; }
+}
+@media (max-width: 520px) {
+  .guests-table tbody > tr:not(.guest-empty-row) { grid-template-columns: 1fr; }
+  .guests-table .guest-person-column,.guests-table .guest-status-column,.guests-table .guest-group-column,.guests-table .guest-circle-column,.guests-table .guest-seats-column,.guests-table .guest-actions-column { grid-column: 1; grid-row: auto; }
+  .guests-table .guest-person-column { padding-right: 34px!important; }
+  .guests-table .guest-status-column { padding-right: 0!important; text-align: left; }
+  .guests-table .guest-status-column .status-select,.guests-table .guest-status-column .status { width: 100%; }
 }

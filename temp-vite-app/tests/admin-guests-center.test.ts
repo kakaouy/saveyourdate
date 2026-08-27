@@ -813,3 +813,11 @@ test('los elementos del plano conservan tamaños de hasta 20 px al guardar y res
   assert.match(restoreApi, /element_height: Math\.max\(20,/);
   assert.doesNotMatch(tablesApi, /element_width: Math\.round\(Math\.max\(90,/);
 });
+
+test('las tarjetas de invitados distribuyen datos y acciones sin comprimirlos', () => {
+  assert.match(styles, /grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(styles, /\.guest-person-column \{ grid-column: 1 \/ 3; grid-row: 1/);
+  assert.match(styles, /\.guest-status-column \{ grid-column: 3; grid-row: 1/);
+  assert.match(styles, /\.guest-actions-column \.whatsapp-button \{ min-width: 48px; white-space: nowrap/);
+  assert.match(styles, /@media \(max-width: 520px\)/);
+});
