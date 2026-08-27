@@ -163,12 +163,13 @@ const confirmedPeopleTotal = (guests: Guest[]) =>
 
 const meaningfulGuestValue = (value: string) => {
   const normalized = value.trim().toLowerCase();
-  return Boolean(normalized && !["ninguna", "ninguno", "none", "nenhuma", "nenhum", "no"].includes(normalized));
+  return Boolean(normalized && !["—", "-", "ninguna", "ninguno", "none", "nenhuma", "nenhum", "no", "sin restricción", "sin restricciones", "no aplica", "n/a"].includes(normalized));
 };
 
 const guestHasRestriction = (guest: Guest) =>
   meaningfulGuestValue(guest.food) ||
-  Boolean(guest.socialTogetherWith || guest.socialSeparateFrom || guest.preferredTableName);
+  meaningfulGuestValue(guest.accessibilityNeeds) ||
+  guest.companions.some((companion) => meaningfulGuestValue(companion.food));
 
 const normalizedReference = (value: string) =>
   value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
@@ -1407,6 +1408,7 @@ function Guests({
   const [updatingId, setUpdatingId] = useState("");
   const [notice, setNotice] = useState("");
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
+  const [inspectingGuest, setInspectingGuest] = useState<Guest | null>(null);
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState("");
   const [newGuestCode, setNewGuestCode] = useState(defaultPhoneCountryCode);
@@ -2320,7 +2322,7 @@ function Guests({
           </div>
         )}
         <div className="table-scroll">
-          <table>
+          <table className="guests-table">
             <thead>
               <tr>
                 {canEdit && (
@@ -2478,6 +2480,10 @@ function Guests({
                         <details className="guest-more-menu">
                           <summary aria-label={`${t("Más opciones para", "More options for", "Mais opções para")} ${guest.name}`} title={t("Más opciones", "More options", "Mais opções")}>•••</summary>
                           <div>
+                            <button type="button" onClick={() => setInspectingGuest(guest)}>
+                              <span aria-hidden="true">ⓘ</span>
+                              {t("Ver datos solicitados", "View requested details", "Ver dados solicitados")}
+                            </button>
                             <button
                               className="guest-menu-danger"
                               type="button"
@@ -2529,6 +2535,11 @@ function Guests({
             <h2 id="add-guests-title">{t("¿Cómo querés agregar invitados?", "How would you like to add guests?", "Como você quer adicionar convidados?")}</h2>
             <p>{t("Elegí el método que te resulte más cómodo. Podrás revisar todo antes de guardar.", "Choose the method that works best for you. You can review everything before saving.", "Escolha o método mais conveniente. Você poderá revisar tudo antes de salvar.")}</p>
             <div className="guest-add-options">
+              <button className="guest-template-option" type="button" onClick={downloadTemplate}>
+                <span className="guest-add-icon">↓</span>
+                <span><strong>{t("Descargar planilla tipo", "Download spreadsheet template", "Baixar planilha modelo")}</strong><small>{t("Incluye encabezados y una fila de ejemplo para completar sin dudas.", "Includes headers and an example row so it is easy to complete.", "Inclui cabeçalhos e uma linha de exemplo para preencher sem dúvidas.")}</small><code>{t("Nombre · Grupo · WhatsApp · Cupos · Email · Documento · Restricción", "Name · Group · WhatsApp · Seats · Email · ID · Dietary need", "Nome · Grupo · WhatsApp · Vagas · Email · Documento · Restrição")}</code></span>
+                <b aria-hidden="true">↓ CSV</b>
+              </button>
               <button type="button" onClick={() => { setShowAddGuests(false); setShowModal(true); }}>
                 <span className="guest-add-icon">▦</span>
                 <span><strong>{t("Agregar manualmente", "Add manually", "Adicionar manualmente")}</strong><small>{t("Cargá una invitación con todos sus datos.", "Enter one invitation with all its details.", "Cadastre um convite com todos os dados.")}</small></span>
@@ -2563,6 +2574,30 @@ function Guests({
               <button className="outline-button" type="button" onClick={() => setShowPasteGuests(false)}>{t("Cancelar", "Cancel", "Cancelar")}</button>
               <button className="primary-button small" type="button" disabled={saving || !pastedGuests.trim()} onClick={previewPastedGuests}>{saving ? t("Procesando…", "Processing…", "Processando…") : t("Revisar lista", "Review list", "Revisar lista")}</button>
             </div>
+          </div>
+        </div>
+      )}
+      {inspectingGuest && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="guest-details-title" onMouseDown={() => setInspectingGuest(null)}>
+          <div className="modal guest-details-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setInspectingGuest(null)} aria-label={t("Cerrar", "Close", "Fechar")}>×</button>
+            <span className="eyebrow">{t("Datos del invitado", "Guest details", "Dados do convidado")}</span>
+            <h2 id="guest-details-title">{inspectingGuest.name}</h2>
+            <p>{t("Se muestran únicamente los datos que fueron solicitados o completados.", "Only requested or completed information is shown.", "São exibidos apenas os dados solicitados ou preenchidos.")}</p>
+            <dl className="guest-details-grid">
+              {inspectingGuest.identificationNumber && <div><dt>{inspectingGuest.identificationType || t("Documento", "ID", "Documento")}</dt><dd>{inspectingGuest.identificationNumber}</dd></div>}
+              {inspectingGuest.email && <div><dt>Email</dt><dd>{inspectingGuest.email}</dd></div>}
+              {inspectingGuest.phone && <div><dt>WhatsApp</dt><dd>{inspectingGuest.phoneCountryCode} {inspectingGuest.phone}</dd></div>}
+              {inspectingGuest.group && <div><dt>{t("Grupo", "Group", "Grupo")}</dt><dd>{inspectingGuest.group}</dd></div>}
+              {inspectingGuest.invitedBy && <div><dt>{t("Invitado por", "Invited by", "Convidado por")}</dt><dd>{inspectingGuest.invitedBy}</dd></div>}
+              {meaningfulGuestValue(inspectingGuest.food) && <div><dt>{t("Restricción alimentaria", "Dietary requirement", "Restrição alimentar")}</dt><dd>{inspectingGuest.food}</dd></div>}
+              {meaningfulGuestValue(inspectingGuest.menuChoice) && <div><dt>{t("Menú", "Menu", "Menu")}</dt><dd>{inspectingGuest.menuChoice}</dd></div>}
+              {meaningfulGuestValue(inspectingGuest.accessibilityNeeds) && <div><dt>{t("Accesibilidad", "Accessibility", "Acessibilidade")}</dt><dd>{inspectingGuest.accessibilityNeeds}</dd></div>}
+              {meaningfulGuestValue(inspectingGuest.transportOption) && <div><dt>{t("Transporte", "Transport", "Transporte")}</dt><dd>{inspectingGuest.transportOption}{meaningfulGuestValue(inspectingGuest.transportStop) ? ` · ${inspectingGuest.transportStop}` : ""}</dd></div>}
+              {meaningfulGuestValue(inspectingGuest.song) && <div><dt>{t("Canción", "Song", "Música")}</dt><dd>{inspectingGuest.song}</dd></div>}
+              {meaningfulGuestValue(inspectingGuest.guestNotes) && <div className="is-wide"><dt>{t("Otras respuestas u observaciones", "Other answers or notes", "Outras respostas ou observações")}</dt><dd>{inspectingGuest.guestNotes}</dd></div>}
+            </dl>
+            <div className="modal-actions"><button className="outline-button" type="button" onClick={() => setInspectingGuest(null)}>{t("Cerrar", "Close", "Fechar")}</button>{canEdit && <button className="primary-button small" type="button" onClick={() => { setEditingGuest(inspectingGuest); setInspectingGuest(null); }}>{t("Editar datos", "Edit details", "Editar dados")}</button>}</div>
           </div>
         </div>
       )}
@@ -3343,44 +3378,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     (total, table) => total + (table.shape === "living" ? 0 : table.capacity),
     0,
   );
-  const seatingProgress = [
-    {
-      label: t("Crear las mesas", "Create tables", "Criar as mesas"),
-      detail: t("Elegí la forma y capacidad de cada mesa o Living.", "Choose the shape and capacity of every table or lounge.", "Escolha a forma e a capacidade de cada mesa ou Living."),
-      complete: tables.length > 0,
-      action: () => { setLayoutMode(false); setMobileSeatingStep("tables"); },
-    },
-    {
-      label: t("Ubicar a los invitados", "Seat guests", "Alocar os convidados"),
-      detail: t("Asigná sólo a las personas confirmadas; podés mover grupos completos.", "Assign confirmed people only; you can move entire groups.", "Atribua apenas pessoas confirmadas; você pode mover grupos inteiros."),
-      complete: totalConfirmed > 0 && assignedPeople === totalConfirmed,
-      action: () => { setLayoutMode(false); setMobileSeatingStep("guests"); },
-    },
-    {
-      label: t("Revisar alertas", "Review alerts", "Revisar alertas"),
-      detail: t("Comprobá capacidad, restricciones y preferencias de ubicación.", "Check capacity, dietary needs, and seating preferences.", "Confira capacidade, restrições e preferências de lugares."),
-      complete: tables.length > 0 && totalConfirmed === assignedPeople,
-      action: () => { setLayoutMode(false); setMobileSeatingStep("tables"); },
-    },
-    {
-      label: t("Diseñar el salón", "Design the venue", "Desenhar o salão"),
-      detail: t("Posicioná mesas, entrada, pista y zonas de servicio en el plano.", "Place tables, entrance, dance floor, and service areas on the layout.", "Posicione mesas, entrada, pista e áreas de serviço no plano."),
-      complete: tables.length > 0 && tables.every((table) => Boolean(table.space)),
-      action: () => setLayoutMode(true),
-    },
-  ];
-  const completedSeatingSteps = seatingProgress.filter((step) => step.complete).length;
   const overCapacityTables = tables.filter((table) => table.shape !== "living" && table.guests.reduce((total, id) => {
     const guest = confirmedGuests.find((candidate) => candidate.id === id);
     return total + (guest ? confirmedPeopleForGuest(guest, guests) : 0);
   }, 0) > table.capacity);
-  const currentSeatingStepIndex = layoutMode
-    ? 3
-    : tables.length === 0
-      ? 0
-      : assignedPeople < totalConfirmed
-        ? 1
-        : 2;
   const matchingGroups = query.trim()
     ? [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
         .filter((group) => normalizedReference(group).includes(normalizedReference(query)))
@@ -3524,6 +3525,15 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       setError(t("Ingresá un nombre o número para la mesa.", "Enter a name or number for the table.", "Digite um nome ou número para a mesa."));
       return;
     }
+    const editingId = editing?.id || "";
+    const previousTable = editing
+      ? tables.find((table) => table.id === editing.id) || editing
+      : null;
+    if (editingId) {
+      setTables((current) => current.map((table) =>
+        table.id === editingId ? { ...table, name: normalizedTableName } : table,
+      ));
+    }
     setSaving(true);
     setError("");
     try {
@@ -3547,21 +3557,33 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       };
       if (!response.ok || !result.table)
         throw new Error(result.error || "No pudimos guardar la mesa.");
-      if (editing && result.table.name !== normalizedTableName)
+      if (editingId && result.table.name !== normalizedTableName)
         throw new Error(t("El servidor no confirmó el nuevo nombre. Volvé a intentarlo.", "The server did not confirm the new name. Try again.", "O servidor não confirmou o novo nome. Tente novamente."));
       setTables((current) =>
-        editing
+        editingId
           ? current.map((table) =>
-              table.id === editing.id
-                ? { ...result.table!, guests: table.guests, seatAssignments: table.seatAssignments || {} }
+              table.id === editingId
+                ? { ...table, ...result.table!, name: normalizedTableName, guests: table.guests, seatAssignments: table.seatAssignments || {} }
                 : table,
             )
           : [...current, result.table!],
       );
+      if (editingId) {
+        setEditing((current) => current?.id === editingId
+          ? { ...current, ...result.table!, name: normalizedTableName }
+          : current,
+        );
+        setLayoutTableNameDraft(normalizedTableName);
+      }
       setShowModal(false);
       setLayoutNotice(editing ? t("Mesa actualizada y guardada.", "Table updated and saved.", "Mesa atualizada e salva.") : t("Mesa creada.", "Table created.", "Mesa criada."));
       window.setTimeout(() => setLayoutNotice(""), 1800);
     } catch (saveError) {
+      if (previousTable) {
+        setTables((current) => current.map((table) =>
+          table.id === previousTable.id ? previousTable : table,
+        ));
+      }
       setError(
         saveError instanceof Error
           ? saveError.message
@@ -3809,8 +3831,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       });
       const result = await response.json() as { table?: EventTable; error?: string };
       if (!response.ok || !result.table) throw new Error(result.error || t("No pudimos cambiar el nombre de la mesa.", "Could not rename the table.", "Não foi possível renomear a mesa."));
-      setTables((current) => current.map((item) => item.id === table.id ? { ...item, ...result.table!, guests: item.guests, seatAssignments: item.seatAssignments } : item));
-      setLayoutTableNameDraft(result.table.name);
+      setTables((current) => current.map((item) => item.id === table.id ? { ...item, ...result.table!, name, guests: item.guests, seatAssignments: item.seatAssignments } : item));
+      setEditing((current) => current?.id === table.id ? { ...current, ...result.table!, name } : current);
+      setLayoutTableNameDraft(name);
       setLayoutNotice(t("Nombre actualizado.", "Name updated.", "Nome atualizado."));
       window.setTimeout(() => setLayoutNotice(""), 1800);
     } catch (renameError) {
@@ -4192,9 +4215,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           <p>
             {canEdit
               ? t(
-                  "Asigná invitados confirmados y controlá la capacidad de cada mesa.",
-                  "Assign confirmed guests and control each table's capacity.",
-                  "Atribua convidados confirmados e controle a capacidade de cada mesa.",
+                  "Creá las mesas, ubicá a los invitados, revisá la distribución y después diseñá el salón.",
+                  "Create tables, seat guests, review the arrangement, and then design the venue.",
+                  "Crie as mesas, aloque os convidados, revise a distribuição e depois desenhe o salão.",
                 )
               : t(
                   "Consultá la distribución y capacidad de las mesas.",
@@ -4209,11 +4232,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           {canEdit && <button className="primary-button small" onClick={() => openNew()}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
         </div>
       </div>
-      <section className="seating-quick-status" aria-label={t("Progreso de organización", "Planning progress", "Progresso da organização")}>
-        <strong>{completedSeatingSteps}/{seatingProgress.length} {t("pasos completos", "steps complete", "etapas concluídas")}</strong>
-        <div className="seating-progress-track" aria-hidden="true"><i style={{ width: `${(completedSeatingSteps / seatingProgress.length) * 100}%` }} /></div>
-        <nav>{seatingProgress.map((step, index) => <button key={step.label} aria-current={index === currentSeatingStepIndex ? "step" : undefined} className={`context-tip ${step.complete ? "is-complete" : ""} ${index === currentSeatingStepIndex ? "is-current" : ""}`} data-help={step.detail} onClick={step.action}><span>{step.complete ? "✓" : index + 1}</span>{step.label}</button>)}</nav>
-      </section>
       {loading && (
         <p className="module-notice">
           {t(
@@ -4236,12 +4254,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         </section>
       )}
 
-      <section className="seating-mode-tabs" aria-label={t("Vistas de organización", "Planning views", "Vistas de organização")}>
-        <button className={!layoutMode ? "active" : ""} onClick={() => setLayoutMode(false)}><span>01</span><strong>{t("Personas y mesas", "People and tables", "Pessoas e mesas")}</strong><small>{t("Asigná grupos, mesas y sillas", "Assign groups, tables, and seats", "Atribua grupos, mesas e assentos")}</small></button>
-        <button className={layoutMode ? "active" : ""} onClick={() => setLayoutMode(true)}><span>02</span><strong>{t("Plano del salón", "Venue layout", "Plano do salão")}</strong><small>{t("Ubicá físicamente cada elemento", "Position every element", "Posicione fisicamente cada elemento")}</small></button>
-      </section>
-
-      <section className="seating-summary">
+      <section className="seating-overview">
+      <nav className="seating-mode-tabs" aria-label={t("Vistas de organización", "Planning views", "Vistas de organização")}>
+        <button aria-pressed={!layoutMode} onClick={() => setLayoutMode(false)}>♙ {t("Personas y mesas", "People and tables", "Pessoas e mesas")}</button>
+        <button aria-pressed={layoutMode} onClick={() => setLayoutMode(true)}>▦ {t("Plano del salón", "Venue layout", "Plano do salão")}</button>
+      </nav>
+      <div className="seating-summary">
         <article>
           <span>{t("Mesas creadas", "Tables created", "Mesas criadas")}</span>
           <strong>{tables.length}</strong>
@@ -4273,6 +4291,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 )}
           </small>
         </article>
+      </div>
       </section>
 
       {showExportCenter && <section className="seating-export-center" aria-labelledby="export-center-title">
@@ -4622,9 +4641,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   "A capacidade é calculada pelas pessoas confirmadas de cada grupo.",
                 )}
               </p>
-              <div className="seat-category-legend workspace-legend" aria-label={t("Colores de los invitados", "Guest colors", "Cores dos convidados")}>
-                <span><i className="adult-dot" />{t("Adultos", "Adults", "Adultos")}</span><span><i className="teen-dot" />{t("Adolescentes", "Teenagers", "Adolescentes")}</span><span><i className="child-dot" />{t("Niños", "Children", "Crianças")}</span><span><i className="alert-dot" />{t("Restricciones", "Restrictions", "Restrições")}</span>
-              </div>
             </div>
             <div className="workspace-actions">
               <label className="table-search"><span>⌕</span><input value={tableQuery} onChange={(event) => setTableQuery(event.target.value)} placeholder={t("Buscar mesa o invitado…", "Search table or guest…", "Buscar mesa ou convidado…")} /></label>
@@ -4667,33 +4683,14 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               const remaining = table.capacity - occupied;
               const full = !isLiving && remaining === 0;
               const over = !isLiving && remaining < 0;
-              const dietaryAlerts = tableGuests.flatMap((guest) => [
-                ...(meaningfulGuestValue(guest.food)
-                  ? [{ id: guest.id, name: guest.name, food: guest.food }]
-                  : []),
-                ...guest.companions
-                  .filter((companion) => meaningfulGuestValue(companion.food))
-                  .map((companion, companionIndex) => ({
-                    id: `${guest.id}-${companionIndex}`,
-                    name: companion.name || `${t("Acompañante de", "Companion of", "Acompanhante de")} ${guest.name}`,
-                    food: companion.food,
-                  })),
-              ]);
-              const accessibilityAlerts = tableGuests.filter((guest) =>
-                meaningfulGuestValue(guest.accessibilityNeeds),
-              );
               const tableSocialConflicts = socialConflicts.filter((conflict) => conflict.tableId === table.id);
-              const tableNeedsReview = over || tableSocialConflicts.length > 0 || dietaryAlerts.length > 0 || accessibilityAlerts.length > 0;
+              const tableNeedsReview = over || tableSocialConflicts.length > 0;
               const tableStatusLabel = isLiving
                 ? t("Zona flexible", "Flexible area", "Área flexível")
                 : over
                   ? t("Sobrecapacidad", "Over capacity", "Acima da capacidade")
                   : tableSocialConflicts.length > 0
                     ? t("Conflicto de ubicación", "Seating conflict", "Conflito de localização")
-                    : accessibilityAlerts.length > 0
-                      ? t("Necesidad de accesibilidad", "Accessibility need", "Necessidade de acessibilidade")
-                      : dietaryAlerts.length > 0
-                        ? `${dietaryAlerts.length} ${dietaryAlerts.length === 1 ? t("restricción", "dietary need", "restrição") : t("restricciones", "dietary needs", "restrições")} · ${dietaryAlerts.slice(0, 2).map((alert) => alert.name).join(", ")}${dietaryAlerts.length > 2 ? ` +${dietaryAlerts.length - 2}` : ""}`
                     : full
                       ? t("Mesa completa", "Table full", "Mesa completa")
                       : occupied === 0
@@ -4776,10 +4773,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   </div>
                   <div className={`table-health is-${over ? "over" : tableNeedsReview ? "review" : full ? "full" : isLiving ? "living" : "available"}`}>
                     <span><i />{tableStatusLabel}</span>
-                    {(dietaryAlerts.length > 0 || accessibilityAlerts.length > 0) && <small>{[
-                      ...dietaryAlerts.slice(0, 3).map((alert) => `${alert.name}: ${alert.food}`),
-                      ...accessibilityAlerts.slice(0, 2).map((guest) => `${guest.name}: ${guest.accessibilityNeeds}`),
-                    ].join(" · ")}</small>}
                   </div>
                   <div className="capacity-row">
                     <span>
@@ -4846,6 +4839,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   <div className="seated-guests">
                     {tableGuests.map((guest) => {
                       const people = confirmedPeopleForGuest(guest, guests);
+                      const restrictionDetails = [
+                        meaningfulGuestValue(guest.food) ? guest.food : "",
+                        meaningfulGuestValue(guest.accessibilityNeeds) ? guest.accessibilityNeeds : "",
+                        ...guest.companions
+                          .filter((companion) => meaningfulGuestValue(companion.food))
+                          .map((companion) => `${companion.name || t("Acompañante", "Companion", "Acompanhante")}: ${companion.food}`),
+                      ].filter(Boolean).join(" · ");
                       const assignedSeat = effectiveSeatByGuest.get(guest.id) || 1;
                       const availableStarts = Array.from({ length: table.capacity }, (_, seatIndex) => seatIndex + 1).filter((start) =>
                         start + people - 1 <= table.capacity &&
@@ -4853,8 +4853,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                           (slot) => !slot || slot.guest.id === guest.id,
                         ),
                       );
-                      return <div className={`is-${guest.guestType || "adult"} ${guestHasRestriction(guest) ? "has-restriction" : ""}`} key={guest.id}>
+                      return <div className={`is-${guest.guestType || "adult"}`} key={guest.id}>
                         <GuestNameButton guest={guest} />
+                        {guestHasRestriction(guest) && <span className="restriction-mark context-tip" data-help={`${t("Restricción", "Restriction", "Restrição")}: ${restrictionDetails}`} aria-label={`${t("Restricción de", "Restriction for", "Restrição de")} ${guest.name}`} role="img">⚠</span>}
                         {people > 1 && <small>{people} {t("lugares", "seats", "lugares")}</small>}
                         {canEdit && !isLiving && (
                           <select

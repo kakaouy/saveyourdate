@@ -56,11 +56,22 @@ test('Agregar invitados reúne los métodos y recomienda pegar una lista', () =>
   assert.match(source, /Pegar una lista/);
   assert.match(source, /Recomendado/);
   assert.match(source, /Importar un archivo/);
+  assert.match(source, /Descargar planilla tipo/);
+  assert.match(source, /guest-template-option/);
   assert.match(source, /const previewPastedGuests = async/);
   assert.match(source, /Paso 1 de 2 · Pegar lista/);
   assert.match(source, /Paso 2 de 2 · Revisión/);
   assert.match(styles, /\.guest-add-options/);
   assert.match(styles, /\.paste-guests-input/);
+});
+
+test('la lista conserva las acciones completas y expone los datos solicitados', () => {
+  assert.match(source, /className="guests-table"/);
+  assert.match(source, /Ver datos solicitados/);
+  assert.match(source, /className="modal guest-details-modal"/);
+  assert.match(source, /inspectingGuest\.identificationNumber/);
+  assert.match(styles, /\.guests-table th:nth-last-child\(1\)/);
+  assert.match(styles, /\.guest-details-grid/);
 });
 
 test('Invitados usa ayuda contextual y estados vacíos accionables', () => {
@@ -180,8 +191,16 @@ test('las tarjetas de mesa priorizan identidad, ocupación e invitados', () => {
   assert.doesNotMatch(card, /table-social-conflicts/);
   assert.doesNotMatch(card, /table-operations/);
   assert.match(source, /className="table-name-edit"/);
-  assert.match(source, /dietaryAlerts\.slice\(0, 3\).*alert\.food/s);
+  assert.doesNotMatch(card, /dietaryAlerts/);
+  assert.match(source, /className="restriction-mark context-tip"/);
   assert.match(source, /people > 1 && <small>/);
+});
+
+test('el nombre guardado se impone en la tarjeta y no puede volver al valor anterior', () => {
+  assert.match(source, /table\.id === editingId \? \{ \.\.\.table, name: normalizedTableName \} : table/);
+  assert.match(source, /\.\.\.result\.table!, name: normalizedTableName, guests: table\.guests/);
+  assert.match(source, /\.\.\.result\.table!, name, guests: item\.guests/);
+  assert.match(source, /table\.id === previousTable\.id \? previousTable : table/);
 });
 
 test('la leyenda de mesas pasa a una ayuda contextual compacta', () => {
@@ -337,7 +356,7 @@ test('el plano admite los nuevos elementos y muestra ayuda sólo en contexto', (
   for (const element of ['wall', 'fountain', 'stage', 'restroom', 'photo-booth', 'divider']) {
     assert.match(migration, new RegExp(`'${element}'`));
   }
-  assert.match(source, /className="seating-quick-status"/);
+  assert.doesNotMatch(source, /className="seating-quick-status"/);
   assert.match(source, /className="context-tip" data-help=/);
   assert.doesNotMatch(source, /className="floor-plan-guide"/);
   assert.match(source, /className="table-name-save"/);
@@ -531,7 +550,8 @@ test('el paquete de usabilidad agrupa densidad, guardado, vacíos y adaptación 
   assert.match(source, /setAssignmentStatus\("saved"\)/);
   assert.match(source, /const \[failedAssignment, setFailedAssignment\]/);
   assert.match(source, /assignmentStatus === "error" && failedAssignment/);
-  assert.match(source, /className="seat-category-legend workspace-legend"/);
+  assert.match(source, /className="seating-overview"/);
+  assert.match(styles, /\.seating-overview/);
   assert.match(source, /className="tables-empty-state"/);
   assert.match(source, /Vista compacta/);
   assert.match(source, /className="clear-seating-filters"/);
