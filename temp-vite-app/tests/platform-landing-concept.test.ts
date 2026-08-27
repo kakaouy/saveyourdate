@@ -104,3 +104,11 @@ test('el formulario contextualiza tipo y cantidad de eventos', () => {
   assert.match(landing, /Varios eventos/);
   assert.match(styles, /\.concept-contact-scope/);
 });
+
+test('planes compara alcance y modalidad de precio sin inventar importes', () => {
+  assert.match(landing, /¿Un evento o varios\?/);
+  assert.match(landing, /Precio por evento/);
+  assert.match(landing, /Propuesta según volumen/);
+  assert.match(landing, /Sin cargos sorpresa/);
+  assert.match(styles, /\.concept-plan-price/);
+});
