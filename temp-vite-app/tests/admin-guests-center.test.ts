@@ -391,6 +391,9 @@ test('la biblioteca conserva el elemento durante el arrastre y confirma dónde s
   assert.match(source, /const \[draggedNewFloorElement, setDraggedNewFloorElement\]/);
   assert.match(source, /event\.dataTransfer\.effectAllowed = "copy"/);
   assert.match(source, /draggedNewFloorElement\?\.kind/);
+  assert.match(source, /defaultFloorElementSize\(newElementKind\)/);
+  assert.match(source, /room\.width - element\.width/);
+  assert.match(source, /room\.height - element\.height/);
   assert.match(source, /className="floor-drop-message"/);
   assert.match(styles, /\.floor-space\.is-drop-target/);
   assert.match(tablesApi, /event_layout_elements_element_type_check/);
@@ -416,6 +419,14 @@ test('el plano confirma el guardado, permite reintentar y revierte movimientos f
   assert.match(source, /const \[failedFloorSave, setFailedFloorSave\]/);
   assert.match(source, /const retryFloorElementSave = async/);
   assert.match(source, /persistFloorElement\(next, element\)/);
+  assert.match(source, /const mergeSavedTableLayout =/);
+  assert.match(source, /mergeSavedTableLayout\(saved\)/);
+  assert.match(source, /item\.id === table\.id \? table : item/);
+  assert.match(source, /savedSpaceSizesRef/);
+  assert.match(source, /const tablesToFit = tables\.filter/);
+  assert.match(source, /const elementsToFit = floorElements\.filter/);
+  assert.match(source, /elementos se ajustaron al nuevo tamaño/);
+  assert.match(source, /item\.id === saved\.id \? \{ \.\.\.item, \.\.\.saved \}/);
   assert.match(source, /className=\{`floor-save-status is-\$\{floorSaveStatus\}`\}/);
   assert.match(styles, /\.floor-save-status\.is-error/);
 });
@@ -424,6 +435,10 @@ test('los elementos usan formas reconocibles y rotación contextual', () => {
   const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
   const rotationMigration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260827030000_floor_plan_element_rotation.sql'), 'utf8');
   assert.match(source, /className="floor-element-rotation"/);
+  assert.match(source, /const defaultFloorElementSize =/);
+  assert.match(source, /kind === "wall" \|\| kind === "divider"/);
+  assert.match(source, /room\.width - size\.width/);
+  assert.match(source, /"door", "window"/);
   assert.match(source, /transform: `rotate\(\$\{element\.rotation \|\| 0\}deg\)`/);
   assert.match(tablesApi, /rotation_degrees: Math\.round/);
   assert.match(rotationMigration, /add column if not exists rotation_degrees/);
@@ -645,6 +660,16 @@ test('los círculos sociales alimentan la carga y las sugerencias de proximidad'
   assert.match(styles, /\.floor-social-connectors line/);
   assert.match(styles, /\.seating-final-review/);
   assert.match(styles, /\.social-circle-manager-list/);
+});
+
+test('grupo de invitación y círculo social se editan y muestran como conceptos separados', () => {
+  assert.match(source, /<th>\{t\("Grupo de invitación", "Invitation group", "Grupo do convite"\)\}<\/th>/);
+  assert.match(source, /<th>\{t\("Círculo social", "Social circle", "Círculo social"\)\}<\/th>/);
+  assert.doesNotMatch(source, /Grupo \/ círculo/);
+  assert.match(source, /const updateSocialCircleFromDetails = async/);
+  assert.match(source, /className="guest-details-circle"/);
+  assert.match(source, /detailsSocialCircle === inspectingGuest\.socialCircle/);
+  assert.match(styles, /\.guest-circle-cell/);
 });
 
 test('la sugerencia permanece visible y se reinicia después de cada movimiento', () => {

@@ -1411,6 +1411,7 @@ function Guests({
   const [notice, setNotice] = useState("");
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [inspectingGuest, setInspectingGuest] = useState<Guest | null>(null);
+  const [detailsSocialCircle, setDetailsSocialCircle] = useState("");
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState("");
   const [newGuestCode, setNewGuestCode] = useState(defaultPhoneCountryCode);
@@ -1427,6 +1428,9 @@ function Guests({
   useEffect(() => {
     if (!editingGuest) setEditCustomSocialCircle(false);
   }, [editingGuest]);
+  useEffect(() => {
+    setDetailsSocialCircle(inspectingGuest?.socialCircle || "");
+  }, [inspectingGuest]);
   const activeGuests = guests.filter((guest) => !guest.archivedAt);
   const archivedInvitations = guests.length - activeGuests.length;
   const confirmedPeople = confirmedPeopleTotal(activeGuests);
@@ -1732,6 +1736,35 @@ function Guests({
           ? updateError.message
           : "No pudimos guardar los datos.",
       );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateSocialCircleFromDetails = async () => {
+    if (!inspectingGuest) return;
+    setSaving(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: inspectingGuest.id,
+          status: inspectingGuest.status,
+          confirmed: inspectingGuest.confirmed,
+          food: inspectingGuest.food,
+          song: inspectingGuest.song,
+          socialCircle: detailsSocialCircle,
+        }),
+      });
+      const result = await readApiJson<{ guest?: Guest; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
+      if (!response.ok || !result.guest) throw new Error(result.error || t("No pudimos guardar el círculo social.", "Could not save the social circle.", "Não foi possível salvar o círculo social."));
+      setGuests((current) => current.map((guest) => guest.id === inspectingGuest.id ? result.guest! : guest));
+      setInspectingGuest(result.guest);
+      setNotice(t("Círculo social actualizado.", "Social circle updated.", "Círculo social atualizado."));
+    } catch (updateError) {
+      setError(updateError instanceof Error ? updateError.message : t("No pudimos guardar el círculo social.", "Could not save the social circle.", "Não foi possível salvar o círculo social."));
     } finally {
       setSaving(false);
     }
@@ -2373,7 +2406,8 @@ function Guests({
                   </th>
                 )}
                 <th>{t("Invitado", "Guest", "Convidado")}</th>
-                <th>{t("Grupo / círculo", "Group / circle", "Grupo / círculo")}</th>
+                <th>{t("Grupo de invitación", "Invitation group", "Grupo do convite")}</th>
+                <th>{t("Círculo social", "Social circle", "Círculo social")}</th>
                 <th>{t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}</th>
                 <th>{t("Estado", "Status", "Status")}</th>
                 <th>{t("Restricción", "Dietary need", "Restrição")}</th>
@@ -2384,7 +2418,7 @@ function Guests({
             <tbody>
               {filtered.length === 0 && (
                 <tr className="guest-empty-row">
-                  <td colSpan={canEdit ? 8 : 7}>
+                  <td colSpan={canEdit ? 9 : 8}>
                     <div className="guest-empty-state">
                       <span aria-hidden="true">♙</span>
                       <strong>{activeGuests.length === 0
@@ -2430,7 +2464,8 @@ function Guests({
                       </p>
                     </div>
                   </td>
-                  <td><span className="guest-group-cell"><strong>{guest.group || "—"}</strong>{guest.socialCircle && <small>{guest.socialCircle}</small>}</span></td>
+                  <td><span className="guest-group-cell"><strong>{guest.group || "—"}</strong><small>{t("Una invitación compartida", "One shared invitation", "Um convite compartilhado")}</small></span></td>
+                  <td><span className="guest-circle-cell">{guest.socialCircle || <em>{t("Sin asignar", "Unassigned", "Não atribuído")}</em>}</span></td>
                   <td>{(() => { const progress = seatProgress(guest, guests); return <span className="seat-progress"><strong>{progress.used}/{progress.total}</strong><small>{t("confirmados / cupos", "confirmed / seats", "confirmados / vagas")}</small></span>; })()}</td>
                   <td>
                     {canEdit && !guest.archivedAt ? (
@@ -2618,7 +2653,7 @@ function Guests({
               {inspectingGuest.email && <div><dt>Email</dt><dd>{inspectingGuest.email}</dd></div>}
               {inspectingGuest.phone && <div><dt>WhatsApp</dt><dd>{inspectingGuest.phoneCountryCode} {inspectingGuest.phone}</dd></div>}
               {inspectingGuest.group && <div><dt>{t("Grupo de invitación", "Invitation group", "Grupo do convite")}</dt><dd>{inspectingGuest.group}</dd></div>}
-              {inspectingGuest.socialCircle && <div><dt>{t("Círculo social", "Social circle", "Círculo social")}</dt><dd>{inspectingGuest.socialCircle}</dd></div>}
+              <div className="guest-details-circle"><dt>{t("Círculo social", "Social circle", "Círculo social")}</dt><dd>{canEdit ? <span><select value={detailsSocialCircle} disabled={saving} onChange={(event) => setDetailsSocialCircle(event.target.value)}><option value="">{t("Sin círculo social", "No social circle", "Sem círculo social")}</option>{guestSocialCircleOptions.map((circle) => <option key={circle} value={circle}>{circle}</option>)}</select><button type="button" disabled={saving || detailsSocialCircle === inspectingGuest.socialCircle} onClick={() => void updateSocialCircleFromDetails()}>{saving ? "…" : t("Guardar", "Save", "Salvar")}</button></span> : (inspectingGuest.socialCircle || t("Sin asignar", "Unassigned", "Não atribuído"))}</dd></div>
               {inspectingGuest.invitedBy && <div><dt>{t("Invitado por", "Invited by", "Convidado por")}</dt><dd>{inspectingGuest.invitedBy}</dd></div>}
               {meaningfulGuestValue(inspectingGuest.food) && <div><dt>{t("Restricción alimentaria", "Dietary requirement", "Restrição alimentar")}</dt><dd>{inspectingGuest.food}</dd></div>}
               {meaningfulGuestValue(inspectingGuest.menuChoice) && <div><dt>{t("Menú", "Menu", "Menu")}</dt><dd>{inspectingGuest.menuChoice}</dd></div>}
@@ -3367,6 +3402,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
   const [layoutMode, setLayoutMode] = useState(false);
   const [spaces, setSpaces] = useState(["Espacio 1"]);
   const [spaceSizes, setSpaceSizes] = useState<Record<string, { width: number; height: number }>>({ "Espacio 1": { width: 1200, height: 700 } });
+  const savedSpaceSizesRef = useRef<Record<string, { width: number; height: number }>>({ "Espacio 1": { width: 1200, height: 700 } });
   const [layoutNotice, setLayoutNotice] = useState("");
   const [floorElements, setFloorElements] = useState<FloorElement[]>([]);
   const [floorZoom, setFloorZoom] = useState(1);
@@ -3608,7 +3644,9 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
           throw new Error(result.error || "No pudimos cargar las mesas.");
         setTables(result.tables);
         setFloorElements(result.layoutElements || []);
-        setSpaceSizes((current) => ({ ...current, ...Object.fromEntries((result.layoutSpaces || []).map((space) => [space.name, { width: space.width, height: space.height }])) }));
+        const loadedSpaceSizes = Object.fromEntries((result.layoutSpaces || []).map((space) => [space.name, { width: space.width, height: space.height }]));
+        savedSpaceSizesRef.current = { ...savedSpaceSizesRef.current, ...loadedSpaceSizes };
+        setSpaceSizes((current) => ({ ...current, ...loadedSpaceSizes }));
         const loadedSpaces = [...new Set(result.tables.map((table) => table.space || "Espacio 1"))];
         setSpaces(loadedSpaces.length ? loadedSpaces : ["Espacio 1"]);
       })
@@ -3889,13 +3927,23 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
 
 
   const saveTableLayout = async (table: EventTable) => {
+    setFloorSaveStatus("saving");
     const response = await fetch("/api/admin/tables", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "layout", id: table.id, space: table.space, x: table.x, y: table.y, width: table.width, height: table.height, rotation: table.rotation || 0, locked: Boolean(table.locked) }),
     });
-    if (!response.ok) throw new Error("No pudimos guardar el plano.");
+    const result = await readApiJson<{ table?: EventTable; error?: string }>(response, t("El servicio del plano no está disponible.", "The layout service is unavailable.", "O serviço do plano não está disponível."));
+    if (!response.ok || !result.table) {
+      setFloorSaveStatus("error");
+      throw new Error(result.error || t("No pudimos guardar el plano.", "Could not save the layout.", "Não foi possível salvar o plano."));
+    }
+    setFloorSaveStatus("saved");
+    window.setTimeout(() => setFloorSaveStatus((current) => current === "saved" ? "idle" : current), 1800);
+    return result.table;
   };
+
+  const mergeSavedTableLayout = (saved: EventTable) => setTables((current) => current.map((item) => item.id === saved.id ? { ...item, ...saved, guests: item.guests, seatAssignments: item.seatAssignments } : item));
 
   const rememberLayoutChange = (before: EventTable, after: EventTable) => {
     setLayoutUndoStack((current) => [...current.slice(-29), { before, after }]);
@@ -3904,7 +3952,8 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
 
   const restoreLayoutVersion = async (table: EventTable) => {
     setTables((current) => current.map((item) => item.id === table.id ? table : item));
-    await saveTableLayout(table);
+    const saved = await saveTableLayout(table);
+    mergeSavedTableLayout(saved);
   };
 
   const undoLayoutChange = async () => {
@@ -3945,9 +3994,11 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     };
     setTables((current) => current.map((item) => item.id === table.id ? next : item));
     try {
-      await saveTableLayout(next);
+      const saved = await saveTableLayout(next);
+      mergeSavedTableLayout(saved);
       rememberLayoutChange(table, next);
     } catch (moveError) {
+      setTables((current) => current.map((item) => item.id === table.id ? table : item));
       setError(moveError instanceof Error ? moveError.message : "No pudimos guardar la posición.");
     }
   };
@@ -3956,9 +4007,11 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     const next = { ...table, ...changes };
     setTables((current) => current.map((item) => item.id === table.id ? next : item));
     try {
-      await saveTableLayout(next);
+      const saved = await saveTableLayout(next);
+      mergeSavedTableLayout(saved);
       rememberLayoutChange(table, next);
     } catch (layoutError) {
+      setTables((current) => current.map((item) => item.id === table.id ? table : item));
       setError(layoutError instanceof Error ? layoutError.message : "No pudimos actualizar la mesa.");
     }
   };
@@ -4052,17 +4105,20 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     const startY = event.clientY;
     const startWidth = table.width || 140;
     const startHeight = table.height || 70;
+    const room = spaceSizes[table.space || "Espacio 1"] || { width: 1200, height: 700 };
+    const maxWidth = Math.max(60, Math.min(300, room.width - (table.x || 24)));
+    const maxHeight = Math.max(40, Math.min(180, room.height - (table.y || 24)));
     let resized = table;
     const onMove = (moveEvent: PointerEvent) => {
-      resized = { ...table, width: Math.max(100, Math.min(300, startWidth + moveEvent.clientX - startX)), height: Math.max(60, Math.min(180, startHeight + moveEvent.clientY - startY)) };
+      resized = { ...table, width: Math.min(maxWidth, Math.max(Math.min(100, maxWidth), startWidth + moveEvent.clientX - startX)), height: Math.min(maxHeight, Math.max(Math.min(60, maxHeight), startHeight + moveEvent.clientY - startY)) };
       setTables((current) => current.map((item) => item.id === table.id ? resized : item));
     };
     const onEnd = () => {
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerup", onEnd);
       void saveTableLayout(resized)
-        .then(() => rememberLayoutChange(table, resized))
-        .catch(() => setError("No pudimos guardar el nuevo tamaño."));
+        .then((saved) => { mergeSavedTableLayout(saved); rememberLayoutChange(table, resized); })
+        .catch(() => { setTables((current) => current.map((item) => item.id === table.id ? table : item)); setError("No pudimos guardar el nuevo tamaño."); });
     };
     document.addEventListener("pointermove", onMove);
     document.addEventListener("pointerup", onEnd);
@@ -4085,9 +4141,24 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     }
   };
 
+  const defaultFloorElementSize = (kind: FloorElement["kind"]) => {
+    if (kind === "dance-floor") return { width: 240, height: 160 };
+    if (kind === "wall" || kind === "divider") return { width: 260, height: 24 };
+    if (kind === "door" || kind === "window") return { width: 120, height: 28 };
+    if (kind === "stage" || kind === "dj" || kind === "buffet") return { width: 200, height: 90 };
+    if (["cake", "fountain", "plant", "column"].includes(kind)) return { width: 96, height: 96 };
+    if (["restroom", "kitchen", "emergency", "entrance"].includes(kind)) return { width: 150, height: 64 };
+    return { width: 150, height: 80 };
+  };
+
   const addFloorElement = async (kind: FloorElement["kind"], label: string, position?: { space: string; x: number; y: number }) => {
+    const space = position?.space || spaces[0] || "Espacio 1";
+    const room = spaceSizes[space] || { width: 1200, height: 700 };
+    const size = defaultFloorElementSize(kind);
+    const x = Math.max(0, Math.min(room.width - size.width, position?.x ?? (room.width - size.width) / 2));
+    const y = Math.max(0, Math.min(room.height - size.height, position?.y ?? (room.height - size.height) / 2));
     try {
-      const element = await saveFloorElement({ id: "", kind, label, space: position?.space || spaces[0], x: position?.x ?? 40, y: position?.y ?? 90, width: kind === "dance-floor" ? 220 : 150, height: kind === "dance-floor" ? 130 : 80 }, "POST");
+      const element = await saveFloorElement({ id: "", kind, label, space, x, y, ...size }, "POST");
       setFloorElements((current) => [...current, element]);
       setSelectedLayoutTableId("");
       setSelectedFloorElementId(element.id);
@@ -4107,10 +4178,16 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     return next;
   };
 
-  const persistFloorElement = (element: FloorElement, rollback?: FloorElement) => void saveFloorElement(element).catch((saveError) => {
-    if (rollback) setFloorElements((current) => current.map((item) => item.id === rollback.id ? rollback : item));
-    setError(saveError instanceof Error ? saveError.message : "No pudimos guardar el elemento.");
-  });
+  const persistFloorElement = async (element: FloorElement, rollback?: FloorElement) => {
+    try {
+      const saved = await saveFloorElement(element);
+      setFloorElements((current) => current.map((item) => item.id === saved.id ? { ...item, ...saved } : item));
+      setFloorElementLabelDraft((current) => selectedFloorElementId === saved.id ? saved.label : current);
+    } catch (saveError) {
+      if (rollback) setFloorElements((current) => current.map((item) => item.id === rollback.id ? rollback : item));
+      setError(saveError instanceof Error ? saveError.message : "No pudimos guardar el elemento.");
+    }
+  };
 
   const retryFloorElementSave = async () => {
     if (!failedFloorSave) return;
@@ -4147,9 +4224,12 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
   const resizeFloorElement = (element: FloorElement, event: React.PointerEvent<HTMLButtonElement>) => {
     event.preventDefault(); event.stopPropagation();
     const startX = event.clientX, startY = event.clientY, startWidth = element.width, startHeight = element.height;
+    const room = spaceSizes[element.space] || { width: 1200, height: 700 };
+    const maxWidth = Math.max(24, Math.min(420, room.width - element.x));
+    const maxHeight = Math.max(24, Math.min(260, room.height - element.y));
     let resized = element;
     const onMove = (moveEvent: PointerEvent) => {
-      resized = updateFloorElement(element, { width: Math.max(90, Math.min(420, startWidth + (moveEvent.clientX - startX) / floorZoom)), height: Math.max(55, Math.min(260, startHeight + (moveEvent.clientY - startY) / floorZoom)) });
+      resized = updateFloorElement(element, { width: Math.min(maxWidth, Math.max(Math.min(90, maxWidth), startWidth + (moveEvent.clientX - startX) / floorZoom)), height: Math.min(maxHeight, Math.max(Math.min(55, maxHeight), startHeight + (moveEvent.clientY - startY) / floorZoom)) });
     };
     const onEnd = () => { document.removeEventListener("pointermove", onMove); document.removeEventListener("pointerup", onEnd); persistFloorElement(resized, element); };
     document.addEventListener("pointermove", onMove); document.addEventListener("pointerup", onEnd);
@@ -4343,10 +4423,50 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
   };
 
   const saveSpaceSize = async (space: string, width: number, height: number) => {
+    const previous = savedSpaceSizesRef.current[space] || { width: 1200, height: 700 };
     const next = { width: Math.max(700, Math.min(2400, width)), height: Math.max(480, Math.min(1800, height)) };
     setSpaceSizes((current) => ({ ...current, [space]: next }));
-    const response = await fetch("/api/admin/tables", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "space-settings", space, ...next }) });
-    if (!response.ok) setError(t("No pudimos guardar el tamaño del espacio.", "Could not save space size.", "Não foi possível salvar o tamanho do espaço."));
+    setFloorSaveStatus("saving");
+    try {
+      const response = await fetch("/api/admin/tables", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "space-settings", space, ...next }) });
+      const result = await readApiJson<{ space?: { name: string; width: number; height: number }; error?: string }>(response, t("El servicio del plano no está disponible.", "The layout service is unavailable.", "O serviço do plano não está disponível."));
+      if (!response.ok || !result.space) throw new Error(result.error || t("No pudimos guardar el tamaño del espacio.", "Could not save space size.", "Não foi possível salvar o tamanho do espaço."));
+      const confirmed = { width: result.space.width, height: result.space.height };
+      savedSpaceSizesRef.current = { ...savedSpaceSizesRef.current, [space]: confirmed };
+      setSpaceSizes((current) => ({ ...current, [space]: confirmed }));
+      const tablesToFit = tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => ({
+        before: table,
+        after: { ...table, x: Math.max(0, Math.min(confirmed.width - (table.width || 140), table.x ?? 24)), y: Math.max(0, Math.min(confirmed.height - (table.height || 70), table.y ?? 24)) },
+      })).filter(({ before, after }) => before.x !== after.x || before.y !== after.y);
+      const elementsToFit = floorElements.filter((element) => element.space === space).map((element) => ({
+        before: element,
+        after: { ...element, x: Math.max(0, Math.min(confirmed.width - element.width, element.x)), y: Math.max(0, Math.min(confirmed.height - element.height, element.y)) },
+      })).filter(({ before, after }) => before.x !== after.x || before.y !== after.y);
+      setTables((current) => current.map((table) => tablesToFit.find(({ before }) => before.id === table.id)?.after || table));
+      setFloorElements((current) => current.map((element) => elementsToFit.find(({ before }) => before.id === element.id)?.after || element));
+      let repositionFailures = 0;
+      await Promise.all([
+        ...tablesToFit.map(async ({ before, after }) => {
+          try { mergeSavedTableLayout(await saveTableLayout(after)); }
+          catch { repositionFailures += 1; setTables((current) => current.map((table) => table.id === before.id ? before : table)); }
+        }),
+        ...elementsToFit.map(async ({ before, after }) => {
+          try { const saved = await saveFloorElement(after); setFloorElements((current) => current.map((element) => element.id === saved.id ? { ...element, ...saved } : element)); }
+          catch { repositionFailures += 1; setFloorElements((current) => current.map((element) => element.id === before.id ? before : element)); }
+        }),
+      ]);
+      if (repositionFailures) throw new Error(t("Guardamos el tamaño, pero algunos elementos no pudieron reubicarse.", "The room size was saved, but some elements could not be repositioned.", "O tamanho foi salvo, mas alguns elementos não puderam ser reposicionados."));
+      setFloorSaveStatus("saved");
+      if (tablesToFit.length + elementsToFit.length > 0) {
+        setLayoutNotice(t(`${tablesToFit.length + elementsToFit.length} elementos se ajustaron al nuevo tamaño.`, `${tablesToFit.length + elementsToFit.length} elements were fitted to the new size.`, `${tablesToFit.length + elementsToFit.length} elementos foram ajustados ao novo tamanho.`));
+        window.setTimeout(() => setLayoutNotice(""), 2200);
+      }
+      window.setTimeout(() => setFloorSaveStatus((current) => current === "saved" ? "idle" : current), 1800);
+    } catch (spaceError) {
+      if (savedSpaceSizesRef.current[space]?.width === previous.width && savedSpaceSizesRef.current[space]?.height === previous.height) setSpaceSizes((current) => ({ ...current, [space]: previous }));
+      setFloorSaveStatus("error");
+      setError(spaceError instanceof Error ? spaceError.message : t("No pudimos guardar el tamaño del espacio.", "Could not save space size.", "Não foi possível salvar o tamanho do espaço."));
+    }
   };
 
   return (
@@ -4535,10 +4655,17 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
               const table = tables.find((item) => item.id === event.dataTransfer.getData("text/table-id"));
               if (table) { void moveTable(table, space, (event.clientX - bounds.left) / floorZoom - (table.width || 140) / 2, (event.clientY - bounds.top) / floorZoom - (table.height || 70) / 2); return; }
               const element = floorElements.find((item) => item.id === event.dataTransfer.getData("text/element-id"));
-              if (element) { const next = updateFloorElement(element, { space, x: Math.max(0, (event.clientX - bounds.left) / floorZoom - element.width / 2), y: Math.max(0, (event.clientY - bounds.top) / floorZoom - element.height / 2) }); persistFloorElement(next, element); }
+              if (element) {
+                const room = spaceSizes[space] || { width: 1200, height: 700 };
+                const next = updateFloorElement(element, { space, x: Math.max(0, Math.min(room.width - element.width, (event.clientX - bounds.left) / floorZoom - element.width / 2)), y: Math.max(0, Math.min(room.height - element.height, (event.clientY - bounds.top) / floorZoom - element.height / 2)) });
+                void persistFloorElement(next, element);
+              }
               const newElementKind = (event.dataTransfer.getData("text/new-element-kind") || draggedNewFloorElement?.kind || "") as FloorElement["kind"];
               const newElementLabel = event.dataTransfer.getData("text/new-element-label") || draggedNewFloorElement?.label || t("Elemento", "Element", "Elemento");
-              if (newElementKind) void addFloorElement(newElementKind, newElementLabel, { space, x: Math.max(0, (event.clientX - bounds.left) / floorZoom - 75), y: Math.max(0, (event.clientY - bounds.top) / floorZoom - 40) });
+              if (newElementKind) {
+                const size = defaultFloorElementSize(newElementKind);
+                void addFloorElement(newElementKind, newElementLabel, { space, x: (event.clientX - bounds.left) / floorZoom - size.width / 2, y: (event.clientY - bounds.top) / floorZoom - size.height / 2 });
+              }
               setDraggedNewFloorElement(null);
               setFloorDropTarget("");
             }}>
@@ -4567,7 +4694,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
               <header><div><span>{t("Elemento seleccionado", "Selected element", "Elemento selecionado")}</span><strong>{selectedElement.label}</strong></div><button onClick={() => setSelectedFloorElementId("")} aria-label={t("Cerrar inspector", "Close inspector", "Fechar inspetor")}>×</button></header>
               <label>{t("Nombre", "Name", "Nome")}<span className="table-name-save"><input value={floorElementLabelDraft} maxLength={120} onChange={(event) => setFloorElementLabelDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && floorElementLabelDraft.trim()) persistFloorElement(updateFloorElement(selectedElement, { label: floorElementLabelDraft.trim() })); }} /><button disabled={!floorElementLabelDraft.trim() || floorElementLabelDraft.trim() === selectedElement.label} onClick={() => persistFloorElement(updateFloorElement(selectedElement, { label: floorElementLabelDraft.trim() }))}>{t("Guardar", "Save", "Salvar")}</button></span></label>
               <div className="floor-element-size"><label>{t("Ancho", "Width", "Largura")}<input type="number" min="90" max="420" value={selectedElement.width} onChange={(event) => updateFloorElement(selectedElement, { width: Math.max(90, Math.min(420, Number(event.target.value))) })} onBlur={() => persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min="55" max="260" value={selectedElement.height} onChange={(event) => updateFloorElement(selectedElement, { height: Math.max(55, Math.min(260, Number(event.target.value))) })} onBlur={() => persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label></div>
-              {(["wall", "divider", "stage", "dj", "buffet", "gifts", "hydration", "gourmet", "photo-booth"] as FloorElement["kind"][]).includes(selectedElement.kind) && <fieldset className="floor-element-rotation"><legend>{t("Rotación", "Rotation", "Rotação")}</legend><div>{[0, 45, 90, 180, 270].map((rotation) => <button key={rotation} className={(selectedElement.rotation || 0) === rotation ? "active" : ""} onClick={() => persistFloorElement(updateFloorElement(selectedElement, { rotation }), selectedElement)}>{rotation}°</button>)}</div></fieldset>}
+              {(["wall", "divider", "door", "window", "stage", "dj", "buffet", "gifts", "hydration", "gourmet", "photo-booth", "entrance", "emergency"] as FloorElement["kind"][]).includes(selectedElement.kind) && <fieldset className="floor-element-rotation"><legend>{t("Rotación", "Rotation", "Rotação")}</legend><div>{[0, 45, 90, 180, 270].map((rotation) => <button key={rotation} className={(selectedElement.rotation || 0) === rotation ? "active" : ""} onClick={() => void persistFloorElement(updateFloorElement(selectedElement, { rotation }), selectedElement)}>{rotation}°</button>)}</div></fieldset>}
               <div className="floor-element-actions"><button disabled={!canEdit} onClick={() => void duplicateFloorElement(selectedElement)}>{t("Duplicar", "Duplicate", "Duplicar")}</button><button className="is-danger" disabled={!canEdit} onClick={() => void deleteFloorElement(selectedElement.id)}>{t("Eliminar", "Delete", "Excluir")}</button></div>
               <small>{t("Arrastrá el elemento para moverlo. Usá el control de la esquina para cambiar su tamaño.", "Drag the element to move it. Use the corner control to resize it.", "Arraste o elemento para movê-lo. Use o controle do canto para redimensioná-lo.")}</small>
             </aside>; })()}
