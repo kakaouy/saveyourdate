@@ -171,7 +171,7 @@ async function handler(request: Request) {
       const response = await supabaseRequest(`event_layout_elements?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`, {
         method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
           label: String(body.label || '').trim().slice(0, 120) || 'Texto editable', space_name: String(body.space || 'Espacio 1'),
-          position_x: Math.round(Math.max(0, Number(body.x) || 0)), position_y: Math.round(Math.max(0, Number(body.y) || 0)), element_width: Math.round(Math.max(90, Math.min(420, Number(body.width) || 150))), element_height: Math.round(Math.max(55, Math.min(260, Number(body.height) || 80))), rotation_degrees: Math.round(Number(body.rotation) || 0) % 360, updated_at: new Date().toISOString(),
+          position_x: Math.round(Math.max(0, Number(body.x) || 0)), position_y: Math.round(Math.max(0, Number(body.y) || 0)), element_width: Math.round(Math.max(20, Math.min(420, Number(body.width) || 150))), element_height: Math.round(Math.max(20, Math.min(260, Number(body.height) || 80))), rotation_degrees: Math.round(Number(body.rotation) || 0) % 360, updated_at: new Date().toISOString(),
         }),
       });
       const row = ((await response.json()) as LayoutElementRow[])[0];

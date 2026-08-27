@@ -333,6 +333,15 @@ button { color: inherit; }
 .guests-table th:nth-last-child(1), .guests-table td:nth-last-child(1) { width: 164px; }
 .guests-table .person { min-width: 0; }
 .guests-table .row-actions { justify-content: flex-end; gap: 5px; }
+.guests-table .checkbox-cell { width: 46px; }
+.guests-table .guest-person-column { width: 190px; }
+.guests-table .guest-group-column { width: 170px; }
+.guests-table .guest-circle-column { width: 145px; }
+.guests-table .guest-seats-column { width: 130px; }
+.guests-table .guest-status-column { width: 150px; }
+.guests-table .guest-actions-column { width: 174px; }
+.guests-table .person p { min-width: 0; overflow: hidden; }
+.guests-table .guest-name-button,.guests-table .person small { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .guest-empty-row:hover { background: transparent; }
 .guest-empty-row td { padding: 0!important; border: 0!important; }
 .guest-empty-state { display: grid; justify-items: center; gap: 7px; min-width: 520px; padding: 42px 20px; color: var(--muted); text-align: center; }
@@ -356,9 +365,11 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .guest-name-button:hover, .guest-name-button:focus-visible { color: var(--teal-dark); border-bottom-color: currentColor; outline: none; }
 
 @media (max-width: 1450px) and (min-width: 901px) {
+  .table-scroll { overflow-x: auto; }
+  .guests-table { min-width: 1005px; }
   .guests-table .guest-secondary-column { display: none; }
   .guests-table th:nth-last-child(1), .guests-table td:nth-last-child(1) { width: 172px; }
-  .guests-table .person { min-width: 145px; }
+  .guests-table .person { min-width: 0; }
 }
 .restriction-chips { display: flex; flex-wrap: wrap; gap: 4px; max-width: 280px; white-space: normal; }
 .restriction-chips span { padding: 4px 6px; border-radius: 999px; font-size: 7px; font-weight: 800; }
@@ -1477,4 +1488,8 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .workspace-legend { max-width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; }
   .seated-guests > div { flex-wrap: nowrap; }
   .seat-position-select { width: 94px; }
+}
+@media (max-width: 760px) {
+  .guests-table { min-width: 0; }
+  .guests-table :is(.guest-person-column,.guest-group-column,.guest-circle-column,.guest-seats-column,.guest-status-column,.guest-actions-column) { width: auto; }
 }

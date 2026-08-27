@@ -514,6 +514,20 @@ test('el encabezado de entregables conserva aire respecto del borde', () => {
   assert.match(styles, /\.seating-export-center > header > div \{ min-width: 0; padding-right: 8px/);
 });
 
+test('la landing publica una política de privacidad adaptada a SaveYourDate', () => {
+  const landing = readFileSync(path.join(appRoot, 'src', 'components', 'PlatformLandingConcept.tsx'), 'utf8');
+  const landingStyles = readFileSync(path.join(appRoot, 'src', 'components', 'platform-landing-concept.css'), 'utf8');
+  assert.match(landing, /function PrivacyPolicy\(\)/);
+  assert.match(landing, /Última actualización: 27 de agosto de 2026/);
+  assert.match(landing, /Supabase:/);
+  assert.match(landing, /Resend y FormSubmit:/);
+  assert.match(landing, /Mercado Pago:/);
+  assert.match(landing, /hola@saveyourdate\.site/);
+  assert.doesNotMatch(landing, /contact@seatplanning\.com/);
+  assert.doesNotMatch(landing, /Stripe/);
+  assert.match(landingStyles, /\.concept-legal-modal\.is-policy/);
+});
+
 test('imprimir y cerrar sesión usan PNG transparentes recoloreables', () => {
   ['print.png', 'logout.png'].forEach((icon) => assert.equal(existsSync(path.join(appRoot, 'public', 'admin-icons', icon)), true, `falta ${icon}`));
   assert.match(source, /admin-action-icon is-print/);
@@ -745,8 +759,8 @@ test('los círculos sociales alimentan la carga y las sugerencias de proximidad'
 });
 
 test('grupo de invitación y círculo social se editan y muestran como conceptos separados', () => {
-  assert.match(source, /<th>\{t\("Grupo de invitación", "Invitation group", "Grupo do convite"\)\}<\/th>/);
-  assert.match(source, /<th>\{t\("Círculo social", "Social circle", "Círculo social"\)\}<\/th>/);
+  assert.match(source, /<th className="guest-group-column">\{t\("Grupo de invitación", "Invitation group", "Grupo do convite"\)\}<\/th>/);
+  assert.match(source, /<th className="guest-circle-column">\{t\("Círculo social", "Social circle", "Círculo social"\)\}<\/th>/);
   assert.doesNotMatch(source, /Grupo \/ círculo/);
   assert.match(source, /const updateSocialCircleFromDetails = async/);
   assert.match(source, /className="guest-details-circle"/);
@@ -787,4 +801,15 @@ test('las acciones masivas actualizan edad, logística y restricciones sin tocar
   assert.match(source, /selected\.length >= 25/);
   assert.match(source, /bulk-social-references/);
   assert.match(guestsApi, /changes\.guest_type = guestType/);
+});
+
+test('los elementos del plano conservan tamaños de hasta 20 px al guardar y restaurar', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  const restoreApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'restore.ts'), 'utf8');
+  assert.match(source, /return \{ width: 20, height: 20 \}/);
+  assert.match(tablesApi, /element_width: Math\.round\(Math\.max\(20,/);
+  assert.match(tablesApi, /element_height: Math\.round\(Math\.max\(20,/);
+  assert.match(restoreApi, /element_width: Math\.max\(20,/);
+  assert.match(restoreApi, /element_height: Math\.max\(20,/);
+  assert.doesNotMatch(tablesApi, /element_width: Math\.round\(Math\.max\(90,/);
 });

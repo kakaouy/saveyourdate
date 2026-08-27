@@ -2405,14 +2405,14 @@ function Guests({
                     />
                   </th>
                 )}
-                <th>{t("Invitado", "Guest", "Convidado")}</th>
-                <th>{t("Grupo de invitación", "Invitation group", "Grupo do convite")}</th>
-                <th>{t("Círculo social", "Social circle", "Círculo social")}</th>
-                <th>{t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}</th>
-                <th>{t("Estado", "Status", "Status")}</th>
+                <th className="guest-person-column">{t("Invitado", "Guest", "Convidado")}</th>
+                <th className="guest-group-column">{t("Grupo de invitación", "Invitation group", "Grupo do convite")}</th>
+                <th className="guest-circle-column">{t("Círculo social", "Social circle", "Círculo social")}</th>
+                <th className="guest-seats-column">{t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}</th>
+                <th className="guest-status-column">{t("Estado", "Status", "Status")}</th>
                 <th className="guest-secondary-column">{t("Restricción", "Dietary need", "Restrição")}</th>
                 <th className="guest-secondary-column">{t("Seguimiento", "Tracking", "Acompanhamento")}</th>
-                <th>{t("Acciones", "Actions", "Ações")}</th>
+                <th className="guest-actions-column">{t("Acciones", "Actions", "Ações")}</th>
               </tr>
             </thead>
             <tbody>
