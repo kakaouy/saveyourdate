@@ -169,6 +169,31 @@
 @media(max-width:760px){.concept-trust{padding:75px 20px}.concept-trust header{grid-template-columns:1fr}.concept-trust h2{font-size:50px}.concept-trust>div{grid-template-columns:1fr 1fr}.concept-plan-actions{grid-template-columns:1fr}}
 @media(max-width:460px){.concept-trust>div{grid-template-columns:1fr}.concept-trust article{min-height:205px}}
 
+/* Cierre de landing: menos opciones simultáneas, mejor contexto y controles táctiles. */
+.concept-trust>div{grid-template-columns:repeat(3,1fr)}
+.concept-trust article{min-height:215px;padding:clamp(24px,3vw,38px)}
+.concept-trust article h3{margin-top:42px;font-size:clamp(24px,2.2vw,32px)}
+.concept-trust article p{max-width:390px;font-size:14px}
+.concept-faq-content{min-width:0}
+.concept-faq-topics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.concept-faq-topics button{min-height:44px;padding:10px 15px;border:1px solid rgba(23,56,75,.2);border-radius:999px;color:#60747c;background:rgba(255,255,255,.45);font:750 13px 'DM Sans',sans-serif;cursor:pointer}
+.concept-faq-topics button[aria-selected=true]{border-color:var(--navy);color:#fff;background:var(--navy)}
+.concept-faq-list details>p{font-size:14px}
+.concept-contact form{border-radius:12px}
+.concept-contact-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.concept-contact input,.concept-contact textarea,.concept-contact select{min-height:46px;width:100%;padding:13px;border:1px solid #cddbd7;border-radius:5px;color:var(--ink);background:#fbfcfa;font:500 15px 'DM Sans',sans-serif}
+.concept-contact select{appearance:auto}
+.concept-contact textarea{min-height:110px;resize:vertical}
+.concept-contact-scope{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0;padding:0;border:0}
+.concept-contact-scope legend{grid-column:1/-1;margin-bottom:7px;font-size:11px;font-weight:750;letter-spacing:.06em;text-transform:uppercase}
+.concept-contact-scope label{display:flex;grid-template-columns:none;align-items:center;gap:9px;min-height:46px;padding:11px 13px;border:1px solid #cddbd7;border-radius:5px;background:#fbfcfa;font-size:13px;letter-spacing:0;text-transform:none;cursor:pointer}
+.concept-contact-scope input{min-height:0;width:17px;height:17px;padding:0;accent-color:var(--aqua)}
+.concept-contact button{min-height:46px;font-size:13px}
+.concept-nav a,.concept-nav button,.concept-return-links a,.concept-final a{min-height:44px}
+
+@media(max-width:980px){.concept-faq-content{width:100%}.concept-trust>div{grid-template-columns:1fr}.concept-trust article{min-height:auto}.concept-trust article h3{margin-top:25px}}
+@media(max-width:680px){.concept-faq-topics{flex-wrap:nowrap;margin-inline:-20px;padding-inline:20px;overflow-x:auto;scrollbar-width:none}.concept-faq-topics::-webkit-scrollbar{display:none}.concept-faq-topics button{flex:0 0 auto}.concept-contact-pair,.concept-contact-scope{grid-template-columns:1fr}.concept-contact form{gap:16px;padding:22px}.concept-contact label{font-size:12px}.concept-contact button{width:100%;justify-self:stretch}.concept-trust header{margin-bottom:38px}.concept-trust h2,.concept-faq-heading h2,.concept-contact h2{overflow-wrap:anywhere}.concept-faq-list summary{font-size:16px}.concept-faq-list details>p{margin-left:34px;font-size:14px}}
+
 .concept-role-compare{display:grid;grid-template-columns:.72fr 1.28fr;gap:clamp(45px,8vw,125px);padding:clamp(80px,10vw,145px) clamp(24px,7vw,110px);background:#e9f2ef}.concept-role-compare header>span{color:#6e8581;font-size:9px;font-weight:900;letter-spacing:.16em}.concept-role-compare h2{margin:20px 0;font:clamp(44px,5vw,74px)/1 'Italiana',Georgia,serif}.concept-role-compare h2 em{color:var(--aqua);font-weight:400}.concept-role-table{border-top:1px solid #bfcfcb}.concept-role-table>div{display:grid;grid-template-columns:.65fr 1fr 1fr;gap:20px;align-items:center;min-height:72px;border-bottom:1px solid #bfcfcb}.concept-role-table span{color:#6d817f;font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}.concept-role-table p{margin:0;font-size:13px}.concept-role-table .role-head{min-height:48px}.concept-role-table .role-head b{font:20px 'Italiana',Georgia,serif}.concept-role-actions{grid-column:2;display:flex;gap:10px}.concept-role-actions a,.concept-role-actions button{display:flex;justify-content:space-between;gap:25px;min-width:190px;padding:15px 18px;border:0;border-radius:4px;color:#fff;background:var(--navy);font:800 12px 'DM Sans',sans-serif;cursor:pointer}.concept-role-actions button{color:var(--navy);background:#f1cf75}
 @media(max-width:800px){.concept-role-compare{grid-template-columns:1fr}.concept-role-actions{grid-column:1}.concept-role-table>div{grid-template-columns:.6fr 1fr 1fr}}
 @media(max-width:520px){.concept-role-compare{padding:70px 20px}.concept-role-table{overflow-x:auto}.concept-role-table>div{min-width:590px}.concept-role-actions{flex-direction:column}.concept-role-actions a,.concept-role-actions button{width:100%}}

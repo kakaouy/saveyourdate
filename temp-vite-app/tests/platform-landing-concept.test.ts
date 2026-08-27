@@ -75,3 +75,32 @@ test('mesas muestra el flujo simplificado y los eventos existentes sólo conserv
   assert.match(landing, /concept-return-links/);
   assert.doesNotMatch(landing, /Tu evento sigue donde lo dejaste/);
 });
+
+test('confianza se resume en tres garantías concretas', () => {
+  assert.match(landing, /Demo sin registro/);
+  assert.match(landing, /Información protegida/);
+  assert.match(landing, /Soporte humano/);
+  assert.doesNotMatch(landing, /<h3>Acceso privado<\/h3>/);
+  assert.doesNotMatch(landing, /<h3>Permisos por rol<\/h3>/);
+  assert.match(styles, /\.concept-trust>div\{grid-template-columns:repeat\(3,1fr\)\}/);
+});
+
+test('preguntas se agrupan por temas y muestran primero los primeros pasos', () => {
+  assert.match(landing, /const faqGroups/);
+  assert.match(landing, /'Primeros pasos'/);
+  assert.match(landing, /Invitaciones:/);
+  assert.match(landing, /'Invitados y mesas'/);
+  assert.match(landing, /Planes:/);
+  assert.match(landing, /Privacidad:/);
+  assert.match(landing, /useState<FaqTopic>\('Primeros pasos'\)/);
+  assert.match(styles, /\.concept-faq-topics/);
+});
+
+test('el formulario contextualiza tipo y cantidad de eventos', () => {
+  assert.match(landing, /name="eventType"/);
+  assert.match(landing, /name="eventScope" value="one"/);
+  assert.match(landing, /name="eventScope" value="many"/);
+  assert.match(landing, /Un evento propio/);
+  assert.match(landing, /Varios eventos/);
+  assert.match(styles, /\.concept-contact-scope/);
+});
