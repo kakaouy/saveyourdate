@@ -341,10 +341,12 @@
    Así el diseño conserva sus proporciones en cualquier ancho de la grilla. */
 .catalog-grid .catalog-phone{
   height:auto;
-  aspect-ratio:230/470;
+  /* El vidrio interior conserva la misma proporción que el lienzo canónico
+     de 390 × 820. Así el escalado termina exactamente en el borde inferior. */
+  aspect-ratio:230/462;
   /* El vidrio llega casi hasta el borde inferior. El marco anterior reservaba
      demasiado espacio y dejaba una franja vacía debajo de todas las portadas. */
-  padding:8px 6px 4px;
+  padding:8px 6px 0;
 }
 .catalog-grid .catalog-phone-screen{
   background:#f8f4ec;
@@ -383,6 +385,41 @@
 .catalog-card-preview-canvas > *::-webkit-scrollbar{display:block!important;width:5px!important;height:5px!important}
 .catalog-card-preview-canvas > *::-webkit-scrollbar-track{background:transparent}
 .catalog-card-preview-canvas > *::-webkit-scrollbar-thumb{border-radius:999px;background:rgba(23,56,75,.42)}
+
+/* Astraea conserva en las tarjetas la composición vertical aprobada. Su
+   layout amplio original depende del viewport del navegador; como el lienzo
+   del catálogo vive dentro de una página de escritorio, esa regla se activaba
+   aunque el dispositivo simulado midiera sólo 390px y separaba texto y fecha
+   en columnas. Aquí anulamos únicamente esa bifurcación de escritorio. */
+.catalog-card-preview-canvas .au-embedded.astraea-model .au-hero-content{
+  --astraea-edge:7cqw;
+  height:100cqh;
+  min-height:0;
+  padding:calc(var(--astraea-edge)*2) var(--astraea-edge);
+}
+.catalog-card-preview-canvas .au-embedded.astraea-model .au-astraea-intro{
+  display:flex;
+  width:min(100%,540px);
+  height:100%;
+  min-height:0;
+  flex-direction:column;
+}
+.catalog-card-preview-canvas .au-embedded.astraea-model .au-astraea-intro>:not(.au-astraea-date){
+  grid-column:auto;
+}
+.catalog-card-preview-canvas .au-embedded.astraea-model .au-astraea-date{
+  display:flex;
+  grid-row:auto;
+  grid-column:auto;
+  align-self:auto;
+  min-height:0;
+  flex:1;
+  justify-content:flex-end;
+  gap:0;
+  padding-top:calc(var(--astraea-edge)*2);
+  font-size:min(50cqw,21cqh);
+  line-height:.84;
+}
 
 /* El visor reserva siempre una fila para los controles y otra para la ayuda.
    El dispositivo usa únicamente el espacio central disponible. */
