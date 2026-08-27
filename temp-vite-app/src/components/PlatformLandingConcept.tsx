@@ -26,17 +26,10 @@ const frequentlyAskedQuestions = [
   ['¿Qué hago si necesito ayuda?', 'Podés escribirnos desde el formulario de contacto. Te ayudamos a elegir el recorrido adecuado y a resolver dudas sobre tu evento, tu pedido o el uso de la plataforma.'],
 ];
 
-const platformModules = [
-  { icon: '✦', name: 'Invitación', text: 'Diseño, textos, fotos y toda la información del evento en un único enlace.', demo: 'Invitación' },
-  { icon: '♙', name: 'Invitados y RSVP', text: 'Grupos, acompañantes, confirmaciones y seguimiento sin planillas separadas.', demo: 'Invitados' },
-  { icon: '↗', name: 'Comunicados', text: 'Novedades y recordatorios para mantener a todos informados.', demo: 'Comunicados' },
-  { icon: '◇', name: 'Restricciones', text: 'Alimentación, accesibilidad y necesidades importantes centralizadas.', demo: 'Invitados' },
-  { icon: '▦', name: 'Mesas y Living', text: 'Distribución visual de personas, grupos y espacios sin límite de Living.', demo: 'Mesas y Living' },
-  { icon: '♡', name: 'Regalos y canciones', text: 'Información para regalos y sugerencias musicales vinculadas al evento.', demo: 'Resumen' },
-  { icon: '◎', name: 'Proveedores y accesos', text: 'Cada colaborador ve únicamente la parte que necesita para trabajar.', demo: 'Proveedores' },
-  { icon: '▧', name: 'Galería de imágenes', text: 'Fotos y recuerdos integrados a la experiencia de la invitación.', demo: 'Invitación' },
-  { icon: '✓', name: 'Check-in', text: 'Recepción y control de llegadas desde el panel del evento.', upcoming: true },
-  { icon: '▣', name: 'Álbum colaborativo', text: 'Un espacio para reunir las fotos compartidas por los invitados.', upcoming: true },
+const platformJourneys = [
+  { number: '01', eyebrow: 'INVITACIÓN Y COMUNICACIÓN', title: 'Invitá y comunicá', text: 'Diseñá la experiencia, compartí cada detalle y mantené a todos informados desde un mismo lugar.', demo: 'Invitación', preview: 'invite', features: ['Configurá el evento', 'Invitá y comunicá', 'Confirmaciones y RSVP'], more: ['Invitación personalizada', 'Comunicados y recordatorios', 'Galería de imágenes', 'Regalos', 'Canciones sugeridas'] },
+  { number: '02', eyebrow: 'PERSONAS Y DISTRIBUCIÓN', title: 'Organizá invitados y mesas', text: 'Gestioná grupos, círculos sociales y necesidades para construir una distribución clara.', demo: 'Mesas y Living', preview: 'tables', features: ['Grupos y acompañantes', 'Mesas y zonas Living', 'Restricciones y accesibilidad'], more: ['Importación de invitados', 'Sugerencias de ubicación', 'Plano del salón'] },
+  { number: '03', eyebrow: 'SALÓN Y OPERACIÓN', title: 'Prepará salón y entregables', text: 'Diseñá el plano y compartí con cada proveedor únicamente la información que necesita para trabajar.', demo: 'Proveedores', preview: 'team', features: ['Plano y elementos del salón', 'Numeración de mesas', 'Entregables por destinatario'], more: ['Reporte para catering', 'Plano para montaje', 'Proveedores y accesos', 'Check-in y álbum colaborativo · Próximamente'] },
 ];
 
 function PrivacyPolicy() {
@@ -62,6 +55,7 @@ export default function PlatformLandingConcept() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [language, setLanguage] = useState('es');
   const [plansOpen, setPlansOpen] = useState(false);
+  const [audience, setAudience] = useState<'host' | 'pro'>('host');
   const [eventsInQuarter, setEventsInQuarter] = useState('3');
   const [legalOpen, setLegalOpen] = useState<'privacy' | 'terms' | null>(null);
   const [contactStatus, setContactStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -103,64 +97,64 @@ export default function PlatformLandingConcept() {
       <div className="concept-hero-slides" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
       <div className="concept-hero-copy">
         <img className="concept-hero-logo" src="/logo.svg" alt="Save Your Date" />
-        <p className="concept-kicker"><span>01</span> Tu evento empieza acá</p>
+        <p className="concept-kicker">Tu evento empieza acá</p>
         <h1>Lo lindo se ve.<br /><em>Todo lo demás</em><br />queda organizado.</h1>
-        <p className="concept-lead">Creá la invitación, gestioná invitados y compartí cada detalle sin vivir entre planillas y mensajes.</p>
+        <p className="concept-lead">Invitaciones, confirmaciones, invitados, mesas y salón conectados en un solo lugar, desde la planificación hasta el día del evento.</p>
         <div className="concept-actions"><a className="concept-action-create" href="/admin">Crear mi evento <span>→</span></a><a className="concept-action-demo" href="/?demo=panel">Probar la plataforma <span>→</span></a><a className="concept-action-pro" href="#organizadores">Organizo eventos <span>→</span></a></div>
         <p className="concept-proof"><b>Una sola plataforma</b><span>Invitación · Comunicados · RSVP · Mesas · Proveedores</span></p>
+        <div className="concept-scroll">DESLIZÁ PARA DESCUBRIR <span>↓</span></div>
       </div>
 
       <div className="concept-worktable" role="img" aria-label="Mesa de trabajo vista desde arriba con invitaciones, agenda y herramientas para organizar un evento">
         {['INVITACIÓN','PLANIFICACIÓN','GESTIÓN','FIESTA','CELEBRACIÓN','ORGANIZACIÓN','ENCUENTRO','EMOCIÓN','RECUERDOS','DETALLES','MÚSICA','BRINDIS','INVITADOS','MOMENTOS','ALEGRÍA','CONEXIÓN'].map((word,index)=><span key={word} style={{'--tag-index':index} as React.CSSProperties}>{word}</span>)}
       </div>
-      <div className="concept-scroll">DESLIZÁ PARA DESCUBRIR <span>↓</span></div>
     </section>
 
     <section className="concept-less" aria-label="Beneficios principales">
       <div><span>MENOS RUIDO. MÁS EVENTO.</span><p>Menos planillas.</p><p>Menos mensajes perdidos.</p><p>Menos errores.</p><strong>Más tiempo para vivir el evento.</strong></div>
+      <article className="concept-event-overview" aria-label="Ejemplo de organización del evento">
+        <header><div><small>ORGANIZACIÓN DEL EVENTO</small><h2>Todo conectado</h2></div><b>En progreso</b></header>
+        <div className="concept-event-progress" aria-label="Tres de cuatro áreas preparadas"><i /><i /><i /><i /></div>
+        <div className="concept-event-stats"><div><strong>259</strong><span>Confirmados</span></div><div><strong>16</strong><span>Mesas</span></div><div><strong>0</strong><span>Sin ubicar</span></div></div>
+        <div className="concept-event-row"><i /><div><b>Mesa Familia</b><small>Círculo social · Familia</small></div><span>12/12</span></div>
+        <div className="concept-event-row"><i /><div><b>Mesa Facultad</b><small>Círculo social · Facultad</small></div><span>10/12</span></div>
+        <div className="concept-event-row"><i /><div><b>Mesa Amigos</b><small>Círculo social · Amigos</small></div><span>8/10</span></div>
+      </article>
     </section>
 
     <section className="concept-connected" id="como-funciona">
-      <div className="concept-flow">
-        <div className="concept-section-heading"><p><span>02</span> Empezar es simple</p><h2>Del primer dato<br /><em>al evento organizado.</em></h2><p>Un recorrido claro para pasar de la idea a un panel listo para trabajar.</p></div>
-        <div className="concept-flow-line concept-flow-three">
-          <article><b>01</b><span>✦</span><h3>Contanos qué estás organizando</h3><p>Elegís si sos anfitrión u organizador y completás los datos básicos.</p></article>
-          <article><b>02</b><span>↗</span><h3>Recibí el acceso a tu evento</h3><p>Se genera el pedido y recibís los datos para entrar al panel privado.</p></article>
-          <article><b>03</b><span>▦</span><h3>Organizá todo desde el panel</h3><p>Creás la invitación, cargás invitados y activás los módulos necesarios.</p></article>
-        </div>
-        <div className="concept-path-choice"><article><span>RECORRIDO REAL</span><h3>Crear mi evento</h3><p>Para comenzar un evento, recibir el acceso y gestionar información real.</p><a href="/admin">Empezar mi evento <b>→</b></a></article><article><span>RECORRIDO DE PRUEBA</span><h3>Probar la plataforma</h3><p>Para explorar los módulos con datos ficticios. Nada se guarda.</p><a href="/?demo=panel">Abrir demostración <b>→</b></a></article></div>
-      </div>
       <div className="concept-modules" id="modulos">
-        <header><p>Lo que encontrás al ingresar</p><h2>Todo tu evento,<br /><em>en un solo lugar.</em></h2><div><p>No son herramientas sueltas. La información de cada módulo se conecta para evitar repetir tareas y reducir errores.</p><a href="/?demo=panel">Recorrer la demostración →</a></div></header>
-        <div className="concept-module-grid">{platformModules.map((module, index) => <article key={module.name} className={module.upcoming ? 'is-upcoming' : ''}><div><span>{module.icon}</span><i>{String(index + 1).padStart(2, '0')}</i></div><h3>{module.name}</h3><p>{module.text}</p>{module.upcoming ? <small>PRÓXIMAMENTE</small> : <a href={`/?demo=panel&modulo=${encodeURIComponent(module.demo || 'Resumen')}`}>Ver en la demo <span>→</span></a>}</article>)}</div>
+        <header><p>Cómo funciona</p><div className="concept-how-card"><header><small>UN RECORRIDO CONECTADO</small><h3>De la primera lista al evento listo para compartir</h3><p>Cargá la información una vez y usala durante toda la organización.</p></header><ol><li><b>01</b><div><strong>Configurá e importá</strong><span>Completá los datos principales o subí tu lista de invitados.</span></div></li><li><b>02</b><div><strong>Ordená personas y grupos</strong><span>Reuní acompañantes, círculos sociales y confirmaciones.</span></div></li><li><b>03</b><div><strong>Diseñá mesas y salón</strong><span>Ubicá invitados y adaptá cada elemento al espacio real.</span></div></li><li><b>04</b><div><strong>Revisá y compartí</strong><span>Generá entregables claros para coordinación y proveedores.</span></div></li></ol></div><h2>Todo tu evento,<br /><em>en un solo lugar.</em></h2><div><p>Tres momentos conectados para configurar, organizar y preparar el evento sin repetir información ni depender de herramientas separadas.</p><a href="/?demo=panel">Recorrer la demostración →</a></div></header>
+        <div className="concept-journey-grid">{platformJourneys.map((journey) => <article className="concept-journey-card" key={journey.title}>
+          <div className={`concept-journey-preview is-${journey.preview}`} aria-hidden="true">
+            <div className="concept-preview-nav"><i /><i /><i /><span /></div>
+            {journey.preview === 'invite' && <div className="concept-preview-invite"><section><small>INVITACIÓN</small><b>Sofía &amp; Mateo</b><span>12 · 10 · 2026</span><button>Confirmar asistencia</button></section><aside><i /><i /><i /></aside><div className="concept-preview-guest-sheet"><div className="concept-preview-rsvp-stats"><span><b>245</b>Confirmados</span><span><b>34</b>Pendientes</span><span><b>63</b>No asisten</span></div><header><b>INVITADOS</b><span>Estado</span></header><p><i>SM</i><b>Sofía M.</b><span>Confirmado</span></p><p><i>JL</i><b>Juan L.</b><span>Pendiente</span></p><p><i>AR</i><b>Ana R.</b><span>Confirmado</span></p><p><i>MC</i><b>Martín C.</b><span>No asiste</span></p><p><i>LV</i><b>Lucía V.</b><span>Confirmado</span></p></div></div>}
+            {journey.preview === 'tables' && <div className="concept-preview-seating"><aside><small>INVITADOS Y GRUPOS</small><label>Buscar grupo…</label><div><i>F</i><span><b>Familia</b><small>Grupo confirmado</small></span></div><div><i>A</i><span><b>Amigos</b><small>Sin ubicar</small></span></div><div><i>U</i><span><b>Facultad</b><small>Mesa asignada</small></span></div></aside><main><header><div><small>ORGANIZACIÓN DE MESAS</small><b>Ubicá grupos completos</b></div><span>+ Añadir mesa</span></header><section><article><b>Mesa Familia</b><div className="concept-mini-table"><i /><i /><i /><i /><i /><i /><strong>F</strong></div><small>Grupo ubicado</small></article><article><b>Mesa Amigos</b><div className="concept-mini-table"><i /><i /><i /><i /><i /><i /><strong>+</strong></div><small>Elegí un grupo para ubicar</small></article></section></main></div>}
+            {journey.preview === 'team' && <div className="concept-preview-team"><section><i>12</i><div><b>Numeración de mesas</b><span>Números listos para imprimir</span></div><strong>Listo</strong></section><section><i>SA</i><div><b>Salón</b><span>Plano de montaje</span></div><strong>Listo</strong></section><section><i>CP</i><div><b>Catering</b><span>Listado por mesa y asiento</span></div><strong>Listo</strong></section></div>}
+          </div>
+          <div className="concept-journey-copy"><span>{journey.number} · {journey.eyebrow}</span><h3>{journey.title}</h3><p>{journey.text}</p><ul>{journey.features.map((feature) => <li key={feature}>{feature}</li>)}</ul><details><summary>Ver todas las funciones</summary><ul>{journey.more.map((feature) => <li key={feature}>{feature}</li>)}</ul></details><a href={`/?demo=panel&modulo=${encodeURIComponent(journey.demo)}`}>Ver en la demostración <b>→</b></a></div>
+        </article>)}</div>
       </div>
     </section>
 
-    <section className="concept-audiences" id="para-quien">
-      <article className="concept-host">
-        <div className="concept-audience-photo"><img src="/concept/planner-heart-polaroids-v2.png" alt="Álbum de evento con un corazón dorado y recuerdos de distintas celebraciones" /><span>PARA NOVIOS, QUINCEAÑERAS Y ANFITRIONES</span></div>
-        <div className="concept-audience-copy"><p>Organizo mi propio evento</p><h2>Disfrutá más.<br />Coordiná menos.</h2><ul><li>Invitación y comunicados</li><li>Confirmaciones y acompañantes</li><li>Regalos, canciones y detalles</li><li>Mesas y zonas Living</li></ul><a href="/admin">Quiero crear mi evento →</a></div>
-      </article>
-      <article className="concept-pro" id="organizadores">
-        <div className="concept-pro-board"><span className="board-label">EVENTOS ACTIVOS</span><strong>Todo lo importante,<br />a la vista.</strong><div className="event-row"><i className="coral" /><b>Sofía & Mateo</b><span>15 pendientes</span></div><div className="event-row"><i className="mint" /><b>Quince de Juanita</b><span>Mesas listas</span></div><div className="event-row"><i className="gold" /><b>Evento corporativo</b><span>3 proveedores</span></div></div>
-        <div className="concept-audience-copy"><p>Organizo eventos profesionalmente</p><h2>Más eventos.<br />Menos tareas repetidas.</h2><ul><li>Varios eventos en una cuenta</li><li>Invitados, mesas y pendientes</li><li>Accesos para equipo y proveedores</li><li>Información siempre actualizada</li></ul><a href="/admin">Gestionar mis eventos →</a></div>
+    <section className="concept-audience-switch" id="para-quien" aria-labelledby="audience-title">
+      <header><span>PARA QUIÉN ES</span><h2 id="audience-title">Una plataforma.<br /><em>Dos formas de organizar.</em></h2><div className="concept-audience-tabs" role="tablist" aria-label="Elegir forma de organización"><button type="button" role="tab" aria-selected={audience === 'host'} onClick={() => setAudience('host')}>Organizo mi evento</button><button type="button" role="tab" aria-selected={audience === 'pro'} onClick={() => setAudience('pro')}>Organizo varios eventos</button></div></header>
+      <article className={`concept-audience-panel is-${audience}`} role="tabpanel">
+        <div className="concept-audience-visual">
+          {audience === 'host' ? <img src="/concept/planner-heart-polaroids-v2.png" alt="Recuerdos e invitaciones de una celebración" /> : <div className="concept-pro-board"><span className="board-label">EVENTOS ACTIVOS</span><strong>Todo lo importante,<br />a la vista.</strong><div className="event-row"><i className="coral" /><b>Sofía &amp; Mateo</b><span>15 pendientes</span></div><div className="event-row"><i className="mint" /><b>Quince de Juanita</b><span>Mesas listas</span></div><div className="event-row"><i className="gold" /><b>Evento corporativo</b><span>3 proveedores</span></div></div>}
+        </div>
+        <div className="concept-audience-content">{audience === 'host' ? <><span>PARA ANFITRIONES</span><h3>Disfrutá más.<br />Coordiná menos.</h3><p>Tené la invitación, las respuestas y la organización del evento conectadas desde el comienzo.</p><ul><li>Un evento con control completo</li><li>Invitados, confirmaciones y acompañantes</li><li>Mesas, salón y entregables</li></ul><a href="/admin">Quiero crear mi evento <b>→</b></a></> : <><span>PARA ORGANIZADORES</span><h3>Más eventos.<br />Menos tareas repetidas.</h3><p>Gestioná eventos, equipos y pendientes dentro de una misma operación profesional.</p><ul><li>Varios eventos en una cuenta</li><li>Procesos reutilizables y seguimiento</li><li>Accesos acotados para equipo y proveedores</li></ul><button type="button" onClick={() => setPlansOpen(true)}>Consultar modalidad profesional <b>→</b></button></>}
+          <aside><b>¿Trabajás como proveedor?</b><span>No necesitás contratar un plan. El anfitrión o el organizador te concede acceso únicamente a la información necesaria para tu tarea.</span></aside>
+        </div>
       </article>
     </section>
-
-    <section className="concept-role-compare" aria-labelledby="role-compare-title"><header><span>04 · COLABORACIÓN SIN RUIDO</span><h2 id="role-compare-title">Cada persona ve<br /><em>sólo lo que necesita.</em></h2><p>La misma plataforma adapta el alcance según la responsabilidad de cada persona dentro del evento.</p></header><div className="concept-role-table"><div className="role-head"><span>ROL</span><b>ALCANCE</b><b>QUÉ PUEDE VER</b></div><div><span>ANFITRIÓN</span><p>Control completo del evento</p><p>Todo el evento</p></div><div><span>ORGANIZADOR</span><p>Gestión y coordinación</p><p>Invitados · Mesas · Equipo</p></div><div><span>PROVEEDOR INVITADO</span><p>Acceso específico</p><p>Su tarea · Su información</p></div><div><span>MODALIDAD</span><p>Plan por evento</p><p>Propuesta por volumen para organizadores</p></div></div><div className="concept-role-actions"><a href="/admin">Soy anfitrión <b>→</b></a><button type="button" onClick={() => setPlansOpen(true)}>Organizo eventos <b>→</b></button></div></section>
 
     <section className="concept-invitations" id="invitaciones">
       <div className="concept-invite-copy"><p><span>03</span> Creá tu invitación</p><h2>La primera impresión<br />también cuenta.</h2><p>Empezá por una invitación que entusiasme. Personalizá colores, textos, fotos y cada detalle de la experiencia.</p><a className="concept-explore-cta" href="/?catalogo=1">Explorar todas las invitaciones <span>→</span></a></div>
       <div className="concept-invite-stack">{[...invitationPreviews, ...invitationPreviews.slice(0, 6)].map(([src, label], index) => <figure key={`${src}-${index}`} tabIndex={0} style={{ '--card-index': index } as React.CSSProperties}><img src={src} alt={`Invitación ${label}`} /><figcaption>{label}</figcaption></figure>)}</div>
     </section>
 
-    <section className="concept-existing-event" aria-labelledby="existing-event-title">
-      <div><span>¿YA EMPEZASTE?</span><h2 id="existing-event-title">Tu evento sigue donde lo dejaste.</h2><p>El pedido y el panel cumplen funciones diferentes. Elegí el acceso que necesitás.</p></div>
-      <div className="concept-existing-actions">
-        <article><span>SEGUIMIENTO</span><h3>Consultar mi pedido</h3><p>Revisá el estado del pago, la preparación o la publicación de tu invitación.</p><a href="/consultar">Consultar estado <b>→</b></a></article>
-        <article><span>GESTIÓN</span><h3>Ingresar a mi evento</h3><p>Entrá al panel para gestionar invitados, módulos, mesas y accesos.</p><a href="/admin">Abrir mi panel <b>→</b></a></article>
-      </div>
-    </section>
+    <nav className="concept-return-links" aria-label="Accesos para eventos existentes"><span>¿Ya tenés un evento?</span><a href="/consultar"><small>SEGUIMIENTO</small>Consultar mi pedido <b>→</b></a><a href="/admin"><small>GESTIÓN</small>Ingresar a mi evento <b>→</b></a></nav>
 
     <section className="concept-trust" aria-labelledby="trust-title"><header><span>CONFIANZA SIN LETRA CHICA</span><h2 id="trust-title">Probalo. Entendelo.<br /><em>Después decidí.</em></h2></header><div><article><b>01</b><h3>Demo sin registro</h3><p>Recorré la plataforma con datos ficticios antes de compartir información propia.</p></article><article><b>02</b><h3>Acceso privado</h3><p>El evento real se protege con los datos del pedido y un código de seguridad.</p></article><article><b>03</b><h3>Permisos por rol</h3><p>Cada persona accede únicamente a los módulos necesarios para su tarea.</p></article><article><b>04</b><h3>Revisión antes de publicar</h3><p>La invitación atraviesa un circuito de borrador, revisión y aprobación.</p></article><article><b>05</b><h3>Soporte humano</h3><p>Podés consultar antes de comenzar o pedir ayuda durante la organización.</p></article></div></section>
 
