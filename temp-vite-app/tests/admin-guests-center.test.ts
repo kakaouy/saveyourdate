@@ -498,6 +498,22 @@ test('las mesas y elementos del plano se pueden seleccionar con teclado', () => 
   assert.match(styles, /\.floor-table:focus-visible,\.floor-element:focus-visible/);
 });
 
+test('el celular puede mover invitados y objetos sin depender del drag nativo', () => {
+  assert.match(source, /const moveTableWithPointer =/);
+  assert.match(source, /const moveFloorElementWithPointer =/);
+  assert.match(source, /event\.pointerType === "mouse"/);
+  assert.match(source, /onPointerDown=\{\(event\) => moveTableWithPointer\(table, event\)\}/);
+  assert.match(source, /onPointerDown=\{\(event\) => moveFloorElementWithPointer\(element, event\)\}/);
+  assert.match(source, /if \(person\) selectGuestForSeat\(person\.guest\.id\)/);
+  assert.match(styles, /\.floor-table,\.floor-element \{ touch-action: none/);
+  assert.match(styles, /\.seat-marker\.is-occupied \{ touch-action: manipulation/);
+});
+
+test('el encabezado de entregables conserva aire respecto del borde', () => {
+  assert.match(styles, /\.seating-export-center > header \{[^}]*padding: 4px 18px 2px/);
+  assert.match(styles, /\.seating-export-center > header > div \{ min-width: 0; padding-right: 8px/);
+});
+
 test('imprimir y cerrar sesión usan PNG transparentes recoloreables', () => {
   ['print.png', 'logout.png'].forEach((icon) => assert.equal(existsSync(path.join(appRoot, 'public', 'admin-icons', icon)), true, `falta ${icon}`));
   assert.match(source, /admin-action-icon is-print/);

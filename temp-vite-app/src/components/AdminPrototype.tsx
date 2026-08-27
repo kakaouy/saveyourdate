@@ -4003,6 +4003,38 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     }
   };
 
+  const moveTableWithPointer = (table: EventTable, event: React.PointerEvent<HTMLElement>) => {
+    if (event.pointerType === "mouse" || table.locked || !canEdit) return;
+    event.stopPropagation();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const originalX = table.x || 24;
+    const originalY = table.y || 24;
+    const room = spaceSizes[table.space || "Espacio 1"] || { width: 1200, height: 700 };
+    let nextX = originalX;
+    let nextY = originalY;
+    let moved = false;
+    const onMove = (moveEvent: PointerEvent) => {
+      moveEvent.preventDefault();
+      const deltaX = (moveEvent.clientX - startX) / floorZoom;
+      const deltaY = (moveEvent.clientY - startY) / floorZoom;
+      if (!moved && Math.hypot(deltaX, deltaY) < 4) return;
+      moved = true;
+      nextX = Math.max(0, Math.min(room.width - (table.width || 140), originalX + deltaX));
+      nextY = Math.max(0, Math.min(room.height - (table.height || 70), originalY + deltaY));
+      setTables((current) => current.map((item) => item.id === table.id ? { ...item, x: nextX, y: nextY } : item));
+    };
+    const onEnd = () => {
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerup", onEnd);
+      document.removeEventListener("pointercancel", onEnd);
+      if (moved) void moveTable(table, table.space || "Espacio 1", nextX, nextY);
+    };
+    document.addEventListener("pointermove", onMove, { passive: false });
+    document.addEventListener("pointerup", onEnd);
+    document.addEventListener("pointercancel", onEnd);
+  };
+
   const updateTableLayout = async (table: EventTable, changes: Partial<EventTable>) => {
     const next = { ...table, ...changes };
     setTables((current) => current.map((item) => item.id === table.id ? next : item));
@@ -4099,7 +4131,6 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
   ));
 
   const resizeTable = (table: EventTable, event: React.PointerEvent<HTMLButtonElement>) => {
-    event.preventDefault();
     event.stopPropagation();
     const startX = event.clientX;
     const startY = event.clientY;
@@ -4110,6 +4141,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     const maxHeight = Math.max(40, Math.min(180, room.height - (table.y || 24)));
     let resized = table;
     const onMove = (moveEvent: PointerEvent) => {
+      moveEvent.preventDefault();
       if (table.shape === "round" || table.shape === "square") {
         const maxSurfaceSize = Math.min(maxHeight, maxWidth / 2);
         const requestedSize = Math.max(startHeight + moveEvent.clientY - startY, startWidth / 2 + (moveEvent.clientX - startX) / 2);
@@ -4264,6 +4296,36 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     };
     const onEnd = () => { document.removeEventListener("pointermove", onMove); document.removeEventListener("pointerup", onEnd); persistFloorElement(resized, element); };
     document.addEventListener("pointermove", onMove); document.addEventListener("pointerup", onEnd);
+  };
+
+  const moveFloorElementWithPointer = (element: FloorElement, event: React.PointerEvent<HTMLElement>) => {
+    if (event.pointerType === "mouse" || !canEdit) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const room = spaceSizes[element.space] || { width: 1200, height: 700 };
+    let moved = false;
+    let movedElement = element;
+    const onMove = (moveEvent: PointerEvent) => {
+      const deltaX = (moveEvent.clientX - startX) / floorZoom;
+      const deltaY = (moveEvent.clientY - startY) / floorZoom;
+      if (!moved && Math.hypot(deltaX, deltaY) < 4) return;
+      moved = true;
+      movedElement = updateFloorElement(element, {
+        x: Math.max(0, Math.min(room.width - element.width, element.x + deltaX)),
+        y: Math.max(0, Math.min(room.height - element.height, element.y + deltaY)),
+      });
+    };
+    const onEnd = () => {
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerup", onEnd);
+      document.removeEventListener("pointercancel", onEnd);
+      if (moved) void persistFloorElement(movedElement, element);
+    };
+    document.addEventListener("pointermove", onMove, { passive: false });
+    document.addEventListener("pointerup", onEnd);
+    document.addEventListener("pointercancel", onEnd);
   };
 
   const loadPlanIcon = (source: string) => new Promise<HTMLImageElement | null>((resolve) => {
@@ -4753,13 +4815,13 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
                 return origin && linkedTables.length > 1 ? <svg className="floor-social-connectors" width="100%" height="100%" aria-label={`${t("Proximidad del círculo", "Circle proximity", "Proximidade do círculo")} ${socialCircleFilter}`}>{linkedTables.slice(1).map((table) => <line key={`${origin.id}-${table.id}`} x1={(origin.x || 24) + (origin.width || 140) / 2} y1={(origin.y || 24) + (origin.height || 70) / 2} x2={(table.x || 24) + (table.width || 140) / 2} y2={(table.y || 24) + (table.height || 70) / 2} />)}</svg> : null;
               })()}
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""} ${socialCircleFilter && table.guests.some((guestId) => normalizedReference(confirmedGuests.find((guest) => guest.id === guestId)?.socialCircle || "") === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""}`} key={table.id} draggable={canEdit && !table.locked} role="button" tabIndex={0} aria-pressed={selectedLayoutTableId === table.id} aria-label={`${table.name}. ${table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}`} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""} ${socialCircleFilter && table.guests.some((guestId) => normalizedReference(confirmedGuests.find((guest) => guest.id === guestId)?.socialCircle || "") === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""}`} key={table.id} draggable={canEdit && !table.locked} role="button" tabIndex={0} aria-pressed={selectedLayoutTableId === table.id} aria-label={`${table.name}. ${table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}`} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} onPointerDown={(event) => moveTableWithPointer(table, event)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
                   <strong>{table.name}</strong><small>{table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}</small>
                   {canEdit && !table.locked && selectedLayoutTableId === table.id && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
                 </article>
               ))}
-              {floorElements.filter((element) => element.space === space).map((element) => { const iconOnly = floorElementNeedsIcon(element); return <article className={`floor-element is-${element.kind} ${iconOnly ? "is-icon-only" : ""} ${element.width < 44 || element.height < 44 ? "is-very-small" : ""} ${selectedFloorElementId === element.id ? "is-selected" : ""}`} key={element.id} draggable={canEdit} role="button" tabIndex={0} title={element.label} aria-label={element.label} aria-pressed={selectedFloorElementId === element.id} onClick={(event) => { event.stopPropagation(); setSelectedLayoutTableId(""); setSelectedFloorElementId(element.id); setFloorElementLabelDraft(element.label); setShowFloorInspector(true); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height, transform: `rotate(${element.rotation || 0}deg)` }}>
+              {floorElements.filter((element) => element.space === space).map((element) => { const iconOnly = floorElementNeedsIcon(element); return <article className={`floor-element is-${element.kind} ${iconOnly ? "is-icon-only" : ""} ${element.width < 44 || element.height < 44 ? "is-very-small" : ""} ${selectedFloorElementId === element.id ? "is-selected" : ""}`} key={element.id} draggable={canEdit} role="button" tabIndex={0} title={element.label} aria-label={element.label} aria-pressed={selectedFloorElementId === element.id} onClick={(event) => { event.stopPropagation(); setSelectedLayoutTableId(""); setSelectedFloorElementId(element.id); setFloorElementLabelDraft(element.label); setShowFloorInspector(true); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} onPointerDown={(event) => moveFloorElementWithPointer(element, event)} style={{ left: element.x, top: element.y, width: element.width, height: element.height, transform: `rotate(${element.rotation || 0}deg)` }}>
                 {iconOnly ? <span className={`floor-element-icon is-${element.kind}`} aria-hidden="true">{floorElementIcon(element.kind)}</span> : <strong>{element.label}</strong>}
                 {canEdit && selectedFloorElementId === element.id && <><button className="element-delete" onClick={(event) => { event.stopPropagation(); void deleteFloorElement(element.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${element.label}`}>×</button><button className="resize-handle" onPointerDown={(event) => resizeFloorElement(element, event)} aria-label={t("Cambiar tamaño", "Resize", "Redimensionar")} /></>}
               </article>; })}
@@ -5217,7 +5279,12 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
                             if (canEdit && guestId && (!person || person.guest.id === guestId)) void assignGuest(guestId, table.id, true, seatIndex + 1);
                           }}
                           onClick={() => {
-                            if (canEdit && !assignmentSavingId && selectedGuestId && (!person || person.guest.id === selectedGuestId)) void assignGuest(selectedGuestId, table.id, true, seatIndex + 1);
+                            if (!canEdit || assignmentSavingId) return;
+                            if (selectedGuestId && (!person || person.guest.id === selectedGuestId)) {
+                              void assignGuest(selectedGuestId, table.id, true, seatIndex + 1);
+                              return;
+                            }
+                            if (person) selectGuestForSeat(person.guest.id);
                           }}
                         ><b className="seat-number">{seatIndex + 1}</b><em>{person?.label || "♧"}</em></span>
                       );
