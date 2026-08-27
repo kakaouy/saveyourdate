@@ -490,9 +490,13 @@ test('imprimir y cerrar sesión usan PNG transparentes recoloreables', () => {
 
 test('la exportación del plano ofrece calidad y vista previa privada', () => {
   assert.match(source, /const \[planExportScale, setPlanExportScale\]/);
-  assert.match(source, /const createPlanImage =/);
+  assert.match(source, /const floorElementIconPath =/);
+  assert.match(source, /const createPlanImage = async/);
   assert.match(source, /context\.scale\(scale, scale\)/);
+  assert.match(source, /context\.drawImage\(icon/);
+  assert.match(source, /await createPlanImage\(\)/);
   assert.match(source, /const previewPlan =/);
+  assert.match(source, /draw-element\.icon-only i/);
   assert.match(source, /Esta versión no incluye datos privados/);
   assert.match(source, /Abrir PDF imprimible/);
   assert.match(styles, /\.plan-preview-frame/);

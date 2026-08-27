@@ -4167,6 +4167,10 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     entrance: "↪", "dance-floor": "♫", gourmet: "▱", hydration: "♨", stage: "▰", dj: "◉", cake: "♨", gifts: "◇", buffet: "♨", wall: "▬", door: "⌑", window: "▤", column: "●", stairs: "≋", restroom: "WC", kitchen: "♨", emergency: "↗", "photo-booth": "▣", fountain: "≋", plant: "♧", divider: "┄", custom: "T",
   })[kind];
 
+  const floorElementIconPath = (kind: FloorElement["kind"]) => ({
+    entrance: "/admin-icons/emergency-exit.png", "dance-floor": "/admin-icons/dance-floor.png", gourmet: "/admin-icons/living.png", hydration: "/admin-icons/bar.png", dj: "/admin-icons/dance-floor.png", buffet: "/admin-icons/kitchen.png", wall: "/admin-icons/wall.png", restroom: "/admin-icons/restroom.png", kitchen: "/admin-icons/kitchen.png", emergency: "/admin-icons/emergency-exit.png", "photo-booth": "/admin-icons/photo-booth.png", plant: "/admin-icons/plant.png", divider: "/admin-icons/wall.png",
+  } as Partial<Record<FloorElement["kind"], string>>)[kind] || "";
+
   const floorElementNeedsIcon = (element: FloorElement) => element.width < 90 || element.height < 46 || element.label.length * 6.2 > element.width - 20;
   const isCircularFloorElement = (kind: FloorElement["kind"]) => ["cake", "fountain", "plant", "column"].includes(kind);
 
@@ -4262,7 +4266,17 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     document.addEventListener("pointermove", onMove); document.addEventListener("pointerup", onEnd);
   };
 
-  const createPlanImage = (scale = planExportScale) => {
+  const loadPlanIcon = (source: string) => new Promise<HTMLImageElement | null>((resolve) => {
+    if (!source) { resolve(null); return; }
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => resolve(null);
+    image.src = source;
+  });
+
+  const createPlanImage = async (scale = planExportScale) => {
+    const iconSources = [...new Set(floorElements.map((element) => floorElementIconPath(element.kind)).filter(Boolean))];
+    const loadedIcons = new Map(await Promise.all(iconSources.map(async (source) => [source, await loadPlanIcon(source)] as const)));
     const width = 1200;
     const spaceHeight = 520;
     const canvas = document.createElement("canvas");
@@ -4316,15 +4330,21 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
         context.beginPath();
         context.rect(-element.width / 2, -element.height / 2, element.width, element.height);
         context.clip();
-        context.fillText(iconOnly ? floorElementIcon(element.kind) : element.label, 0, 0, Math.max(8, element.width - 8));
+        const icon = loadedIcons.get(floorElementIconPath(element.kind));
+        if (iconOnly && icon) {
+          const iconSize = Math.max(8, Math.min(24, element.width - 6, element.height - 6));
+          context.drawImage(icon, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
+        } else {
+          context.fillText(iconOnly ? floorElementIcon(element.kind) : element.label, 0, 0, Math.max(8, element.width - 8));
+        }
         context.restore();
       });
     });
     return canvas.toDataURL("image/png");
   };
 
-  const exportPlan = () => {
-    const image = createPlanImage();
+  const exportPlan = async () => {
+    const image = await createPlanImage();
     if (!image) return;
     const link = document.createElement("a");
     link.download = "plano-de-mesas.png";
@@ -4332,8 +4352,8 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     link.click();
   };
 
-  const previewPlan = () => {
-    const image = createPlanImage();
+  const previewPlan = async () => {
+    const image = await createPlanImage();
     if (image) setPlanPreviewUrl(image);
   };
 
@@ -4376,7 +4396,12 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     const spaceSections = spaces.map((space) => {
       const spaceTables = tables.filter((table) => (table.space || "Espacio 1") === space);
       const drawingTables = spaceTables.map((table) => `<div class="draw-table" style="left:${Math.min(82, (table.x || 0) / 10)}%;top:${Math.min(82, (table.y || 0) / 5)}%;width:${Math.max(10, (table.width || 140) / 10)}%;height:${Math.max(9, (table.height || 70) / 5)}%"><b>${safe(table.name)}</b><span>${table.shape === "living" ? safe(t("Sin límite", "Unlimited", "Sem limite")) : `${table.capacity} ${safe(t("lugares", "seats", "lugares"))}`}</span></div>`).join("");
-      const drawingElements = floorElements.filter((element) => element.space === space).map((element) => `<div class="draw-element${floorElementNeedsIcon(element) ? " icon-only" : ""}" title="${safe(element.label)}" style="left:${Math.min(84, element.x / 10)}%;top:${Math.min(84, element.y / 5)}%;width:${Math.max(2, element.width / 10)}%;height:${Math.max(2, element.height / 5)}%;transform:rotate(${element.rotation || 0}deg)">${safe(floorElementNeedsIcon(element) ? floorElementIcon(element.kind) : element.label)}</div>`).join("");
+      const drawingElements = floorElements.filter((element) => element.space === space).map((element) => {
+        const iconOnly = floorElementNeedsIcon(element);
+        const iconPath = floorElementIconPath(element.kind);
+        const content = iconOnly && iconPath ? `<i aria-hidden="true" style="--element-icon:url('${safe(`${window.location.origin}${iconPath}`)}')"></i>` : safe(iconOnly ? floorElementIcon(element.kind) : element.label);
+        return `<div class="draw-element${iconOnly ? " icon-only" : ""}" title="${safe(element.label)}" style="left:${Math.min(84, element.x / 10)}%;top:${Math.min(84, element.y / 5)}%;width:${Math.max(2, element.width / 10)}%;height:${Math.max(2, element.height / 5)}%;transform:rotate(${element.rotation || 0}deg)">${content}</div>`;
+      }).join("");
       const details = spaceTables.map((table) => {
         const tableGuests = table.guests.map((id) => guests.find((guest) => guest.id === id)).filter(Boolean) as Guest[];
         const occupied = tableGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
@@ -4394,7 +4419,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
       }).join("");
       return `<section><h2>${safe(space)}</h2><div class="drawing">${drawingElements}${drawingTables}</div><div class="details">${details || `<p>${safe(t("Sin mesas en este espacio", "No tables in this space", "Sem mesas neste espaço"))}</p>`}</div></section>`;
     }).join("");
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${safe(t("Reporte de mesas", "Table report", "Relatório de mesas"))}</title><style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font:12px Arial;color:#19354d;margin:0}header{display:flex;justify-content:space-between;border-bottom:2px solid #0aabb0;padding-bottom:10px;margin-bottom:18px}h1{margin:0;font:28px Georgia}header p{margin:6px 0 0;color:#718292}section{page-break-after:always}section:last-child{page-break-after:auto}h2{font:22px Georgia}.drawing{position:relative;height:360px;border:2px dashed #b9d9dc;border-radius:12px;background:#f8fbfc;overflow:hidden}.draw-table,.draw-element{position:absolute;display:grid;place-items:center;text-align:center;padding:6px;border-radius:9px}.draw-table{border:2px solid #0aabb0;background:#fff}.draw-table b{font-size:11px}.draw-table span,.draw-element{font-size:9px}.draw-element{border:1px solid #dde6ea;background:#dff5f2;color:#078f96;font-weight:bold}.details{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.table-detail{border:1px solid #dde6ea;border-radius:10px;padding:12px;break-inside:avoid}.table-detail h3{margin:0 0 5px}.table-detail p{margin:0 0 8px;color:#718292}.table-detail .ops{margin:8px 0;padding:7px;border-radius:6px;background:#fff6dd;color:#694f08;font-size:9px}.table-detail ul{margin:0;padding-left:18px}.table-detail li{margin:4px 0}.table-detail li span{color:#718292}footer{position:fixed;bottom:0;right:0;color:#718292;font-size:9px}@media print{.print-action{display:none}}</style></head><body><header><div><h1>${safe(t("Plano y reporte de mesas", "Table plan and report", "Plano e relatório de mesas"))}</h1><p>${safe(t("Distribución completa del evento", "Complete event layout", "Distribuição completa do evento"))}</p></div><button class="print-action" onclick="window.print()">${safe(t("Guardar como PDF o imprimir", "Save as PDF or print", "Salvar como PDF ou imprimir"))}</button></header>${spaceSections}<footer>${new Date().toLocaleDateString()}</footer></body></html>`;
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${safe(t("Reporte de mesas", "Table report", "Relatório de mesas"))}</title><style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font:12px Arial;color:#19354d;margin:0}header{display:flex;justify-content:space-between;border-bottom:2px solid #0aabb0;padding-bottom:10px;margin-bottom:18px}h1{margin:0;font:28px Georgia}header p{margin:6px 0 0;color:#718292}section{page-break-after:always}section:last-child{page-break-after:auto}h2{font:22px Georgia}.drawing{position:relative;height:360px;border:2px dashed #b9d9dc;border-radius:12px;background:#f8fbfc;overflow:hidden}.draw-table,.draw-element{position:absolute;display:grid;place-items:center;text-align:center;padding:6px;border-radius:9px}.draw-table{border:2px solid #0aabb0;background:#fff}.draw-table b{font-size:11px}.draw-table span,.draw-element{font-size:9px}.draw-element{border:1px solid #dde6ea;background:#dff5f2;color:#078f96;font-weight:bold}.draw-element.icon-only{padding:2px}.draw-element.icon-only i{display:block;width:min(22px,80%);height:min(22px,80%);background:#078f96;-webkit-mask:var(--element-icon) center/contain no-repeat;mask:var(--element-icon) center/contain no-repeat}.details{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.table-detail{border:1px solid #dde6ea;border-radius:10px;padding:12px;break-inside:avoid}.table-detail h3{margin:0 0 5px}.table-detail p{margin:0 0 8px;color:#718292}.table-detail .ops{margin:8px 0;padding:7px;border-radius:6px;background:#fff6dd;color:#694f08;font-size:9px}.table-detail ul{margin:0;padding-left:18px}.table-detail li{margin:4px 0}.table-detail li span{color:#718292}footer{position:fixed;bottom:0;right:0;color:#718292;font-size:9px}@media print{.print-action{display:none}}</style></head><body><header><div><h1>${safe(t("Plano y reporte de mesas", "Table plan and report", "Plano e relatório de mesas"))}</h1><p>${safe(t("Distribución completa del evento", "Complete event layout", "Distribuição completa do evento"))}</p></div><button class="print-action" onclick="window.print()">${safe(t("Guardar como PDF o imprimir", "Save as PDF or print", "Salvar como PDF ou imprimir"))}</button></header>${spaceSections}<footer>${new Date().toLocaleDateString()}</footer></body></html>`;
     const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
     window.open(url, "_blank", "noopener,noreferrer");
     window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
