@@ -320,6 +320,10 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .seat-progress { display: grid; gap: 2px; min-width: 92px; }
 .seat-progress strong { color: var(--ink); font-size: 10px; }
 .seat-progress small { color: var(--muted); font-size: 7px; white-space: normal; }
+.guest-group-cell { display: grid; gap: 2px; min-width: 0; }
+.guest-group-cell strong, .guest-group-cell small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.guest-group-cell strong { color: var(--ink); font-size: 10px; }
+.guest-group-cell small { color: var(--muted); font-size: 8px; }
 .guest-name-button { width: fit-content; padding: 0; border: 0; border-bottom: 1px dashed transparent; color: inherit; background: transparent; font: inherit; font-weight: 800; text-align: left; cursor: pointer; }
 .guest-name-button:hover, .guest-name-button:focus-visible { color: var(--teal-dark); border-bottom-color: currentColor; outline: none; }
 .restriction-chips { display: flex; flex-wrap: wrap; gap: 4px; max-width: 280px; white-space: normal; }
@@ -836,7 +840,7 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .tables-empty-state button { padding: 8px 11px; border: 1px solid var(--teal); border-radius: 8px; color: var(--teal-dark); background: white; cursor: pointer; }
 .table-card.is-saving { pointer-events: none; opacity: .7; }
 .tables-grid.is-compact .table-card { min-height: 0; padding: 13px; }
-.tables-grid.is-compact .table-seat-map { height: 145px; margin-block: 5px; }
+.tables-grid.is-compact .table-seat-map { width: 145px; height: auto; margin-block: 5px; }
 .tables-grid.is-compact .table-operations, .tables-grid.is-compact .seated-guests, .tables-grid.is-compact .table-card-top p { display: none; }
 .tables-grid.is-compact .capacity-row { margin-top: 10px; }
 .table-card.has-selected-guest { border-color: #48bec2; box-shadow: 0 0 0 3px rgba(10,171,176,.12); }
@@ -873,9 +877,9 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .capacity-row strong { color: var(--teal-dark); }
 .capacity-bar { height: 6px; overflow: hidden; border-radius: 999px; background: #edf2f3; }
 .capacity-bar i { display: block; height: 100%; border-radius: inherit; background: var(--teal); transition: width .25s ease; }
-.table-seat-map { position: relative; width: min(100%, 250px); height: 150px; margin: 15px auto 5px; }
+.table-seat-map { position: relative; width: min(100%, 250px); height: auto; aspect-ratio: 1; margin: 10px auto 5px; }
 .table-surface { position: absolute; inset: 25% 24%; display: grid; place-items: center; border: 2px solid #a7d8d8; background: #f5fbfb; box-shadow: 0 4px 12px rgba(25,53,77,.06); }
-.table-seat-map.is-round .table-surface { inset: 22% 30%; border-radius: 50%; }
+.table-seat-map.is-round .table-surface { inset: auto; top: 50%; left: 50%; width: 92px; height: 92px; aspect-ratio: 1; transform: translate(-50%,-50%); border-radius: 50%; }
 .table-seat-map.is-rectangular .table-surface { inset: 31% 17%; border-radius: 9px; }
 .table-seat-map.is-square .table-surface { inset: 22% 31%; border-radius: 7px; }
 .table-surface strong { max-width: 90%; overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
@@ -1281,8 +1285,7 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
 .workspace-legend span { font-size: 8px; }
 .assignment-save-status { display: inline-flex; align-items: center; gap: 5px; }
 .assignment-save-status button { min-height: 24px; padding: 2px 6px; border: 1px solid currentColor; border-radius: 6px; color: inherit; background: white; font-size: 8px; font-weight: 850; cursor: pointer; }
-.table-seat-map { height: 132px; margin-block: 10px 3px; }
-.table-seat-map.is-round .table-surface { top: 50%; left: 50%; width: 82px; height: 82px; aspect-ratio: 1; inset: auto; transform: translate(-50%,-50%); border-radius: 50%; }
+.table-seat-map { height: auto; margin-block: 10px 3px; }
 .tables-workspace :is(.workspace-heading p,.capacity-row,.seat-category-legend span,.assignment-filters button,.category-filters button,.restriction-filter,.workspace-actions > span,.table-search input,.seated-guests small) { font-size: 10px; }
 .tables-workspace :is(.table-health > span,.seated-guests span,.seated-guests .guest-name-button,.seat-position-select) { font-size: 11px; }
 .tables-workspace .table-card-top h3 { font-size: 15px; }

@@ -13,6 +13,7 @@ type Guest = {
   inviteToken: string;
   name: string;
   group: string;
+  socialCircle: string;
   email: string;
   phone: string;
   phoneCountryCode: string;
@@ -54,6 +55,7 @@ type Guest = {
 type GuestImportDraft = {
   name: string;
   group: string;
+  socialCircle: string;
   phone: string;
   phoneCountryCode: string;
   seats: string;
@@ -1674,6 +1676,7 @@ function Guests({
           song: data.get("song"),
           name: data.get("name"),
           group: data.get("group"),
+          socialCircle: data.get("socialCircle"),
           invitedBy: data.get("invitedBy"),
           companionOfId: data.get("companionOfId"),
           phone: data.get("phone"),
@@ -1795,7 +1798,8 @@ function Guests({
       "plantilla-invitados.csv",
       [
         t("Nombre", "Name", "Nome"),
-        t("Círculo", "Circle", "Círculo"),
+        t("Grupo de invitación", "Invitation group", "Grupo do convite"),
+        t("Círculo social", "Social circle", "Círculo social"),
         "WhatsApp",
         t("Código país", "Country code", "Código do país"),
         t("Cupos", "Seats", "Vagas"),
@@ -1810,6 +1814,7 @@ function Guests({
         [
           "Valentina Pérez",
           "Familia Pérez",
+          "Familia",
           "99123456",
           defaultPhoneCountryCode,
           2,
@@ -1828,7 +1833,8 @@ function Guests({
       `invitados-${new Date().toISOString().slice(0, 10)}.csv`,
       [
         t("Invitado", "Guest", "Convidado"),
-        t("Grupo", "Group", "Grupo"),
+        t("Grupo de invitación", "Invitation group", "Grupo do convite"),
+        t("Círculo social", "Social circle", "Círculo social"),
         t("Estado", "Status", "Status"),
         t("Cupos", "Seats", "Vagas"),
         t("Personas confirmadas", "Confirmed people", "Pessoas confirmadas"),
@@ -1848,6 +1854,7 @@ function Guests({
       activeGuests.map((guest) => [
         guest.name,
         guest.group,
+        guest.socialCircle,
         adminStatus(language, guest.status),
         guest.seats,
         confirmedPeopleForGuest(guest, guests),
@@ -1885,7 +1892,8 @@ function Guests({
       const nameIndex = column("nombre", "invitado", "nombre y apellido");
       if (nameIndex < 0)
         throw new Error('La plantilla debe incluir una columna "Nombre".');
-      const groupIndex = column("circulo", "círculo", "grupo", "familia");
+      const groupIndex = column("grupo", "grupo de invitacion", "grupo invitacion", "familia");
+      const socialCircleIndex = column("circulo", "círculo", "circulo social", "círculo social");
       const phoneIndex = column("whatsapp", "telefono", "celular");
       const codeIndex = column(
         "codigo pais",
@@ -1925,6 +1933,7 @@ function Guests({
         .map((values: string[]) => ({
           name: values[nameIndex],
           group: groupIndex >= 0 ? values[groupIndex] : "",
+          socialCircle: socialCircleIndex >= 0 ? values[socialCircleIndex] : "",
           phone: phoneIndex >= 0 ? values[phoneIndex] : "",
           phoneCountryCode:
             codeIndex >= 0 && values[codeIndex]
@@ -2263,7 +2272,8 @@ function Guests({
               <option value="invitedBy">{t("Invitador", "Invited by", "Anfitrião")}</option>
               <option value="status">{t("Estado", "Status", "Status")}</option>
               <option value="guestType">{t("Categoría de edad", "Age category", "Categoria etária")}</option>
-              <option value="group">{t("Círculo", "Circle", "Círculo")}</option>
+              <option value="group">{t("Grupo de invitación", "Invitation group", "Grupo do convite")}</option>
+              <option value="socialCircle">{t("Círculo social", "Social circle", "Círculo social")}</option>
               <option value="transportOption">{t("Transporte", "Transport", "Transporte")}</option>
               <option value="menuChoice">{t("Preferencia de menú", "Menu preference", "Preferência de menu")}</option>
               <option value="food">{t("Restricción alimentaria", "Dietary need", "Restrição alimentar")}</option>
@@ -2298,7 +2308,7 @@ function Guests({
                 placeholder={bulkField === "group" ? t("Ej. Familia de ella, amigos del colegio…", "E.g. Her family, school friends…", "Ex. Família dela, amigos da escola…") : bulkField === "invitedBy" ? t("Nombre del invitador", "Host name", "Nome do anfitrião") : t("Valor para toda la selección", "Value for the selection", "Valor para toda a seleção")}
               />
             ))}
-            <datalist id="bulk-social-references">{[...new Set(guests.flatMap((guest) => [guest.name, guest.group]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
+            <datalist id="bulk-social-references">{[...new Set(guests.flatMap((guest) => [guest.name, guest.group, guest.socialCircle]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
             {filter !== "Archivados" && <button className="primary-button small" type="button" disabled={saving || (!bulkAllowsEmpty && !bulkValue.trim())} onClick={updateSelected}>
               {t("Aplicar", "Apply", "Aplicar")}
             </button>}
@@ -2344,7 +2354,7 @@ function Guests({
                   </th>
                 )}
                 <th>{t("Invitado", "Guest", "Convidado")}</th>
-                <th>{t("Círculo", "Circle", "Círculo")}</th>
+                <th>{t("Grupo / círculo", "Group / circle", "Grupo / círculo")}</th>
                 <th>{t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}</th>
                 <th>{t("Estado", "Status", "Status")}</th>
                 <th>{t("Restricción", "Dietary need", "Restrição")}</th>
@@ -2401,7 +2411,7 @@ function Guests({
                       </p>
                     </div>
                   </td>
-                  <td>{guest.group}</td>
+                  <td><span className="guest-group-cell"><strong>{guest.group || "—"}</strong>{guest.socialCircle && <small>{guest.socialCircle}</small>}</span></td>
                   <td>{(() => { const progress = seatProgress(guest, guests); return <span className="seat-progress"><strong>{progress.used}/{progress.total}</strong><small>{t("confirmados / cupos", "confirmed / seats", "confirmados / vagas")}</small></span>; })()}</td>
                   <td>
                     {canEdit && !guest.archivedAt ? (
@@ -2537,7 +2547,7 @@ function Guests({
             <div className="guest-add-options">
               <button className="guest-template-option" type="button" onClick={downloadTemplate}>
                 <span className="guest-add-icon">↓</span>
-                <span><strong>{t("Descargar planilla tipo", "Download spreadsheet template", "Baixar planilha modelo")}</strong><small>{t("Incluye encabezados y una fila de ejemplo para completar sin dudas.", "Includes headers and an example row so it is easy to complete.", "Inclui cabeçalhos e uma linha de exemplo para preencher sem dúvidas.")}</small><code>{t("Nombre · Círculo · WhatsApp · Cupos · Email · Documento · Restricción", "Name · Circle · WhatsApp · Seats · Email · ID · Dietary need", "Nome · Círculo · WhatsApp · Vagas · Email · Documento · Restrição")}</code></span>
+                <span><strong>{t("Descargar planilla tipo", "Download spreadsheet template", "Baixar planilha modelo")}</strong><small>{t("Incluye encabezados y una fila de ejemplo para completar sin dudas.", "Includes headers and an example row so it is easy to complete.", "Inclui cabeçalhos e uma linha de exemplo para preencher sem dúvidas.")}</small><code>{t("Nombre · Grupo de invitación · Círculo social · WhatsApp · Cupos · Email · Documento · Restricción", "Name · Invitation group · Social circle · WhatsApp · Seats · Email · ID · Dietary need", "Nome · Grupo do convite · Círculo social · WhatsApp · Vagas · Email · Documento · Restrição")}</code></span>
                 <b aria-hidden="true">↓ CSV</b>
               </button>
               <button type="button" onClick={() => { setShowAddGuests(false); setShowModal(true); }}>
@@ -2588,7 +2598,8 @@ function Guests({
               {inspectingGuest.identificationNumber && <div><dt>{inspectingGuest.identificationType || t("Documento", "ID", "Documento")}</dt><dd>{inspectingGuest.identificationNumber}</dd></div>}
               {inspectingGuest.email && <div><dt>Email</dt><dd>{inspectingGuest.email}</dd></div>}
               {inspectingGuest.phone && <div><dt>WhatsApp</dt><dd>{inspectingGuest.phoneCountryCode} {inspectingGuest.phone}</dd></div>}
-              {inspectingGuest.group && <div><dt>{t("Círculo", "Circle", "Círculo")}</dt><dd>{inspectingGuest.group}</dd></div>}
+              {inspectingGuest.group && <div><dt>{t("Grupo de invitación", "Invitation group", "Grupo do convite")}</dt><dd>{inspectingGuest.group}</dd></div>}
+              {inspectingGuest.socialCircle && <div><dt>{t("Círculo social", "Social circle", "Círculo social")}</dt><dd>{inspectingGuest.socialCircle}</dd></div>}
               {inspectingGuest.invitedBy && <div><dt>{t("Invitado por", "Invited by", "Convidado por")}</dt><dd>{inspectingGuest.invitedBy}</dd></div>}
               {meaningfulGuestValue(inspectingGuest.food) && <div><dt>{t("Restricción alimentaria", "Dietary requirement", "Restrição alimentar")}</dt><dd>{inspectingGuest.food}</dd></div>}
               {meaningfulGuestValue(inspectingGuest.menuChoice) && <div><dt>{t("Menú", "Menu", "Menu")}</dt><dd>{inspectingGuest.menuChoice}</dd></div>}
@@ -2753,14 +2764,19 @@ function Guests({
                 <input name="name" required />
               </label>
               <label>
+                {t("Grupo de invitación", "Invitation group", "Grupo do convite")}
+                <small className="field-help">{t("Personas incluidas en una misma invitación, por ejemplo: Ana y novio.", "People included in one invitation, for example: Ana and partner.", "Pessoas incluídas no mesmo convite, por exemplo: Ana e parceiro.")}</small>
+                <input name="group" placeholder={t("Ej. Ana y novio", "E.g. Ana and partner", "Ex. Ana e parceiro")} />
+              </label>
+              <label>
                 {t("Círculo social", "Social circle", "Círculo social")}
                 <small className="field-help">{t("Ayuda a sentar juntas a personas afines y a acercar sus mesas.", "Helps seat related people together and keep their tables nearby.", "Ajuda a sentar pessoas próximas juntas e manter suas mesas perto.")}</small>
                 <input
-                  name="group"
+                  name="socialCircle"
                   list="guest-circle-options"
-                  placeholder={t("Ej. Familia de ella", "E.g. Her family", "Ex. Família dela")}
+                  placeholder={t("Ej. Familia, Facultad o Trabajo", "E.g. Family, College or Work", "Ex. Família, Faculdade ou Trabalho")}
                 />
-                <datalist id="guest-circle-options">{[...new Set(guests.map((guest) => guest.group).filter(Boolean))].map((circle) => <option key={circle} value={circle} />)}</datalist>
+                <datalist id="guest-circle-options">{[...new Set(guests.map((guest) => guest.socialCircle).filter(Boolean))].map((circle) => <option key={circle} value={circle} />)}</datalist>
               </label>
               <label>
                 {t("País de WhatsApp", "WhatsApp country", "País do WhatsApp")}
@@ -2937,10 +2953,14 @@ function Guests({
                 <input name="name" defaultValue={editingGuest.name} required />
               </label>
               <label>
+                {t("Grupo de invitación", "Invitation group", "Grupo do convite")}
+                <input name="group" defaultValue={editingGuest.group} />
+              </label>
+              <label>
                 {t("Círculo social", "Social circle", "Círculo social")}
                 <small className="field-help">{t("Se usa para sugerir la misma mesa o una mesa cercana.", "Used to suggest the same table or a nearby table.", "Usado para sugerir a mesma mesa ou uma mesa próxima.")}</small>
-                <input name="group" list="edit-guest-circle-options" defaultValue={editingGuest.group} />
-                <datalist id="edit-guest-circle-options">{[...new Set(guests.map((guest) => guest.group).filter(Boolean))].map((circle) => <option key={circle} value={circle} />)}</datalist>
+                <input name="socialCircle" list="edit-guest-circle-options" defaultValue={editingGuest.socialCircle} />
+                <datalist id="edit-guest-circle-options">{[...new Set(guests.map((guest) => guest.socialCircle).filter(Boolean))].map((circle) => <option key={circle} value={circle} />)}</datalist>
               </label>
               <label>
                 {t("Categoría", "Category", "Categoria")}
@@ -3046,7 +3066,7 @@ function Guests({
               <label>Accesibilidad<input name="accessibilityNeeds" defaultValue={editingGuest.accessibilityNeeds} /></label>
               <label>Sentar junto a<small className="field-help">Elegí una persona o grupo para recibir sugerencias en Mesas.</small><input name="socialTogetherWith" list="local-social-references" defaultValue={editingGuest.socialTogetherWith} placeholder="Nombre o grupo" /></label>
               <label>Sentar separado de<input name="socialSeparateFrom" list="local-social-references" defaultValue={editingGuest.socialSeparateFrom} placeholder="Nombre o grupo" /></label>
-              <datalist id="local-social-references">{[...new Set(guests.flatMap((guest) => [guest.name, guest.group]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
+              <datalist id="local-social-references">{[...new Set(guests.flatMap((guest) => [guest.name, guest.group, guest.socialCircle]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
               <label>Mesa preferida<input name="preferredTableName" defaultValue={editingGuest.preferredTableName} placeholder="Ej. Mesa familiar" /></label>
               <label className="form-span-2">Observaciones<textarea name="guestNotes" rows={3} defaultValue={editingGuest.guestNotes} /></label>
             </div>
@@ -3391,14 +3411,14 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const matchingGroups = socialCircleFilter
     ? [socialCircleFilter]
     : query.trim()
-      ? [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
+      ? [...new Set(confirmedGuests.map((guest) => guest.socialCircle.trim()).filter(Boolean))]
         .filter((group) => normalizedReference(group).includes(normalizedReference(query)))
         .sort((a, b) => a.localeCompare(b))
       : [];
-  const socialCircleOptions = [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
+  const socialCircleOptions = [...new Set(confirmedGuests.map((guest) => guest.socialCircle.trim()).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b));
   const visibleTables = tables.filter((table) => {
-    const guestTerms = table.guests.map((id) => { const guest = guests.find((item) => item.id === id); return guest ? `${guest.name} ${guest.group}` : ""; }).join(" ");
+    const guestTerms = table.guests.map((id) => { const guest = guests.find((item) => item.id === id); return guest ? `${guest.name} ${guest.group} ${guest.socialCircle}` : ""; }).join(" ");
     return `${table.name} ${guestTerms}`.toLowerCase().includes(tableQuery.toLowerCase());
   });
   const findSocialReferences = (reference: string, guestId: string) => {
@@ -3444,7 +3464,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     socialCircleOptions.forEach((circle) => {
       const circleTables = tables.filter((table) => table.guests.some((guestId) => {
         const guest = confirmedGuests.find((candidate) => candidate.id === guestId);
-        return normalizedReference(guest?.group || "") === normalizedReference(circle);
+        return normalizedReference(guest?.socialCircle || "") === normalizedReference(circle);
       }));
       circleTables.forEach((table, index) => {
         const distantPeer = circleTables.slice(index + 1).find((peer) =>
@@ -3464,12 +3484,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const explicitMatches = findSocialReferences(guest.socialTogetherWith, guest.id);
     const explicitTable = tables.find((table) => table.guests.some((guestId) => explicitMatches.some((match) => match.id === guestId)));
     if (explicitTable) return { table: explicitTable, reason: guest.socialTogetherWith, explicit: true, nearby: false };
-    const normalizedGroup = normalizedReference(guest.group);
+    const normalizedGroup = normalizedReference(guest.socialCircle);
     if (!normalizedGroup) return null;
     const people = confirmedPeopleForGuest(guest, guests);
     const circleTables = tables.filter((table) => table.guests.some((guestId) => {
       const seatedGuest = guests.find((candidate) => candidate.id === guestId);
-      return seatedGuest && seatedGuest.id !== guest.id && normalizedReference(seatedGuest.group) === normalizedGroup;
+      return seatedGuest && seatedGuest.id !== guest.id && normalizedReference(seatedGuest.socialCircle) === normalizedGroup;
     }));
     const availableCapacity = (table: EventTable) => table.shape === "living" || table.capacity - table.guests.reduce((total, guestId) => {
       const seatedGuest = confirmedGuests.find((candidate) => candidate.id === guestId);
@@ -3477,15 +3497,15 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     }, 0) >= people;
     const sameCircleTable = circleTables
       .filter(availableCapacity)
-      .sort((left, right) => right.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.group || "") === normalizedGroup).length - left.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.group || "") === normalizedGroup).length)[0];
-    if (sameCircleTable) return { table: sameCircleTable, reason: guest.group, explicit: false, nearby: false };
+      .sort((left, right) => right.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.socialCircle || "") === normalizedGroup).length - left.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.socialCircle || "") === normalizedGroup).length)[0];
+    if (sameCircleTable) return { table: sameCircleTable, reason: guest.socialCircle, explicit: false, nearby: false };
     const nearbyTable = tables
       .filter((table) => !circleTables.includes(table) && availableCapacity(table) && circleTables.some((circleTable) => circleTable.space === table.space))
       .sort((left, right) => {
         const distance = (table: EventTable) => Math.min(...circleTables.map((circleTable) => Math.hypot((table.x || 0) - (circleTable.x || 0), (table.y || 0) - (circleTable.y || 0))));
         return distance(left) - distance(right);
       })[0];
-    return nearbyTable ? { table: nearbyTable, reason: guest.group, explicit: false, nearby: true } : null;
+    return nearbyTable ? { table: nearbyTable, reason: guest.socialCircle, explicit: false, nearby: true } : null;
   };
   const selectedGuest = confirmedGuests.find((guest) => guest.id === selectedGuestId);
   const explicitTogetherGuests = selectedGuest ? findSocialReferences(selectedGuest.socialTogetherWith, selectedGuest.id) : [];
@@ -3494,7 +3514,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const seatedExplicitTargetIds = suggestedGroupTable ? explicitTogetherGuests.filter((guest) => suggestedGroupTable.guests.includes(guest.id)).map((guest) => guest.id) : [];
   const suggestedTargetIds = seatedExplicitTargetIds.length
     ? seatedExplicitTargetIds
-    : selectedGuest && suggestedGroupTable ? confirmedGuests.filter((guest) => guest.id !== selectedGuest.id && suggestedGroupTable.guests.includes(guest.id) && normalizedReference(guest.group) === normalizedReference(selectedGuest.group)).map((guest) => guest.id) : [];
+    : selectedGuest && suggestedGroupTable ? confirmedGuests.filter((guest) => guest.id !== selectedGuest.id && suggestedGroupTable.guests.includes(guest.id) && normalizedReference(guest.socialCircle) === normalizedReference(selectedGuest.socialCircle)).map((guest) => guest.id) : [];
 
   const focusTable = (direction: -1 | 1) => {
     if (!visibleTables.length) return;
@@ -3726,7 +3746,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const assignGroup = async (groupName: string, tableId: string) => {
     const groupGuests = confirmedGuests.filter(
-      (guest) => normalizedReference(guest.group) === normalizedReference(groupName),
+      (guest) => normalizedReference(guest.socialCircle) === normalizedReference(groupName),
     );
     if (!groupGuests.length || !tableId) return;
     setGroupAssignmentSaving(groupName);
@@ -4433,7 +4453,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               {floorDropTarget === space && draggedNewFloorElement && <span className="floor-drop-message">＋ {t(`Soltá para agregar ${draggedNewFloorElement.label}`, `Drop to add ${draggedNewFloorElement.label}`, `Solte para adicionar ${draggedNewFloorElement.label}`)}</span>}
               <div className="space-heading"><strong className="space-label">{space}</strong>{canEdit && <span title={t("Estas medidas definen el lienzo visual; mantené la proporción del plano real", "These values define the visual canvas; preserve the real layout proportions", "Estas medidas definem a tela visual; mantenha a proporção do plano real")}><label>{t("Ancho", "Width", "Largura")}<input type="number" min="700" max="2400" value={spaceSizes[space]?.width || 1200} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: Number(event.target.value), height: current[space]?.height || 700 } }))} onBlur={(event) => void saveSpaceSize(space, Number(event.target.value), spaceSizes[space]?.height || 700)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min="480" max="1800" value={spaceSizes[space]?.height || 700} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: current[space]?.width || 1200, height: Number(event.target.value) } }))} onBlur={(event) => void saveSpaceSize(space, spaceSizes[space]?.width || 1200, Number(event.target.value))} /></label></span>}</div>
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""} ${socialCircleFilter && table.guests.some((guestId) => normalizedReference(confirmedGuests.find((guest) => guest.id === guestId)?.group || "") === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""} ${socialCircleFilter && table.guests.some((guestId) => normalizedReference(confirmedGuests.find((guest) => guest.id === guestId)?.socialCircle || "") === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
                   <strong>{table.name}</strong><small>{table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}</small>
                   {canEdit && !table.locked && selectedLayoutTableId === table.id && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
@@ -4513,7 +4533,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             {matchingGroups.length > 0 && <section className="group-search-results" aria-label={t("Grupos encontrados", "Matching groups", "Grupos encontrados")}>
               <strong>{t("Ubicar grupo completo", "Seat entire group", "Alocar grupo completo")}</strong>
               {matchingGroups.map((groupName) => {
-                const groupGuests = confirmedGuests.filter((guest) => normalizedReference(guest.group) === normalizedReference(groupName));
+                const groupGuests = confirmedGuests.filter((guest) => normalizedReference(guest.socialCircle) === normalizedReference(groupName));
                 const groupIds = new Set(groupGuests.map((guest) => guest.id));
                 const groupPeople = groupGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
                 return <label key={groupName}>
@@ -4571,8 +4591,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </div>
             )}
             {confirmedGuests.filter((guest) => {
-              const matchesQuery = `${guest.name} ${guest.group}`.toLowerCase().includes(query.toLowerCase());
-              const matchesCircle = !socialCircleFilter || normalizedReference(guest.group) === normalizedReference(socialCircleFilter);
+              const matchesQuery = `${guest.name} ${guest.group} ${guest.socialCircle}`.toLowerCase().includes(query.toLowerCase());
+              const matchesCircle = !socialCircleFilter || normalizedReference(guest.socialCircle) === normalizedReference(socialCircleFilter);
               const isAssigned = assignedIds.includes(guest.id);
               const matchesCategory = guestCategoryFilter === "all" || (guest.guestType || "adult") === guestCategoryFilter;
               const matchesRestriction = !guestRestrictionFilter || guestHasRestriction(guest);
@@ -4582,7 +4602,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 table.guests.includes(guest.id),
               );
               const guestSuggestion = suggestedTableForGuest(guest);
-              const hasConfirmedGroupPeers = Boolean(normalizedReference(guest.group)) && confirmedGuests.some((candidate) => candidate.id !== guest.id && normalizedReference(candidate.group) === normalizedReference(guest.group));
+              const hasConfirmedGroupPeers = Boolean(normalizedReference(guest.socialCircle)) && confirmedGuests.some((candidate) => candidate.id !== guest.id && normalizedReference(candidate.socialCircle) === normalizedReference(guest.socialCircle));
               return (
                 <div
                   key={guest.id}
@@ -4607,13 +4627,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   <GuestAvatar guest={guest} />
                   <p>
                     <GuestNameButton guest={guest} />
-                    {guest.group && <span className="guest-circle-tag">{guest.group}</span>}
+                    {guest.socialCircle && <span className="guest-circle-tag">{guest.socialCircle}</span>}
                     <small>
                       {confirmedPeopleForGuest(guest, guests)}{" "}
                       {confirmedPeopleForGuest(guest, guests) === 1
                         ? t("persona", "person", "pessoa")
                         : t("personas", "people", "pessoas")}{" "}
-                      · {guest.group}
+                      · {guest.group || t("Sin grupo", "No invitation group", "Sem grupo")}
                     </small>
                     {guestSuggestion ? <small className={`guest-seat-suggestion ${guestSuggestion.table.id === currentTable?.id ? "is-current" : ""}`}>★ {t("Sugerencia", "Suggestion", "Sugestão")}: {guestSuggestion.table.name} · {guestSuggestion.explicit ? `${t("junto a", "next to", "junto a")} ${guestSuggestion.reason}` : guestSuggestion.nearby ? t("mesa cercana a su círculo", "table near their circle", "mesa próxima ao seu círculo") : t("junto a su círculo", "next to their circle", "junto ao seu círculo")}{guestSuggestion.table.id === currentTable?.id ? ` · ${t("mesa correcta", "correct table", "mesa correta")}` : ""}</small> : hasConfirmedGroupPeers && <small className="guest-seat-suggestion is-waiting">☆ {t("Sugerencia pendiente: ubicá primero a alguien de su círculo", "Pending suggestion: seat someone from their circle first", "Sugestão pendente: coloque primeiro alguém do círculo")}</small>}
                   </p>
@@ -4781,7 +4801,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               return (
                 <article
                   id={`table-card-${table.id}`}
-                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""} ${selectedGuestId && table.guests.includes(selectedGuestId) ? "has-selected-guest" : ""} ${suggestedGroupTable?.id === table.id ? "is-group-suggestion" : ""} ${socialCircleFilter && tableGuests.some((guest) => normalizedReference(guest.group) === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""} ${assignmentSavingId && table.guests.includes(assignmentSavingId) ? "is-saving" : ""}`}
+                  className={`table-card ${over ? "table-over" : full ? "table-full" : ""} ${dragGuestId ? (canDrop ? "drop-compatible" : "drop-blocked") : ""} ${selectedGuestId && table.guests.includes(selectedGuestId) ? "has-selected-guest" : ""} ${suggestedGroupTable?.id === table.id ? "is-group-suggestion" : ""} ${socialCircleFilter && tableGuests.some((guest) => normalizedReference(guest.socialCircle) === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""} ${assignmentSavingId && table.guests.includes(assignmentSavingId) ? "is-saving" : ""}`}
                   key={table.id}
                   onDragOver={(event) => {
                     if (canEdit && dragGuestId && canDrop) {
@@ -4899,7 +4919,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       );
                       return <div className={`is-${guest.guestType || "adult"}`} key={guest.id}>
                         <GuestNameButton guest={guest} />
-                        {guest.group && <span className="seated-circle-tag">{guest.group}</span>}
+                        {guest.socialCircle && <span className="seated-circle-tag">{guest.socialCircle}</span>}
                         {guestHasRestriction(guest) && <span className="restriction-mark context-tip" data-help={`${t("Restricción", "Restriction", "Restrição")}: ${restrictionDetails}`} aria-label={`${t("Restricción de", "Restriction for", "Restrição de")} ${guest.name}`} role="img">⚠</span>}
                         {people > 1 && <small>{people} {t("lugares", "seats", "lugares")}</small>}
                         {canEdit && !isLiving && (

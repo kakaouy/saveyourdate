@@ -45,6 +45,7 @@ type GuestRow = {
   invite_token: string;
   name: string;
   group_name: string;
+  social_circle: string;
   email: string;
   phone: string;
   phone_country_code: string;
@@ -87,6 +88,7 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
   inviteToken: row.invite_token,
   name: row.name,
   group: row.group_name,
+  socialCircle: row.social_circle || "",
   email: row.email,
   phone: row.phone,
   phoneCountryCode: row.phone_country_code,
@@ -201,6 +203,7 @@ async function handler(request: Request) {
             order_number: session.order_number,
             name,
             group_name: String(guest.group || "").trim(),
+            social_circle: String(guest.socialCircle || "").trim().slice(0, 120),
             email: String(guest.email || "")
               .trim()
               .toLowerCase(),
@@ -283,6 +286,7 @@ async function handler(request: Request) {
           order_number: session.order_number,
           name,
           group_name: String(body.group || "").trim(),
+          social_circle: String(body.socialCircle || "").trim().slice(0, 120),
           email: String(body.email || "")
             .trim()
             .toLowerCase(),
@@ -495,6 +499,7 @@ async function handler(request: Request) {
           }
         }
         if (body.group !== undefined) changes.group_name = String(body.group).trim();
+        if (body.socialCircle !== undefined) changes.social_circle = String(body.socialCircle).trim().slice(0, 120);
         if (body.invitedBy !== undefined)
           changes.invited_by = String(body.invitedBy).trim();
         if (body.guestType !== undefined) {
@@ -656,7 +661,7 @@ async function handler(request: Request) {
         );
       }
       const guestResponse = await supabaseRequest(
-        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,email,phone,phone_country_code,identification_type,identification_number,name,group_name,invited_by,companion_of_id,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes,guest_type,social_together_with,social_separate_from,preferred_table_name`,
+        `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=seats,email,phone,phone_country_code,identification_type,identification_number,name,group_name,social_circle,invited_by,companion_of_id,transport_option,transport_stop,menu_choice,accessibility_needs,guest_notes,guest_type,social_together_with,social_separate_from,preferred_table_name`,
       );
       const existingGuests = (await guestResponse.json()) as GuestRow[];
       if (!existingGuests[0])
@@ -719,6 +724,7 @@ async function handler(request: Request) {
               body.group === undefined
                 ? existingGuests[0].group_name
                 : String(body.group).trim(),
+            social_circle: body.socialCircle === undefined ? existingGuests[0].social_circle || "" : String(body.socialCircle).trim().slice(0, 120),
             invited_by:
               body.invitedBy === undefined
                 ? existingGuests[0].invited_by

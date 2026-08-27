@@ -202,7 +202,8 @@ test('el nombre guardado se impone en la tarjeta y no puede volver al valor ante
   assert.match(source, /\.\.\.result\.table!, name, guests: item\.guests/);
   assert.match(source, /table\.id === previousTable\.id \? previousTable : table/);
   assert.match(styles, /\.tables-workspace \.table-card-top \.table-name-edit/);
-  assert.match(styles, /\.table-seat-map\.is-round \.table-surface \{ top: 50%; left: 50%; width: 82px; height: 82px/);
+  assert.match(styles, /\.table-seat-map\.is-round \.table-surface \{ inset: auto; top: 50%; left: 50%; width: 92px; height: 92px/);
+  assert.match(styles, /\.table-seat-map \{ height: auto; margin-block: 10px 3px; \}/);
 });
 
 test('la leyenda de mesas pasa a una ayuda contextual compacta', () => {
@@ -606,7 +607,8 @@ test('busca por grupo y prioriza la condición explícita de sentar junto', () =
 test('los círculos sociales alimentan la carga y las sugerencias de proximidad', () => {
   assert.match(source, /Círculo social/);
   assert.match(source, /guest-circle-options/);
-  assert.match(source, /column\("circulo", "círculo", "grupo", "familia"\)/);
+  assert.match(source, /column\("grupo", "grupo de invitacion", "grupo invitacion", "familia"\)/);
+  assert.match(source, /column\("circulo", "círculo", "circulo social", "círculo social"\)/);
   assert.match(source, /const circleTables = tables\.filter/);
   assert.match(source, /Math\.hypot/);
   assert.match(source, /mesa cercana a su círculo/);

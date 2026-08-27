@@ -84,6 +84,7 @@ async function handler(request: Request) {
           order_number: session.order_number,
           name: String(guest.name).trim().slice(0, 120),
           group_name: String(guest.group_name || '').trim().slice(0, 120),
+          social_circle: String(guest.social_circle || '').trim().slice(0, 120),
           email: String(guest.email || '').trim().toLowerCase().slice(0, 254),
           phone: String(guest.phone || '').trim().slice(0, 30),
           phone_country_code: String(guest.phone_country_code || '+598').trim().slice(0, 6),
