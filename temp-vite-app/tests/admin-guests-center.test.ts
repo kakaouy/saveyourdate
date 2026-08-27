@@ -50,6 +50,40 @@ test('la importación exige revisar duplicados y errores antes de guardar', () =
   assert.match(api, /La lista cambió o contiene duplicados/);
 });
 
+test('Agregar invitados reúne los métodos y recomienda pegar una lista', () => {
+  assert.match(source, /className="modal add-guests-modal"/);
+  assert.match(source, /Agregar manualmente/);
+  assert.match(source, /Pegar una lista/);
+  assert.match(source, /Recomendado/);
+  assert.match(source, /Importar un archivo/);
+  assert.match(source, /const previewPastedGuests = async/);
+  assert.match(source, /Paso 1 de 2 · Pegar lista/);
+  assert.match(source, /Paso 2 de 2 · Revisión/);
+  assert.match(styles, /\.guest-add-options/);
+  assert.match(styles, /\.paste-guests-input/);
+});
+
+test('Invitados usa ayuda contextual y estados vacíos accionables', () => {
+  assert.match(source, /aria-label=\{t\("Ayuda sobre invitados"/);
+  assert.match(source, /className="help-circle context-tip"/);
+  assert.match(source, /className="guest-empty-row"/);
+  assert.match(source, /Todavía no agregaste invitados/);
+  assert.match(source, /No encontramos invitados con estos filtros/);
+  assert.match(source, /setQuery\(""\); setFilter\("Todos"\)/);
+  assert.match(styles, /\.guest-empty-state/);
+  assert.match(styles, /\.heading-actions \.context-tip::after/);
+});
+
+test('las acciones principales quedan visibles y Archivar pasa a Más opciones', () => {
+  assert.match(source, /title=\{t\("Copiar enlace"/);
+  assert.match(source, /className="whatsapp-button"/);
+  assert.match(source, /aria-label=\{`\$\{t\("Editar"/);
+  assert.match(source, /className="guest-more-menu"/);
+  assert.match(source, /Archivar invitado/);
+  assert.doesNotMatch(source, /className="icon-button danger"/);
+  assert.match(styles, /\.guest-more-menu>div/);
+});
+
 test('archivar es recuperable y excluye al invitado de la operación', () => {
   const api = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
   const rsvp = readFileSync(path.join(appRoot, 'api', 'rsvp.ts'), 'utf8');
@@ -126,13 +160,65 @@ test('la asignación asistida se aplica como una única transacción', () => {
   assert.match(migration, /update event_guests guest/);
 });
 
-test('cada mesa resume menús y alertas operativas también en el reporte', () => {
-  assert.match(source, /const menuSummary = new Map<string, number>/);
-  assert.match(source, /className="table-operations"/);
-  assert.match(source, /dietaryAlerts/);
-  assert.match(source, /accessibilityAlerts/);
+test('el inspector concentra menús y alertas operativas y el reporte los conserva', () => {
+  assert.match(source, /const selectedMenuSummary = new Map<string, number>/);
+  assert.match(source, /className="floor-inspector-operations"/);
+  assert.match(source, /selectedDietaryAlerts/);
+  assert.match(source, /selectedAccessibilityAlerts/);
   assert.match(source, /class="ops"/);
   assert.match(source, /guest\.companions/);
+});
+
+test('las tarjetas de mesa priorizan identidad, ocupación e invitados', () => {
+  const card = source.match(/<article\s+id=\{`table-card-[\s\S]*?<div className="seated-guests">/)?.[0] || '';
+  assert.match(card, /<h3>\{table\.name\}<\/h3>/);
+  assert.match(card, /className="capacity-row"/);
+  assert.match(card, /className=\{`table-health/);
+  assert.doesNotMatch(card, /table\.note/);
+  assert.doesNotMatch(card, /table-social-conflicts/);
+  assert.doesNotMatch(card, /table-operations/);
+});
+
+test('la leyenda de mesas pasa a una ayuda contextual compacta', () => {
+  assert.match(source, /className="table-layout-title"/);
+  assert.match(source, /aria-label=\{t\("Cómo leer las mesas"/);
+  assert.match(source, /Verde: tiene lugares/);
+  assert.doesNotMatch(source, /className="table-status-legend"/);
+  assert.match(styles, /\.table-layout-title \.context-tip::after/);
+  assert.doesNotMatch(styles, /\.table-status-legend \{/);
+});
+
+test('la navegación y densidad se agrupan en Vista con controles más compactos', () => {
+  assert.match(source, /className="workspace-view-menu"/);
+  assert.match(source, /<summary>\{t\("Vista"/);
+  assert.match(source, /className="table-navigation"/);
+  assert.match(source, /className=\{`view-density-toggle/);
+  assert.match(styles, /\.workspace-actions>\.outline-button\.compact \{ min-height: 30px/);
+  assert.match(styles, /\.workspace-view-menu>summary \{ min-height: 30px/);
+  assert.match(styles, /\.add-table-menu>summary \{[^}]*min-height: 31px/);
+  assert.match(styles, /\.floor-inspector-actions button \{ min-height: 30px/);
+});
+
+test('las formas de mesa se conservan dentro de Añadir mesa', () => {
+  assert.match(source, /className="add-table-menu"/);
+  assert.match(source, /Elegir forma de mesa/);
+  for (const shape of ['round', 'rectangular', 'square', 'living']) {
+    assert.match(source, new RegExp(`openNew\\("${shape}"\\)`));
+  }
+  assert.match(styles, /\.table-shape-tools \{ position: absolute/);
+});
+
+test('el inspector deja lo cotidiano visible y agrupa lo avanzado', () => {
+  assert.match(source, /className="floor-inspector-advanced"/);
+  assert.match(source, /Opciones avanzadas/);
+  assert.match(source, /Edición completa/);
+  assert.match(source, /className="floor-inspector-delete"/);
+  const advanced = source.match(/<details className="floor-inspector-advanced">[\s\S]*?<\/details>/)?.[0] || '';
+  assert.match(advanced, /floor-inspector-note/);
+  assert.match(advanced, /floor-inspector-operations/);
+  assert.match(advanced, /floor-inspector-actions/);
+  assert.doesNotMatch(advanced, /floor-inspector-delete/);
+  assert.match(styles, /\.floor-inspector-advanced>summary/);
 });
 
 test('el plano admite mesas y Living con lugares visibles', () => {
@@ -211,8 +297,8 @@ test('el plano permite girar, bloquear y ampliar la sala', () => {
   const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
   const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260812060000_table_rotation_lock.sql'), 'utf8');
   assert.match(source, /const \[floorZoom, setFloorZoom\]/);
-  assert.match(source, /rotation: \(\(table\.rotation \|\| 0\) \+ 45\) % 360/);
-  assert.match(source, /locked: !table\.locked/);
+  assert.match(source, /rotation: \(\(selectedTable\.rotation \|\| 0\) \+ 45\) % 360/);
+  assert.match(source, /locked: !selectedTable\.locked/);
   assert.match(source, /draggable=\{canEdit && !table\.locked\}/);
   assert.match(tablesApi, /rotation_degrees/);
   assert.match(tablesApi, /is_locked/);
@@ -229,6 +315,18 @@ test('el inspector del plano edita mesas sin dejar asignaciones inconsistentes',
   assert.match(source, /floor-inspector-guests/);
   assert.match(tablesApi, /select=confirmed,seat_number/);
   assert.match(tablesApi, /El asiento \$\{lastAssignedSeat\} está ocupado/);
+});
+
+test('el plano admite los nuevos elementos y muestra ayuda sólo en contexto', () => {
+  const migration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260827020000_expand_floor_plan_element_types.sql'), 'utf8');
+  for (const element of ['wall', 'fountain', 'stage', 'restroom', 'photo-booth', 'divider']) {
+    assert.match(migration, new RegExp(`'${element}'`));
+  }
+  assert.match(source, /className="seating-quick-status"/);
+  assert.match(source, /className="context-tip" data-help=/);
+  assert.doesNotMatch(source, /className="floor-plan-guide"/);
+  assert.match(source, /className="table-name-save"/);
+  assert.match(styles, /\.context-tip:hover::after/);
 });
 
 test('la navegación del plano permite concentrarse en el lienzo', () => {
@@ -267,7 +365,7 @@ test('el plano ajusta a cuadrícula, detecta solapamientos y duplica mesas', () 
   assert.match(source, /const overlappingTableIds = new Set/);
   assert.match(source, /className="layout-overlap-warning"/);
   assert.match(source, /const duplicateTable = async/);
-  assert.match(source, /void duplicateTable\(table\)/);
+  assert.match(source, /void duplicateTable\(selectedTable\)/);
 });
 
 test('el reporte de catering exporta personas con mesa, asiento y necesidades', () => {
@@ -361,9 +459,10 @@ test('las preferencias sociales generan conflictos accionables por mesa', () => 
   assert.match(source, /t\("debe sentarse junto a"/);
   assert.match(source, /t\("debe sentarse separado de"/);
   assert.match(source, /className="social-conflict-summary"/);
-  assert.match(source, /className="table-social-conflicts"/);
+  assert.match(source, /const selectedSocialConflicts =/);
+  assert.match(source, /className="floor-inspector-operations"/);
   assert.match(styles, /\.social-conflict-summary/);
-  assert.match(styles, /\.table-social-conflicts/);
+  assert.match(styles, /\.floor-inspector-operations/);
 });
 
 test('el paquete de usabilidad agrupa densidad, guardado, vacíos y adaptación móvil', () => {

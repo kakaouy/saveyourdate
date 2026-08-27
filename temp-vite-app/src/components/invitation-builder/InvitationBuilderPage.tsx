@@ -13,13 +13,13 @@ type WorkflowCapabilities = { canEdit: boolean; canApprove: boolean; canPublish:
 type SavedSetup = { id: string; name: string; payload: Partial<InvitationBuilderDocument>; updated_at: string };
 type ReviewEvent = { id: string; action: string; comment: string | null; actor_type: string; created_at: string };
 type BuilderStepId = 'design' | 'event' | 'sections' | 'copy' | 'media' | 'extras' | 'review';
-const BUILDER_STEPS: Array<{ id: BuilderStepId; label: string; shortLabel: string; description: string; icon: string }> = [
+const BUILDER_STEPS: Array<{ id: BuilderStepId; label: string; shortLabel: string; description: string; icon: string; optional?: boolean }> = [
   { id: 'design', label: 'Elegí el estilo', shortLabel: 'Diseño', description: 'Modelo, idioma y colores', icon: '✦' },
   { id: 'event', label: 'Datos del evento', shortLabel: 'Evento', description: 'Nombre, fecha y lugar', icon: '♡' },
   { id: 'sections', label: 'Armá la invitación', shortLabel: 'Secciones', description: 'Qué mostrar y en qué orden', icon: '▦' },
   { id: 'copy', label: 'Personalizá los textos', shortLabel: 'Textos', description: 'Mensajes y botones', icon: '✎' },
-  { id: 'media', label: 'Sumá tus imágenes', shortLabel: 'Fotos', description: 'Portada y galería', icon: '▣' },
-  { id: 'extras', label: 'Agregá los detalles', shortLabel: 'Extras', description: 'Regalos, QR y alojamiento', icon: '＋' },
+  { id: 'media', label: 'Sumá tus imágenes', shortLabel: 'Fotos', description: 'Portada y galería', icon: '▣', optional: true },
+  { id: 'extras', label: 'Agregá los detalles', shortLabel: 'Extras', description: 'Regalos, QR y alojamiento', icon: '＋', optional: true },
   { id: 'review', label: 'Revisá y terminá', shortLabel: 'Revisar', description: 'Validación y envío', icon: '✓' },
 ];
 const stepForValidationField = (field: string): BuilderStepId => {
@@ -56,6 +56,7 @@ export default function InvitationBuilderPage() {
   const [setupName, setSetupName] = useState('');
   const [reviewHistory, setReviewHistory] = useState<ReviewEvent[]>([]);
   const [activeStep, setActiveStep] = useState<BuilderStepId>('design');
+  const [guestPreviewOpen, setGuestPreviewOpen] = useState(false);
   const [unsupportedRequestedModel, setUnsupportedRequestedModel] = useState('');
   const config = useMemo(() => auroraConfigFromBuilder(document), [document]);
   const event = config.event!;
@@ -274,7 +275,7 @@ export default function InvitationBuilderPage() {
             {BUILDER_STEPS.map((step, index) => <button key={step.id} type="button" className={activeStep === step.id ? 'active' : index < activeStepIndex ? 'complete' : ''} aria-current={activeStep === step.id ? 'step' : undefined} onClick={() => goToStep(step.id)}><span>{index < activeStepIndex ? '✓' : step.icon}</span><small>{step.shortLabel}</small></button>)}
           </nav>
         </div>
-        <div className="builder-step-intro"><span>{BUILDER_STEPS[activeStepIndex].icon}</span><div><p>Paso {activeStepIndex + 1}</p><h1>{BUILDER_STEPS[activeStepIndex].label}</h1><small>{BUILDER_STEPS[activeStepIndex].description}</small></div></div>
+        <div className="builder-step-intro"><span>{BUILDER_STEPS[activeStepIndex].icon}</span><div><p>Paso {activeStepIndex + 1}{BUILDER_STEPS[activeStepIndex].optional ? ' · Opcional' : ''}</p><h1>{BUILDER_STEPS[activeStepIndex].label}</h1><small>{BUILDER_STEPS[activeStepIndex].description}{BUILDER_STEPS[activeStepIndex].optional ? '. Podés omitirlo y volver después.' : ''}</small></div></div>
         {!['draft', 'changes_requested'].includes(document.status) && <div className="builder-readonly-notice" role="status"><strong>Vista de consulta</strong><p>{document.status === 'in_review' ? 'La invitación está en revisión. Para editarla nuevamente primero deben solicitarse cambios.' : document.status === 'approved' ? 'La invitación está aprobada y ya no admite cambios de contenido.' : 'La invitación está publicada. Creá un nuevo ciclo de cambios antes de modificarla.'}</p></div>}
         {unsupportedRequestedModel && <div className="builder-compatibility-warning" role="alert"><strong>Este pedido usa un modelo tradicional</strong><p>El cliente eligió “{unsupportedRequestedModel}”, que todavía no está disponible en esta experiencia de edición. El guardado está bloqueado para evitar reemplazarlo por Aurora. Si acordaron cambiar el diseño, elegí conscientemente otro modelo en este primer paso.</p></div>}
         {message && <p className="builder-message" role="status">{message}</p>}{authenticated && workflow.requiresPlatformReview && document.status === 'approved' && <p className="builder-message">Esta cuenta requiere revisión final de Save Your Date antes de publicar.</p>}
@@ -387,10 +388,10 @@ export default function InvitationBuilderPage() {
         </section>
         </>}
         {activeStep === 'review' && <section className="builder-finish-card"><span className="builder-finish-icon">{validationIssues.length || unsupportedRequestedModel ? '!' : '✓'}</span><h2>{unsupportedRequestedModel ? 'Primero confirmá el modelo' : validationIssues.length ? 'Tu invitación está casi pronta' : '¡Todo pronto para revisar!'}</h2><p>{unsupportedRequestedModel ? 'Volvé al paso Diseño y elegí una plantilla modular únicamente si el cambio fue acordado.' : validationIssues.length ? `Completá los ${validationIssues.length} datos señalados antes de enviarla.` : 'Guardá los últimos cambios y enviala a revisión cuando quieras.'}</p>{canEditDocument && <button type="button" onClick={() => void save()} disabled={saving}>{saving ? 'Guardando…' : 'Guardar borrador'}</button>}{canEditDocument && <button className="builder-finish-primary" type="button" onClick={submitForReview} disabled={saving || validationIssues.length > 0}>Enviar a revisión</button>}</section>}
-        <div className="builder-step-actions"><button type="button" onClick={() => goToAdjacentStep(-1)} disabled={activeStepIndex === 0}>← Anterior</button>{activeStepIndex < BUILDER_STEPS.length - 1 && <button className="builder-next" type="button" onClick={() => goToAdjacentStep(1)}>Continuar →</button>}</div>
+        <div className="builder-step-actions"><button type="button" onClick={() => goToAdjacentStep(-1)} disabled={activeStepIndex === 0}>← Anterior</button>{activeStepIndex < BUILDER_STEPS.length - 1 && <button className="builder-next" type="button" onClick={() => goToAdjacentStep(1)}>{BUILDER_STEPS[activeStepIndex].optional ? 'Omitir o continuar' : 'Continuar'} →</button>}</div>
       </aside>
       <section className="builder-preview-area" id="builder-live-preview">
-        <div className="builder-preview-toolbar"><strong>Vista previa en vivo</strong><div className="builder-view-switch"><button aria-pressed={viewport === 'phone'} onClick={() => setViewport('phone')}>▯ Celular</button><button aria-pressed={viewport === 'desktop'} onClick={() => setViewport('desktop')}>▭ Pantalla amplia</button></div></div>
+        <div className="builder-preview-toolbar"><div><strong>Vista previa en vivo</strong><button className="builder-guest-test" type="button" onClick={() => setGuestPreviewOpen(true)}>◎ Probar como invitado</button></div><div className="builder-view-switch"><button aria-pressed={viewport === 'phone'} onClick={() => setViewport('phone')}>▯ Celular</button><button aria-pressed={viewport === 'desktop'} onClick={() => setViewport('desktop')}>▭ Pantalla amplia</button></div></div>
         <div className="builder-preview-stage">
           <div className={`builder-preview builder-preview-${viewport} builder-preview-template-${document.templateId}`} data-template={document.templateId}><Preview locale={document.locale} palette={document.paletteId as never} embedded config={config} sectionOrder={ordered.filter(({ enabled }) => enabled).map(({ id }) => id)} /></div>
           <div className="builder-scroll-hint" aria-hidden="true"><img src="/scroll-mouse.png" alt="" /><span>Deslizá con el dedo<small>o usá las flechas</small></span></div>
@@ -403,5 +404,12 @@ export default function InvitationBuilderPage() {
       aria-controls={mobilePanel === 'edit' ? 'builder-live-preview' : 'builder-editor'}
       onClick={() => setMobilePanel((current) => current === 'edit' ? 'preview' : 'edit')}
     >{mobilePanel === 'edit' ? 'Ver vista previa' : 'Volver a editar'}</button>
+    {guestPreviewOpen && <div className="builder-guest-preview-backdrop" role="dialog" aria-modal="true" aria-labelledby="builder-guest-preview-title" onMouseDown={() => setGuestPreviewOpen(false)}>
+      <section className="builder-guest-preview-modal" onMouseDown={(event) => event.stopPropagation()}>
+        <header><div><span>Vista del invitado</span><h2 id="builder-guest-preview-title">Probá la invitación antes de enviarla</h2><p>Recorré el contenido como lo hará una persona invitada. Esta prueba no guarda respuestas ni envía mensajes.</p></div><button type="button" onClick={() => setGuestPreviewOpen(false)} aria-label="Cerrar prueba">×</button></header>
+        <div className="builder-guest-preview-device"><Preview locale={document.locale} palette={document.paletteId as never} embedded config={config} sectionOrder={ordered.filter(({ enabled }) => enabled).map(({ id }) => id)} /></div>
+        <footer><span>Modo de prueba · sin datos reales</span><button type="button" onClick={() => setGuestPreviewOpen(false)}>Volver a editar</button></footer>
+      </section>
+    </div>}
   </main>;
 }

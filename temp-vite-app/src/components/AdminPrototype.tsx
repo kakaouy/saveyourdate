@@ -1399,6 +1399,9 @@ function Guests({
   const bulkAllowsEmpty = ["transportOption", "menuChoice", "food", "socialTogetherWith", "socialSeparateFrom", "preferredTableName"].includes(bulkField);
   const [showImportHelp, setShowImportHelp] = useState(false);
   const [importPreview, setImportPreview] = useState<GuestImportPreview | null>(null);
+  const [showAddGuests, setShowAddGuests] = useState(false);
+  const [showPasteGuests, setShowPasteGuests] = useState(false);
+  const [pastedGuests, setPastedGuests] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
@@ -1861,10 +1864,7 @@ function Guests({
       ]),
     );
 
-  const importGuests = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
+  const previewGuestFile = async (file: File) => {
     setSaving(true);
     setError("");
     setNotice("");
@@ -1990,6 +1990,8 @@ function Guests({
         return { guest, duplicate, errors };
       });
       setImportPreview({ fileName: file.name, rows: previewRows });
+      setShowAddGuests(false);
+      setShowPasteGuests(false);
       setNotice("");
     } catch (importError) {
       setError(
@@ -2000,6 +2002,31 @@ function Guests({
     } finally {
       setSaving(false);
     }
+  };
+
+  const importGuests = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (file) await previewGuestFile(file);
+  };
+
+  const previewPastedGuests = async () => {
+    const lines = pastedGuests.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    if (!lines.length) {
+      setError(t("Pegá al menos un invitado.", "Paste at least one guest.", "Cole pelo menos um convidado."));
+      return;
+    }
+    const escaped = (value: string) => `"${value.replace(/"/g, '""')}"`;
+    const rows = lines.map((line) => {
+      const cells = line.includes("\t") ? line.split("\t") : line.split(",");
+      return [cells[0] || "", cells[1] || "", cells[2] || ""].map((cell) => escaped(cell.trim())).join(",");
+    });
+    const file = new File(
+      [[ ["Nombre", "WhatsApp", "Grupo"].map(escaped).join(","), ...rows ].join("\n")],
+      t("lista-pegada.csv", "pasted-list.csv", "lista-colada.csv"),
+      { type: "text/csv" },
+    );
+    await previewGuestFile(file);
   };
 
   const confirmGuestImport = async () => {
@@ -2065,32 +2092,29 @@ function Guests({
           </p>
         </div>
         <div className="heading-actions">
+          <button
+            className="help-circle context-tip"
+            type="button"
+            data-help={t(
+              "Cada registro representa una invitación. Los cupos indican cuántas personas pueden confirmar con el mismo enlace.",
+              "Each record represents an invitation. Seats indicate how many people can RSVP through the same link.",
+              "Cada registro representa um convite. As vagas indicam quantas pessoas podem confirmar pelo mesmo link.",
+            )}
+            aria-label={t("Ayuda sobre invitados", "Guest help", "Ajuda sobre convidados")}
+          >?</button>
           <button className="outline-button" onClick={exportGuestReport}>
             ⇩ {t("Exportar lista", "Export list", "Exportar lista")}
           </button>
           {canEdit && (
             <button
               className="primary-button small"
-              onClick={() => setShowModal(true)}
+              onClick={() => setShowAddGuests(true)}
             >
-              ＋ {t("Agregar invitado", "Add guest", "Adicionar convidado")}
+              ＋ {t("Agregar invitados", "Add guests", "Adicionar convidados")}
             </button>
           )}
         </div>
       </div>
-      <ContextHelp
-        title={t(
-          "Cómo funciona una invitación",
-          "How an invitation works",
-          "Como funciona um convite",
-        )}
-      >
-        {t(
-          "Cada registro representa una invitación. Los cupos indican cuántas personas pueden confirmar con ese mismo enlace personalizado.",
-          "Each record represents one invitation. Seats indicate how many people can RSVP through that personalized link.",
-          "Cada registro representa um convite. As vagas indicam quantas pessoas podem confirmar pelo mesmo link personalizado.",
-        )}
-      </ContextHelp>
       <section className="guest-operation-summary" aria-label={t("Resumen de invitados", "Guest summary", "Resumo de convidados")}>
         <button className={filter === "Todos" ? "active" : ""} onClick={() => setFilter("Todos")}>
           <span>{t("Invitaciones", "Invitations", "Convites")}</span>
@@ -2204,11 +2228,11 @@ function Guests({
               <button
                 className="outline-button compact"
                 disabled={saving}
-                onClick={() => importInput.current?.click()}
+                onClick={() => setShowAddGuests(true)}
               >
                 {saving
                   ? t("Importando…", "Importing…", "Importando…")
-                  : `⇩ ${t("Importar archivo", "Import file", "Importar arquivo")}`}
+                  : `＋ ${t("Agregar invitados", "Add guests", "Adicionar convidados")}`}
               </button>
               <input
                 ref={importInput}
@@ -2327,6 +2351,24 @@ function Guests({
               </tr>
             </thead>
             <tbody>
+              {filtered.length === 0 && (
+                <tr className="guest-empty-row">
+                  <td colSpan={canEdit ? 8 : 7}>
+                    <div className="guest-empty-state">
+                      <span aria-hidden="true">♙</span>
+                      <strong>{activeGuests.length === 0
+                        ? t("Todavía no agregaste invitados", "You haven't added guests yet", "Você ainda não adicionou convidados")
+                        : t("No encontramos invitados con estos filtros", "No guests match these filters", "Nenhum convidado corresponde a estes filtros")}</strong>
+                      <p>{activeGuests.length === 0
+                        ? t("Empezá pegando una lista o cargando una invitación manualmente.", "Start by pasting a list or entering one invitation manually.", "Comece colando uma lista ou cadastrando um convite manualmente.")
+                        : t("Probá otra búsqueda o volvé a mostrar la lista completa.", "Try another search or return to the full list.", "Tente outra busca ou volte para a lista completa.")}</p>
+                      {canEdit && activeGuests.length === 0
+                        ? <button className="primary-button small" type="button" onClick={() => setShowAddGuests(true)}>＋ {t("Agregar invitados", "Add guests", "Adicionar convidados")}</button>
+                        : <button className="outline-button compact" type="button" onClick={() => { setQuery(""); setFilter("Todos"); }}>{t("Limpiar filtros", "Clear filters", "Limpar filtros")}</button>}
+                    </div>
+                  </td>
+                </tr>
+              )}
               {filtered.map((guest) => (
                 <tr key={guest.id}>
                   {canEdit && (
@@ -2433,14 +2475,19 @@ function Guests({
                         >
                           ✎
                         </button>
-                        <button
-                          className="icon-button danger"
-                          onClick={() => setGuestArchived(guest, true)}
-                          aria-label={`${t("Archivar a", "Archive", "Arquivar")} ${guest.name}`}
-                          title={t("Archivar", "Archive", "Arquivar")}
-                        >
-                          <svg className="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" /></svg>
-                        </button>
+                        <details className="guest-more-menu">
+                          <summary aria-label={`${t("Más opciones para", "More options for", "Mais opções para")} ${guest.name}`} title={t("Más opciones", "More options", "Mais opções")}>•••</summary>
+                          <div>
+                            <button
+                              className="guest-menu-danger"
+                              type="button"
+                              onClick={() => setGuestArchived(guest, true)}
+                            >
+                              <svg className="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" /></svg>
+                              {t("Archivar invitado", "Archive guest", "Arquivar convidado")}
+                            </button>
+                          </div>
+                        </details>
                       </>}
                       {canEdit && guest.archivedAt && (
                         <button className="outline-button compact" onClick={() => setGuestArchived(guest, false)}>
@@ -2474,6 +2521,51 @@ function Guests({
           </span>
         </div>
       </section>
+      {showAddGuests && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="add-guests-title" onMouseDown={() => setShowAddGuests(false)}>
+          <div className="modal add-guests-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setShowAddGuests(false)} aria-label={t("Cerrar", "Close", "Fechar")}>×</button>
+            <span className="eyebrow">{t("Lista de invitados", "Guest list", "Lista de convidados")}</span>
+            <h2 id="add-guests-title">{t("¿Cómo querés agregar invitados?", "How would you like to add guests?", "Como você quer adicionar convidados?")}</h2>
+            <p>{t("Elegí el método que te resulte más cómodo. Podrás revisar todo antes de guardar.", "Choose the method that works best for you. You can review everything before saving.", "Escolha o método mais conveniente. Você poderá revisar tudo antes de salvar.")}</p>
+            <div className="guest-add-options">
+              <button type="button" onClick={() => { setShowAddGuests(false); setShowModal(true); }}>
+                <span className="guest-add-icon">▦</span>
+                <span><strong>{t("Agregar manualmente", "Add manually", "Adicionar manualmente")}</strong><small>{t("Cargá una invitación con todos sus datos.", "Enter one invitation with all its details.", "Cadastre um convite com todos os dados.")}</small></span>
+                <b aria-hidden="true">›</b>
+              </button>
+              <button className="recommended" type="button" onClick={() => { setShowAddGuests(false); setShowPasteGuests(true); setError(""); }}>
+                <span className="guest-add-icon">⧉</span>
+                <span><strong>{t("Pegar una lista", "Paste a list", "Colar uma lista")} <em>{t("Recomendado", "Recommended", "Recomendado")}</em></strong><small>{t("Copiá nombres desde Excel, Sheets o Numbers.", "Copy names from Excel, Sheets or Numbers.", "Copie nomes do Excel, Sheets ou Numbers.")}</small></span>
+                <b aria-hidden="true">›</b>
+              </button>
+              <button type="button" onClick={() => { setShowAddGuests(false); importInput.current?.click(); }}>
+                <span className="guest-add-icon">⇧</span>
+                <span><strong>{t("Importar un archivo", "Import a file", "Importar um arquivo")}</strong><small>{t("Subí un CSV, Excel XLSX o una tabla DOCX.", "Upload a CSV, Excel XLSX or DOCX table.", "Envie um CSV, Excel XLSX ou tabela DOCX.")}</small></span>
+                <b aria-hidden="true">›</b>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showPasteGuests && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="paste-guests-title" onMouseDown={() => setShowPasteGuests(false)}>
+          <div className="modal paste-guests-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setShowPasteGuests(false)} aria-label={t("Cerrar", "Close", "Fechar")}>×</button>
+            <button className="modal-back-link" type="button" onClick={() => { setShowPasteGuests(false); setShowAddGuests(true); }}>← {t("Volver", "Back", "Voltar")}</button>
+            <span className="eyebrow">{t("Paso 1 de 2 · Pegar lista", "Step 1 of 2 · Paste list", "Etapa 1 de 2 · Colar lista")}</span>
+            <h2 id="paste-guests-title">{t("Pegá tus invitados", "Paste your guests", "Cole seus convidados")}</h2>
+            <p>{t("Usá una fila por invitado. Las columnas pueden ser Nombre, WhatsApp y Grupo, en ese orden.", "Use one row per guest. Columns can be Name, WhatsApp and Group, in that order.", "Use uma linha por convidado. As colunas podem ser Nome, WhatsApp e Grupo, nessa ordem.")}</p>
+            <textarea className="paste-guests-input" value={pastedGuests} onChange={(event) => setPastedGuests(event.target.value)} autoFocus placeholder={t("María Pérez    099123456    Familia Pérez\nJuan Gómez     098654321    Amigos", "Maria Perez    5551234    Perez family\nJohn Smith     5559876    Friends", "Maria Pérez    1199123456    Família Pérez\nJoão Silva     1198765432    Amigos")} />
+            <div className="paste-format-hint"><span>1</span>{t("Copiá las celdas de tu planilla y pegalas aquí.", "Copy the cells from your spreadsheet and paste them here.", "Copie as células da planilha e cole aqui.")}<span>2</span>{t("En el siguiente paso revisás duplicados y errores.", "Review duplicates and errors in the next step.", "Na próxima etapa, revise duplicados e erros.")}</div>
+            {error && <p className="table-error" role="alert">{error}</p>}
+            <div className="modal-actions">
+              <button className="outline-button" type="button" onClick={() => setShowPasteGuests(false)}>{t("Cancelar", "Cancel", "Cancelar")}</button>
+              <button className="primary-button small" type="button" disabled={saving || !pastedGuests.trim()} onClick={previewPastedGuests}>{saving ? t("Procesando…", "Processing…", "Processando…") : t("Revisar lista", "Review list", "Revisar lista")}</button>
+            </div>
+          </div>
+        </div>
+      )}
       {showImportHelp && (
         <div
           className="modal-backdrop"
@@ -2555,7 +2647,7 @@ function Guests({
           <div className="modal-backdrop" onMouseDown={() => setImportPreview(null)}>
             <div className="modal import-preview-modal" onMouseDown={(event) => event.stopPropagation()}>
               <button className="modal-close" type="button" onClick={() => setImportPreview(null)}>×</button>
-              <span className="eyebrow">{t("Revisión previa", "Import review", "Revisão da importação")}</span>
+              <span className="eyebrow">{t("Paso 2 de 2 · Revisión", "Step 2 of 2 · Review", "Etapa 2 de 2 · Revisão")}</span>
               <h2>{t("Revisá antes de importar", "Review before importing", "Revise antes de importar")}</h2>
               <p className="import-preview-file">{importPreview.fileName}</p>
               <div className="import-preview-summary">
@@ -3205,9 +3297,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [assignmentSavingId, setAssignmentSavingId] = useState("");
   const [groupAssignmentSaving, setGroupAssignmentSaving] = useState("");
   const [mobileSeatingStep, setMobileSeatingStep] = useState<"guests" | "tables">("guests");
-  const [showSeatingGuide, setShowSeatingGuide] = useState(true);
   const [showExportCenter, setShowExportCenter] = useState(false);
   const [selectedLayoutTableId, setSelectedLayoutTableId] = useState("");
+  const [layoutTableNameDraft, setLayoutTableNameDraft] = useState("");
   const [floorLibraryCategory, setFloorLibraryCategory] = useState<"main" | "structure" | "services" | "furniture" | "utilities">("main");
   const [assignmentStatus, setAssignmentStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
@@ -3674,7 +3766,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const renameTableInline = async (table: EventTable, nextName: string) => {
     const name = nextName.trim().slice(0, 120);
-    if (!name || name === table.name) return;
+    if (!name) {
+      setError(t("Ingresá un nombre para la mesa.", "Enter a table name.", "Digite um nome para a mesa."));
+      return;
+    }
+    if (name === table.name) return;
+    const previousName = table.name;
+    setTables((current) => current.map((item) => item.id === table.id ? { ...item, name } : item));
     setSaving(true);
     setError("");
     try {
@@ -3686,7 +3784,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       const result = await response.json() as { table?: EventTable; error?: string };
       if (!response.ok || !result.table) throw new Error(result.error || t("No pudimos cambiar el nombre de la mesa.", "Could not rename the table.", "Não foi possível renomear a mesa."));
       setTables((current) => current.map((item) => item.id === table.id ? { ...item, ...result.table!, guests: item.guests, seatAssignments: item.seatAssignments } : item));
+      setLayoutTableNameDraft(result.table.name);
+      setLayoutNotice(t("Nombre actualizado.", "Name updated.", "Nome atualizado."));
+      window.setTimeout(() => setLayoutNotice(""), 1800);
     } catch (renameError) {
+      setTables((current) => current.map((item) => item.id === table.id ? { ...item, name: previousName } : item));
+      setLayoutTableNameDraft(previousName);
       setError(renameError instanceof Error ? renameError.message : t("No pudimos cambiar el nombre de la mesa.", "Could not rename the table.", "Não foi possível renomear a mesa."));
     } finally { setSaving(false); }
   };
@@ -3776,7 +3879,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     try {
       const element = await saveFloorElement({ id: "", kind, label, space: position?.space || spaces[0], x: position?.x ?? 40, y: position?.y ?? 90, width: kind === "dance-floor" ? 220 : 150, height: kind === "dance-floor" ? 130 : 80 }, "POST");
       setFloorElements((current) => [...current, element]);
-    } catch (addError) { setError(addError instanceof Error ? addError.message : "No pudimos agregar el elemento."); }
+      setLayoutNotice(t(`${label} agregado al plano.`, `${label} added to the layout.`, `${label} adicionado ao plano.`));
+      window.setTimeout(() => setLayoutNotice(""), 1800);
+    } catch (addError) { setError(addError instanceof Error ? addError.message : t("No pudimos agregar el elemento. Revisá que las migraciones estén aplicadas.", "Could not add the element. Check that migrations are applied.", "Não foi possível adicionar o elemento. Verifique as migrações.")); }
   };
 
   const updateFloorElement = (element: FloorElement, changes: Partial<FloorElement>) => {
@@ -4010,50 +4115,11 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           {canEdit && <button className="primary-button small" onClick={() => openNew()}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
         </div>
       </div>
-      <section className="seating-command-center" aria-labelledby="seating-progress-title">
-        <div className="seating-command-intro">
-          <div>
-            <span className="seating-kicker">{t("Tu recorrido", "Your workflow", "Seu percurso")}</span>
-            <h2 id="seating-progress-title">{t("Prepará una distribución clara y lista para compartir", "Build a clear layout that is ready to share", "Prepare uma distribuição clara e pronta para compartilhar")}</h2>
-            <p>{t("Avanzá en orden o entrá directamente al paso que necesitás. Los cambios de invitados confirmados se reflejan aquí.", "Follow the steps or jump directly to what you need. Confirmed guest changes appear here.", "Avance em ordem ou vá diretamente ao passo necessário. As mudanças dos convidados confirmados aparecem aqui.")}</p>
-          </div>
-          <div className="seating-progress-ring" aria-label={`${completedSeatingSteps} ${t("de", "of", "de")} ${seatingProgress.length} ${t("pasos completos", "steps complete", "etapas concluídas")}`}>
-            <strong>{completedSeatingSteps}/{seatingProgress.length}</strong>
-            <span>{t("completos", "complete", "concluídos")}</span>
-          </div>
-        </div>
+      <section className="seating-quick-status" aria-label={t("Progreso de organización", "Planning progress", "Progresso da organização")}>
+        <strong>{completedSeatingSteps}/{seatingProgress.length} {t("pasos completos", "steps complete", "etapas concluídas")}</strong>
         <div className="seating-progress-track" aria-hidden="true"><i style={{ width: `${(completedSeatingSteps / seatingProgress.length) * 100}%` }} /></div>
-        <nav className="seating-workflow" aria-label={t("Pasos para organizar las mesas", "Table planning steps", "Etapas para organizar as mesas")}>{seatingProgress.map((step, index) => (
-          <button key={step.label} className={step.complete ? "is-complete" : ""} onClick={step.action}>
-            <span className="workflow-number">{step.complete ? "✓" : index + 1}</span>
-            <span><strong>{step.label}</strong><small>{step.detail}</small></span>
-            <b aria-hidden="true">→</b>
-          </button>
-        ))}</nav>
+        <nav>{seatingProgress.map((step, index) => <button key={step.label} className={`context-tip ${step.complete ? "is-complete" : ""}`} data-help={step.detail} onClick={step.action}><span>{step.complete ? "✓" : index + 1}</span>{step.label}</button>)}</nav>
       </section>
-
-      <section className={`seating-guide ${showSeatingGuide ? "is-open" : ""}`}>
-        <button className="seating-guide-toggle" onClick={() => setShowSeatingGuide((current) => !current)} aria-expanded={showSeatingGuide}>
-          <span className="guide-icon">?</span>
-          <span><strong>{t("¿Cómo funciona la organización de mesas?", "How does table planning work?", "Como funciona a organização das mesas?")}</strong><small>{t("Una guía breve de los controles y conceptos de esta pantalla.", "A quick guide to the controls and concepts on this screen.", "Um guia rápido dos controles e conceitos desta tela.")}</small></span>
-          <b>{showSeatingGuide ? "−" : "+"}</b>
-        </button>
-        {showSeatingGuide && <div className="seating-guide-grid">
-          <article><span>♙</span><div><strong>{t("Invitación vs. persona", "Invitation vs. person", "Convite vs. pessoa")}</strong><p>{t("Una invitación puede representar a varias personas. La capacidad siempre cuenta personas confirmadas, no filas de la lista.", "One invitation can represent several people. Capacity counts confirmed people, not list rows.", "Um convite pode representar várias pessoas. A capacidade conta pessoas confirmadas, não linhas da lista.")}</p></div></article>
-          <article><span>◎</span><div><strong>{t("Mesa y silla", "Table and seat", "Mesa e assento")}</strong><p>{t("Primero elegís una mesa; si necesitás precisión, también podés asignar una silla numerada.", "Choose a table first; when needed, you can also assign a numbered seat.", "Primeiro escolha uma mesa; se precisar, também pode atribuir um assento numerado.")}</p></div></article>
-          <article><span>★</span><div><strong>{t("Sugerencias", "Suggestions", "Sugestões")}</strong><p>{t("El sistema recomienda mesas según grupos y preferencias. Son ayudas: siempre podés decidir otra ubicación.", "The system recommends tables using groups and preferences. They are suggestions; you stay in control.", "O sistema recomenda mesas conforme grupos e preferências. São sugestões; você mantém o controle.")}</p></div></article>
-          <article><span>⚠</span><div><strong>{t("Alertas", "Alerts", "Alertas")}</strong><p>{t("Señalan sobrecapacidad, restricciones o personas que deberían estar juntas o separadas. No borran ni mueven nada automáticamente.", "They flag overcapacity, dietary needs, or people who should sit together or apart. Nothing is moved automatically.", "Sinalizam excesso de capacidade, restrições ou pessoas que devem ficar juntas ou separadas. Nada é movido automaticamente.")}</p></div></article>
-        </div>}
-      </section>
-      <ContextHelp
-        title={t("Antes de asignar", "Before assigning", "Antes de atribuir")}
-      >
-        {t(
-          "Sólo aparecen invitaciones confirmadas. La capacidad cuenta a todas las personas confirmadas dentro de cada grupo.",
-          "Only confirmed invitations appear. Capacity counts every confirmed person within each group.",
-          "Apenas convites confirmados aparecem. A capacidade conta todas as pessoas confirmadas de cada grupo.",
-        )}
-      </ContextHelp>
       {loading && (
         <p className="module-notice">
           {t(
@@ -4141,11 +4207,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
       {layoutMode && (
         <section className="panel floor-plan-panel" ref={floorPlanRef}>
-          <div className="floor-plan-guide">
-            <div><span>1</span><p><strong>{t("Definí el espacio", "Define the space", "Defina o espaço")}</strong><small>{t("Ajustá ancho y alto respetando las proporciones del salón real.", "Set width and height using the same proportions as the real venue.", "Ajuste largura e altura respeitando as proporções do salão real.")}</small></p></div>
-            <div><span>2</span><p><strong>{t("Ubicá mesas y zonas", "Place tables and areas", "Posicione mesas e áreas")}</strong><small>{t("Arrastrá cada elemento. La cuadrícula ayuda a mantener una distribución ordenada.", "Drag each element. The grid helps keep the layout orderly.", "Arraste cada elemento. A grade ajuda a manter uma distribuição organizada.")}</small></p></div>
-            <div><span>3</span><p><strong>{t("Revisá y bloqueá", "Review and lock", "Revise e bloqueie")}</strong><small>{t("Corregí superposiciones y bloqueá lo que ya está en su posición definitiva.", "Fix overlaps and lock anything already in its final position.", "Corrija sobreposições e bloqueie o que já estiver na posição final.")}</small></p></div>
-          </div>
           <div className="floor-plan-legend" aria-label={t("Leyenda del plano", "Layout legend", "Legenda do plano")}>
             <strong>{t("Leyenda", "Legend", "Legenda")}</strong>
             <span><i className="legend-table" />{t("Mesa editable", "Editable table", "Mesa editável")}</span>
@@ -4187,7 +4248,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               <strong>{t("Elementos del salón", "Venue elements", "Elementos do salão")}</strong>
               <p>{t("Arrastrá o hacé clic para colocar. Elegí una categoría para encontrar cada objeto.", "Drag or click to place. Choose a category to find each object.", "Arraste ou clique para posicionar. Escolha uma categoria para encontrar cada objeto.")}</p>
               <nav className="floor-library-tabs" aria-label={t("Categorías de elementos", "Element categories", "Categorias de elementos")}>
-                {(["main", "structure", "services", "furniture", "utilities"] as const).map((category) => <button key={category} className={floorLibraryCategory === category ? "active" : ""} onClick={() => setFloorLibraryCategory(category)}>{category === "main" ? t("Áreas", "Areas", "Áreas") : category === "structure" ? t("Estructura", "Structure", "Estrutura") : category === "services" ? t("Servicios", "Services", "Serviços") : category === "furniture" ? t("Mobiliario", "Furniture", "Mobiliário") : t("Utilidades", "Utilities", "Utilidades")}</button>)}
+                {(["main", "structure", "services", "furniture", "utilities"] as const).map((category) => <button key={category} className={floorLibraryCategory === category ? "active" : ""} onClick={() => setFloorLibraryCategory(category)}><span>{category === "main" ? t("Áreas principales", "Main areas", "Áreas principais") : category === "structure" ? t("Estructura", "Structure", "Estrutura") : category === "services" ? t("Servicios", "Services", "Serviços") : category === "furniture" ? t("Mobiliario", "Furniture", "Mobiliário") : t("Utilidades", "Utilities", "Utilidades")}</span><b>{category === "main" ? 7 : category === "structure" ? 5 : category === "services" ? 3 : category === "furniture" ? 4 : 2}</b><i>{floorLibraryCategory === category ? "⌃" : "⌄"}</i></button>)}
               </nav>
               <div className="floor-library-items">{({
                 main: [["dance-floor", t("Pista de baile", "Dance floor", "Pista de dança")], ["stage", t("Escenario", "Stage", "Palco")], ["dj", t("DJ y sonido", "DJ and sound", "DJ e som")], ["cake", t("Área de torta", "Cake area", "Área do bolo")], ["gifts", t("Mesa de regalos", "Gift table", "Mesa de presentes")], ["hydration", t("Barra de bebidas", "Drinks bar", "Bar de bebidas")], ["buffet", "Buffet"]],
@@ -4195,7 +4256,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 services: [["restroom", t("Baños", "Restrooms", "Banheiros")], ["kitchen", t("Cocina y servicio", "Kitchen and service", "Cozinha e serviço")], ["emergency", t("Salida de emergencia", "Emergency exit", "Saída de emergência")]],
                 furniture: [["photo-booth", "Photo booth"], ["gourmet", "Living / Lounge"], ["fountain", t("Fuente o centro", "Fountain or centerpiece", "Fonte ou centro")], ["plant", t("Planta o maceta", "Plant or planter", "Planta ou vaso")]],
                 utilities: [["custom", t("Texto o etiqueta", "Text or label", "Texto ou etiqueta")], ["divider", t("Línea o divisor", "Line or divider", "Linha ou divisor")]],
-              }[floorLibraryCategory] as Array<[FloorElement["kind"], string]>).map(([kind, label]) => <button key={kind} draggable title={t("Hacé clic para agregar o arrastrá al plano", "Click to add or drag onto the layout", "Clique para adicionar ou arraste para o plano")} onDragStart={(event) => { event.dataTransfer.setData("text/new-element-kind", kind); event.dataTransfer.setData("text/new-element-label", label); }} onClick={() => void addFloorElement(kind, label)}><i className={`library-icon is-${kind}`} /> <span><strong>{label}</strong><small>{kind === "gourmet" ? t("Zona flexible", "Flexible area", "Área flexível") : t("Agregar al plano", "Add to layout", "Adicionar ao plano")}</small></span></button>)}</div>
+              }[floorLibraryCategory] as Array<[FloorElement["kind"], string]>).map(([kind, label]) => <button className="context-tip" data-help={t("Hacé clic para agregarlo al centro o arrastralo a una posición exacta.", "Click to add it to the center or drag it to an exact position.", "Clique para adicionar ao centro ou arraste para uma posição exata.")} key={kind} draggable onDragStart={(event) => { event.dataTransfer.setData("text/new-element-kind", kind); event.dataTransfer.setData("text/new-element-label", label); }} onClick={() => void addFloorElement(kind, label)}><i className={`library-icon is-${kind}`} /> <span><strong>{label}</strong></span></button>)}</div>
             </aside>}
             <div className="floor-spaces" style={{ zoom: floorZoom }}>
           {spaces.map((space) => (
@@ -4211,11 +4272,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             }}>
               <div className="space-heading"><strong className="space-label">{space}</strong>{canEdit && <span title={t("Estas medidas definen el lienzo visual; mantené la proporción del plano real", "These values define the visual canvas; preserve the real layout proportions", "Estas medidas definem a tela visual; mantenha a proporção do plano real")}><label>{t("Ancho", "Width", "Largura")}<input type="number" min="700" max="2400" value={spaceSizes[space]?.width || 1200} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: Number(event.target.value), height: current[space]?.height || 700 } }))} onBlur={(event) => void saveSpaceSize(space, Number(event.target.value), spaceSizes[space]?.height || 700)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min="480" max="1800" value={spaceSizes[space]?.height || 700} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: current[space]?.width || 1200, height: Number(event.target.value) } }))} onBlur={(event) => void saveSpaceSize(space, spaceSizes[space]?.width || 1200, Number(event.target.value))} /></label></span>}</div>
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedLayoutTableId(table.id); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
                   <strong>{table.name}</strong><small>{table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}</small>
-                  {canEdit && <div className="floor-table-actions"><button onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { locked: !table.locked }); }} aria-label={table.locked ? t("Desbloquear mesa", "Unlock table", "Desbloquear mesa") : t("Bloquear mesa", "Lock table", "Bloquear mesa")}>{table.locked ? "🔒" : "🔓"}</button><button disabled={table.locked} onClick={(event) => { event.stopPropagation(); void updateTableLayout(table, { rotation: ((table.rotation || 0) + 45) % 360 }); }} aria-label={t("Girar mesa", "Rotate table", "Girar mesa")}>↻</button><button onClick={(event) => { event.stopPropagation(); void duplicateTable(table); }} aria-label={`${t("Duplicar", "Duplicate", "Duplicar")} ${table.name}`}>⧉</button><button onClick={(event) => { event.stopPropagation(); void deleteTable(table.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${table.name}`}>×</button></div>}
-                  {canEdit && !table.locked && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
+                  {canEdit && !table.locked && selectedLayoutTableId === table.id && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
                 </article>
               ))}
               {floorElements.filter((element) => element.space === space).map((element) => <article className={`floor-element is-${element.kind}`} key={element.id} draggable={canEdit} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height }}>
@@ -4225,14 +4285,21 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             </div>
           ))}
             </div>
-            {selectedLayoutTableId && showFloorInspector && (() => { const selectedTable = tables.find((table) => table.id === selectedLayoutTableId); if (!selectedTable) return null; const occupied = selectedTable.guests.reduce((total, id) => { const guest = confirmedGuests.find((candidate) => candidate.id === id); return total + (guest ? confirmedPeopleForGuest(guest, guests) : 0); }, 0); const lastAssignedSeat = selectedTable.guests.reduce((lastSeat, guestId) => { const start = selectedTable.seatAssignments?.[guestId] || 0; const guest = confirmedGuests.find((candidate) => candidate.id === guestId); return start && guest ? Math.max(lastSeat, start + confirmedPeopleForGuest(guest, guests) - 1) : lastSeat; }, 0); const minimumCapacity = Math.max(1, occupied, lastAssignedSeat); return <aside className="floor-table-inspector">
+            {selectedLayoutTableId && showFloorInspector && (() => { const selectedTable = tables.find((table) => table.id === selectedLayoutTableId); if (!selectedTable) return null; const selectedTableGuests = selectedTable.guests.map((guestId) => confirmedGuests.find((guest) => guest.id === guestId)).filter(Boolean) as Guest[]; const occupied = selectedTableGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0); const selectedMenuSummary = new Map<string, number>(); selectedTableGuests.forEach((guest) => { if (meaningfulGuestValue(guest.menuChoice)) selectedMenuSummary.set(guest.menuChoice, (selectedMenuSummary.get(guest.menuChoice) || 0) + confirmedPeopleForGuest(guest, guests)); }); const selectedDietaryAlerts = selectedTableGuests.flatMap((guest) => [meaningfulGuestValue(guest.food) ? `${guest.name}: ${guest.food}` : "", ...guest.companions.filter((companion) => meaningfulGuestValue(companion.food)).map((companion) => `${companion.name || guest.name}: ${companion.food}`)]).filter(Boolean); const selectedAccessibilityAlerts = selectedTableGuests.filter((guest) => meaningfulGuestValue(guest.accessibilityNeeds)); const selectedSocialConflicts = socialConflicts.filter((conflict) => conflict.tableId === selectedTable.id); const lastAssignedSeat = selectedTable.guests.reduce((lastSeat, guestId) => { const start = selectedTable.seatAssignments?.[guestId] || 0; const guest = confirmedGuests.find((candidate) => candidate.id === guestId); return start && guest ? Math.max(lastSeat, start + confirmedPeopleForGuest(guest, guests) - 1) : lastSeat; }, 0); const minimumCapacity = Math.max(1, occupied, lastAssignedSeat); return <aside className="floor-table-inspector">
               <header><div><span>{t("Mesa seleccionada", "Selected table", "Mesa selecionada")}</span><strong>{selectedTable.name}</strong></div><button onClick={() => setSelectedLayoutTableId("")} aria-label={t("Cerrar inspector", "Close inspector", "Fechar inspetor")}>×</button></header>
-              <label>{t("Nombre de la mesa", "Table name", "Nome da mesa")}<input key={`${selectedTable.id}-${selectedTable.name}`} defaultValue={selectedTable.name} maxLength={120} onBlur={(event) => void renameTableInline(selectedTable, event.target.value)} /></label>
+              <label>{t("Nombre de la mesa", "Table name", "Nome da mesa")}<span className="table-name-save"><input value={layoutTableNameDraft || selectedTable.name} maxLength={120} onChange={(event) => setLayoutTableNameDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") void renameTableInline(selectedTable, layoutTableNameDraft || selectedTable.name); }} /><button disabled={saving || !(layoutTableNameDraft || "").trim() || layoutTableNameDraft.trim() === selectedTable.name} onClick={() => void renameTableInline(selectedTable, layoutTableNameDraft)}>{saving ? "…" : t("Guardar", "Save", "Salvar")}</button></span></label>
               <div className="floor-inspector-capacity"><span>{t("Ocupación", "Occupancy", "Ocupação")}</span><strong>{selectedTable.shape === "living" ? `${occupied} ${t("personas", "people", "pessoas")}` : `${occupied}/${selectedTable.capacity}`}</strong>{selectedTable.shape !== "living" && <><div className="capacity-stepper"><button disabled={saving || selectedTable.capacity <= minimumCapacity} onClick={() => void updateTableCapacityInline(selectedTable, selectedTable.capacity - 1)} aria-label={t("Quitar un lugar", "Remove one seat", "Remover um lugar")}>−</button><b>{selectedTable.capacity}</b><button disabled={saving || selectedTable.capacity >= 30} onClick={() => void updateTableCapacityInline(selectedTable, selectedTable.capacity + 1)} aria-label={t("Agregar un lugar", "Add one seat", "Adicionar um lugar")}>+</button></div><div className="capacity-bar"><i style={{ width: `${Math.min(100, (occupied / selectedTable.capacity) * 100)}%` }} /></div>{selectedTable.capacity <= minimumCapacity && <small className="capacity-minimum-note">⚠ {lastAssignedSeat > occupied ? t(`No podés reducir: el asiento ${lastAssignedSeat} está ocupado.`, `Cannot reduce: seat ${lastAssignedSeat} is occupied.`, `Não é possível reduzir: o assento ${lastAssignedSeat} está ocupado.`) : t(`No podés reducir: ya hay ${occupied} personas ubicadas.`, `Cannot reduce: ${occupied} people are already seated.`, `Não é possível reduzir: já há ${occupied} pessoas alocadas.`)}</small>}</>}</div>
-              <p className="floor-inspector-note">{selectedTable.note || t("Sin observaciones. Podés agregar una desde la edición completa.", "No notes. Add one from full settings.", "Sem observações. Adicione uma na edição completa.")}</p>
               <label>{t("Agregar invitado", "Add guest", "Adicionar convidado")}<select value="" disabled={!canEdit || saving || !unassigned.length} onChange={(event) => { if (event.target.value) void assignGuest(event.target.value, selectedTable.id); }}><option value="">{unassigned.length ? t("Elegir persona sin mesa…", "Choose an unseated guest…", "Escolher pessoa sem mesa…") : t("Todos tienen mesa", "Everyone has a table", "Todos têm mesa")}</option>{unassigned.map((guest) => { const people = confirmedPeopleForGuest(guest, guests); const free = selectedTable.shape === "living" ? Infinity : selectedTable.capacity - occupied; return <option key={guest.id} value={guest.id} disabled={people > free}>{guest.name} · {people} {people === 1 ? t("persona", "person", "pessoa") : t("personas", "people", "pessoas")}{people > free ? ` · ${t("sin lugar", "no room", "sem lugar")}` : ""}</option>; })}</select></label>
               {selectedTable.guests.length > 0 && <div className="floor-inspector-guests"><strong>{t("Personas en esta mesa", "Guests at this table", "Pessoas nesta mesa")}</strong>{selectedTable.guests.map((guestId) => { const guest = confirmedGuests.find((candidate) => candidate.id === guestId); return guest ? <span key={guest.id}>{guest.name}<button disabled={!canEdit || saving} onClick={() => void unassignGuest(guest.id)} aria-label={`${t("Quitar de la mesa", "Remove from table", "Remover da mesa")} ${guest.name}`}>×</button></span> : null; })}</div>}
-              <div className="floor-inspector-actions"><button onClick={() => void updateTableLayout(selectedTable, { locked: !selectedTable.locked })}>{selectedTable.locked ? `🔓 ${t("Desbloquear", "Unlock", "Desbloquear")}` : `🔒 ${t("Bloquear", "Lock", "Bloquear")}`}</button><button disabled={selectedTable.locked} onClick={() => void updateTableLayout(selectedTable, { rotation: ((selectedTable.rotation || 0) + 45) % 360 })}>↻ {t("Girar", "Rotate", "Girar")}</button><button onClick={() => void duplicateTable(selectedTable)}>⧉ {t("Duplicar", "Duplicate", "Duplicar")}</button><button onClick={() => openEdit(selectedTable)}>⚙ {t("Edición completa", "Full settings", "Edição completa")}</button></div>
+              <details className="floor-inspector-advanced">
+                <summary>{t("Opciones avanzadas", "Advanced options", "Opções avançadas")} <span>⌄</span></summary>
+                <div>
+                  <p className="floor-inspector-note">{selectedTable.note || t("Sin observaciones. Podés agregar una desde la edición completa.", "No notes. Add one from full settings.", "Sem observações. Adicione uma na edição completa.")}</p>
+                  {(selectedMenuSummary.size > 0 || selectedDietaryAlerts.length > 0 || selectedAccessibilityAlerts.length > 0 || selectedSocialConflicts.length > 0) && <section className="floor-inspector-operations"><strong>{t("Detalles para revisar", "Details to review", "Detalhes para revisar")}</strong>{[...selectedMenuSummary].map(([menu, count]) => <span key={menu}>🍽 {count}× {menu}</span>)}{selectedDietaryAlerts.map((alert) => <span className="is-alert" key={alert}>⚠ {alert}</span>)}{selectedAccessibilityAlerts.map((guest) => <span className="is-accessibility" key={guest.id}>♿ {guest.name}: {guest.accessibilityNeeds}</span>)}{selectedSocialConflicts.map((conflict) => <button key={conflict.id} onClick={() => focusSpecificTable(conflict.tableId)}>⚠ {conflict.message}</button>)}</section>}
+                  <div className="floor-inspector-actions"><button onClick={() => void updateTableLayout(selectedTable, { locked: !selectedTable.locked })}>{selectedTable.locked ? t("Desbloquear", "Unlock", "Desbloquear") : t("Bloquear", "Lock", "Bloquear")}</button><button disabled={selectedTable.locked} onClick={() => void updateTableLayout(selectedTable, { rotation: ((selectedTable.rotation || 0) + 45) % 360 })}>{t("Girar 45°", "Rotate 45°", "Girar 45°")}</button><button onClick={() => void duplicateTable(selectedTable)}>{t("Duplicar", "Duplicate", "Duplicar")}</button><button onClick={() => openEdit(selectedTable)}>{t("Edición completa", "Full settings", "Edição completa")}</button></div>
+                </div>
+              </details>
+              <button className="floor-inspector-delete" onClick={() => void deleteTable(selectedTable.id)}>{t("Eliminar mesa", "Delete table", "Excluir mesa")}</button>
               <small>{t("Consejo: hacé doble clic sobre una mesa para abrir directamente toda su configuración.", "Tip: double-click a table to open all its settings.", "Dica: dê dois cliques em uma mesa para abrir toda a configuração.")}</small>
             </aside>; })()}
           </div>
@@ -4426,17 +4493,19 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
         <section className={`tables-workspace ${mobileSeatingStep === "guests" ? "seating-mobile-hidden" : ""}`}>
           {canEdit && (
-            <div className="table-shape-tools" aria-label={t("Añadir mesas", "Add tables", "Adicionar mesas")}>
-              <strong>{t("Añadir mesa", "Add table", "Adicionar mesa")}</strong>
-              <button onClick={() => openNew("round")}><i className="shape-icon is-round" />{t("Redonda", "Round", "Redonda")}</button>
-              <button onClick={() => openNew("rectangular")}><i className="shape-icon is-rectangular" />{t("Rectangular", "Rectangular", "Retangular")}</button>
-              <button onClick={() => openNew("square")}><i className="shape-icon is-square" />{t("Cuadrada", "Square", "Quadrada")}</button>
-              <button onClick={() => openNew("living")}><i className="shape-icon is-living" />Living</button>
-            </div>
+            <details className="add-table-menu">
+              <summary>＋ {t("Añadir mesa", "Add table", "Adicionar mesa")} ▾</summary>
+              <div className="table-shape-tools" aria-label={t("Elegir forma de mesa", "Choose table shape", "Escolher formato da mesa")}>
+                <button onClick={() => openNew("round")}><i className="shape-icon is-round" /><span><strong>{t("Redonda", "Round", "Redonda")}</strong><small>{t("Distribución circular", "Circular seating", "Distribuição circular")}</small></span></button>
+                <button onClick={() => openNew("rectangular")}><i className="shape-icon is-rectangular" /><span><strong>{t("Rectangular", "Rectangular", "Retangular")}</strong><small>{t("Mesa alargada", "Long table", "Mesa alongada")}</small></span></button>
+                <button onClick={() => openNew("square")}><i className="shape-icon is-square" /><span><strong>{t("Cuadrada", "Square", "Quadrada")}</strong><small>{t("Distribución compacta", "Compact seating", "Distribuição compacta")}</small></span></button>
+                <button onClick={() => openNew("living")}><i className="shape-icon is-living" /><span><strong>Living</strong><small>{t("Zona flexible sin límite", "Flexible area without a limit", "Área flexível sem limite")}</small></span></button>
+              </div>
+            </details>
           )}
           <div className="workspace-heading">
             <div>
-              <h2>{t("Plano de mesas", "Table layout", "Plano de mesas")}</h2>
+              <div className="table-layout-title"><h2>{t("Plano de mesas", "Table layout", "Plano de mesas")}</h2><button className="help-circle context-tip" type="button" data-help={t("Verde: tiene lugares. Completa: no quedan lugares. Amarillo o rojo: requiere revisión. Los círculos alrededor de la mesa representan las sillas.", "Green: seats available. Full: no seats remain. Yellow or red: needs review. Circles around the table represent seats.", "Verde: há lugares. Completa: não há lugares. Amarelo ou vermelho: requer revisão. Os círculos ao redor da mesa representam assentos.")} aria-label={t("Cómo leer las mesas", "How to read tables", "Como ler as mesas")}>?</button></div>
               <p>
                 {t(
                   "La capacidad se calcula según las personas confirmadas de cada grupo.",
@@ -4447,12 +4516,17 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             </div>
             <div className="workspace-actions">
               <label className="table-search"><span>⌕</span><input value={tableQuery} onChange={(event) => setTableQuery(event.target.value)} placeholder={t("Buscar mesa o invitado…", "Search table or guest…", "Buscar mesa ou convidado…")} /></label>
-              <div className="table-navigation" aria-label={t("Recorrer mesas", "Browse tables", "Navegar mesas")}>
-                <button onClick={() => focusTable(-1)} disabled={!visibleTables.length} aria-label={t("Mesa anterior", "Previous table", "Mesa anterior")}>←</button>
-                <span>{visibleTables.length} {t("mesas", "tables", "mesas")}</span>
-                <button onClick={() => focusTable(1)} disabled={!visibleTables.length} aria-label={t("Mesa siguiente", "Next table", "Próxima mesa")}>→</button>
-              </div>
-              <button className={`outline-button compact view-density-toggle ${compactTables ? "active" : ""}`} onClick={() => setCompactTables((current) => !current)}>{compactTables ? t("Vista detallada", "Detailed view", "Vista detalhada") : t("Vista compacta", "Compact view", "Vista compacta")}</button>
+              <details className="workspace-view-menu">
+                <summary>{t("Vista", "View", "Vista")} ▾</summary>
+                <div>
+                  <span>{visibleTables.length} {t("mesas", "tables", "mesas")}</span>
+                  <nav className="table-navigation" aria-label={t("Recorrer mesas", "Browse tables", "Navegar mesas")}>
+                    <button onClick={() => focusTable(-1)} disabled={!visibleTables.length} aria-label={t("Mesa anterior", "Previous table", "Mesa anterior")}>← {t("Anterior", "Previous", "Anterior")}</button>
+                    <button onClick={() => focusTable(1)} disabled={!visibleTables.length} aria-label={t("Mesa siguiente", "Next table", "Próxima mesa")}>{t("Siguiente", "Next", "Próxima")} →</button>
+                  </nav>
+                  <button className={`view-density-toggle ${compactTables ? "active" : ""}`} onClick={() => setCompactTables((current) => !current)}>{compactTables ? t("Vista detallada", "Detailed view", "Vista detalhada") : t("Vista compacta", "Compact view", "Vista compacta")}</button>
+                </div>
+              </details>
               {lastAssignment && (
                 <button className="outline-button compact" onClick={undoLastAssignment}>
                   ↶ {t("Deshacer movimiento", "Undo move", "Desfazer movimento")}
@@ -4465,13 +4539,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           </div>
           {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${selectedSuggestion?.explicit ? `${t("junto a", "next to", "junto a")} ${selectedSuggestion.reason}` : t("junto a su grupo", "next to their group", "junto ao seu grupo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
           {tableQuery && <div className="active-table-filter"><span>{t("Resultados para", "Results for", "Resultados para")} “{tableQuery}”</span><button onClick={() => setTableQuery("")}>× {t("Limpiar", "Clear", "Limpar")}</button></div>}
-          <div className="table-status-legend" aria-label={t("Cómo leer el estado de las mesas", "How to read table status", "Como ler o estado das mesas")}>
-            <strong>{t("Cómo leer las mesas", "Reading table status", "Como ler as mesas")}</strong>
-            <span><i className="is-available" />{t("Con lugares", "Seats available", "Com lugares")}</span>
-            <span><i className="is-full" />{t("Completa", "Full", "Completa")}</span>
-            <span><i className="is-alert" />{t("Requiere revisión", "Needs review", "Requer revisão")}</span>
-            <small>{t("Los círculos alrededor de la mesa son sillas. El número identifica el asiento y las iniciales muestran quién lo ocupa.", "Circles around the table are seats. The number identifies the seat and initials show who occupies it.", "Os círculos ao redor da mesa são assentos. O número identifica o lugar e as iniciais mostram quem o ocupa.")}</small>
-          </div>
           <div className={`tables-grid ${compactTables ? "is-compact" : ""}`}>
             {!visibleTables.length && <div className="tables-empty-state"><strong>{t("No encontramos mesas", "No tables found", "Nenhuma mesa encontrada")}</strong><span>{t("Probá con otro nombre de mesa o invitado.", "Try another table or guest name.", "Tente outro nome de mesa ou convidado.")}</span><button onClick={() => setTableQuery("")}>{t("Ver todas las mesas", "View all tables", "Ver todas as mesas")}</button></div>}
             {visibleTables.map((table) => {
@@ -4487,15 +4554,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               const remaining = table.capacity - occupied;
               const full = !isLiving && remaining === 0;
               const over = !isLiving && remaining < 0;
-              const menuSummary = new Map<string, number>();
-              tableGuests.forEach((guest) => {
-                if (!meaningfulGuestValue(guest.menuChoice)) return;
-                menuSummary.set(
-                  guest.menuChoice,
-                  (menuSummary.get(guest.menuChoice) || 0) +
-                    confirmedPeopleForGuest(guest, guests),
-                );
-              });
               const dietaryAlerts = tableGuests.flatMap((guest) => [
                 ...(meaningfulGuestValue(guest.food)
                   ? [{ id: guest.id, name: guest.name, food: guest.food }]
@@ -4588,10 +4646,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                     <span className="table-number">{index + 1}</span>
                     <div>
                       <h3>{table.name}</h3>
-                      <p>
-                        {table.note ||
-                          t("Sin observaciones", "No notes", "Sem observações")}
-                      </p>
                     </div>
                     {canEdit && (
                       <button
@@ -4605,19 +4659,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   </div>
                   <div className={`table-health is-${over ? "over" : tableNeedsReview ? "review" : full ? "full" : isLiving ? "living" : "available"}`}>
                     <span><i />{tableStatusLabel}</span>
-                    <small>{isLiving
-                      ? t("Espacio informal sin sillas ni límite de capacidad.", "Informal area without numbered seats or a capacity limit.", "Espaço informal sem assentos numerados nem limite de capacidade.")
-                      : over
-                        ? t("Mové personas a otra mesa para evitar un sobrecupo.", "Move people to another table to remove the overcapacity.", "Mova pessoas para outra mesa para eliminar o excesso de capacidade.")
-                        : tableSocialConflicts.length
-                          ? t("Hay una preferencia de ubicación que necesita atención.", "A seating preference needs attention.", "Há uma preferência de lugar que precisa de atenção.")
-                          : dietaryAlerts.length || accessibilityAlerts.length
-                            ? t("La capacidad está bien; revisá las necesidades operativas.", "Capacity is fine; review operational needs.", "A capacidade está correta; revise as necessidades operacionais.")
-                            : full
-                              ? t("Todos los lugares de esta mesa están ocupados.", "Every seat at this table is occupied.", "Todos os lugares desta mesa estão ocupados.")
-                              : occupied === 0
-                                ? t("Todavía no asignaste personas a esta mesa.", "No one has been assigned to this table yet.", "Ainda não há pessoas atribuídas a esta mesa.")
-                                : t("Podés seguir asignando personas o elegir sillas específicas.", "You can keep assigning people or choose specific seats.", "Você pode continuar atribuindo pessoas ou escolher assentos específicos.")}</small>
                   </div>
                   <div className="capacity-row">
                     <span>
@@ -4640,7 +4681,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       }}
                     />
                   </div>}
-                  {tableSocialConflicts.length > 0 && <div className="table-social-conflicts" aria-label={t("Conflictos sociales", "Social conflicts", "Conflitos sociais")}>{tableSocialConflicts.map((conflict) => <button key={conflict.id} onClick={() => focusSpecificTable(conflict.tableId)}>⚠ {conflict.message}</button>)}</div>}
                   {!isLiving && <div className={`table-seat-map is-${table.shape || "round"}`}>
                     <div className="table-surface"><strong>{table.name}</strong></div>
                     {Array.from({ length: table.capacity }, (_, seatIndex) => {
@@ -4679,19 +4719,6 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                       );
                     })}
                   </div>}
-                  {(menuSummary.size > 0 || dietaryAlerts.length > 0 || accessibilityAlerts.length > 0) && (
-                    <div className="table-operations" aria-label={t("Datos operativos", "Operational details", "Dados operacionais")}>
-                      {[...menuSummary].map(([menu, count]) => (
-                        <span key={menu} title={menu}>🍽 {count}× {menu}</span>
-                      ))}
-                      {dietaryAlerts.map((alert) => (
-                        <span className="is-alert" key={`food-${alert.id}`} title={`${alert.name}: ${alert.food}`}>⚠ {alert.name}: {alert.food}</span>
-                      ))}
-                      {accessibilityAlerts.map((guest) => (
-                        <span className="is-accessibility" key={`access-${guest.id}`} title={`${guest.name}: ${guest.accessibilityNeeds}`}>♿ {guest.name}: {guest.accessibilityNeeds}</span>
-                      ))}
-                    </div>
-                  )}
                   <div className="seated-guests">
                     {tableGuests.map((guest) => {
                       const people = confirmedPeopleForGuest(guest, guests);

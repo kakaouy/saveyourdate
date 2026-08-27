@@ -27,6 +27,16 @@ test('el constructor divide el formulario en un recorrido guiado', () => {
   assert.match(builder, /Ir a corregir →/);
 });
 
+test('el constructor distingue pasos opcionales y permite probar como invitado', () => {
+  assert.match(builder, /icon: '▣', optional: true/);
+  assert.match(builder, /icon: '＋', optional: true/);
+  assert.match(builder, /Podés omitirlo y volver después/);
+  assert.match(builder, /Probar como invitado/);
+  assert.match(builder, /builder-guest-preview-backdrop/);
+  assert.match(builder, /Esta prueba no guarda respuestas ni envía mensajes/);
+  assert.match(builder, /Modo de prueba · sin datos reales/);
+});
+
 test('los recordatorios permiten selección y envío de emails en lote', () => {
   assert.match(admin, /selectedReminderIds/);
   assert.match(admin, /const emailSelectedReminders = async/);

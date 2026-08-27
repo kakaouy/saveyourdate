@@ -304,13 +304,17 @@ async function handler(request: Request) {
       const rows = await response.json() as TableRow[];
       if (!rows[0]) return json({ error: 'No encontramos esa mesa.' }, 404);
       if (currentTable.name !== rows[0].name) {
-        await supabaseRequest(
-          `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&preferred_table_name=eq.${encodeURIComponent(currentTable.name)}`,
-          {
-            method: 'PATCH',
-            body: JSON.stringify({ preferred_table_name: rows[0].name, updated_at: new Date().toISOString() }),
-          },
-        );
+        try {
+          await supabaseRequest(
+            `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&preferred_table_name=eq.${encodeURIComponent(currentTable.name)}`,
+            {
+              method: 'PATCH',
+              body: JSON.stringify({ preferred_table_name: rows[0].name, updated_at: new Date().toISOString() }),
+            },
+          );
+        } catch (preferenceError) {
+          console.error('Table renamed but preferred table references could not be synchronized.', preferenceError);
+        }
       }
       await logAdminActivity(session, 'table.updated', 'table', rows[0].id, { name: rows[0].name, capacity: rows[0].capacity });
       return json({ table: clientTable(rows[0]) });
