@@ -628,6 +628,9 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
 .form-grid .form-span-2 { grid-column: 1 / -1; }
 .form-grid textarea { width: 100%; resize: vertical; }
+.social-circle-field { display: grid; gap: 8px; }
+.modal .social-circle-field select { height: 50px; padding-inline: 15px; border-radius: 10px; font-size: 12px; font-weight: 650; }
+.modal .social-circle-field select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(10,171,176,.12); outline: none; }
 .modal-actions { position: sticky; bottom: -28px; z-index: 2; display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; padding: 14px 0 28px; background: white; }
 .modal-actions .primary-button { width: auto; }
 .modal select { width: 100%; height: 39px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: white; font-size: 10px; }
@@ -796,8 +799,39 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .group-search-results label { display: grid; gap: 7px; padding: 9px; border-radius: 8px; background: white; }
 .group-search-results label > span { display: grid; gap: 2px; }
 .group-search-results b { color: var(--ink); font-size: 10px; }
+.group-search-results em { width: fit-content; padding: 2px 5px; border-radius: 999px; color: var(--teal-dark); background: var(--mint); font-size: 7px; font-style: normal; font-weight: 800; }
 .group-search-results small { color: var(--muted); font-size: 8px; }
 .group-search-results select { width: 100%; min-height: 36px; padding-inline: 8px; border: 1px solid #cdb4dd; border-radius: 8px; color: #56366f; background: white; font-size: 9px; font-weight: 750; }
+.manage-circles-button { width: 100%; min-height: 32px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--teal-dark); background: white; font-size: 8px; font-weight: 800; cursor: pointer; }
+.seating-final-review { margin: 8px 0 10px; border: 1px solid var(--line); border-radius: 10px; background: white; }
+.seating-final-review summary { display: grid; grid-template-columns: 22px auto 1fr; gap: 7px; align-items: center; min-height: 38px; padding: 7px 10px; cursor: pointer; list-style: none; }
+.seating-final-review summary::-webkit-details-marker { display: none; }
+.seating-final-review summary > span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #227256; background: #e3f5ed; font-size: 9px; }
+.seating-final-review.has-warnings summary > span { color: #8b6212; background: #fff0c9; }
+.seating-final-review summary strong { color: var(--ink); font-size: 10px; }
+.seating-final-review summary small { color: var(--muted); font-size: 8px; text-align: right; }
+.seating-final-review > div { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 5px; padding: 0 8px 8px; }
+.seating-final-review button { display: grid; grid-template-columns: auto 1fr; gap: 5px; align-items: center; min-height: 34px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: #f8fafb; text-align: left; cursor: pointer; }
+.seating-final-review button b { color: var(--ink); font-size: 11px; }
+.seating-final-review button span { font-size: 7px; line-height: 1.2; }
+.seating-final-review button.has-issue { color: #8b6212; border-color: #efd39a; background: #fff9e9; }
+.floor-social-connectors { position: absolute; inset: 0; z-index: 0; overflow: visible; pointer-events: none; }
+.floor-social-connectors line { stroke: rgba(10,171,176,.42); stroke-width: 3; stroke-dasharray: 8 7; }
+.floor-table, .floor-element, .space-heading { z-index: 1; }
+.social-circle-manager { width: min(100%,720px); }
+.social-circle-manager > p { margin: -12px 0 18px; color: var(--muted); font-size: 10px; }
+.social-circle-manager-list { display: grid; gap: 9px; }
+.social-circle-manager-list article { display: grid; grid-template-columns: minmax(130px,.8fr) minmax(220px,1fr) minmax(260px,1.2fr); gap: 8px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: #fbfcfd; }
+.social-circle-manager-list header div { display: grid; gap: 3px; }
+.social-circle-manager-list header strong { color: var(--ink); font-size: 11px; }
+.social-circle-manager-list header small { color: var(--muted); font-size: 8px; }
+.social-circle-manager-list form { display: flex; gap: 5px; margin: 0; }
+.social-circle-manager-list :is(input,select) { min-width: 0; height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 7px; background: white; font-size: 9px; }
+.social-circle-manager-list input { width: 100%; }
+.social-circle-manager-list select { flex: 1; }
+.social-circle-manager-list button { min-height: 34px; padding: 4px 8px; border: 1px solid #b8d9db; border-radius: 7px; color: var(--teal-dark); background: white; font-size: 8px; font-weight: 800; cursor: pointer; }
+.social-circle-manager-list .clear-circle { color: #9a403a; border-color: #ecc9c6; }
+.social-circle-manager-empty { padding: 24px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); text-align: center; }
 .table-seat-map.is-living .table-surface { width: 68%; height: 38%; border: 3px solid #8d67b1; border-bottom-width: 10px; border-radius: 18px 18px 7px 7px; background: linear-gradient(145deg,#f4e8f5,#e7d8ed); }
 .floor-table.is-living .floor-table-shape { border-radius: 18px 18px 6px 6px; border-bottom-width: 12px; border-color: #8d67b1; background: #f4e8f5; }
 .workspace-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin: 3px 2px 14px; }
@@ -1295,6 +1329,10 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .page-heading .seating-heading-controls { width: 100%; }
 }
 @media (max-width: 620px) {
+  .seating-final-review > div { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .social-circle-manager-list article { grid-template-columns: 1fr; }
+  .social-circle-manager-list form { flex-wrap: wrap; }
+  .social-circle-manager-list :is(input,select) { flex: 1 1 150px; }
   .seating-heading-controls .heading-actions { grid-template-columns: 1fr; }
   .seating-mode-tabs button { min-height: 38px; padding: 7px 9px; font-size: 11px; }
   .seating-summary { grid-template-columns: 1fr; }

@@ -1397,7 +1397,7 @@ function Guests({
   const [filter, setFilter] = useState("Todos");
   const [sortBy, setSortBy] = useState<"name" | "group" | "food" | "status">("name");
   const [selected, setSelected] = useState<string[]>([]);
-  const [bulkField, setBulkField] = useState<"status" | "group" | "invitedBy" | "guestType" | "transportOption" | "menuChoice" | "food" | "socialTogetherWith" | "socialSeparateFrom" | "preferredTableName">("invitedBy");
+  const [bulkField, setBulkField] = useState<"status" | "group" | "socialCircle" | "invitedBy" | "guestType" | "transportOption" | "menuChoice" | "food" | "socialTogetherWith" | "socialSeparateFrom" | "preferredTableName">("invitedBy");
   const [bulkValue, setBulkValue] = useState(defaultInviter);
   const bulkAllowsEmpty = ["transportOption", "menuChoice", "food", "socialTogetherWith", "socialSeparateFrom", "preferredTableName"].includes(bulkField);
   const [showImportHelp, setShowImportHelp] = useState(false);
@@ -1418,7 +1418,15 @@ function Guests({
     suggestedIdentification(defaultPhoneCountryCode),
   );
   const [customGuestCode, setCustomGuestCode] = useState("");
+  const [newCustomSocialCircle, setNewCustomSocialCircle] = useState(false);
+  const [editCustomSocialCircle, setEditCustomSocialCircle] = useState(false);
   const importInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!showModal) setNewCustomSocialCircle(false);
+  }, [showModal]);
+  useEffect(() => {
+    if (!editingGuest) setEditCustomSocialCircle(false);
+  }, [editingGuest]);
   const activeGuests = guests.filter((guest) => !guest.archivedAt);
   const archivedInvitations = guests.length - activeGuests.length;
   const confirmedPeople = confirmedPeopleTotal(activeGuests);
@@ -1426,6 +1434,17 @@ function Guests({
   const declinedInvitations = activeGuests.filter((guest) => guest.status === "No asiste").length;
   const hasGuestRestriction = guestHasRestriction;
   const dietaryInvitations = activeGuests.filter(hasGuestRestriction).length;
+  const defaultGuestSocialCircles = [
+    "Amigos",
+    "Facultad",
+    "Trabajo",
+    "Colegio",
+    "Familia",
+    "Club",
+  ];
+  const customGuestSocialCircles = [...new Set(guests.map((guest) => guest.socialCircle.trim()).filter((circle) => circle && !defaultGuestSocialCircles.includes(circle)))]
+    .sort((left, right) => left.localeCompare(right, language, { sensitivity: "base" }));
+  const guestSocialCircleOptions = [...defaultGuestSocialCircles, ...customGuestSocialCircles];
   const unsentInvitations = activeGuests.filter(
     (guest) => guest.status === "Pendiente" && !guest.invitationSentAt,
   ).length;
@@ -2771,12 +2790,14 @@ function Guests({
               <label>
                 {t("Círculo social", "Social circle", "Círculo social")}
                 <small className="field-help">{t("Ayuda a sentar juntas a personas afines y a acercar sus mesas.", "Helps seat related people together and keep their tables nearby.", "Ajuda a sentar pessoas próximas juntas e manter suas mesas perto.")}</small>
-                <input
-                  name="socialCircle"
-                  list="guest-circle-options"
-                  placeholder={t("Ej. Familia, Facultad o Trabajo", "E.g. Family, College or Work", "Ex. Família, Faculdade ou Trabalho")}
-                />
-                <datalist id="guest-circle-options">{[...new Set(guests.map((guest) => guest.socialCircle).filter(Boolean))].map((circle) => <option key={circle} value={circle} />)}</datalist>
+                <span className="social-circle-field">
+                  <select name={newCustomSocialCircle ? undefined : "socialCircle"} defaultValue="" onChange={(event) => setNewCustomSocialCircle(event.target.value === "__custom__")}>
+                    <option value="">{t("Sin círculo social", "No social circle", "Sem círculo social")}</option>
+                    {guestSocialCircleOptions.map((circle) => <option key={circle} value={circle}>{circle}</option>)}
+                    <option value="__custom__">＋ {t("Agregar otro círculo…", "Add another circle…", "Adicionar outro círculo…")}</option>
+                  </select>
+                  {newCustomSocialCircle && <input name="socialCircle" autoFocus placeholder={t("Ej. Amigos del novio", "E.g. Groom's friends", "Ex. Amigos do noivo")} />}
+                </span>
               </label>
               <label>
                 {t("País de WhatsApp", "WhatsApp country", "País do WhatsApp")}
@@ -2959,8 +2980,14 @@ function Guests({
               <label>
                 {t("Círculo social", "Social circle", "Círculo social")}
                 <small className="field-help">{t("Se usa para sugerir la misma mesa o una mesa cercana.", "Used to suggest the same table or a nearby table.", "Usado para sugerir a mesma mesa ou uma mesa próxima.")}</small>
-                <input name="socialCircle" list="edit-guest-circle-options" defaultValue={editingGuest.socialCircle} />
-                <datalist id="edit-guest-circle-options">{[...new Set(guests.map((guest) => guest.socialCircle).filter(Boolean))].map((circle) => <option key={circle} value={circle} />)}</datalist>
+                <span className="social-circle-field">
+                  <select name={editCustomSocialCircle ? undefined : "socialCircle"} defaultValue={editingGuest.socialCircle || ""} onChange={(event) => setEditCustomSocialCircle(event.target.value === "__custom__")}>
+                    <option value="">{t("Sin círculo social", "No social circle", "Sem círculo social")}</option>
+                    {guestSocialCircleOptions.map((circle) => <option key={circle} value={circle}>{circle}</option>)}
+                    <option value="__custom__">＋ {t("Agregar otro círculo…", "Add another circle…", "Adicionar outro círculo…")}</option>
+                  </select>
+                  {editCustomSocialCircle && <input name="socialCircle" autoFocus placeholder={t("Ej. Amigos de los padres", "E.g. Parents' friends", "Ex. Amigos dos pais")} />}
+                </span>
               </label>
               <label>
                 {t("Categoría", "Category", "Categoria")}
@@ -3321,7 +3348,7 @@ type FloorElement = {
   rotation?: number;
 };
 
-function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
+function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: React.Dispatch<React.SetStateAction<Guest[]>>; canEdit: boolean }) {
   const { text: t } = useAdminI18n();
   const confirmedGuests = guests.filter(
     (guest) => guest.status === "Confirmado",
@@ -3376,6 +3403,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "teen" | "child">("all");
   const [guestRestrictionFilter, setGuestRestrictionFilter] = useState(false);
   const [socialCircleFilter, setSocialCircleFilter] = useState("");
+  const [showSocialCircleManager, setShowSocialCircleManager] = useState(false);
+  const [socialCircleSaving, setSocialCircleSaving] = useState("");
   const [lastAssignment, setLastAssignment] = useState<{
     guestId: string;
     fromTableId: string;
@@ -3408,15 +3437,28 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const guest = confirmedGuests.find((candidate) => candidate.id === id);
     return total + (guest ? confirmedPeopleForGuest(guest, guests) : 0);
   }, 0) > table.capacity);
-  const matchingGroups = socialCircleFilter
+  const matchingInvitationGroups = query.trim()
+    ? [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
+      .filter((group) => normalizedReference(group).includes(normalizedReference(query)))
+      .sort((a, b) => a.localeCompare(b))
+    : [];
+  const matchingSocialCircles = socialCircleFilter
     ? [socialCircleFilter]
     : query.trim()
       ? [...new Set(confirmedGuests.map((guest) => guest.socialCircle.trim()).filter(Boolean))]
-        .filter((group) => normalizedReference(group).includes(normalizedReference(query)))
+        .filter((circle) => normalizedReference(circle).includes(normalizedReference(query)))
         .sort((a, b) => a.localeCompare(b))
       : [];
+  const matchingSeatingCollections = [
+    ...matchingInvitationGroups.map((value) => ({ kind: "group" as const, value })),
+    ...matchingSocialCircles.map((value) => ({ kind: "socialCircle" as const, value })),
+  ];
   const socialCircleOptions = [...new Set(confirmedGuests.map((guest) => guest.socialCircle.trim()).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b));
+  const socialCircleStats = socialCircleOptions.map((circle) => {
+    const members = guests.filter((guest) => normalizedReference(guest.socialCircle) === normalizedReference(circle));
+    return { circle, invitations: members.length, people: members.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0) };
+  }).sort((left, right) => right.people - left.people || left.circle.localeCompare(right.circle));
   const visibleTables = tables.filter((table) => {
     const guestTerms = table.guests.map((id) => { const guest = guests.find((item) => item.id === id); return guest ? `${guest.name} ${guest.group} ${guest.socialCircle}` : ""; }).join(" ");
     return `${table.name} ${guestTerms}`.toLowerCase().includes(tableQuery.toLowerCase());
@@ -3477,35 +3519,55 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     });
     return [...conflicts.values()];
   })();
+  const splitInvitationGroups = [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))].filter((group) => {
+    const memberIds = new Set(confirmedGuests.filter((guest) => normalizedReference(guest.group) === normalizedReference(group)).map((guest) => guest.id));
+    return tables.filter((table) => table.guests.some((id) => memberIds.has(id))).length > 1;
+  });
+  const normalizedTableNames = tables.map((table) => normalizedReference(table.name)).filter(Boolean);
+  const duplicateTableNames = [...new Set(normalizedTableNames.filter((name, index) => normalizedTableNames.indexOf(name) !== index))];
+  const unnamedTables = tables.filter((table) => !table.name.trim());
+  const dispersedCircleConflicts = socialConflicts.filter((conflict) => conflict.id.startsWith("circle-distance-"));
+  const confirmedRestrictions = confirmedGuests.filter(guestHasRestriction).length;
+  const reviewIssueCount = unassigned.length + splitInvitationGroups.length + dispersedCircleConflicts.length + overCapacityTables.length + unnamedTables.length + duplicateTableNames.length;
 
   const focusSpecificTable = (tableId: string) => document.getElementById(`table-card-${tableId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
   const exportSocialConflicts = () => exportCsv("conflictos-de-mesas.csv", [t("Mesa", "Table", "Mesa"), t("Conflicto", "Conflict", "Conflito")], socialConflicts.map((conflict) => [tables.find((table) => table.id === conflict.tableId)?.name || "—", conflict.message]));
   const suggestedTableForGuest = (guest: Guest) => {
     const explicitMatches = findSocialReferences(guest.socialTogetherWith, guest.id);
     const explicitTable = tables.find((table) => table.guests.some((guestId) => explicitMatches.some((match) => match.id === guestId)));
-    if (explicitTable) return { table: explicitTable, reason: guest.socialTogetherWith, explicit: true, nearby: false };
-    const normalizedGroup = normalizedReference(guest.socialCircle);
-    if (!normalizedGroup) return null;
+    if (explicitTable) return { table: explicitTable, reason: guest.socialTogetherWith, basis: "explicit" as const, nearby: false };
     const people = confirmedPeopleForGuest(guest, guests);
-    const circleTables = tables.filter((table) => table.guests.some((guestId) => {
-      const seatedGuest = guests.find((candidate) => candidate.id === guestId);
-      return seatedGuest && seatedGuest.id !== guest.id && normalizedReference(seatedGuest.socialCircle) === normalizedGroup;
-    }));
     const availableCapacity = (table: EventTable) => table.shape === "living" || table.capacity - table.guests.reduce((total, guestId) => {
       const seatedGuest = confirmedGuests.find((candidate) => candidate.id === guestId);
       return total + (seatedGuest ? confirmedPeopleForGuest(seatedGuest, guests) : 0);
     }, 0) >= people;
+    const normalizedInvitationGroup = normalizedReference(guest.group);
+    if (normalizedInvitationGroup) {
+      const invitationGroupTable = tables
+        .filter((table) => availableCapacity(table) && table.guests.some((guestId) => {
+          const seatedGuest = guests.find((candidate) => candidate.id === guestId);
+          return seatedGuest && seatedGuest.id !== guest.id && normalizedReference(seatedGuest.group) === normalizedInvitationGroup;
+        }))
+        .sort((left, right) => right.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.group || "") === normalizedInvitationGroup).length - left.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.group || "") === normalizedInvitationGroup).length)[0];
+      if (invitationGroupTable) return { table: invitationGroupTable, reason: guest.group, basis: "group" as const, nearby: false };
+    }
+    const normalizedGroup = normalizedReference(guest.socialCircle);
+    if (!normalizedGroup) return null;
+    const circleTables = tables.filter((table) => table.guests.some((guestId) => {
+      const seatedGuest = guests.find((candidate) => candidate.id === guestId);
+      return seatedGuest && seatedGuest.id !== guest.id && normalizedReference(seatedGuest.socialCircle) === normalizedGroup;
+    }));
     const sameCircleTable = circleTables
       .filter(availableCapacity)
       .sort((left, right) => right.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.socialCircle || "") === normalizedGroup).length - left.guests.filter((id) => normalizedReference(guests.find((item) => item.id === id)?.socialCircle || "") === normalizedGroup).length)[0];
-    if (sameCircleTable) return { table: sameCircleTable, reason: guest.socialCircle, explicit: false, nearby: false };
+    if (sameCircleTable) return { table: sameCircleTable, reason: guest.socialCircle, basis: "circle" as const, nearby: false };
     const nearbyTable = tables
       .filter((table) => !circleTables.includes(table) && availableCapacity(table) && circleTables.some((circleTable) => circleTable.space === table.space))
       .sort((left, right) => {
         const distance = (table: EventTable) => Math.min(...circleTables.map((circleTable) => Math.hypot((table.x || 0) - (circleTable.x || 0), (table.y || 0) - (circleTable.y || 0))));
         return distance(left) - distance(right);
       })[0];
-    return nearbyTable ? { table: nearbyTable, reason: guest.socialCircle, explicit: false, nearby: true } : null;
+    return nearbyTable ? { table: nearbyTable, reason: guest.socialCircle, basis: "circle" as const, nearby: true } : null;
   };
   const selectedGuest = confirmedGuests.find((guest) => guest.id === selectedGuestId);
   const explicitTogetherGuests = selectedGuest ? findSocialReferences(selectedGuest.socialTogetherWith, selectedGuest.id) : [];
@@ -3514,7 +3576,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const seatedExplicitTargetIds = suggestedGroupTable ? explicitTogetherGuests.filter((guest) => suggestedGroupTable.guests.includes(guest.id)).map((guest) => guest.id) : [];
   const suggestedTargetIds = seatedExplicitTargetIds.length
     ? seatedExplicitTargetIds
-    : selectedGuest && suggestedGroupTable ? confirmedGuests.filter((guest) => guest.id !== selectedGuest.id && suggestedGroupTable.guests.includes(guest.id) && normalizedReference(guest.socialCircle) === normalizedReference(selectedGuest.socialCircle)).map((guest) => guest.id) : [];
+    : selectedGuest && suggestedGroupTable ? confirmedGuests.filter((guest) => guest.id !== selectedGuest.id && suggestedGroupTable.guests.includes(guest.id) && (selectedSuggestion?.basis === "group" ? normalizedReference(guest.group) === normalizedReference(selectedGuest.group) : normalizedReference(guest.socialCircle) === normalizedReference(selectedGuest.socialCircle))).map((guest) => guest.id) : [];
 
   const focusTable = (direction: -1 | 1) => {
     if (!visibleTables.length) return;
@@ -3744,12 +3806,42 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
 
   const unassignGuest = (guestId: string) => assignGuest(guestId, "");
 
-  const assignGroup = async (groupName: string, tableId: string) => {
-    const groupGuests = confirmedGuests.filter(
-      (guest) => normalizedReference(guest.socialCircle) === normalizedReference(groupName),
+  const updateSocialCircleMembers = async (sourceCircle: string, targetCircle: string) => {
+    const ids = guests.filter((guest) => normalizedReference(guest.socialCircle) === normalizedReference(sourceCircle)).map((guest) => guest.id);
+    const normalizedTarget = targetCircle.trim().slice(0, 120);
+    if (!ids.length || normalizedReference(sourceCircle) === normalizedReference(normalizedTarget)) return;
+    setSocialCircleSaving(sourceCircle);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "bulk-update", ids, socialCircle: normalizedTarget }),
+      });
+      const result = await readApiJson<{ guests?: Guest[]; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
+      if (!response.ok || !result.guests) throw new Error(result.error || t("No pudimos actualizar el círculo.", "Could not update the circle.", "Não foi possível atualizar o círculo."));
+      const updated = new Map(result.guests.map((guest) => [guest.id, guest]));
+      setGuests((current) => current.map((guest) => updated.get(guest.id) || guest));
+      if (normalizedReference(socialCircleFilter) === normalizedReference(sourceCircle)) setSocialCircleFilter(normalizedTarget);
+      setAssignmentStatus("saved");
+    } catch (circleError) {
+      setError(circleError instanceof Error ? circleError.message : t("No pudimos actualizar el círculo.", "Could not update the circle.", "Não foi possível atualizar o círculo."));
+    } finally {
+      setSocialCircleSaving("");
+    }
+  };
+
+  const assignCollection = async (kind: "group" | "socialCircle", collectionName: string, tableId: string) => {
+    const directGuests = confirmedGuests.filter(
+      (guest) => normalizedReference(guest[kind]) === normalizedReference(collectionName),
     );
-    if (!groupGuests.length || !tableId) return;
-    setGroupAssignmentSaving(groupName);
+    const protectedInvitationGroups = new Set(directGuests.map((guest) => normalizedReference(guest.group)).filter(Boolean));
+    const collectionGuests = kind === "socialCircle"
+      ? confirmedGuests.filter((guest) => directGuests.some((member) => member.id === guest.id) || protectedInvitationGroups.has(normalizedReference(guest.group)))
+      : directGuests;
+    if (!collectionGuests.length || !tableId) return;
+    const savingKey = `${kind}:${collectionName}`;
+    setGroupAssignmentSaving(savingKey);
     setAssignmentStatus("saving");
     setError("");
     try {
@@ -3758,13 +3850,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "assign-batch",
-          assignments: groupGuests.map((guest) => ({ guestId: guest.id, tableId })),
+          assignments: collectionGuests.map((guest) => ({ guestId: guest.id, tableId })),
         }),
       });
       const result = (await response.json()) as { error?: string };
       if (!response.ok)
         throw new Error(result.error || t("No pudimos ubicar el grupo completo.", "Could not seat the entire group.", "Não foi possível alocar o grupo completo."));
-      const groupIds = new Set(groupGuests.map((guest) => guest.id));
+      const groupIds = new Set(collectionGuests.map((guest) => guest.id));
       setTables((current) => current.map((table) => ({
         ...table,
         guests: table.id === tableId
@@ -3773,7 +3865,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
         seatAssignments: Object.fromEntries(Object.entries(table.seatAssignments || {}).filter(([id]) => !groupIds.has(id))),
       })));
       setAssignmentStatus("saved");
-      setTableQuery(groupName);
+      setTableQuery(collectionName);
       setMobileSeatingStep("tables");
       window.setTimeout(() => setAssignmentStatus((current) => current === "saved" ? "idle" : current), 1800);
     } catch (groupError) {
@@ -4452,6 +4544,11 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             }}>
               {floorDropTarget === space && draggedNewFloorElement && <span className="floor-drop-message">＋ {t(`Soltá para agregar ${draggedNewFloorElement.label}`, `Drop to add ${draggedNewFloorElement.label}`, `Solte para adicionar ${draggedNewFloorElement.label}`)}</span>}
               <div className="space-heading"><strong className="space-label">{space}</strong>{canEdit && <span title={t("Estas medidas definen el lienzo visual; mantené la proporción del plano real", "These values define the visual canvas; preserve the real layout proportions", "Estas medidas definem a tela visual; mantenha a proporção do plano real")}><label>{t("Ancho", "Width", "Largura")}<input type="number" min="700" max="2400" value={spaceSizes[space]?.width || 1200} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: Number(event.target.value), height: current[space]?.height || 700 } }))} onBlur={(event) => void saveSpaceSize(space, Number(event.target.value), spaceSizes[space]?.height || 700)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min="480" max="1800" value={spaceSizes[space]?.height || 700} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: current[space]?.width || 1200, height: Number(event.target.value) } }))} onBlur={(event) => void saveSpaceSize(space, spaceSizes[space]?.width || 1200, Number(event.target.value))} /></label></span>}</div>
+              {socialCircleFilter && (() => {
+                const linkedTables = tables.filter((table) => (table.space || "Espacio 1") === space && table.guests.some((guestId) => normalizedReference(confirmedGuests.find((guest) => guest.id === guestId)?.socialCircle || "") === normalizedReference(socialCircleFilter)));
+                const origin = linkedTables[0];
+                return origin && linkedTables.length > 1 ? <svg className="floor-social-connectors" width="100%" height="100%" aria-label={`${t("Proximidad del círculo", "Circle proximity", "Proximidade do círculo")} ${socialCircleFilter}`}>{linkedTables.slice(1).map((table) => <line key={`${origin.id}-${table.id}`} x1={(origin.x || 24) + (origin.width || 140) / 2} y1={(origin.y || 24) + (origin.height || 70) / 2} x2={(table.x || 24) + (table.width || 140) / 2} y2={(table.y || 24) + (table.height || 70) / 2} />)}</svg> : null;
+              })()}
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
                 <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""} ${socialCircleFilter && table.guests.some((guestId) => normalizedReference(confirmedGuests.find((guest) => guest.id === guestId)?.socialCircle || "") === normalizedReference(socialCircleFilter)) ? "has-social-circle" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
@@ -4528,18 +4625,20 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             <span className="count-badge">{confirmedGuests.length}</span>
           </div>
           <div className="guest-assign-list">
-            <label className="search seating-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado o grupo…", "Search guest or group…", "Buscar convidado ou grupo…")} /></label>
+            <label className="search seating-search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar invitado, grupo o círculo…", "Search guest, group or circle…", "Buscar convidado, grupo ou círculo…")} /></label>
             <label className="social-circle-filter"><span>{t("Círculo social", "Social circle", "Círculo social")}</span><select value={socialCircleFilter} onChange={(event) => setSocialCircleFilter(event.target.value)}><option value="">{t("Todos los círculos", "All circles", "Todos os círculos")}</option>{socialCircleOptions.map((circle) => <option key={circle} value={circle}>{circle}</option>)}</select></label>
-            {matchingGroups.length > 0 && <section className="group-search-results" aria-label={t("Grupos encontrados", "Matching groups", "Grupos encontrados")}>
-              <strong>{t("Ubicar grupo completo", "Seat entire group", "Alocar grupo completo")}</strong>
-              {matchingGroups.map((groupName) => {
-                const groupGuests = confirmedGuests.filter((guest) => normalizedReference(guest.socialCircle) === normalizedReference(groupName));
+            {canEdit && <button className="manage-circles-button" type="button" onClick={() => setShowSocialCircleManager(true)}>⚙ {t("Administrar círculos", "Manage circles", "Administrar círculos")}</button>}
+            {matchingSeatingCollections.length > 0 && <section className="group-search-results" aria-label={t("Grupos y círculos encontrados", "Matching groups and circles", "Grupos e círculos encontrados")}>
+              <strong>{t("Ubicar juntos", "Seat together", "Alocar juntos")}</strong>
+              {matchingSeatingCollections.map(({ kind, value: groupName }) => {
+                const groupGuests = confirmedGuests.filter((guest) => normalizedReference(guest[kind]) === normalizedReference(groupName));
                 const groupIds = new Set(groupGuests.map((guest) => guest.id));
                 const groupPeople = groupGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
-                return <label key={groupName}>
-                  <span><b>{groupName}</b><small>{groupGuests.length} {t("invitaciones", "invitations", "convites")} · {groupPeople} {t("personas", "people", "pessoas")}</small></span>
-                  <select defaultValue="" disabled={!canEdit || groupAssignmentSaving === groupName} onChange={(event) => { if (event.target.value) void assignGroup(groupName, event.target.value); event.currentTarget.value = ""; }} aria-label={`${t("Ubicar grupo", "Seat group", "Alocar grupo")} ${groupName}`}>
-                    <option value="">{groupAssignmentSaving === groupName ? t("Guardando…", "Saving…", "Salvando…") : t("Elegir mesa o Living…", "Choose table or Living…", "Escolher mesa ou Living…")}</option>
+                const savingKey = `${kind}:${groupName}`;
+                return <label key={savingKey}>
+                  <span><b>{groupName}</b><em>{kind === "group" ? t("Grupo de invitación", "Invitation group", "Grupo do convite") : t("Círculo social", "Social circle", "Círculo social")}</em><small>{groupGuests.length} {t("invitaciones", "invitations", "convites")} · {groupPeople} {t("personas", "people", "pessoas")}</small></span>
+                  <select defaultValue="" disabled={!canEdit || groupAssignmentSaving === savingKey} onChange={(event) => { if (event.target.value) void assignCollection(kind, groupName, event.target.value); event.currentTarget.value = ""; }} aria-label={`${t("Ubicar juntos", "Seat together", "Alocar juntos")} ${groupName}`}>
+                    <option value="">{groupAssignmentSaving === savingKey ? t("Guardando…", "Saving…", "Salvando…") : t("Elegir mesa o Living…", "Choose table or Living…", "Escolher mesa ou Living…")}</option>
                     {tables.map((table) => {
                       const occupiedByOthers = table.guests.filter((id) => !groupIds.has(id)).reduce((total, id) => {
                         const assigned = guests.find((guest) => guest.id === id);
@@ -4602,7 +4701,16 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 table.guests.includes(guest.id),
               );
               const guestSuggestion = suggestedTableForGuest(guest);
-              const hasConfirmedGroupPeers = Boolean(normalizedReference(guest.socialCircle)) && confirmedGuests.some((candidate) => candidate.id !== guest.id && normalizedReference(candidate.socialCircle) === normalizedReference(guest.socialCircle));
+              const suggestionPeerCount = guestSuggestion ? guestSuggestion.table.guests.filter((guestId) => {
+                const peer = confirmedGuests.find((candidate) => candidate.id === guestId);
+                if (!peer || peer.id === guest.id) return false;
+                return guestSuggestion.basis === "group" ? normalizedReference(peer.group) === normalizedReference(guest.group) : guestSuggestion.basis === "circle" ? normalizedReference(peer.socialCircle) === normalizedReference(guest.socialCircle) : true;
+              }).length : 0;
+              const suggestionFreeSeats = guestSuggestion && guestSuggestion.table.shape !== "living" ? guestSuggestion.table.capacity - guestSuggestion.table.guests.reduce((total, guestId) => { const seated = confirmedGuests.find((candidate) => candidate.id === guestId); return total + (seated ? confirmedPeopleForGuest(seated, guests) : 0); }, 0) : null;
+              const hasConfirmedGroupPeers = confirmedGuests.some((candidate) => candidate.id !== guest.id && (
+                (Boolean(normalizedReference(guest.group)) && normalizedReference(candidate.group) === normalizedReference(guest.group)) ||
+                (Boolean(normalizedReference(guest.socialCircle)) && normalizedReference(candidate.socialCircle) === normalizedReference(guest.socialCircle))
+              ));
               return (
                 <div
                   key={guest.id}
@@ -4635,7 +4743,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         : t("personas", "people", "pessoas")}{" "}
                       · {guest.group || t("Sin grupo", "No invitation group", "Sem grupo")}
                     </small>
-                    {guestSuggestion ? <small className={`guest-seat-suggestion ${guestSuggestion.table.id === currentTable?.id ? "is-current" : ""}`}>★ {t("Sugerencia", "Suggestion", "Sugestão")}: {guestSuggestion.table.name} · {guestSuggestion.explicit ? `${t("junto a", "next to", "junto a")} ${guestSuggestion.reason}` : guestSuggestion.nearby ? t("mesa cercana a su círculo", "table near their circle", "mesa próxima ao seu círculo") : t("junto a su círculo", "next to their circle", "junto ao seu círculo")}{guestSuggestion.table.id === currentTable?.id ? ` · ${t("mesa correcta", "correct table", "mesa correta")}` : ""}</small> : hasConfirmedGroupPeers && <small className="guest-seat-suggestion is-waiting">☆ {t("Sugerencia pendiente: ubicá primero a alguien de su círculo", "Pending suggestion: seat someone from their circle first", "Sugestão pendente: coloque primeiro alguém do círculo")}</small>}
+                    {guestSuggestion ? <small className={`guest-seat-suggestion ${guestSuggestion.table.id === currentTable?.id ? "is-current" : ""}`}>★ {t("Sugerencia", "Suggestion", "Sugestão")}: {guestSuggestion.table.name} · {guestSuggestion.basis === "explicit" ? `${t("junto a", "next to", "junto a")} ${guestSuggestion.reason}` : guestSuggestion.basis === "group" ? t("junto a su grupo de invitación", "next to their invitation group", "junto ao seu grupo do convite") : guestSuggestion.nearby ? t("mesa cercana a su círculo", "table near their circle", "mesa próxima ao seu círculo") : t("junto a su círculo", "next to their circle", "junto ao seu círculo")} · {suggestionPeerCount} {t("afines ubicados", "related guests seated", "convidados afins alocados")}{suggestionFreeSeats !== null ? ` · ${suggestionFreeSeats} ${t("lugares libres", "free seats", "lugares livres")}` : ` · ${t("sin límite", "unlimited", "sem limite")}`}{guestSuggestion.table.id === currentTable?.id ? ` · ${t("mesa correcta", "correct table", "mesa correta")}` : ""}</small> : hasConfirmedGroupPeers && <small className="guest-seat-suggestion is-waiting">☆ {t("Sugerencia pendiente: ubicá primero a alguien de su grupo o círculo", "Pending suggestion: seat someone from their group or circle first", "Sugestão pendente: coloque primeiro alguém do grupo ou círculo")}</small>}
                   </p>
                   <select
                     value={currentTable?.id ?? ""}
@@ -4730,7 +4838,18 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </span>
             </div>
           </div>
-          {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${selectedSuggestion?.explicit ? `${t("junto a", "next to", "junto a")} ${selectedSuggestion.reason}` : selectedSuggestion?.nearby ? t("mesa cercana a su círculo", "table near their circle", "mesa próxima ao seu círculo") : t("junto a su círculo", "next to their circle", "junto ao seu círculo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
+          <details className={`seating-final-review ${reviewIssueCount ? "has-warnings" : "is-ready"}`}>
+            <summary><span>{reviewIssueCount ? "⚠" : "✓"}</span><strong>{t("Revisión final", "Final review", "Revisão final")}</strong><small>{reviewIssueCount ? `${reviewIssueCount} ${t("asuntos para revisar", "items to review", "itens para revisar")}` : t("Distribución sin alertas", "Layout has no alerts", "Distribuição sem alertas")}</small></summary>
+            <div>
+              <button className={unassigned.length ? "has-issue" : ""} onClick={() => { setAssignmentFilter("unassigned"); setMobileSeatingStep("guests"); }}><b>{unassigned.length}</b><span>{t("Invitaciones sin mesa", "Invitations without a table", "Convites sem mesa")}</span></button>
+              <button className={splitInvitationGroups.length ? "has-issue" : ""} onClick={() => { if (splitInvitationGroups[0]) setQuery(splitInvitationGroups[0]); setMobileSeatingStep("guests"); }}><b>{splitInvitationGroups.length}</b><span>{t("Grupos separados", "Split invitation groups", "Grupos separados")}</span></button>
+              <button className={dispersedCircleConflicts.length ? "has-issue" : ""} onClick={() => { if (dispersedCircleConflicts[0]) focusSpecificTable(dispersedCircleConflicts[0].tableId); }}><b>{dispersedCircleConflicts.length}</b><span>{t("Círculos dispersos", "Spread-out circles", "Círculos dispersos")}</span></button>
+              <button className={overCapacityTables.length ? "has-issue" : ""} onClick={() => { if (overCapacityTables[0]) focusSpecificTable(overCapacityTables[0].id); }}><b>{overCapacityTables.length}</b><span>{t("Sobrecupos", "Over capacity", "Acima da capacidade")}</span></button>
+              <button className={unnamedTables.length || duplicateTableNames.length ? "has-issue" : ""} onClick={() => { const target = unnamedTables[0] || tables.find((table) => duplicateTableNames.includes(normalizedReference(table.name))); if (target) openEdit(target); }}><b>{unnamedTables.length + duplicateTableNames.length}</b><span>{t("Nombres de mesa", "Table names", "Nomes de mesa")}</span></button>
+              <button onClick={() => setGuestRestrictionFilter(true)}><b>{confirmedRestrictions}</b><span>{t("Restricciones registradas", "Recorded restrictions", "Restrições registradas")}</span></button>
+            </div>
+          </details>
+          {selectedGuestId && <div className="seat-selection-banner"><strong>{selectedGuest?.name}</strong><span>{suggestedGroupTable ? `${t("Sugerencia", "Suggestion", "Sugestão")}: ${suggestedGroupTable.name} · ${selectedSuggestion?.basis === "explicit" ? `${t("junto a", "next to", "junto a")} ${selectedSuggestion.reason}` : selectedSuggestion?.basis === "group" ? t("junto a su grupo de invitación", "next to their invitation group", "junto ao seu grupo do convite") : selectedSuggestion?.nearby ? t("mesa cercana a su círculo", "table near their circle", "mesa próxima ao seu círculo") : t("junto a su círculo", "next to their circle", "junto ao seu círculo")}` : t("Ahora elegí una silla libre", "Now choose a free seat", "Agora escolha um assento livre")}</span>{suggestedGroupTable && <button onClick={() => focusSpecificTable(suggestedGroupTable.id)}>↓ {t("Ver sugerencia", "View suggestion", "Ver sugestão")}</button>}<button onClick={() => setSelectedGuestId("")}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
           {tableQuery && <div className="active-table-filter"><span>{t("Resultados para", "Results for", "Resultados para")} “{tableQuery}”</span><button onClick={() => setTableQuery("")}>× {t("Limpiar", "Clear", "Limpar")}</button></div>}
           <div className={`tables-grid ${compactTables ? "is-compact" : ""}`}>
             {!visibleTables.length && <div className="tables-empty-state"><strong>{t("No encontramos mesas", "No tables found", "Nenhuma mesa encontrada")}</strong><span>{t("Probá con otro nombre de mesa o invitado.", "Try another table or guest name.", "Tente outro nome de mesa ou convidado.")}</span><button onClick={() => setTableQuery("")}>{t("Ver todas las mesas", "View all tables", "Ver todas as mesas")}</button></div>}
@@ -5008,6 +5127,30 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           {seatHover && <div className="seat-hover-tooltip" role="tooltip" style={{ left: Math.min(window.innerWidth - 18, seatHover.x + 14), top: Math.max(12, seatHover.y - 12) }}>{seatHover.name}</div>}
         </section>
       </div></>}
+
+      {showSocialCircleManager && <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="social-circle-manager-title" onMouseDown={() => setShowSocialCircleManager(false)}>
+        <div className="modal social-circle-manager" onMouseDown={(event) => event.stopPropagation()}>
+          <button className="modal-close" type="button" onClick={() => setShowSocialCircleManager(false)}>×</button>
+          <span className="eyebrow">{t("Organización social", "Social organization", "Organização social")}</span>
+          <h2 id="social-circle-manager-title">{t("Administrar círculos", "Manage circles", "Administrar círculos")}</h2>
+          <p>{t("Renombrá, unificá o vaciá círculos sin editar cada invitado por separado.", "Rename, merge, or clear circles without editing every guest.", "Renomeie, una ou esvazie círculos sem editar cada convidado.")}</p>
+          <div className="social-circle-manager-list">
+            {!socialCircleStats.length && <div className="social-circle-manager-empty">{t("Todavía no hay círculos asignados.", "No circles have been assigned yet.", "Ainda não há círculos atribuídos.")}</div>}
+            {socialCircleStats.map(({ circle, invitations, people }) => <article key={circle}>
+              <header><div><strong>{circle}</strong><small>{invitations} {t("invitaciones", "invitations", "convites")} · {people} {t("personas confirmadas", "confirmed people", "pessoas confirmadas")}</small></div></header>
+              <form onSubmit={(event) => { event.preventDefault(); const value = new FormData(event.currentTarget).get("circleName"); if (typeof value === "string") void updateSocialCircleMembers(circle, value); }}>
+                <input name="circleName" defaultValue={circle} maxLength={120} aria-label={`${t("Nuevo nombre para", "New name for", "Novo nome para")} ${circle}`} />
+                <button type="submit" disabled={socialCircleSaving === circle}>{t("Renombrar", "Rename", "Renomear")}</button>
+              </form>
+              <form onSubmit={(event) => { event.preventDefault(); const value = new FormData(event.currentTarget).get("mergeCircle"); if (typeof value === "string" && value) void updateSocialCircleMembers(circle, value); }}>
+                <select name="mergeCircle" defaultValue="" aria-label={`${t("Unificar", "Merge", "Unir")} ${circle}`}><option value="">{t("Unificar con…", "Merge into…", "Unir com…")}</option>{socialCircleOptions.filter((candidate) => normalizedReference(candidate) !== normalizedReference(circle)).map((candidate) => <option key={candidate} value={candidate}>{candidate}</option>)}</select>
+                <button type="submit" disabled={socialCircleSaving === circle}>{t("Unificar", "Merge", "Unir")}</button>
+                <button className="clear-circle" type="button" disabled={socialCircleSaving === circle} onClick={() => { if (window.confirm(t(`¿Dejar sin círculo a ${invitations} invitaciones de “${circle}”?`, `Clear “${circle}” from ${invitations} invitations?`, `Remover “${circle}” de ${invitations} convites?`))) void updateSocialCircleMembers(circle, ""); }}>{t("Vaciar", "Clear", "Esvaziar")}</button>
+              </form>
+            </article>)}
+          </div>
+        </div>
+      </div>}
 
       {showModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}>
@@ -7502,7 +7645,7 @@ function Admin({
             />
           )}
           {view === "Mesas" && (
-            <Seating guests={activeGuests} canEdit={order.accessRole !== "viewer"} />
+            <Seating guests={activeGuests} setGuests={setGuests} canEdit={order.accessRole !== "viewer"} />
           )}
           {view === "Check-in" && <CheckInModule guests={activeGuests} setGuests={setGuests} canEdit={order.accessRole !== "viewer"} />}
           {["Restricciones", "Canciones", "Recordatorios"].includes(view) && (

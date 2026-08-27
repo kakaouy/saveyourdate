@@ -272,12 +272,15 @@ test('Living funciona como una zona sin límite ni sillas numeradas', () => {
   assert.match(migration, /event_table\.table_shape <> 'living'/);
 });
 
-test('la búsqueda permite ubicar un grupo completo de forma atómica', () => {
-  assert.match(source, /const matchingGroups = socialCircleFilter/);
-  assert.match(source, /const assignGroup = async/);
+test('la búsqueda permite ubicar juntos un grupo o círculo de forma atómica', () => {
+  assert.match(source, /const matchingInvitationGroups = query\.trim/);
+  assert.match(source, /const matchingSocialCircles = socialCircleFilter/);
+  assert.match(source, /const matchingSeatingCollections =/);
+  assert.match(source, /const assignCollection = async/);
   assert.match(source, /action: "assign-batch"/);
   assert.match(source, /className="group-search-results"/);
-  assert.match(source, /Ubicar grupo completo/);
+  assert.match(source, /Ubicar juntos/);
+  assert.match(source, /Buscar invitado, grupo o círculo…/);
 });
 
 test('Mesas ofrece un recorrido móvil simple de dos pasos', () => {
@@ -606,7 +609,11 @@ test('busca por grupo y prioriza la condición explícita de sentar junto', () =
 
 test('los círculos sociales alimentan la carga y las sugerencias de proximidad', () => {
   assert.match(source, /Círculo social/);
-  assert.match(source, /guest-circle-options/);
+  assert.match(source, /Sin círculo social/);
+  assert.match(source, /Agregar otro círculo…/);
+  assert.match(source, /"Amigos",\s*"Facultad",\s*"Trabajo",\s*"Colegio",\s*"Familia",\s*"Club"/);
+  assert.match(source, /newCustomSocialCircle && <input name="socialCircle"/);
+  assert.match(source, /editCustomSocialCircle && <input name="socialCircle"/);
   assert.match(source, /column\("grupo", "grupo de invitacion", "grupo invitacion", "familia"\)/);
   assert.match(source, /column\("circulo", "círculo", "circulo social", "círculo social"\)/);
   assert.match(source, /const circleTables = tables\.filter/);
@@ -617,13 +624,27 @@ test('los círculos sociales alimentan la carga y las sugerencias de proximidad'
   assert.match(source, /const matchesCircle =/);
   assert.match(source, /Círculo disperso/);
   assert.match(source, /circle-distance-/);
-  assert.match(source, /assignGroup\(groupName, event\.target\.value\)/);
+  assert.match(source, /assignCollection\(kind, groupName, event\.target\.value\)/);
+  assert.match(source, /basis: "circle"/);
+  assert.match(source, /basis: "group"/);
+  assert.match(source, /Administrar círculos/);
+  assert.match(source, /const updateSocialCircleMembers = async/);
+  assert.match(source, /protectedInvitationGroups/);
+  assert.match(source, /className="modal social-circle-manager"/);
+  assert.match(source, /className="floor-social-connectors"/);
+  assert.match(source, /className={`seating-final-review/);
+  assert.match(source, /Grupos separados/);
+  assert.match(source, /Círculos dispersos/);
+  assert.match(source, /afines ubicados/);
   assert.match(source, /guest-circle-tag/);
   assert.match(source, /has-social-circle/);
   assert.match(styles, /\.social-circle-filter/);
   assert.match(styles, /\.guest-circle-tag/);
   assert.match(styles, /\.table-card\.has-social-circle/);
   assert.match(styles, /\.floor-table\.has-social-circle/);
+  assert.match(styles, /\.floor-social-connectors line/);
+  assert.match(styles, /\.seating-final-review/);
+  assert.match(styles, /\.social-circle-manager-list/);
 });
 
 test('la sugerencia permanece visible y se reinicia después de cada movimiento', () => {
@@ -637,7 +658,7 @@ test('la sugerencia permanece visible y se reinicia después de cada movimiento'
   assert.match(styles, /\.guest-assign-list \.guest-seat-suggestion/);
   assert.doesNotMatch(source, /guestSuggestion && guestSuggestion\.table\.id !== currentTable/);
   assert.match(source, /hasConfirmedGroupPeers/);
-  assert.match(source, /Sugerencia pendiente: ubicá primero a alguien de su círculo/);
+  assert.match(source, /Sugerencia pendiente: ubicá primero a alguien de su grupo o círculo/);
   assert.match(source, /mesa correcta/);
 });
 
