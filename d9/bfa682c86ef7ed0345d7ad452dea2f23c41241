@@ -1,0 +1,73 @@
+temp-vite-app/tests/admin-guests-center.test.ts
+  s_7bf15498a84739::t_fcb4f35052b269 53-65
+  s_7bf15498a84739::t_c03d400c31a2d1 77-86
+  s_7bf15498a84739::t_cacfd850b4a401 198,200-208
+  s_7bf15498a84739::t_d4d28dcc47b697 182-190
+  s_7bf15498a84739::t_56bc8ac08c54e3 300-301,368
+  s_7bf15498a84739::t_56d152ce7421e3 176
+  s_7bf15498a84739::t_6f9ee00053f2d3 66-76
+  s_7bf15498a84739::t_0f1527b03d87b2 163-167,462-463,465
+  s_7bf15498a84739::t_b38c4ac97024bc 172-175,177-181
+  s_7bf15498a84739::t_a86a3e6420d949 191-197,199,209-210
+  s_7bf15498a84739::t_cd264dafcee6b5 211-223
+  s_7bf15498a84739::t_21bbf54673be15 320-331
+temp-vite-app/src/components/invitation-builder/invitation-builder.css
+  s_7bf15498a84739::t_8217c47ac62541 19-20
+temp-vite-app/api/_lib/admin/tables.ts
+  s_7bf15498a84739::t_855392b660c207 307-317
+temp-vite-app/src/components/invitation-builder/InvitationBuilderPage.tsx
+  s_7bf15498a84739::t_c0e45bff3b5d97 16,21-22,59,278,391,394,407-413
+temp-vite-app/supabase/migrations/20260827020000_expand_floor_plan_element_types.sql
+  s_7bf15498a84739::t_bee8eee26ec688 1-12
+temp-vite-app/src/admin-prototype.css
+  s_7bf15498a84739::t_5986827e6c1d9d 490-496
+  s_7bf15498a84739::t_94426c022a5ec1 623-624
+  s_7bf15498a84739::t_259d46beee3958 1070-1072
+  s_7bf15498a84739::t_77f0a7e90625c0 347-354
+  s_7bf15498a84739::t_a5eba9dc4e950e 756,758,764-775
+  s_7bf15498a84739::t_5ad8a73abf7617 286-302
+  s_7bf15498a84739::t_55676e7cb45d99 305-310
+  s_7bf15498a84739::t_24d96a697e8101 727-737
+  s_7bf15498a84739::t_08609aee57cccb 776-780
+  s_7bf15498a84739::t_57dbe608d60619 407-411,413,505
+  s_7bf15498a84739::t_651d5cb4806ab7 614-622
+  s_7bf15498a84739::t_fa2ba0bb80eb40 1151-1153
+  s_7bf15498a84739::t_4b1fa50375ea27 484-489
+  s_7bf15498a84739::t_07948269065688 471-473
+temp-vite-app/tests/module-completion.test.ts
+  s_7bf15498a84739::t_37d1697454f2f7 30-39
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7bf15498a84739::t_f8229934e07eb3 4496-4504
+  s_7bf15498a84739::t_7c88063e9467b1 1402-1404,1867,1993-1994,2007-2024,2026-2030,2111,2113,2231,2235
+  s_7bf15498a84739::t_be2c29945f306c 2524-2568,2650
+  s_7bf15498a84739::t_0d2e4fcba5a43a 2025
+  s_7bf15498a84739::t_5016f59696f01f 4294-4301
+  s_7bf15498a84739::t_8d685a4249a4ef 4251,4278,4302
+  s_7bf15498a84739::t_d17b03e9642b05 2095-2104,2354-2371
+  s_7bf15498a84739::t_f212030f7690ee 4259
+  s_7bf15498a84739::t_ff9fb40af25d0f 4508
+  s_7bf15498a84739::t_9e4f7f416f1c58 4118-4119,4121
+  s_7bf15498a84739::t_e8450291c18eee 4275,4290
+  s_7bf15498a84739::t_aa98dfe924cd8a 4288
+  s_7bf15498a84739::t_760010319f1acc 4527
+  s_7bf15498a84739::t_bee8eee26ec688 3302,3769-3775,3787-3789,3791-3792,3882-3884
+  s_7bf15498a84739::t_43f31d8e7a84e0 4519-4526,4528-4529
+  s_7bf15498a84739::t_5ac7d7bcc3e64a 2478-2490
+  s_7bf15498a84739::t_3dfce9e4db0cf7 2031
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "d9bfa682c86ef7ed0345d7ad452dea2f23c41241",
+  "prompts": {},
+  "sessions": {
+    "s_7bf15498a84739": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04384-e93b-7e52-b32b-d6b49a0c1989",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
