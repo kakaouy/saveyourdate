@@ -36,8 +36,8 @@ test('los módulos se presentan en tres recorridos con detalle progresivo', () =
 
 test('para quién es separa anfitriones y organizadores sin vender un plan al proveedor', () => {
   assert.match(landing, /concept-audience-switch/);
-  assert.match(landing, /Organizo mi evento/);
-  assert.match(landing, /Organizo varios eventos/);
+  assert.match(landing, /Mi evento/);
+  assert.match(landing, /Varios eventos/);
   assert.match(landing, /No necesitás contratar un plan/);
   assert.doesNotMatch(landing, /concept-role-compare/);
   assert.match(styles, /\.concept-audience-tabs/);
@@ -45,7 +45,7 @@ test('para quién es separa anfitriones y organizadores sin vender un plan al pr
 
 test('cómo funciona se explica mediante tres recorridos conectados', () => {
   assert.doesNotMatch(landing, /concept-integrated-flow/);
-  assert.match(landing, /<header><p>Cómo funciona<\/p>/);
+  assert.match(landing, /concept-how-intro/);
   assert.match(landing, /Configurá el evento/);
   assert.match(landing, /Organizá invitados y mesas/);
   assert.match(landing, /Prepará salón y entregables/);
@@ -60,6 +60,10 @@ test('cómo funciona se explica mediante tres recorridos conectados', () => {
   assert.match(styles, /concept-preview-invite\{grid-template-columns:minmax\(190px/);
   assert.match(styles, /permanece dentro de la ventana y cambia de composición/);
   assert.match(styles, /@media\(max-width:1180px\)/);
+  assert.match(styles, /Cómo funciona vive sobre crema/);
+  assert.match(landing, /La misma plataforma/);
+  assert.match(landing, /Tu evento, claro/);
+  assert.match(landing, /Todos tus eventos/);
 });
 
 test('mesas muestra el flujo simplificado y los eventos existentes sólo conservan sus accesos', () => {
