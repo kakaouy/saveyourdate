@@ -2410,8 +2410,8 @@ function Guests({
                 <th>{t("Círculo social", "Social circle", "Círculo social")}</th>
                 <th>{t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}</th>
                 <th>{t("Estado", "Status", "Status")}</th>
-                <th>{t("Restricción", "Dietary need", "Restrição")}</th>
-                <th>{t("Seguimiento", "Tracking", "Acompanhamento")}</th>
+                <th className="guest-secondary-column">{t("Restricción", "Dietary need", "Restrição")}</th>
+                <th className="guest-secondary-column">{t("Seguimiento", "Tracking", "Acompanhamento")}</th>
                 <th>{t("Acciones", "Actions", "Ações")}</th>
               </tr>
             </thead>
@@ -2437,7 +2437,7 @@ function Guests({
               {filtered.map((guest) => (
                 <tr key={guest.id}>
                   {canEdit && (
-                    <td className="checkbox-cell">
+                    <td className="checkbox-cell guest-select-column">
                       <input
                         type="checkbox"
                         checked={selected.includes(guest.id)}
@@ -2451,7 +2451,7 @@ function Guests({
                       />
                     </td>
                   )}
-                  <td>
+                  <td className="guest-person-column" data-label={t("Invitado", "Guest", "Convidado")}>
                     <div className="person">
                       <GuestAvatar guest={guest} />
                       <p>
@@ -2464,10 +2464,10 @@ function Guests({
                       </p>
                     </div>
                   </td>
-                  <td><span className="guest-group-cell"><strong>{guest.group || "—"}</strong><small>{t("Una invitación compartida", "One shared invitation", "Um convite compartilhado")}</small></span></td>
-                  <td><span className="guest-circle-cell">{guest.socialCircle || <em>{t("Sin asignar", "Unassigned", "Não atribuído")}</em>}</span></td>
-                  <td>{(() => { const progress = seatProgress(guest, guests); return <span className="seat-progress"><strong>{progress.used}/{progress.total}</strong><small>{t("confirmados / cupos", "confirmed / seats", "confirmados / vagas")}</small></span>; })()}</td>
-                  <td>
+                  <td className="guest-group-column" data-label={t("Grupo de invitación", "Invitation group", "Grupo do convite")}><span className="guest-group-cell"><strong>{guest.group || "—"}</strong><small>{t("Una invitación compartida", "One shared invitation", "Um convite compartilhado")}</small></span></td>
+                  <td className="guest-circle-column" data-label={t("Círculo social", "Social circle", "Círculo social")}><span className="guest-circle-cell">{guest.socialCircle || <em>{t("Sin asignar", "Unassigned", "Não atribuído")}</em>}</span></td>
+                  <td className="guest-seats-column" data-label={t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}>{(() => { const progress = seatProgress(guest, guests); return <span className="seat-progress"><strong>{progress.used}/{progress.total}</strong><small>{t("confirmados / cupos", "confirmed / seats", "confirmados / vagas")}</small></span>; })()}</td>
+                  <td className="guest-status-column" data-label={t("Estado", "Status", "Status")}>
                     {canEdit && !guest.archivedAt ? (
                       <select
                         className={`status-select status-${guest.status.toLowerCase().replace(" ", "-")}`}
@@ -2495,7 +2495,7 @@ function Guests({
                       <Status value={guest.status} />
                     )}
                   </td>
-                  <td>
+                  <td className="guest-secondary-column">
                     <div className="restriction-chips">
                       {meaningfulGuestValue(guest.food) && <span className="is-food">⚠ {guest.food}</span>}
                       {guest.socialTogetherWith && <span className="is-together">↔ {guest.socialTogetherWith}</span>}
@@ -2504,7 +2504,7 @@ function Guests({
                       {!hasGuestRestriction(guest) && <span className="is-empty">—</span>}
                     </div>
                   </td>
-                  <td>
+                  <td className="guest-secondary-column">
                     <span className={`delivery-status ${guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
                       {guest.respondedAt
                         ? `${t("Respondió", "Responded", "Respondeu")} · ${reportDate(guest.respondedAt, language)}`
@@ -2515,7 +2515,7 @@ function Guests({
                             : t("Sin enviar", "Not sent", "Não enviado")}
                     </span>
                   </td>
-                  <td>
+                  <td className="guest-actions-column" data-label={t("Acciones", "Actions", "Ações")}>
                     <div className="row-actions icon-actions">
                       {!guest.archivedAt && <button
                         className="icon-button"
@@ -4110,7 +4110,14 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     const maxHeight = Math.max(40, Math.min(180, room.height - (table.y || 24)));
     let resized = table;
     const onMove = (moveEvent: PointerEvent) => {
-      resized = { ...table, width: Math.min(maxWidth, Math.max(Math.min(100, maxWidth), startWidth + moveEvent.clientX - startX)), height: Math.min(maxHeight, Math.max(Math.min(60, maxHeight), startHeight + moveEvent.clientY - startY)) };
+      if (table.shape === "round" || table.shape === "square") {
+        const maxSurfaceSize = Math.min(maxHeight, maxWidth / 2);
+        const requestedSize = Math.max(startHeight + moveEvent.clientY - startY, startWidth / 2 + (moveEvent.clientX - startX) / 2);
+        const surfaceSize = Math.min(maxSurfaceSize, Math.max(Math.min(50, maxSurfaceSize), requestedSize));
+        resized = { ...table, width: surfaceSize * 2, height: surfaceSize };
+      } else {
+        resized = { ...table, width: Math.min(maxWidth, Math.max(Math.min(100, maxWidth), startWidth + moveEvent.clientX - startX)), height: Math.min(maxHeight, Math.max(Math.min(60, maxHeight), startHeight + moveEvent.clientY - startY)) };
+      }
       setTables((current) => current.map((item) => item.id === table.id ? resized : item));
     };
     const onEnd = () => {
@@ -4150,6 +4157,18 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     if (["restroom", "kitchen", "emergency", "entrance"].includes(kind)) return { width: 150, height: 64 };
     return { width: 150, height: 80 };
   };
+
+  const minimumFloorElementSize = (kind: FloorElement["kind"]) => {
+    void kind;
+    return { width: 20, height: 20 };
+  };
+
+  const floorElementIcon = (kind: FloorElement["kind"]) => ({
+    entrance: "↪", "dance-floor": "♫", gourmet: "▱", hydration: "♨", stage: "▰", dj: "◉", cake: "♨", gifts: "◇", buffet: "♨", wall: "▬", door: "⌑", window: "▤", column: "●", stairs: "≋", restroom: "WC", kitchen: "♨", emergency: "↗", "photo-booth": "▣", fountain: "≋", plant: "♧", divider: "┄", custom: "T",
+  })[kind];
+
+  const floorElementNeedsIcon = (element: FloorElement) => element.width < 90 || element.height < 46 || element.label.length * 6.2 > element.width - 20;
+  const isCircularFloorElement = (kind: FloorElement["kind"]) => ["cake", "fountain", "plant", "column"].includes(kind);
 
   const addFloorElement = async (kind: FloorElement["kind"], label: string, position?: { space: string; x: number; y: number }) => {
     const space = position?.space || spaces[0] || "Espacio 1";
@@ -4225,11 +4244,19 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     event.preventDefault(); event.stopPropagation();
     const startX = event.clientX, startY = event.clientY, startWidth = element.width, startHeight = element.height;
     const room = spaceSizes[element.space] || { width: 1200, height: 700 };
-    const maxWidth = Math.max(24, Math.min(420, room.width - element.x));
-    const maxHeight = Math.max(24, Math.min(260, room.height - element.y));
+    const minimum = minimumFloorElementSize(element.kind);
+    const maxWidth = Math.max(20, Math.min(420, room.width - element.x));
+    const maxHeight = Math.max(20, Math.min(260, room.height - element.y));
     let resized = element;
     const onMove = (moveEvent: PointerEvent) => {
-      resized = updateFloorElement(element, { width: Math.min(maxWidth, Math.max(Math.min(90, maxWidth), startWidth + (moveEvent.clientX - startX) / floorZoom)), height: Math.min(maxHeight, Math.max(Math.min(55, maxHeight), startHeight + (moveEvent.clientY - startY) / floorZoom)) });
+      if (isCircularFloorElement(element.kind)) {
+        const maxSize = Math.min(maxWidth, maxHeight);
+        const requestedSize = Math.max(startWidth + (moveEvent.clientX - startX) / floorZoom, startHeight + (moveEvent.clientY - startY) / floorZoom);
+        const size = Math.min(maxSize, Math.max(20, requestedSize));
+        resized = updateFloorElement(element, { width: size, height: size });
+      } else {
+        resized = updateFloorElement(element, { width: Math.min(maxWidth, Math.max(Math.min(minimum.width, maxWidth), startWidth + (moveEvent.clientX - startX) / floorZoom)), height: Math.min(maxHeight, Math.max(Math.min(minimum.height, maxHeight), startHeight + (moveEvent.clientY - startY) / floorZoom)) });
+      }
     };
     const onEnd = () => { document.removeEventListener("pointermove", onMove); document.removeEventListener("pointerup", onEnd); persistFloorElement(resized, element); };
     document.addEventListener("pointermove", onMove); document.addEventListener("pointerup", onEnd);
@@ -4273,14 +4300,24 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
       floorElements.filter((element) => element.space === space).forEach((element) => {
         const x = Math.min(width - element.width, element.x);
         const y = top + 58 + Math.min(420, element.y);
+        const iconOnly = floorElementNeedsIcon(element);
+        context.save();
+        context.translate(x + element.width / 2, y + element.height / 2);
+        context.rotate(((element.rotation || 0) * Math.PI) / 180);
         context.fillStyle = "#dff5f2";
         context.strokeStyle = "#17384b";
         context.lineWidth = 2;
-        context.fillRect(x, y, element.width, element.height);
-        context.strokeRect(x, y, element.width, element.height);
+        context.fillRect(-element.width / 2, -element.height / 2, element.width, element.height);
+        context.strokeRect(-element.width / 2, -element.height / 2, element.width, element.height);
         context.fillStyle = "#17384b";
-        context.font = "bold 16px sans-serif";
-        context.fillText(element.label, x + 12, y + 28);
+        context.font = `bold ${iconOnly ? Math.max(9, Math.min(18, Math.min(element.width, element.height) * .65)) : 16}px sans-serif`;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.beginPath();
+        context.rect(-element.width / 2, -element.height / 2, element.width, element.height);
+        context.clip();
+        context.fillText(iconOnly ? floorElementIcon(element.kind) : element.label, 0, 0, Math.max(8, element.width - 8));
+        context.restore();
       });
     });
     return canvas.toDataURL("image/png");
@@ -4339,7 +4376,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
     const spaceSections = spaces.map((space) => {
       const spaceTables = tables.filter((table) => (table.space || "Espacio 1") === space);
       const drawingTables = spaceTables.map((table) => `<div class="draw-table" style="left:${Math.min(82, (table.x || 0) / 10)}%;top:${Math.min(82, (table.y || 0) / 5)}%;width:${Math.max(10, (table.width || 140) / 10)}%;height:${Math.max(9, (table.height || 70) / 5)}%"><b>${safe(table.name)}</b><span>${table.shape === "living" ? safe(t("Sin límite", "Unlimited", "Sem limite")) : `${table.capacity} ${safe(t("lugares", "seats", "lugares"))}`}</span></div>`).join("");
-      const drawingElements = floorElements.filter((element) => element.space === space).map((element) => `<div class="draw-element" style="left:${Math.min(84, element.x / 10)}%;top:${Math.min(84, element.y / 5)}%;width:${Math.max(9, element.width / 10)}%;height:${Math.max(8, element.height / 5)}%">${safe(element.label)}</div>`).join("");
+      const drawingElements = floorElements.filter((element) => element.space === space).map((element) => `<div class="draw-element${floorElementNeedsIcon(element) ? " icon-only" : ""}" title="${safe(element.label)}" style="left:${Math.min(84, element.x / 10)}%;top:${Math.min(84, element.y / 5)}%;width:${Math.max(2, element.width / 10)}%;height:${Math.max(2, element.height / 5)}%;transform:rotate(${element.rotation || 0}deg)">${safe(floorElementNeedsIcon(element) ? floorElementIcon(element.kind) : element.label)}</div>`).join("");
       const details = spaceTables.map((table) => {
         const tableGuests = table.guests.map((id) => guests.find((guest) => guest.id === id)).filter(Boolean) as Guest[];
         const occupied = tableGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0);
@@ -4683,20 +4720,21 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
                   {canEdit && !table.locked && selectedLayoutTableId === table.id && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
                 </article>
               ))}
-              {floorElements.filter((element) => element.space === space).map((element) => <article className={`floor-element is-${element.kind} ${selectedFloorElementId === element.id ? "is-selected" : ""}`} key={element.id} draggable={canEdit} onClick={(event) => { event.stopPropagation(); setSelectedLayoutTableId(""); setSelectedFloorElementId(element.id); setFloorElementLabelDraft(element.label); setShowFloorInspector(true); }} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height, transform: `rotate(${element.rotation || 0}deg)` }}>
-                <strong>{element.label}</strong>
+              {floorElements.filter((element) => element.space === space).map((element) => { const iconOnly = floorElementNeedsIcon(element); return <article className={`floor-element is-${element.kind} ${iconOnly ? "is-icon-only" : ""} ${element.width < 44 || element.height < 44 ? "is-very-small" : ""} ${selectedFloorElementId === element.id ? "is-selected" : ""}`} key={element.id} draggable={canEdit} title={element.label} aria-label={element.label} onClick={(event) => { event.stopPropagation(); setSelectedLayoutTableId(""); setSelectedFloorElementId(element.id); setFloorElementLabelDraft(element.label); setShowFloorInspector(true); }} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height, transform: `rotate(${element.rotation || 0}deg)` }}>
+                {iconOnly ? <span className="floor-element-icon" aria-hidden="true">{floorElementIcon(element.kind)}</span> : <strong>{element.label}</strong>}
                 {canEdit && selectedFloorElementId === element.id && <><button className="element-delete" onClick={(event) => { event.stopPropagation(); void deleteFloorElement(element.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${element.label}`}>×</button><button className="resize-handle" onPointerDown={(event) => resizeFloorElement(element, event)} aria-label={t("Cambiar tamaño", "Resize", "Redimensionar")} /></>}
-              </article>)}
+              </article>; })}
             </div>
           ))}
             </div>
-            {selectedFloorElementId && showFloorInspector && (() => { const selectedElement = floorElements.find((element) => element.id === selectedFloorElementId); if (!selectedElement) return null; return <aside className="floor-table-inspector floor-element-inspector">
+            {selectedFloorElementId && showFloorInspector && (() => { const selectedElement = floorElements.find((element) => element.id === selectedFloorElementId); if (!selectedElement) return null; const minimumSize = minimumFloorElementSize(selectedElement.kind); return <aside className="floor-table-inspector floor-element-inspector">
               <header><div><span>{t("Elemento seleccionado", "Selected element", "Elemento selecionado")}</span><strong>{selectedElement.label}</strong></div><button onClick={() => setSelectedFloorElementId("")} aria-label={t("Cerrar inspector", "Close inspector", "Fechar inspetor")}>×</button></header>
               <label>{t("Nombre", "Name", "Nome")}<span className="table-name-save"><input value={floorElementLabelDraft} maxLength={120} onChange={(event) => setFloorElementLabelDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && floorElementLabelDraft.trim()) persistFloorElement(updateFloorElement(selectedElement, { label: floorElementLabelDraft.trim() })); }} /><button disabled={!floorElementLabelDraft.trim() || floorElementLabelDraft.trim() === selectedElement.label} onClick={() => persistFloorElement(updateFloorElement(selectedElement, { label: floorElementLabelDraft.trim() }))}>{t("Guardar", "Save", "Salvar")}</button></span></label>
-              <div className="floor-element-size"><label>{t("Ancho", "Width", "Largura")}<input type="number" min="90" max="420" value={selectedElement.width} onChange={(event) => updateFloorElement(selectedElement, { width: Math.max(90, Math.min(420, Number(event.target.value))) })} onBlur={() => persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min="55" max="260" value={selectedElement.height} onChange={(event) => updateFloorElement(selectedElement, { height: Math.max(55, Math.min(260, Number(event.target.value))) })} onBlur={() => persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label></div>
+              {isCircularFloorElement(selectedElement.kind) ? <div className="floor-element-size is-proportional"><label>{t("Tamaño", "Size", "Tamanho")}<input type="number" min="20" max="260" value={Math.round(selectedElement.width)} onChange={(event) => { const room = spaceSizes[selectedElement.space] || { width: 1200, height: 700 }; const size = Math.max(20, Math.min(260, room.width - selectedElement.x, room.height - selectedElement.y, Number(event.target.value))); updateFloorElement(selectedElement, { width: size, height: size }); }} onBlur={() => persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label></div> : <div className="floor-element-size"><label>{t("Ancho", "Width", "Largura")}<input type="number" min={minimumSize.width} max="420" value={selectedElement.width} onChange={(event) => updateFloorElement(selectedElement, { width: Math.max(minimumSize.width, Math.min(420, Number(event.target.value))) })} onBlur={() => persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min={minimumSize.height} max="260" value={selectedElement.height} onChange={(event) => updateFloorElement(selectedElement, { height: Math.max(minimumSize.height, Math.min(260, Number(event.target.value))) })} onBlur={() => persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label></div>}
+              <div className="floor-element-position"><label>{t("Posición X", "X position", "Posição X")}<input type="number" min="0" max={(spaceSizes[selectedElement.space]?.width || 1200) - selectedElement.width} value={Math.round(selectedElement.x)} onChange={(event) => updateFloorElement(selectedElement, { x: Math.max(0, Math.min((spaceSizes[selectedElement.space]?.width || 1200) - selectedElement.width, Number(event.target.value))) })} onBlur={() => void persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label><label>{t("Posición Y", "Y position", "Posição Y")}<input type="number" min="0" max={(spaceSizes[selectedElement.space]?.height || 700) - selectedElement.height} value={Math.round(selectedElement.y)} onChange={(event) => updateFloorElement(selectedElement, { y: Math.max(0, Math.min((spaceSizes[selectedElement.space]?.height || 700) - selectedElement.height, Number(event.target.value))) })} onBlur={() => void persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label></div>
               {(["wall", "divider", "door", "window", "stage", "dj", "buffet", "gifts", "hydration", "gourmet", "photo-booth", "entrance", "emergency"] as FloorElement["kind"][]).includes(selectedElement.kind) && <fieldset className="floor-element-rotation"><legend>{t("Rotación", "Rotation", "Rotação")}</legend><div>{[0, 45, 90, 180, 270].map((rotation) => <button key={rotation} className={(selectedElement.rotation || 0) === rotation ? "active" : ""} onClick={() => void persistFloorElement(updateFloorElement(selectedElement, { rotation }), selectedElement)}>{rotation}°</button>)}</div></fieldset>}
               <div className="floor-element-actions"><button disabled={!canEdit} onClick={() => void duplicateFloorElement(selectedElement)}>{t("Duplicar", "Duplicate", "Duplicar")}</button><button className="is-danger" disabled={!canEdit} onClick={() => void deleteFloorElement(selectedElement.id)}>{t("Eliminar", "Delete", "Excluir")}</button></div>
-              <small>{t("Arrastrá el elemento para moverlo. Usá el control de la esquina para cambiar su tamaño.", "Drag the element to move it. Use the corner control to resize it.", "Arraste o elemento para movê-lo. Use o controle do canto para redimensioná-lo.")}</small>
+              <small>{t("Arrastralo para moverlo o usá X/Y para ubicarlo con precisión. El control de la esquina cambia su tamaño.", "Drag it to move it or use X/Y for precise placement. The corner control resizes it.", "Arraste para mover ou use X/Y para posicionar com precisão. O controle do canto redimensiona.")}</small>
             </aside>; })()}
             {selectedLayoutTableId && showFloorInspector && (() => { const selectedTable = tables.find((table) => table.id === selectedLayoutTableId); if (!selectedTable) return null; const selectedTableGuests = selectedTable.guests.map((guestId) => confirmedGuests.find((guest) => guest.id === guestId)).filter(Boolean) as Guest[]; const occupied = selectedTableGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0); const selectedMenuSummary = new Map<string, number>(); selectedTableGuests.forEach((guest) => { if (meaningfulGuestValue(guest.menuChoice)) selectedMenuSummary.set(guest.menuChoice, (selectedMenuSummary.get(guest.menuChoice) || 0) + confirmedPeopleForGuest(guest, guests)); }); const selectedDietaryAlerts = selectedTableGuests.flatMap((guest) => [meaningfulGuestValue(guest.food) ? `${guest.name}: ${guest.food}` : "", ...guest.companions.filter((companion) => meaningfulGuestValue(companion.food)).map((companion) => `${companion.name || guest.name}: ${companion.food}`)]).filter(Boolean); const selectedAccessibilityAlerts = selectedTableGuests.filter((guest) => meaningfulGuestValue(guest.accessibilityNeeds)); const selectedSocialConflicts = socialConflicts.filter((conflict) => conflict.tableId === selectedTable.id); const lastAssignedSeat = selectedTable.guests.reduce((lastSeat, guestId) => { const start = selectedTable.seatAssignments?.[guestId] || 0; const guest = confirmedGuests.find((candidate) => candidate.id === guestId); return start && guest ? Math.max(lastSeat, start + confirmedPeopleForGuest(guest, guests) - 1) : lastSeat; }, 0); const minimumCapacity = Math.max(1, occupied, lastAssignedSeat); return <aside className="floor-table-inspector">
               <header><div><span>{t("Mesa seleccionada", "Selected table", "Mesa selecionada")}</span><strong>{selectedTable.name}</strong></div><button onClick={() => setSelectedLayoutTableId("")} aria-label={t("Cerrar inspector", "Close inspector", "Fechar inspetor")}>×</button></header>
@@ -7272,6 +7310,9 @@ function GlobalGuestEditor({
   const { text: t, language } = useAdminI18n();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [customSocialCircle, setCustomSocialCircle] = useState(false);
+  const defaultSocialCircles = ["Amigos", "Facultad", "Trabajo", "Colegio", "Familia", "Club"];
+  const socialCircleOptions = [...new Set([...defaultSocialCircles, ...guests.map((item) => item.socialCircle).filter(Boolean)])];
   const save = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSaving(true);
@@ -7301,7 +7342,8 @@ function GlobalGuestEditor({
         <h2>{t("Editar a", "Edit", "Editar")} {guest.name}</h2>
         <div className="form-grid">
           <label>{t("Nombre y apellido", "Full name", "Nome completo")}<input name="name" defaultValue={guest.name} required /></label>
-          <label>{t("Grupo", "Group", "Grupo")}<input name="group" defaultValue={guest.group} /></label>
+          <label>{t("Grupo de invitación", "Invitation group", "Grupo do convite")}<small className="field-help">{t("Personas que comparten una misma invitación.", "People sharing one invitation.", "Pessoas que compartilham o mesmo convite.")}</small><input name="group" defaultValue={guest.group} /></label>
+          <label>{t("Círculo social", "Social circle", "Círculo social")}<small className="field-help">{t("Se usa para sugerir la misma mesa o una mesa cercana.", "Used to suggest the same or a nearby table.", "Usado para sugerir a mesma mesa ou uma mesa próxima.")}</small><span className="social-circle-field"><select name={customSocialCircle ? undefined : "socialCircle"} defaultValue={guest.socialCircle || ""} onChange={(event) => setCustomSocialCircle(event.target.value === "__custom__")}><option value="">{t("Sin círculo social", "No social circle", "Sem círculo social")}</option>{socialCircleOptions.map((circle) => <option key={circle} value={circle}>{circle}</option>)}<option value="__custom__">＋ {t("Agregar otro círculo…", "Add another circle…", "Adicionar outro círculo…")}</option></select>{customSocialCircle && <input name="socialCircle" autoFocus placeholder={t("Ej. Amigos de los padres", "E.g. Parents' friends", "Ex. Amigos dos pais")} />}</span></label>
           <label>{t("Invitación realizada por", "Invited by", "Convite feito por")}<input name="invitedBy" defaultValue={guest.invitedBy || defaultInviter} /></label>
           <label>{t("Acompañante de", "Companion of", "Acompanhante de")}<select name="companionOfId" defaultValue={guest.companionOfId}><option value="">{t("Invitación principal", "Primary invitation", "Convite principal")}</option>{guests.filter((item) => item.id !== guest.id && !item.companionOfId).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
           <label>{t("Estado", "Status", "Status")}<select name="status" defaultValue={guest.status}><option value="Confirmado">{adminStatus(language, "Confirmado")}</option><option value="Pendiente">{adminStatus(language, "Pendiente")}</option><option value="No asiste">{adminStatus(language, "No asiste")}</option></select></label>
@@ -7320,7 +7362,7 @@ function GlobalGuestEditor({
           <label>{t("Accesibilidad", "Accessibility", "Acessibilidade")}<input name="accessibilityNeeds" defaultValue={guest.accessibilityNeeds} /></label>
           <label>{t("Sentar junto a", "Seat together with", "Sentar junto com")}<small className="field-help">{t("Elegí una persona o grupo; aparecerá como sugerencia en Mesas.", "Choose a person or group; it will appear as a seating suggestion.", "Escolha uma pessoa ou grupo; aparecerá como sugestão nas mesas.")}</small><input name="socialTogetherWith" list="global-social-references" defaultValue={guest.socialTogetherWith} placeholder={t("Nombre o grupo", "Name or group", "Nome ou grupo")} /></label>
           <label>{t("Mantener separado de", "Keep separate from", "Manter separado de")}<input name="socialSeparateFrom" list="global-social-references" defaultValue={guest.socialSeparateFrom} placeholder={t("Nombre o grupo", "Name or group", "Nome ou grupo")} /></label>
-          <datalist id="global-social-references">{[...new Set(guests.flatMap((item) => [item.name, item.group]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
+          <datalist id="global-social-references">{[...new Set(guests.flatMap((item) => [item.name, item.group, item.socialCircle]).filter(Boolean))].map((value) => <option key={value} value={value} />)}</datalist>
           <label>{t("Mesa preferida", "Preferred table", "Mesa preferida")}<input name="preferredTableName" defaultValue={guest.preferredTableName} placeholder={t("Ej. Mesa familia", "E.g. Family table", "Ex. Mesa família")} /></label>
           <label className="form-span-2">{t("Observaciones", "Notes", "Observações")}<textarea name="guestNotes" rows={3} defaultValue={guest.guestNotes} /></label>
         </div>

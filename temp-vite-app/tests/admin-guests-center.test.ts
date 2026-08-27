@@ -342,6 +342,11 @@ test('el plano permite girar, bloquear y ampliar la sala', () => {
   assert.match(migration, /is_locked boolean/);
 });
 
+test('las mesas redondas y cuadradas conservan su proporción al redimensionarlas', () => {
+  assert.match(source, /table\.shape === "round" \|\| table\.shape === "square"/);
+  assert.match(source, /width: surfaceSize \* 2, height: surfaceSize/);
+});
+
 test('el inspector del plano edita mesas sin dejar asignaciones inconsistentes', () => {
   const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
   assert.match(source, /const renameTableInline = async/);
@@ -382,6 +387,9 @@ test('los elementos del plano muestran controles sólo al seleccionarlos', () =>
   assert.match(source, /canEdit && selectedFloorElementId === element\.id/);
   assert.match(source, /className="floor-table-inspector floor-element-inspector"/);
   assert.match(source, /const duplicateFloorElement = async/);
+  assert.match(source, /Posición X/);
+  assert.match(source, /Posición Y/);
+  assert.match(styles, /\.floor-element-position/);
   assert.match(styles, /\.floor-element\.is-selected/);
   assert.match(styles, /\.floor-element-actions/);
 });
@@ -436,6 +444,18 @@ test('los elementos usan formas reconocibles y rotación contextual', () => {
   const rotationMigration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260827030000_floor_plan_element_rotation.sql'), 'utf8');
   assert.match(source, /className="floor-element-rotation"/);
   assert.match(source, /const defaultFloorElementSize =/);
+  assert.match(source, /const minimumFloorElementSize =/);
+  assert.match(source, /return \{ width: 20, height: 20 \}/);
+  assert.match(source, /const floorElementIcon =/);
+  assert.match(source, /const floorElementNeedsIcon =/);
+  assert.match(source, /const isCircularFloorElement =/);
+  assert.match(source, /width: size, height: size/);
+  assert.match(source, /floor-element-size is-proportional/);
+  assert.match(source, /className="floor-element-icon"/);
+  assert.match(source, /context\.rotate\(\(\(element\.rotation \|\| 0\) \* Math\.PI\) \/ 180\)/);
+  assert.match(source, /element\.width < 44 \|\| element\.height < 44/);
+  assert.match(styles, /\.floor-element\.is-icon-only/);
+  assert.match(styles, /\.floor-element\.is-very-small \.element-delete/);
   assert.match(source, /kind === "wall" \|\| kind === "divider"/);
   assert.match(source, /room\.width - size\.width/);
   assert.match(source, /"door", "window"/);
@@ -669,7 +689,14 @@ test('grupo de invitación y círculo social se editan y muestran como conceptos
   assert.match(source, /const updateSocialCircleFromDetails = async/);
   assert.match(source, /className="guest-details-circle"/);
   assert.match(source, /detailsSocialCircle === inspectingGuest\.socialCircle/);
+  assert.match(source, /function GlobalGuestEditor/);
+  assert.match(source, /name=\{customSocialCircle \? undefined : "socialCircle"\}/);
+  assert.match(source, /item\.name, item\.group, item\.socialCircle/);
   assert.match(styles, /\.guest-circle-cell/);
+  assert.match(styles, /\.guests-table \.guest-secondary-column/);
+  assert.match(source, /className="guest-circle-column" data-label=/);
+  assert.match(source, /className="guest-actions-column" data-label=/);
+  assert.match(styles, /\.guests-table tbody > tr:not\(\.guest-empty-row\)/);
 });
 
 test('la sugerencia permanece visible y se reinicia después de cada movimiento', () => {
