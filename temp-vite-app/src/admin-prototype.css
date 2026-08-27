@@ -112,6 +112,9 @@ button { color: inherit; }
 .sidebar-help small { color: #617b83; font-size: 9px; }
 .sidebar-help button { margin-top: 12px; padding: 0; border: 0; color: var(--teal-dark); background: transparent; font-size: 10px; font-weight: 800; cursor: pointer; }
 .logout { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 12px 13px; border: 0; color: #9fb1bd; background: transparent; font-size: 11px; cursor: pointer; }
+.admin-action-icon { display: inline-block; flex: 0 0 15px; width: 15px; height: 15px; background-color: currentColor; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain; mask-position: center; mask-repeat: no-repeat; mask-size: contain; }
+.admin-action-icon.is-print { -webkit-mask-image: url('/admin-icons/print.png'); mask-image: url('/admin-icons/print.png'); }
+.admin-action-icon.is-logout { -webkit-mask-image: url('/admin-icons/logout.png'); mask-image: url('/admin-icons/logout.png'); }
 
 @media (max-height: 850px) {
   .admin-shell .sidebar { padding: 12px 14px; }
@@ -461,6 +464,16 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .floor-library-items { display: grid; gap: 7px; }
 .floor-library-items > button { display: grid; grid-template-columns: 30px minmax(0,1fr); align-items: center; gap: 9px; min-height: 48px; padding: 7px 9px; }
 .floor-library-items > button > i { display: block; width: 26px; height: 26px; border: 2px solid #79bfc1; border-radius: 7px; background: #eaf5f5; }
+.floor-library-items > button > i:is(.is-kitchen,.is-buffet,.is-hydration,.is-restroom,.is-dance-floor,.is-dj,.is-photo-booth,.is-emergency,.is-entrance,.is-wall,.is-divider,.is-plant,.is-gourmet) { border: 0; border-radius: 0; background-color: currentColor; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: 22px 22px; mask-position: center; mask-repeat: no-repeat; mask-size: 22px 22px; }
+.floor-library-items > button > i:is(.is-kitchen,.is-buffet) { -webkit-mask-image: url('/admin-icons/kitchen.png'); mask-image: url('/admin-icons/kitchen.png'); }
+.floor-library-items > button > i.is-hydration { -webkit-mask-image: url('/admin-icons/bar.png'); mask-image: url('/admin-icons/bar.png'); }
+.floor-library-items > button > i.is-restroom { -webkit-mask-image: url('/admin-icons/restroom.png'); mask-image: url('/admin-icons/restroom.png'); }
+.floor-library-items > button > i:is(.is-dance-floor,.is-dj) { -webkit-mask-image: url('/admin-icons/dance-floor.png'); mask-image: url('/admin-icons/dance-floor.png'); }
+.floor-library-items > button > i.is-photo-booth { -webkit-mask-image: url('/admin-icons/photo-booth.png'); mask-image: url('/admin-icons/photo-booth.png'); }
+.floor-library-items > button > i:is(.is-emergency,.is-entrance) { -webkit-mask-image: url('/admin-icons/emergency-exit.png'); mask-image: url('/admin-icons/emergency-exit.png'); }
+.floor-library-items > button > i:is(.is-wall,.is-divider) { -webkit-mask-image: url('/admin-icons/wall.png'); mask-image: url('/admin-icons/wall.png'); }
+.floor-library-items > button > i.is-plant { -webkit-mask-image: url('/admin-icons/plant.png'); mask-image: url('/admin-icons/plant.png'); }
+.floor-library-items > button > i.is-gourmet { -webkit-mask-image: url('/admin-icons/living.png'); mask-image: url('/admin-icons/living.png'); }
 .floor-library-items > button > span { display: grid; gap: 2px; min-width: 0; }
 .floor-library-items > button > span strong { overflow: hidden; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
 .floor-library-items > button > span small { color: var(--muted); font-size: 7px; font-weight: 600; }
@@ -511,6 +524,16 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .floor-element > strong { font-size: 10px; line-height: 1.25; text-align: center; }
 .floor-element.is-icon-only { padding: 1px; overflow: visible; }
 .floor-element-icon { display: grid; place-items: center; width: 100%; height: 100%; overflow: hidden; font-size: clamp(9px, 65%, 20px); font-weight: 900; line-height: 1; }
+.floor-element-icon:is(.is-kitchen,.is-buffet,.is-hydration,.is-restroom,.is-dance-floor,.is-dj,.is-photo-booth,.is-emergency,.is-entrance,.is-wall,.is-divider,.is-plant,.is-gourmet) { width: min(70%,22px); height: min(70%,22px); background-color: currentColor; font-size: 0; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain; mask-position: center; mask-repeat: no-repeat; mask-size: contain; }
+.floor-element-icon:is(.is-kitchen,.is-buffet) { -webkit-mask-image: url('/admin-icons/kitchen.png'); mask-image: url('/admin-icons/kitchen.png'); }
+.floor-element-icon.is-hydration { -webkit-mask-image: url('/admin-icons/bar.png'); mask-image: url('/admin-icons/bar.png'); }
+.floor-element-icon.is-restroom { -webkit-mask-image: url('/admin-icons/restroom.png'); mask-image: url('/admin-icons/restroom.png'); }
+.floor-element-icon:is(.is-dance-floor,.is-dj) { -webkit-mask-image: url('/admin-icons/dance-floor.png'); mask-image: url('/admin-icons/dance-floor.png'); }
+.floor-element-icon.is-photo-booth { -webkit-mask-image: url('/admin-icons/photo-booth.png'); mask-image: url('/admin-icons/photo-booth.png'); }
+.floor-element-icon:is(.is-emergency,.is-entrance) { -webkit-mask-image: url('/admin-icons/emergency-exit.png'); mask-image: url('/admin-icons/emergency-exit.png'); }
+.floor-element-icon:is(.is-wall,.is-divider) { -webkit-mask-image: url('/admin-icons/wall.png'); mask-image: url('/admin-icons/wall.png'); }
+.floor-element-icon.is-plant { -webkit-mask-image: url('/admin-icons/plant.png'); mask-image: url('/admin-icons/plant.png'); }
+.floor-element-icon.is-gourmet { -webkit-mask-image: url('/admin-icons/living.png'); mask-image: url('/admin-icons/living.png'); }
 .floor-element.is-very-small .element-delete { display: none; }
 .floor-element.is-very-small .resize-handle { right: -6px; bottom: -6px; width: 13px; height: 13px; border-width: 1px; border-radius: 4px; }
 .floor-element.is-selected { outline: 2px solid var(--teal); outline-offset: 3px; box-shadow: 0 8px 22px rgba(17,103,107,.18); }
@@ -830,6 +853,9 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .shape-icon.is-rectangular { width: 24px; border-radius: 3px; }
 .shape-icon.is-square { border-radius: 3px; }
 .shape-icon.is-living { width: 25px; height: 14px; border-radius: 7px 7px 3px 3px; border-bottom-width: 5px; background: #f4e8f5; border-color: #8d67b1; }
+.shape-icon:is(.is-round,.is-living) { border: 0; border-radius: 0; background-color: currentColor; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain; mask-position: center; mask-repeat: no-repeat; mask-size: contain; }
+.shape-icon.is-round { width: 20px; height: 20px; -webkit-mask-image: url('/admin-icons/round-table.png'); mask-image: url('/admin-icons/round-table.png'); }
+.shape-icon.is-living { width: 24px; height: 20px; -webkit-mask-image: url('/admin-icons/living.png'); mask-image: url('/admin-icons/living.png'); }
 .mobile-seating-switch { display: none; }
 .group-search-results { display: grid; gap: 7px; margin: 0 0 10px; padding: 10px; border: 1px solid #d9c8e6; border-radius: 10px; background: #fbf7fd; }
 .group-search-results > strong { color: #694683; font-size: 9px; }
@@ -1360,6 +1386,47 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
 .tables-workspace :is(.workspace-heading p,.capacity-row,.seat-category-legend span,.assignment-filters button,.category-filters button,.restriction-filter,.workspace-actions > span,.table-search input,.seated-guests small) { font-size: 10px; }
 .tables-workspace :is(.table-health > span,.seated-guests span,.seated-guests .guest-name-button,.seat-position-select) { font-size: 11px; }
 .tables-workspace .table-card-top h3 { font-size: 15px; }
+
+/* Escala legible del panel: conserva controles compactos, pero evita textos
+   operativos de 8–10 px que resultan difíciles de leer en pantallas amplias. */
+.admin-shell :is(
+  .topbar-title small,.admin-user small,.panel-title p,.panel-title button,.panel-context,
+  .metric small,.context-help p,.getting-started-panel p,.next-actions button small,
+  .activity-list small,.activity-list time,.person small,.filter-pills button,
+  .guest-add-options small,.paste-format-hint,.guest-empty-state p,.guests-table th,
+  .guest-group-cell small,.guest-circle-cell,.status,.status-select,.table-error,
+  .import-success,.sort-control,.guest-more-menu button,.guest-details-grid dt,
+  .admin-email,.guest-operation-summary span,.guest-operation-summary small,
+  .delivery-status,.floor-plan-guide small,.floor-plan-legend span,.floor-elements-menu p,
+  .floor-library-tabs button,.floor-library-tabs button b,.floor-library-items > button > span strong,
+  .floor-plan-toolbar > span,.floor-drop-message,.space-heading label,.space-heading input,
+  .floor-zoom span,.layout-overlap-warning,.floor-save-status,.floor-save-status button,
+  .layout-history-actions button,.floor-element-actions button,.export-quality,
+  .import-preview-summary span,.import-preview-table th,.import-preview-table td,
+  .guest-role-badge,.included-in-group,.cell-sub,.table-footer,.table-footer button,
+  .settings-module-grid small,.settings-form label,.health-grid small,.health-status,
+  .health-checked,.seating-quick-status > strong,.seating-quick-status nav button,
+  .context-tip::after,.seating-progress-ring span,.seating-guide-toggle small,
+  .seating-guide-grid p,.seating-summary span,.seating-summary small,.export-options-grid ul,
+  .social-conflict-summary span,.social-conflict-summary button,.assignment-filters button,
+  .category-filters button,.clear-seating-filters,.restriction-filter,.unassign-drop-zone,
+  .guest-assign-list small,.social-circle-filter,.social-circle-filter select,
+  .guest-circle-tag,.seated-circle-tag,.guest-assign-list select,.add-table-menu > summary,
+  .table-shape-tools button strong,.table-shape-tools button small,.table-shape-picker button,
+  .group-search-results > strong,.group-search-results em,.group-search-results small,
+  .group-search-results select,.manage-circles-button,.seating-final-review summary small,
+  .workspace-heading p,.workspace-actions > span,.table-search input,
+  .workspace-view-menu > div > span,.table-navigation button,.workspace-view-menu .view-density-toggle,
+  .seat-selection-banner,.active-table-filter,.tables-empty-state span,.table-health > small,
+  .table-social-conflicts button,.seat-hover-tooltip,.workspace-legend span,
+  .assignment-save-status button
+) { font-size: 11px; }
+
+.group-search-results { gap: 9px; padding: 15px 12px 12px; }
+.group-search-results > strong { display: block; margin: 0; line-height: 1.35; }
+.group-search-results label { padding: 10px; }
+.group-search-results b { font-size: 12px; }
+.group-search-results select { min-height: 40px; }
 :is(.seating-mode-tabs,.seating-summary,.assignment-filters,.category-filters,.restriction-filter,.table-card-top,.seated-guests,.workspace-actions) button:focus-visible,
 :is(.seat-position-select,.guest-assign-list select,.table-name-save input):focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 @media (max-width: 900px) {

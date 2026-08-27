@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -283,6 +283,12 @@ test('la búsqueda permite ubicar juntos un grupo o círculo de forma atómica',
   assert.match(source, /Buscar invitado, grupo o círculo…/);
 });
 
+test('el panel mantiene textos auxiliares legibles y separa ubicar juntos del borde', () => {
+  assert.match(styles, /\.group-search-results \{ gap: 9px; padding: 15px 12px 12px; \}/);
+  assert.match(styles, /\.group-search-results > strong \{ display: block; margin: 0; line-height: 1\.35; \}/);
+  assert.match(styles, /\.admin-shell :is\([\s\S]*\.guest-assign-list small[\s\S]*\) \{ font-size: 11px; \}/);
+});
+
 test('Mesas ofrece un recorrido móvil simple de dos pasos', () => {
   assert.match(source, /const \[mobileSeatingStep, setMobileSeatingStep\]/);
   assert.match(source, /className="mobile-seating-switch"/);
@@ -451,7 +457,7 @@ test('los elementos usan formas reconocibles y rotación contextual', () => {
   assert.match(source, /const isCircularFloorElement =/);
   assert.match(source, /width: size, height: size/);
   assert.match(source, /floor-element-size is-proportional/);
-  assert.match(source, /className="floor-element-icon"/);
+  assert.match(source, /floor-element-icon is-\$\{element\.kind\}/);
   assert.match(source, /context\.rotate\(\(\(element\.rotation \|\| 0\) \* Math\.PI\) \/ 180\)/);
   assert.match(source, /element\.width < 44 \|\| element\.height < 44/);
   assert.match(styles, /\.floor-element\.is-icon-only/);
@@ -464,6 +470,22 @@ test('los elementos usan formas reconocibles y rotación contextual', () => {
   assert.match(rotationMigration, /add column if not exists rotation_degrees/);
   assert.match(styles, /\.floor-element:is\(\.is-wall,\.is-divider\)/);
   assert.match(styles, /\.floor-element:is\(\.is-cake,\.is-fountain,\.is-plant,\.is-column\)/);
+});
+
+test('el plano usa los iconos entregados para sus elementos principales', () => {
+  const expectedIcons = ['kitchen.png', 'bar.png', 'restroom.png', 'dance-floor.png', 'photo-booth.png', 'emergency-exit.png', 'round-table.png', 'wall.png', 'plant.png', 'living.png'];
+  expectedIcons.forEach((icon) => assert.equal(existsSync(path.join(appRoot, 'public', 'admin-icons', icon)), true, `falta ${icon}`));
+  assert.match(styles, /mask-image: url\('\/admin-icons\/kitchen\.png'\)/);
+  assert.match(styles, /mask-image: url\('\/admin-icons\/round-table\.png'\)/);
+  assert.match(source, /floor-element-icon is-\$\{element\.kind\}/);
+});
+
+test('imprimir y cerrar sesión usan PNG transparentes recoloreables', () => {
+  ['print.png', 'logout.png'].forEach((icon) => assert.equal(existsSync(path.join(appRoot, 'public', 'admin-icons', icon)), true, `falta ${icon}`));
+  assert.match(source, /admin-action-icon is-print/);
+  assert.match(source, /admin-action-icon is-logout/);
+  assert.match(styles, /mask-image: url\('\/admin-icons\/print\.png'\)/);
+  assert.match(styles, /mask-image: url\('\/admin-icons\/logout\.png'\)/);
 });
 
 test('la exportación del plano ofrece calidad y vista previa privada', () => {

@@ -4540,7 +4540,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
             <button aria-pressed={layoutMode} onClick={() => setLayoutMode(true)}>▦ {t("Plano del salón", "Venue layout", "Plano do salão")}</button>
           </nav>
           <div className="heading-actions">
-            <button className={`outline-button ${showExportCenter ? "active" : ""}`} onClick={() => setShowExportCenter((current) => !current)}>⇩ {t("Compartir e imprimir", "Share and print", "Compartilhar e imprimir")}</button>
+            <button className={`outline-button ${showExportCenter ? "active" : ""}`} onClick={() => setShowExportCenter((current) => !current)}><span className="admin-action-icon is-print" aria-hidden="true" />{t("Compartir e imprimir", "Share and print", "Compartilhar e imprimir")}</button>
             <button className={`outline-button ${layoutMode ? "active" : ""}`} onClick={() => setLayoutMode((value) => !value)}>{layoutMode ? t("Ver lista", "View list", "Ver lista") : t("Editar plano", "Edit layout", "Editar plano")}</button>
             {canEdit && <button className="primary-button small" onClick={() => openNew()}>＋ {t("Agregar mesa", "Add table", "Adicionar mesa")}</button>}
           </div>
@@ -4721,7 +4721,7 @@ function Seating({ guests, setGuests, canEdit }: { guests: Guest[]; setGuests: R
                 </article>
               ))}
               {floorElements.filter((element) => element.space === space).map((element) => { const iconOnly = floorElementNeedsIcon(element); return <article className={`floor-element is-${element.kind} ${iconOnly ? "is-icon-only" : ""} ${element.width < 44 || element.height < 44 ? "is-very-small" : ""} ${selectedFloorElementId === element.id ? "is-selected" : ""}`} key={element.id} draggable={canEdit} title={element.label} aria-label={element.label} onClick={(event) => { event.stopPropagation(); setSelectedLayoutTableId(""); setSelectedFloorElementId(element.id); setFloorElementLabelDraft(element.label); setShowFloorInspector(true); }} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height, transform: `rotate(${element.rotation || 0}deg)` }}>
-                {iconOnly ? <span className="floor-element-icon" aria-hidden="true">{floorElementIcon(element.kind)}</span> : <strong>{element.label}</strong>}
+                {iconOnly ? <span className={`floor-element-icon is-${element.kind}`} aria-hidden="true">{floorElementIcon(element.kind)}</span> : <strong>{element.label}</strong>}
                 {canEdit && selectedFloorElementId === element.id && <><button className="element-delete" onClick={(event) => { event.stopPropagation(); void deleteFloorElement(element.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${element.label}`}>×</button><button className="resize-handle" onPointerDown={(event) => resizeFloorElement(element, event)} aria-label={t("Cambiar tamaño", "Resize", "Redimensionar")} /></>}
               </article>; })}
             </div>
@@ -7725,7 +7725,7 @@ function Admin({
           </button>
         </div>
         <button className="logout" onClick={onLogout}>
-          <span>↪</span>
+          <span className="admin-action-icon is-logout" aria-hidden="true" />
           {t("Cerrar sesión", "Sign out", "Sair")}
         </button>
       </aside>
