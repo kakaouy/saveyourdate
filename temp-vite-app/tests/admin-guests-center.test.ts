@@ -110,6 +110,8 @@ test('los cambios de invitados y mesas no dejan nombres o asientos obsoletos', (
   assert.match(guestsApi, /changes\.seat_number = null/);
   assert.match(rsvpApi, /status !== 'Confirmado' \? \{ table_id: null, seat_number: null \}/);
   assert.match(source, /const normalizedTableName = tableName\.trim\(\)/);
+  assert.match(source, /const onlyRenaming = Boolean/);
+  assert.match(source, /onlyRenaming\s*\? \{ action: "rename"/);
   assert.match(source, /confirmedGuests\.find\(\(guest\) => guest\.id === id\)/);
 });
 
@@ -177,6 +179,9 @@ test('las tarjetas de mesa priorizan identidad, ocupación e invitados', () => {
   assert.doesNotMatch(card, /table\.note/);
   assert.doesNotMatch(card, /table-social-conflicts/);
   assert.doesNotMatch(card, /table-operations/);
+  assert.match(source, /className="table-name-edit"/);
+  assert.match(source, /dietaryAlerts\.slice\(0, 3\).*alert\.food/s);
+  assert.match(source, /people > 1 && <small>/);
 });
 
 test('la leyenda de mesas pasa a una ayuda contextual compacta', () => {
@@ -524,6 +529,9 @@ test('el paquete de usabilidad agrupa densidad, guardado, vacíos y adaptación 
   assert.match(source, /const \[assignmentSavingId, setAssignmentSavingId\]/);
   assert.match(source, /setAssignmentStatus\("saving"\)/);
   assert.match(source, /setAssignmentStatus\("saved"\)/);
+  assert.match(source, /const \[failedAssignment, setFailedAssignment\]/);
+  assert.match(source, /assignmentStatus === "error" && failedAssignment/);
+  assert.match(source, /className="seat-category-legend workspace-legend"/);
   assert.match(source, /className="tables-empty-state"/);
   assert.match(source, /Vista compacta/);
   assert.match(source, /className="clear-seating-filters"/);

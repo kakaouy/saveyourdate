@@ -3311,6 +3311,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [failedFloorSave, setFailedFloorSave] = useState<{ element: FloorElement; method: "POST" | "PATCH" } | null>(null);
   const [floorLibraryCategory, setFloorLibraryCategory] = useState<"main" | "structure" | "services" | "furniture" | "utilities">("main");
   const [assignmentStatus, setAssignmentStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [failedAssignment, setFailedAssignment] = useState<{ guestId: string; tableId: string; seatNumber: number } | null>(null);
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
   const [guestCategoryFilter, setGuestCategoryFilter] = useState<"all" | "adult" | "teen" | "child">("all");
   const [guestRestrictionFilter, setGuestRestrictionFilter] = useState(false);
@@ -3373,6 +3374,13 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const guest = confirmedGuests.find((candidate) => candidate.id === id);
     return total + (guest ? confirmedPeopleForGuest(guest, guests) : 0);
   }, 0) > table.capacity);
+  const currentSeatingStepIndex = layoutMode
+    ? 3
+    : tables.length === 0
+      ? 0
+      : assignedPeople < totalConfirmed
+        ? 1
+        : 2;
   const matchingGroups = query.trim()
     ? [...new Set(confirmedGuests.map((guest) => guest.group.trim()).filter(Boolean))]
         .filter((group) => normalizedReference(group).includes(normalizedReference(query)))
@@ -3519,16 +3527,19 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     setSaving(true);
     setError("");
     try {
+      const onlyRenaming = Boolean(
+        editing &&
+        normalizedTableName !== editing.name &&
+        capacity === editing.capacity &&
+        note.trim() === editing.note.trim() &&
+        tableShape === editing.shape
+      );
       const response = await fetch("/api/admin/tables", {
         method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: editing?.id,
-          name: normalizedTableName,
-          capacity,
-          note,
-          shape: tableShape,
-        }),
+        body: JSON.stringify(onlyRenaming
+          ? { action: "rename", id: editing?.id, name: normalizedTableName }
+          : { id: editing?.id, name: normalizedTableName, capacity, note, shape: tableShape }),
       });
       const result = (await response.json()) as {
         table?: EventTable;
@@ -3536,6 +3547,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       };
       if (!response.ok || !result.table)
         throw new Error(result.error || "No pudimos guardar la mesa.");
+      if (editing && result.table.name !== normalizedTableName)
+        throw new Error(t("El servidor no confirmó el nuevo nombre. Volvé a intentarlo.", "The server did not confirm the new name. Try again.", "O servidor não confirmou o novo nome. Tente novamente."));
       setTables((current) =>
         editing
           ? current.map((table) =>
@@ -3546,6 +3559,8 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           : [...current, result.table!],
       );
       setShowModal(false);
+      setLayoutNotice(editing ? t("Mesa actualizada y guardada.", "Table updated and saved.", "Mesa atualizada e salva.") : t("Mesa creada.", "Table created.", "Mesa criada."));
+      window.setTimeout(() => setLayoutNotice(""), 1800);
     } catch (saveError) {
       setError(
         saveError instanceof Error
@@ -3629,6 +3644,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       setDragGuestId("");
       setSelectedGuestId("");
       setAssignmentStatus("saved");
+      setFailedAssignment(null);
       window.setTimeout(() => setAssignmentStatus((current) => current === "saved" ? "idle" : current), 1800);
       return true;
     } catch (assignError) {
@@ -3638,6 +3654,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
           : "No pudimos asignar el invitado.",
       );
       setAssignmentStatus("error");
+      setFailedAssignment({ guestId, tableId, seatNumber });
       return false;
     } finally {
       setAssignmentSavingId("");
@@ -4195,7 +4212,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       <section className="seating-quick-status" aria-label={t("Progreso de organización", "Planning progress", "Progresso da organização")}>
         <strong>{completedSeatingSteps}/{seatingProgress.length} {t("pasos completos", "steps complete", "etapas concluídas")}</strong>
         <div className="seating-progress-track" aria-hidden="true"><i style={{ width: `${(completedSeatingSteps / seatingProgress.length) * 100}%` }} /></div>
-        <nav>{seatingProgress.map((step, index) => <button key={step.label} className={`context-tip ${step.complete ? "is-complete" : ""}`} data-help={step.detail} onClick={step.action}><span>{step.complete ? "✓" : index + 1}</span>{step.label}</button>)}</nav>
+        <nav>{seatingProgress.map((step, index) => <button key={step.label} aria-current={index === currentSeatingStepIndex ? "step" : undefined} className={`context-tip ${step.complete ? "is-complete" : ""} ${index === currentSeatingStepIndex ? "is-current" : ""}`} data-help={step.detail} onClick={step.action}><span>{step.complete ? "✓" : index + 1}</span>{step.label}</button>)}</nav>
       </section>
       {loading && (
         <p className="module-notice">
@@ -4605,6 +4622,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   "A capacidade é calculada pelas pessoas confirmadas de cada grupo.",
                 )}
               </p>
+              <div className="seat-category-legend workspace-legend" aria-label={t("Colores de los invitados", "Guest colors", "Cores dos convidados")}>
+                <span><i className="adult-dot" />{t("Adultos", "Adults", "Adultos")}</span><span><i className="teen-dot" />{t("Adolescentes", "Teenagers", "Adolescentes")}</span><span><i className="child-dot" />{t("Niños", "Children", "Crianças")}</span><span><i className="alert-dot" />{t("Restricciones", "Restrictions", "Restrições")}</span>
+              </div>
             </div>
             <div className="workspace-actions">
               <label className="table-search"><span>⌕</span><input value={tableQuery} onChange={(event) => setTableQuery(event.target.value)} placeholder={t("Buscar mesa o invitado…", "Search table or guest…", "Buscar mesa ou convidado…")} /></label>
@@ -4626,6 +4646,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               )}
               <span className={`assignment-save-status is-${assignmentStatus}`} role="status">
                 {assignmentStatus === "saving" ? t("Guardando…", "Saving…", "Salvando…") : assignmentStatus === "saved" ? `✓ ${t("Guardado", "Saved", "Salvo")}` : assignmentStatus === "error" ? t("No se guardó", "Not saved", "Não foi salvo") : t("Actualización automática", "Automatic updates", "Atualização automática")}
+                {assignmentStatus === "error" && failedAssignment && <button type="button" onClick={() => void assignGuest(failedAssignment.guestId, failedAssignment.tableId, true, failedAssignment.seatNumber)}>{t("Reintentar", "Retry", "Tentar novamente")}</button>}
               </span>
             </div>
           </div>
@@ -4672,7 +4693,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                     : accessibilityAlerts.length > 0
                       ? t("Necesidad de accesibilidad", "Accessibility need", "Necessidade de acessibilidade")
                       : dietaryAlerts.length > 0
-                        ? t("Restricción alimentaria", "Dietary restriction", "Restrição alimentar")
+                        ? `${dietaryAlerts.length} ${dietaryAlerts.length === 1 ? t("restricción", "dietary need", "restrição") : t("restricciones", "dietary needs", "restrições")} · ${dietaryAlerts.slice(0, 2).map((alert) => alert.name).join(", ")}${dietaryAlerts.length > 2 ? ` +${dietaryAlerts.length - 2}` : ""}`
                     : full
                       ? t("Mesa completa", "Table full", "Mesa completa")
                       : occupied === 0
@@ -4741,7 +4762,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                   <div className="table-card-top">
                     <span className="table-number">{index + 1}</span>
                     <div>
-                      <h3>{table.name}</h3>
+                      <button className="table-name-edit" type="button" onClick={() => openEdit(table)} title={t("Editar nombre de la mesa", "Edit table name", "Editar nome da mesa")}><h3>{table.name}</h3><span aria-hidden="true">✎</span></button>
                     </div>
                     {canEdit && (
                       <button
@@ -4749,12 +4770,16 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                         aria-label={`${t("Editar nombre, forma, capacidad y nota de", "Edit name, shape, capacity, and note for", "Editar nome, forma, capacidade e nota de")} ${table.name}`}
                         title={t("Editar mesa", "Edit table", "Editar mesa")}
                       >
-                        •••
+                        ⋯
                       </button>
                     )}
                   </div>
                   <div className={`table-health is-${over ? "over" : tableNeedsReview ? "review" : full ? "full" : isLiving ? "living" : "available"}`}>
                     <span><i />{tableStatusLabel}</span>
+                    {(dietaryAlerts.length > 0 || accessibilityAlerts.length > 0) && <small>{[
+                      ...dietaryAlerts.slice(0, 3).map((alert) => `${alert.name}: ${alert.food}`),
+                      ...accessibilityAlerts.slice(0, 2).map((guest) => `${guest.name}: ${guest.accessibilityNeeds}`),
+                    ].join(" · ")}</small>}
                   </div>
                   <div className="capacity-row">
                     <span>
@@ -4828,11 +4853,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                           (slot) => !slot || slot.guest.id === guest.id,
                         ),
                       );
-                      return <div key={guest.id}>
+                      return <div className={`is-${guest.guestType || "adult"} ${guestHasRestriction(guest) ? "has-restriction" : ""}`} key={guest.id}>
                         <GuestNameButton guest={guest} />
-                        <small>
-                          {people} {t("lugares", "seats", "lugares")}
-                        </small>
+                        {people > 1 && <small>{people} {t("lugares", "seats", "lugares")}</small>}
                         {canEdit && !isLiving && (
                           <select
                             className="seat-position-select"

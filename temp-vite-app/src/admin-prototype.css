@@ -1214,3 +1214,69 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
 .access-role-guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}.access-role-guide article{display:flex;gap:12px;align-items:flex-start;padding:16px;border:1px solid var(--admin-border,#e5e7eb);border-radius:14px;background:#fff}.access-role-guide article>span{display:grid;place-items:center;flex:0 0 34px;height:34px;border-radius:10px;background:#f6eaf0;color:#8b3f62;font-weight:900}.access-role-guide strong,.access-role-guide small{display:block}.access-role-guide small{margin-top:4px;color:#6b7280;line-height:1.4}.reminder-bulk-bar{display:flex;align-items:center;gap:8px;margin-left:auto;padding:6px 8px;border-radius:12px;background:#f7edf2;color:#713853}.reminder-bulk-bar strong{font-size:12px}@media(max-width:800px){.access-role-guide{grid-template-columns:1fr}.reminder-bulk-bar{width:100%;flex-wrap:wrap;margin-left:0}}
+
+/* Seating workspace: compact, explicit and scannable. */
+.seating-quick-status { width: calc(100% - 16px); grid-template-columns: auto minmax(70px,140px) auto; margin-inline: 8px; padding: 7px 9px; }
+.seating-quick-status nav { justify-content: flex-start; gap: 4px; }
+.seating-quick-status nav button { min-height: 28px; padding: 4px 7px; border-radius: 7px; white-space: nowrap; }
+.seating-quick-status nav button.is-current { border-color: var(--teal); color: var(--teal-dark); background: #e9f8f7; box-shadow: inset 0 0 0 1px var(--teal); }
+.seating-quick-status nav button.is-current::before { content: "Ahora"; margin-right: 2px; color: var(--teal-dark); font-size: 7px; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+.seating-mode-tabs { display: inline-grid; width: min(620px,100%); grid-template-columns: repeat(2,minmax(220px,1fr)); margin: 0 0 12px 8px; padding: 4px; }
+.seating-mode-tabs button { min-height: 46px; grid-template-columns: 30px minmax(0,1fr); padding: 6px 9px; }
+.seating-mode-tabs button > span { width: 28px; height: 28px; border-radius: 8px; }
+.seating-summary { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 8px 13px; }
+.seating-summary article { min-width: 150px; max-width: 245px; flex: 1 1 180px; grid-template-columns: auto auto; align-items: baseline; gap: 2px 8px; padding: 9px 11px; }
+.seating-summary span { grid-column: 1 / -1; }
+.seating-summary strong { font-size: 20px; }
+.seating-summary small { align-self: center; }
+.assignment-filters { justify-content: flex-start; flex-wrap: wrap; }
+.assignment-filters button { flex: 0 0 auto; padding: 5px 9px; }
+.guest-assign-list .category-filters { display: flex; flex-wrap: wrap; }
+.category-filters button { width: auto; min-height: 27px; padding: 4px 9px; }
+.restriction-filter { width: fit-content; padding: 6px 9px; }
+.table-card { padding: 14px; }
+.table-card-top { gap: 8px; }
+.table-number { width: 32px; height: 32px; font-size: 14px; }
+.table-card-top .table-name-edit { display: inline-flex; place-items: initial; align-items: center; gap: 6px; width: auto; max-width: 100%; height: auto; padding: 2px 4px; border: 0; border-radius: 5px; color: var(--ink); background: transparent; letter-spacing: 0; text-align: left; }
+.table-card-top .table-name-edit:hover { color: var(--teal-dark); background: #edf8f7; }
+.table-name-edit h3 { max-width: min(260px,40vw); margin: 0; }
+.table-name-edit span { color: var(--teal-dark); font-size: 10px; opacity: .72; }
+.table-card-top > button:last-child { width: 30px; height: 30px; padding: 0; font-size: 18px; line-height: 1; letter-spacing: 0; }
+.table-health { margin-top: 9px; padding: 7px 9px; }
+.table-health > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.table-health > small { grid-column: 1 / -1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.capacity-row { margin: 9px 0 5px; }
+.seated-guests { gap: 4px; margin-top: 10px; }
+.seated-guests > div { min-height: 38px; gap: 6px; padding: 4px 6px 4px 9px; border-left: 3px solid #83afd8; border-radius: 7px; }
+.seated-guests > div.is-teen { border-left-color: #a88ac8; }
+.seated-guests > div.is-child { border-left-color: #e7aa61; }
+.seated-guests > div.has-restriction { border-left-color: #df655d; background: #fff7f6; }
+.seated-guests span, .seated-guests .guest-name-button { font-size: 10px; }
+.seated-guests small { flex: 0 0 auto; font-size: 8px; }
+.seat-position-select { width: 104px; min-height: 30px; padding-inline: 6px; font-size: 9px; }
+.tables-workspace .seated-guests button { width: 24px; height: 24px; }
+.workspace-legend { margin-top: 5px; gap: 7px; }
+.workspace-legend span { font-size: 8px; }
+.assignment-save-status { display: inline-flex; align-items: center; gap: 5px; }
+.assignment-save-status button { min-height: 24px; padding: 2px 6px; border: 1px solid currentColor; border-radius: 6px; color: inherit; background: white; font-size: 8px; font-weight: 850; cursor: pointer; }
+.table-seat-map { height: 132px; margin-block: 10px 3px; }
+:is(.seating-quick-status,.seating-mode-tabs,.seating-summary,.assignment-filters,.category-filters,.restriction-filter,.table-card-top,.seated-guests,.workspace-actions) button:focus-visible,
+:is(.seat-position-select,.guest-assign-list select,.table-name-save input):focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+@media (max-width: 900px) {
+  .seating-quick-status { grid-template-columns: 1fr; }
+  .seating-quick-status nav { overflow-x: auto; padding-bottom: 2px; }
+  .seating-mode-tabs { margin-left: 0; grid-template-columns: 1fr 1fr; }
+  .seating-summary { margin-inline: 0; }
+}
+@media (max-width: 620px) {
+  .seating-mode-tabs { display: grid; width: 100%; grid-template-columns: 1fr 1fr; }
+  .seating-mode-tabs button { grid-template-columns: 26px minmax(0,1fr); min-height: 42px; padding: 5px 7px; }
+  .seating-mode-tabs button > span { width: 25px; height: 25px; }
+  .seating-mode-tabs button small { display: none; }
+  .seating-summary { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; }
+  .seating-summary article { min-width: 145px; }
+  .workspace-heading { gap: 9px; }
+  .workspace-legend { max-width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; }
+  .seated-guests > div { flex-wrap: nowrap; }
+  .seat-position-select { width: 94px; }
+}
