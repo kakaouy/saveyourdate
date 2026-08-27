@@ -315,6 +315,16 @@ test('el inspector del plano edita mesas sin dejar asignaciones inconsistentes',
   assert.match(source, /floor-inspector-guests/);
   assert.match(tablesApi, /select=confirmed,seat_number/);
   assert.match(tablesApi, /El asiento \$\{lastAssignedSeat\} está ocupado/);
+  assert.match(source, /action: "rename"/);
+  assert.match(source, /onBlur=\{\(\) => \{ if \(layoutTableNameDraft\.trim\(\)/);
+  assert.match(tablesApi, /body\.action === 'rename'/);
+});
+
+test('las sillas ocupadas muestran el nombre junto al cursor', () => {
+  assert.match(source, /const \[seatHover, setSeatHover\]/);
+  assert.match(source, /onMouseMove=\{\(event\) => person && setSeatHover/);
+  assert.match(source, /className="seat-hover-tooltip" role="tooltip"/);
+  assert.match(styles, /\.seat-hover-tooltip \{ position: fixed/);
 });
 
 test('el plano admite los nuevos elementos y muestra ayuda sólo en contexto', () => {
@@ -329,6 +339,27 @@ test('el plano admite los nuevos elementos y muestra ayuda sólo en contexto', (
   assert.match(styles, /\.context-tip:hover::after/);
 });
 
+test('los elementos del plano muestran controles sólo al seleccionarlos', () => {
+  assert.match(source, /const \[selectedFloorElementId, setSelectedFloorElementId\]/);
+  assert.match(source, /selectedFloorElementId === element\.id \? "is-selected"/);
+  assert.match(source, /canEdit && selectedFloorElementId === element\.id/);
+  assert.match(source, /className="floor-table-inspector floor-element-inspector"/);
+  assert.match(source, /const duplicateFloorElement = async/);
+  assert.match(styles, /\.floor-element\.is-selected/);
+  assert.match(styles, /\.floor-element-actions/);
+});
+
+test('la biblioteca conserva el elemento durante el arrastre y confirma dónde soltarlo', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  assert.match(source, /const \[draggedNewFloorElement, setDraggedNewFloorElement\]/);
+  assert.match(source, /event\.dataTransfer\.effectAllowed = "copy"/);
+  assert.match(source, /draggedNewFloorElement\?\.kind/);
+  assert.match(source, /className="floor-drop-message"/);
+  assert.match(styles, /\.floor-space\.is-drop-target/);
+  assert.match(tablesApi, /event_layout_elements_element_type_check/);
+  assert.match(tablesApi, /La base de datos todavía no admite este tipo de elemento/);
+});
+
 test('la navegación del plano permite concentrarse en el lienzo', () => {
   assert.match(source, /const centerFloorPlan =/);
   assert.match(source, /const toggleFloorFullscreen = async/);
@@ -338,6 +369,29 @@ test('la navegación del plano permite concentrarse en el lienzo', () => {
   assert.match(source, /showFloorInspector/);
   assert.match(styles, /\.floor-plan-panel:fullscreen/);
   assert.match(styles, /\.floor-editor\.library-hidden/);
+  assert.match(source, /const changeFloorZoom =/);
+  assert.match(source, /const fitFloorPlan =/);
+  assert.match(source, /Ajustar al salón/);
+});
+
+test('el plano confirma el guardado, permite reintentar y revierte movimientos fallidos', () => {
+  assert.match(source, /const \[floorSaveStatus, setFloorSaveStatus\]/);
+  assert.match(source, /const \[failedFloorSave, setFailedFloorSave\]/);
+  assert.match(source, /const retryFloorElementSave = async/);
+  assert.match(source, /persistFloorElement\(next, element\)/);
+  assert.match(source, /className=\{`floor-save-status is-\$\{floorSaveStatus\}`\}/);
+  assert.match(styles, /\.floor-save-status\.is-error/);
+});
+
+test('los elementos usan formas reconocibles y rotación contextual', () => {
+  const tablesApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'tables.ts'), 'utf8');
+  const rotationMigration = readFileSync(path.join(appRoot, 'supabase', 'migrations', '20260827030000_floor_plan_element_rotation.sql'), 'utf8');
+  assert.match(source, /className="floor-element-rotation"/);
+  assert.match(source, /transform: `rotate\(\$\{element\.rotation \|\| 0\}deg\)`/);
+  assert.match(tablesApi, /rotation_degrees: Math\.round/);
+  assert.match(rotationMigration, /add column if not exists rotation_degrees/);
+  assert.match(styles, /\.floor-element:is\(\.is-wall,\.is-divider\)/);
+  assert.match(styles, /\.floor-element:is\(\.is-cake,\.is-fountain,\.is-plant,\.is-column\)/);
 });
 
 test('la exportación del plano ofrece calidad y vista previa privada', () => {

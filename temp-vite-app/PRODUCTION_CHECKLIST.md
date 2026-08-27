@@ -7,6 +7,10 @@
   `supabase/migrations`.
 - Para habilitar ubicaciones Living, aplicar
   `20260813030000_living_seating_areas.sql`.
+- Para habilitar muros, área de torta, fuentes y el resto de la biblioteca del
+  plano, aplicar `20260827020000_expand_floor_plan_element_types.sql`.
+- Para permitir girar muros, divisores y mobiliario, aplicar después
+  `20260827030000_floor_plan_element_rotation.sql`.
 - No eliminar ni recrear `event_tables` o `event_guests`: esas tablas contienen
   la distribución actual de invitados.
 - Confirmar que una mesa existente mantiene sus invitados, asientos, posición y

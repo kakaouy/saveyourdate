@@ -3258,6 +3258,7 @@ type FloorElement = {
   y: number;
   width: number;
   height: number;
+  rotation?: number;
 };
 
 function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
@@ -3287,6 +3288,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [planExportScale, setPlanExportScale] = useState(2);
   const [planPreviewUrl, setPlanPreviewUrl] = useState("");
   const floorPlanRef = useRef<HTMLElement | null>(null);
+  const floorSpacesRef = useRef<HTMLDivElement | null>(null);
   const [snapToGrid, setSnapToGrid] = useState(true);
   const [layoutUndoStack, setLayoutUndoStack] = useState<Array<{ before: EventTable; after: EventTable }>>([]);
   const [layoutRedoStack, setLayoutRedoStack] = useState<Array<{ before: EventTable; after: EventTable }>>([]);
@@ -3299,7 +3301,14 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   const [mobileSeatingStep, setMobileSeatingStep] = useState<"guests" | "tables">("guests");
   const [showExportCenter, setShowExportCenter] = useState(false);
   const [selectedLayoutTableId, setSelectedLayoutTableId] = useState("");
+  const [selectedFloorElementId, setSelectedFloorElementId] = useState("");
   const [layoutTableNameDraft, setLayoutTableNameDraft] = useState("");
+  const [floorElementLabelDraft, setFloorElementLabelDraft] = useState("");
+  const [seatHover, setSeatHover] = useState<{ name: string; x: number; y: number } | null>(null);
+  const [draggedNewFloorElement, setDraggedNewFloorElement] = useState<{ kind: FloorElement["kind"]; label: string } | null>(null);
+  const [floorDropTarget, setFloorDropTarget] = useState("");
+  const [floorSaveStatus, setFloorSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [failedFloorSave, setFailedFloorSave] = useState<{ element: FloorElement; method: "POST" | "PATCH" } | null>(null);
   const [floorLibraryCategory, setFloorLibraryCategory] = useState<"main" | "structure" | "services" | "furniture" | "utilities">("main");
   const [assignmentStatus, setAssignmentStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [assignmentFilter, setAssignmentFilter] = useState<"all" | "unassigned" | "assigned">("all");
@@ -3779,7 +3788,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
       const response = await fetch("/api/admin/tables", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: table.id, name, capacity: table.capacity, note: table.note, shape: table.shape }),
+        body: JSON.stringify({ action: "rename", id: table.id, name }),
       });
       const result = await response.json() as { table?: EventTable; error?: string };
       if (!response.ok || !result.table) throw new Error(result.error || t("No pudimos cambiar el nombre de la mesa.", "Could not rename the table.", "Não foi possível renomear a mesa."));
@@ -3869,19 +3878,36 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   };
 
   const saveFloorElement = async (element: FloorElement, method: "POST" | "PATCH" = "PATCH") => {
-    const response = await fetch("/api/admin/tables", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "layout-element", ...element }) });
-    const result = await response.json() as { element?: FloorElement; error?: string };
-    if (!response.ok || !result.element) throw new Error(result.error || "No pudimos guardar el elemento.");
-    return result.element;
+    setFloorSaveStatus("saving");
+    try {
+      const response = await fetch("/api/admin/tables", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "layout-element", ...element }) });
+      const result = await response.json() as { element?: FloorElement; error?: string };
+      if (!response.ok || !result.element) throw new Error(result.error || "No pudimos guardar el elemento.");
+      setFailedFloorSave(null);
+      setFloorSaveStatus("saved");
+      window.setTimeout(() => setFloorSaveStatus((current) => current === "saved" ? "idle" : current), 1800);
+      return result.element;
+    } catch (saveError) {
+      setFailedFloorSave({ element, method });
+      setFloorSaveStatus("error");
+      throw saveError;
+    }
   };
 
   const addFloorElement = async (kind: FloorElement["kind"], label: string, position?: { space: string; x: number; y: number }) => {
     try {
       const element = await saveFloorElement({ id: "", kind, label, space: position?.space || spaces[0], x: position?.x ?? 40, y: position?.y ?? 90, width: kind === "dance-floor" ? 220 : 150, height: kind === "dance-floor" ? 130 : 80 }, "POST");
       setFloorElements((current) => [...current, element]);
+      setSelectedLayoutTableId("");
+      setSelectedFloorElementId(element.id);
+      setFloorElementLabelDraft(element.label);
+      setShowFloorInspector(true);
       setLayoutNotice(t(`${label} agregado al plano.`, `${label} added to the layout.`, `${label} adicionado ao plano.`));
       window.setTimeout(() => setLayoutNotice(""), 1800);
-    } catch (addError) { setError(addError instanceof Error ? addError.message : t("No pudimos agregar el elemento. Revisá que las migraciones estén aplicadas.", "Could not add the element. Check that migrations are applied.", "Não foi possível adicionar o elemento. Verifique as migrações.")); }
+    } catch (addError) {
+      setError(addError instanceof Error ? addError.message : t("No pudimos agregar el elemento. Revisá que las migraciones estén aplicadas.", "Could not add the element. Check that migrations are applied.", "Não foi possível adicionar o elemento. Verifique as migrações."));
+      setLayoutNotice("");
+    }
   };
 
   const updateFloorElement = (element: FloorElement, changes: Partial<FloorElement>) => {
@@ -3890,12 +3916,41 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     return next;
   };
 
-  const persistFloorElement = (element: FloorElement) => void saveFloorElement(element).catch((saveError) => setError(saveError instanceof Error ? saveError.message : "No pudimos guardar el elemento."));
+  const persistFloorElement = (element: FloorElement, rollback?: FloorElement) => void saveFloorElement(element).catch((saveError) => {
+    if (rollback) setFloorElements((current) => current.map((item) => item.id === rollback.id ? rollback : item));
+    setError(saveError instanceof Error ? saveError.message : "No pudimos guardar el elemento.");
+  });
+
+  const retryFloorElementSave = async () => {
+    if (!failedFloorSave) return;
+    setError("");
+    try {
+      const savedElement = await saveFloorElement(failedFloorSave.element, failedFloorSave.method);
+      setFloorElements((current) => failedFloorSave.method === "POST" && !current.some((item) => item.id === savedElement.id) ? [...current, savedElement] : current.map((item) => item.id === savedElement.id ? { ...item, ...savedElement } : item));
+      setSelectedFloorElementId(savedElement.id);
+    } catch (retryError) {
+      setError(retryError instanceof Error ? retryError.message : t("No pudimos reintentar el guardado.", "Could not retry saving.", "Não foi possível tentar salvar novamente."));
+    }
+  };
 
   const deleteFloorElement = async (id: string) => {
     const response = await fetch(`/api/admin/tables?elementId=${encodeURIComponent(id)}`, { method: "DELETE" });
-    if (response.ok) setFloorElements((current) => current.filter((item) => item.id !== id));
+    if (response.ok) {
+      setFloorElements((current) => current.filter((item) => item.id !== id));
+      setSelectedFloorElementId((current) => current === id ? "" : current);
+    }
     else setError("No pudimos eliminar el elemento.");
+  };
+
+  const duplicateFloorElement = async (element: FloorElement) => {
+    try {
+      const duplicate = await saveFloorElement({ ...element, id: "", label: `${element.label} ${t("copia", "copy", "cópia")}`, x: element.x + 24, y: element.y + 24 }, "POST");
+      setFloorElements((current) => [...current, duplicate]);
+      setSelectedFloorElementId(duplicate.id);
+      setFloorElementLabelDraft(duplicate.label);
+    } catch (duplicateError) {
+      setError(duplicateError instanceof Error ? duplicateError.message : t("No pudimos duplicar el elemento.", "Could not duplicate the element.", "Não foi possível duplicar o elemento."));
+    }
   };
 
   const resizeFloorElement = (element: FloorElement, event: React.PointerEvent<HTMLButtonElement>) => {
@@ -3903,9 +3958,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
     const startX = event.clientX, startY = event.clientY, startWidth = element.width, startHeight = element.height;
     let resized = element;
     const onMove = (moveEvent: PointerEvent) => {
-      resized = updateFloorElement(element, { width: Math.max(90, Math.min(420, startWidth + moveEvent.clientX - startX)), height: Math.max(55, Math.min(260, startHeight + moveEvent.clientY - startY)) });
+      resized = updateFloorElement(element, { width: Math.max(90, Math.min(420, startWidth + (moveEvent.clientX - startX) / floorZoom)), height: Math.max(55, Math.min(260, startHeight + (moveEvent.clientY - startY) / floorZoom)) });
     };
-    const onEnd = () => { document.removeEventListener("pointermove", onMove); document.removeEventListener("pointerup", onEnd); persistFloorElement(resized); };
+    const onEnd = () => { document.removeEventListener("pointermove", onMove); document.removeEventListener("pointerup", onEnd); persistFloorElement(resized, element); };
     document.addEventListener("pointermove", onMove); document.addEventListener("pointerup", onEnd);
   };
 
@@ -3975,8 +4030,30 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
   };
 
   const centerFloorPlan = () => {
-    setFloorZoom(1);
-    requestAnimationFrame(() => floorPlanRef.current?.scrollIntoView({ behavior: "smooth", block: "start", inline: "center" }));
+    const container = floorSpacesRef.current;
+    if (container) container.scrollTo({ left: 0, top: 0, behavior: "smooth" });
+  };
+
+  const changeFloorZoom = (nextZoom: number) => {
+    const container = floorSpacesRef.current;
+    const previousZoom = floorZoom;
+    const centerX = container ? (container.scrollLeft + container.clientWidth / 2) / previousZoom : 0;
+    const centerY = container ? (container.scrollTop + container.clientHeight / 2) / previousZoom : 0;
+    const normalized = Math.max(.45, Math.min(1.5, Number(nextZoom.toFixed(2))));
+    setFloorZoom(normalized);
+    requestAnimationFrame(() => {
+      if (!container) return;
+      container.scrollLeft = centerX * normalized - container.clientWidth / 2;
+      container.scrollTop = centerY * normalized - container.clientHeight / 2;
+    });
+  };
+
+  const fitFloorPlan = () => {
+    const container = floorSpacesRef.current;
+    if (!container) return;
+    const widestSpace = Math.max(...spaces.map((space) => spaceSizes[space]?.width || 1200));
+    changeFloorZoom(Math.min(1, (container.clientWidth - 16) / widestSpace));
+    requestAnimationFrame(() => container.scrollTo({ left: 0, top: 0, behavior: "smooth" }));
   };
 
   const toggleFloorFullscreen = async () => {
@@ -4221,15 +4298,16 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             {canEdit && <button className="primary-button small" disabled={saving} onClick={savePlan}>{saving ? t("Guardando…", "Saving…", "Salvando…") : t("Guardar modificaciones", "Save changes", "Salvar alterações")}</button>}
             <button className="outline-button compact" onClick={exportPlan}>⇩ PNG</button>
             <div className="floor-zoom" aria-label={t("Zoom del plano", "Layout zoom", "Zoom do plano")}>
-              <button onClick={() => setFloorZoom((value) => Math.max(.6, Number((value - .1).toFixed(1))))}>−</button>
+              <button onClick={() => changeFloorZoom(floorZoom - .1)}>−</button>
               <span>{Math.round(floorZoom * 100)}%</span>
-              <button onClick={() => setFloorZoom((value) => Math.min(1.5, Number((value + .1).toFixed(1))))}>＋</button>
-              <button onClick={() => setFloorZoom(1)}>↺</button>
+              <button onClick={() => changeFloorZoom(floorZoom + .1)}>＋</button>
+              <button onClick={() => changeFloorZoom(1)}>↺</button>
             </div>
-            <button className="outline-button compact" onClick={centerFloorPlan}>⌖ {t("Centrar", "Center", "Centralizar")}</button>
+            <button className="outline-button compact" onClick={fitFloorPlan}>↔ {t("Ajustar al salón", "Fit venue", "Ajustar ao salão")}</button>
+            <button className="outline-button compact" onClick={centerFloorPlan}>⌖ {t("Ir al inicio", "Go to start", "Ir ao início")}</button>
             <button className="outline-button compact" onClick={() => void toggleFloorFullscreen()}>⛶ {t("Pantalla completa", "Fullscreen", "Tela cheia")}</button>
             <button className={`outline-button compact ${showFloorLibrary ? "active" : ""}`} onClick={() => setShowFloorLibrary((value) => !value)}>◧ {showFloorLibrary ? t("Ocultar elementos", "Hide elements", "Ocultar elementos") : t("Mostrar elementos", "Show elements", "Mostrar elementos")}</button>
-            <button className={`outline-button compact ${showFloorInspector ? "active" : ""}`} disabled={!selectedLayoutTableId} onClick={() => setShowFloorInspector((value) => !value)}>◨ {showFloorInspector ? t("Ocultar inspector", "Hide inspector", "Ocultar inspetor") : t("Mostrar inspector", "Show inspector", "Mostrar inspetor")}</button>
+            <button className={`outline-button compact ${showFloorInspector ? "active" : ""}`} disabled={!selectedLayoutTableId && !selectedFloorElementId} onClick={() => setShowFloorInspector((value) => !value)}>◨ {showFloorInspector ? t("Ocultar inspector", "Hide inspector", "Ocultar inspetor") : t("Mostrar inspector", "Show inspector", "Mostrar inspetor")}</button>
             <button className={`outline-button compact ${snapToGrid ? "active" : ""}`} title={t("La cuadrícula alinea los elementos en incrementos regulares", "The grid aligns elements at regular intervals", "A grade alinha os elementos em intervalos regulares")} onClick={() => setSnapToGrid((value) => !value)}>⠿ {snapToGrid ? t("Cuadrícula activa", "Grid on", "Grade ativa") : t("Movimiento libre", "Free movement", "Movimento livre")}</button>
             <div className="layout-history-actions" aria-label={t("Historial del plano", "Layout history", "Histórico do plano")}>
               <button disabled={!layoutUndoStack.length || saving} onClick={undoLayoutChange}>↶ {t("Deshacer", "Undo", "Desfazer")}</button>
@@ -4242,8 +4320,9 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
             }}>{t("Eliminar último espacio", "Remove last space", "Remover último espaço")}</button>}
           </div>
           {layoutNotice && <p className="import-success" role="status">{layoutNotice}</p>}
+          <div className={`floor-save-status is-${floorSaveStatus}`} role="status"><i />{floorSaveStatus === "saving" ? t("Guardando cambio…", "Saving change…", "Salvando alteração…") : floorSaveStatus === "saved" ? t("Cambio guardado", "Change saved", "Alteração salva") : floorSaveStatus === "error" ? t("El cambio no se guardó", "Change not saved", "A alteração não foi salva") : t("Los cambios se guardan automáticamente", "Changes save automatically", "As alterações são salvas automaticamente")}{floorSaveStatus === "error" && failedFloorSave && <button onClick={() => void retryFloorElementSave()}>{t("Reintentar", "Retry", "Tentar novamente")}</button>}</div>
           {overlappingTableIds.size > 0 && <p className="layout-overlap-warning" role="alert">⚠ {t(`${overlappingTableIds.size} mesas están superpuestas o demasiado juntas.`, `${overlappingTableIds.size} tables overlap or are too close.`, `${overlappingTableIds.size} mesas estão sobrepostas ou muito próximas.`)}</p>}
-          <div className={`floor-editor ${selectedLayoutTableId && showFloorInspector ? "has-inspector" : ""} ${!showFloorLibrary ? "library-hidden" : ""}`}>
+          <div className={`floor-editor ${(selectedLayoutTableId || selectedFloorElementId) && showFloorInspector ? "has-inspector" : ""} ${!showFloorLibrary ? "library-hidden" : ""}`}>
             {canEdit && showFloorLibrary && <aside className="floor-elements-menu">
               <strong>{t("Elementos del salón", "Venue elements", "Elementos do salão")}</strong>
               <p>{t("Arrastrá o hacé clic para colocar. Elegí una categoría para encontrar cada objeto.", "Drag or click to place. Choose a category to find each object.", "Arraste ou clique para posicionar. Escolha uma categoria para encontrar cada objeto.")}</p>
@@ -4256,38 +4335,51 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 services: [["restroom", t("Baños", "Restrooms", "Banheiros")], ["kitchen", t("Cocina y servicio", "Kitchen and service", "Cozinha e serviço")], ["emergency", t("Salida de emergencia", "Emergency exit", "Saída de emergência")]],
                 furniture: [["photo-booth", "Photo booth"], ["gourmet", "Living / Lounge"], ["fountain", t("Fuente o centro", "Fountain or centerpiece", "Fonte ou centro")], ["plant", t("Planta o maceta", "Plant or planter", "Planta ou vaso")]],
                 utilities: [["custom", t("Texto o etiqueta", "Text or label", "Texto ou etiqueta")], ["divider", t("Línea o divisor", "Line or divider", "Linha ou divisor")]],
-              }[floorLibraryCategory] as Array<[FloorElement["kind"], string]>).map(([kind, label]) => <button className="context-tip" data-help={t("Hacé clic para agregarlo al centro o arrastralo a una posición exacta.", "Click to add it to the center or drag it to an exact position.", "Clique para adicionar ao centro ou arraste para uma posição exata.")} key={kind} draggable onDragStart={(event) => { event.dataTransfer.setData("text/new-element-kind", kind); event.dataTransfer.setData("text/new-element-label", label); }} onClick={() => void addFloorElement(kind, label)}><i className={`library-icon is-${kind}`} /> <span><strong>{label}</strong></span></button>)}</div>
+              }[floorLibraryCategory] as Array<[FloorElement["kind"], string]>).map(([kind, label]) => <button className="context-tip" data-help={t("Hacé clic para agregarlo al centro o arrastralo a una posición exacta.", "Click to add it to the center or drag it to an exact position.", "Clique para adicionar ao centro ou arraste para uma posição exata.")} key={kind} draggable onDragStart={(event) => { event.dataTransfer.effectAllowed = "copy"; event.dataTransfer.setData("text/plain", kind); event.dataTransfer.setData("text/new-element-kind", kind); event.dataTransfer.setData("text/new-element-label", label); setDraggedNewFloorElement({ kind, label }); }} onDragEnd={() => { setDraggedNewFloorElement(null); setFloorDropTarget(""); }} onClick={() => void addFloorElement(kind, label)}><i className={`library-icon is-${kind}`} /> <span><strong>{label}</strong></span></button>)}</div>
             </aside>}
-            <div className="floor-spaces" style={{ zoom: floorZoom }}>
+            <div className="floor-spaces" ref={floorSpacesRef}>
           {spaces.map((space) => (
-            <div className="floor-space" key={space} style={{ width: spaceSizes[space]?.width || 1200, height: spaceSizes[space]?.height || 700 }} onDragOver={(event) => event.preventDefault()} onDrop={(event) => {
+            <div className={`floor-space ${floorDropTarget === space && draggedNewFloorElement ? "is-drop-target" : ""}`} key={space} style={{ width: spaceSizes[space]?.width || 1200, height: spaceSizes[space]?.height || 700, transform: `scale(${floorZoom})`, transformOrigin: "top left", marginRight: (spaceSizes[space]?.width || 1200) * (floorZoom - 1), marginBottom: (spaceSizes[space]?.height || 700) * (floorZoom - 1) }} onClick={(event) => { if (event.target === event.currentTarget) { setSelectedLayoutTableId(""); setSelectedFloorElementId(""); } }} onDragEnter={(event) => { if (draggedNewFloorElement) { event.preventDefault(); setFloorDropTarget(space); } }} onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setFloorDropTarget((current) => current === space ? "" : current); }} onDragOver={(event) => { event.preventDefault(); if (draggedNewFloorElement) { event.dataTransfer.dropEffect = "copy"; setFloorDropTarget(space); } }} onDrop={(event) => {
               if (!canEdit) return;
+              event.preventDefault();
               const bounds = event.currentTarget.getBoundingClientRect();
               const table = tables.find((item) => item.id === event.dataTransfer.getData("text/table-id"));
-              if (table) { void moveTable(table, space, event.clientX - bounds.left - (table.width || 140) / 2, event.clientY - bounds.top - (table.height || 70) / 2); return; }
+              if (table) { void moveTable(table, space, (event.clientX - bounds.left) / floorZoom - (table.width || 140) / 2, (event.clientY - bounds.top) / floorZoom - (table.height || 70) / 2); return; }
               const element = floorElements.find((item) => item.id === event.dataTransfer.getData("text/element-id"));
-              if (element) { const next = updateFloorElement(element, { space, x: Math.max(0, event.clientX - bounds.left - element.width / 2), y: Math.max(0, event.clientY - bounds.top - element.height / 2) }); persistFloorElement(next); }
-              const newElementKind = event.dataTransfer.getData("text/new-element-kind") as FloorElement["kind"];
-              if (newElementKind) void addFloorElement(newElementKind, event.dataTransfer.getData("text/new-element-label") || t("Elemento", "Element", "Elemento"), { space, x: Math.max(0, event.clientX - bounds.left - 75), y: Math.max(0, event.clientY - bounds.top - 40) });
+              if (element) { const next = updateFloorElement(element, { space, x: Math.max(0, (event.clientX - bounds.left) / floorZoom - element.width / 2), y: Math.max(0, (event.clientY - bounds.top) / floorZoom - element.height / 2) }); persistFloorElement(next, element); }
+              const newElementKind = (event.dataTransfer.getData("text/new-element-kind") || draggedNewFloorElement?.kind || "") as FloorElement["kind"];
+              const newElementLabel = event.dataTransfer.getData("text/new-element-label") || draggedNewFloorElement?.label || t("Elemento", "Element", "Elemento");
+              if (newElementKind) void addFloorElement(newElementKind, newElementLabel, { space, x: Math.max(0, (event.clientX - bounds.left) / floorZoom - 75), y: Math.max(0, (event.clientY - bounds.top) / floorZoom - 40) });
+              setDraggedNewFloorElement(null);
+              setFloorDropTarget("");
             }}>
+              {floorDropTarget === space && draggedNewFloorElement && <span className="floor-drop-message">＋ {t(`Soltá para agregar ${draggedNewFloorElement.label}`, `Drop to add ${draggedNewFloorElement.label}`, `Solte para adicionar ${draggedNewFloorElement.label}`)}</span>}
               <div className="space-heading"><strong className="space-label">{space}</strong>{canEdit && <span title={t("Estas medidas definen el lienzo visual; mantené la proporción del plano real", "These values define the visual canvas; preserve the real layout proportions", "Estas medidas definem a tela visual; mantenha a proporção do plano real")}><label>{t("Ancho", "Width", "Largura")}<input type="number" min="700" max="2400" value={spaceSizes[space]?.width || 1200} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: Number(event.target.value), height: current[space]?.height || 700 } }))} onBlur={(event) => void saveSpaceSize(space, Number(event.target.value), spaceSizes[space]?.height || 700)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min="480" max="1800" value={spaceSizes[space]?.height || 700} onChange={(event) => setSpaceSizes((current) => ({ ...current, [space]: { width: current[space]?.width || 1200, height: Number(event.target.value) } }))} onBlur={(event) => void saveSpaceSize(space, spaceSizes[space]?.width || 1200, Number(event.target.value))} /></label></span>}</div>
               {tables.filter((table) => (table.space || "Espacio 1") === space).map((table) => (
-                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
+                <article className={`floor-table is-${table.shape || "round"} ${table.locked ? "is-locked" : ""} ${overlappingTableIds.has(table.id) ? "has-overlap" : ""} ${selectedLayoutTableId === table.id ? "is-selected" : ""}`} key={table.id} draggable={canEdit && !table.locked} onClick={() => { setSelectedFloorElementId(""); setSelectedLayoutTableId(table.id); setLayoutTableNameDraft(table.name); setShowFloorInspector(true); }} onDoubleClick={() => canEdit && openEdit(table)} onDragStart={(event) => event.dataTransfer.setData("text/table-id", table.id)} style={{ left: table.x || 24, top: table.y || 24, width: table.width || 140, height: table.height || 70 }}>
                   <div className="floor-table-shape" style={{ transform: `rotate(${table.rotation || 0}deg)` }} />
                   <strong>{table.name}</strong><small>{table.shape === "living" ? t("Sin límite", "Unlimited", "Sem limite") : `${table.capacity} ${t("lugares", "seats", "lugares")}`}</small>
                   {canEdit && !table.locked && selectedLayoutTableId === table.id && <button className="resize-handle" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => resizeTable(table, event)} aria-label={t("Cambiar tamaño de mesa", "Resize table", "Redimensionar mesa")} />}
                 </article>
               ))}
-              {floorElements.filter((element) => element.space === space).map((element) => <article className={`floor-element is-${element.kind}`} key={element.id} draggable={canEdit} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height }}>
-                {element.kind === "custom" && canEdit ? <input value={element.label} onChange={(event) => updateFloorElement(element, { label: event.target.value })} onBlur={(event) => persistFloorElement(updateFloorElement(element, { label: event.target.value }))} aria-label={t("Texto del elemento", "Element text", "Texto do elemento")} /> : <strong>{element.label}</strong>}
-                {canEdit && <><button className="element-delete" onClick={() => void deleteFloorElement(element.id)} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${element.label}`}>×</button><button className="resize-handle" onPointerDown={(event) => resizeFloorElement(element, event)} aria-label={t("Cambiar tamaño", "Resize", "Redimensionar")} /></>}
+              {floorElements.filter((element) => element.space === space).map((element) => <article className={`floor-element is-${element.kind} ${selectedFloorElementId === element.id ? "is-selected" : ""}`} key={element.id} draggable={canEdit} onClick={(event) => { event.stopPropagation(); setSelectedLayoutTableId(""); setSelectedFloorElementId(element.id); setFloorElementLabelDraft(element.label); setShowFloorInspector(true); }} onDragStart={(event) => event.dataTransfer.setData("text/element-id", element.id)} style={{ left: element.x, top: element.y, width: element.width, height: element.height, transform: `rotate(${element.rotation || 0}deg)` }}>
+                <strong>{element.label}</strong>
+                {canEdit && selectedFloorElementId === element.id && <><button className="element-delete" onClick={(event) => { event.stopPropagation(); void deleteFloorElement(element.id); }} aria-label={`${t("Eliminar", "Delete", "Excluir")} ${element.label}`}>×</button><button className="resize-handle" onPointerDown={(event) => resizeFloorElement(element, event)} aria-label={t("Cambiar tamaño", "Resize", "Redimensionar")} /></>}
               </article>)}
             </div>
           ))}
             </div>
+            {selectedFloorElementId && showFloorInspector && (() => { const selectedElement = floorElements.find((element) => element.id === selectedFloorElementId); if (!selectedElement) return null; return <aside className="floor-table-inspector floor-element-inspector">
+              <header><div><span>{t("Elemento seleccionado", "Selected element", "Elemento selecionado")}</span><strong>{selectedElement.label}</strong></div><button onClick={() => setSelectedFloorElementId("")} aria-label={t("Cerrar inspector", "Close inspector", "Fechar inspetor")}>×</button></header>
+              <label>{t("Nombre", "Name", "Nome")}<span className="table-name-save"><input value={floorElementLabelDraft} maxLength={120} onChange={(event) => setFloorElementLabelDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && floorElementLabelDraft.trim()) persistFloorElement(updateFloorElement(selectedElement, { label: floorElementLabelDraft.trim() })); }} /><button disabled={!floorElementLabelDraft.trim() || floorElementLabelDraft.trim() === selectedElement.label} onClick={() => persistFloorElement(updateFloorElement(selectedElement, { label: floorElementLabelDraft.trim() }))}>{t("Guardar", "Save", "Salvar")}</button></span></label>
+              <div className="floor-element-size"><label>{t("Ancho", "Width", "Largura")}<input type="number" min="90" max="420" value={selectedElement.width} onChange={(event) => updateFloorElement(selectedElement, { width: Math.max(90, Math.min(420, Number(event.target.value))) })} onBlur={() => persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label><label>{t("Alto", "Height", "Altura")}<input type="number" min="55" max="260" value={selectedElement.height} onChange={(event) => updateFloorElement(selectedElement, { height: Math.max(55, Math.min(260, Number(event.target.value))) })} onBlur={() => persistFloorElement(floorElements.find((element) => element.id === selectedElement.id) || selectedElement)} /></label></div>
+              {(["wall", "divider", "stage", "dj", "buffet", "gifts", "hydration", "gourmet", "photo-booth"] as FloorElement["kind"][]).includes(selectedElement.kind) && <fieldset className="floor-element-rotation"><legend>{t("Rotación", "Rotation", "Rotação")}</legend><div>{[0, 45, 90, 180, 270].map((rotation) => <button key={rotation} className={(selectedElement.rotation || 0) === rotation ? "active" : ""} onClick={() => persistFloorElement(updateFloorElement(selectedElement, { rotation }), selectedElement)}>{rotation}°</button>)}</div></fieldset>}
+              <div className="floor-element-actions"><button disabled={!canEdit} onClick={() => void duplicateFloorElement(selectedElement)}>{t("Duplicar", "Duplicate", "Duplicar")}</button><button className="is-danger" disabled={!canEdit} onClick={() => void deleteFloorElement(selectedElement.id)}>{t("Eliminar", "Delete", "Excluir")}</button></div>
+              <small>{t("Arrastrá el elemento para moverlo. Usá el control de la esquina para cambiar su tamaño.", "Drag the element to move it. Use the corner control to resize it.", "Arraste o elemento para movê-lo. Use o controle do canto para redimensioná-lo.")}</small>
+            </aside>; })()}
             {selectedLayoutTableId && showFloorInspector && (() => { const selectedTable = tables.find((table) => table.id === selectedLayoutTableId); if (!selectedTable) return null; const selectedTableGuests = selectedTable.guests.map((guestId) => confirmedGuests.find((guest) => guest.id === guestId)).filter(Boolean) as Guest[]; const occupied = selectedTableGuests.reduce((total, guest) => total + confirmedPeopleForGuest(guest, guests), 0); const selectedMenuSummary = new Map<string, number>(); selectedTableGuests.forEach((guest) => { if (meaningfulGuestValue(guest.menuChoice)) selectedMenuSummary.set(guest.menuChoice, (selectedMenuSummary.get(guest.menuChoice) || 0) + confirmedPeopleForGuest(guest, guests)); }); const selectedDietaryAlerts = selectedTableGuests.flatMap((guest) => [meaningfulGuestValue(guest.food) ? `${guest.name}: ${guest.food}` : "", ...guest.companions.filter((companion) => meaningfulGuestValue(companion.food)).map((companion) => `${companion.name || guest.name}: ${companion.food}`)]).filter(Boolean); const selectedAccessibilityAlerts = selectedTableGuests.filter((guest) => meaningfulGuestValue(guest.accessibilityNeeds)); const selectedSocialConflicts = socialConflicts.filter((conflict) => conflict.tableId === selectedTable.id); const lastAssignedSeat = selectedTable.guests.reduce((lastSeat, guestId) => { const start = selectedTable.seatAssignments?.[guestId] || 0; const guest = confirmedGuests.find((candidate) => candidate.id === guestId); return start && guest ? Math.max(lastSeat, start + confirmedPeopleForGuest(guest, guests) - 1) : lastSeat; }, 0); const minimumCapacity = Math.max(1, occupied, lastAssignedSeat); return <aside className="floor-table-inspector">
               <header><div><span>{t("Mesa seleccionada", "Selected table", "Mesa selecionada")}</span><strong>{selectedTable.name}</strong></div><button onClick={() => setSelectedLayoutTableId("")} aria-label={t("Cerrar inspector", "Close inspector", "Fechar inspetor")}>×</button></header>
-              <label>{t("Nombre de la mesa", "Table name", "Nome da mesa")}<span className="table-name-save"><input value={layoutTableNameDraft || selectedTable.name} maxLength={120} onChange={(event) => setLayoutTableNameDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") void renameTableInline(selectedTable, layoutTableNameDraft || selectedTable.name); }} /><button disabled={saving || !(layoutTableNameDraft || "").trim() || layoutTableNameDraft.trim() === selectedTable.name} onClick={() => void renameTableInline(selectedTable, layoutTableNameDraft)}>{saving ? "…" : t("Guardar", "Save", "Salvar")}</button></span></label>
+              <label>{t("Nombre de la mesa", "Table name", "Nome da mesa")}<span className="table-name-save"><input value={layoutTableNameDraft} maxLength={120} onChange={(event) => setLayoutTableNameDraft(event.target.value)} onBlur={() => { if (layoutTableNameDraft.trim() && layoutTableNameDraft.trim() !== selectedTable.name) void renameTableInline(selectedTable, layoutTableNameDraft); }} onKeyDown={(event) => { if (event.key === "Enter") { event.currentTarget.blur(); } }} /><button disabled={saving || !layoutTableNameDraft.trim() || layoutTableNameDraft.trim() === selectedTable.name} onMouseDown={(event) => event.preventDefault()} onClick={() => void renameTableInline(selectedTable, layoutTableNameDraft)}>{saving ? "…" : t("Guardar", "Save", "Salvar")}</button></span></label>
               <div className="floor-inspector-capacity"><span>{t("Ocupación", "Occupancy", "Ocupação")}</span><strong>{selectedTable.shape === "living" ? `${occupied} ${t("personas", "people", "pessoas")}` : `${occupied}/${selectedTable.capacity}`}</strong>{selectedTable.shape !== "living" && <><div className="capacity-stepper"><button disabled={saving || selectedTable.capacity <= minimumCapacity} onClick={() => void updateTableCapacityInline(selectedTable, selectedTable.capacity - 1)} aria-label={t("Quitar un lugar", "Remove one seat", "Remover um lugar")}>−</button><b>{selectedTable.capacity}</b><button disabled={saving || selectedTable.capacity >= 30} onClick={() => void updateTableCapacityInline(selectedTable, selectedTable.capacity + 1)} aria-label={t("Agregar un lugar", "Add one seat", "Adicionar um lugar")}>+</button></div><div className="capacity-bar"><i style={{ width: `${Math.min(100, (occupied / selectedTable.capacity) * 100)}%` }} /></div>{selectedTable.capacity <= minimumCapacity && <small className="capacity-minimum-note">⚠ {lastAssignedSeat > occupied ? t(`No podés reducir: el asiento ${lastAssignedSeat} está ocupado.`, `Cannot reduce: seat ${lastAssignedSeat} is occupied.`, `Não é possível reduzir: o assento ${lastAssignedSeat} está ocupado.`) : t(`No podés reducir: ya hay ${occupied} personas ubicadas.`, `Cannot reduce: ${occupied} people are already seated.`, `Não é possível reduzir: já há ${occupied} pessoas alocadas.`)}</small>}</>}</div>
               <label>{t("Agregar invitado", "Add guest", "Adicionar convidado")}<select value="" disabled={!canEdit || saving || !unassigned.length} onChange={(event) => { if (event.target.value) void assignGuest(event.target.value, selectedTable.id); }}><option value="">{unassigned.length ? t("Elegir persona sin mesa…", "Choose an unseated guest…", "Escolher pessoa sem mesa…") : t("Todos tienen mesa", "Everyone has a table", "Todos têm mesa")}</option>{unassigned.map((guest) => { const people = confirmedPeopleForGuest(guest, guests); const free = selectedTable.shape === "living" ? Infinity : selectedTable.capacity - occupied; return <option key={guest.id} value={guest.id} disabled={people > free}>{guest.name} · {people} {people === 1 ? t("persona", "person", "pessoa") : t("personas", "people", "pessoas")}{people > free ? ` · ${t("sin lugar", "no room", "sem lugar")}` : ""}</option>; })}</select></label>
               {selectedTable.guests.length > 0 && <div className="floor-inspector-guests"><strong>{t("Personas en esta mesa", "Guests at this table", "Pessoas nesta mesa")}</strong>{selectedTable.guests.map((guestId) => { const guest = confirmedGuests.find((candidate) => candidate.id === guestId); return guest ? <span key={guest.id}>{guest.name}<button disabled={!canEdit || saving} onClick={() => void unassignGuest(guest.id)} aria-label={`${t("Quitar de la mesa", "Remove from table", "Remover da mesa")} ${guest.name}`}>×</button></span> : null; })}</div>}
@@ -4295,7 +4387,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 <summary>{t("Opciones avanzadas", "Advanced options", "Opções avançadas")} <span>⌄</span></summary>
                 <div>
                   <p className="floor-inspector-note">{selectedTable.note || t("Sin observaciones. Podés agregar una desde la edición completa.", "No notes. Add one from full settings.", "Sem observações. Adicione uma na edição completa.")}</p>
-                  {(selectedMenuSummary.size > 0 || selectedDietaryAlerts.length > 0 || selectedAccessibilityAlerts.length > 0 || selectedSocialConflicts.length > 0) && <section className="floor-inspector-operations"><strong>{t("Detalles para revisar", "Details to review", "Detalhes para revisar")}</strong>{[...selectedMenuSummary].map(([menu, count]) => <span key={menu}>🍽 {count}× {menu}</span>)}{selectedDietaryAlerts.map((alert) => <span className="is-alert" key={alert}>⚠ {alert}</span>)}{selectedAccessibilityAlerts.map((guest) => <span className="is-accessibility" key={guest.id}>♿ {guest.name}: {guest.accessibilityNeeds}</span>)}{selectedSocialConflicts.map((conflict) => <button key={conflict.id} onClick={() => focusSpecificTable(conflict.tableId)}>⚠ {conflict.message}</button>)}</section>}
+                  {(selectedMenuSummary.size > 0 || selectedDietaryAlerts.length > 0 || selectedAccessibilityAlerts.length > 0 || selectedSocialConflicts.length > 0) && <section className="floor-inspector-operations"><strong>{t("Necesidades y alertas de esta mesa", "Needs and alerts for this table", "Necessidades e alertas desta mesa")}</strong>{[...selectedMenuSummary].map(([menu, count]) => <span key={menu}>🍽 {count}× {menu}</span>)}{selectedDietaryAlerts.map((alert) => <span className="is-alert" key={alert}>⚠ {alert}</span>)}{selectedAccessibilityAlerts.map((guest) => <span className="is-accessibility" key={guest.id}>♿ {guest.name}: {guest.accessibilityNeeds}</span>)}{selectedSocialConflicts.map((conflict) => <button key={conflict.id} onClick={() => focusSpecificTable(conflict.tableId)}>⚠ {conflict.message}</button>)}</section>}
                   <div className="floor-inspector-actions"><button onClick={() => void updateTableLayout(selectedTable, { locked: !selectedTable.locked })}>{selectedTable.locked ? t("Desbloquear", "Unlock", "Desbloquear") : t("Bloquear", "Lock", "Bloquear")}</button><button disabled={selectedTable.locked} onClick={() => void updateTableLayout(selectedTable, { rotation: ((selectedTable.rotation || 0) + 45) % 360 })}>{t("Girar 45°", "Rotate 45°", "Girar 45°")}</button><button onClick={() => void duplicateTable(selectedTable)}>{t("Duplicar", "Duplicate", "Duplicar")}</button><button onClick={() => openEdit(selectedTable)}>{t("Edición completa", "Full settings", "Edição completa")}</button></div>
                 </div>
               </details>
@@ -4575,8 +4667,12 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                 ? t("Zona flexible", "Flexible area", "Área flexível")
                 : over
                   ? t("Sobrecapacidad", "Over capacity", "Acima da capacidade")
-                  : tableNeedsReview
-                    ? t("Revisar detalles", "Review details", "Revisar detalhes")
+                  : tableSocialConflicts.length > 0
+                    ? t("Conflicto de ubicación", "Seating conflict", "Conflito de localização")
+                    : accessibilityAlerts.length > 0
+                      ? t("Necesidad de accesibilidad", "Accessibility need", "Necessidade de acessibilidade")
+                      : dietaryAlerts.length > 0
+                        ? t("Restricción alimentaria", "Dietary restriction", "Restrição alimentar")
                     : full
                       ? t("Mesa completa", "Table full", "Mesa completa")
                       : occupied === 0
@@ -4693,7 +4789,10 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
                           className={`seat-marker ${person ? "is-occupied" : ""} ${person?.guest.guestType === "teen" ? "is-teen" : ""} ${person?.guest.guestType === "child" ? "is-child" : ""} ${person?.guest.id === selectedGuestId ? "is-selected" : ""} ${selectedGuestId && (!person || person.guest.id === selectedGuestId) ? "is-click-target" : ""} ${seatIndex === suggestedSeatIndex ? "is-suggested" : ""} ${person && guestHasRestriction(person.guest) ? "has-alert" : ""}`}
                           key={seatIndex}
                           style={{ left: `${50 + Math.cos(angle) * radiusX}%`, top: `${50 + Math.sin(angle) * radiusY}%` }}
-                          title={seatIndex === suggestedSeatIndex ? `${t("Asiento sugerido junto al grupo", "Suggested seat next to group", "Assento sugerido junto ao grupo")} · ${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}` : person ? `${person.personName}${meaningfulGuestValue(person.guest.food) ? ` · ${person.guest.food}` : ""}${person.guest.socialTogetherWith ? ` · ${t("Junto a", "Together with", "Junto a")} ${person.guest.socialTogetherWith}` : ""}${person.guest.socialSeparateFrom ? ` · ${t("Separado de", "Separate from", "Separado de")} ${person.guest.socialSeparateFrom}` : ""}${person.guest.preferredTableName ? ` · ${t("Mesa preferida", "Preferred table", "Mesa preferida")}: ${person.guest.preferredTableName}` : ""}` : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
+                          title={seatIndex === suggestedSeatIndex ? `${t("Asiento sugerido junto al grupo", "Suggested seat next to group", "Assento sugerido junto ao grupo")} · ${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}` : person ? undefined : `${t("Asiento", "Seat", "Assento")} ${seatIndex + 1}`}
+                          onMouseEnter={(event) => person && setSeatHover({ name: person.personName, x: event.clientX, y: event.clientY })}
+                          onMouseMove={(event) => person && setSeatHover({ name: person.personName, x: event.clientX, y: event.clientY })}
+                          onMouseLeave={() => setSeatHover(null)}
                           draggable={Boolean(canEdit && person)}
                           onDragStart={(event) => {
                             if (!person) return;
@@ -4817,6 +4916,7 @@ function Seating({ guests, canEdit }: { guests: Guest[]; canEdit: boolean }) {
               </button>
             )}
           </div>
+          {seatHover && <div className="seat-hover-tooltip" role="tooltip" style={{ left: Math.min(window.innerWidth - 18, seatHover.x + 14), top: Math.max(12, seatHover.y - 12) }}>{seatHover.name}</div>}
         </section>
       </div></>}
 

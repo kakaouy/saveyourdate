@@ -27,6 +27,7 @@ type LayoutElementRow = {
   position_y: number;
   element_width: number;
   element_height: number;
+  rotation_degrees?: number;
 };
 
 type SpaceSettingRow = { space_name: string; canvas_width: number; canvas_height: number };
@@ -59,7 +60,7 @@ const clientTable = (row: TableRow, assignments: AssignmentRow[] = []) => ({
   )
 });
 
-const clientElement = (row: LayoutElementRow) => ({ id: row.id, kind: row.element_type, label: row.label, space: row.space_name, x: Number(row.position_x), y: Number(row.position_y), width: Number(row.element_width), height: Number(row.element_height) });
+const clientElement = (row: LayoutElementRow) => ({ id: row.id, kind: row.element_type, label: row.label, space: row.space_name, x: Number(row.position_x), y: Number(row.position_y), width: Number(row.element_width), height: Number(row.element_height), rotation: Number(row.rotation_degrees || 0) });
 
 async function handler(request: Request) {
   try {
@@ -107,6 +108,34 @@ async function handler(request: Request) {
       if (!rows[0]) return json({ error: 'No encontramos esa mesa.' }, 404);
       return json({ table: clientTable(rows[0]) });
     }
+    if (request.method === 'PATCH' && body.action === 'rename') {
+      const id = String(body.id || '');
+      const name = String(body.name || '').trim().slice(0, 120);
+      if (!id) return json({ error: 'Falta identificar la mesa.' }, 400);
+      if (!name) return json({ error: 'Ingresá un nombre para la mesa.' }, 400);
+      const currentResponse = await supabaseRequest(`event_tables?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&select=id,name&limit=1`);
+      const currentTable = ((await currentResponse.json()) as Pick<TableRow, 'id' | 'name'>[])[0];
+      if (!currentTable) return json({ error: 'No encontramos esa mesa.' }, 404);
+      const response = await supabaseRequest(`event_tables?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`, {
+        method: 'PATCH',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify({ name, updated_at: new Date().toISOString() }),
+      });
+      const row = ((await response.json()) as TableRow[])[0];
+      if (!row) return json({ error: 'No pudimos cambiar el nombre de la mesa.' }, 500);
+      if (currentTable.name !== row.name) {
+        try {
+          await supabaseRequest(`event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&preferred_table_name=eq.${encodeURIComponent(currentTable.name)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ preferred_table_name: row.name, updated_at: new Date().toISOString() }),
+          });
+        } catch (preferenceError) {
+          console.error('Table renamed but preferred table references could not be synchronized.', preferenceError);
+        }
+      }
+      await logAdminActivity(session, 'table.renamed', 'table', row.id, { previousName: currentTable.name, name: row.name });
+      return json({ table: clientTable(row) });
+    }
     if (request.method === 'PATCH' && body.action === 'space-settings') {
       const spaceName = String(body.space || 'Espacio 1').trim() || 'Espacio 1';
       const response = await supabaseRequest('event_layout_spaces?on_conflict=order_number,space_name', {
@@ -118,22 +147,31 @@ async function handler(request: Request) {
       return json({ space: { name: row.space_name, width: Number(row.canvas_width), height: Number(row.canvas_height) } });
     }
     if (body.action === 'layout-element' && request.method === 'POST') {
-      const response = await supabaseRequest('event_layout_elements', {
-        method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
-          order_number: session.order_number,
-          element_type: String(body.kind || 'custom'), label: String(body.label || 'Texto editable').trim().slice(0, 120), space_name: String(body.space || 'Espacio 1'),
-          position_x: Math.round(Number(body.x) || 0), position_y: Math.round(Number(body.y) || 0), element_width: Math.round(Number(body.width) || 150), element_height: Math.round(Number(body.height) || 80),
-        }),
-      });
-      const row = ((await response.json()) as LayoutElementRow[])[0];
-      return json({ element: clientElement(row) }, 201);
+      try {
+        const response = await supabaseRequest('event_layout_elements', {
+          method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
+            order_number: session.order_number,
+            element_type: String(body.kind || 'custom'), label: String(body.label || 'Texto editable').trim().slice(0, 120), space_name: String(body.space || 'Espacio 1'),
+            position_x: Math.round(Number(body.x) || 0), position_y: Math.round(Number(body.y) || 0), element_width: Math.round(Number(body.width) || 150), element_height: Math.round(Number(body.height) || 80), rotation_degrees: Math.round(Number(body.rotation) || 0) % 360,
+          }),
+        });
+        const row = ((await response.json()) as LayoutElementRow[])[0];
+        if (!row) return json({ error: 'No pudimos crear el elemento.' }, 500);
+        return json({ element: clientElement(row) }, 201);
+      } catch (elementError) {
+        const detail = elementError instanceof Error ? elementError.message : String(elementError);
+        if (detail.includes('event_layout_elements_element_type_check') || detail.includes('23514')) {
+          return json({ error: 'La base de datos todavía no admite este tipo de elemento. Aplicá la migración pendiente del plano y volvé a intentarlo.' }, 409);
+        }
+        throw elementError;
+      }
     }
     if (body.action === 'layout-element' && request.method === 'PATCH') {
       const id = String(body.id || '');
       const response = await supabaseRequest(`event_layout_elements?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`, {
         method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
           label: String(body.label || '').trim().slice(0, 120) || 'Texto editable', space_name: String(body.space || 'Espacio 1'),
-          position_x: Math.round(Math.max(0, Number(body.x) || 0)), position_y: Math.round(Math.max(0, Number(body.y) || 0)), element_width: Math.round(Math.max(90, Math.min(420, Number(body.width) || 150))), element_height: Math.round(Math.max(55, Math.min(260, Number(body.height) || 80))), updated_at: new Date().toISOString(),
+          position_x: Math.round(Math.max(0, Number(body.x) || 0)), position_y: Math.round(Math.max(0, Number(body.y) || 0)), element_width: Math.round(Math.max(90, Math.min(420, Number(body.width) || 150))), element_height: Math.round(Math.max(55, Math.min(260, Number(body.height) || 80))), rotation_degrees: Math.round(Number(body.rotation) || 0) % 360, updated_at: new Date().toISOString(),
         }),
       });
       const row = ((await response.json()) as LayoutElementRow[])[0];
