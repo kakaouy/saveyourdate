@@ -1,0 +1,49 @@
+temp-vite-app/tests/admin-guests-center.test.ts
+  s_7bf15498a84739::t_ef1854ca402cbc 318-327
+  s_7bf15498a84739::t_a15dd124c4ed77 342-351
+  s_7bf15498a84739::t_c68e09f52c33f0 353,359-360
+  s_7bf15498a84739::t_8cbfbdfa36fe09 372-394
+  s_7bf15498a84739::t_f573c5195df258 352,354-358,361-362
+temp-vite-app/src/admin-prototype.css
+  s_7bf15498a84739::t_dab26e1026e428 873
+  s_7bf15498a84739::t_f573c5195df258 422-423
+  s_7bf15498a84739::t_39f263340e0f92 463,528,534-536
+  s_7bf15498a84739::t_4caf8ea853c5b2 398-399,401-402,444-452,470-474,478-482,484,529-533,1075,1080
+temp-vite-app/api/_lib/admin/tables.ts
+  s_7bf15498a84739::t_5a1ee0a1a817f3 30,63,155,174
+  s_7bf15498a84739::t_c68e09f52c33f0 150-154,156-167
+  s_7bf15498a84739::t_dab26e1026e428 111-126,135-138
+  s_7bf15498a84739::t_ef1854ca402cbc 127-134
+temp-vite-app/PRODUCTION_CHECKLIST.md
+  s_7bf15498a84739::t_c68e09f52c33f0 10-11
+  s_7bf15498a84739::t_5a1ee0a1a817f3 12-13
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7bf15498a84739::t_3239b89ece9588 3919-3922,3963,4347,4349,4376
+  s_7bf15498a84739::t_dd25a7c2384ece 3261,3291,3310-3311,3881-3894,3923-3934,3954,4033-4056
+  s_7bf15498a84739::t_7a36cdf25d5e94 4301,4303-4304,4306-4307,4323,4340,4342,4365
+  s_7bf15498a84739::t_ef1854ca402cbc 4792
+  s_7bf15498a84739::t_dab26e1026e428 3307,3791,4382,4390,4670-4675,4793-4795,4919
+  s_7bf15498a84739::t_f573c5195df258 3308-3309,4338,4344,4350-4354,4356
+  s_7bf15498a84739::t_39f263340e0f92 3304,3306,3901-3904,3938-3941,3945-3953,4310,4325,4359,4366-4367,4372-4375,4377-4379
+  s_7bf15498a84739::t_c68e09f52c33f0 3907-3910
+  s_7bf15498a84739::t_0c78bf52f754cd 3961
+  s_7bf15498a84739::t_7df2ef25947b3a 3955
+temp-vite-app/supabase/migrations/20260827030000_floor_plan_element_rotation.sql
+  s_7bf15498a84739::t_5a1ee0a1a817f3 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ea6b138177faf7d93d03e71d1866121b85e35ec0",
+  "prompts": {},
+  "sessions": {
+    "s_7bf15498a84739": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04384-e93b-7e52-b32b-d6b49a0c1989",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
