@@ -15,6 +15,9 @@
   la distribución actual de invitados.
 - Confirmar que una mesa existente mantiene sus invitados, asientos, posición y
   bloqueo después de la migración.
+- `20260828010000_event_whatsapp_connections.sql` puede aplicarse desde ahora
+  sin activar envíos. Sólo crea el almacenamiento aislado por evento que se
+  utilizará cuando se habilite WhatsApp Business.
 
 En una instalación nueva se puede ejecutar `supabase/orders.sql`; en una base
 con datos se deben usar las migraciones incrementales.
@@ -33,9 +36,13 @@ Verificar en Vercel para Production, Preview y Development:
 - `ADMIN_AUTH_SECRET` (mínimo 32 caracteres)
 - `CRON_SECRET`
 
-WhatsApp Business requiere además las variables `WHATSAPP_*` documentadas en
-el README. Sin ellas, el panel funciona en modo manual y no debe mostrar una
-entrega como confirmada.
+WhatsApp Business es opcional y queda pospuesto. Sin las variables de Meta, el
+panel funciona en modo manual: prepara el mensaje y lo abre en el WhatsApp de la
+persona anfitriona, sin presentar esa acción como una entrega confirmada.
+
+Cuando se decida activarlo, configurar las variables `META_*`,
+`WHATSAPP_CONNECTION_ENCRYPTION_KEY` y las plantillas documentadas en
+`docs/meta-whatsapp-templates.md`. Cada evento deberá conectar su propio número.
 
 ## 3. Verificación previa
 

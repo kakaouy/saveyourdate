@@ -87,6 +87,14 @@ async function handler(request: Request) {
     }
     if (request.method === 'POST') {
       if (!['owner', 'admin', 'editor'].includes(session.access_role)) return json({ error: 'No tenés permiso para programar comunicaciones.' }, 403);
+      const connectionResponse = await supabaseRequest(`event_whatsapp_connections?order_number=eq.${encodeURIComponent(session.order_number)}&status=eq.connected&select=phone_number_id,token_expires_at&limit=1`);
+      const connectionPayload = await connectionResponse.json() as unknown;
+      const connection = connectionResponse.ok && Array.isArray(connectionPayload)
+        ? connectionPayload[0] as { phone_number_id?: string; token_expires_at?: string | null } | undefined
+        : undefined;
+      if (!connection?.phone_number_id || (connection.token_expires_at && new Date(connection.token_expires_at).getTime() <= Date.now())) {
+        return json({ error: 'Conectá y verificá el WhatsApp Business propio de este evento antes de programar envíos.' }, 409);
+      }
       const body = await request.json() as Record<string, unknown>;
       const kind = String(body.kind || '');
       const recipientIds = Array.isArray(body.recipientIds) ? [...new Set(body.recipientIds.map(String).filter(Boolean))].slice(0, 500) : [];
@@ -95,8 +103,7 @@ async function handler(request: Request) {
       if (!['invite', 'reminder', 'notice', 'thanks'].includes(kind) || !recipientIds.length || !message || !scheduledAt) return json({ error: 'Completá el tipo, la fecha, el mensaje y los destinatarios.' }, 400);
       const date = new Date(scheduledAt);
       if (Number.isNaN(date.getTime()) || date.getTime() <= Date.now()) return json({ error: 'Elegí una fecha y hora futuras.' }, 400);
-      const before = new Date(Date.now() + 180 * 86400000);
-      if (date > before) return json({ error: 'La comunicación puede programarse con hasta 180 días de anticipación.' }, 400);
+      if (date > new Date(Date.now() + 180 * 86400000)) return json({ error: 'La comunicación puede programarse con hasta 180 días de anticipación.' }, 400);
       const details = {
         kind,
         recipientIds,
@@ -109,7 +116,7 @@ async function handler(request: Request) {
         htmlContent: String(body.htmlContent || '').slice(0, 8000),
         bankDetails: String(body.bankDetails || '').slice(0, 1500),
         title: String(body.title || '').slice(0, 120),
-        delivery: 'automatic-whatsapp',
+        delivery: 'event-whatsapp-business',
       };
       await logAdminActivity(session, 'communication.scheduled', 'communication', '', details);
       return json({ ok: true, scheduledAt: details.scheduledAt, recipientCount: recipientIds.length });

@@ -1,8 +1,13 @@
 # Plantillas de WhatsApp para comunicaciones
 
-Estas cuatro plantillas deben crearse y aprobarse en WhatsApp Manager antes de
-activar el envío automático. Los nombres son sugeridos; si Meta aprueba otros,
-hay que colocar esos nombres exactos en Vercel.
+> Estado actual: integración preparada, pero activación pospuesta hasta contar
+> con WhatsApp Business. Mientras tanto, Save Your Date prepara cada mensaje y
+> lo abre en el WhatsApp de la persona anfitriona para su revisión y envío
+> manual. Este flujo no necesita ninguna variable de Meta.
+
+Estas cuatro plantillas deberán crearse y aprobarse en WhatsApp Manager antes
+de activar el envío automático para un evento. Los nombres son sugeridos; si
+Meta aprueba otros, hay que colocar esos nombres exactos en Vercel.
 
 Todas usan idioma `es` y cinco variables de cuerpo, siempre en este orden:
 
@@ -69,12 +74,14 @@ Hola {{1}}. Gracias por acompañarnos en {{2}}.
 Podés volver a ver el evento en {{5}}
 ```
 
-## Variables privadas de Vercel
+## Variables privadas para una activación futura
 
 ```dotenv
-WHATSAPP_ACCESS_TOKEN=
-WHATSAPP_PHONE_NUMBER_ID=
-WHATSAPP_GRAPH_VERSION=
+META_APP_ID=
+META_APP_SECRET=
+META_EMBEDDED_SIGNUP_CONFIG_ID=
+META_GRAPH_VERSION=v23.0
+WHATSAPP_CONNECTION_ENCRYPTION_KEY=
 WHATSAPP_TEMPLATE_LANGUAGE=es
 WHATSAPP_INVITE_TEMPLATE_NAME=syd_event_invitation_v1
 WHATSAPP_REMINDER_TEMPLATE_NAME=syd_rsvp_reminder_v1
@@ -84,6 +91,21 @@ WHATSAPP_APP_SECRET=
 WHATSAPP_WEBHOOK_VERIFY_TOKEN=
 ```
 
+`WHATSAPP_CONNECTION_ENCRYPTION_KEY` debe ser una clave aleatoria de 32 bytes
+(codificada en base64 o hexadecimal). El token y el identificador del número se
+obtienen mediante Embedded Signup y se guardan cifrados por evento; no se usa un
+número central ni se cargan tokens de eventos como variables globales.
+
 No se deben guardar tokens o secretos en Git. Las imágenes opcionales necesitan
 una variante de plantilla con cabecera `IMAGE` aprobada por Meta; no deben
 añadirse dinámicamente a una plantilla aprobada sin cabecera.
+
+## Cómo activarlo más adelante
+
+1. Aplicar `20260828010000_event_whatsapp_connections.sql` en Supabase.
+2. Configurar Embedded Signup y las variables anteriores.
+3. Aprobar las cuatro plantillas en la cuenta Business correspondiente.
+4. Conectar el número desde Configuración del evento.
+5. Hacer un primer envío programado únicamente a la persona organizadora.
+6. Verificar en el historial los estados enviado, entregado y leído antes de
+   habilitar programaciones para más destinatarios.

@@ -6544,6 +6544,15 @@ function Settings({
   const [canRestore, setCanRestore] = useState(false);
   const [restoreConfirmation, setRestoreConfirmation] = useState("");
   const [restoring, setRestoring] = useState(false);
+  const [whatsAppConnection, setWhatsAppConnection] = useState<{
+    status: "disconnected" | "pending" | "connected" | "error";
+    configured: boolean;
+    displayPhoneNumber: string;
+    verifiedName: string;
+    error: string;
+    embeddedSignup?: { appId: string; configId: string; graphVersion: string } | null;
+  } | null>(null);
+  const [connectingWhatsApp, setConnectingWhatsApp] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/settings", { cache: "no-store" }).then(
@@ -6575,6 +6584,12 @@ function Settings({
     }).catch(() => undefined);
   }, []);
 
+  useEffect(() => {
+    fetch('/api/admin/whatsapp-connection', { cache: 'no-store' }).then(async (response) => {
+      if (response.ok) setWhatsAppConnection(await response.json() as NonNullable<typeof whatsAppConnection>);
+    }).catch(() => undefined);
+  }, []);
+
   const toggleAccountModule = async (module: AdminOrder["enabledModules"][number], enabled: boolean) => {
     const response = await fetch('/api/admin/modules', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ module, enabled }) });
     const result = await response.json() as { error?: string };
@@ -6583,6 +6598,86 @@ function Settings({
     setAccountModules(next);
     onModulesChange(next.filter((item) => item.enabled).map((item) => item.module));
     setMessage('Accesos de la cuenta actualizados.');
+  };
+
+  const connectEventWhatsApp = async () => {
+    const embedded = whatsAppConnection?.embeddedSignup;
+    if (!embedded || connectingWhatsApp) return;
+    setConnectingWhatsApp(true);
+    setMessage("");
+    try {
+      const facebookWindow = window as typeof window & {
+        FB?: {
+          init: (options: Record<string, unknown>) => void;
+          login: (callback: (response: { authResponse?: { code?: string } }) => void, options: Record<string, unknown>) => void;
+        };
+      };
+      if (!facebookWindow.FB) {
+        await new Promise<void>((resolve, reject) => {
+          const existing = document.getElementById("facebook-jssdk") as HTMLScriptElement | null;
+          if (existing) {
+            existing.addEventListener("load", () => resolve(), { once: true });
+            existing.addEventListener("error", () => reject(new Error("No pudimos cargar la conexión de Meta.")), { once: true });
+            return;
+          }
+          const script = document.createElement("script");
+          script.id = "facebook-jssdk";
+          script.src = "https://connect.facebook.net/es_LA/sdk.js";
+          script.async = true;
+          script.defer = true;
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error("No pudimos cargar la conexión de Meta."));
+          document.head.appendChild(script);
+        });
+      }
+      if (!facebookWindow.FB) throw new Error("Meta no inició correctamente.");
+      facebookWindow.FB.init({ appId: embedded.appId, autoLogAppEvents: true, xfbml: false, version: embedded.graphVersion });
+
+      let sessionData: { phoneNumberId: string; wabaId: string } | null = null;
+      let authorizationCode = "";
+      const complete = async () => {
+        if (!sessionData || !authorizationCode) return;
+        const response = await fetch("/api/admin/whatsapp-connection", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: authorizationCode, ...sessionData }),
+        });
+        const result = await response.json() as NonNullable<typeof whatsAppConnection> & { error?: string };
+        if (!response.ok) throw new Error(result.error || "No pudimos completar la conexión.");
+        setWhatsAppConnection(result);
+        setMessage(t("WhatsApp del evento conectado correctamente.", "Event WhatsApp connected successfully.", "WhatsApp do evento conectado corretamente."));
+      };
+      const messageHandler = (event: MessageEvent) => {
+        if (!event.origin.endsWith("facebook.com")) return;
+        try {
+          const payload = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+          if (payload?.type === "WA_EMBEDDED_SIGNUP" && payload?.event === "FINISH") {
+            sessionData = { phoneNumberId: String(payload.data?.phone_number_id || ""), wabaId: String(payload.data?.waba_id || "") };
+            void complete().catch((error) => { setMessage(error instanceof Error ? error.message : "No pudimos completar la conexión."); setConnectingWhatsApp(false); });
+          }
+        } catch { /* Meta also emits non-JSON messages. */ }
+      };
+      window.addEventListener("message", messageHandler);
+      facebookWindow.FB.login((response) => {
+        authorizationCode = response.authResponse?.code || "";
+        if (!authorizationCode) {
+          window.removeEventListener("message", messageHandler);
+          setConnectingWhatsApp(false);
+          return;
+        }
+        void complete().then(() => {
+          if (sessionData) window.removeEventListener("message", messageHandler);
+          setConnectingWhatsApp(false);
+        }).catch((error) => {
+          window.removeEventListener("message", messageHandler);
+          setMessage(error instanceof Error ? error.message : "No pudimos completar la conexión.");
+          setConnectingWhatsApp(false);
+        });
+      }, { config_id: embedded.configId, response_type: "code", override_default_response_type: true });
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos iniciar la conexión con Meta.");
+      setConnectingWhatsApp(false);
+    }
   };
 
   const loadHealth = useCallback(async () => {
@@ -6862,6 +6957,48 @@ function Settings({
           "Os backups não incluem senhas nem códigos. Restaurar ou excluir dados sempre exige o número do pedido.",
         )}
       </ContextHelp>
+      <section className="panel settings-panel event-whatsapp-setup" id="event-whatsapp-connection">
+        <div className="panel-title">
+          <div>
+            <span className="eyebrow">{t("Comunicaciones", "Communications", "Comunicações")}</span>
+            <h2>{t("WhatsApp propio del evento", "Event-owned WhatsApp", "WhatsApp próprio do evento")}</h2>
+            <p>{t("Las invitaciones y comunicaciones deben salir desde el número de la pareja, la quinceañera o la persona anfitriona.", "Invitations and messages must be sent from the couple's, celebrant's or host's number.", "Os convites e mensagens devem sair do número da pessoa anfitriã.")}</p>
+          </div>
+          <span className={`event-whatsapp-status ${whatsAppConnection?.status === "connected" ? "is-connected" : ""}`}>
+            {whatsAppConnection?.status === "connected"
+              ? t("Conectado", "Connected", "Conectado")
+              : whatsAppConnection?.status === "error"
+                ? t("Requiere revisión", "Needs attention", "Requer revisão")
+                : t("No conectado", "Not connected", "Não conectado")}
+          </span>
+        </div>
+        <div className="event-whatsapp-path" aria-label={t("Pasos para conectar WhatsApp", "Steps to connect WhatsApp", "Passos para conectar o WhatsApp")}>
+          <div><b>1</b><span><strong>{t("Elegir el número", "Choose the number", "Escolher o número")}</strong><small>{t("Debe pertenecer al evento y poder recibir el código de Meta.", "It must belong to the event and receive Meta's verification code.", "Deve pertencer ao evento e receber o código da Meta.")}</small></span></div>
+          <div><b>2</b><span><strong>{t("Verificar con Meta", "Verify with Meta", "Verificar com a Meta")}</strong><small>{t("La conexión se realizará en Meta; Save Your Date no mostrará ni guardará la contraseña.", "Connection happens in Meta; Save Your Date never displays or stores the password.", "A conexão acontece na Meta; Save Your Date não exibe nem armazena a senha.")}</small></span></div>
+          <div><b>3</b><span><strong>{t("Aprobar plantillas", "Approve templates", "Aprovar modelos")}</strong><small>{t("Invitación, recordatorio, aviso y agradecimiento se revisan antes de automatizar.", "Invitation, reminder, notice and thank-you templates are reviewed before automation.", "Convite, lembrete, aviso e agradecimento são revisados antes da automação.")}</small></span></div>
+          <div><b>4</b><span><strong>{t("Hacer una prueba", "Run a test", "Fazer um teste")}</strong><small>{t("Primero se envía únicamente a la persona organizadora y luego se habilita la programación.", "The first message only goes to the organizer; scheduling is enabled afterward.", "A primeira mensagem vai apenas para a pessoa organizadora; depois a programação é habilitada.")}</small></span></div>
+        </div>
+        <div className="event-whatsapp-footer">
+          <p>{whatsAppConnection?.status === "connected"
+            ? `${whatsAppConnection.verifiedName || t("Número verificado", "Verified number", "Número verificado")} · ${whatsAppConnection.displayPhoneNumber}`
+            : t("Mientras no esté conectado, el panel prepara cada mensaje y lo abre en el WhatsApp del evento para enviarlo manualmente.", "Until connected, the dashboard prepares each message and opens it in the event's WhatsApp for manual sending.", "Enquanto não estiver conectado, o painel prepara cada mensagem e abre no WhatsApp do evento para envio manual.")}</p>
+          <button
+            className="outline-button compact"
+            type="button"
+            disabled={!whatsAppConnection?.configured || whatsAppConnection.status === "connected"}
+            onClick={() => void connectEventWhatsApp()}
+            title={!whatsAppConnection?.configured ? t("Falta configurar la aplicación de Meta en producción.", "The Meta app still needs production configuration.", "Ainda falta configurar o aplicativo da Meta em produção.") : undefined}
+          >
+            {whatsAppConnection?.status === "connected"
+              ? t("Número conectado", "Number connected", "Número conectado")
+              : connectingWhatsApp
+                ? t("Abriendo Meta…", "Opening Meta…", "Abrindo a Meta…")
+                : whatsAppConnection?.configured
+                ? t("Conectar con Meta", "Connect with Meta", "Conectar com a Meta")
+                : t("Pendiente de configuración técnica", "Awaiting technical setup", "Aguardando configuração técnica")}
+          </button>
+        </div>
+      </section>
       <section className="panel settings-panel">
         <div className="panel-title"><div><h2>Módulos de la cuenta</h2><p>Podés apagar o volver a prender los módulos incluidos en el plan. Los adicionales se contratan por separado.</p></div></div>
         <div className="settings-module-grid">{accountModules.map((item) => <label key={item.module}><input type="checkbox" checked={item.enabled} disabled={!['owner', 'admin'].includes(order.accessRole)} onChange={(event) => toggleAccountModule(item.module, event.target.checked)} /><span>{({ invitation: 'Invitación', guests_rsvp: 'Invitados y RSVP', tables: 'Mesas', check_in: 'Check-in', messaging: 'Mensajería', collaborative_album: 'Álbum colaborativo', suppliers: 'Proveedores' } as Record<string, string>)[item.module]}</span><small>Incluido por {item.source === 'plan' ? 'plan' : item.source === 'addon' ? 'adicional' : item.source === 'role' ? 'rol' : 'configuración manual'}</small></label>)}</div>
@@ -7878,9 +8015,10 @@ function CommunicationsModule({
   const [sendingId, setSendingId] = useState("");
   const [error, setError] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
+  const [scheduling, setScheduling] = useState(false);
+  const [automaticConnection, setAutomaticConnection] = useState<{ status: string; displayPhoneNumber: string; verifiedName: string } | null>(null);
   const [history, setHistory] = useState<CommunicationHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [scheduling, setScheduling] = useState(false);
   const [activeScheduleId, setActiveScheduleId] = useState("");
   const [historyKindFilter, setHistoryKindFilter] = useState<"all" | CommunicationHistoryItem["kind"]>("all");
   const [historyStatusFilter, setHistoryStatusFilter] = useState<"all" | CommunicationHistoryItem["status"]>("all");
@@ -7916,6 +8054,11 @@ function CommunicationsModule({
   }, [t]);
 
   useEffect(() => { void loadHistory(); }, [loadHistory]);
+  useEffect(() => {
+    fetch("/api/admin/whatsapp-connection", { cache: "no-store" }).then(async (response) => {
+      if (response.ok) setAutomaticConnection(await response.json() as NonNullable<typeof automaticConnection>);
+    }).catch(() => undefined);
+  }, []);
 
   useEffect(() => { setSelectedIds([]); setError(""); }, [kind]);
   const messageFor = () => kind === "invite" ? inviteText : kind === "reminder" ? reminderText : kind === "notice" ? noticeText : thankText;
@@ -7924,7 +8067,7 @@ function CommunicationsModule({
     : `Hola ${previewName}.\n\n${messageFor()}${kind === "invite" || kind === "reminder" ? `\n\n${t("Abrí tu invitación personal y confirmá tu asistencia desde el enlace.", "Open your personal invitation and confirm from the link.", "Abra seu convite pessoal e confirme pelo link.")}` : ""}\n\n${closing}${extraPreview}`;
 
   const scheduleCommunication = async () => {
-    if (!selectedIds.length || !scheduledAt) return;
+    if (!selectedIds.length || !scheduledAt || automaticConnection?.status !== "connected") return;
     setScheduling(true); setError("");
     try {
       const response = await fetch("/api/admin/communications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
@@ -7961,7 +8104,6 @@ function CommunicationsModule({
     setExtraContent(item.extraContent || "none"); setImageUrl(item.imageUrl || ""); setHtmlContent(item.htmlContent || "");
     setBankDetails(item.bankDetails || "");
     setActiveScheduleId(duplicate ? "" : item.id);
-    if (duplicate) setScheduledAt("");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -8041,6 +8183,19 @@ function CommunicationsModule({
         <div><strong>{eligibleGuests.length}</strong><span>{kind === "invite" ? t("invitaciones pendientes de envío", "invitations ready to send", "convites pendentes de envio") : kind === "reminder" ? t("personas pendientes que ya recibieron su invitación", "pending guests who already received an invitation", "pendentes que já receberam o convite") : kind === "thanks" ? t("personas confirmadas para agradecer", "confirmed guests ready for a thank-you", "confirmados para agradecer") : t("personas disponibles para este aviso", "people available for this notice", "pessoas disponíveis para este aviso")}</span></div>
         <small>{kind === "invite" ? t("No incluye invitaciones ya preparadas ni personas que respondieron.", "Excludes prepared invitations and guests who already responded.", "Não inclui convites já preparados nem pessoas que responderam.") : kind === "reminder" ? t("No vuelve a contactar a quienes ya confirmaron o rechazaron.", "Does not contact guests who already confirmed or declined.", "Não contata quem já confirmou ou recusou.") : kind === "thanks" ? t("El agradecimiento se dirige únicamente a quienes confirmaron asistencia.", "Thank-yous are limited to confirmed attendees.", "O agradecimento é enviado somente a quem confirmou presença.") : t("El aviso puede enviarse a cualquier invitado con WhatsApp.", "The notice can be sent to any guest with WhatsApp.", "O aviso pode ser enviado a qualquer convidado com WhatsApp.")}</small>
       </div>
+      <section className="communication-delivery-model" aria-label={t("Forma de envío", "Delivery method", "Forma de envio")}>
+        <div className="is-primary">
+          <span aria-hidden="true">WA</span>
+          <div><strong>{t("Enviá desde el WhatsApp del evento", "Send from the event's WhatsApp", "Envie pelo WhatsApp do evento")}</strong><small>{t("Preparamos cada mensaje y lo abrimos en tu WhatsApp para que lo revises y lo envíes con el número de la pareja, la quinceañera o la persona anfitriona.", "We prepare each message and open it in your WhatsApp so it can be reviewed and sent from the host's number.", "Preparamos cada mensagem e abrimos no seu WhatsApp para revisar e enviar pelo número da pessoa anfitriã.")}</small></div>
+        </div>
+        <div className="is-optional">
+          <span aria-hidden="true">⌁</span>
+          <div><strong>{t("Automatización opcional", "Optional automation", "Automação opcional")}</strong><small>{t("Para programar envíos reales, cada evento deberá conectar su propio número de WhatsApp Business. No usamos un número central de Save Your Date.", "To schedule real sends, each event must connect its own WhatsApp Business number. We do not use a central Save Your Date number.", "Para programar envios reais, cada evento deve conectar seu próprio número do WhatsApp Business. Não usamos um número central da Save Your Date.")}</small></div>
+          <em>{automaticConnection?.status === "connected"
+            ? `${automaticConnection.verifiedName || t("Número verificado", "Verified number", "Número verificado")} · ${automaticConnection.displayPhoneNumber}`
+            : t("Número propio no conectado", "Own number not connected", "Número próprio não conectado")}</em>
+        </div>
+      </section>
       <section className="panel thanks-composer communication-composer">
         <div className="panel-title"><div><h2>{kind === "invite" ? t("Preparar invitación", "Prepare invitation", "Preparar convite") : kind === "reminder" ? t("Preparar recordatorio", "Prepare reminder", "Preparar lembrete") : kind === "notice" ? t("Preparar aviso", "Prepare notice", "Preparar aviso") : t("Preparar agradecimiento", "Prepare thank-you", "Preparar agradecimento")}</h2><p>{t("Revisá el texto y elegí abajo quiénes deben recibirlo.", "Review the text and choose the recipients below.", "Revise o texto e escolha os destinatários abaixo.")}</p></div></div>
         <div className="message-composer-body">
@@ -8056,16 +8211,16 @@ function CommunicationsModule({
         <div className="table-scroll"><table className="communications-table"><thead><tr><th className="checkbox-cell"><input type="checkbox" checked={visibleGuests.length > 0 && visibleGuests.every((guest) => selectedIds.includes(guest.id))} onChange={(event) => setSelectedIds(event.target.checked ? visibleGuests.filter((guest) => guest.phone).map((guest) => guest.id) : [])} /></th><th>{t("Invitado", "Guest", "Convidado")}</th><th>{t("Grupo", "Group", "Grupo")}</th><th>{t("Círculo", "Circle", "Círculo")}</th><th>{t("Asistencia", "Attendance", "Presença")}</th><th>{t("Última comunicación", "Latest communication", "Última comunicação")}</th><th>{t("Acción", "Action", "Ação")}</th></tr></thead>
           <tbody>{visibleGuests.map((guest) => <tr key={guest.id}><td className="checkbox-cell"><input type="checkbox" disabled={!guest.phone} checked={selectedIds.includes(guest.id)} onChange={(event) => setSelectedIds((current) => event.target.checked ? [...new Set([...current, guest.id])] : current.filter((id) => id !== guest.id))} /></td><td data-label={t("Invitado", "Guest", "Convidado")}><div className="person"><GuestAvatar guest={guest} /><p><GuestNameButton guest={guest} /><small>{guest.phone || t("Sin WhatsApp", "No WhatsApp", "Sem WhatsApp")}</small></p></div></td><td data-label={t("Grupo", "Group", "Grupo")}><strong>{guest.group || "—"}</strong></td><td data-label={t("Círculo", "Circle", "Círculo")}><span>{guest.socialCircle || t("Sin círculo", "No circle", "Sem círculo")}</span></td><td data-label={t("Asistencia", "Attendance", "Presença")}><Status value={guest.status} /></td><td data-label={t("Última comunicación", "Latest communication", "Última comunicação")}>{kind === "thanks" && guest.thankedAt ? <span className="status status-confirmado">{t("Agradecido", "Thanked", "Agradecido")} · {reportDate(guest.thankedAt, locale)}</span> : kind === "reminder" && guest.reminded !== "—" ? <span className="status status-confirmado">{t("Recordado", "Reminded", "Lembrado")} · {reportDate(guest.reminded, locale)}</span> : <span className="muted">{t("Sin registrar", "Not recorded", "Sem registro")}</span>}</td><td data-label={t("Acción", "Action", "Ação")}>{canEdit ? <button className="whatsapp-button" disabled={!guest.phone || sendingId === guest.id} onClick={() => prepareCommunication(guest)}>{sendingId === guest.id ? t("Preparando…", "Preparing…", "Preparando…") : "WA"}</button> : <span className="muted">{t("Solo lectura", "View only", "Somente leitura")}</span>}</td></tr>)}</tbody>
         </table></div>
-        {canEdit && selectedIds.length > 0 && <div className="communication-selection-bar"><div><strong>{selectedIds.length} {t("destinatarios listos", "recipients ready", "destinatários prontos")}</strong><small>{t("Podés preparar el envío ahora o dejar esta selección programada para más adelante.", "Prepare it now or schedule this selection for later.", "Prepare agora ou programe esta seleção para mais tarde.")}</small></div><label className="communication-schedule-input"><span>{t("Fecha y hora", "Date and time", "Data e hora")}</span><input type="datetime-local" value={scheduledAt} min={new Date(Date.now() + 60000).toISOString().slice(0, 16)} onChange={(event) => setScheduledAt(event.target.value)} /></label><button className="outline-button compact" disabled={!scheduledAt || scheduling} onClick={() => void scheduleCommunication()}>{scheduling ? t("Programando…", "Scheduling…", "Programando…") : t("Programar", "Schedule", "Programar")}</button><button className="primary-button small" disabled={Boolean(sendingId)} onClick={() => void prepareNextSelected()}>{t("Preparar siguiente", "Prepare next", "Preparar próximo")}</button><button className="outline-button compact" onClick={() => { setSelectedIds([]); setActiveScheduleId(""); }}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
+        {canEdit && selectedIds.length > 0 && <div className="communication-selection-bar"><div><strong>{selectedIds.length} {t("destinatarios listos", "recipients ready", "destinatários prontos")}</strong><small>{automaticConnection?.status === "connected" ? t("Podés abrirlos manualmente o programar el envío desde el número verificado del evento.", "Open them manually or schedule delivery from the event's verified number.", "Abra manualmente ou programe o envio pelo número verificado do evento.") : t("Los mensajes se abrirán de a uno en el WhatsApp del evento. Para programarlos, conectá primero su número Business en Configuración.", "Messages open one by one in the event's WhatsApp. To schedule them, connect its Business number in Settings first.", "As mensagens abrem uma por uma no WhatsApp do evento. Para programar, conecte o número Business em Configurações.")}</small></div>{automaticConnection?.status === "connected" && <><label className="communication-schedule-input"><span>{t("Fecha y hora", "Date and time", "Data e hora")}</span><input type="datetime-local" value={scheduledAt} min={new Date(Date.now() + 60000).toISOString().slice(0, 16)} onChange={(event) => setScheduledAt(event.target.value)} /></label><button className="outline-button compact" disabled={!scheduledAt || scheduling} onClick={() => void scheduleCommunication()}>{scheduling ? t("Programando…", "Scheduling…", "Programando…") : t("Programar", "Schedule", "Programar")}</button></>}<button className="primary-button small" disabled={Boolean(sendingId)} onClick={() => void prepareNextSelected()}>{t("Abrir siguiente en mi WhatsApp", "Open next in my WhatsApp", "Abrir próxima no meu WhatsApp")}</button><button className="outline-button compact" onClick={() => { setSelectedIds([]); setActiveScheduleId(""); }}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
         {error && <p className="table-error" role="alert">{error}</p>}
       </section>
       <section className="panel communication-history-panel">
-        <div className="panel-title"><div><h2>{t("Historial unificado", "Unified history", "Histórico unificado")}</h2><p>{t("Invitaciones, recordatorios, avisos y agradecimientos preparados o programados.", "Invitations, reminders, notices and thank-yous that were prepared or scheduled.", "Convites, lembretes, avisos e agradecimentos preparados ou programados.")}</p></div><button className="outline-button compact" onClick={() => void loadHistory()}>{t("Actualizar", "Refresh", "Atualizar")}</button></div>
+        <div className="panel-title"><div><h2>{t("Historial unificado", "Unified history", "Histórico unificado")}</h2><p>{t("Registra mensajes preparados desde el panel y respuestas recibidas. Sólo se muestra como entregado cuando existe confirmación real de Meta.", "Tracks messages prepared in the dashboard and received responses. A message is only shown as delivered when Meta actually confirms it.", "Registra mensagens preparadas no painel e respostas recebidas. Só aparece como entregue quando houver confirmação real da Meta.")}</p></div><button className="outline-button compact" onClick={() => void loadHistory()}>{t("Actualizar", "Refresh", "Atualizar")}</button></div>
         <div className="communication-history-filters"><label>{t("Tipo", "Type", "Tipo")}<select value={historyKindFilter} onChange={(event) => setHistoryKindFilter(event.target.value as typeof historyKindFilter)}><option value="all">{t("Todos", "All", "Todos")}</option><option value="invite">{t("Invitación", "Invitation", "Convite")}</option><option value="reminder">{t("Recordatorio", "Reminder", "Lembrete")}</option><option value="notice">{t("Aviso", "Notice", "Aviso")}</option><option value="thanks">{t("Agradecimiento", "Thank-you", "Agradecimento")}</option></select></label><label>{t("Estado", "Status", "Status")}<select value={historyStatusFilter} onChange={(event) => setHistoryStatusFilter(event.target.value as typeof historyStatusFilter)}><option value="all">{t("Todos", "All", "Todos")}</option><option value="scheduled">{t("Programada", "Scheduled", "Programada")}</option><option value="ready">{t("Lista", "Ready", "Pronta")}</option><option value="completed">{t("Completada", "Completed", "Concluída")}</option><option value="cancelled">{t("Cancelada", "Cancelled", "Cancelada")}</option><option value="prepared">{t("Preparada", "Prepared", "Preparada")}</option><option value="failed">{t("Falló", "Failed", "Falhou")}</option></select></label><label>{t("Fecha", "Date", "Data")}<input type="date" value={historyDateFilter} onChange={(event) => setHistoryDateFilter(event.target.value)} /></label><button className="text-button" type="button" onClick={() => { setHistoryKindFilter("all"); setHistoryStatusFilter("all"); setHistoryDateFilter(""); }}>{t("Limpiar", "Clear", "Limpar")}</button></div>
         {historyLoading ? <p className="communication-history-empty">{t("Cargando historial…", "Loading history…", "Carregando histórico…")}</p> : filteredHistory.length === 0 ? <p className="communication-history-empty">{t("No hay comunicaciones para estos filtros.", "No communications match these filters.", "Não há comunicações para estes filtros.")}</p> : <div className="communication-history-list">{filteredHistory.map((item) => {
           const kindLabel = item.kind === "invite" ? t("Invitación", "Invitation", "Convite") : item.kind === "reminder" ? t("Recordatorio", "Reminder", "Lembrete") : item.kind === "notice" ? t("Aviso", "Notice", "Aviso") : t("Agradecimiento", "Thank-you", "Agradecimento");
-          const statusLabel = item.status === "scheduled" ? t("Programada", "Scheduled", "Programada") : item.status === "ready" ? t("Lista para enviar", "Ready to send", "Pronta para enviar") : item.status === "completed" ? t("Completada", "Completed", "Concluída") : item.status === "cancelled" ? t("Cancelada", "Cancelled", "Cancelada") : item.status === "failed" ? t("Falló", "Failed", "Falhou") : t("Enviada", "Sent", "Enviada");
-          return <article className={`communication-history-item status-${item.status}`} key={item.id}><div className="communication-history-kind"><strong>{kindLabel}</strong><span>{statusLabel}</span></div><div><strong>{item.recipientCount || 1} {t("destinatarios", "recipients", "destinatários")}</strong><small>{item.scheduledAt ? `${t("Programada para", "Scheduled for", "Programada para")} ${reportDate(item.scheduledAt, locale)}` : `${t("Registrada", "Recorded", "Registrada")} ${reportDate(item.createdAt, locale)}`}</small>{item.action === "communication.scheduled" && <div className="communication-history-progress"><span><b>{item.preparedCount}</b> {t("enviados", "sent", "enviados")}</span><span><b>{item.skippedCount || 0}</b> {t("omitidos", "skipped", "omitidos")}</span><span><b>{item.pendingCount}</b> {t("pendientes", "pending", "pendentes")}</span><span className={item.failedCount ? "has-failures" : ""}><b>{item.failedCount || 0}</b> {t("fallidos", "failed", "falhos")}</span><progress max={item.recipientCount || 1} value={item.preparedCount + (item.skippedCount || 0)} /></div>}</div>{item.action === "communication.scheduled" && <div className="communication-history-actions"><button className="outline-button compact" onClick={() => loadScheduledCommunication(item)}>{t("Cargar", "Load", "Carregar")}</button><button className="outline-button compact" onClick={() => loadScheduledCommunication(item, true)}>{t("Duplicar", "Duplicate", "Duplicar")}</button>{item.status !== "cancelled" && item.status !== "completed" && <button className="text-button danger" onClick={() => void cancelSchedule(item.id)}>{t("Cancelar", "Cancel", "Cancelar")}</button>}</div>}</article>;
+          const statusLabel = item.status === "scheduled" ? t("Programación anterior", "Previous schedule", "Programação anterior") : item.status === "ready" ? t("Lista para revisar", "Ready to review", "Pronta para revisar") : item.status === "completed" ? t("Procesada", "Processed", "Processada") : item.status === "cancelled" ? t("Cancelada", "Cancelled", "Cancelada") : item.status === "failed" ? t("Falló", "Failed", "Falhou") : t("Preparada", "Prepared", "Preparada");
+          return <article className={`communication-history-item status-${item.status}`} key={item.id}><div className="communication-history-kind"><strong>{kindLabel}</strong><span>{statusLabel}</span></div><div><strong>{item.recipientCount || 1} {t("destinatarios", "recipients", "destinatários")}</strong><small>{item.scheduledAt ? `${t("Fecha configurada", "Configured date", "Data configurada")} ${reportDate(item.scheduledAt, locale)}` : `${t("Registrada", "Recorded", "Registrada")} ${reportDate(item.createdAt, locale)}`}</small>{item.action === "communication.scheduled" && <div className="communication-history-progress"><span><b>{item.preparedCount}</b> {t("procesados", "processed", "processados")}</span><span><b>{item.skippedCount || 0}</b> {t("omitidos", "skipped", "omitidos")}</span><span><b>{item.pendingCount}</b> {t("pendientes", "pending", "pendentes")}</span><span className={item.failedCount ? "has-failures" : ""}><b>{item.failedCount || 0}</b> {t("fallidos", "failed", "falhos")}</span><progress max={item.recipientCount || 1} value={item.preparedCount + (item.skippedCount || 0)} /></div>}</div>{item.action === "communication.scheduled" && <div className="communication-history-actions"><button className="outline-button compact" onClick={() => loadScheduledCommunication(item)}>{t("Cargar", "Load", "Carregar")}</button><button className="outline-button compact" onClick={() => loadScheduledCommunication(item, true)}>{t("Duplicar", "Duplicate", "Duplicar")}</button>{item.status !== "cancelled" && item.status !== "completed" && <button className="text-button danger" onClick={() => void cancelSchedule(item.id)}>{t("Cancelar", "Cancel", "Cancelar")}</button>}</div>}</article>;
         })}</div>}
       </section>
     </>

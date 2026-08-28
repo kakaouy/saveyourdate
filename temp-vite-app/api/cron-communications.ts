@@ -1,10 +1,12 @@
 import { appUrl, json, supabaseRequest } from './_lib/orders.js';
 import { normalizeWhatsAppPhone, sendScheduledWhatsAppTemplate } from './_lib/whatsapp.js';
+import { decryptEventWhatsAppToken } from './_lib/event-whatsapp-crypto.js';
 
 type Kind = 'invite' | 'reminder' | 'notice' | 'thanks';
 type Activity = { id: string; order_number: string; action: string; entity_id: string | null; details: Record<string, unknown>; created_at: string };
 type Guest = { id: string; invite_token: string; name: string; phone: string; status: string; archived_at: string | null; invitation_sent_at: string | null };
 type Order = { order_number: string; customer_name: string; invitation_url: string | null; order_payload: Record<string, unknown> };
+type WhatsAppConnection = { status: string; phone_number_id: string; access_token_ciphertext: string; token_expires_at: string | null };
 
 const actions = ['communication.scheduled', 'communication.cancelled', 'communication.dispatching', 'communication.auto_sent', 'communication.auto_failed'].join(',');
 const maxBatch = 100;
@@ -73,7 +75,10 @@ async function handler(request: Request) {
     const response = await supabaseRequest(`admin_activity_log?action=in.(${actions})&select=id,order_number,action,entity_id,details,created_at&order=created_at.asc&limit=5000`);
     const activities = await response.json() as Activity[];
     const cancelled = new Set(activities.filter((row) => row.action === 'communication.cancelled').map((row) => String(row.details.scheduleId || '')));
-    const schedules = activities.filter((row) => row.action === 'communication.scheduled' && !cancelled.has(row.id) && new Date(String(row.details.scheduledAt || '')).getTime() <= Date.now());
+    const schedules = activities.filter((row) => row.action === 'communication.scheduled'
+      && row.details.delivery === 'event-whatsapp-business'
+      && !cancelled.has(row.id)
+      && new Date(String(row.details.scheduledAt || '')).getTime() <= Date.now());
     let sent = 0;
     let failed = 0;
     let skipped = 0;
@@ -88,6 +93,20 @@ async function handler(request: Request) {
       const orderResponse = await supabaseRequest(`orders?order_number=eq.${encodeURIComponent(schedule.order_number)}&select=order_number,customer_name,invitation_url,order_payload&limit=1`);
       const order = (await orderResponse.json() as Order[])[0];
       if (!order) continue;
+      const connectionResponse = await supabaseRequest(`event_whatsapp_connections?order_number=eq.${encodeURIComponent(schedule.order_number)}&status=eq.connected&select=status,phone_number_id,access_token_ciphertext,token_expires_at&limit=1`);
+      const eventConnection = (await connectionResponse.json() as WhatsAppConnection[])[0];
+      const connectionExpired = eventConnection?.token_expires_at && new Date(eventConnection.token_expires_at).getTime() <= Date.now();
+      if (!eventConnection?.phone_number_id || !eventConnection.access_token_ciphertext || connectionExpired) {
+        diagnostics.add(connectionExpired ? `Conexión de WhatsApp vencida para ${schedule.order_number}` : `WhatsApp no conectado para ${schedule.order_number}`);
+        continue;
+      }
+      let eventAccessToken = '';
+      try {
+        eventAccessToken = await decryptEventWhatsAppToken(eventConnection.access_token_ciphertext, schedule.order_number);
+      } catch {
+        diagnostics.add(`No pudimos abrir la conexión de WhatsApp de ${schedule.order_number}`);
+        continue;
+      }
       const eventTitle = String(order.order_payload.eventTitle || order.customer_name || 'tu evento');
       for (const guestId of recipientIds) {
         if (sent + failed >= maxBatch) break;
@@ -123,6 +142,11 @@ async function handler(request: Request) {
             closing: String(schedule.details.closing || ''),
             actionUrl,
             imageUrl: String(schedule.details.extraContent || '') === 'image' ? String(schedule.details.imageUrl || '') || undefined : undefined,
+            connection: {
+              accessToken: eventAccessToken,
+              phoneNumberId: eventConnection.phone_number_id,
+              graphVersion: process.env.META_GRAPH_VERSION || '',
+            },
           });
           if (!result.sent) throw new Error(result.reason);
           const now = new Date().toISOString();

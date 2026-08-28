@@ -68,6 +68,7 @@ export const sendScheduledWhatsAppTemplate = async ({
   closing,
   actionUrl,
   imageUrl,
+  connection,
 }: {
   kind: ScheduledCommunicationKind;
   phone: string;
@@ -77,12 +78,16 @@ export const sendScheduledWhatsAppTemplate = async ({
   closing: string;
   actionUrl: string;
   imageUrl?: string;
+  connection?: { accessToken: string; phoneNumberId: string; graphVersion: string };
 }) => {
   const normalizedPhone = normalizeWhatsAppPhone(phone);
   if (normalizedPhone.length < 8) throw new Error('El número de WhatsApp no es válido.');
   const envName = `WHATSAPP_${kind.toUpperCase()}_TEMPLATE_NAME`;
   const templateName = process.env[envName] || ((kind === 'invite' || kind === 'reminder') ? process.env.WHATSAPP_TEMPLATE_NAME : '');
-  if (!process.env.WHATSAPP_ACCESS_TOKEN || !process.env.WHATSAPP_PHONE_NUMBER_ID || !process.env.WHATSAPP_GRAPH_VERSION || !templateName) {
+  const accessToken = connection?.accessToken || process.env.WHATSAPP_ACCESS_TOKEN || '';
+  const phoneNumberId = connection?.phoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID || '';
+  const graphVersion = connection?.graphVersion || process.env.WHATSAPP_GRAPH_VERSION || '';
+  if (!accessToken || !phoneNumberId || !graphVersion || !templateName) {
     return { sent: false as const, reason: `missing_${envName.toLowerCase()}` };
   }
   const usesLegacyTemplate = templateName === process.env.WHATSAPP_TEMPLATE_NAME && !process.env[envName];
@@ -104,9 +109,9 @@ export const sendScheduledWhatsAppTemplate = async ({
           { type: 'text', text: actionUrl || '-' },
         ],
   });
-  const response = await fetch(`https://graph.facebook.com/${encodeURIComponent(process.env.WHATSAPP_GRAPH_VERSION)}/${encodeURIComponent(process.env.WHATSAPP_PHONE_NUMBER_ID)}/messages`, {
+  const response = await fetch(`https://graph.facebook.com/${encodeURIComponent(graphVersion)}/${encodeURIComponent(phoneNumberId)}/messages`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       messaging_product: 'whatsapp',
       to: normalizedPhone,

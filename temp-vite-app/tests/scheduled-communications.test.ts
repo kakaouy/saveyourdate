@@ -7,6 +7,11 @@ const whatsapp = fs.readFileSync(new URL('../api/_lib/whatsapp.ts', import.meta.
 const vercel = fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8');
 
 test('las comunicaciones programadas se envían con control de duplicados y elegibilidad', () => {
+  assert.match(cron, /row\.details\.delivery === 'event-whatsapp-business'/);
+  assert.match(cron, /event_whatsapp_connections\?order_number=/);
+  assert.match(cron, /decryptEventWhatsAppToken/);
+  assert.match(cron, /phoneNumberId: eventConnection\.phone_number_id/);
+  assert.doesNotMatch(cron, /supportsEventWhatsAppConnections = false/);
   assert.match(cron, /communication\.dispatching/);
   assert.match(cron, /deterministicUuid/);
   assert.match(cron, /communication\.auto_sent/);

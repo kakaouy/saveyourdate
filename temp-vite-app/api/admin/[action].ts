@@ -20,6 +20,7 @@ import resources from '../_lib/admin/resources.js';
 import modules from '../_lib/admin/modules.js';
 import communications from '../_lib/admin/communications.js';
 import orderProgress from '../_lib/admin/order-progress.js';
+import whatsappConnection from '../_lib/admin/whatsapp-connection.js';
 import { json } from '../_lib/orders.js';
 
 const handlers: Record<string, { fetch: (request: Request) => Promise<Response> }> = {
@@ -45,6 +46,7 @@ const handlers: Record<string, { fetch: (request: Request) => Promise<Response> 
   , modules
   , communications
   , 'order-progress': orderProgress
+  , 'whatsapp-connection': whatsappConnection
 };
 
 async function handler(request: Request) {
