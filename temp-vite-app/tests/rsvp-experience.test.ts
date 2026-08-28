@@ -6,6 +6,14 @@ import { fileURLToPath } from 'node:url';
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const page = readFileSync(path.join(appRoot, 'src', 'components', 'GuestRsvpPage.tsx'), 'utf8');
+const entry = readFileSync(path.join(appRoot, 'src', 'main.tsx'), 'utf8');
+const vercel = readFileSync(path.join(appRoot, 'vercel.json'), 'utf8');
+
+test('RSVP funciona desde confirmar y desde el alias rsvp', () => {
+  assert.match(entry, /pathname === '\/confirmar' \|\| pathname === '\/rsvp'/);
+  assert.match(vercel, /"source": "\/confirmar"/);
+  assert.match(vercel, /"source": "\/rsvp"/);
+});
 const styles = readFileSync(path.join(appRoot, 'src', 'admin-prototype.css'), 'utf8');
 
 test('RSVP explica enlaces incompletos sin consultar la API', () => {

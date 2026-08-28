@@ -20,7 +20,7 @@ const Page = pathname === '/estado'
     ? OrderLookupPage
   : pathname === '/admin'
     ? AdminPrototype
-  : pathname === '/confirmar'
+  : pathname === '/confirmar' || pathname === '/rsvp'
     ? GuestRsvpPage
   : pathname === '/validar-pago'
     ? PaymentValidationPage
