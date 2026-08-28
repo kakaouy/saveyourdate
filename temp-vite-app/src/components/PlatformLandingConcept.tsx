@@ -101,10 +101,10 @@ export default function PlatformLandingConcept() {
 
   return <main className="platform-concept">
     <header className="concept-nav">
-      <nav className={menuOpen ? 'is-open' : ''} aria-label="Principal"><a href="#como-funciona" onClick={() => setMenuOpen(false)}>Cómo funciona</a><a href="/?catalogo=1" onClick={() => setMenuOpen(false)}>Invitaciones</a><button type="button" onClick={() => { setMenuOpen(false); setPlansOpen(true); }}>Planes</button><a href="#preguntas" onClick={() => setMenuOpen(false)}>Preguntas</a></nav>
+      <nav className={menuOpen ? 'is-open' : ''} aria-label="Principal"><a href="#como-funciona" onClick={() => setMenuOpen(false)}>Cómo funciona</a><a href="/?catalogo=1" onClick={() => setMenuOpen(false)}>Invitaciones</a><button type="button" onClick={() => { setMenuOpen(false); setPlansOpen(true); }}>Planes</button><a href="#preguntas" onClick={() => setMenuOpen(false)}>Preguntas</a><a className="concept-nav-login" href="/admin" onClick={() => setMenuOpen(false)}>Ingresar</a></nav>
       <div className="concept-nav-actions">
         <label className="concept-language"><span className="sr-only">Idioma</span><select aria-label="Seleccionar idioma" value={language} onChange={(event) => setLanguage(event.target.value)}><option value="es">ES</option><option value="en">EN</option><option value="pt">PT</option></select></label>
-        <a className="concept-login" href="/admin">Ingresar</a><a className="concept-nav-cta" href="/admin">Crear mi evento</a>
+        <a className="concept-nav-cta" href="/admin">Crear mi evento</a>
         <button className="concept-menu-button" type="button" aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><span /><span /><span /></button>
       </div>
     </header>

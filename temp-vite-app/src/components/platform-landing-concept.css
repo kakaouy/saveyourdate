@@ -193,6 +193,16 @@
 .concept-nav nav{align-items:center}
 .concept-nav nav>a,.concept-nav nav>button{display:inline-flex;align-items:center;justify-content:center;line-height:1;margin:0}
 
+/* Navegación principal: las tres pills comparten altura y el acceso permanece dentro del menú. */
+@media(min-width:981px){
+  .concept-nav nav,.concept-language select,.concept-nav-cta{height:58px}
+  .concept-nav nav{padding-block:0}
+  .concept-nav nav>a,.concept-nav nav>button{min-height:58px}
+  .concept-nav-login{padding-left:22px;border-left:1px solid rgba(23,56,75,.16)}
+  .concept-language select{min-width:92px}
+  .concept-nav-cta{display:inline-flex;align-items:center;padding-block:0}
+}
+
 @media(max-width:980px){.concept-faq-content{width:100%}.concept-trust>div{grid-template-columns:1fr}.concept-trust article{min-height:auto}.concept-trust article h3{margin-top:25px}}
 @media(max-width:680px){.concept-faq-topics{flex-wrap:nowrap;margin-inline:-20px;padding-inline:20px;overflow-x:auto;scrollbar-width:none}.concept-faq-topics::-webkit-scrollbar{display:none}.concept-faq-topics button{flex:0 0 auto}.concept-contact-pair,.concept-contact-scope{grid-template-columns:1fr}.concept-contact form{gap:16px;padding:22px}.concept-contact label{font-size:12px}.concept-contact button{width:100%;justify-self:stretch}.concept-trust header{margin-bottom:38px}.concept-trust h2,.concept-faq-heading h2,.concept-contact h2{overflow-wrap:anywhere}.concept-faq-list summary{font-size:16px}.concept-faq-list details>p{margin-left:34px;font-size:14px}}
 

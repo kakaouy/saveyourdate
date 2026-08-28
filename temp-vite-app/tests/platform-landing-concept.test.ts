@@ -26,7 +26,9 @@ test('el menú superior conserva sólo los accesos principales sin duplicar acci
   assert.match(principalNav, /Invitaciones/);
   assert.match(principalNav, /Planes/);
   assert.match(principalNav, /Preguntas/);
-  assert.doesNotMatch(principalNav, /Para quién es|Consultar pedido|Probar la plataforma|>Ingresar</);
+  assert.match(principalNav, /concept-nav-login[^>]*[\s\S]*?>Ingresar</);
+  assert.doesNotMatch(principalNav, /Para quién es|Consultar pedido|Probar la plataforma/);
+  assert.doesNotMatch(landing, /className="concept-login"/);
 });
 
 test('la segunda sección combina beneficios con una muestra de organización', () => {
