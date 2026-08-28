@@ -54,6 +54,15 @@ test('el seguimiento RSVP distingue el recorrido y recomienda la próxima acció
   assert.match(styles, /\.guest-follow-up/);
 });
 
+test('el seguimiento separa el estado de la fecha y evita texto operativo diminuto', () => {
+  assert.match(source, /className=\{`delivery-status guest-delivery-status/);
+  assert.match(source, /<strong>\{guest\.respondedAt/);
+  assert.match(source, /<small>\{reportDate/);
+  assert.match(styles, /\.guest-delivery-status small \{[^}]*font-size: 10px/);
+  assert.match(styles, /\.seat-progress small \{[^}]*font-size: 10px/);
+  assert.match(styles, /\.guest-group-cell strong, \.guest-group-cell small \{[^}]*white-space: normal/);
+});
+
 test('el seguimiento usa mensajes por etapa y muestra el historial de contacto', () => {
   assert.match(source, /guest\.invitationOpenedAt\s*\?\s*t\(/);
   assert.match(source, /Te reenviamos la invitación/);

@@ -2591,14 +2591,15 @@ function Guests({
                     </div>
                   </td>
                   <td className="guest-secondary-column guest-follow-up-column" data-label={t("Seguimiento", "Tracking", "Acompanhamento")}>
-                    <div className="guest-follow-up"><span className={`delivery-status ${guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
-                      {guest.respondedAt
-                        ? `${t("Respondió", "Responded", "Respondeu")} · ${reportDate(guest.respondedAt, language)}`
+                    <div className="guest-follow-up"><span className={`delivery-status guest-delivery-status ${guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
+                      <strong>{guest.respondedAt
+                        ? t("Respondió", "Responded", "Respondeu")
                         : guest.invitationOpenedAt
-                          ? `${t("Abrió", "Opened", "Abriu")} · ${reportDate(guest.invitationOpenedAt, language)}`
+                          ? t("Abrió", "Opened", "Abriu")
                           : guest.invitationSentAt
-                            ? `${t("Preparada", "Prepared", "Preparado")} · ${reportDate(guest.invitationSentAt, language)}`
-                            : t("Sin enviar", "Not sent", "Não enviado")}
+                            ? t("Preparada", "Prepared", "Preparado")
+                            : t("Sin enviar", "Not sent", "Não enviado")}</strong>
+                      {(guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt) && <small>{reportDate(guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt || "", language)}</small>}
                     </span>{guest.status === "Pendiente" && <button type="button" disabled={!guest.phone || updatingId === guest.id} onClick={() => setWhatsAppReviewGuest(guest)}>{!guest.phone ? t("Falta WhatsApp", "WhatsApp missing", "Falta WhatsApp") : guest.invitationOpenedAt ? t("Recordar respuesta", "Remind to respond", "Lembrar resposta") : guest.invitationSentAt ? t("Reenviar invitación", "Resend invitation", "Reenviar convite") : t("Enviar invitación", "Send invitation", "Enviar convite")}</button>}</div>
                   </td>
                   <td className="guest-actions-column" data-label={t("Acciones", "Actions", "Ações")}>

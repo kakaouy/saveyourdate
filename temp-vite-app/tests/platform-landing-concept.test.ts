@@ -15,6 +15,11 @@ test('la portada comunica el recorrido integral sin numerar el inicio', () => {
   assert.match(styles, /\.concept-nav\{padding-top:var\(--concept-hero-top\)\}/);
 });
 
+test('todos los accesos del menú comparten alineación vertical', () => {
+  assert.match(styles, /\.concept-nav nav\{align-items:center\}/);
+  assert.match(styles, /\.concept-nav nav>a,\.concept-nav nav>button\{display:inline-flex;align-items:center;justify-content:center;line-height:1;margin:0\}/);
+});
+
 test('la segunda sección combina beneficios con una muestra de organización', () => {
   assert.match(landing, /concept-event-overview/);
   assert.match(landing, /ORGANIZACIÓN DEL EVENTO/);

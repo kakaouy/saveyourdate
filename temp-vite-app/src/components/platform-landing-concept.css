@@ -190,6 +190,8 @@
 .concept-contact-scope input{min-height:0;width:17px;height:17px;padding:0;accent-color:var(--aqua)}
 .concept-contact button{min-height:46px;font-size:13px}
 .concept-nav a,.concept-nav button,.concept-return-links a,.concept-final a{min-height:44px}
+.concept-nav nav{align-items:center}
+.concept-nav nav>a,.concept-nav nav>button{display:inline-flex;align-items:center;justify-content:center;line-height:1;margin:0}
 
 @media(max-width:980px){.concept-faq-content{width:100%}.concept-trust>div{grid-template-columns:1fr}.concept-trust article{min-height:auto}.concept-trust article h3{margin-top:25px}}
 @media(max-width:680px){.concept-faq-topics{flex-wrap:nowrap;margin-inline:-20px;padding-inline:20px;overflow-x:auto;scrollbar-width:none}.concept-faq-topics::-webkit-scrollbar{display:none}.concept-faq-topics button{flex:0 0 auto}.concept-contact-pair,.concept-contact-scope{grid-template-columns:1fr}.concept-contact form{gap:16px;padding:22px}.concept-contact label{font-size:12px}.concept-contact button{width:100%;justify-self:stretch}.concept-trust header{margin-bottom:38px}.concept-trust h2,.concept-faq-heading h2,.concept-contact h2{overflow-wrap:anywhere}.concept-faq-list summary{font-size:16px}.concept-faq-list details>p{margin-left:34px;font-size:14px}}

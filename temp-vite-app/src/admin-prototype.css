@@ -333,18 +333,18 @@ button { color: inherit; }
 .table-scroll { overflow: visible; }
 .guests-table { table-layout: fixed; }
 .guests-table th, .guests-table td { padding-inline: 10px; }
-.guests-table th { font-size: 9px; letter-spacing: .035em; }
+.guests-table th { font-size: 11px; line-height: 1.25; letter-spacing: .025em; white-space: normal; }
 .guests-table th:nth-last-child(1), .guests-table td:nth-last-child(1) { width: 105px; }
 .guests-table .person { min-width: 0; }
 .guests-table .row-actions { justify-content: flex-end; gap: 5px; }
 .guests-table .checkbox-cell { width: 46px; }
-.guests-table .guest-person-column { width: 190px; }
-.guests-table .guest-group-column { width: 160px; }
-.guests-table .guest-circle-column { width: 125px; }
-.guests-table .guest-seats-column { width: 105px; }
-.guests-table .guest-status-column { width: 135px; }
-.guests-table .guest-follow-up-column { width: 135px; }
-.guests-table .guest-actions-column { width: 105px; }
+.guests-table .guest-person-column { width: 180px; }
+.guests-table .guest-group-column { width: 145px; }
+.guests-table .guest-circle-column { width: 110px; }
+.guests-table .guest-seats-column { width: 96px; }
+.guests-table .guest-status-column { width: 130px; }
+.guests-table .guest-follow-up-column { width: 125px; }
+.guests-table .guest-actions-column { width: 94px; }
 .guests-table .person p { min-width: 0; overflow: hidden; }
 .guests-table .guest-name-button,.guests-table .person small { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .guest-empty-row:hover { background: transparent; }
@@ -358,13 +358,13 @@ th { padding: 11px 16px; color: var(--muted); background: #f7f9fa; font-size: 8p
 td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-space: nowrap; }
 .person { display: flex; align-items: center; gap: 10px; min-width: 170px; }
 .seat-progress { display: grid; gap: 2px; min-width: 92px; }
-.seat-progress strong { color: var(--ink); font-size: 10px; }
-.seat-progress small { color: var(--muted); font-size: 7px; white-space: normal; }
+.seat-progress strong { color: var(--ink); font-size: 12px; }
+.seat-progress small { color: var(--muted); font-size: 10px; line-height: 1.25; white-space: normal; }
 .guest-group-cell { display: grid; gap: 2px; min-width: 0; }
-.guest-group-cell strong, .guest-group-cell small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.guest-group-cell strong { color: var(--ink); font-size: 10px; }
-.guest-group-cell small { color: var(--muted); font-size: 8px; }
-.guest-circle-cell { display: block; overflow: hidden; color: var(--teal-dark); font-size: 9px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.guest-group-cell strong, .guest-group-cell small { overflow-wrap: anywhere; white-space: normal; }
+.guest-group-cell strong { color: var(--ink); font-size: 12px; line-height: 1.25; }
+.guest-group-cell small { color: var(--muted); font-size: 10px; line-height: 1.3; }
+.guest-circle-cell { display: block; overflow-wrap: anywhere; color: var(--teal-dark); font-size: 11px; line-height: 1.3; font-weight: 800; white-space: normal; }
 .guest-circle-cell em { color: var(--muted); font-style: normal; font-weight: 600; }
 .guest-name-button { width: fit-content; padding: 0; border: 0; border-bottom: 1px dashed transparent; color: inherit; background: transparent; font: inherit; font-weight: 800; text-align: left; cursor: pointer; }
 .guest-name-button:hover, .guest-name-button:focus-visible { color: var(--teal-dark); border-bottom-color: currentColor; outline: none; }
@@ -487,12 +487,14 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .guest-operation-summary span { overflow: hidden; color: var(--muted); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; text-overflow: ellipsis; white-space: nowrap; }
 .guest-operation-summary strong { font-family: Georgia, serif; font-size: 27px; font-weight: 500; line-height: 1; }
 .guest-operation-summary small { overflow: hidden; color: var(--muted); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
-.delivery-status { display: inline-flex; align-items: center; width: max-content; max-width: 170px; padding: 4px 8px; border-radius: 999px; background: #f2f5f6; color: var(--muted); font-size: 9px; font-weight: 700; white-space: nowrap; }
+.delivery-status.guest-delivery-status { display: inline-grid; align-items: center; width: max-content; min-width: 0; max-width: 100%; gap: 0; padding: 6px 10px; border-radius: 12px; background: #f2f5f6; color: var(--muted); font-size: 11px; line-height: 1.2; font-weight: 700; white-space: normal; }
+.guest-delivery-status strong { font-size: 11px; line-height: 1.2; }
+.guest-delivery-status small { margin-top: 2px; color: currentColor; font-size: 10px; line-height: 1.25; white-space: normal; }
 .delivery-status.sent { background: #eef8fb; color: #26728a; }
 .delivery-status.opened { background: #fff7df; color: #9a6b00; }
 .delivery-status.responded { background: #eaf8ef; color: #27804d; }
 .guest-follow-up { display: grid; justify-items: start; gap: 6px; }
-.guest-follow-up > button { padding: 0; border: 0; background: transparent; color: var(--teal); font-size: 9px; font-weight: 800; text-align: left; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.guest-follow-up > button { padding: 0; border: 0; background: transparent; color: var(--teal); font-size: 11px; line-height: 1.3; font-weight: 800; text-align: left; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .guest-follow-up > button:disabled { color: #a54a42; cursor: default; text-decoration: none; }
 .floor-plan-panel { display: grid; gap: 16px; margin-bottom: 18px; padding: 16px; }
 .floor-plan-guide { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
