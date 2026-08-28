@@ -1,0 +1,90 @@
+.demo-communications,
+.demo-suppliers {
+  max-width: 980px;
+  margin-top: 32px;
+  border: 1px solid #dbe5e5;
+  border-radius: 18px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.demo-communication-list { display: grid; }
+.demo-communication-list article {
+  display: grid;
+  grid-template-columns: 112px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e7edec;
+}
+.demo-communication-list article:last-child { border-bottom: 0; }
+.demo-communication-list article > span {
+  justify-self: start;
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .07em;
+}
+.demo-communication-list .sent { color: #24725e; background: #e2f5ec; }
+.demo-communication-list .scheduled { color: #8a6412; background: #fff3cf; }
+.demo-communication-list .draft { color: #66777e; background: #edf1f1; }
+.demo-communication-list article > div { display: grid; gap: 5px; }
+.demo-communication-list small,
+.demo-communication-list time { color: #70838b; }
+.demo-communication-list button {
+  border: 0;
+  color: #168f96;
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.demo-supplier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding: 18px;
+}
+.demo-supplier-grid article {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #dfe8e7;
+  border-radius: 14px;
+}
+.demo-supplier-grid article > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  color: #166d72;
+  background: #dff4f1;
+  font-weight: 900;
+}
+.demo-supplier-grid article > div { display: grid; gap: 4px; min-width: 0; }
+.demo-supplier-grid small { color: #71848b; }
+.demo-supplier-grid p { margin: 7px 0 0; color: #475f69; font-size: 13px; line-height: 1.45; }
+.demo-supplier-grid i {
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #24725e;
+  background: #e2f5ec;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.demo-supplier-grid i.pending { color: #8a6412; background: #fff3cf; }
+
+@media (max-width: 760px) {
+  .demo-communication-list article { grid-template-columns: 1fr; gap: 9px; }
+  .demo-communication-list time,
+  .demo-communication-list article > button { justify-self: start; }
+  .demo-supplier-grid { grid-template-columns: 1fr; }
+}

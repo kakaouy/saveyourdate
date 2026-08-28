@@ -59,6 +59,7 @@ test('el seguimiento separa el estado de la fecha y evita texto operativo diminu
   assert.match(source, /<strong>\{guest\.respondedAt/);
   assert.match(source, /<small>\{reportDate/);
   assert.match(styles, /\.guest-delivery-status small \{[^}]*font-size: 10px/);
+  assert.match(styles, /\.status-select \{[^}]*font-size: 11px/);
   assert.match(styles, /\.seat-progress small \{[^}]*font-size: 10px/);
   assert.match(styles, /\.guest-group-cell strong, \.guest-group-cell small \{[^}]*white-space: normal/);
 });
@@ -688,7 +689,7 @@ test('los filtros no comprimen sus etiquetas y las restricciones sociales son vi
   assert.match(source, /socialTogetherWith/);
   assert.match(source, /socialSeparateFrom/);
   assert.match(source, /preferredTableName/);
-  assert.match(source, /className="restriction-chips"/);
+  assert.match(source, /className="guest-menu-restrictions"/);
   assert.match(guestsApi, /social_together_with/);
   assert.match(guestsApi, /social_separate_from/);
   assert.match(migration, /preferred_table_name/);
@@ -849,6 +850,14 @@ test('grupo de invitación y círculo social se editan y muestran como conceptos
   assert.match(source, /className="guest-circle-column" data-label=/);
   assert.match(source, /className="guest-actions-column" data-label=/);
   assert.match(styles, /\.guests-table tbody > tr:not\(\.guest-empty-row\)/);
+});
+
+test('las restricciones salen de la tabla y permanecen disponibles en más opciones', () => {
+  assert.doesNotMatch(source, /<th className="guest-secondary-column">\{t\("Restricción"/);
+  assert.doesNotMatch(source, /<td className="guest-secondary-column" data-label=\{t\("Restricción"/);
+  assert.match(source, /className="guest-menu-restrictions"/);
+  assert.match(source, /hasGuestRestriction\(guest\)/);
+  assert.match(styles, /\.guest-menu-restrictions/);
 });
 
 test('la sugerencia permanece visible y se reinicia después de cada movimiento', () => {

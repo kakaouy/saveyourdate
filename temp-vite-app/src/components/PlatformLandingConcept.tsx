@@ -167,7 +167,7 @@ export default function PlatformLandingConcept() {
     </section>
 
     <section className="concept-invitations" id="invitaciones">
-      <div className="concept-invite-copy"><p><span>03</span> Creá tu invitación</p><h2>La primera impresión<br />también cuenta.</h2><p>Empezá por una invitación que entusiasme. Personalizá colores, textos, fotos y cada detalle de la experiencia.</p><a className="concept-explore-cta" href="/?catalogo=1">Explorar todas las invitaciones <span>→</span></a></div>
+      <div className="concept-invite-copy"><p>Creá tu invitación</p><h2>La primera impresión<br />también cuenta.</h2><p>Empezá por una invitación que entusiasme. Personalizá colores, textos, fotos y cada detalle de la experiencia.</p><a className="concept-explore-cta" href="/?catalogo=1">Explorar todas las invitaciones <span>→</span></a></div>
       <div className="concept-invite-stack">{[...invitationPreviews, ...invitationPreviews.slice(0, 6)].map(([src, label], index) => <figure key={`${src}-${index}`} tabIndex={0} style={{ '--card-index': index } as React.CSSProperties}><img src={src} alt={`Invitación ${label}`} /><figcaption>{label}</figcaption></figure>)}</div>
     </section>
 
@@ -176,7 +176,7 @@ export default function PlatformLandingConcept() {
     <section className="concept-trust" aria-labelledby="trust-title"><header><span>CONFIANZA SIN LETRA CHICA</span><h2 id="trust-title">Probalo. Entendelo.<br /><em>Después decidí.</em></h2></header><div><article><b>01</b><h3>Demo sin registro</h3><p>Recorré la plataforma con datos ficticios antes de crear una cuenta o compartir información propia.</p></article><article><b>02</b><h3>Información protegida</h3><p>Accesos privados, permisos por rol y revisión antes de publicar para cuidar cada etapa del evento.</p></article><article><b>03</b><h3>Soporte humano</h3><p>Hablá con una persona para elegir el recorrido adecuado o resolver dudas durante la organización.</p></article></div></section>
 
     <section className="concept-faq" id="preguntas">
-      <div className="concept-faq-heading"><p><span>05</span> Antes de empezar</p><h2>Preguntas simples.<br /><em>Respuestas claras.</em></h2><p>Todo lo importante para decidir cómo querés organizar tu evento.</p><a href="#contacto">¿Tenés otra pregunta? Hablemos →</a></div>
+      <div className="concept-faq-heading"><p>Antes de empezar</p><h2>Preguntas simples.<br /><em>Respuestas claras.</em></h2><p>Todo lo importante para decidir cómo querés organizar tu evento.</p><a href="#contacto">¿Tenés otra pregunta? Hablemos →</a></div>
       <div className="concept-faq-content"><div className="concept-faq-topics" role="tablist" aria-label="Temas de preguntas">{(Object.keys(faqGroups) as FaqTopic[]).map((topic) => <button key={topic} type="button" role="tab" aria-selected={faqTopic === topic} onClick={() => setFaqTopic(topic)}>{topic}</button>)}</div><div className="concept-faq-list" role="tabpanel">{faqGroups[faqTopic].map(([question, answer], index) => <details key={question} open={index === 0}><summary><span>{String(index + 1).padStart(2, '0')}</span>{question}<i aria-hidden="true">＋</i></summary><p>{answer}</p></details>)}</div></div>
     </section>
 

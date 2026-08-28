@@ -227,6 +227,20 @@
 .concept-plan-actions a{min-height:44px;display:grid;place-items:center}
 @media(max-width:560px){.concept-plans-modal{padding:52px 16px 20px}.concept-plan-shared{display:grid;grid-template-columns:1fr 1fr}.concept-plan-shared b{grid-column:1/-1}.concept-plan-shared span{padding:7px 8px}.concept-plan-grid article{padding:20px 18px}.concept-plan-actions{grid-template-columns:1fr}.concept-plans-footnote{text-align:left}}
 
+/* Keep the transition from the overview into the workflow completely flush. */
+.concept-connected .concept-modules{padding-block-start:0!important}
+.concept-connected .concept-how-intro{margin-block-start:0;transform:none}
+
+/* One editorial scale for every landing section eyebrow. */
+.concept-kicker,
+.concept-less>div>span,
+.concept-how-intro>p,
+.concept-audience-switch>header>span,
+.concept-invite-copy>p:first-child,
+.concept-trust header>span,
+.concept-faq-heading>p:first-child,
+.concept-contact>div>span{font-size:11px}
+
 .concept-role-compare{display:grid;grid-template-columns:.72fr 1.28fr;gap:clamp(45px,8vw,125px);padding:clamp(80px,10vw,145px) clamp(24px,7vw,110px);background:#e9f2ef}.concept-role-compare header>span{color:#6e8581;font-size:9px;font-weight:900;letter-spacing:.16em}.concept-role-compare h2{margin:20px 0;font:clamp(44px,5vw,74px)/1 'Italiana',Georgia,serif}.concept-role-compare h2 em{color:var(--aqua);font-weight:400}.concept-role-table{border-top:1px solid #bfcfcb}.concept-role-table>div{display:grid;grid-template-columns:.65fr 1fr 1fr;gap:20px;align-items:center;min-height:72px;border-bottom:1px solid #bfcfcb}.concept-role-table span{color:#6d817f;font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}.concept-role-table p{margin:0;font-size:13px}.concept-role-table .role-head{min-height:48px}.concept-role-table .role-head b{font:20px 'Italiana',Georgia,serif}.concept-role-actions{grid-column:2;display:flex;gap:10px}.concept-role-actions a,.concept-role-actions button{display:flex;justify-content:space-between;gap:25px;min-width:190px;padding:15px 18px;border:0;border-radius:4px;color:#fff;background:var(--navy);font:800 12px 'DM Sans',sans-serif;cursor:pointer}.concept-role-actions button{color:var(--navy);background:#f1cf75}
 @media(max-width:800px){.concept-role-compare{grid-template-columns:1fr}.concept-role-actions{grid-column:1}.concept-role-table>div{grid-template-columns:.6fr 1fr 1fr}}
 @media(max-width:520px){.concept-role-compare{padding:70px 20px}.concept-role-table{overflow-x:auto}.concept-role-table>div{min-width:590px}.concept-role-actions{flex-direction:column}.concept-role-actions a,.concept-role-actions button{width:100%}}

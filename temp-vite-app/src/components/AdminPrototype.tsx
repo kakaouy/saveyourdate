@@ -2496,7 +2496,6 @@ function Guests({
                 <th className="guest-circle-column">{t("Círculo", "Circle", "Círculo")}</th>
                 <th className="guest-seats-column">{t("Asistencia", "Attendance", "Presença")}</th>
                 <th className="guest-status-column">{t("Estado", "Status", "Status")}</th>
-                <th className="guest-secondary-column">{t("Restricción", "Dietary need", "Restrição")}</th>
                 <th className="guest-secondary-column guest-follow-up-column">{t("Seguimiento", "Tracking", "Acompanhamento")}</th>
                 <th className="guest-actions-column">{t("Acciones", "Actions", "Ações")}</th>
               </tr>
@@ -2504,7 +2503,7 @@ function Guests({
             <tbody>
               {filtered.length === 0 && (
                 <tr className="guest-empty-row">
-                  <td colSpan={canEdit ? 9 : 8}>
+                  <td colSpan={canEdit ? 8 : 7}>
                     <div className="guest-empty-state">
                       <span aria-hidden="true">♙</span>
                       <strong>{activeGuests.length === 0
@@ -2581,15 +2580,6 @@ function Guests({
                       <Status value={guest.status} />
                     )}
                   </td>
-                  <td className="guest-secondary-column" data-label={t("Restricción", "Dietary need", "Restrição")}>
-                    <div className="restriction-chips">
-                      {meaningfulGuestValue(guest.food) && <span className="is-food">⚠ {guest.food}</span>}
-                      {guest.socialTogetherWith && <span className="is-together">↔ {guest.socialTogetherWith}</span>}
-                      {guest.socialSeparateFrom && <span className="is-separate">⇥ {guest.socialSeparateFrom}</span>}
-                      {guest.preferredTableName && <span className="is-preferred">⌖ {guest.preferredTableName}</span>}
-                      {!hasGuestRestriction(guest) && <span className="is-empty">—</span>}
-                    </div>
-                  </td>
                   <td className="guest-secondary-column guest-follow-up-column" data-label={t("Seguimiento", "Tracking", "Acompanhamento")}>
                     <div className="guest-follow-up"><span className={`delivery-status guest-delivery-status ${guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
                       <strong>{guest.respondedAt
@@ -2627,6 +2617,13 @@ function Guests({
                               <span aria-hidden="true">ⓘ</span>
                               {t("Ver datos solicitados", "View requested details", "Ver dados solicitados")}
                             </button>
+                            {hasGuestRestriction(guest) && <div className="guest-menu-restrictions" role="group" aria-label={`${t("Restricciones y ubicación de", "Dietary needs and placement for", "Restrições e localização de")} ${guest.name}`}>
+                              <strong>{t("Restricciones y ubicación", "Dietary needs and placement", "Restrições e localização")}</strong>
+                              {meaningfulGuestValue(guest.food) && <span>⚠ {guest.food}</span>}
+                              {guest.socialTogetherWith && <span>↔ {t("Junto a", "Together with", "Junto com")}: {guest.socialTogetherWith}</span>}
+                              {guest.socialSeparateFrom && <span>⇥ {t("Separado de", "Separate from", "Separado de")}: {guest.socialSeparateFrom}</span>}
+                              {guest.preferredTableName && <span>⌖ {t("Mesa preferida", "Preferred table", "Mesa preferida")}: {guest.preferredTableName}</span>}
+                            </div>}
                             {canEdit && <button
                               className="guest-menu-danger"
                               type="button"
