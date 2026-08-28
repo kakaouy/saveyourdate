@@ -1,0 +1,22 @@
+temp-vite-app/src/components/PlatformLandingConcept.tsx
+  s_7bf15498a84739::t_e9b02079d1e34b 104
+temp-vite-app/tests/platform-landing-concept.test.ts
+  s_7bf15498a84739::t_e9b02079d1e34b 23-29
+  s_7bf15498a84739::t_2457277edea7e0 30-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "71ac243bc4a8221158c897b261b935a3c3dad535",
+  "prompts": {},
+  "sessions": {
+    "s_7bf15498a84739": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04384-e93b-7e52-b32b-d6b49a0c1989",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
