@@ -76,6 +76,14 @@ type GuestImportPreview = {
   }>;
 };
 
+type GuestImportResult = {
+  fileName: string;
+  imported: number;
+  omittedDuplicates: number;
+  omittedErrors: number;
+  importedIds: string[];
+};
+
 type GuestImportMapping = {
   fileName: string;
   rows: string[][];
@@ -1418,11 +1426,14 @@ function Guests({
   const [filter, setFilter] = useState("Todos");
   const [sortBy, setSortBy] = useState<"name" | "group" | "food" | "status">("name");
   const [selected, setSelected] = useState<string[]>([]);
+  const [showBulkReminderReview, setShowBulkReminderReview] = useState(false);
+  const [bulkReminderCursor, setBulkReminderCursor] = useState(0);
   const [bulkField, setBulkField] = useState<"status" | "group" | "socialCircle" | "invitedBy" | "guestType" | "transportOption" | "menuChoice" | "food" | "socialTogetherWith" | "socialSeparateFrom" | "preferredTableName">("invitedBy");
   const [bulkValue, setBulkValue] = useState(defaultInviter);
   const bulkAllowsEmpty = ["transportOption", "menuChoice", "food", "socialTogetherWith", "socialSeparateFrom", "preferredTableName"].includes(bulkField);
   const [showImportHelp, setShowImportHelp] = useState(false);
   const [importPreview, setImportPreview] = useState<GuestImportPreview | null>(null);
+  const [importResult, setImportResult] = useState<GuestImportResult | null>(null);
   const [importMapping, setImportMapping] = useState<GuestImportMapping | null>(null);
   const [showAddGuests, setShowAddGuests] = useState(false);
   const [showPasteGuests, setShowPasteGuests] = useState(false);
@@ -1436,6 +1447,7 @@ function Guests({
   const [detailsSocialCircle, setDetailsSocialCircle] = useState("");
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState("");
+  const [whatsAppReviewGuest, setWhatsAppReviewGuest] = useState<Guest | null>(null);
   const [newGuestCode, setNewGuestCode] = useState(defaultPhoneCountryCode);
   const [newIdentificationType, setNewIdentificationType] = useState(
     suggestedIdentification(defaultPhoneCountryCode),
@@ -1454,12 +1466,13 @@ function Guests({
     setDetailsSocialCircle(inspectingGuest?.socialCircle || "");
   }, [inspectingGuest]);
   const activeGuests = guests.filter((guest) => !guest.archivedAt);
+  const selectedGuests = activeGuests.filter((guest) => selected.includes(guest.id));
+  const bulkReminderRecipients = selectedGuests.filter((guest) => guest.status === "Pendiente" && !guest.respondedAt && Boolean(guest.phone) && Boolean(guest.inviteToken));
+  const bulkReminderExcluded = selectedGuests.filter((guest) => !bulkReminderRecipients.some((recipient) => recipient.id === guest.id));
   const archivedInvitations = guests.length - activeGuests.length;
   const confirmedPeople = confirmedPeopleTotal(activeGuests);
-  const pendingInvitations = activeGuests.filter((guest) => guest.status === "Pendiente").length;
   const declinedInvitations = activeGuests.filter((guest) => guest.status === "No asiste").length;
   const hasGuestRestriction = guestHasRestriction;
-  const dietaryInvitations = activeGuests.filter(hasGuestRestriction).length;
   const defaultGuestSocialCircles = [
     "Amigos",
     "Facultad",
@@ -1477,6 +1490,9 @@ function Guests({
   const sentPendingInvitations = activeGuests.filter(
     (guest) => guest.status === "Pendiente" && Boolean(guest.invitationSentAt),
   ).length;
+  const openedPendingInvitations = activeGuests.filter(
+    (guest) => guest.status === "Pendiente" && Boolean(guest.invitationOpenedAt),
+  ).length;
   const filtered = guests
     .filter((guest) => {
       const matches = `${guest.name} ${guest.group}`
@@ -1488,6 +1504,7 @@ function Guests({
         filter === "Logística" ||
         filter === "Sin enviar" ||
         filter === "Enviadas pendientes" ||
+        filter === "Vistas pendientes" ||
         guest.status === filter ||
         (filter === "Restricciones" && hasGuestRestriction(guest)) ||
         (filter === "Respondieron" && guest.status !== "Pendiente");
@@ -1499,6 +1516,8 @@ function Guests({
           ? guest.status === "Pendiente" && !guest.invitationSentAt
           : filter === "Enviadas pendientes"
             ? guest.status === "Pendiente" && Boolean(guest.invitationSentAt)
+            : filter === "Vistas pendientes"
+              ? guest.status === "Pendiente" && Boolean(guest.invitationOpenedAt)
             : true;
       const matchesArchive = filter === "Archivados" ? Boolean(guest.archivedAt) : !guest.archivedAt;
       return matches && matchesView && matchesDelivery && matchesArchive && matchesLogistics;
@@ -1808,18 +1827,35 @@ function Guests({
     window.setTimeout(() => setCopiedId(""), 1800);
   };
 
-  const openWhatsAppInvite = (guest: Guest) => {
-    if (!guest.inviteToken)
-      return setError("Falta el enlace personalizado del invitado.");
+  const whatsappInviteContent = (guest: Guest) => {
     const target = invitationUrl || `${window.location.origin}/confirmar`;
     const separator = target.includes("?") ? "&" : "?";
     const link = `${target}${separator}token=${guest.inviteToken}`;
+    const message = guest.invitationOpenedAt
+      ? t(
+          `Hola ${guest.name}. Vimos que ya pudiste ver la invitación de ${defaultInviter}. Cuando tengas un momento, ¿podés confirmar tu asistencia acá? ${link}`,
+          `Hi ${guest.name}. We saw that you viewed ${defaultInviter}'s invitation. When you have a moment, could you RSVP here? ${link}`,
+          `Olá ${guest.name}. Vimos que você abriu o convite de ${defaultInviter}. Quando puder, confirme sua presença aqui: ${link}`,
+        )
+      : guest.invitationSentAt
+        ? t(
+            `Hola ${guest.name}. Te reenviamos la invitación de ${defaultInviter} para que tengas a mano todos los detalles y puedas confirmar: ${link}`,
+            `Hi ${guest.name}. We're resending ${defaultInviter}'s invitation so you have the details and can RSVP: ${link}`,
+            `Olá ${guest.name}. Estamos reenviando o convite de ${defaultInviter} para você consultar os detalhes e confirmar: ${link}`,
+          )
+        : t(
+            `Hola ${guest.name}, queremos invitarte a ${defaultInviter}. Encontrás todos los detalles y la confirmación acá: ${link}`,
+            `Hi ${guest.name}, we'd love to invite you to ${defaultInviter}. Details and RSVP: ${link}`,
+            `Olá ${guest.name}, queremos convidar você para ${defaultInviter}. Detalhes e confirmação: ${link}`,
+          );
+    return { link, message };
+  };
+
+  const openWhatsAppInvite = (guest: Guest) => {
+    if (!guest.inviteToken)
+      return setError("Falta el enlace personalizado del invitado.");
+    const { message } = whatsappInviteContent(guest);
     const phone = guest.phone.replace(/\D/g, "");
-    const message = t(
-      `Hola ${guest.name}, queremos invitarte a ${defaultInviter}. Encontrás todos los detalles y la confirmación acá: ${link}`,
-      `Hi ${guest.name}, we'd love to invite you to ${defaultInviter}. Details and RSVP: ${link}`,
-      `Olá ${guest.name}, queremos convidar você para ${defaultInviter}. Detalhes e confirmação: ${link}`,
-    );
     const popup = window.open(
       `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
       "_blank",
@@ -1835,17 +1871,18 @@ function Guests({
     popup.opener = null;
     setUpdatingId(guest.id);
     setNotice(t(
-      `WhatsApp quedó abierto para ${guest.name}. Registrando el envío…`,
-      `WhatsApp is open for ${guest.name}. Recording the send…`,
-      `O WhatsApp foi aberto para ${guest.name}. Registrando o envio…`,
+      `WhatsApp quedó abierto para ${guest.name}. Registrando el mensaje como preparado…`,
+      `WhatsApp is open for ${guest.name}. Recording the message as prepared…`,
+      `O WhatsApp foi aberto para ${guest.name}. Registrando a mensagem como preparada…`,
     ));
     void fetch("/api/admin/guests", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: "mark-invitation-sent",
+        action: "mark-whatsapp-prepared",
         id: guest.id,
         channel: "whatsapp",
+        kind: guest.invitationSentAt ? "reminder" : "invitation",
       }),
     })
       .then(async (response) => {
@@ -1855,7 +1892,7 @@ function Guests({
         setGuests((current) =>
           current.map((item) => (item.id === guest.id ? result.guest! : item)),
         );
-        setNotice(t("Invitación registrada como enviada.", "Invitation recorded as sent.", "Convite registrado como enviado."));
+        setNotice(t("WhatsApp registrado como preparado.", "WhatsApp recorded as prepared.", "WhatsApp registrado como preparado."));
       })
       .catch((sendError) =>
         setError(
@@ -1915,7 +1952,7 @@ function Guests({
         "WhatsApp",
         "Email",
         t("Restricción", "Dietary need", "Restrição"),
-        t("Invitación enviada", "Invitation sent", "Convite enviado"),
+        t("WhatsApp preparado", "WhatsApp prepared", "WhatsApp preparado"),
         t("Invitación abierta", "Invitation opened", "Convite aberto"),
         t("Respuesta recibida", "Response received", "Resposta recebida"),
         t("Transporte", "Transport", "Transporte"),
@@ -1990,6 +2027,14 @@ function Guests({
         const seats = Number(guest.seats); if (!Number.isInteger(seats) || seats < 1 || seats > 20) errors.push(t("Cupos fuera de rango", "Seats out of range", "Vagas fora do limite"));
         seenNames.add(nameKey); if (phoneKey) seenPhones.add(phoneKey); if (emailKey) seenEmails.add(emailKey); return { guest, duplicate, errors };
       });
+      if (mappedColumns && typeof window !== "undefined") {
+        const rememberedHeaders = Object.fromEntries(
+          Object.entries(mappedColumns)
+            .filter(([, index]) => index >= 0 && rows[0][index])
+            .map(([field, index]) => [field, normalize(rows[0][index])]),
+        );
+        window.localStorage.setItem("syd-guest-import-mapping-v1", JSON.stringify(rememberedHeaders));
+      }
       setImportPreview({ fileName, rows: previewRows }); setImportMapping(null); setShowAddGuests(false); setShowPasteGuests(false); setNotice("");
   };
 
@@ -2013,6 +2058,15 @@ function Guests({
       const detected: Record<string, number> = { name: nameIndex };
       const aliases: Record<string, string[]> = { group: ["grupo", "grupo de invitacion", "grupo invitacion", "familia"], socialCircle: ["circulo", "circulo social"], phone: ["whatsapp", "telefono", "celular"], phoneCountryCode: ["codigo pais", "codigo de pais", "pais", "caracteristica"], seats: ["cupos", "personas", "cantidad"], email: ["email", "correo"], identificationType: ["tipo identificacion", "tipo de identificacion", "documento"], identificationNumber: ["identificacion", "numero identificacion", "numero de identificacion"], food: ["restriccion", "restricciones", "alimentacion", "dieta"], invitedBy: ["invitado por", "invita", "responsable"], companionOf: ["acompanante de", "invitado principal"] };
       Object.entries(aliases).forEach(([field, names]) => { detected[field] = column(...names); });
+      try {
+        const remembered = JSON.parse(window.localStorage.getItem("syd-guest-import-mapping-v1") || "{}") as Record<string, string>;
+        Object.entries(remembered).forEach(([field, header]) => {
+          const rememberedIndex = headers.indexOf(header);
+          if (rememberedIndex >= 0) detected[field] = rememberedIndex;
+        });
+      } catch {
+        // Una preferencia dañada no debe bloquear una nueva importación.
+      }
       setImportMapping({ fileName: file.name, rows, columns: detected });
       setShowAddGuests(false);
       setNotice("");
@@ -2073,6 +2127,13 @@ function Guests({
       if (!response.ok || !result.guests)
         throw new Error(result.error || "No pudimos importar los invitados.");
       setGuests((current) => [...current, ...result.guests!]);
+      setImportResult({
+        fileName: importPreview.fileName,
+        imported: result.guests.length,
+        omittedDuplicates: importPreview.rows.filter((row) => row.duplicate).length,
+        omittedErrors: importPreview.rows.filter((row) => row.errors.length > 0).length,
+        importedIds: result.guests.map((guest) => guest.id),
+      });
       setNotice(
         t(
           `${result.guests.length} invitados importados correctamente desde ${importPreview.fileName}.`,
@@ -2090,6 +2151,76 @@ function Guests({
     } finally {
       setSaving(false);
     }
+  };
+
+  const undoLastGuestImport = async () => {
+    if (!importResult?.importedIds.length) return;
+    setSaving(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/guests", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "bulk-archive", ids: importResult.importedIds }),
+      });
+      const result = await readApiJson<{ guests?: Guest[]; error?: string }>(response, t("El servicio de invitados no está disponible.", "The guest service is unavailable.", "O serviço de convidados não está disponível."));
+      if (!response.ok || !result.guests) throw new Error(result.error || t("No pudimos deshacer la importación.", "We could not undo the import.", "Não foi possível desfazer a importação."));
+      const archived = new Map(result.guests.map((guest) => [guest.id, guest]));
+      setGuests((current) => current.map((guest) => archived.get(guest.id) || guest));
+      setImportResult(null);
+      setNotice(t("Importación deshecha. Los invitados quedaron en Archivados y podés restaurarlos.", "Import undone. Guests were moved to Archived and can be restored.", "Importação desfeita. Os convidados foram movidos para Arquivados e podem ser restaurados."));
+    } catch (undoError) {
+      setError(undoError instanceof Error ? undoError.message : t("No pudimos deshacer la importación.", "We could not undo the import.", "Não foi possível desfazer a importação."));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateImportPreviewGuest = (
+    index: number,
+    field: "name" | "group" | "phone" | "seats",
+    value: string,
+  ) => {
+    setImportPreview((current) => {
+      if (!current) return current;
+      const normalize = (text: string) => text.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+      const drafts = current.rows.map((row, rowIndex) => ({
+        ...row.guest,
+        ...(rowIndex === index ? { [field]: value } : {}),
+      }));
+      const existingNames = new Set(guests.map((guest) => normalize(`${guest.name}|${guest.group}`)));
+      const existingPhones = new Set(guests.map((guest) => guest.phone.replace(/\D/g, "")).filter(Boolean));
+      const existingEmails = new Set(guests.map((guest) => guest.email.trim().toLowerCase()).filter(Boolean));
+      const seenNames = new Set<string>();
+      const seenPhones = new Set<string>();
+      const seenEmails = new Set<string>();
+      const rows = drafts.map((guest) => {
+        const nameKey = normalize(`${guest.name}|${guest.group}`);
+        const phoneKey = `${guest.phoneCountryCode}${guest.phone}`.replace(/\D/g, "");
+        const emailKey = guest.email.trim().toLowerCase();
+        const duplicate = existingPhones.has(phoneKey) && phoneKey
+          ? t("WhatsApp ya registrado", "WhatsApp already exists", "WhatsApp já cadastrado")
+          : existingEmails.has(emailKey) && emailKey
+            ? t("Email ya registrado", "Email already exists", "Email já cadastrado")
+            : existingNames.has(nameKey) || seenNames.has(nameKey)
+              ? t("Nombre y grupo repetidos", "Duplicate name and group", "Nome e grupo repetidos")
+              : seenPhones.has(phoneKey) && phoneKey
+                ? t("WhatsApp repetido en el archivo", "Duplicate WhatsApp in file", "WhatsApp repetido no arquivo")
+                : seenEmails.has(emailKey) && emailKey
+                  ? t("Email repetido en el archivo", "Duplicate email in file", "Email repetido no arquivo")
+                  : "";
+        const errors: string[] = [];
+        if (!guest.name.trim()) errors.push(t("Falta el nombre", "Name is required", "Falta o nome"));
+        if (!/^\+\d{1,4}$/.test(guest.phoneCountryCode)) errors.push(t("Código de país inválido", "Invalid country code", "Código de país inválido"));
+        const seats = Number(guest.seats);
+        if (!Number.isInteger(seats) || seats < 1 || seats > 20) errors.push(t("Cupos fuera de rango", "Seats out of range", "Vagas fora do limite"));
+        seenNames.add(nameKey);
+        if (phoneKey) seenPhones.add(phoneKey);
+        if (emailKey) seenEmails.add(emailKey);
+        return { guest, duplicate, errors };
+      });
+      return { ...current, rows };
+    });
   };
 
   return (
@@ -2149,35 +2280,25 @@ function Guests({
           <strong>{confirmedPeople}</strong>
           <small>{t("personas", "people", "pessoas")}</small>
         </button>
-        <button className={`${filter === "Pendiente" ? "active " : ""}${pendingInvitations ? "needs-attention" : ""}`} onClick={() => setFilter("Pendiente")}>
-          <span>{t("Pendientes", "Pending", "Pendentes")}</span>
-          <strong>{pendingInvitations}</strong>
-          <small>{t("requieren seguimiento", "need follow-up", "requerem acompanhamento")}</small>
-        </button>
         <button className={`${filter === "Sin enviar" ? "active " : ""}${unsentInvitations ? "needs-attention" : ""}`} onClick={() => setFilter("Sin enviar")}>
           <span>{t("Sin enviar", "Not sent", "Não enviados")}</span>
           <strong>{unsentInvitations}</strong>
           <small>{t("primer contacto pendiente", "awaiting first contact", "primeiro contato pendente")}</small>
         </button>
         <button className={filter === "Enviadas pendientes" ? "active" : ""} onClick={() => setFilter("Enviadas pendientes")}>
-          <span>{t("Enviadas", "Sent", "Enviados")}</span>
+          <span>{t("Preparadas", "Prepared", "Preparados")}</span>
           <strong>{sentPendingInvitations}</strong>
-          <small>{t("esperando respuesta", "awaiting response", "aguardando resposta")}</small>
+          <small>{t("WhatsApp abierto desde el panel", "WhatsApp opened from the panel", "WhatsApp aberto pelo painel")}</small>
+        </button>
+        <button className={`${filter === "Vistas pendientes" ? "active " : ""}${openedPendingInvitations ? "needs-attention" : ""}`} onClick={() => setFilter("Vistas pendientes")}>
+          <span>{t("Vistas", "Opened", "Visualizados")}</span>
+          <strong>{openedPendingInvitations}</strong>
+          <small>{t("abrieron y aún no respondieron", "opened, no response yet", "abriram e ainda não responderam")}</small>
         </button>
         <button className={filter === "No asiste" ? "active" : ""} onClick={() => setFilter("No asiste")}>
           <span>{t("No asisten", "Declined", "Não comparecem")}</span>
           <strong>{declinedInvitations}</strong>
           <small>{t("invitaciones", "invitations", "convites")}</small>
-        </button>
-        <button className={filter === "Restricciones" ? "active" : ""} onClick={() => setFilter("Restricciones")}>
-          <span>{t("Restricciones", "Dietary needs", "Restrições")}</span>
-          <strong>{dietaryInvitations}</strong>
-          <small>{t("para catering", "for catering", "para catering")}</small>
-        </button>
-        <button className={filter === "Archivados" ? "active" : ""} onClick={() => setFilter("Archivados")}>
-          <span>{t("Archivados", "Archived", "Arquivados")}</span>
-          <strong>{archivedInvitations}</strong>
-          <small>{t("fuera de la operación", "outside operations", "fora da operação")}</small>
         </button>
       </section>
       <section className="panel table-panel">
@@ -2195,7 +2316,7 @@ function Guests({
             />
           </label>
           <div className="filter-pills">
-            {["Todos", "Sin enviar", "Enviadas pendientes", "Confirmado", "Pendiente", "No asiste", "Respondieron", "Restricciones", "Logística", "Archivados"].map((item) => (
+            {["Todos", "Sin enviar", "Enviadas pendientes", "Vistas pendientes", "Confirmado", "Pendiente", "No asiste", "Respondieron", "Restricciones", "Logística", "Archivados"].map((item) => (
               <button
                 key={item}
                 className={filter === item ? "active" : ""}
@@ -2206,7 +2327,9 @@ function Guests({
                   : item === "Sin enviar"
                     ? t("Sin enviar", "Not sent", "Não enviados")
                     : item === "Enviadas pendientes"
-                      ? t("Enviadas, sin respuesta", "Sent, no response", "Enviados, sem resposta")
+                      ? t("Preparadas, sin respuesta", "Prepared, no response", "Preparados, sem resposta")
+                    : item === "Vistas pendientes"
+                      ? t("Vistas, sin respuesta", "Opened, no response", "Visualizados, sem resposta")
                   : item === "Respondieron"
                     ? t("Respondieron", "Responded", "Responderam")
                     : item === "Restricciones"
@@ -2324,6 +2447,9 @@ function Guests({
             {filter !== "Archivados" && <button className="primary-button small" type="button" disabled={saving || (!bulkAllowsEmpty && !bulkValue.trim())} onClick={updateSelected}>
               {t("Aplicar", "Apply", "Aplicar")}
             </button>}
+            {filter !== "Archivados" && <button className="outline-button compact" type="button" disabled={saving} onClick={() => { setBulkReminderCursor(0); setShowBulkReminderReview(true); }}>
+              {t("Recordar respuestas", "Remind responses", "Lembrar respostas")}
+            </button>}
             <button
               className={filter === "Archivados" ? "primary-button small" : "delete-button"}
               type="button"
@@ -2366,12 +2492,12 @@ function Guests({
                   </th>
                 )}
                 <th className="guest-person-column">{t("Invitado", "Guest", "Convidado")}</th>
-                <th className="guest-group-column">{t("Grupo de invitación", "Invitation group", "Grupo do convite")}</th>
-                <th className="guest-circle-column">{t("Círculo social", "Social circle", "Círculo social")}</th>
-                <th className="guest-seats-column">{t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}</th>
+                <th className="guest-group-column">{t("Grupo", "Group", "Grupo")}</th>
+                <th className="guest-circle-column">{t("Círculo", "Circle", "Círculo")}</th>
+                <th className="guest-seats-column">{t("Asistencia", "Attendance", "Presença")}</th>
                 <th className="guest-status-column">{t("Estado", "Status", "Status")}</th>
                 <th className="guest-secondary-column">{t("Restricción", "Dietary need", "Restrição")}</th>
-                <th className="guest-secondary-column">{t("Seguimiento", "Tracking", "Acompanhamento")}</th>
+                <th className="guest-secondary-column guest-follow-up-column">{t("Seguimiento", "Tracking", "Acompanhamento")}</th>
                 <th className="guest-actions-column">{t("Acciones", "Actions", "Ações")}</th>
               </tr>
             </thead>
@@ -2455,7 +2581,7 @@ function Guests({
                       <Status value={guest.status} />
                     )}
                   </td>
-                  <td className="guest-secondary-column">
+                  <td className="guest-secondary-column" data-label={t("Restricción", "Dietary need", "Restrição")}>
                     <div className="restriction-chips">
                       {meaningfulGuestValue(guest.food) && <span className="is-food">⚠ {guest.food}</span>}
                       {guest.socialTogetherWith && <span className="is-together">↔ {guest.socialTogetherWith}</span>}
@@ -2464,58 +2590,50 @@ function Guests({
                       {!hasGuestRestriction(guest) && <span className="is-empty">—</span>}
                     </div>
                   </td>
-                  <td className="guest-secondary-column">
-                    <span className={`delivery-status ${guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
+                  <td className="guest-secondary-column guest-follow-up-column" data-label={t("Seguimiento", "Tracking", "Acompanhamento")}>
+                    <div className="guest-follow-up"><span className={`delivery-status ${guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
                       {guest.respondedAt
                         ? `${t("Respondió", "Responded", "Respondeu")} · ${reportDate(guest.respondedAt, language)}`
                         : guest.invitationOpenedAt
                           ? `${t("Abrió", "Opened", "Abriu")} · ${reportDate(guest.invitationOpenedAt, language)}`
                           : guest.invitationSentAt
-                            ? `${t("Enviada", "Sent", "Enviado")} · ${reportDate(guest.invitationSentAt, language)}`
+                            ? `${t("Preparada", "Prepared", "Preparado")} · ${reportDate(guest.invitationSentAt, language)}`
                             : t("Sin enviar", "Not sent", "Não enviado")}
-                    </span>
+                    </span>{guest.status === "Pendiente" && <button type="button" disabled={!guest.phone || updatingId === guest.id} onClick={() => setWhatsAppReviewGuest(guest)}>{!guest.phone ? t("Falta WhatsApp", "WhatsApp missing", "Falta WhatsApp") : guest.invitationOpenedAt ? t("Recordar respuesta", "Remind to respond", "Lembrar resposta") : guest.invitationSentAt ? t("Reenviar invitación", "Resend invitation", "Reenviar convite") : t("Enviar invitación", "Send invitation", "Enviar convite")}</button>}</div>
                   </td>
                   <td className="guest-actions-column" data-label={t("Acciones", "Actions", "Ações")}>
                     <div className="row-actions icon-actions">
-                      {!guest.archivedAt && <button
-                        className="icon-button"
-                        onClick={() => copyInviteLink(guest)}
-                        title={t("Copiar enlace", "Copy link", "Copiar link")}
-                        aria-label={t("Copiar enlace", "Copy link", "Copiar link")}
-                      >
-                        {copiedId === guest.id ? "✓" : "⧉"}
-                      </button>}
                       {canEdit && !guest.archivedAt && <button
                         className="whatsapp-button"
                         disabled={!guest.phone || updatingId === guest.id}
-                        onClick={() => openWhatsAppInvite(guest)}
+                        onClick={() => setWhatsAppReviewGuest(guest)}
                       >
                         {updatingId === guest.id ? "…" : "WA"}
                       </button>}
-                      {canEdit && !guest.archivedAt && <>
-                        <button
-                          className="icon-button"
-                          onClick={() => setEditingGuest(guest)}
-                          title={t("Editar", "Edit", "Editar")}
-                          aria-label={`${t("Editar", "Edit", "Editar")} ${guest.name}`}
-                        >
-                          <span className="admin-action-icon is-edit" aria-hidden="true" />
-                        </button>
+                      {!guest.archivedAt && <>
                         <details className="guest-more-menu">
                           <summary aria-label={`${t("Más opciones para", "More options for", "Mais opções para")} ${guest.name}`} title={t("Más opciones", "More options", "Mais opções")}>•••</summary>
                           <div>
+                            <button type="button" onClick={() => copyInviteLink(guest)}>
+                              <span aria-hidden="true">{copiedId === guest.id ? "✓" : "⧉"}</span>
+                              {copiedId === guest.id ? t("Enlace copiado", "Link copied", "Link copiado") : t("Copiar enlace", "Copy link", "Copiar link")}
+                            </button>
+                            {canEdit && <button type="button" onClick={() => setEditingGuest(guest)}>
+                              <span className="admin-action-icon is-edit" aria-hidden="true" />
+                              {t("Editar invitado", "Edit guest", "Editar convidado")}
+                            </button>}
                             <button type="button" onClick={() => setInspectingGuest(guest)}>
                               <span aria-hidden="true">ⓘ</span>
                               {t("Ver datos solicitados", "View requested details", "Ver dados solicitados")}
                             </button>
-                            <button
+                            {canEdit && <button
                               className="guest-menu-danger"
                               type="button"
                               onClick={() => setGuestArchived(guest, true)}
                             >
                               <svg className="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" /></svg>
                               {t("Archivar invitado", "Archive guest", "Arquivar convidado")}
-                            </button>
+                            </button>}
                           </div>
                         </details>
                       </>}
@@ -2551,6 +2669,48 @@ function Guests({
           </span>
         </div>
       </section>
+      {showBulkReminderReview && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="bulk-reminder-title" onMouseDown={() => setShowBulkReminderReview(false)}>
+          <div className="modal bulk-reminder-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setShowBulkReminderReview(false)} aria-label={t("Cerrar", "Close", "Fechar")}>×</button>
+            <span className="eyebrow">RSVP · WhatsApp</span>
+            <h2 id="bulk-reminder-title">{t("Revisá antes de recordar", "Review before reminding", "Revise antes de lembrar")}</h2>
+            <p>{t("Solo incluimos invitaciones pendientes que tienen WhatsApp y enlace personalizado. Cada mensaje se abre por separado para que puedas revisarlo antes de enviarlo.", "Only pending invitations with WhatsApp and a personal link are included. Each message opens separately so you can review it before sending.", "Incluímos apenas convites pendentes com WhatsApp e link pessoal. Cada mensagem abre separadamente para revisão antes do envio.")}</p>
+            <div className="bulk-reminder-summary">
+              <span><strong>{selectedGuests.length}</strong>{t("seleccionados", "selected", "selecionados")}</span>
+              <span className="ready"><strong>{bulkReminderRecipients.length}</strong>{t("recibirán recordatorio", "will receive a reminder", "receberão lembrete")}</span>
+              <span className="excluded"><strong>{bulkReminderExcluded.length}</strong>{t("excluidos automáticamente", "automatically excluded", "excluídos automaticamente")}</span>
+            </div>
+            <div className="bulk-reminder-review-list">
+              {bulkReminderRecipients.map((guest, index) => <span className={index === bulkReminderCursor ? "is-current" : index < bulkReminderCursor ? "is-done" : ""} key={guest.id}><b>{index < bulkReminderCursor ? "✓" : index + 1}</b><strong>{guest.name}</strong><small>{guest.invitationOpenedAt ? t("Vio la invitación · recordar respuesta", "Viewed invitation · remind to respond", "Viu o convite · lembrar resposta") : guest.invitationSentAt ? t("WhatsApp preparado · reenviar", "WhatsApp prepared · resend", "WhatsApp preparado · reenviar") : t("Primera invitación pendiente", "First invitation pending", "Primeiro convite pendente")}</small></span>)}
+            </div>
+            {bulkReminderExcluded.length > 0 && <details className="bulk-reminder-excluded"><summary>{t("Ver quiénes quedaron afuera", "See who was excluded", "Ver quem ficou de fora")}</summary>{bulkReminderExcluded.map((guest) => <p key={guest.id}><strong>{guest.name}</strong> · {guest.respondedAt || guest.status !== "Pendiente" ? t("ya respondió", "already responded", "já respondeu") : !guest.phone ? t("falta WhatsApp", "WhatsApp missing", "falta WhatsApp") : t("falta enlace personalizado", "personal link missing", "falta link pessoal")}</p>)}</details>}
+            <div className="modal-actions">
+              <button className="outline-button" type="button" onClick={() => setShowBulkReminderReview(false)}>{bulkReminderCursor >= bulkReminderRecipients.length ? t("Cerrar", "Close", "Fechar") : t("Cancelar", "Cancel", "Cancelar")}</button>
+              {bulkReminderCursor < bulkReminderRecipients.length && <button className="primary-button" type="button" onClick={() => { openWhatsAppInvite(bulkReminderRecipients[bulkReminderCursor]); setBulkReminderCursor((current) => current + 1); }}>{bulkReminderCursor === 0 ? t("Abrir primer mensaje", "Open first message", "Abrir primeira mensagem") : t("Abrir siguiente mensaje", "Open next message", "Abrir próxima mensagem")} · {bulkReminderCursor + 1}/{bulkReminderRecipients.length}</button>}
+            </div>
+          </div>
+        </div>
+      )}
+      {whatsAppReviewGuest && (() => {
+        const content = whatsappInviteContent(whatsAppReviewGuest);
+        const actionLabel = whatsAppReviewGuest.invitationOpenedAt
+          ? t("Recordatorio de respuesta", "Response reminder", "Lembrete de resposta")
+          : whatsAppReviewGuest.invitationSentAt
+            ? t("Reenvío de invitación", "Invitation resend", "Reenvio do convite")
+            : t("Primera invitación", "First invitation", "Primeiro convite");
+        return <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="whatsapp-review-title" onMouseDown={() => setWhatsAppReviewGuest(null)}>
+          <div className="modal whatsapp-review-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setWhatsAppReviewGuest(null)}>×</button>
+            <span className="eyebrow">WhatsApp · {actionLabel}</span>
+            <h2 id="whatsapp-review-title">{t("Revisá el mensaje", "Review the message", "Revise a mensagem")}</h2>
+            <div className="whatsapp-review-recipient"><GuestAvatar guest={whatsAppReviewGuest} /><span><strong>{whatsAppReviewGuest.name}</strong><small>{whatsAppReviewGuest.phoneCountryCode} {whatsAppReviewGuest.phone}</small></span></div>
+            <div className="whatsapp-message-preview"><p>{content.message}</p></div>
+            <p className="dynamic-help">{t("WhatsApp se abrirá con este texto preparado. Podrás editarlo antes de enviarlo.", "WhatsApp will open with this message ready. You can edit it before sending.", "O WhatsApp abrirá com esta mensagem pronta. Você poderá editá-la antes de enviar.")}</p>
+            <div className="modal-actions"><button className="outline-button" type="button" onClick={() => setWhatsAppReviewGuest(null)}>{t("Cancelar", "Cancel", "Cancelar")}</button><button className="primary-button small" type="button" onClick={() => { const guest = whatsAppReviewGuest; setWhatsAppReviewGuest(null); openWhatsAppInvite(guest); }}>{t("Continuar en WhatsApp", "Continue in WhatsApp", "Continuar no WhatsApp")}</button></div>
+          </div>
+        </div>;
+      })()}
       {showAddGuests && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="add-guests-title" onMouseDown={() => setShowAddGuests(false)}>
           <div className="modal add-guests-modal" onMouseDown={(event) => event.stopPropagation()}>
@@ -2650,6 +2810,16 @@ function Guests({
               {meaningfulGuestValue(inspectingGuest.song) && <div><dt>{t("Canción", "Song", "Música")}</dt><dd>{inspectingGuest.song}</dd></div>}
               {meaningfulGuestValue(inspectingGuest.guestNotes) && <div className="is-wide"><dt>{t("Otras respuestas u observaciones", "Other answers or notes", "Outras respostas ou observações")}</dt><dd>{inspectingGuest.guestNotes}</dd></div>}
             </dl>
+            <section className="guest-contact-history" aria-label={t("Historial de contacto", "Contact history", "Histórico de contato")}>
+              <h3>{t("Historial de contacto", "Contact history", "Histórico de contato")}</h3>
+              <ol>
+                <li className={inspectingGuest.invitationSentAt ? "is-complete" : ""}><span /> <div><strong>{t("WhatsApp preparado", "WhatsApp prepared", "WhatsApp preparado")}</strong><small>{inspectingGuest.invitationSentAt ? reportDate(inspectingGuest.invitationSentAt, language) : t("Todavía no se preparó", "Not prepared yet", "Ainda não preparado")}</small></div></li>
+                <li className={inspectingGuest.invitationOpenedAt ? "is-complete" : ""}><span /> <div><strong>{t("Invitación vista", "Invitation viewed", "Convite visualizado")}</strong><small>{inspectingGuest.invitationOpenedAt ? reportDate(inspectingGuest.invitationOpenedAt, language) : t("Sin apertura registrada", "No view recorded", "Sem visualização registrada")}</small></div></li>
+                <li className={inspectingGuest.respondedAt ? "is-complete" : ""}><span /> <div><strong>{t("Respuesta recibida", "Response received", "Resposta recebida")}</strong><small>{inspectingGuest.respondedAt ? `${adminStatus(language, inspectingGuest.status)} · ${reportDate(inspectingGuest.respondedAt, language)}` : t("Respuesta pendiente", "Response pending", "Resposta pendente")}</small></div></li>
+                {inspectingGuest.reminded && <li className="is-complete"><span /><div><strong>{t("Último recordatorio", "Last reminder", "Último lembrete")}</strong><small>{reportDate(inspectingGuest.reminded, language)}</small></div></li>}
+              </ol>
+            </section>
+            <p className="delivery-verification-note">{t("Save Your Date puede confirmar cuándo se preparó el mensaje y cuándo se abrió la invitación. El envío efectivo dentro de WhatsApp no puede verificarse desde el panel.", "Save Your Date can confirm when the message was prepared and when the invitation was opened. Sending inside WhatsApp cannot be verified from the panel.", "A Save Your Date confirma quando a mensagem foi preparada e quando o convite foi aberto. O envio dentro do WhatsApp não pode ser verificado pelo painel.")}</p>
             <div className="modal-actions"><button className="outline-button" type="button" onClick={() => setInspectingGuest(null)}>{t("Cerrar", "Close", "Fechar")}</button>{canEdit && <button className="primary-button small" type="button" onClick={() => { setEditingGuest(inspectingGuest); setInspectingGuest(null); }}>{t("Editar datos", "Edit details", "Editar dados")}</button>}</div>
           </div>
         </div>
@@ -2759,10 +2929,10 @@ function Guests({
                       return (
                         <tr key={`${row.guest.name}-${index}`} className={row.errors.length ? "invalid" : row.duplicate ? "duplicate" : "valid"}>
                           <td><span>{issue || t("Listo", "Ready", "Pronto")}</span></td>
-                          <td><strong>{row.guest.name}</strong><small>{row.guest.email}</small></td>
-                          <td>{row.guest.group || "—"}</td>
-                          <td>{row.guest.phone ? `${row.guest.phoneCountryCode} ${row.guest.phone}` : "—"}</td>
-                          <td>{row.guest.seats}</td>
+                          <td><input aria-label={t("Nombre", "Name", "Nome")} value={row.guest.name} onChange={(event) => updateImportPreviewGuest(index, "name", event.target.value)} /><small>{row.guest.email}</small></td>
+                          <td><input aria-label={t("Grupo", "Group", "Grupo")} value={row.guest.group} placeholder="—" onChange={(event) => updateImportPreviewGuest(index, "group", event.target.value)} /></td>
+                          <td><div className="import-phone-field"><span>{row.guest.phoneCountryCode}</span><input aria-label="WhatsApp" value={row.guest.phone} placeholder="—" onChange={(event) => updateImportPreviewGuest(index, "phone", event.target.value)} /></div></td>
+                          <td><input className="import-seats-field" aria-label={t("Cupos", "Seats", "Vagas")} inputMode="numeric" value={row.guest.seats} onChange={(event) => updateImportPreviewGuest(index, "seats", event.target.value)} /></td>
                         </tr>
                       );
                     })}
@@ -2782,6 +2952,27 @@ function Guests({
           </div>
         );
       })()}
+      {importResult && (
+        <div className="modal-backdrop" onMouseDown={() => setImportResult(null)}>
+          <div className="modal import-result-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setImportResult(null)}>×</button>
+            <span className="eyebrow">{t("Importación terminada", "Import complete", "Importação concluída")}</span>
+            <h2>{t("La lista quedó actualizada", "Your list is updated", "A lista foi atualizada")}</h2>
+            <p>{importResult.fileName}</p>
+            <div className="import-result-summary">
+              <span><strong>{importResult.imported}</strong>{t("invitados agregados", "guests added", "convidados adicionados")}</span>
+              <span><strong>{importResult.omittedDuplicates}</strong>{t("duplicados omitidos", "duplicates skipped", "duplicados ignorados")}</span>
+              <span><strong>{importResult.omittedErrors}</strong>{t("filas con error omitidas", "invalid rows skipped", "linhas com erro ignoradas")}</span>
+            </div>
+            <p className="dynamic-help">{t("Ya podés buscarlos, completar sus datos o enviarles la invitación desde el panel.", "You can now search, complete their details or send invitations from the panel.", "Agora você pode pesquisar, completar os dados ou enviar convites pelo painel.")}</p>
+            {error && <p className="table-error" role="alert">{error}</p>}
+            <div className="modal-actions import-result-actions">
+              <button className="outline-button" type="button" disabled={saving} onClick={undoLastGuestImport}>{saving ? t("Deshaciendo…", "Undoing…", "Desfazendo…") : t("Deshacer importación", "Undo import", "Desfazer importação")}</button>
+              <button className="primary-button small" type="button" onClick={() => setImportResult(null)}>{t("Ver invitados", "View guests", "Ver convidados")}</button>
+            </div>
+          </div>
+        </div>
+      )}
       {showModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowModal(false)}>
           <form

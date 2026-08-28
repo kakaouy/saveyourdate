@@ -100,7 +100,7 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
   food: row.food,
   song: row.song,
   companions: Array.isArray(row.companions) ? row.companions : [],
-  reminded: row.reminded_at || "—",
+  reminded: row.reminded_at || "",
   invitationSentAt: row.invitation_sent_at || "",
   invitationOpenedAt: row.invitation_opened_at || "",
   respondedAt: row.responded_at || "",
@@ -321,23 +321,28 @@ async function handler(request: Request) {
     if (request.method === "PATCH") {
       const body = (await request.json()) as Record<string, unknown>;
       const id = String(body.id || "");
-      if (body.action === "mark-invitation-sent") {
+      if (["mark-whatsapp-prepared", "mark-invitation-sent"].includes(String(body.action))) {
         if (!id) return json({ error: "Falta identificar al invitado." }, 400);
-        const sentAt = new Date().toISOString();
+        const preparedAt = new Date().toISOString();
+        const isReminder = body.kind === "reminder";
         const response = await supabaseRequest(
           `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
           {
             method: "PATCH",
             headers: { Prefer: "return=representation" },
-            body: JSON.stringify({ invitation_sent_at: sentAt, updated_at: sentAt }),
+            body: JSON.stringify({
+              invitation_sent_at: preparedAt,
+              ...(isReminder ? { reminded_at: preparedAt } : {}),
+              updated_at: preparedAt,
+            }),
           },
         );
         const rows = (await response.json()) as GuestRow[];
         if (!rows[0]) return json({ error: "No encontramos al invitado." }, 404);
-        await logAdminActivity(session, "guest.invitation_sent", "guest", id, {
+        await logAdminActivity(session, isReminder ? "guest.reminder_prepared" : "guest.invitation_prepared", "guest", id, {
           channel: String(body.channel || "manual"),
         });
-        return json({ guest: clientGuest(rows[0], "sent") });
+        return json({ guest: clientGuest(rows[0], "prepared") });
       }
       if (["check-in", "undo-check-in", "bulk-check-in", "bulk-undo-check-in"].includes(String(body.action))) {
         const ids = String(body.action).startsWith("bulk-")

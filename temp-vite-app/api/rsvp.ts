@@ -70,7 +70,7 @@ async function handler(request: Request) {
       const openedAt = new Date().toISOString();
       await supabaseRequest(
         `event_guests?id=eq.${encodeURIComponent(guest.id)}&invitation_opened_at=is.null`,
-        { method: 'PATCH', body: JSON.stringify({ invitation_opened_at: openedAt }) }
+        { method: 'PATCH', body: JSON.stringify({ invitation_opened_at: openedAt, updated_at: openedAt }) }
       );
       return json({
         event: {
@@ -123,6 +123,7 @@ async function handler(request: Request) {
       if (companions.some((companion) => !companion.name)) {
         return json({ error: 'Ingresá el nombre de cada acompañante.' }, 400);
       }
+      const respondedAt = new Date().toISOString();
       await supabaseRequest(`event_guests?id=eq.${encodeURIComponent(guest.id)}`, {
         method: 'PATCH',
         body: JSON.stringify({
@@ -139,8 +140,8 @@ async function handler(request: Request) {
           accessibility_needs: status === 'Confirmado' ? String(body.accessibilityNeeds || '').trim().slice(0, 500) : '',
           guest_notes: status === 'Confirmado' ? String(body.guestNotes || '').trim().slice(0, 1000) : '',
           ...(status !== 'Confirmado' ? { table_id: null, seat_number: null } : {}),
-          responded_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          responded_at: respondedAt,
+          updated_at: respondedAt
         })
       });
       return json({ ok: true });

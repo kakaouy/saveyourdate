@@ -10,6 +10,7 @@ const source = readFileSync(
   'utf8',
 );
 const styles = readFileSync(path.join(appRoot, 'src', 'admin-prototype.css'), 'utf8');
+const guestsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
 
 test('Invitados concentra confirmaciones y seguimiento operativo', () => {
   const navBlock = source.match(/const nav = \[[\s\S]*?\n\];/)?.[0] || '';
@@ -24,20 +25,64 @@ test('Invitados concentra confirmaciones y seguimiento operativo', () => {
   assert.match(source, /className=\{`delivery-status/);
 });
 
-test('el ciclo de invitación registra envío, apertura y respuesta', () => {
-  const api = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+test('el ciclo de invitación registra preparación, apertura y respuesta', () => {
   const rsvp = readFileSync(path.join(appRoot, 'api', 'rsvp.ts'), 'utf8');
   const migration = readFileSync(
     path.join(appRoot, 'supabase', 'migrations', '20260812010000_guest_invitation_lifecycle.sql'),
     'utf8',
   );
 
-  assert.match(api, /mark-invitation-sent/);
-  assert.match(rsvp, /invitation_opened_at/);
-  assert.match(rsvp, /responded_at/);
+  assert.match(guestsApi, /mark-whatsapp-prepared/);
+  assert.match(guestsApi, /mark-invitation-sent/);
+  assert.match(guestsApi, /invitation_sent_at: preparedAt/);
+  assert.match(guestsApi, /isReminder \? \{ reminded_at: preparedAt \}/);
+  assert.match(guestsApi, /updated_at: preparedAt/);
+  assert.match(rsvp, /invitation_opened_at: openedAt, updated_at: openedAt/);
+  assert.match(rsvp, /responded_at: respondedAt,[\s\S]*updated_at: respondedAt/);
   assert.match(migration, /invitation_sent_at/);
   assert.match(migration, /invitation_opened_at/);
   assert.match(migration, /responded_at/);
+});
+
+test('el seguimiento RSVP distingue el recorrido y recomienda la próxima acción', () => {
+  assert.match(source, /filter === "Vistas pendientes"/);
+  assert.match(source, /abrieron y aún no respondieron/);
+  assert.match(source, /className="guest-follow-up"/);
+  assert.match(source, /Recordar respuesta/);
+  assert.match(source, /Reenviar invitación/);
+  assert.match(source, /Falta WhatsApp/);
+  assert.match(styles, /\.guest-follow-up/);
+});
+
+test('el seguimiento usa mensajes por etapa y muestra el historial de contacto', () => {
+  assert.match(source, /guest\.invitationOpenedAt\s*\?\s*t\(/);
+  assert.match(source, /Te reenviamos la invitación/);
+  assert.match(source, /className="guest-contact-history"/);
+  assert.match(source, /WhatsApp preparado/);
+  assert.match(source, /Invitación vista/);
+  assert.match(source, /Respuesta recibida/);
+  assert.match(styles, /\.guest-contact-history ol/);
+  assert.match(source, /whatsAppReviewGuest/);
+  assert.match(source, /className="modal whatsapp-review-modal"/);
+  assert.match(source, /Continuar en WhatsApp/);
+  assert.match(source, /Podrás editarlo antes de enviarlo/);
+  assert.match(styles, /\.whatsapp-message-preview/);
+  assert.match(source, /El envío efectivo dentro de WhatsApp no puede verificarse/);
+  assert.match(source, /WhatsApp registrado como preparado/);
+  assert.match(source, /action: "mark-whatsapp-prepared"/);
+  assert.match(source, /kind: guest\.invitationSentAt \? "reminder" : "invitation"/);
+  assert.match(guestsApi, /reminded: row\.reminded_at \|\| ""/);
+  assert.match(styles, /\.delivery-verification-note/);
+});
+
+test('los recordatorios por lote excluyen respuestas y requieren una revisión previa', () => {
+  assert.match(source, /showBulkReminderReview/);
+  assert.match(source, /bulkReminderRecipients/);
+  assert.match(source, /guest\.status === "Pendiente" && !guest\.respondedAt/);
+  assert.match(source, /Revisá antes de recordar/);
+  assert.match(source, /Abrir siguiente mensaje/);
+  assert.match(source, /Cada mensaje se abre por separado/);
+  assert.match(styles, /\.bulk-reminder-summary/);
 });
 
 test('la importación exige revisar duplicados y errores antes de guardar', () => {
@@ -63,6 +108,20 @@ test('Agregar invitados reúne los métodos y recomienda pegar una lista', () =>
   assert.match(source, /Paso 3 de 3 · Revisión/);
   assert.match(styles, /\.guest-add-options/);
   assert.match(styles, /\.paste-guests-input/);
+});
+
+test('la revisión de importación permite corregir filas y muestra un resultado final', () => {
+  assert.match(source, /const updateImportPreviewGuest =/);
+  assert.match(source, /onChange=\{\(event\) => updateImportPreviewGuest\(index, "name"/);
+  assert.match(source, /onChange=\{\(event\) => updateImportPreviewGuest\(index, "seats"/);
+  assert.match(source, /type GuestImportResult =/);
+  assert.match(source, /Importación terminada/);
+  assert.match(source, /duplicados omitidos/);
+  assert.match(styles, /\.import-result-summary/);
+  assert.match(source, /syd-guest-import-mapping-v1/);
+  assert.match(source, /const undoLastGuestImport = async/);
+  assert.match(source, /action: "bulk-archive"/);
+  assert.match(source, /Deshacer importación/);
 });
 
 test('la importación de archivos permite asociar columnas antes de revisar', () => {
@@ -93,11 +152,11 @@ test('Invitados usa ayuda contextual y estados vacíos accionables', () => {
   assert.match(styles, /\.heading-actions \.context-tip::after/);
 });
 
-test('las acciones principales quedan visibles y Archivar pasa a Más opciones', () => {
-  assert.match(source, /title=\{t\("Copiar enlace"/);
+test('WhatsApp queda visible y copiar, editar y archivar pasan a Más opciones', () => {
   assert.match(source, /className="whatsapp-button"/);
-  assert.match(source, /aria-label=\{`\$\{t\("Editar"/);
   assert.match(source, /className="guest-more-menu"/);
+  assert.match(source, /Copiar enlace/);
+  assert.match(source, /Editar invitado/);
   assert.match(source, /Archivar invitado/);
   assert.doesNotMatch(source, /className="icon-button danger"/);
   assert.match(styles, /\.guest-more-menu>div/);
@@ -767,8 +826,8 @@ test('los círculos sociales alimentan la carga y las sugerencias de proximidad'
 });
 
 test('grupo de invitación y círculo social se editan y muestran como conceptos separados', () => {
-  assert.match(source, /<th className="guest-group-column">\{t\("Grupo de invitación", "Invitation group", "Grupo do convite"\)\}<\/th>/);
-  assert.match(source, /<th className="guest-circle-column">\{t\("Círculo social", "Social circle", "Círculo social"\)\}<\/th>/);
+  assert.match(source, /<th className="guest-group-column">\{t\("Grupo", "Group", "Grupo"\)\}<\/th>/);
+  assert.match(source, /<th className="guest-circle-column">\{t\("Círculo", "Circle", "Círculo"\)\}<\/th>/);
   assert.doesNotMatch(source, /Grupo \/ círculo/);
   assert.match(source, /const updateSocialCircleFromDetails = async/);
   assert.match(source, /className="guest-details-circle"/);

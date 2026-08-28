@@ -60,7 +60,7 @@ test('sólo quienes editan pueden iniciar invitaciones por WhatsApp', () => {
   assert.match(admin, /\{canEdit && !guest\.archivedAt && <button\s+className="whatsapp-button"/);
   assert.match(admin, /El navegador bloqueó WhatsApp/);
   assert.doesNotMatch(admin, /const invitationSentAt = new Date\(\)\.toISOString\(\);\s*setGuests/);
-  assert.match(admin, /Invitación registrada como enviada/);
+  assert.match(admin, /WhatsApp registrado como preparado/);
 });
 
 test('WhatsApp manual no se presenta como entrega confirmada', () => {
