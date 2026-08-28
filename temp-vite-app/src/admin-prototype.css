@@ -155,16 +155,16 @@ button { color: inherit; }
 :is(.font-small,.font-comfortable) .event-switcher small { margin-top: 1px; font-size: 9px; }
 .sidebar nav { gap: 1px; }
 .admin-shell:is(.font-small,.font-comfortable) .sidebar nav button {
-  min-height: 32px;
+  min-height: 33px;
   gap: 8px;
   padding: 0 9px;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.1;
 }
 .admin-shell:is(.font-small,.font-comfortable) .sidebar nav button span { width: 17px; font-size: 13px; }
 .admin-shell .sidebar nav button b { width: 18px; height: 18px; font-size: 9px; }
-.admin-shell .sidebar nav button.upcoming em { padding: 2px 5px; font-size: 6px; }
+.admin-shell .sidebar nav button.upcoming em { padding: 2px 5px; font-size: 7px; }
 .sidebar-help {
   display: grid;
   grid-template-columns: 24px 1fr;
@@ -220,7 +220,7 @@ button { color: inherit; }
 .font-size-switcher button.active { color: var(--ink); background: white; box-shadow: 0 2px 7px rgba(25,53,77,.12); }
 .notification { position: relative; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; background: white; cursor: pointer; }
 .notification b { position: absolute; top: -3px; right: -3px; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; color: white; background: var(--coral); font-size: 8px; }
-.admin-user { display: flex; align-items: center; gap: 9px; }
+.admin-user { display: flex; align-items: center; gap: 9px; padding: 0; border: 0; color: inherit; background: transparent; text-align: left; cursor: pointer; }
 .admin-user > span { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 10px; color: var(--ink); background: var(--yellow); font-size: 11px; font-weight: 900; }
 .admin-user div { display: grid; gap: 2px; }
 .admin-user strong { font-size: 11px; }
@@ -394,6 +394,13 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .copy-button, .more-button, .whatsapp-button { border: 0; background: transparent; color: var(--teal-dark); font-size: 9px; font-weight: 800; cursor: pointer; }
 .whatsapp-button { padding: 8px 11px; border-radius: 8px; color: white; background: #2aa96b; }
 .whatsapp-button:disabled { cursor: wait; opacity: .65; }
+.whatsapp-button.context-tip::after { right: 0; left: auto; transform: translateY(5px); }
+.whatsapp-button.context-tip:hover::after,
+.whatsapp-button.context-tip:focus-visible::after { transform: translateY(0); }
+.whatsapp-flow-help { display: grid; gap: 9px; margin-top: 14px; padding: 14px 16px; border: 1px solid #cfe7e8; border-radius: 12px; color: var(--ink); background: #f3fbfb; }
+.whatsapp-flow-help > strong { font-size: 14px; }
+.whatsapp-flow-help ol { display: grid; gap: 7px; margin: 0; padding-left: 20px; color: #496676; font-size: 13px; line-height: 1.45; }
+.whatsapp-flow-help p { margin: 0; padding-top: 9px; border-top: 1px solid #d9ebec; color: #607986; font-size: 12px; line-height: 1.45; }
 .sort-control { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 9px; font-weight: 750; }
 .sort-control select { height: 34px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: white; }
 .sort-control.is-active { padding: 3px 5px 3px 9px; border-radius: 9px; color: var(--teal-dark); background: var(--mint); }
@@ -1861,11 +1868,44 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
 .event-whatsapp-path small { color: var(--muted); font-size: 12px; line-height: 1.4; }
 .event-whatsapp-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
 .event-whatsapp-footer p { max-width: 740px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+/* Gestión del evento desde los dos identificadores visibles del panel. */
+.event-switcher-details { min-width: 0; flex: 1; display: grid; gap: 2px; padding: 0; text-align: left; cursor: pointer; }
+.event-switcher-details strong,
+.event-switcher-details small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.event-switcher-details em { margin-top: 2px; color: #7fe1dc; font-size: 8px; font-style: normal; font-weight: 800; }
+.admin-user > b { color: var(--muted); font-size: 13px; }
+.event-manager-modal { width: min(880px, calc(100vw - 32px)); max-height: min(90vh, 900px); overflow-y: auto; }
+.event-manager-modal > h2 { margin: 8px 0 5px; font-family: Georgia, serif; font-size: clamp(28px, 3vw, 42px); font-weight: 500; }
+.event-manager-intro { max-width: 680px; margin: 0 0 20px; color: var(--muted); line-height: 1.5; }
+.event-manager-switch { display: grid; gap: 7px; margin-bottom: 20px; padding: 15px; border: 1px solid #a7dcda; border-radius: 13px; background: #f1fbfa; font-weight: 800; }
+.event-manager-switch select { width: 100%; min-height: 46px; padding: 0 13px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font: inherit; }
+.event-manager-switch small,
+.event-manager-grid small { color: var(--muted); font-size: 11px; font-weight: 500; line-height: 1.4; }
+.event-manager-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.event-manager-grid label { display: grid; gap: 7px; color: var(--ink); font-size: 13px; font-weight: 800; }
+.event-manager-grid input,
+.event-manager-grid textarea { width: 100%; min-height: 46px; padding: 11px 13px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); font: inherit; }
+.event-manager-grid input[readonly] { background: #f4f6f6; }
+.event-manager-grid .form-span-2 { grid-column: 1 / -1; }
+
+.communications-first-guide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; align-items: stretch; gap: 10px; margin: -8px 0 18px; padding: 12px; border: 1px solid #b7dfdc; border-radius: 15px; background: #f3fbfa; }
+.communications-first-guide > div { display: grid; grid-template-columns: 27px 1fr; gap: 2px 9px; align-content: center; padding: 7px; }
+.communications-first-guide > div > span { grid-row: 1 / 3; display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; color: #fff; background: var(--teal); font-size: 11px; font-weight: 900; }
+.communications-first-guide strong { font-size: 12px; }
+.communications-first-guide small { color: var(--muted); font-size: 11px; line-height: 1.35; }
+.communications-first-guide > button { align-self: center; min-height: 34px; padding: 0 12px; border: 1px solid #8bcfcb; border-radius: 9px; color: var(--teal-dark); background: #fff; font-size: 11px; font-weight: 800; cursor: pointer; }
+.whatsapp-missing { display: inline-flex; align-items: center; min-height: 34px; padding: 0 10px; border-radius: 9px; color: #8a5550; background: #fff1ef; font-size: 11px; font-weight: 800; }
+
 @media (max-width: 860px) {
   .event-whatsapp-path { grid-template-columns: 1fr 1fr; }
   .event-whatsapp-footer { align-items: stretch; flex-direction: column; }
+  .communications-first-guide { grid-template-columns: 1fr; }
 }
 @media (max-width: 540px) {
   .event-whatsapp-path { grid-template-columns: 1fr; }
   .event-whatsapp-setup .panel-title { gap: 10px; }
+  .event-manager-modal { width: calc(100vw - 18px); padding: 22px 16px; }
+  .event-manager-grid { grid-template-columns: 1fr; }
+  .event-manager-grid .form-span-2 { grid-column: auto; }
 }

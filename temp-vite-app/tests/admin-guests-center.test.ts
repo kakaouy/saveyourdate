@@ -82,7 +82,7 @@ test('el seguimiento usa mensajes por etapa y muestra el historial de contacto',
   assert.match(source, /whatsAppReviewGuest/);
   assert.match(source, /className="modal whatsapp-review-modal"/);
   assert.match(source, /Continuar en WhatsApp/);
-  assert.match(source, /Podrás editarlo antes de enviarlo/);
+  assert.match(source, /Revisás o editás el texto y presionás Enviar desde WhatsApp/);
   assert.match(styles, /\.whatsapp-message-preview/);
   assert.match(source, /no significa que WhatsApp haya marcado el mensaje como leído/);
   assert.match(source, /WhatsApp registrado como preparado/);
@@ -194,7 +194,7 @@ test('Invitados usa ayuda contextual y estados vacíos accionables', () => {
 });
 
 test('WhatsApp queda visible y copiar, editar y archivar pasan a Más opciones', () => {
-  assert.match(source, /className="whatsapp-button"/);
+  assert.match(source, /className="whatsapp-button context-tip"/);
   assert.match(source, /className="guest-more-menu"/);
   assert.match(source, /Copiar enlace/);
   assert.match(source, /Editar invitado/);
@@ -935,6 +935,7 @@ test('el listado de invitados resume la fila y revela detalles sin comprimirlos'
   assert.match(source, /guest-compact-table/);
   assert.match(source, /className="guest-expand-button"/);
   assert.match(source, /aria-expanded=\{isExpanded\}/);
+  assert.match(source, /\{isExpanded && <td className="guest-details-column"/);
   assert.match(source, /className="guest-expanded-details"/);
   assert.match(styles, /\.guest-compact-table \{ display: block; width: 100%; min-width: 0!important;/);
   assert.match(styles, /\.guest-summary-row\.is-expanded \.guest-details-column \{ display: block!important; \}/);
@@ -989,6 +990,14 @@ test('el centro de invitados muestra el seguimiento oficial de WhatsApp separado
   assert.match(webhook, /\['sent', 'delivered', 'read', 'failed'\]/);
   assert.match(styles, /\.guest-delivery-status\.is-read/);
   assert.match(styles, /\.guest-delivery-status\.is-failed/);
+});
+
+test('WhatsApp explica la apertura manual, la vinculación y el envío final', () => {
+  assert.match(source, /className="whatsapp-button context-tip"/);
+  assert.match(source, /WhatsApp Web te pedirá vincular tu cuenta con un código QR/);
+  assert.match(source, /SaveYourDate no accede a tu contraseña ni envía el mensaje por vos/);
+  assert.match(source, /El número se toma de la ficha de este invitado/);
+  assert.match(source, /className="whatsapp-flow-help"/);
 });
 
 test('comunicaciones reúne invitaciones, recordatorios, avisos y agradecimientos sin mezclar grupo y círculo', () => {

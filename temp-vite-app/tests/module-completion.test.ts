@@ -57,7 +57,7 @@ test('los accesos explican permisos y evitan colaboradores duplicados', () => {
 });
 
 test('sólo quienes editan pueden iniciar invitaciones por WhatsApp', () => {
-  assert.match(admin, /\{canEdit && !guest\.archivedAt && <button\s+className="whatsapp-button"/);
+  assert.match(admin, /\{canEdit && !guest\.archivedAt && <button\s+className="whatsapp-button context-tip"/);
   assert.match(admin, /El navegador bloqueó WhatsApp/);
   assert.doesNotMatch(admin, /const invitationSentAt = new Date\(\)\.toISOString\(\);\s*setGuests/);
   assert.match(admin, /WhatsApp registrado como preparado/);

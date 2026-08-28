@@ -2358,9 +2358,9 @@ function Guests({
             className="help-circle context-tip"
             type="button"
             data-help={t(
-              "Cada registro representa una invitación. Los cupos indican cuántas personas pueden confirmar con el mismo enlace.",
-              "Each record represents an invitation. Seats indicate how many people can RSVP through the same link.",
-              "Cada registro representa um convite. As vagas indicam quantas pessoas podem confirmar pelo mesmo link.",
+              "Cada registro representa una invitación. El botón WA abre WhatsApp con el destinatario y el mensaje preparados; si no tenés una sesión iniciada, WhatsApp Web te pedirá vincularla. Vos revisás y confirmás el envío.",
+              "Each record represents an invitation. The WA button opens WhatsApp with the recipient and message ready; if you are not signed in, WhatsApp Web will ask you to link your account. You review and confirm the send.",
+              "Cada registro representa um convite. O botão WA abre o WhatsApp com o destinatário e a mensagem preparados; se você não tiver uma sessão iniciada, o WhatsApp Web solicitará a vinculação. Você revisa e confirma o envio.",
             )}
             aria-label={t("Ayuda sobre invitados", "Guest help", "Ajuda sobre convidados")}
           >?</button>
@@ -2744,7 +2744,13 @@ function Guests({
                   <td className="guest-actions-column" data-label={t("Acciones", "Actions", "Ações")}>
                     <div className="row-actions icon-actions">
                       {canEdit && !guest.archivedAt && <button
-                        className="whatsapp-button"
+                        className="whatsapp-button context-tip"
+                        data-help={t(
+                          `Abrir WhatsApp para ${guest.name}. El número y el mensaje ya estarán preparados; vos revisás y confirmás el envío.`,
+                          `Open WhatsApp for ${guest.name}. The number and message will be ready; you review and confirm the send.`,
+                          `Abrir o WhatsApp para ${guest.name}. O número e a mensagem estarão preparados; você revisa e confirma o envio.`,
+                        )}
+                        aria-label={t(`Preparar WhatsApp para ${guest.name}`, `Prepare WhatsApp for ${guest.name}`, `Preparar WhatsApp para ${guest.name}`)}
                         disabled={!guest.phone || updatingId === guest.id}
                         onClick={() => setWhatsAppReviewGuest(guest)}
                       >
@@ -2766,7 +2772,7 @@ function Guests({
                       <button className="guest-expand-button" type="button" aria-expanded={isExpanded} aria-controls={`guest-details-${guest.id}`} onClick={() => setExpandedGuests((current) => current.includes(guest.id) ? current.filter((id) => id !== guest.id) : [...current, guest.id])}><span aria-hidden="true">⌄</span><span className="visually-hidden">{isExpanded ? t("Ocultar información", "Hide information", "Ocultar informações") : t("Mostrar más información", "Show more information", "Mostrar mais informações")}</span></button>
                     </div>
                   </td>
-                  <td className="guest-details-column" id={`guest-details-${guest.id}`}>
+                  {isExpanded && <td className="guest-details-column" id={`guest-details-${guest.id}`}>
                     <div className="guest-expanded-details">
                       <div data-label={t("Círculo social", "Social circle", "Círculo social")}><span className="guest-circle-cell">{guest.socialCircle || <em>{t("Sin asignar", "Unassigned", "Não atribuído")}</em>}</span></div>
                       <div data-label={t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}><span className="seat-progress"><strong>{progress.used}/{progress.total}</strong><small>{t("confirmados / cupos", "confirmed / seats", "confirmados / vagas")}</small></span></div>
@@ -2787,7 +2793,7 @@ function Guests({
                       <small className="guest-reminder-eligibility">{reminderEligibility(guest)}</small>
                     </span>{guest.status === "Pendiente" && <button type="button" disabled={!guest.phone || updatingId === guest.id} onClick={() => setWhatsAppReviewGuest(guest)}>{!guest.phone ? t("Falta WhatsApp", "WhatsApp missing", "Falta WhatsApp") : guest.invitationOpenedAt ? t("Recordar respuesta", "Remind to respond", "Lembrar resposta") : guest.invitationSentAt ? t("Reenviar invitación", "Resend invitation", "Reenviar convite") : t("Enviar invitación", "Send invitation", "Enviar convite")}</button>}</div></div>
                     </div>
-                  </td>
+                  </td>}
                 </tr>
               )})}
             </tbody>
@@ -2850,7 +2856,15 @@ function Guests({
             <h2 id="whatsapp-review-title">{t("Revisá el mensaje", "Review the message", "Revise a mensagem")}</h2>
             <div className="whatsapp-review-recipient"><GuestAvatar guest={whatsAppReviewGuest} /><span><strong>{whatsAppReviewGuest.name}</strong><small>{whatsAppReviewGuest.phoneCountryCode} {whatsAppReviewGuest.phone}</small></span></div>
             <div className="whatsapp-message-preview"><p>{content.message}</p></div>
-            <p className="dynamic-help">{t("WhatsApp se abrirá con este texto preparado. Podrás editarlo antes de enviarlo.", "WhatsApp will open with this message ready. You can edit it before sending.", "O WhatsApp abrirá com esta mensagem pronta. Você poderá editá-la antes de enviar.")}</p>
+            <div className="whatsapp-flow-help">
+              <strong>{t("¿Qué va a pasar?", "What happens next?", "O que vai acontecer?")}</strong>
+              <ol>
+                <li>{t("Abriremos WhatsApp con este destinatario y mensaje ya preparados.", "We will open WhatsApp with this recipient and message already prepared.", "Abriremos o WhatsApp com este destinatário e a mensagem já preparados.")}</li>
+                <li>{t("Si no tenés una sesión iniciada, WhatsApp Web te pedirá vincular tu cuenta con un código QR.", "If you are not signed in, WhatsApp Web will ask you to link your account with a QR code.", "Se você não tiver uma sessão iniciada, o WhatsApp Web solicitará a vinculação da sua conta com um código QR.")}</li>
+                <li>{t("Revisás o editás el texto y presionás Enviar desde WhatsApp.", "Review or edit the text, then press Send in WhatsApp.", "Revise ou edite o texto e pressione Enviar no WhatsApp.")}</li>
+              </ol>
+              <p>{t("SaveYourDate no accede a tu contraseña ni envía el mensaje por vos. El número se toma de la ficha de este invitado.", "SaveYourDate does not access your password or send the message for you. The number comes from this guest's record.", "A SaveYourDate não acessa sua senha nem envia a mensagem por você. O número vem do cadastro deste convidado.")}</p>
+            </div>
             <div className="modal-actions"><button className="outline-button" type="button" onClick={() => setWhatsAppReviewGuest(null)}>{t("Cancelar", "Cancel", "Cancelar")}</button><button className="primary-button small" type="button" onClick={() => { const guest = whatsAppReviewGuest; setWhatsAppReviewGuest(null); openWhatsAppInvite(guest); }}>{t("Continuar en WhatsApp", "Continue in WhatsApp", "Continuar no WhatsApp")}</button></div>
           </div>
         </div>;
@@ -6421,10 +6435,9 @@ function SimpleModule({
                         {canEdit ? (
                           <div className="reminder-actions">
                             <button
-                              className="whatsapp-button"
-                              disabled={
-                                remindingId === guest.id || !guest.phone
-                              }
+                              className="whatsapp-button context-tip"
+                              data-help={guest.phone ? t("Abre WhatsApp Web con el destinatario y el recordatorio ya preparados. Revisalo y tocá Enviar.", "Opens WhatsApp Web with the recipient and reminder ready. Review it and press Send.", "Abre o WhatsApp Web com o destinatário e o lembrete preparados. Revise e envie.") : t("Este invitado no tiene un número de WhatsApp. Agregalo desde Editar invitado para poder contactarlo.", "This guest has no WhatsApp number. Add it in Edit guest to contact them.", "Este convidado não tem WhatsApp. Adicione em Editar convidado para contatá-lo.")}
+                              disabled={remindingId === guest.id || !guest.phone}
                               onClick={() => remindGuest(guest)}
                             >
                               WhatsApp
@@ -8023,6 +8036,7 @@ function CommunicationsModule({
   const [historyKindFilter, setHistoryKindFilter] = useState<"all" | CommunicationHistoryItem["kind"]>("all");
   const [historyStatusFilter, setHistoryStatusFilter] = useState<"all" | CommunicationHistoryItem["status"]>("all");
   const [historyDateFilter, setHistoryDateFilter] = useState("");
+  const [showFirstGuide, setShowFirstGuide] = useState(() => window.localStorage.getItem("syd-communications-guide-v1") !== "dismissed");
   const isEligible = (guest: Guest) => {
     if (!guest.phone) return false;
     if (kind === "invite") return guest.status === "Pendiente" && !guest.invitationSentAt;
@@ -8173,6 +8187,12 @@ function CommunicationsModule({
           <p>{t("Recordá confirmaciones, compartí avisos importantes o agradecé desde un único lugar.", "Remind guests, share important updates or send thanks from one place.", "Envie lembretes, avisos importantes ou agradecimentos em um só lugar.")}</p>
         </div>
       </div>
+      {showFirstGuide && <section className="communications-first-guide">
+        <div><span>1</span><strong>{t("Elegí qué querés comunicar", "Choose what to communicate", "Escolha o que comunicar")}</strong><small>{t("Invitación, recordatorio, aviso o agradecimiento.", "Invitation, reminder, notice or thank-you.", "Convite, lembrete, aviso ou agradecimento.")}</small></div>
+        <div><span>2</span><strong>{t("Revisá el texto y los destinatarios", "Review text and recipients", "Revise o texto e os destinatários")}</strong><small>{t("Nunca contactamos a alguien sin que lo selecciones.", "Nobody is contacted unless you select them.", "Ninguém é contatado sem ser selecionado.")}</small></div>
+        <div><span>3</span><strong>{t("WhatsApp abre el chat preparado", "WhatsApp opens the prepared chat", "O WhatsApp abre a conversa preparada")}</strong><small>{t("Si hace falta, conectás WhatsApp Web; luego revisás y tocás Enviar.", "Connect WhatsApp Web if needed, then review and press Send.", "Conecte o WhatsApp Web se necessário, revise e envie.")}</small></div>
+        <button type="button" onClick={() => { window.localStorage.setItem("syd-communications-guide-v1", "dismissed"); setShowFirstGuide(false); }}>{t("Entendido", "Got it", "Entendi")}</button>
+      </section>}
       <div className="communication-kind-tabs" role="tablist" aria-label={t("Tipo de comunicación", "Communication type", "Tipo de comunicação")}>
         <button className={kind === "invite" ? "active" : ""} onClick={() => setKind("invite")}><span><img src="/icons/communications/send.png" alt="" /></span><strong>{t("Enviar invitación", "Send invitation", "Enviar convite")}</strong><small>{t("Primer contacto y enlace personal", "First contact and personal link", "Primeiro contato e link pessoal")}</small></button>
         <button className={kind === "reminder" ? "active" : ""} onClick={() => setKind("reminder")}><span><img src="/icons/communications/reminder.png" alt="" /></span><strong>{t("Recordar confirmación", "RSVP reminder", "Lembrar confirmação")}</strong><small>{t("Sólo personas pendientes", "Pending guests only", "Somente pendentes")}</small></button>
@@ -8209,7 +8229,7 @@ function CommunicationsModule({
       <section className="panel table-panel">
         <div className="table-tools communication-tools"><label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar por invitado, grupo o círculo…", "Search guest, group or circle…", "Buscar convidado, grupo ou círculo…")} /></label><button className="outline-button compact" onClick={() => setSelectedIds(visibleGuests.map((guest) => guest.id))}>{t("Seleccionar visibles", "Select visible", "Selecionar visíveis")}</button><span><strong>{selectedIds.length}</strong> {t("seleccionados", "selected", "selecionados")}</span></div>
         <div className="table-scroll"><table className="communications-table"><thead><tr><th className="checkbox-cell"><input type="checkbox" checked={visibleGuests.length > 0 && visibleGuests.every((guest) => selectedIds.includes(guest.id))} onChange={(event) => setSelectedIds(event.target.checked ? visibleGuests.filter((guest) => guest.phone).map((guest) => guest.id) : [])} /></th><th>{t("Invitado", "Guest", "Convidado")}</th><th>{t("Grupo", "Group", "Grupo")}</th><th>{t("Círculo", "Circle", "Círculo")}</th><th>{t("Asistencia", "Attendance", "Presença")}</th><th>{t("Última comunicación", "Latest communication", "Última comunicação")}</th><th>{t("Acción", "Action", "Ação")}</th></tr></thead>
-          <tbody>{visibleGuests.map((guest) => <tr key={guest.id}><td className="checkbox-cell"><input type="checkbox" disabled={!guest.phone} checked={selectedIds.includes(guest.id)} onChange={(event) => setSelectedIds((current) => event.target.checked ? [...new Set([...current, guest.id])] : current.filter((id) => id !== guest.id))} /></td><td data-label={t("Invitado", "Guest", "Convidado")}><div className="person"><GuestAvatar guest={guest} /><p><GuestNameButton guest={guest} /><small>{guest.phone || t("Sin WhatsApp", "No WhatsApp", "Sem WhatsApp")}</small></p></div></td><td data-label={t("Grupo", "Group", "Grupo")}><strong>{guest.group || "—"}</strong></td><td data-label={t("Círculo", "Circle", "Círculo")}><span>{guest.socialCircle || t("Sin círculo", "No circle", "Sem círculo")}</span></td><td data-label={t("Asistencia", "Attendance", "Presença")}><Status value={guest.status} /></td><td data-label={t("Última comunicación", "Latest communication", "Última comunicação")}>{kind === "thanks" && guest.thankedAt ? <span className="status status-confirmado">{t("Agradecido", "Thanked", "Agradecido")} · {reportDate(guest.thankedAt, locale)}</span> : kind === "reminder" && guest.reminded !== "—" ? <span className="status status-confirmado">{t("Recordado", "Reminded", "Lembrado")} · {reportDate(guest.reminded, locale)}</span> : <span className="muted">{t("Sin registrar", "Not recorded", "Sem registro")}</span>}</td><td data-label={t("Acción", "Action", "Ação")}>{canEdit ? <button className="whatsapp-button" disabled={!guest.phone || sendingId === guest.id} onClick={() => prepareCommunication(guest)}>{sendingId === guest.id ? t("Preparando…", "Preparing…", "Preparando…") : "WA"}</button> : <span className="muted">{t("Solo lectura", "View only", "Somente leitura")}</span>}</td></tr>)}</tbody>
+          <tbody>{visibleGuests.map((guest) => <tr key={guest.id}><td className="checkbox-cell"><input type="checkbox" disabled={!guest.phone} title={!guest.phone ? t("Agregá un número de WhatsApp para seleccionar a este invitado.", "Add a WhatsApp number to select this guest.", "Adicione um número de WhatsApp para selecionar este convidado.") : undefined} checked={selectedIds.includes(guest.id)} onChange={(event) => setSelectedIds((current) => event.target.checked ? [...new Set([...current, guest.id])] : current.filter((id) => id !== guest.id))} /></td><td data-label={t("Invitado", "Guest", "Convidado")}><div className="person"><GuestAvatar guest={guest} /><p><GuestNameButton guest={guest} /><small>{guest.phone || t("Sin WhatsApp", "No WhatsApp", "Sem WhatsApp")}</small></p></div></td><td data-label={t("Grupo", "Group", "Grupo")}><strong>{guest.group || "—"}</strong></td><td data-label={t("Círculo", "Circle", "Círculo")}><span>{guest.socialCircle || t("Sin círculo", "No circle", "Sem círculo")}</span></td><td data-label={t("Asistencia", "Attendance", "Presença")}><Status value={guest.status} /></td><td data-label={t("Última comunicación", "Latest communication", "Última comunicação")}>{kind === "thanks" && guest.thankedAt ? <span className="status status-confirmado">{t("Agradecido", "Thanked", "Agradecido")} · {reportDate(guest.thankedAt, locale)}</span> : kind === "reminder" && guest.reminded !== "—" ? <span className="status status-confirmado">{t("Recordado", "Reminded", "Lembrado")} · {reportDate(guest.reminded, locale)}</span> : <span className="muted">{t("Sin registrar", "Not recorded", "Sem registro")}</span>}</td><td data-label={t("Acción", "Action", "Ação")}>{canEdit ? guest.phone ? <button className="whatsapp-button context-tip" data-help={t("Abre WhatsApp Web con el destinatario y el mensaje preparados. Si todavía no está conectado, WhatsApp te pedirá vincular el dispositivo. Después sólo revisás y tocás Enviar.", "Opens WhatsApp Web with the recipient and message ready. If it is not connected, WhatsApp will ask you to link the device. Then review and press Send.", "Abre o WhatsApp Web com destinatário e mensagem preparados. Se não estiver conectado, vincule o dispositivo. Depois revise e envie.")} disabled={sendingId === guest.id} onClick={() => prepareCommunication(guest)}>{sendingId === guest.id ? t("Preparando…", "Preparing…", "Preparando…") : "WA"}</button> : <span className="whatsapp-missing context-tip" data-help={t("Este invitado no tiene un número cargado. Editá sus datos y agregá WhatsApp para habilitar el envío.", "This guest has no number. Edit their details and add WhatsApp to enable sending.", "Este convidado não tem número. Edite os dados e adicione WhatsApp para habilitar o envio.")}>{t("Sin WhatsApp", "No WhatsApp", "Sem WhatsApp")}</span> : <span className="muted">{t("Solo lectura", "View only", "Somente leitura")}</span>}</td></tr>)}</tbody>
         </table></div>
         {canEdit && selectedIds.length > 0 && <div className="communication-selection-bar"><div><strong>{selectedIds.length} {t("destinatarios listos", "recipients ready", "destinatários prontos")}</strong><small>{automaticConnection?.status === "connected" ? t("Podés abrirlos manualmente o programar el envío desde el número verificado del evento.", "Open them manually or schedule delivery from the event's verified number.", "Abra manualmente ou programe o envio pelo número verificado do evento.") : t("Los mensajes se abrirán de a uno en el WhatsApp del evento. Para programarlos, conectá primero su número Business en Configuración.", "Messages open one by one in the event's WhatsApp. To schedule them, connect its Business number in Settings first.", "As mensagens abrem uma por uma no WhatsApp do evento. Para programar, conecte o número Business em Configurações.")}</small></div>{automaticConnection?.status === "connected" && <><label className="communication-schedule-input"><span>{t("Fecha y hora", "Date and time", "Data e hora")}</span><input type="datetime-local" value={scheduledAt} min={new Date(Date.now() + 60000).toISOString().slice(0, 16)} onChange={(event) => setScheduledAt(event.target.value)} /></label><button className="outline-button compact" disabled={!scheduledAt || scheduling} onClick={() => void scheduleCommunication()}>{scheduling ? t("Programando…", "Scheduling…", "Programando…") : t("Programar", "Schedule", "Programar")}</button></>}<button className="primary-button small" disabled={Boolean(sendingId)} onClick={() => void prepareNextSelected()}>{t("Abrir siguiente en mi WhatsApp", "Open next in my WhatsApp", "Abrir próxima no meu WhatsApp")}</button><button className="outline-button compact" onClick={() => { setSelectedIds([]); setActiveScheduleId(""); }}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
         {error && <p className="table-error" role="alert">{error}</p>}
@@ -8299,6 +8319,55 @@ function InvitationModule({ order }: { order: AdminOrder }) {
   </>;
 }
 
+type EventPortfolioItem = { id: string; orderNumber: string; name: string; eventDate: string };
+
+function EventManagerModal({ order, events, switching, onSwitch, onClose, onSaved }: {
+  order: AdminOrder;
+  events: EventPortfolioItem[];
+  switching: boolean;
+  onSwitch: (orderNumber: string) => void;
+  onClose: () => void;
+  onSaved: (details: { eventName: string; eventDate: string; eventType: string }) => void;
+}) {
+  const { text: t } = useAdminI18n();
+  const [details, setDetails] = useState({ eventName: order.customerName, eventDate: order.eventDate || "", eventType: order.eventType || "", expirationDate: "", eventVenue: "", associatedEmails: order.loginEmail || "" });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    fetch("/api/admin/settings", { cache: "no-store" }).then(async (response) => {
+      const result = await response.json() as Partial<typeof details> & { associatedEmails?: string[] };
+      if (response.ok) setDetails((current) => ({ ...current, ...result, associatedEmails: Array.isArray(result.associatedEmails) ? result.associatedEmails.join("\n") : current.associatedEmails }));
+    }).finally(() => setLoading(false));
+  }, []);
+  const save = async (event: React.FormEvent) => {
+    event.preventDefault(); setSaving(true); setError("");
+    const response = await fetch("/api/admin/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "event-details", ...details, associatedEmails: details.associatedEmails.split(/[\n,;]+/).map((email) => email.trim()).filter(Boolean) }) });
+    const result = await response.json() as { error?: string } & typeof details;
+    setSaving(false);
+    if (!response.ok) { setError(result.error || t("No pudimos guardar los datos.", "We couldn't save the details.", "Não foi possível salvar os dados.")); return; }
+    onSaved(result); onClose();
+  };
+  return <div className="modal-backdrop event-manager-backdrop" onMouseDown={onClose}><form className="modal event-manager-modal" onSubmit={save} onMouseDown={(event) => event.stopPropagation()}>
+    <button type="button" className="modal-close" onClick={onClose}>×</button>
+    <span className="eyebrow">{t("Gestión del evento", "Event management", "Gestão do evento")}</span>
+    <h2>{t("Datos y acceso al evento", "Event details and access", "Dados e acesso ao evento")}</h2>
+    <p className="event-manager-intro">{t("Identificá el evento activo, actualizá sus datos y cambiá de pedido sin salir del panel.", "Identify the active event, update its details and switch orders without leaving the dashboard.", "Identifique o evento ativo, atualize os dados e troque de pedido sem sair do painel.")}</p>
+    {events.length > 1 && <label className="event-manager-switch">{t("Evento o pedido activo", "Active event or order", "Evento ou pedido ativo")}<select value={order.orderNumber} disabled={switching} onChange={(event) => onSwitch(event.target.value)}>{events.map((item) => <option key={item.id} value={item.orderNumber}>{item.name} · {item.orderNumber}</option>)}</select><small>{t("Al cambiar, el panel vuelve a cargar con los datos del evento elegido.", "The dashboard reloads with the selected event's data.", "O painel recarrega com os dados do evento escolhido.")}</small></label>}
+    <div className="form-grid event-manager-grid">
+      <label>{t("Nombre del evento", "Event name", "Nome do evento")}<input value={details.eventName} disabled={loading} onChange={(event) => setDetails({ ...details, eventName: event.target.value })} required /></label>
+      <label>{t("Pedido asociado", "Associated order", "Pedido associado")}<input value={order.orderNumber} readOnly /><small>{t("Es el identificador del pedido y no se modifica.", "This order identifier cannot be changed.", "Este identificador não pode ser alterado.")}</small></label>
+      <label>{t("Tipo de evento", "Event type", "Tipo de evento")}<input value={details.eventType} onChange={(event) => setDetails({ ...details, eventType: event.target.value })} placeholder={t("Boda, cumpleaños, XV años…", "Wedding, birthday, quinceañera…", "Casamento, aniversário, 15 anos…")} /></label>
+      <label>{t("Fecha del evento", "Event date", "Data do evento")}<input type="date" value={details.eventDate} onChange={(event) => setDetails({ ...details, eventDate: event.target.value })} /></label>
+      <label>{t("Fecha de vencimiento", "Expiration date", "Data de vencimento")}<input type="date" value={details.expirationDate} onChange={(event) => setDetails({ ...details, expirationDate: event.target.value })} /><small>{t("Dato administrativo para seguimiento.", "Administrative date for tracking.", "Data administrativa para acompanhamento.")}</small></label>
+      <label>{t("Lugar o salón", "Venue", "Local ou salão")}<input value={details.eventVenue} onChange={(event) => setDetails({ ...details, eventVenue: event.target.value })} /></label>
+      <label className="form-span-2">{t("Emails asociados", "Associated emails", "E-mails associados")}<textarea rows={3} value={details.associatedEmails} onChange={(event) => setDetails({ ...details, associatedEmails: event.target.value })} placeholder={t("Un email por línea", "One email per line", "Um e-mail por linha")} /><small>{t("Sirven para identificar responsables del evento. Los permisos se administran en Accesos.", "They identify event contacts. Permissions are managed under Access.", "Identificam responsáveis; as permissões são gerenciadas em Acessos.")}</small></label>
+    </div>
+    {error && <p className="login-error" role="alert">{error}</p>}
+    <div className="modal-actions"><button type="button" className="outline-button" onClick={onClose}>{t("Cancelar", "Cancel", "Cancelar")}</button><button className="primary-button small" disabled={loading || saving}>{saving ? t("Guardando…", "Saving…", "Salvando…") : t("Guardar datos", "Save details", "Salvar dados")}</button></div>
+  </form></div>;
+}
+
 function Admin({
   onLogout,
   order,
@@ -8321,8 +8390,9 @@ function Admin({
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [globalEditingId, setGlobalEditingId] = useState("");
-  const [eventPortfolio, setEventPortfolio] = useState<Array<{ id: string; orderNumber: string; name: string; eventDate: string }>>([]);
+  const [eventPortfolio, setEventPortfolio] = useState<EventPortfolioItem[]>([]);
   const [switchingEvent, setSwitchingEvent] = useState(false);
+  const [eventManagerOpen, setEventManagerOpen] = useState(false);
   const [comfortableText, setComfortableText] = useState(
     () =>
       window.sessionStorage.getItem("syd-admin-font-size") === "comfortable-v2",
@@ -8431,15 +8501,13 @@ function Admin({
         </div>
         <div className="event-switcher">
           <span>{initials(order.customerName)}</span>
-          <div>
+          <button type="button" className="event-switcher-details" onClick={() => setEventManagerOpen(true)} aria-label={t("Editar o cambiar evento", "Edit or switch event", "Editar ou trocar evento")}>
             <strong>{order.customerName}</strong>
             <small>
               {t("Pedido", "Order", "Pedido")} {order.orderNumber}
             </small>
-            {eventPortfolio.length > 1 && <select aria-label={t("Cambiar evento", "Switch event", "Trocar evento")} value={order.orderNumber} disabled={switchingEvent} onChange={(event) => void switchEvent(event.target.value)}>
-              {eventPortfolio.map((item) => <option key={item.id} value={item.orderNumber}>{item.name}</option>)}
-            </select>}
-          </div>
+            <em>{eventPortfolio.length > 1 ? t("Editar o cambiar", "Edit or switch", "Editar ou trocar") : t("Editar evento", "Edit event", "Editar evento")}</em>
+          </button>
         </div>
         <nav>
           {nav
@@ -8534,7 +8602,7 @@ function Admin({
             >
               ↻
             </button>
-            <div className="admin-user">
+            <button type="button" className="admin-user" onClick={() => setEventManagerOpen(true)} aria-label={t("Administrar evento", "Manage event", "Gerenciar evento")}>
               <span>{initials(order.loginEmail || order.customerName)}</span>
               <div>
                 <strong>{order.customerName}</strong>
@@ -8549,7 +8617,8 @@ function Admin({
                       : t("Solo lectura", "Read only", "Somente leitura")}
                 </small>
               </div>
-            </div>
+              <b aria-hidden="true">⌄</b>
+            </button>
           </div>
         </header>
         <div className="admin-content">
@@ -8618,6 +8687,10 @@ function Admin({
           </small>
         </footer>
       </section>
+      {eventManagerOpen && <EventManagerModal order={order} events={eventPortfolio} switching={switchingEvent} onSwitch={(orderNumber) => void switchEvent(orderNumber)} onClose={() => setEventManagerOpen(false)} onSaved={(details) => {
+        onOrderChange({ ...order, customerName: details.eventName, eventTitle: details.eventName, eventDate: details.eventDate, eventType: details.eventType });
+        setEventPortfolio((current) => current.map((item) => item.orderNumber === order.orderNumber ? { ...item, name: details.eventName, eventDate: details.eventDate } : item));
+      }} />}
       {globalEditingId && order.accessRole !== "viewer" && (() => {
         const guest = guests.find((item) => item.id === globalEditingId);
         return guest ? <GlobalGuestEditor guest={guest} guests={guests} defaultPhoneCountryCode={defaultPhoneCountryCode} defaultInviter={order.customerName} onClose={() => setGlobalEditingId("")} onSaved={(updated) => setGuests((current) => current.map((item) => item.id === updated.id ? updated : item))} /> : null;
