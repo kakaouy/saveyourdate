@@ -95,6 +95,30 @@ test('los recordatorios por lote excluyen respuestas y requieren una revisión p
   assert.match(styles, /\.bulk-reminder-summary/);
 });
 
+test('Invitados integra seguimiento, selección operativa e historial sin un módulo separado', () => {
+  const navBlock = source.match(/const nav = \[[\s\S]*?\n\];/)?.[0] || '';
+
+  assert.doesNotMatch(navBlock, /\["Recordatorios"/);
+  assert.match(source, /view: "Invitados"/);
+  assert.match(source, /className="guest-selection-shortcuts"/);
+  assert.match(source, /Vistas sin respuesta/);
+  assert.match(source, /guest\.socialCircle/);
+  assert.match(source, /guest-last-reminder/);
+  assert.match(source, /Ver historial y datos/);
+  assert.match(styles, /\.guest-selection-shortcuts/);
+  assert.match(styles, /\.guest-last-reminder/);
+});
+
+test('los cambios operativos se persisten en Supabase y vuelven a consultarse al recargar', () => {
+  assert.match(source, /fetch\("\/api\/admin\/guests", \{ cache: "no-store" \}\)/);
+  assert.match(source, /action: "bulk-update"/);
+  assert.match(source, /action: "bulk-archive"/);
+  assert.match(source, /action: "mark-whatsapp-prepared"/);
+  assert.match(guestsApi, /Prefer: "return=representation"/);
+  assert.match(guestsApi, /updated_at: preparedAt/);
+  assert.match(guestsApi, /updated_at: new Date\(\)\.toISOString\(\)/);
+});
+
 test('la importación exige revisar duplicados y errores antes de guardar', () => {
   assert.match(source, /type GuestImportPreview =/);
   assert.match(source, /setImportPreview\(\{ fileName, rows: previewRows \}\)/);
@@ -144,7 +168,7 @@ test('la importación de archivos permite asociar columnas antes de revisar', ()
 
 test('la lista conserva las acciones completas y expone los datos solicitados', () => {
   assert.match(source, /className="guests-table"/);
-  assert.match(source, /Ver datos solicitados/);
+  assert.match(source, /Ver historial y datos/);
   assert.match(source, /className="modal guest-details-modal"/);
   assert.match(source, /inspectingGuest\.identificationNumber/);
   assert.match(styles, /\.guests-table th:nth-last-child\(1\)/);

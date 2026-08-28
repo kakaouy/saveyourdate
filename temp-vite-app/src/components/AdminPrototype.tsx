@@ -335,7 +335,6 @@ const nav = [
   ["Invitados", "♙"],
   ["Restricciones", "◇"],
   ["Canciones", "♫"],
-  ["Recordatorios", "↗"],
   ["Agradecimientos", "♡"],
   ["Mesas", "▦"],
   ["Check-in", "✓"],
@@ -349,7 +348,6 @@ const moduleForView: Record<string, AdminOrder["enabledModules"][number] | undef
   Invitados: "guests_rsvp",
   Restricciones: "guests_rsvp",
   Canciones: "invitation",
-  Recordatorios: "messaging",
   Agradecimientos: "messaging",
   Mesas: "tables",
   "Check-in": "check_in",
@@ -1039,7 +1037,7 @@ function Dashboard({
     : 0;
   const pendingTasks = [
     { label: t("Invitaciones sin enviar", "Invitations not sent", "Convites não enviados"), count: guests.filter((guest) => guest.status === "Pendiente" && !guest.invitationSentAt).length, view: "Invitados" },
-    { label: t("Respuestas pendientes", "Pending responses", "Respostas pendentes"), count: pending, view: "Recordatorios" },
+    { label: t("Respuestas pendientes", "Pending responses", "Respostas pendentes"), count: pending, view: "Invitados" },
     { label: t("Restricciones para revisar", "Dietary needs to review", "Restrições para revisar"), count: guests.filter(guestHasRestriction).length, view: "Restricciones" },
     { label: t("Preferencias de ubicación", "Seating preferences", "Preferências de lugares"), count: guests.filter((guest) => guest.socialTogetherWith || guest.socialSeparateFrom || guest.preferredTableName).length, view: "Mesas" },
   ];
@@ -1103,7 +1101,7 @@ function Dashboard({
     [
       t("Invitados", "Guests", "Convidados"),
       t("Mesas", "Tables", "Mesas"),
-      t("Recordatorios", "Reminders", "Lembretes"),
+      t("Seguimiento", "Tracking", "Acompanhamento"),
       t("Respaldo", "Backup", "Backup"),
     ],
   ];
@@ -1123,7 +1121,7 @@ function Dashboard({
                 onNavigate(
                   index === 3
                     ? "Configuración"
-                    : ["Invitados", "Mesas", "Recordatorios"][
+                    : ["Invitados", "Mesas", "Invitados"][
                         index
                       ],
                 )
@@ -1495,7 +1493,7 @@ function Guests({
   ).length;
   const filtered = guests
     .filter((guest) => {
-      const matches = `${guest.name} ${guest.group}`
+      const matches = `${guest.name} ${guest.group} ${guest.socialCircle}`
         .toLowerCase()
         .includes(query.toLowerCase());
       const matchesView =
@@ -2469,6 +2467,20 @@ function Guests({
             </button>
           </div>
         )}
+        {canEdit && filter !== "Archivados" && filtered.length > 0 && (
+          <div className="guest-selection-shortcuts" aria-label={t("Selección rápida para seguimiento", "Quick tracking selection", "Seleção rápida para acompanhamento")}>
+            <span>{t("Seleccionar para actuar", "Select for action", "Selecionar para agir")}</span>
+            <button type="button" onClick={() => setSelected(filtered.filter((guest) => guest.status === "Pendiente" && !guest.invitationSentAt).map((guest) => guest.id))}>
+              {t("Sin enviar", "Not sent", "Não enviados")} · {filtered.filter((guest) => guest.status === "Pendiente" && !guest.invitationSentAt).length}
+            </button>
+            <button type="button" onClick={() => setSelected(filtered.filter((guest) => guest.status === "Pendiente" && Boolean(guest.invitationSentAt) && !guest.invitationOpenedAt).map((guest) => guest.id))}>
+              {t("Preparadas", "Prepared", "Preparados")} · {filtered.filter((guest) => guest.status === "Pendiente" && Boolean(guest.invitationSentAt) && !guest.invitationOpenedAt).length}
+            </button>
+            <button type="button" onClick={() => setSelected(filtered.filter((guest) => guest.status === "Pendiente" && Boolean(guest.invitationOpenedAt)).map((guest) => guest.id))}>
+              {t("Vistas sin respuesta", "Viewed, no response", "Vistos sem resposta")} · {filtered.filter((guest) => guest.status === "Pendiente" && Boolean(guest.invitationOpenedAt)).length}
+            </button>
+          </div>
+        )}
         <div className="table-scroll">
           <table className="guests-table">
             <thead>
@@ -2590,6 +2602,7 @@ function Guests({
                             ? t("Preparada", "Prepared", "Preparado")
                             : t("Sin enviar", "Not sent", "Não enviado")}</strong>
                       {(guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt) && <small>{reportDate(guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt || "", language)}</small>}
+                      {guest.status === "Pendiente" && guest.reminded && <small className="guest-last-reminder">{t("Último recordatorio", "Last reminder", "Último lembrete")} · {reportDate(guest.reminded, language)}</small>}
                     </span>{guest.status === "Pendiente" && <button type="button" disabled={!guest.phone || updatingId === guest.id} onClick={() => setWhatsAppReviewGuest(guest)}>{!guest.phone ? t("Falta WhatsApp", "WhatsApp missing", "Falta WhatsApp") : guest.invitationOpenedAt ? t("Recordar respuesta", "Remind to respond", "Lembrar resposta") : guest.invitationSentAt ? t("Reenviar invitación", "Resend invitation", "Reenviar convite") : t("Enviar invitación", "Send invitation", "Enviar convite")}</button>}</div>
                   </td>
                   <td className="guest-actions-column" data-label={t("Acciones", "Actions", "Ações")}>
@@ -2615,7 +2628,7 @@ function Guests({
                             </button>}
                             <button type="button" onClick={() => setInspectingGuest(guest)}>
                               <span aria-hidden="true">ⓘ</span>
-                              {t("Ver datos solicitados", "View requested details", "Ver dados solicitados")}
+                              {t("Ver historial y datos", "View history and details", "Ver histórico e dados")}
                             </button>
                             {hasGuestRestriction(guest) && <div className="guest-menu-restrictions" role="group" aria-label={`${t("Restricciones y ubicación de", "Dietary needs and placement for", "Restrições e localização de")} ${guest.name}`}>
                               <strong>{t("Restricciones y ubicación", "Dietary needs and placement", "Restrições e localização")}</strong>
@@ -7980,16 +7993,6 @@ function Admin({
                 <span>{icon}</span>
                 {navLabel(item)}
                 {upcomingViews.has(item) && <em>{t("Próximamente", "Coming soon", "Em breve")}</em>}
-                {item === "Recordatorios" &&
-                  activeGuests.filter((guest) => guest.status === "Pendiente")
-                    .length > 0 && (
-                    <b>
-                      {
-                        activeGuests.filter((guest) => guest.status === "Pendiente")
-                          .length
-                      }
-                    </b>
-                  )}
               </button>
             ))}
         </nav>
