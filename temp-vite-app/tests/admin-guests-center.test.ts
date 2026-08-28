@@ -54,6 +54,13 @@ test('el seguimiento RSVP distingue el recorrido y recomienda la próxima acció
   assert.match(styles, /\.guest-follow-up/);
 });
 
+test('Preparadas no mezcla invitaciones ya abiertas o respondidas', () => {
+  assert.match(source, /const isPreparedGuest = \(guest: Guest\) =>/);
+  assert.match(source, /Boolean\(guest\.invitationSentAt\)[\s\S]*?!guest\.invitationOpenedAt[\s\S]*?!guest\.respondedAt/);
+  assert.match(source, /filter === "Enviadas pendientes"[\s\S]*?isPreparedGuest\(guest\)/);
+  assert.match(source, /filtered\.filter\(isPreparedGuest\)/);
+});
+
 test('el seguimiento separa el estado de la fecha y evita texto operativo diminuto', () => {
   assert.match(source, /className=\{`delivery-status guest-delivery-status/);
   assert.match(source, /<strong>\{guest\.whatsappStatus/);
@@ -924,11 +931,10 @@ test('los elementos del plano conservan tamaños de hasta 20 px al guardar y res
 });
 
 test('las tarjetas de invitados distribuyen datos y acciones sin comprimirlos', () => {
-  assert.match(styles, /grid-template-columns: repeat\(3,minmax\(0,1fr\)\)/);
-  assert.match(styles, /\.guest-person-column \{ grid-column: 1 \/ 3; grid-row: 1/);
-  assert.match(styles, /\.guest-status-column \{ grid-column: 3; grid-row: 1/);
-  assert.match(styles, /\.guest-actions-column \.whatsapp-button \{ min-width: 48px; white-space: nowrap/);
-  assert.match(styles, /@media \(max-width: 520px\)/);
+  assert.match(styles, /\/\* Regla final: gana sobre las variantes históricas de la tabla\. \*\/[\s\S]*?@media \(max-width: 1750px\)/);
+  assert.match(styles, /\.table-panel \.guests-table tbody > tr:not\(\.guest-empty-row\) > td \{[\s\S]*?grid-template-columns: minmax\(150px,210px\) minmax\(0,1fr\)/);
+  assert.match(styles, /\.table-panel \.guests-table \.guest-actions-column \.row-actions \{[\s\S]*?align-items: center;[\s\S]*?flex-wrap: nowrap/);
+  assert.match(styles, /@media \(max-width: 620px\)[\s\S]*?grid-template-columns: minmax\(108px,38%\) minmax\(0,1fr\)/);
 });
 
 test('entregables guía la elección y muestra una vista previa enfocada', () => {
@@ -969,4 +975,23 @@ test('el centro de invitados muestra el seguimiento oficial de WhatsApp separado
   assert.match(webhook, /\['sent', 'delivered', 'read', 'failed'\]/);
   assert.match(styles, /\.guest-delivery-status\.is-read/);
   assert.match(styles, /\.guest-delivery-status\.is-failed/);
+});
+
+test('comunicaciones reúne recordatorios, avisos y agradecimientos sin mezclar grupo y círculo', () => {
+  const guestsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  assert.match(source, /\["Comunicaciones", "♡"\]/);
+  assert.match(source, /function CommunicationsModule/);
+  assert.match(source, /Recordar confirmación/);
+  assert.match(source, /Aviso del evento/);
+  assert.match(source, /Agradecer/);
+  assert.match(source, /kind !== "reminder" \|\| guest\.status === "Pendiente"/);
+  assert.match(source, /Buscar por invitado, grupo o círculo/);
+  assert.match(source, /t\("Grupo", "Group", "Grupo"\)/);
+  assert.match(source, /t\("Círculo", "Circle", "Círculo"\)/);
+  assert.match(source, /action: kind === "thanks" \? "thank-you" : kind === "reminder" \? "remind" : "communication"/);
+  assert.match(guestsApi, /body\.action === "communication"/);
+  assert.match(guestsApi, /guest\.communication_prepared/);
+  assert.match(styles, /\.communication-kind-tabs/);
+  assert.match(styles, /\.communication-selection-bar/);
+  assert.match(styles, /\.communications-table tr/);
 });

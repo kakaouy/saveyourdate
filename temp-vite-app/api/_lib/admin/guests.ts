@@ -584,6 +584,30 @@ async function handler(request: Request) {
         });
         return json({ guests: rows.map((guest) => clientGuest(guest)) });
       }
+      if (body.action === "communication") {
+        if (!id) return json({ error: "Falta identificar al invitado." }, 400);
+        const guestResponse = await supabaseRequest(
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&archived_at=is.null&select=*&limit=1`,
+        );
+        const guest = ((await guestResponse.json()) as GuestRow[])[0];
+        if (!guest) return json({ error: "No encontramos al invitado." }, 404);
+        const phone = normalizeWhatsAppPhone(guest.phone);
+        if (phone.length < 8) return json({ error: "El invitado no tiene un número de WhatsApp válido." }, 400);
+        const title = String(body.communicationTitle || "Aviso del evento").trim().slice(0, 120);
+        const content = String(body.message || "").trim().slice(0, 3000);
+        if (!content) return json({ error: "Escribí el contenido de la comunicación." }, 400);
+        const preparedAt = new Date().toISOString();
+        await logAdminActivity(session, "guest.communication_prepared", "guest", guest.id, {
+          channel: "whatsapp",
+          type: String(body.communicationType || "notice").slice(0, 60),
+          title,
+        });
+        return json({
+          guest: clientGuest(guest),
+          preparedAt,
+          url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(`Hola ${guest.name}.\n\n*${title}*\n${content}`)}&type=phone_number&app_absent=0`,
+        });
+      }
       if (body.action === "thank-you") {
         if (!id) return json({ error: "Falta identificar al invitado." }, 400);
         const guestResponse = await supabaseRequest(
