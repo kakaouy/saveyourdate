@@ -1,6 +1,6 @@
 import { appUrl, emailShell, escapeHtml, json, sendEmail, supabaseRequest } from './_lib/orders.js';
 import { reminderEmailHtml } from './_lib/reminder-email.js';
-import { isReminderDue, reminderDaysFor } from './_lib/reminder-rules.js';
+import { guestReminderDue, isReminderDue, reminderDaysFor, reminderMaxAttemptsFor } from './_lib/reminder-rules.js';
 import { deleteEventData } from './_lib/delete-event.js';
 import { daysBeforeRetentionDeadline, eventAccessExpired, retentionDeadline } from './_lib/event-lifecycle.js';
 
@@ -16,7 +16,10 @@ type PendingGuest = {
   invite_token: string;
   name: string;
   email: string;
+  reminded_at?: string | null;
 };
+
+type ReminderActivity = { entity_id: string | null; action: string; created_at: string };
 
 const sendCronAlert = async (subject: string, detail: string, key: string) => {
   try {
@@ -79,28 +82,42 @@ async function handler(request: Request) {
     for (const order of dueOrders) {
       if (sent >= 100) break;
       const guestsResponse = await supabaseRequest(
-        `event_guests?order_number=eq.${encodeURIComponent(order.order_number)}&status=eq.Pendiente&archived_at=is.null&email=neq.&reminded_at=is.null&select=id,invite_token,name,email&order=created_at.asc&limit=${100 - sent}`
+        `event_guests?order_number=eq.${encodeURIComponent(order.order_number)}&status=eq.Pendiente&archived_at=is.null&email=neq.&select=id,invite_token,name,email,reminded_at&order=created_at.asc&limit=${100 - sent}`
       );
       const guests = await guestsResponse.json() as PendingGuest[];
+      const activityResponse = await supabaseRequest(
+        `admin_activity_log?order_number=eq.${encodeURIComponent(order.order_number)}&action=eq.reminder.auto_sent&select=entity_id,action,created_at&order=created_at.desc&limit=1000`
+      );
+      const activities = await activityResponse.json() as ReminderActivity[];
       const eventTitle = String(order.order_payload.eventTitle || order.customer_name);
       const daysBefore = reminderDaysFor(order.order_payload);
       for (const guest of guests) {
+        const guestActivities = activities.filter((activity) => activity.entity_id === guest.id);
+        if (!guestReminderDue({ payload: order.order_payload, attempts: guestActivities.length, lastReminderAt: guestActivities[0]?.created_at || guest.reminded_at })) continue;
         try {
           const confirmationUrl = `${appUrl()}/confirmar?token=${encodeURIComponent(guest.invite_token)}`;
           await sendEmail({
             to: guest.email,
             subject: `Recordatorio de confirmación · ${eventTitle}`,
-            idempotencyKey: `rsvp-reminder-${guest.id}-${daysBefore}`,
+            idempotencyKey: `rsvp-reminder-${guest.id}-${daysBefore}-${guestActivities.length + 1}`,
             html: reminderEmailHtml({ recipientName: guest.name, eventTitle, actionUrl: confirmationUrl })
           });
           const remindedAt = new Date().toISOString();
           await supabaseRequest(
-            `event_guests?id=eq.${encodeURIComponent(guest.id)}&order_number=eq.${encodeURIComponent(order.order_number)}&status=eq.Pendiente&archived_at=is.null&reminded_at=is.null`,
+            `event_guests?id=eq.${encodeURIComponent(guest.id)}&order_number=eq.${encodeURIComponent(order.order_number)}&status=eq.Pendiente&archived_at=is.null`,
             { method: 'PATCH', body: JSON.stringify({ reminded_at: remindedAt, updated_at: remindedAt }) }
           );
+          await supabaseRequest('admin_activity_log', {
+            method: 'POST',
+            body: JSON.stringify({ order_number: order.order_number, actor_email: 'automation@saveyourdate.site', actor_role: 'owner', action: 'reminder.auto_sent', entity_type: 'guest', entity_id: guest.id, details: { channel: 'email', attempt: guestActivities.length + 1, maxAttempts: reminderMaxAttemptsFor(order.order_payload) } })
+          });
           sent += 1;
         } catch (error) {
           console.error('No pudimos enviar un recordatorio automático.', error);
+          await supabaseRequest('admin_activity_log', {
+            method: 'POST',
+            body: JSON.stringify({ order_number: order.order_number, actor_email: 'automation@saveyourdate.site', actor_role: 'owner', action: 'reminder.auto_failed', entity_type: 'guest', entity_id: guest.id, details: { channel: 'email', error: error instanceof Error ? error.message : 'Error desconocido' } })
+          }).catch(() => undefined);
           failed += 1;
         }
       }

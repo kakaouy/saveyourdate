@@ -17,7 +17,10 @@ async function handler(request: Request) {
         eventName: String(order?.customer_name || order?.order_payload.eventTitle || ''),
         eventDate: String(order?.order_payload.eventDate || ''),
         reminderDaysBefore: Math.max(1, Math.min(60, Number(order?.order_payload.reminderDaysBefore) || 7)),
-        automaticRemindersEnabled: order?.order_payload.automaticRemindersEnabled === true
+        reminderRepeatDays: Math.max(1, Math.min(30, Number(order?.order_payload.reminderRepeatDays) || 3)),
+        reminderMaxAttempts: Math.max(1, Math.min(5, Number(order?.order_payload.reminderMaxAttempts) || 1)),
+        automaticRemindersEnabled: order?.order_payload.automaticRemindersEnabled === true,
+        automaticRemindersPaused: order?.order_payload.automaticRemindersPaused === true
       });
     }
 
@@ -41,6 +44,9 @@ async function handler(request: Request) {
       const code = String(body.defaultPhoneCountryCode || '').trim();
       const reminderDaysBefore = Math.max(1, Math.min(60, Number(body.reminderDaysBefore) || 7));
       const automaticRemindersEnabled = body.automaticRemindersEnabled === true;
+      const automaticRemindersPaused = body.automaticRemindersPaused === true;
+      const reminderRepeatDays = Math.max(1, Math.min(30, Number(body.reminderRepeatDays) || 3));
+      const reminderMaxAttempts = Math.max(1, Math.min(5, Number(body.reminderMaxAttempts) || 1));
       const eventName = String(body.eventName || '').trim().slice(0, 160);
       const eventDate = String(body.eventDate || '').trim();
       if (!validCode(code)) return json({ error: 'El código de país no es válido.' }, 400);
@@ -53,12 +59,12 @@ async function handler(request: Request) {
         body: JSON.stringify({
           default_phone_country_code: code,
           customer_name: eventName,
-          order_payload: { ...order.order_payload, eventTitle: eventName, eventDate, reminderDaysBefore, automaticRemindersEnabled },
+          order_payload: { ...order.order_payload, eventTitle: eventName, eventDate, reminderDaysBefore, reminderRepeatDays, reminderMaxAttempts, automaticRemindersEnabled, automaticRemindersPaused },
           updated_at: new Date().toISOString()
         })
       });
-      await logAdminActivity(session, 'settings.updated', 'settings', session.order_number, { defaultPhoneCountryCode: code, reminderDaysBefore, automaticRemindersEnabled });
-      return json({ defaultPhoneCountryCode: code, eventName, eventDate, reminderDaysBefore, automaticRemindersEnabled });
+      await logAdminActivity(session, 'settings.updated', 'settings', session.order_number, { defaultPhoneCountryCode: code, reminderDaysBefore, reminderRepeatDays, reminderMaxAttempts, automaticRemindersEnabled, automaticRemindersPaused });
+      return json({ defaultPhoneCountryCode: code, eventName, eventDate, reminderDaysBefore, reminderRepeatDays, reminderMaxAttempts, automaticRemindersEnabled, automaticRemindersPaused });
     }
 
     return json({ error: 'Método no permitido.' }, 405);

@@ -89,9 +89,17 @@ type WhatsAppTracking = {
   errorDetail: unknown;
 };
 
+type ReminderTracking = {
+  attempts: number;
+  lastAt: string;
+  lastStatus: "sent" | "failed" | "";
+  lastError: string;
+};
+
 const clientGuest = (
   row: GuestRow,
   whatsappTracking: WhatsAppTracking = { status: "", statusAt: "", errorDetail: null },
+  reminderTracking: ReminderTracking = { attempts: 0, lastAt: "", lastStatus: "", lastError: "" },
 ) => ({
   id: row.id,
   inviteToken: row.invite_token,
@@ -127,6 +135,10 @@ const clientGuest = (
   whatsappStatus: whatsappTracking.status,
   whatsappStatusAt: whatsappTracking.statusAt,
   whatsappErrorDetail: whatsappTracking.errorDetail,
+  reminderAttempts: reminderTracking.attempts,
+  reminderLastAt: reminderTracking.lastAt,
+  reminderLastStatus: reminderTracking.lastStatus,
+  reminderLastError: reminderTracking.lastError,
   invitedBy: row.invited_by || "",
   companionOfId: row.companion_of_id || "",
   thankedAt: row.thanked_at || "",
@@ -147,12 +159,15 @@ async function handler(request: Request) {
     if (request.method !== "GET" && session.access_role === "viewer")
       return json({ error: "Tu acceso es de solo lectura." }, 403);
     if (request.method === "GET") {
-      const [response, messagesResponse] = await Promise.all([
+      const [response, messagesResponse, reminderResponse] = await Promise.all([
         supabaseRequest(
           `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc&limit=500`,
         ),
         supabaseRequest(
           `whatsapp_message_log?order_number=eq.${encodeURIComponent(session.order_number)}&select=guest_id,status,status_at,error_detail&order=status_at.desc&limit=500`,
+        ),
+        supabaseRequest(
+          `admin_activity_log?order_number=eq.${encodeURIComponent(session.order_number)}&action=in.(reminder.auto_sent,reminder.auto_failed)&select=entity_id,action,created_at,details&order=created_at.desc&limit=1000`,
         ),
       ]);
       const messages = (await messagesResponse.json()) as Array<{
@@ -170,11 +185,25 @@ async function handler(request: Request) {
             errorDetail: message.error_detail || null,
           });
       });
+      const reminderActivities = (await reminderResponse.json()) as Array<{ entity_id: string | null; action: string; created_at: string; details?: { error?: string } }>;
+      const reminderTracking = new Map<string, ReminderTracking>();
+      reminderActivities.forEach((activity) => {
+        if (!activity.entity_id) return;
+        const current = reminderTracking.get(activity.entity_id) || { attempts: 0, lastAt: "", lastStatus: "" as const, lastError: "" };
+        if (activity.action === "reminder.auto_sent") current.attempts += 1;
+        if (!current.lastAt) {
+          current.lastAt = activity.created_at || "";
+          current.lastStatus = activity.action === "reminder.auto_sent" ? "sent" : "failed";
+          current.lastError = String(activity.details?.error || "");
+        }
+        reminderTracking.set(activity.entity_id, current);
+      });
       return json({
         guests: ((await response.json()) as GuestRow[]).map((guest) =>
           clientGuest(
             guest,
             latestStatus.get(guest.id),
+            reminderTracking.get(guest.id),
           ),
         ),
       });

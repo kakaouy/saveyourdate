@@ -48,6 +48,10 @@ type Guest = {
   whatsappStatus?: string;
   whatsappStatusAt?: string;
   whatsappErrorDetail?: unknown;
+  reminderAttempts?: number;
+  reminderLastAt?: string;
+  reminderLastStatus?: "sent" | "failed" | "";
+  reminderLastError?: string;
   invitedBy: string;
   companionOfId: string;
   thankedAt?: string;
@@ -1471,9 +1475,28 @@ function Guests({
     eventName: string;
     eventDate: string;
     reminderDaysBefore: number;
+    reminderRepeatDays: number;
+    reminderMaxAttempts: number;
     automaticRemindersEnabled: boolean;
+    automaticRemindersPaused: boolean;
   } | null>(null);
   const [savingReminderSettings, setSavingReminderSettings] = useState(false);
+  const reminderEligibility = (guest: Guest) => {
+    if (guest.archivedAt) return t("Excluido: archivado", "Excluded: archived", "Excluído: arquivado");
+    if (guest.status !== "Pendiente" || guest.respondedAt) return t("Excluido: ya respondió", "Excluded: already responded", "Excluído: já respondeu");
+    if (!guest.email) return t("Excluido: falta email", "Excluded: email missing", "Excluído: falta email");
+    if (!reminderSettings?.automaticRemindersEnabled) return t("Automatización desactivada", "Automation disabled", "Automação desativada");
+    if (reminderSettings.automaticRemindersPaused) return t("Automatización pausada", "Automation paused", "Automação pausada");
+    if ((guest.reminderAttempts || 0) >= reminderSettings.reminderMaxAttempts) return t("Máximo de intentos alcanzado", "Maximum attempts reached", "Máximo de tentativas atingido");
+    const base = guest.reminderLastAt || guest.reminded;
+    const next = base
+      ? new Date(new Date(base).getTime() + reminderSettings.reminderRepeatDays * 86400000)
+      : reminderSettings.eventDate
+        ? new Date(`${reminderSettings.eventDate}T12:00:00Z`)
+        : null;
+    if (next && !base) next.setUTCDate(next.getUTCDate() - reminderSettings.reminderDaysBefore);
+    return next ? `${t("Próxima acción", "Next action", "Próxima ação")}: ${reportDate(next.toISOString(), language)}` : t("Pendiente de programación", "Awaiting schedule", "Aguardando programação");
+  };
   const importInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (!showModal) setNewCustomSocialCircle(false);
@@ -2358,13 +2381,15 @@ function Guests({
         </button>
       </section>
       {reminderSettings && (
-        <section className={`guest-reminder-schedule ${reminderSettings.automaticRemindersEnabled ? "is-enabled" : ""}`} aria-label={t("Recordatorios programados", "Scheduled reminders", "Lembretes programados")}>
+        <section className={`guest-reminder-schedule ${reminderSettings.automaticRemindersEnabled ? "is-enabled" : ""} ${reminderSettings.automaticRemindersPaused ? "is-paused" : ""}`} aria-label={t("Recordatorios programados", "Scheduled reminders", "Lembretes programados")}>
           <div>
             <span className="guest-reminder-schedule-icon" aria-hidden="true">◷</span>
             <p>
               <strong>{t("Recordatorio automático por email", "Automatic email reminder", "Lembrete automático por email")}</strong>
-              <small>{reminderSettings.eventDate
-                ? t(`Se enviará una vez a quienes sigan pendientes, ${reminderSettings.reminderDaysBefore} días antes del evento.`, `It will be sent once to guests still pending, ${reminderSettings.reminderDaysBefore} days before the event.`, `Será enviado uma vez a quem continuar pendente, ${reminderSettings.reminderDaysBefore} dias antes do evento.`)
+              <small>{reminderSettings.automaticRemindersPaused
+                ? t("La automatización está pausada. Ningún invitado recibirá recordatorios hasta reactivarla y guardar.", "Automation is paused. No guest will receive reminders until it is resumed and saved.", "A automação está pausada. Nenhum convidado receberá lembretes até reativar e salvar.")
+                : reminderSettings.eventDate
+                ? t(`Primer aviso ${reminderSettings.reminderDaysBefore} días antes; se repite cada ${reminderSettings.reminderRepeatDays} días, hasta ${reminderSettings.reminderMaxAttempts} veces.`, `First reminder ${reminderSettings.reminderDaysBefore} days before; repeats every ${reminderSettings.reminderRepeatDays} days, up to ${reminderSettings.reminderMaxAttempts} times.`, `Primeiro aviso ${reminderSettings.reminderDaysBefore} dias antes; repete a cada ${reminderSettings.reminderRepeatDays} dias, até ${reminderSettings.reminderMaxAttempts} vezes.`)
                 : t("Agregá la fecha del evento en Configuración para poder programarlo.", "Add the event date in Settings to schedule it.", "Adicione a data do evento em Configurações para programá-lo.")}</small>
             </p>
           </div>
@@ -2373,10 +2398,19 @@ function Guests({
               <span>{t("Días antes", "Days before", "Dias antes")}</span>
               <input type="number" min="1" max="60" value={reminderSettings.reminderDaysBefore} disabled={!reminderSettings.automaticRemindersEnabled || savingReminderSettings} onChange={(event) => setReminderSettings((current) => current ? { ...current, reminderDaysBefore: Math.max(1, Math.min(60, Number(event.target.value) || 1)) } : current)} />
             </label>
+            <label>
+              <span>{t("Repetir cada", "Repeat every", "Repetir a cada")}</span>
+              <input type="number" min="1" max="30" value={reminderSettings.reminderRepeatDays} disabled={!reminderSettings.automaticRemindersEnabled || savingReminderSettings} onChange={(event) => setReminderSettings((current) => current ? { ...current, reminderRepeatDays: Math.max(1, Math.min(30, Number(event.target.value) || 1)) } : current)} />
+            </label>
+            <label>
+              <span>{t("Máximo", "Maximum", "Máximo")}</span>
+              <input type="number" min="1" max="5" value={reminderSettings.reminderMaxAttempts} disabled={!reminderSettings.automaticRemindersEnabled || savingReminderSettings} onChange={(event) => setReminderSettings((current) => current ? { ...current, reminderMaxAttempts: Math.max(1, Math.min(5, Number(event.target.value) || 1)) } : current)} />
+            </label>
             <label className="guest-reminder-toggle">
               <input type="checkbox" checked={reminderSettings.automaticRemindersEnabled} disabled={!reminderSettings.eventDate || savingReminderSettings} onChange={(event) => setReminderSettings((current) => current ? { ...current, automaticRemindersEnabled: event.target.checked } : current)} />
               <span>{reminderSettings.automaticRemindersEnabled ? t("Activado", "Enabled", "Ativado") : t("Desactivado", "Disabled", "Desativado")}</span>
             </label>
+            {reminderSettings.automaticRemindersEnabled && <button className="outline-button compact" type="button" disabled={savingReminderSettings} onClick={() => setReminderSettings((current) => current ? { ...current, automaticRemindersPaused: !current.automaticRemindersPaused } : current)}>{reminderSettings.automaticRemindersPaused ? t("Reactivar", "Resume", "Reativar") : t("Pausar", "Pause", "Pausar")}</button>}
             <button className="outline-button compact" type="button" disabled={savingReminderSettings || !reminderSettings.eventDate} onClick={() => void saveReminderSettings()}>{savingReminderSettings ? t("Guardando…", "Saving…", "Salvando…") : t("Guardar", "Save", "Salvar")}</button>
           </div>}
           <button type="button" className={`guest-reminder-due ${filter === "Necesitan recordatorio" ? "active" : ""}`} onClick={() => setFilter("Necesitan recordatorio")}>
@@ -2694,6 +2728,8 @@ function Guests({
                       {(guest.whatsappStatusAt || guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt) && <small>{reportDate(guest.whatsappStatusAt || guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt || "", language)}</small>}
                       {guest.whatsappStatus === "failed" && <small className="guest-delivery-error">{t("Meta no pudo entregar el mensaje", "Meta could not deliver the message", "A Meta não conseguiu entregar a mensagem")}</small>}
                       {guest.status === "Pendiente" && guest.reminded && <small className="guest-last-reminder">{t("Último recordatorio", "Last reminder", "Último lembrete")} · {reportDate(guest.reminded, language)}</small>}
+                      {guest.reminderAttempts ? <small className="guest-last-reminder">{t(`Automáticos: ${guest.reminderAttempts}`, `Automatic: ${guest.reminderAttempts}`, `Automáticos: ${guest.reminderAttempts}`)}{guest.reminderLastStatus === "failed" ? t(" · último intento fallido", " · last attempt failed", " · última tentativa falhou") : ""}</small> : null}
+                      <small className="guest-reminder-eligibility">{reminderEligibility(guest)}</small>
                     </span>{guest.status === "Pendiente" && <button type="button" disabled={!guest.phone || updatingId === guest.id} onClick={() => setWhatsAppReviewGuest(guest)}>{!guest.phone ? t("Falta WhatsApp", "WhatsApp missing", "Falta WhatsApp") : guest.invitationOpenedAt ? t("Recordar respuesta", "Remind to respond", "Lembrar resposta") : guest.invitationSentAt ? t("Reenviar invitación", "Resend invitation", "Reenviar convite") : t("Enviar invitación", "Send invitation", "Enviar convite")}</button>}</div>
                   </td>
                   <td className="guest-actions-column" data-label={t("Acciones", "Actions", "Ações")}>
@@ -6470,8 +6506,11 @@ function Settings({
   const [saving, setSaving] = useState(false);
   const [backingUp, setBackingUp] = useState(false);
   const [reminderDaysBefore, setReminderDaysBefore] = useState(7);
+  const [reminderRepeatDays, setReminderRepeatDays] = useState(3);
+  const [reminderMaxAttempts, setReminderMaxAttempts] = useState(1);
   const [automaticRemindersEnabled, setAutomaticRemindersEnabled] =
     useState(false);
+  const [automaticRemindersPaused, setAutomaticRemindersPaused] = useState(false);
   const [eventName, setEventName] = useState(order.customerName);
   const [eventDate, setEventDate] = useState(order.eventDate);
   const [accountModules, setAccountModules] = useState<Array<{ module: AdminOrder["enabledModules"][number]; source: string; enabled: boolean }>>([]);
@@ -6508,10 +6547,16 @@ function Settings({
           eventName?: string;
           eventDate?: string;
           reminderDaysBefore?: number;
+          reminderRepeatDays?: number;
+          reminderMaxAttempts?: number;
           automaticRemindersEnabled?: boolean;
+          automaticRemindersPaused?: boolean;
         };
         setReminderDaysBefore(result.reminderDaysBefore || 7);
+        setReminderRepeatDays(result.reminderRepeatDays || 3);
+        setReminderMaxAttempts(result.reminderMaxAttempts || 1);
         setAutomaticRemindersEnabled(result.automaticRemindersEnabled === true);
+        setAutomaticRemindersPaused(result.automaticRemindersPaused === true);
         setEventName(result.eventName || order.customerName);
         setEventDate(result.eventDate || order.eventDate);
       },
@@ -6578,7 +6623,10 @@ function Settings({
         body: JSON.stringify({
           defaultPhoneCountryCode: value,
           reminderDaysBefore,
+          reminderRepeatDays,
+          reminderMaxAttempts,
           automaticRemindersEnabled,
+          automaticRemindersPaused,
           eventName,
           eventDate,
         }),
@@ -6586,7 +6634,10 @@ function Settings({
       const result = (await response.json()) as {
         defaultPhoneCountryCode?: string;
         reminderDaysBefore?: number;
+        reminderRepeatDays?: number;
+        reminderMaxAttempts?: number;
         automaticRemindersEnabled?: boolean;
+        automaticRemindersPaused?: boolean;
         eventName?: string;
         eventDate?: string;
         error?: string;
@@ -6595,7 +6646,10 @@ function Settings({
         throw new Error(result.error || "No pudimos guardar la configuración.");
       onChange(result.defaultPhoneCountryCode);
       setReminderDaysBefore(result.reminderDaysBefore || reminderDaysBefore);
+      setReminderRepeatDays(result.reminderRepeatDays || reminderRepeatDays);
+      setReminderMaxAttempts(result.reminderMaxAttempts || reminderMaxAttempts);
       setAutomaticRemindersEnabled(result.automaticRemindersEnabled === true);
+      setAutomaticRemindersPaused(result.automaticRemindersPaused === true);
       const savedEventName = result.eventName || eventName;
       const savedEventDate = result.eventDate ?? eventDate;
       setEventName(savedEventName);
@@ -6912,6 +6966,24 @@ function Settings({
               )}
             </small>
           </label>
+          <label>
+            {t("Repetir cada", "Repeat every", "Repetir a cada")}
+            <input type="number" min="1" max="30" disabled={!automaticRemindersEnabled} value={reminderRepeatDays} onChange={(event) => setReminderRepeatDays(Math.max(1, Math.min(30, Number(event.target.value) || 1)))} />
+            <small>{t("Días mientras siga pendiente", "Days while still pending", "Dias enquanto estiver pendente")}</small>
+          </label>
+          <label>
+            {t("Máximo de intentos", "Maximum attempts", "Máximo de tentativas")}
+            <input type="number" min="1" max="5" disabled={!automaticRemindersEnabled} value={reminderMaxAttempts} onChange={(event) => setReminderMaxAttempts(Math.max(1, Math.min(5, Number(event.target.value) || 1)))} />
+            <small>{t("Nunca incluye confirmados, rechazados ni archivados", "Never includes confirmed, declined or archived guests", "Nunca inclui confirmados, recusados ou arquivados")}</small>
+          </label>
+          {automaticRemindersEnabled && <label>
+            {t("Ejecución", "Execution", "Execução")}
+            <select value={automaticRemindersPaused ? "paused" : "active"} onChange={(event) => setAutomaticRemindersPaused(event.target.value === "paused")}>
+              <option value="active">{t("Activa", "Active", "Ativa")}</option>
+              <option value="paused">{t("Pausada", "Paused", "Pausada")}</option>
+            </select>
+            <small>{t("Podés pausarla sin perder la configuración", "Pause without losing settings", "Pause sem perder a configuração")}</small>
+          </label>}
           <button
             className="primary-button small"
             disabled={saving}
