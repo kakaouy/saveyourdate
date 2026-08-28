@@ -40,6 +40,37 @@ const confirmationUrlFor = (
   return `${base}${base.includes("?") ? "&" : "?"}token=${encodeURIComponent(inviteToken)}`;
 };
 
+const communicationExtras = (body: Record<string, unknown>) => {
+  const imageUrl = String(body.imageUrl || "").trim().slice(0, 1000);
+  let imageBlock = "";
+  if (imageUrl) {
+    const parsed = new URL(imageUrl);
+    if (!["http:", "https:"].includes(parsed.protocol))
+      throw new Error("La URL de la imagen no es válida.");
+    imageBlock = `\n\nImagen: ${parsed.toString()}`;
+  }
+  const html = String(body.htmlContent || "").slice(0, 8000);
+  const htmlText = html
+    .replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/<\/p\s*>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, 3000);
+  return `${imageBlock}${htmlText ? `\n\n${htmlText}` : ""}`;
+};
+
+const communicationClosing = (body: Record<string, unknown>) => {
+  const closing = String(body.closing || "").trim().slice(0, 500);
+  return closing ? `\n\n${closing}` : "";
+};
+
 type GuestRow = {
   id: string;
   invite_token: string;
@@ -584,6 +615,30 @@ async function handler(request: Request) {
         });
         return json({ guests: rows.map((guest) => clientGuest(guest)) });
       }
+      if (body.action === "invite") {
+        if (!id) return json({ error: "Falta identificar al invitado." }, 400);
+        const guestResponse = await supabaseRequest(
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}&archived_at=is.null&select=*&limit=1`,
+        );
+        const guest = ((await guestResponse.json()) as GuestRow[])[0];
+        if (!guest) return json({ error: "No encontramos al invitado." }, 404);
+        const phone = normalizeWhatsAppPhone(guest.phone);
+        if (phone.length < 8) return json({ error: "El invitado no tiene un número de WhatsApp válido." }, 400);
+        const order = await findOrderByNumber(session.order_number);
+        if (!order) return json({ error: "No encontramos el evento." }, 404);
+        const invitationUrl = confirmationUrlFor({ ...body, confirmationTarget: "invitation" }, guest.invite_token, order.invitation_url);
+        const content = String(body.message || "").trim().slice(0, 3000);
+        if (!content) return json({ error: "Escribí el mensaje de la invitación." }, 400);
+        const preparedAt = new Date().toISOString();
+        const finalMessage = `Hola ${guest.name}.\n\n${content}\n\n${invitationUrl}${communicationClosing(body)}${communicationExtras(body)}`;
+        const response = await supabaseRequest(
+          `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
+          { method: "PATCH", headers: { Prefer: "return=representation" }, body: JSON.stringify({ invitation_sent_at: preparedAt, updated_at: preparedAt }) },
+        );
+        const rows = (await response.json()) as GuestRow[];
+        await logAdminActivity(session, "guest.invitation_prepared", "guest", guest.id, { channel: "whatsapp", scheduleId: String(body.scheduleId || "") });
+        return json({ guest: clientGuest(rows[0]), url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(finalMessage)}&type=phone_number&app_absent=0` });
+      }
       if (body.action === "communication") {
         if (!id) return json({ error: "Falta identificar al invitado." }, 400);
         const guestResponse = await supabaseRequest(
@@ -601,11 +656,12 @@ async function handler(request: Request) {
           channel: "whatsapp",
           type: String(body.communicationType || "notice").slice(0, 60),
           title,
+          scheduleId: String(body.scheduleId || ""),
         });
         return json({
           guest: clientGuest(guest),
           preparedAt,
-          url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(`Hola ${guest.name}.\n\n*${title}*\n${content}`)}&type=phone_number&app_absent=0`,
+          url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(`Hola ${guest.name}.\n\n*${title}*\n${content}${communicationClosing(body)}${communicationExtras(body)}`)}&type=phone_number&app_absent=0`,
         });
       }
       if (body.action === "thank-you") {
@@ -627,11 +683,13 @@ async function handler(request: Request) {
           ? `\n\nSi querés hacerme un regalo, te dejo mis datos:\n${bankDetails}`
           : "";
         const template = String(body.message || "").trim().slice(0, 3500);
-        const message = (template || "Hola {{nombre}}.\n\n{{asistencia}}\n\nCon cariño, {{homenajeado}}.")
+        const closing = communicationClosing(body);
+        const message = (template || "Hola {{nombre}}.\n\n{{asistencia}}{{cuenta}}{{cierre}}")
           .replaceAll("{{nombre}}", guest.name)
           .replaceAll("{{asistencia}}", attendanceText)
           .replaceAll("{{homenajeado}}", honoree)
-          .replaceAll("{{cuenta}}", accountBlock);
+          .replaceAll("{{cuenta}}", accountBlock)
+          .replaceAll("{{cierre}}", closing) + communicationExtras(body);
         const thankedAt = new Date().toISOString();
         const response = await supabaseRequest(
           `event_guests?id=eq.${encodeURIComponent(id)}&order_number=eq.${encodeURIComponent(session.order_number)}`,
@@ -642,7 +700,7 @@ async function handler(request: Request) {
           },
         );
         const rows = (await response.json()) as GuestRow[];
-        await logAdminActivity(session, "guest.thanked", "guest", id, { channel: "whatsapp" });
+        await logAdminActivity(session, "guest.thanked", "guest", id, { channel: "whatsapp", scheduleId: String(body.scheduleId || "") });
         return json({
           guest: clientGuest(rows[0]),
           url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`,
@@ -667,14 +725,15 @@ async function handler(request: Request) {
         const confirmationUrl = confirmationUrlFor(body, guest.invite_token, order.invitation_url);
         const reminderText = String(body.message || "").trim().slice(0, 3000);
         const giftText = String(body.giftText || "").trim().slice(0, 1500);
-        const delivery = await sendWhatsAppTemplate({
-          phone,
-          recipientName: guest.name,
-          eventTitle: String(
-            order.order_payload.eventTitle || order.customer_name,
-          ),
-          confirmationUrl,
-        });
+        const hasCustomPresentation = Boolean(String(body.closing || "").trim() || String(body.imageUrl || "").trim() || String(body.htmlContent || "").trim());
+        const delivery = hasCustomPresentation
+          ? { sent: false, messageId: "" }
+          : await sendWhatsAppTemplate({
+              phone,
+              recipientName: guest.name,
+              eventTitle: String(order.order_payload.eventTitle || order.customer_name),
+              confirmationUrl,
+            });
         if (!delivery.sent) {
           const remindedAt = new Date().toISOString();
           const updateResponse = await supabaseRequest(
@@ -689,7 +748,11 @@ async function handler(request: Request) {
           const baseMessage = reminderText
             ? `Hola ${guest.name}.\n\n${reminderText}\n\nConfirmar asistencia: ${confirmationUrl}`
             : `Hola ${guest.name}, te recordamos que se acerca ${String(order.order_payload.eventTitle || order.customer_name)}. Si ya confirmaste, ¡muchas gracias! Si todavía no, completá tu confirmación: ${confirmationUrl}`;
-          const manualMessage = `${baseMessage}${giftText ? `\n\nSi querés hacerme un regalo te dejo mis datos:\n${giftText}` : ""}`;
+          const manualMessage = `${baseMessage}${giftText ? `\n\nSi querés hacerme un regalo te dejo mis datos:\n${giftText}` : ""}${communicationClosing(body)}${communicationExtras(body)}`;
+          await logAdminActivity(session, "guest.reminder_prepared", "guest", guest.id, {
+            channel: "whatsapp",
+            scheduleId: String(body.scheduleId || ""),
+          });
           return json({
             mode: "manual",
             guest: clientGuest(updatedRows[0], {
@@ -728,6 +791,7 @@ async function handler(request: Request) {
           name: rows[0].name,
           channel: "whatsapp_business",
           messageId: delivery.messageId,
+          scheduleId: String(body.scheduleId || ""),
         });
         return json({
           guest: clientGuest(rows[0], {

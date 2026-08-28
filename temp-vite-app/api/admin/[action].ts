@@ -18,6 +18,7 @@ import invitationBuilder from '../_lib/admin/invitation-builder.js';
 import events from '../_lib/admin/events.js';
 import resources from '../_lib/admin/resources.js';
 import modules from '../_lib/admin/modules.js';
+import communications from '../_lib/admin/communications.js';
 import { json } from '../_lib/orders.js';
 
 const handlers: Record<string, { fetch: (request: Request) => Promise<Response> }> = {
@@ -41,6 +42,7 @@ const handlers: Record<string, { fetch: (request: Request) => Promise<Response> 
   , events
   , resources
   , modules
+  , communications
 };
 
 async function handler(request: Request) {

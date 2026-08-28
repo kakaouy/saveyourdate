@@ -174,7 +174,7 @@ test('la importación de archivos permite asociar columnas antes de revisar', ()
 });
 
 test('la lista conserva las acciones completas y expone los datos solicitados', () => {
-  assert.match(source, /className="guests-table"/);
+  assert.match(source, /guests-table guest-compact-table/);
   assert.match(source, /Ver historial y datos/);
   assert.match(source, /className="modal guest-details-modal"/);
   assert.match(source, /inspectingGuest\.identificationNumber/);
@@ -868,7 +868,7 @@ test('los círculos sociales alimentan la carga y las sugerencias de proximidad'
 
 test('grupo de invitación y círculo social se editan y muestran como conceptos separados', () => {
   assert.match(source, /<th className="guest-group-column">\{t\("Grupo", "Group", "Grupo"\)\}<\/th>/);
-  assert.match(source, /<th className="guest-circle-column">\{t\("Círculo", "Circle", "Círculo"\)\}<\/th>/);
+  assert.match(source, /data-label=\{t\("Círculo social", "Social circle", "Círculo social"\)\}/);
   assert.doesNotMatch(source, /Grupo \/ círculo/);
   assert.match(source, /const updateSocialCircleFromDetails = async/);
   assert.match(source, /className="guest-details-circle"/);
@@ -878,7 +878,7 @@ test('grupo de invitación y círculo social se editan y muestran como conceptos
   assert.match(source, /item\.name, item\.group, item\.socialCircle/);
   assert.match(styles, /\.guest-circle-cell/);
   assert.match(styles, /\.guests-table \.guest-secondary-column/);
-  assert.match(source, /className="guest-circle-column" data-label=/);
+  assert.match(source, /className="guest-details-column"/);
   assert.match(source, /className="guest-actions-column" data-label=/);
   assert.match(styles, /\.guests-table tbody > tr:not\(\.guest-empty-row\)/);
 });
@@ -930,11 +930,15 @@ test('los elementos del plano conservan tamaños de hasta 20 px al guardar y res
   assert.doesNotMatch(tablesApi, /element_width: Math\.round\(Math\.max\(90,/);
 });
 
-test('las tarjetas de invitados distribuyen datos y acciones sin comprimirlos', () => {
-  assert.match(styles, /\/\* Regla final: gana sobre las variantes históricas de la tabla\. \*\/[\s\S]*?@media \(max-width: 1750px\)/);
-  assert.match(styles, /\.table-panel \.guests-table tbody > tr:not\(\.guest-empty-row\) > td \{[\s\S]*?grid-template-columns: minmax\(150px,210px\) minmax\(0,1fr\)/);
-  assert.match(styles, /\.table-panel \.guests-table \.guest-actions-column \.row-actions \{[\s\S]*?align-items: center;[\s\S]*?flex-wrap: nowrap/);
-  assert.match(styles, /@media \(max-width: 620px\)[\s\S]*?grid-template-columns: minmax\(108px,38%\) minmax\(0,1fr\)/);
+test('el listado de invitados resume la fila y revela detalles sin comprimirlos', () => {
+  assert.match(source, /const \[expandedGuests, setExpandedGuests\]/);
+  assert.match(source, /guest-compact-table/);
+  assert.match(source, /className="guest-expand-button"/);
+  assert.match(source, /aria-expanded=\{isExpanded\}/);
+  assert.match(source, /className="guest-expanded-details"/);
+  assert.match(styles, /\.guest-summary-row\.is-expanded \.guest-details-column \{ display: block!important; \}/);
+  assert.match(styles, /@media \(max-width: 900px\)[\s\S]*?\.guest-expand-button \{ display: none; \}/);
+  assert.match(styles, /@media \(max-width: 430px\)[\s\S]*?\.guest-expanded-details > div \{ grid-template-columns: 1fr/);
 });
 
 test('entregables guía la elección y muestra una vista previa enfocada', () => {
@@ -977,21 +981,56 @@ test('el centro de invitados muestra el seguimiento oficial de WhatsApp separado
   assert.match(styles, /\.guest-delivery-status\.is-failed/);
 });
 
-test('comunicaciones reúne recordatorios, avisos y agradecimientos sin mezclar grupo y círculo', () => {
+test('comunicaciones reúne invitaciones, recordatorios, avisos y agradecimientos sin mezclar grupo y círculo', () => {
   const guestsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  const communicationsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'communications.ts'), 'utf8');
   assert.match(source, /\["Comunicaciones", "♡"\]/);
   assert.match(source, /function CommunicationsModule/);
   assert.match(source, /Recordar confirmación/);
+  assert.match(source, /Enviar invitación/);
   assert.match(source, /Aviso del evento/);
   assert.match(source, /Agradecer/);
-  assert.match(source, /kind !== "reminder" \|\| guest\.status === "Pendiente"/);
+  assert.match(source, /if \(kind === "invite"\) return guest\.status === "Pendiente" && !guest\.invitationSentAt/);
+  assert.match(source, /if \(kind === "reminder"\) return guest\.status === "Pendiente" && Boolean\(guest\.invitationSentAt\)/);
+  assert.match(source, /if \(kind === "thanks"\) return guest\.status === "Confirmado"/);
+  assert.match(source, /communication-audience-summary/);
   assert.match(source, /Buscar por invitado, grupo o círculo/);
   assert.match(source, /t\("Grupo", "Group", "Grupo"\)/);
   assert.match(source, /t\("Círculo", "Circle", "Círculo"\)/);
-  assert.match(source, /action: kind === "thanks" \? "thank-you" : kind === "reminder" \? "remind" : "communication"/);
+  assert.match(source, /kind === "invite" \? "invite" : "communication"/);
+  assert.match(source, /Despedida o firma/);
+  assert.match(source, /Contenido adicional \(opcional\)/);
+  assert.match(source, /icons\/communications\/send\.png/);
+  assert.match(source, /icons\/communications\/reminder\.png/);
+  assert.match(source, /icons\/communications\/notice\.png/);
+  assert.match(source, /icons\/communications\/thanks\.png/);
+  assert.match(guestsApi, /body\.action === "invite"/);
   assert.match(guestsApi, /body\.action === "communication"/);
+  assert.match(guestsApi, /communicationClosing/);
+  assert.match(guestsApi, /communicationExtras/);
   assert.match(guestsApi, /guest\.communication_prepared/);
   assert.match(styles, /\.communication-kind-tabs/);
   assert.match(styles, /\.communication-selection-bar/);
   assert.match(styles, /\.communications-table tr/);
+  assert.match(source, /Historial unificado/);
+  assert.match(source, /type="datetime-local"/);
+  assert.match(source, /scheduleCommunication/);
+  assert.match(source, /loadScheduledCommunication/);
+  assert.match(source, /activeScheduleId/);
+  assert.match(source, /communication-history-filters/);
+  assert.match(source, /t\("Duplicar", "Duplicate", "Duplicar"\)/);
+  assert.match(source, /failedCount/);
+  assert.match(source, /pendingCount/);
+  assert.match(source, /status === "completed"/);
+  assert.match(source, /\/api\/admin\/communications/);
+  assert.match(communicationsApi, /communication\.scheduled/);
+  assert.match(communicationsApi, /communication\.cancelled/);
+  assert.match(communicationsApi, /communication\.failed/);
+  assert.match(communicationsApi, /preparedBySchedule/);
+  assert.match(communicationsApi, /failedBySchedule/);
+  assert.match(communicationsApi, /pendingCount/);
+  assert.match(communicationsApi, /delivery: 'manual-whatsapp'/);
+  assert.match(communicationsApi, /180 \* 86400000/);
+  assert.match(styles, /\.communication-history-panel/);
+  assert.match(styles, /\.communication-schedule-input/);
 });

@@ -96,6 +96,27 @@ type GuestImportMapping = {
   columns: Record<string, number>;
 };
 
+type CommunicationHistoryItem = {
+  id: string;
+  action: string;
+  guestId: string;
+  kind: "invite" | "reminder" | "notice" | "thanks";
+  recipientCount: number;
+  preparedCount: number;
+  failedCount: number;
+  pendingCount: number;
+  recipientIds?: string[];
+  scheduledAt: string;
+  createdAt: string;
+  status: "scheduled" | "ready" | "completed" | "cancelled" | "prepared" | "failed";
+  title: string;
+  message?: string;
+  closing?: string;
+  extraContent?: "none" | "image" | "html";
+  imageUrl?: string;
+  htmlContent?: string;
+};
+
 const guestImportFields = [
   ["name", "Nombre y apellido"],
   ["group", "Grupo de invitación"],
@@ -1441,6 +1462,7 @@ function Guests({
   const [filter, setFilter] = useState("Todos");
   const [sortBy, setSortBy] = useState<"name" | "group" | "food" | "status">("name");
   const [selected, setSelected] = useState<string[]>([]);
+  const [expandedGuests, setExpandedGuests] = useState<string[]>([]);
   const [showBulkReminderReview, setShowBulkReminderReview] = useState(false);
   const [bulkReminderCursor, setBulkReminderCursor] = useState(0);
   const [bulkField, setBulkField] = useState<"status" | "group" | "socialCircle" | "invitedBy" | "guestType" | "transportOption" | "menuChoice" | "food" | "socialTogetherWith" | "socialSeparateFrom" | "preferredTableName">("invitedBy");
@@ -2609,7 +2631,7 @@ function Guests({
           </div>
         )}
         <div className="table-scroll">
-          <table className="guests-table">
+          <table className={`guests-table guest-compact-table ${canEdit ? "can-select" : ""}`}>
             <thead>
               <tr>
                 {canEdit && (
@@ -2632,17 +2654,14 @@ function Guests({
                 )}
                 <th className="guest-person-column">{t("Invitado", "Guest", "Convidado")}</th>
                 <th className="guest-group-column">{t("Grupo", "Group", "Grupo")}</th>
-                <th className="guest-circle-column">{t("Círculo", "Circle", "Círculo")}</th>
-                <th className="guest-seats-column">{t("Asistencia", "Attendance", "Presença")}</th>
                 <th className="guest-status-column">{t("Estado", "Status", "Status")}</th>
-                <th className="guest-secondary-column guest-follow-up-column">{t("Seguimiento", "Tracking", "Acompanhamento")}</th>
                 <th className="guest-actions-column">{t("Acciones", "Actions", "Ações")}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
                 <tr className="guest-empty-row">
-                  <td colSpan={canEdit ? 8 : 7}>
+                  <td colSpan={canEdit ? 5 : 4}>
                     <div className="guest-empty-state">
                       <span aria-hidden="true">♙</span>
                       <strong>{activeGuests.length === 0
@@ -2658,8 +2677,11 @@ function Guests({
                   </td>
                 </tr>
               )}
-              {filtered.map((guest) => (
-                <tr key={guest.id}>
+              {filtered.map((guest) => {
+                const isExpanded = expandedGuests.includes(guest.id);
+                const progress = seatProgress(guest, guests);
+                return (
+                <tr key={guest.id} className={`guest-summary-row ${isExpanded ? "is-expanded" : ""}`}>
                   {canEdit && (
                     <td className="checkbox-cell guest-select-column">
                       <input
@@ -2689,8 +2711,6 @@ function Guests({
                     </div>
                   </td>
                   <td className="guest-group-column" data-label={t("Grupo de invitación", "Invitation group", "Grupo do convite")}><span className="guest-group-cell"><strong>{guest.group || "—"}</strong><small>{t("Una invitación compartida", "One shared invitation", "Um convite compartilhado")}</small></span></td>
-                  <td className="guest-circle-column" data-label={t("Círculo social", "Social circle", "Círculo social")}><span className="guest-circle-cell">{guest.socialCircle || <em>{t("Sin asignar", "Unassigned", "Não atribuído")}</em>}</span></td>
-                  <td className="guest-seats-column" data-label={t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}>{(() => { const progress = seatProgress(guest, guests); return <span className="seat-progress"><strong>{progress.used}/{progress.total}</strong><small>{t("confirmados / cupos", "confirmed / seats", "confirmados / vagas")}</small></span>; })()}</td>
                   <td className="guest-status-column" data-label={t("Estado", "Status", "Status")}>
                     {canEdit && !guest.archivedAt ? (
                       <select
@@ -2719,8 +2739,36 @@ function Guests({
                       <Status value={guest.status} />
                     )}
                   </td>
-                  <td className="guest-secondary-column guest-follow-up-column" data-label={t("Seguimiento", "Tracking", "Acompanhamento")}>
-                    <div className="guest-follow-up"><span className={`delivery-status guest-delivery-status ${guest.whatsappStatus ? `is-${whatsappStatus(guest.whatsappStatus)[1]}` : guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
+                  <td className="guest-actions-column" data-label={t("Acciones", "Actions", "Ações")}>
+                    <div className="row-actions icon-actions">
+                      {canEdit && !guest.archivedAt && <button
+                        className="whatsapp-button"
+                        disabled={!guest.phone || updatingId === guest.id}
+                        onClick={() => setWhatsAppReviewGuest(guest)}
+                      >
+                        {updatingId === guest.id ? "…" : "WA"}
+                      </button>}
+                      {!guest.archivedAt && <>
+                        <details className="guest-more-menu">
+                          <summary aria-label={`${t("Más opciones para", "More options for", "Mais opções para")} ${guest.name}`} title={t("Más opciones", "More options", "Mais opções")}>•••</summary>
+                          <div>
+                            <button type="button" onClick={() => copyInviteLink(guest)}><span aria-hidden="true">{copiedId === guest.id ? "✓" : "⧉"}</span>{copiedId === guest.id ? t("Enlace copiado", "Link copied", "Link copiado") : t("Copiar enlace", "Copy link", "Copiar link")}</button>
+                            {canEdit && <button type="button" onClick={() => setEditingGuest(guest)}><span className="admin-action-icon is-edit" aria-hidden="true" />{t("Editar invitado", "Edit guest", "Editar convidado")}</button>}
+                            <button type="button" onClick={() => setInspectingGuest(guest)}><span aria-hidden="true">ⓘ</span>{t("Ver historial y datos", "View history and details", "Ver histórico e dados")}</button>
+                            {hasGuestRestriction(guest) && <div className="guest-menu-restrictions" role="group" aria-label={`${t("Restricciones y ubicación de", "Dietary needs and placement for", "Restrições e localização de")} ${guest.name}`}><strong>{t("Restricciones y ubicación", "Dietary needs and placement", "Restrições e localização")}</strong>{meaningfulGuestValue(guest.food) && <span>⚠ {guest.food}</span>}{guest.socialTogetherWith && <span>↔ {t("Junto a", "Together with", "Junto com")}: {guest.socialTogetherWith}</span>}{guest.socialSeparateFrom && <span>⇥ {t("Separado de", "Separate from", "Separado de")}: {guest.socialSeparateFrom}</span>}{guest.preferredTableName && <span>⌖ {t("Mesa preferida", "Preferred table", "Mesa preferida")}: {guest.preferredTableName}</span>}</div>}
+                            {canEdit && <button className="guest-menu-danger" type="button" onClick={() => setGuestArchived(guest, true)}><svg className="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" /></svg>{t("Archivar invitado", "Archive guest", "Arquivar convidado")}</button>}
+                          </div>
+                        </details>
+                      </>}
+                      {canEdit && guest.archivedAt && <button className="outline-button compact" onClick={() => setGuestArchived(guest, false)}>{t("Restaurar", "Restore", "Restaurar")}</button>}
+                      <button className="guest-expand-button" type="button" aria-expanded={isExpanded} aria-controls={`guest-details-${guest.id}`} onClick={() => setExpandedGuests((current) => current.includes(guest.id) ? current.filter((id) => id !== guest.id) : [...current, guest.id])}><span aria-hidden="true">⌄</span><span className="visually-hidden">{isExpanded ? t("Ocultar información", "Hide information", "Ocultar informações") : t("Mostrar más información", "Show more information", "Mostrar mais informações")}</span></button>
+                    </div>
+                  </td>
+                  <td className="guest-details-column" id={`guest-details-${guest.id}`}>
+                    <div className="guest-expanded-details">
+                      <div data-label={t("Círculo social", "Social circle", "Círculo social")}><span className="guest-circle-cell">{guest.socialCircle || <em>{t("Sin asignar", "Unassigned", "Não atribuído")}</em>}</span></div>
+                      <div data-label={t("Confirmados / cupos", "Confirmed / seats", "Confirmados / vagas")}><span className="seat-progress"><strong>{progress.used}/{progress.total}</strong><small>{t("confirmados / cupos", "confirmed / seats", "confirmados / vagas")}</small></span></div>
+                      <div className="guest-follow-up-detail" data-label={t("Seguimiento", "Tracking", "Acompanhamento")}><div className="guest-follow-up"><span className={`delivery-status guest-delivery-status ${guest.whatsappStatus ? `is-${whatsappStatus(guest.whatsappStatus)[1]}` : guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
                       <strong>{guest.whatsappStatus
                         ? whatsappStatus(guest.whatsappStatus)[0]
                         : guest.respondedAt
@@ -2735,60 +2783,11 @@ function Guests({
                       {guest.status === "Pendiente" && guest.reminded && <small className="guest-last-reminder">{t("Último recordatorio", "Last reminder", "Último lembrete")} · {reportDate(guest.reminded, language)}</small>}
                       {guest.reminderAttempts ? <small className="guest-last-reminder">{t(`Automáticos: ${guest.reminderAttempts}`, `Automatic: ${guest.reminderAttempts}`, `Automáticos: ${guest.reminderAttempts}`)}{guest.reminderLastStatus === "failed" ? t(" · último intento fallido", " · last attempt failed", " · última tentativa falhou") : ""}</small> : null}
                       <small className="guest-reminder-eligibility">{reminderEligibility(guest)}</small>
-                    </span>{guest.status === "Pendiente" && <button type="button" disabled={!guest.phone || updatingId === guest.id} onClick={() => setWhatsAppReviewGuest(guest)}>{!guest.phone ? t("Falta WhatsApp", "WhatsApp missing", "Falta WhatsApp") : guest.invitationOpenedAt ? t("Recordar respuesta", "Remind to respond", "Lembrar resposta") : guest.invitationSentAt ? t("Reenviar invitación", "Resend invitation", "Reenviar convite") : t("Enviar invitación", "Send invitation", "Enviar convite")}</button>}</div>
-                  </td>
-                  <td className="guest-actions-column" data-label={t("Acciones", "Actions", "Ações")}>
-                    <div className="row-actions icon-actions">
-                      {canEdit && !guest.archivedAt && <button
-                        className="whatsapp-button"
-                        disabled={!guest.phone || updatingId === guest.id}
-                        onClick={() => setWhatsAppReviewGuest(guest)}
-                      >
-                        {updatingId === guest.id ? "…" : "WA"}
-                      </button>}
-                      {!guest.archivedAt && <>
-                        <details className="guest-more-menu">
-                          <summary aria-label={`${t("Más opciones para", "More options for", "Mais opções para")} ${guest.name}`} title={t("Más opciones", "More options", "Mais opções")}>•••</summary>
-                          <div>
-                            <button type="button" onClick={() => copyInviteLink(guest)}>
-                              <span aria-hidden="true">{copiedId === guest.id ? "✓" : "⧉"}</span>
-                              {copiedId === guest.id ? t("Enlace copiado", "Link copied", "Link copiado") : t("Copiar enlace", "Copy link", "Copiar link")}
-                            </button>
-                            {canEdit && <button type="button" onClick={() => setEditingGuest(guest)}>
-                              <span className="admin-action-icon is-edit" aria-hidden="true" />
-                              {t("Editar invitado", "Edit guest", "Editar convidado")}
-                            </button>}
-                            <button type="button" onClick={() => setInspectingGuest(guest)}>
-                              <span aria-hidden="true">ⓘ</span>
-                              {t("Ver historial y datos", "View history and details", "Ver histórico e dados")}
-                            </button>
-                            {hasGuestRestriction(guest) && <div className="guest-menu-restrictions" role="group" aria-label={`${t("Restricciones y ubicación de", "Dietary needs and placement for", "Restrições e localização de")} ${guest.name}`}>
-                              <strong>{t("Restricciones y ubicación", "Dietary needs and placement", "Restrições e localização")}</strong>
-                              {meaningfulGuestValue(guest.food) && <span>⚠ {guest.food}</span>}
-                              {guest.socialTogetherWith && <span>↔ {t("Junto a", "Together with", "Junto com")}: {guest.socialTogetherWith}</span>}
-                              {guest.socialSeparateFrom && <span>⇥ {t("Separado de", "Separate from", "Separado de")}: {guest.socialSeparateFrom}</span>}
-                              {guest.preferredTableName && <span>⌖ {t("Mesa preferida", "Preferred table", "Mesa preferida")}: {guest.preferredTableName}</span>}
-                            </div>}
-                            {canEdit && <button
-                              className="guest-menu-danger"
-                              type="button"
-                              onClick={() => setGuestArchived(guest, true)}
-                            >
-                              <svg className="trash-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" /></svg>
-                              {t("Archivar invitado", "Archive guest", "Arquivar convidado")}
-                            </button>}
-                          </div>
-                        </details>
-                      </>}
-                      {canEdit && guest.archivedAt && (
-                        <button className="outline-button compact" onClick={() => setGuestArchived(guest, false)}>
-                          {t("Restaurar", "Restore", "Restaurar")}
-                        </button>
-                      )}
+                    </span>{guest.status === "Pendiente" && <button type="button" disabled={!guest.phone || updatingId === guest.id} onClick={() => setWhatsAppReviewGuest(guest)}>{!guest.phone ? t("Falta WhatsApp", "WhatsApp missing", "Falta WhatsApp") : guest.invitationOpenedAt ? t("Recordar respuesta", "Remind to respond", "Lembrar resposta") : guest.invitationSentAt ? t("Reenviar invitación", "Resend invitation", "Reenviar convite") : t("Enviar invitación", "Send invitation", "Enviar convite")}</button>}</div></div>
                     </div>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
@@ -7859,31 +7858,104 @@ function CommunicationsModule({
 }) {
   const { text: t, locale } = useAdminI18n();
   const [query, setQuery] = useState("");
-  const [kind, setKind] = useState<"reminder" | "notice" | "thanks">("reminder");
+  const [kind, setKind] = useState<"invite" | "reminder" | "notice" | "thanks">("invite");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const honoree = order.customerName;
-  const message =
-    "Hola {{nombre}}.\n\n{{asistencia}}\n\nCon cariño, {{homenajeado}}.{{cuenta}}";
+  const message = "Hola {{nombre}}.\n\n{{asistencia}}{{cuenta}}{{cierre}}";
+  const [inviteText, setInviteText] = useState("Queremos invitarte a compartir este momento con nosotros. Encontrá todos los detalles y confirmá tu asistencia en tu invitación personal.");
   const [thankText, setThankText] = useState(
     "Muchas gracias por haber compartido este maravilloso momento con nosotros. Fue muy especial celebrarlo juntos.",
   );
   const [reminderText, setReminderText] = useState("Falta poco para el evento. Si todavía no confirmaste, podés responder desde tu invitación.");
   const [noticeText, setNoticeText] = useState("Tenemos una novedad importante sobre el evento. Por favor, revisá esta información.");
+  const [closing, setClosing] = useState(`Con cariño,\n${honoree}.`);
+  const [extraContent, setExtraContent] = useState<"none" | "image" | "html">("none");
+  const [imageUrl, setImageUrl] = useState("");
+  const [htmlContent, setHtmlContent] = useState("");
   const [bankDetails, setBankDetails] = useState(order.giftDetails);
   const [sendingId, setSendingId] = useState("");
   const [error, setError] = useState("");
-  const eligibleGuests = guests.filter((guest) => kind !== "reminder" || guest.status === "Pendiente");
+  const [scheduledAt, setScheduledAt] = useState("");
+  const [history, setHistory] = useState<CommunicationHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [scheduling, setScheduling] = useState(false);
+  const [activeScheduleId, setActiveScheduleId] = useState("");
+  const [historyKindFilter, setHistoryKindFilter] = useState<"all" | CommunicationHistoryItem["kind"]>("all");
+  const [historyStatusFilter, setHistoryStatusFilter] = useState<"all" | CommunicationHistoryItem["status"]>("all");
+  const [historyDateFilter, setHistoryDateFilter] = useState("");
+  const isEligible = (guest: Guest) => {
+    if (!guest.phone) return false;
+    if (kind === "invite") return guest.status === "Pendiente" && !guest.invitationSentAt;
+    if (kind === "reminder") return guest.status === "Pendiente" && Boolean(guest.invitationSentAt);
+    if (kind === "thanks") return guest.status === "Confirmado";
+    return true;
+  };
+  const eligibleGuests = guests.filter(isEligible);
   const visibleGuests = eligibleGuests.filter((guest) =>
     `${guest.name} ${guest.group} ${guest.socialCircle}`.toLowerCase().includes(query.toLowerCase()),
   );
   const previewName = visibleGuests[0]?.name || t("María", "Mary", "Maria");
-  const thanksPreview = (body: string) => `Hola ${previewName}.\n\n${body}\n\nCon cariño, ${honoree}.${bankDetails ? `\n\nSi querés hacerme un regalo, te dejo mis datos:\n${bankDetails}` : ""}`;
+  const plainHtml = htmlContent.replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/&amp;/gi, "&").replace(/\s+/g, " ").trim();
+  const extraPreview = extraContent === "image" && imageUrl.trim() ? `\n\nImagen: ${imageUrl.trim()}` : extraContent === "html" && plainHtml ? `\n\n${plainHtml}` : "";
+  const thanksPreview = (body: string) => `Hola ${previewName}.\n\n${body}${bankDetails ? `\n\nSi querés hacerme un regalo, te dejo mis datos:\n${bankDetails}` : ""}\n\n${closing}${extraPreview}`;
+
+  const loadHistory = useCallback(async () => {
+    setHistoryLoading(true);
+    try {
+      const response = await fetch("/api/admin/communications");
+      const result = await readApiJson<{ history?: CommunicationHistoryItem[]; error?: string }>(response, t("No pudimos cargar el historial.", "We couldn't load the history.", "Não foi possível carregar o histórico."));
+      if (!response.ok) throw new Error(result.error);
+      setHistory(result.history || []);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause));
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => { void loadHistory(); }, [loadHistory]);
 
   useEffect(() => { setSelectedIds([]); setError(""); }, [kind]);
-  const messageFor = () => kind === "reminder" ? reminderText : kind === "notice" ? noticeText : thankText;
+  const messageFor = () => kind === "invite" ? inviteText : kind === "reminder" ? reminderText : kind === "notice" ? noticeText : thankText;
   const preview = kind === "thanks"
     ? thanksPreview(thankText)
-    : `Hola ${previewName}.\n\n${messageFor()}${kind === "reminder" ? `\n\n${t("Confirmá tu asistencia desde el enlace personal de tu invitación.", "Confirm your attendance from your personal invitation link.", "Confirme sua presença pelo link pessoal do convite.")}` : ""}`;
+    : `Hola ${previewName}.\n\n${messageFor()}${kind === "invite" || kind === "reminder" ? `\n\n${t("Abrí tu invitación personal y confirmá tu asistencia desde el enlace.", "Open your personal invitation and confirm from the link.", "Abra seu convite pessoal e confirme pelo link.")}` : ""}\n\n${closing}${extraPreview}`;
+
+  const scheduleCommunication = async () => {
+    if (!selectedIds.length || !scheduledAt) return;
+    setScheduling(true); setError("");
+    try {
+      const response = await fetch("/api/admin/communications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+        kind, recipientIds: selectedIds, scheduledAt, message: messageFor(), closing, extraContent, imageUrl, htmlContent,
+        title: kind === "invite" ? t("Invitación", "Invitation", "Convite") : kind === "reminder" ? t("Recordatorio de confirmación", "RSVP reminder", "Lembrete de confirmação") : kind === "notice" ? t("Aviso del evento", "Event notice", "Aviso do evento") : t("Agradecimiento", "Thank-you", "Agradecimento"),
+      }) });
+      const result = await readApiJson<{ error?: string }>(response, t("No pudimos programar la comunicación.", "We couldn't schedule the communication.", "Não foi possível programar a comunicação."));
+      if (!response.ok) throw new Error(result.error);
+      setScheduledAt(""); setSelectedIds([]); setActiveScheduleId(""); await loadHistory();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)); }
+    finally { setScheduling(false); }
+  };
+
+  const cancelSchedule = async (scheduleId: string) => {
+    try {
+      const response = await fetch("/api/admin/communications", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ scheduleId }) });
+      const result = await readApiJson<{ error?: string }>(response, t("No pudimos cancelar la programación.", "We couldn't cancel the schedule.", "Não foi possível cancelar a programação."));
+      if (!response.ok) throw new Error(result.error);
+      await loadHistory();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)); }
+  };
+
+  const loadScheduledCommunication = (item: CommunicationHistoryItem, duplicate = false) => {
+    setKind(item.kind);
+    const eligibleIds = new Set(guests.filter((guest) => guest.phone && (item.kind === "invite" ? guest.status === "Pendiente" && !guest.invitationSentAt : item.kind === "reminder" ? guest.status === "Pendiente" && Boolean(guest.invitationSentAt) : item.kind === "thanks" ? guest.status === "Confirmado" : true)).map((guest) => guest.id));
+    setSelectedIds((item.recipientIds || []).filter((id) => eligibleIds.has(id)));
+    if (item.message) item.kind === "invite" ? setInviteText(item.message) : item.kind === "reminder" ? setReminderText(item.message) : item.kind === "notice" ? setNoticeText(item.message) : setThankText(item.message);
+    if (item.closing) setClosing(item.closing);
+    setExtraContent(item.extraContent || "none"); setImageUrl(item.imageUrl || ""); setHtmlContent(item.htmlContent || "");
+    setActiveScheduleId(duplicate ? "" : item.id);
+    if (duplicate) setScheduledAt("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const prepareCommunication = async (guest: Guest) => {
     setSendingId(guest.id);
@@ -7893,7 +7965,7 @@ function CommunicationsModule({
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: kind === "thanks" ? "thank-you" : kind === "reminder" ? "remind" : "communication",
+          action: kind === "thanks" ? "thank-you" : kind === "reminder" ? "remind" : kind === "invite" ? "invite" : "communication",
           id: guest.id,
           honoree,
           message,
@@ -7903,6 +7975,11 @@ function CommunicationsModule({
           communicationTitle: t("Aviso del evento", "Event notice", "Aviso do evento"),
           ...(kind !== "thanks" ? { message: messageFor() } : {}),
           bankDetails,
+          closing,
+          extraContent,
+          imageUrl: extraContent === "image" ? imageUrl : "",
+          htmlContent: extraContent === "html" ? htmlContent : "",
+          scheduleId: activeScheduleId,
         }),
       });
       const result = (await response.json()) as { guest?: Guest; url?: string; mode?: string; error?: string };
@@ -7910,12 +7987,32 @@ function CommunicationsModule({
         throw new Error(result.error || t("No pudimos preparar la comunicación.", "We couldn't prepare the communication.", "Não foi possível preparar a comunicação."));
       setGuests((current) => current.map((item) => item.id === guest.id ? result.guest! : item));
       if (result.url) window.open(result.url, "_blank", "noopener,noreferrer");
+      return true;
     } catch (sendError) {
-      setError(sendError instanceof Error ? sendError.message : t("No pudimos preparar la comunicación.", "We couldn't prepare the communication.", "Não foi possível preparar a comunicação."));
+      const failure = sendError instanceof Error ? sendError.message : t("No pudimos preparar la comunicación.", "We couldn't prepare the communication.", "Não foi possível preparar a comunicação.");
+      setError(failure);
+      if (activeScheduleId) void fetch("/api/admin/communications", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "failed", scheduleId: activeScheduleId, guestId: guest.id, error: failure }) }).then(loadHistory);
+      return false;
     } finally {
       setSendingId("");
     }
   };
+
+  const prepareNextSelected = async () => {
+    const next = visibleGuests.find((guest) => selectedIds.includes(guest.id));
+    if (!next) return;
+    if (await prepareCommunication(next)) {
+      const remaining = selectedIds.filter((id) => id !== next.id);
+      setSelectedIds(remaining);
+      if (!remaining.length) setActiveScheduleId("");
+      await loadHistory();
+    }
+  };
+  const filteredHistory = history.filter((item) =>
+    (historyKindFilter === "all" || item.kind === historyKindFilter)
+    && (historyStatusFilter === "all" || item.status === historyStatusFilter)
+    && (!historyDateFilter || (item.scheduledAt || item.createdAt).slice(0, 10) === historyDateFilter),
+  );
 
   return (
     <>
@@ -7927,25 +8024,41 @@ function CommunicationsModule({
         </div>
       </div>
       <div className="communication-kind-tabs" role="tablist" aria-label={t("Tipo de comunicación", "Communication type", "Tipo de comunicação")}>
-        <button className={kind === "reminder" ? "active" : ""} onClick={() => setKind("reminder")}><span>◷</span><strong>{t("Recordar confirmación", "RSVP reminder", "Lembrar confirmação")}</strong><small>{t("Sólo personas pendientes", "Pending guests only", "Somente pendentes")}</small></button>
-        <button className={kind === "notice" ? "active" : ""} onClick={() => setKind("notice")}><span>!</span><strong>{t("Aviso del evento", "Event notice", "Aviso do evento")}</strong><small>{t("Cambios o información de último momento", "Changes or last-minute information", "Mudanças ou informações de última hora")}</small></button>
-        <button className={kind === "thanks" ? "active" : ""} onClick={() => setKind("thanks")}><span>♡</span><strong>{t("Agradecer", "Send thanks", "Agradecer")}</strong><small>{t("Después del evento", "After the event", "Depois do evento")}</small></button>
+        <button className={kind === "invite" ? "active" : ""} onClick={() => setKind("invite")}><span><img src="/icons/communications/send.png" alt="" /></span><strong>{t("Enviar invitación", "Send invitation", "Enviar convite")}</strong><small>{t("Primer contacto y enlace personal", "First contact and personal link", "Primeiro contato e link pessoal")}</small></button>
+        <button className={kind === "reminder" ? "active" : ""} onClick={() => setKind("reminder")}><span><img src="/icons/communications/reminder.png" alt="" /></span><strong>{t("Recordar confirmación", "RSVP reminder", "Lembrar confirmação")}</strong><small>{t("Sólo personas pendientes", "Pending guests only", "Somente pendentes")}</small></button>
+        <button className={kind === "notice" ? "active" : ""} onClick={() => setKind("notice")}><span><img src="/icons/communications/notice.png" alt="" /></span><strong>{t("Aviso del evento", "Event notice", "Aviso do evento")}</strong><small>{t("Cambios o información de último momento", "Changes or last-minute information", "Mudanças ou informações de última hora")}</small></button>
+        <button className={kind === "thanks" ? "active" : ""} onClick={() => setKind("thanks")}><span><img src="/icons/communications/thanks.png" alt="" /></span><strong>{t("Agradecer", "Send thanks", "Agradecer")}</strong><small>{t("Después del evento", "After the event", "Depois do evento")}</small></button>
+      </div>
+      <div className="communication-audience-summary" role="status">
+        <div><strong>{eligibleGuests.length}</strong><span>{kind === "invite" ? t("invitaciones pendientes de envío", "invitations ready to send", "convites pendentes de envio") : kind === "reminder" ? t("personas pendientes que ya recibieron su invitación", "pending guests who already received an invitation", "pendentes que já receberam o convite") : kind === "thanks" ? t("personas confirmadas para agradecer", "confirmed guests ready for a thank-you", "confirmados para agradecer") : t("personas disponibles para este aviso", "people available for this notice", "pessoas disponíveis para este aviso")}</span></div>
+        <small>{kind === "invite" ? t("No incluye invitaciones ya preparadas ni personas que respondieron.", "Excludes prepared invitations and guests who already responded.", "Não inclui convites já preparados nem pessoas que responderam.") : kind === "reminder" ? t("No vuelve a contactar a quienes ya confirmaron o rechazaron.", "Does not contact guests who already confirmed or declined.", "Não contata quem já confirmou ou recusou.") : kind === "thanks" ? t("El agradecimiento se dirige únicamente a quienes confirmaron asistencia.", "Thank-yous are limited to confirmed attendees.", "O agradecimento é enviado somente a quem confirmou presença.") : t("El aviso puede enviarse a cualquier invitado con WhatsApp.", "The notice can be sent to any guest with WhatsApp.", "O aviso pode ser enviado a qualquer convidado com WhatsApp.")}</small>
       </div>
       <section className="panel thanks-composer communication-composer">
-        <div className="panel-title"><div><h2>{kind === "reminder" ? t("Preparar recordatorio", "Prepare reminder", "Preparar lembrete") : kind === "notice" ? t("Preparar aviso", "Prepare notice", "Preparar aviso") : t("Preparar agradecimiento", "Prepare thank-you", "Preparar agradecimento")}</h2><p>{t("Revisá el texto y elegí abajo quiénes deben recibirlo.", "Review the text and choose the recipients below.", "Revise o texto e escolha os destinatários abaixo.")}</p></div></div>
+        <div className="panel-title"><div><h2>{kind === "invite" ? t("Preparar invitación", "Prepare invitation", "Preparar convite") : kind === "reminder" ? t("Preparar recordatorio", "Prepare reminder", "Preparar lembrete") : kind === "notice" ? t("Preparar aviso", "Prepare notice", "Preparar aviso") : t("Preparar agradecimiento", "Prepare thank-you", "Preparar agradecimento")}</h2><p>{t("Revisá el texto y elegí abajo quiénes deben recibirlo.", "Review the text and choose the recipients below.", "Revise o texto e escolha os destinatários abaixo.")}</p></div></div>
         <div className="message-composer-body">
-          <label>{t("Mensaje", "Message", "Mensagem")}<textarea rows={3} value={messageFor()} onChange={(event) => kind === "reminder" ? setReminderText(event.target.value) : kind === "notice" ? setNoticeText(event.target.value) : setThankText(event.target.value)} /></label>
+          <div className="communication-fields"><label>{t("Mensaje", "Message", "Mensagem")}<textarea rows={4} value={messageFor()} onChange={(event) => kind === "invite" ? setInviteText(event.target.value) : kind === "reminder" ? setReminderText(event.target.value) : kind === "notice" ? setNoticeText(event.target.value) : setThankText(event.target.value)} /></label>
+          <label>{t("Despedida o firma", "Closing or signature", "Despedida ou assinatura")}<textarea rows={2} value={closing} onChange={(event) => setClosing(event.target.value)} placeholder={t("Ej. Con cariño, Juanita.", "E.g. With love, Juanita.", "Ex. Com carinho, Juanita.")} /></label>
           {kind === "thanks" && <label>{t("Datos de la cuenta (opcional)", "Account details (optional)", "Dados da conta (opcional)")}<textarea rows={3} value={bankDetails} onChange={(event) => setBankDetails(event.target.value)} placeholder={t("Sólo se agregarán si completás este campo", "Only included when this field is completed", "Incluídos somente se este campo for preenchido")} /></label>}
+          <fieldset className="communication-extra"><legend>{t("Contenido adicional (opcional)", "Additional content (optional)", "Conteúdo adicional (opcional)")}</legend><div className="communication-extra-options"><button type="button" className={extraContent === "none" ? "active" : ""} onClick={() => setExtraContent("none")}>{t("Ninguno", "None", "Nenhum")}</button><button type="button" className={extraContent === "image" ? "active" : ""} onClick={() => setExtraContent("image")}>{t("Imagen", "Image", "Imagem")}</button><button type="button" className={extraContent === "html" ? "active" : ""} onClick={() => setExtraContent("html")}>HTML</button></div>{extraContent === "image" && <label>{t("URL pública de la imagen", "Public image URL", "URL pública da imagem")}<input type="url" value={imageUrl} onChange={(event) => setImageUrl(event.target.value)} placeholder="https://…" />{imageUrl && <img className="communication-image-preview" src={imageUrl} alt={t("Vista previa de la imagen", "Image preview", "Prévia da imagem")} />}</label>}{extraContent === "html" && <label>HTML<textarea rows={5} value={htmlContent} onChange={(event) => setHtmlContent(event.target.value)} placeholder="<p>…</p>" /><small>{t("Se muestra de forma segura aquí y, para WhatsApp, se convierte a texto legible.", "It is safely previewed here and converted to readable text for WhatsApp.", "É exibido com segurança aqui e convertido em texto para o WhatsApp.")}</small>{htmlContent && <iframe className="communication-html-preview" sandbox="" srcDoc={htmlContent} title={t("Vista previa HTML", "HTML preview", "Prévia HTML")} />}</label>}</fieldset></div>
           <div className="message-preview"><span>{t("Vista previa personalizada", "Personalized preview", "Prévia personalizada")}</span><p>{preview}</p></div>
         </div>
       </section>
       <section className="panel table-panel">
-        <div className="table-tools communication-tools"><label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar por invitado, grupo o círculo…", "Search guest, group or circle…", "Buscar convidado, grupo ou círculo…")} /></label><button className="outline-button compact" onClick={() => setSelectedIds(visibleGuests.filter((guest) => guest.phone).map((guest) => guest.id))}>{t("Seleccionar visibles", "Select visible", "Selecionar visíveis")}</button><span><strong>{selectedIds.length}</strong> {t("seleccionados", "selected", "selecionados")}</span></div>
+        <div className="table-tools communication-tools"><label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Buscar por invitado, grupo o círculo…", "Search guest, group or circle…", "Buscar convidado, grupo ou círculo…")} /></label><button className="outline-button compact" onClick={() => setSelectedIds(visibleGuests.map((guest) => guest.id))}>{t("Seleccionar visibles", "Select visible", "Selecionar visíveis")}</button><span><strong>{selectedIds.length}</strong> {t("seleccionados", "selected", "selecionados")}</span></div>
         <div className="table-scroll"><table className="communications-table"><thead><tr><th className="checkbox-cell"><input type="checkbox" checked={visibleGuests.length > 0 && visibleGuests.every((guest) => selectedIds.includes(guest.id))} onChange={(event) => setSelectedIds(event.target.checked ? visibleGuests.filter((guest) => guest.phone).map((guest) => guest.id) : [])} /></th><th>{t("Invitado", "Guest", "Convidado")}</th><th>{t("Grupo", "Group", "Grupo")}</th><th>{t("Círculo", "Circle", "Círculo")}</th><th>{t("Asistencia", "Attendance", "Presença")}</th><th>{t("Última comunicación", "Latest communication", "Última comunicação")}</th><th>{t("Acción", "Action", "Ação")}</th></tr></thead>
           <tbody>{visibleGuests.map((guest) => <tr key={guest.id}><td className="checkbox-cell"><input type="checkbox" disabled={!guest.phone} checked={selectedIds.includes(guest.id)} onChange={(event) => setSelectedIds((current) => event.target.checked ? [...new Set([...current, guest.id])] : current.filter((id) => id !== guest.id))} /></td><td data-label={t("Invitado", "Guest", "Convidado")}><div className="person"><GuestAvatar guest={guest} /><p><GuestNameButton guest={guest} /><small>{guest.phone || t("Sin WhatsApp", "No WhatsApp", "Sem WhatsApp")}</small></p></div></td><td data-label={t("Grupo", "Group", "Grupo")}><strong>{guest.group || "—"}</strong></td><td data-label={t("Círculo", "Circle", "Círculo")}><span>{guest.socialCircle || t("Sin círculo", "No circle", "Sem círculo")}</span></td><td data-label={t("Asistencia", "Attendance", "Presença")}><Status value={guest.status} /></td><td data-label={t("Última comunicación", "Latest communication", "Última comunicação")}>{kind === "thanks" && guest.thankedAt ? <span className="status status-confirmado">{t("Agradecido", "Thanked", "Agradecido")} · {reportDate(guest.thankedAt, locale)}</span> : kind === "reminder" && guest.reminded !== "—" ? <span className="status status-confirmado">{t("Recordado", "Reminded", "Lembrado")} · {reportDate(guest.reminded, locale)}</span> : <span className="muted">{t("Sin registrar", "Not recorded", "Sem registro")}</span>}</td><td data-label={t("Acción", "Action", "Ação")}>{canEdit ? <button className="whatsapp-button" disabled={!guest.phone || sendingId === guest.id} onClick={() => prepareCommunication(guest)}>{sendingId === guest.id ? t("Preparando…", "Preparing…", "Preparando…") : "WA"}</button> : <span className="muted">{t("Solo lectura", "View only", "Somente leitura")}</span>}</td></tr>)}</tbody>
         </table></div>
-        {canEdit && selectedIds.length > 0 && <div className="communication-selection-bar"><div><strong>{selectedIds.length} {t("destinatarios listos", "recipients ready", "destinatários prontos")}</strong><small>{t("WhatsApp abrirá el mensaje personalizado del primer seleccionado. Al volver, continuá con el siguiente.", "WhatsApp will open the personalized message for the first selection. Return to continue with the next.", "O WhatsApp abrirá a mensagem personalizada do primeiro selecionado. Volte para continuar.")}</small></div><button className="primary-button small" disabled={Boolean(sendingId)} onClick={() => { const next = visibleGuests.find((guest) => selectedIds.includes(guest.id)); if (next) { void prepareCommunication(next); setSelectedIds((current) => current.filter((id) => id !== next.id)); } }}>{t("Preparar siguiente", "Prepare next", "Preparar próximo")}</button><button className="outline-button compact" onClick={() => setSelectedIds([])}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
+        {canEdit && selectedIds.length > 0 && <div className="communication-selection-bar"><div><strong>{selectedIds.length} {t("destinatarios listos", "recipients ready", "destinatários prontos")}</strong><small>{t("Podés preparar el envío ahora o dejar esta selección programada para más adelante.", "Prepare it now or schedule this selection for later.", "Prepare agora ou programe esta seleção para mais tarde.")}</small></div><label className="communication-schedule-input"><span>{t("Fecha y hora", "Date and time", "Data e hora")}</span><input type="datetime-local" value={scheduledAt} min={new Date(Date.now() + 60000).toISOString().slice(0, 16)} onChange={(event) => setScheduledAt(event.target.value)} /></label><button className="outline-button compact" disabled={!scheduledAt || scheduling} onClick={() => void scheduleCommunication()}>{scheduling ? t("Programando…", "Scheduling…", "Programando…") : t("Programar", "Schedule", "Programar")}</button><button className="primary-button small" disabled={Boolean(sendingId)} onClick={() => void prepareNextSelected()}>{t("Preparar siguiente", "Prepare next", "Preparar próximo")}</button><button className="outline-button compact" onClick={() => { setSelectedIds([]); setActiveScheduleId(""); }}>{t("Cancelar", "Cancel", "Cancelar")}</button></div>}
         {error && <p className="table-error" role="alert">{error}</p>}
+      </section>
+      <section className="panel communication-history-panel">
+        <div className="panel-title"><div><h2>{t("Historial unificado", "Unified history", "Histórico unificado")}</h2><p>{t("Invitaciones, recordatorios, avisos y agradecimientos preparados o programados.", "Invitations, reminders, notices and thank-yous that were prepared or scheduled.", "Convites, lembretes, avisos e agradecimentos preparados ou programados.")}</p></div><button className="outline-button compact" onClick={() => void loadHistory()}>{t("Actualizar", "Refresh", "Atualizar")}</button></div>
+        <div className="communication-history-filters"><label>{t("Tipo", "Type", "Tipo")}<select value={historyKindFilter} onChange={(event) => setHistoryKindFilter(event.target.value as typeof historyKindFilter)}><option value="all">{t("Todos", "All", "Todos")}</option><option value="invite">{t("Invitación", "Invitation", "Convite")}</option><option value="reminder">{t("Recordatorio", "Reminder", "Lembrete")}</option><option value="notice">{t("Aviso", "Notice", "Aviso")}</option><option value="thanks">{t("Agradecimiento", "Thank-you", "Agradecimento")}</option></select></label><label>{t("Estado", "Status", "Status")}<select value={historyStatusFilter} onChange={(event) => setHistoryStatusFilter(event.target.value as typeof historyStatusFilter)}><option value="all">{t("Todos", "All", "Todos")}</option><option value="scheduled">{t("Programada", "Scheduled", "Programada")}</option><option value="ready">{t("Lista", "Ready", "Pronta")}</option><option value="completed">{t("Completada", "Completed", "Concluída")}</option><option value="cancelled">{t("Cancelada", "Cancelled", "Cancelada")}</option><option value="prepared">{t("Preparada", "Prepared", "Preparada")}</option><option value="failed">{t("Falló", "Failed", "Falhou")}</option></select></label><label>{t("Fecha", "Date", "Data")}<input type="date" value={historyDateFilter} onChange={(event) => setHistoryDateFilter(event.target.value)} /></label><button className="text-button" type="button" onClick={() => { setHistoryKindFilter("all"); setHistoryStatusFilter("all"); setHistoryDateFilter(""); }}>{t("Limpiar", "Clear", "Limpar")}</button></div>
+        {historyLoading ? <p className="communication-history-empty">{t("Cargando historial…", "Loading history…", "Carregando histórico…")}</p> : filteredHistory.length === 0 ? <p className="communication-history-empty">{t("No hay comunicaciones para estos filtros.", "No communications match these filters.", "Não há comunicações para estes filtros.")}</p> : <div className="communication-history-list">{filteredHistory.map((item) => {
+          const kindLabel = item.kind === "invite" ? t("Invitación", "Invitation", "Convite") : item.kind === "reminder" ? t("Recordatorio", "Reminder", "Lembrete") : item.kind === "notice" ? t("Aviso", "Notice", "Aviso") : t("Agradecimiento", "Thank-you", "Agradecimento");
+          const statusLabel = item.status === "scheduled" ? t("Programada", "Scheduled", "Programada") : item.status === "ready" ? t("Lista para preparar", "Ready to prepare", "Pronta para preparar") : item.status === "completed" ? t("Completada", "Completed", "Concluída") : item.status === "cancelled" ? t("Cancelada", "Cancelled", "Cancelada") : item.status === "failed" ? t("Falló", "Failed", "Falhou") : t("Preparada", "Prepared", "Preparada");
+          return <article className={`communication-history-item status-${item.status}`} key={item.id}><div className="communication-history-kind"><strong>{kindLabel}</strong><span>{statusLabel}</span></div><div><strong>{item.recipientCount || 1} {t("destinatarios", "recipients", "destinatários")}</strong><small>{item.scheduledAt ? `${t("Programada para", "Scheduled for", "Programada para")} ${reportDate(item.scheduledAt, locale)}` : `${t("Registrada", "Recorded", "Registrada")} ${reportDate(item.createdAt, locale)}`}</small>{item.action === "communication.scheduled" && <div className="communication-history-progress"><span><b>{item.preparedCount}</b> {t("preparados", "prepared", "preparados")}</span><span><b>{item.pendingCount}</b> {t("pendientes", "pending", "pendentes")}</span><span className={item.failedCount ? "has-failures" : ""}><b>{item.failedCount || 0}</b> {t("fallidos", "failed", "falhos")}</span><progress max={item.recipientCount || 1} value={item.preparedCount} /></div>}</div>{item.action === "communication.scheduled" && <div className="communication-history-actions"><button className="outline-button compact" onClick={() => loadScheduledCommunication(item)}>{t("Cargar", "Load", "Carregar")}</button><button className="outline-button compact" onClick={() => loadScheduledCommunication(item, true)}>{t("Duplicar", "Duplicate", "Duplicar")}</button>{item.status !== "cancelled" && item.status !== "completed" && <button className="text-button danger" onClick={() => void cancelSchedule(item.id)}>{t("Cancelar", "Cancel", "Cancelar")}</button>}</div>}</article>;
+        })}</div>}
       </section>
     </>
   );
