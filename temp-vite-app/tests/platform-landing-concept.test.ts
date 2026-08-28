@@ -20,6 +20,15 @@ test('todos los accesos del menú comparten alineación vertical', () => {
   assert.match(styles, /\.concept-nav nav>a,\.concept-nav nav>button\{display:inline-flex;align-items:center;justify-content:center;line-height:1;margin:0\}/);
 });
 
+test('el menú superior conserva sólo los accesos principales sin duplicar acciones', () => {
+  const principalNav = landing.match(/<nav className=\{menuOpen[\s\S]*?<\/nav>/)?.[0] ?? '';
+  assert.match(principalNav, /Cómo funciona/);
+  assert.match(principalNav, /Invitaciones/);
+  assert.match(principalNav, /Planes/);
+  assert.match(principalNav, /Preguntas/);
+  assert.doesNotMatch(principalNav, /Para quién es|Consultar pedido|Probar la plataforma|>Ingresar</);
+});
+
 test('la segunda sección combina beneficios con una muestra de organización', () => {
   assert.match(landing, /concept-event-overview/);
   assert.match(landing, /ORGANIZACIÓN DEL EVENTO/);
