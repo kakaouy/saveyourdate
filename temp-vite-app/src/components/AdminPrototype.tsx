@@ -104,6 +104,7 @@ type CommunicationHistoryItem = {
   recipientCount: number;
   preparedCount: number;
   failedCount: number;
+  skippedCount: number;
   pendingCount: number;
   recipientIds?: string[];
   scheduledAt: string;
@@ -115,6 +116,7 @@ type CommunicationHistoryItem = {
   extraContent?: "none" | "image" | "html";
   imageUrl?: string;
   htmlContent?: string;
+  bankDetails?: string;
 };
 
 const guestImportFields = [
@@ -7926,7 +7928,7 @@ function CommunicationsModule({
     setScheduling(true); setError("");
     try {
       const response = await fetch("/api/admin/communications", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-        kind, recipientIds: selectedIds, scheduledAt, message: messageFor(), closing, extraContent, imageUrl, htmlContent,
+        kind, recipientIds: selectedIds, scheduledAt, message: messageFor(), closing, extraContent, imageUrl, htmlContent, bankDetails,
         title: kind === "invite" ? t("Invitación", "Invitation", "Convite") : kind === "reminder" ? t("Recordatorio de confirmación", "RSVP reminder", "Lembrete de confirmação") : kind === "notice" ? t("Aviso del evento", "Event notice", "Aviso do evento") : t("Agradecimiento", "Thank-you", "Agradecimento"),
       }) });
       const result = await readApiJson<{ error?: string }>(response, t("No pudimos programar la comunicación.", "We couldn't schedule the communication.", "Não foi possível programar a comunicação."));
@@ -7949,9 +7951,15 @@ function CommunicationsModule({
     setKind(item.kind);
     const eligibleIds = new Set(guests.filter((guest) => guest.phone && (item.kind === "invite" ? guest.status === "Pendiente" && !guest.invitationSentAt : item.kind === "reminder" ? guest.status === "Pendiente" && Boolean(guest.invitationSentAt) : item.kind === "thanks" ? guest.status === "Confirmado" : true)).map((guest) => guest.id));
     setSelectedIds((item.recipientIds || []).filter((id) => eligibleIds.has(id)));
-    if (item.message) item.kind === "invite" ? setInviteText(item.message) : item.kind === "reminder" ? setReminderText(item.message) : item.kind === "notice" ? setNoticeText(item.message) : setThankText(item.message);
+    if (item.message) {
+      if (item.kind === "invite") setInviteText(item.message);
+      else if (item.kind === "reminder") setReminderText(item.message);
+      else if (item.kind === "notice") setNoticeText(item.message);
+      else setThankText(item.message);
+    }
     if (item.closing) setClosing(item.closing);
     setExtraContent(item.extraContent || "none"); setImageUrl(item.imageUrl || ""); setHtmlContent(item.htmlContent || "");
+    setBankDetails(item.bankDetails || "");
     setActiveScheduleId(duplicate ? "" : item.id);
     if (duplicate) setScheduledAt("");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -8056,8 +8064,8 @@ function CommunicationsModule({
         <div className="communication-history-filters"><label>{t("Tipo", "Type", "Tipo")}<select value={historyKindFilter} onChange={(event) => setHistoryKindFilter(event.target.value as typeof historyKindFilter)}><option value="all">{t("Todos", "All", "Todos")}</option><option value="invite">{t("Invitación", "Invitation", "Convite")}</option><option value="reminder">{t("Recordatorio", "Reminder", "Lembrete")}</option><option value="notice">{t("Aviso", "Notice", "Aviso")}</option><option value="thanks">{t("Agradecimiento", "Thank-you", "Agradecimento")}</option></select></label><label>{t("Estado", "Status", "Status")}<select value={historyStatusFilter} onChange={(event) => setHistoryStatusFilter(event.target.value as typeof historyStatusFilter)}><option value="all">{t("Todos", "All", "Todos")}</option><option value="scheduled">{t("Programada", "Scheduled", "Programada")}</option><option value="ready">{t("Lista", "Ready", "Pronta")}</option><option value="completed">{t("Completada", "Completed", "Concluída")}</option><option value="cancelled">{t("Cancelada", "Cancelled", "Cancelada")}</option><option value="prepared">{t("Preparada", "Prepared", "Preparada")}</option><option value="failed">{t("Falló", "Failed", "Falhou")}</option></select></label><label>{t("Fecha", "Date", "Data")}<input type="date" value={historyDateFilter} onChange={(event) => setHistoryDateFilter(event.target.value)} /></label><button className="text-button" type="button" onClick={() => { setHistoryKindFilter("all"); setHistoryStatusFilter("all"); setHistoryDateFilter(""); }}>{t("Limpiar", "Clear", "Limpar")}</button></div>
         {historyLoading ? <p className="communication-history-empty">{t("Cargando historial…", "Loading history…", "Carregando histórico…")}</p> : filteredHistory.length === 0 ? <p className="communication-history-empty">{t("No hay comunicaciones para estos filtros.", "No communications match these filters.", "Não há comunicações para estes filtros.")}</p> : <div className="communication-history-list">{filteredHistory.map((item) => {
           const kindLabel = item.kind === "invite" ? t("Invitación", "Invitation", "Convite") : item.kind === "reminder" ? t("Recordatorio", "Reminder", "Lembrete") : item.kind === "notice" ? t("Aviso", "Notice", "Aviso") : t("Agradecimiento", "Thank-you", "Agradecimento");
-          const statusLabel = item.status === "scheduled" ? t("Programada", "Scheduled", "Programada") : item.status === "ready" ? t("Lista para preparar", "Ready to prepare", "Pronta para preparar") : item.status === "completed" ? t("Completada", "Completed", "Concluída") : item.status === "cancelled" ? t("Cancelada", "Cancelled", "Cancelada") : item.status === "failed" ? t("Falló", "Failed", "Falhou") : t("Preparada", "Prepared", "Preparada");
-          return <article className={`communication-history-item status-${item.status}`} key={item.id}><div className="communication-history-kind"><strong>{kindLabel}</strong><span>{statusLabel}</span></div><div><strong>{item.recipientCount || 1} {t("destinatarios", "recipients", "destinatários")}</strong><small>{item.scheduledAt ? `${t("Programada para", "Scheduled for", "Programada para")} ${reportDate(item.scheduledAt, locale)}` : `${t("Registrada", "Recorded", "Registrada")} ${reportDate(item.createdAt, locale)}`}</small>{item.action === "communication.scheduled" && <div className="communication-history-progress"><span><b>{item.preparedCount}</b> {t("preparados", "prepared", "preparados")}</span><span><b>{item.pendingCount}</b> {t("pendientes", "pending", "pendentes")}</span><span className={item.failedCount ? "has-failures" : ""}><b>{item.failedCount || 0}</b> {t("fallidos", "failed", "falhos")}</span><progress max={item.recipientCount || 1} value={item.preparedCount} /></div>}</div>{item.action === "communication.scheduled" && <div className="communication-history-actions"><button className="outline-button compact" onClick={() => loadScheduledCommunication(item)}>{t("Cargar", "Load", "Carregar")}</button><button className="outline-button compact" onClick={() => loadScheduledCommunication(item, true)}>{t("Duplicar", "Duplicate", "Duplicar")}</button>{item.status !== "cancelled" && item.status !== "completed" && <button className="text-button danger" onClick={() => void cancelSchedule(item.id)}>{t("Cancelar", "Cancel", "Cancelar")}</button>}</div>}</article>;
+          const statusLabel = item.status === "scheduled" ? t("Programada", "Scheduled", "Programada") : item.status === "ready" ? t("Lista para enviar", "Ready to send", "Pronta para enviar") : item.status === "completed" ? t("Completada", "Completed", "Concluída") : item.status === "cancelled" ? t("Cancelada", "Cancelled", "Cancelada") : item.status === "failed" ? t("Falló", "Failed", "Falhou") : t("Enviada", "Sent", "Enviada");
+          return <article className={`communication-history-item status-${item.status}`} key={item.id}><div className="communication-history-kind"><strong>{kindLabel}</strong><span>{statusLabel}</span></div><div><strong>{item.recipientCount || 1} {t("destinatarios", "recipients", "destinatários")}</strong><small>{item.scheduledAt ? `${t("Programada para", "Scheduled for", "Programada para")} ${reportDate(item.scheduledAt, locale)}` : `${t("Registrada", "Recorded", "Registrada")} ${reportDate(item.createdAt, locale)}`}</small>{item.action === "communication.scheduled" && <div className="communication-history-progress"><span><b>{item.preparedCount}</b> {t("enviados", "sent", "enviados")}</span><span><b>{item.skippedCount || 0}</b> {t("omitidos", "skipped", "omitidos")}</span><span><b>{item.pendingCount}</b> {t("pendientes", "pending", "pendentes")}</span><span className={item.failedCount ? "has-failures" : ""}><b>{item.failedCount || 0}</b> {t("fallidos", "failed", "falhos")}</span><progress max={item.recipientCount || 1} value={item.preparedCount + (item.skippedCount || 0)} /></div>}</div>{item.action === "communication.scheduled" && <div className="communication-history-actions"><button className="outline-button compact" onClick={() => loadScheduledCommunication(item)}>{t("Cargar", "Load", "Carregar")}</button><button className="outline-button compact" onClick={() => loadScheduledCommunication(item, true)}>{t("Duplicar", "Duplicate", "Duplicar")}</button>{item.status !== "cancelled" && item.status !== "completed" && <button className="text-button danger" onClick={() => void cancelSchedule(item.id)}>{t("Cancelar", "Cancel", "Cancelar")}</button>}</div>}</article>;
         })}</div>}
       </section>
     </>

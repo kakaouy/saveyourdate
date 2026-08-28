@@ -31,6 +31,10 @@ CRON_SECRET=otra-cadena-aleatoria-larga
 WHATSAPP_ACCESS_TOKEN=token-permanente-de-meta
 WHATSAPP_PHONE_NUMBER_ID=id-del-numero
 WHATSAPP_TEMPLATE_NAME=nombre-de-la-plantilla-aprobada
+WHATSAPP_INVITE_TEMPLATE_NAME=plantilla-invitacion-aprobada
+WHATSAPP_REMINDER_TEMPLATE_NAME=plantilla-recordatorio-aprobada
+WHATSAPP_NOTICE_TEMPLATE_NAME=plantilla-aviso-aprobada
+WHATSAPP_THANKS_TEMPLATE_NAME=plantilla-agradecimiento-aprobada
 WHATSAPP_TEMPLATE_LANGUAGE=es
 WHATSAPP_GRAPH_VERSION=vXX.X
 WHATSAPP_APP_SECRET=secreto-de-la-aplicacion-meta
@@ -56,7 +60,16 @@ mostrar si cada mensaje fue enviado, entregado, leído o rechazado. Sin la
 configuración Business, el panel abre WhatsApp manualmente y lo identifica como
 un envío preparado, no como una entrega confirmada.
 
-`CRON_SECRET` protege la ejecución de los recordatorios automáticos. El panel
+Las comunicaciones programadas se ejecutan automáticamente cada cinco minutos.
+Cada plantilla específica debe estar aprobada por Meta y recibir, en este orden,
+cinco variables de cuerpo: nombre del invitado, nombre del evento, mensaje,
+despedida y enlace. Si usa una cabecera de imagen, debe ser de tipo `IMAGE`.
+Invitaciones y recordatorios pueden recurrir a `WHATSAPP_TEMPLATE_NAME` por
+compatibilidad; avisos y agradecimientos requieren su plantilla específica. El
+proceso vuelve a validar el estado del invitado antes de enviar, evita duplicados
+y reintenta hasta tres veces los fallos registrados.
+
+`CRON_SECRET` protege la ejecución de los recordatorios y comunicaciones automáticas. El panel
 privado muestra el estado de base de datos, correo, WhatsApp y automatización
 sin revelar el contenido de estas variables.
 

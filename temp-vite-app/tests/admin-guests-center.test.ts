@@ -936,8 +936,10 @@ test('el listado de invitados resume la fila y revela detalles sin comprimirlos'
   assert.match(source, /className="guest-expand-button"/);
   assert.match(source, /aria-expanded=\{isExpanded\}/);
   assert.match(source, /className="guest-expanded-details"/);
+  assert.match(styles, /\.guest-compact-table \{ display: block; width: 100%; min-width: 0!important;/);
   assert.match(styles, /\.guest-summary-row\.is-expanded \.guest-details-column \{ display: block!important; \}/);
-  assert.match(styles, /@media \(max-width: 900px\)[\s\S]*?\.guest-expand-button \{ display: none; \}/);
+  assert.match(styles, /@media \(max-width: 900px\)[\s\S]*?\.guest-details-column \{ display: none!important;[\s\S]*?\.guest-summary-row\.is-expanded \.guest-details-column \{ display: block!important; \}/);
+  assert.match(styles, /@media \(max-width: 900px\)[\s\S]*?\.guest-expand-button \{ display: grid; \}/);
   assert.match(styles, /@media \(max-width: 430px\)[\s\S]*?\.guest-expanded-details > div \{ grid-template-columns: 1fr/);
 });
 
@@ -1026,10 +1028,12 @@ test('comunicaciones reúne invitaciones, recordatorios, avisos y agradecimiento
   assert.match(communicationsApi, /communication\.scheduled/);
   assert.match(communicationsApi, /communication\.cancelled/);
   assert.match(communicationsApi, /communication\.failed/);
-  assert.match(communicationsApi, /preparedBySchedule/);
-  assert.match(communicationsApi, /failedBySchedule/);
+  assert.match(communicationsApi, /outcomeBySchedule/);
+  assert.match(communicationsApi, /preserve the latest terminal result/);
   assert.match(communicationsApi, /pendingCount/);
-  assert.match(communicationsApi, /delivery: 'manual-whatsapp'/);
+  assert.match(communicationsApi, /delivery: 'automatic-whatsapp'/);
+  assert.match(communicationsApi, /communication\.auto_sent/);
+  assert.match(communicationsApi, /communication\.auto_failed/);
   assert.match(communicationsApi, /180 \* 86400000/);
   assert.match(styles, /\.communication-history-panel/);
   assert.match(styles, /\.communication-schedule-input/);

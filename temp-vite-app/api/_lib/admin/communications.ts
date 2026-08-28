@@ -14,6 +14,9 @@ const communicationActions = [
   'communication.scheduled',
   'communication.cancelled',
   'communication.failed',
+  'communication.dispatching',
+  'communication.auto_sent',
+  'communication.auto_failed',
   'guest.invitation_prepared',
   'guest.reminder_prepared',
   'guest.communication_prepared',
@@ -32,23 +35,32 @@ async function handler(request: Request) {
       );
       const activities = await response.json() as ActivityRow[];
       const cancelled = new Set(activities.filter((item) => item.action === 'communication.cancelled').map((item) => String(item.details?.scheduleId || '')));
-      const preparedBySchedule = new Map<string, Set<string>>();
-      const failedBySchedule = new Map<string, Set<string>>();
+      const outcomeBySchedule = new Map<string, Map<string, 'prepared' | 'failed' | 'skipped'>>();
       for (const activity of activities) {
         const scheduleId = String(activity.details?.scheduleId || '');
         if (!scheduleId || !activity.entity_id || activity.action === 'communication.scheduled') continue;
-        const target = activity.action === 'communication.failed' ? failedBySchedule : preparedBySchedule;
-        const guests = target.get(scheduleId) || new Set<string>();
-        guests.add(activity.entity_id);
-        target.set(scheduleId, guests);
+        if (activity.action === 'communication.dispatching') continue;
+        const outcomes = outcomeBySchedule.get(scheduleId) || new Map<string, 'prepared' | 'failed' | 'skipped'>();
+        // Activities arrive newest first: preserve the latest terminal result per recipient.
+        if (!outcomes.has(activity.entity_id)) {
+          outcomes.set(activity.entity_id,
+            activity.action === 'communication.auto_sent' && activity.details?.skipped === true
+              ? 'skipped'
+              : activity.action === 'communication.failed' || activity.action === 'communication.auto_failed'
+                ? 'failed'
+                : 'prepared');
+        }
+        outcomeBySchedule.set(scheduleId, outcomes);
       }
       const now = Date.now();
       return json({ history: activities.filter((item) => item.action !== 'communication.cancelled').map((item) => {
         const scheduledAt = String(item.details?.scheduledAt || '');
         const isSchedule = item.action === 'communication.scheduled';
         const recipientCount = Number(item.details?.recipientCount || (item.entity_id ? 1 : 0));
-        const preparedCount = isSchedule ? preparedBySchedule.get(item.id)?.size || 0 : item.entity_id ? 1 : 0;
-        const failedCount = isSchedule ? failedBySchedule.get(item.id)?.size || 0 : item.action.endsWith('failed') ? 1 : 0;
+        const outcomes = outcomeBySchedule.get(item.id);
+        const preparedCount = isSchedule ? [...(outcomes?.values() || [])].filter((outcome) => outcome === 'prepared').length : item.entity_id ? 1 : 0;
+        const failedCount = isSchedule ? [...(outcomes?.values() || [])].filter((outcome) => outcome === 'failed').length : item.action.endsWith('failed') ? 1 : 0;
+        const skippedCount = isSchedule ? [...(outcomes?.values() || [])].filter((outcome) => outcome === 'skipped').length : 0;
         return {
           id: item.id,
           action: item.action,
@@ -57,10 +69,11 @@ async function handler(request: Request) {
           recipientCount,
           preparedCount,
           failedCount,
-          pendingCount: Math.max(0, recipientCount - preparedCount - failedCount),
+          skippedCount,
+          pendingCount: Math.max(0, recipientCount - preparedCount - skippedCount - failedCount),
           scheduledAt,
           createdAt: item.created_at,
-          status: isSchedule ? cancelled.has(item.id) ? 'cancelled' : recipientCount > 0 && preparedCount >= recipientCount ? 'completed' : scheduledAt && new Date(scheduledAt).getTime() <= now ? 'ready' : 'scheduled' : item.action.endsWith('failed') ? 'failed' : 'prepared',
+          status: isSchedule ? cancelled.has(item.id) ? 'cancelled' : recipientCount > 0 && preparedCount + skippedCount >= recipientCount ? 'completed' : scheduledAt && new Date(scheduledAt).getTime() <= now ? 'ready' : 'scheduled' : item.action.endsWith('failed') ? 'failed' : 'prepared',
           title: String(item.details?.title || ''),
           recipientIds: Array.isArray(item.details?.recipientIds) ? item.details.recipientIds.map(String) : [],
           message: String(item.details?.message || ''),
@@ -68,6 +81,7 @@ async function handler(request: Request) {
           extraContent: String(item.details?.extraContent || 'none'),
           imageUrl: String(item.details?.imageUrl || ''),
           htmlContent: String(item.details?.htmlContent || ''),
+          bankDetails: String(item.details?.bankDetails || ''),
         };
       }) });
     }
@@ -93,8 +107,9 @@ async function handler(request: Request) {
         extraContent: String(body.extraContent || 'none'),
         imageUrl: String(body.imageUrl || '').slice(0, 1000),
         htmlContent: String(body.htmlContent || '').slice(0, 8000),
+        bankDetails: String(body.bankDetails || '').slice(0, 1500),
         title: String(body.title || '').slice(0, 120),
-        delivery: 'manual-whatsapp',
+        delivery: 'automatic-whatsapp',
       };
       await logAdminActivity(session, 'communication.scheduled', 'communication', '', details);
       return json({ ok: true, scheduledAt: details.scheduledAt, recipientCount: recipientIds.length });
