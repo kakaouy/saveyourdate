@@ -42,7 +42,7 @@ test('el ciclo de invitación registra envío, apertura y respuesta', () => {
 
 test('la importación exige revisar duplicados y errores antes de guardar', () => {
   assert.match(source, /type GuestImportPreview =/);
-  assert.match(source, /setImportPreview\(\{ fileName: file\.name, rows: previewRows \}\)/);
+  assert.match(source, /setImportPreview\(\{ fileName, rows: previewRows \}\)/);
   assert.match(source, /const confirmGuestImport = async/);
   assert.match(source, /className="modal import-preview-modal"/);
   assert.match(source, /!row\.duplicate && row\.errors\.length === 0/);
@@ -59,10 +59,18 @@ test('Agregar invitados reúne los métodos y recomienda pegar una lista', () =>
   assert.match(source, /Descargar planilla tipo/);
   assert.match(source, /guest-template-option/);
   assert.match(source, /const previewPastedGuests = async/);
-  assert.match(source, /Paso 1 de 2 · Pegar lista/);
-  assert.match(source, /Paso 2 de 2 · Revisión/);
+  assert.match(source, /Paso 1 de 3 · Pegar lista/);
+  assert.match(source, /Paso 3 de 3 · Revisión/);
   assert.match(styles, /\.guest-add-options/);
   assert.match(styles, /\.paste-guests-input/);
+});
+
+test('la importación de archivos permite asociar columnas antes de revisar', () => {
+  assert.match(source, /type GuestImportMapping =/);
+  assert.match(source, /Paso 2 de 3 · Asociar columnas/);
+  assert.match(source, /Decinos qué contiene cada columna/);
+  assert.match(source, /guestImportFields\.map/);
+  assert.match(styles, /\.import-mapping-grid/);
 });
 
 test('la lista conserva las acciones completas y expone los datos solicitados', () => {
@@ -725,8 +733,8 @@ test('los círculos sociales alimentan la carga y las sugerencias de proximidad'
   assert.match(source, /"Amigos",\s*"Facultad",\s*"Trabajo",\s*"Colegio",\s*"Familia",\s*"Club"/);
   assert.match(source, /newCustomSocialCircle && <input name="socialCircle"/);
   assert.match(source, /editCustomSocialCircle && <input name="socialCircle"/);
-  assert.match(source, /column\("grupo", "grupo de invitacion", "grupo invitacion", "familia"\)/);
-  assert.match(source, /column\("circulo", "círculo", "circulo social", "círculo social"\)/);
+  assert.match(source, /group: \["grupo", "grupo de invitacion", "grupo invitacion", "familia"\]/);
+  assert.match(source, /socialCircle: \["circulo", "circulo social"\]/);
   assert.match(source, /const circleTables = tables\.filter/);
   assert.match(source, /Math\.hypot/);
   assert.match(source, /mesa cercana a su círculo/);

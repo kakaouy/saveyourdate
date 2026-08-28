@@ -76,6 +76,27 @@ type GuestImportPreview = {
   }>;
 };
 
+type GuestImportMapping = {
+  fileName: string;
+  rows: string[][];
+  columns: Record<string, number>;
+};
+
+const guestImportFields = [
+  ["name", "Nombre y apellido"],
+  ["group", "Grupo de invitación"],
+  ["socialCircle", "Círculo social"],
+  ["phone", "WhatsApp"],
+  ["phoneCountryCode", "Código de país"],
+  ["seats", "Cupos"],
+  ["email", "Email"],
+  ["identificationType", "Tipo de identificación"],
+  ["identificationNumber", "Número de identificación"],
+  ["food", "Restricción alimentaria"],
+  ["invitedBy", "Invitado por"],
+  ["companionOf", "Acompañante de"],
+] as const;
+
 type AdminOrder = {
   orderNumber: string;
   customerName: string;
@@ -1402,6 +1423,7 @@ function Guests({
   const bulkAllowsEmpty = ["transportOption", "menuChoice", "food", "socialTogetherWith", "socialSeparateFrom", "preferredTableName"].includes(bulkField);
   const [showImportHelp, setShowImportHelp] = useState(false);
   const [importPreview, setImportPreview] = useState<GuestImportPreview | null>(null);
+  const [importMapping, setImportMapping] = useState<GuestImportMapping | null>(null);
   const [showAddGuests, setShowAddGuests] = useState(false);
   const [showPasteGuests, setShowPasteGuests] = useState(false);
   const [pastedGuests, setPastedGuests] = useState("");
@@ -1925,6 +1947,52 @@ function Guests({
       ]),
     );
 
+  const buildGuestImportPreview = (fileName: string, rows: string[][], mappedColumns?: Record<string, number>) => {
+      const normalize = (value: string) =>
+        value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+      const headers = rows[0].map((header: string) => normalize(header));
+      const column = (field: string, ...names: string[]) =>
+        mappedColumns ? (mappedColumns[field] ?? -1) : headers.findIndex((header) => names.includes(header));
+      const nameIndex = column("name", "nombre", "invitado", "nombre y apellido");
+      if (nameIndex < 0) throw new Error(t("Indicá qué columna contiene el nombre.", "Choose the column containing the name.", "Indique qual coluna contém o nome."));
+      const groupIndex = column("group", "grupo", "grupo de invitacion", "grupo invitacion", "familia");
+      const socialCircleIndex = column("socialCircle", "circulo", "circulo social");
+      const phoneIndex = column("phone", "whatsapp", "telefono", "celular");
+      const codeIndex = column("phoneCountryCode", "codigo pais", "codigo de pais", "pais", "caracteristica");
+      const seatsIndex = column("seats", "cupos", "personas", "cantidad");
+      const emailIndex = column("email", "email", "correo");
+      const identificationTypeIndex = column("identificationType", "tipo identificacion", "tipo de identificacion", "documento");
+      const identificationNumberIndex = column("identificationNumber", "identificacion", "numero identificacion", "numero de identificacion");
+      const foodIndex = column("food", "restriccion", "restricciones", "alimentacion", "dieta");
+      const invitedByIndex = column("invitedBy", "invitado por", "invita", "responsable");
+      const companionOfIndex = column("companionOf", "acompanante de", "invitado principal");
+      const names = new Map(guests.map((guest) => [normalize(guest.name), guest.id]));
+      const imported: GuestImportDraft[] = rows.slice(1).map((values: string[]) => ({
+        name: values[nameIndex], group: groupIndex >= 0 ? values[groupIndex] : "",
+        socialCircle: socialCircleIndex >= 0 ? values[socialCircleIndex] : "",
+        phone: phoneIndex >= 0 ? values[phoneIndex] : "",
+        phoneCountryCode: codeIndex >= 0 && values[codeIndex] ? values[codeIndex] : defaultPhoneCountryCode,
+        seats: seatsIndex >= 0 ? values[seatsIndex] : "1", email: emailIndex >= 0 ? values[emailIndex] : "",
+        identificationType: identificationTypeIndex >= 0 && values[identificationTypeIndex] ? values[identificationTypeIndex] : "",
+        identificationNumber: identificationNumberIndex >= 0 ? values[identificationNumberIndex] : "",
+        food: foodIndex >= 0 ? values[foodIndex] : "", invitedBy: invitedByIndex >= 0 && values[invitedByIndex] ? values[invitedByIndex] : defaultInviter,
+        companionOfId: companionOfIndex >= 0 && values[companionOfIndex] ? names.get(normalize(values[companionOfIndex])) || "" : "",
+      })).filter((guest) => guest.name);
+      if (!imported.length) throw new Error(t("No encontramos filas con nombre.", "We found no rows with a name.", "Não encontramos linhas com nome."));
+      const existingNames = new Set(guests.map((guest) => normalize(`${guest.name}|${guest.group}`)));
+      const existingPhones = new Set(guests.map((guest) => guest.phone.replace(/\D/g, "")).filter(Boolean));
+      const existingEmails = new Set(guests.map((guest) => guest.email.trim().toLowerCase()).filter(Boolean));
+      const seenNames = new Set<string>(); const seenPhones = new Set<string>(); const seenEmails = new Set<string>();
+      const previewRows = imported.map((guest) => {
+        const nameKey = normalize(`${guest.name}|${guest.group}`); const phoneKey = `${guest.phoneCountryCode}${guest.phone}`.replace(/\D/g, ""); const emailKey = guest.email.trim().toLowerCase();
+        const duplicate = existingPhones.has(phoneKey) && phoneKey ? t("WhatsApp ya registrado", "WhatsApp already exists", "WhatsApp já cadastrado") : existingEmails.has(emailKey) && emailKey ? t("Email ya registrado", "Email already exists", "Email já cadastrado") : existingNames.has(nameKey) || seenNames.has(nameKey) ? t("Nombre y grupo repetidos", "Duplicate name and group", "Nome e grupo repetidos") : seenPhones.has(phoneKey) && phoneKey ? t("WhatsApp repetido en el archivo", "Duplicate WhatsApp in file", "WhatsApp repetido no arquivo") : seenEmails.has(emailKey) && emailKey ? t("Email repetido en el archivo", "Duplicate email in file", "Email repetido no arquivo") : "";
+        const errors: string[] = []; if (!/^\+\d{1,4}$/.test(guest.phoneCountryCode)) errors.push(t("Código de país inválido", "Invalid country code", "Código de país inválido"));
+        const seats = Number(guest.seats); if (!Number.isInteger(seats) || seats < 1 || seats > 20) errors.push(t("Cupos fuera de rango", "Seats out of range", "Vagas fora do limite"));
+        seenNames.add(nameKey); if (phoneKey) seenPhones.add(phoneKey); if (emailKey) seenEmails.add(emailKey); return { guest, duplicate, errors };
+      });
+      setImportPreview({ fileName, rows: previewRows }); setImportMapping(null); setShowAddGuests(false); setShowPasteGuests(false); setNotice("");
+  };
+
   const previewGuestFile = async (file: File) => {
     setSaving(true);
     setError("");
@@ -1942,119 +2010,11 @@ function Guests({
       const column = (...names: string[]) =>
         headers.findIndex((header) => names.includes(header));
       const nameIndex = column("nombre", "invitado", "nombre y apellido");
-      if (nameIndex < 0)
-        throw new Error('La plantilla debe incluir una columna "Nombre".');
-      const groupIndex = column("grupo", "grupo de invitacion", "grupo invitacion", "familia");
-      const socialCircleIndex = column("circulo", "círculo", "circulo social", "círculo social");
-      const phoneIndex = column("whatsapp", "telefono", "celular");
-      const codeIndex = column(
-        "codigo pais",
-        "codigo de pais",
-        "pais",
-        "caracteristica",
-      );
-      const seatsIndex = column("cupos", "personas", "cantidad");
-      const emailIndex = column("email", "correo");
-      const identificationTypeIndex = column(
-        "tipo identificacion",
-        "tipo de identificacion",
-        "documento",
-      );
-      const identificationNumberIndex = column(
-        "identificacion",
-        "numero identificacion",
-        "numero de identificacion",
-      );
-      const foodIndex = column(
-        "restriccion",
-        "restricciones",
-        "alimentacion",
-        "dieta",
-      );
-      const invitedByIndex = column("invitado por", "invita", "responsable");
-      const companionOfIndex = column(
-        "acompanante de",
-        "acompañante de",
-        "invitado principal",
-      );
-      const names = new Map(
-        guests.map((guest) => [normalize(guest.name), guest.id]),
-      );
-      const imported: GuestImportDraft[] = rows
-        .slice(1)
-        .map((values: string[]) => ({
-          name: values[nameIndex],
-          group: groupIndex >= 0 ? values[groupIndex] : "",
-          socialCircle: socialCircleIndex >= 0 ? values[socialCircleIndex] : "",
-          phone: phoneIndex >= 0 ? values[phoneIndex] : "",
-          phoneCountryCode:
-            codeIndex >= 0 && values[codeIndex]
-              ? values[codeIndex]
-              : defaultPhoneCountryCode,
-          seats: seatsIndex >= 0 ? values[seatsIndex] : "1",
-          email: emailIndex >= 0 ? values[emailIndex] : "",
-          identificationType:
-            identificationTypeIndex >= 0 && values[identificationTypeIndex]
-              ? values[identificationTypeIndex]
-              : "",
-          identificationNumber:
-            identificationNumberIndex >= 0
-              ? values[identificationNumberIndex]
-              : "",
-          food: foodIndex >= 0 ? values[foodIndex] : "",
-          invitedBy:
-            invitedByIndex >= 0 && values[invitedByIndex]
-              ? values[invitedByIndex]
-              : defaultInviter,
-          companionOfId:
-            companionOfIndex >= 0 && values[companionOfIndex]
-              ? names.get(normalize(values[companionOfIndex])) || ""
-              : "",
-        }))
-        .filter((guest: { name: string }) => guest.name);
-      if (!imported.length)
-        throw new Error(t("No encontramos filas con nombre.", "We found no rows with a name.", "Não encontramos linhas com nome."));
-      const existingNames = new Set(
-        guests.map((guest) => normalize(`${guest.name}|${guest.group}`)),
-      );
-      const existingPhones = new Set(
-        guests.map((guest) => guest.phone.replace(/\D/g, "")).filter(Boolean),
-      );
-      const existingEmails = new Set(
-        guests.map((guest) => guest.email.trim().toLowerCase()).filter(Boolean),
-      );
-      const seenNames = new Set<string>();
-      const seenPhones = new Set<string>();
-      const seenEmails = new Set<string>();
-      const previewRows = imported.map((guest) => {
-        const nameKey = normalize(`${guest.name}|${guest.group}`);
-        const phoneKey = `${guest.phoneCountryCode}${guest.phone}`.replace(/\D/g, "");
-        const emailKey = guest.email.trim().toLowerCase();
-        const duplicate = existingPhones.has(phoneKey) && phoneKey
-          ? t("WhatsApp ya registrado", "WhatsApp already exists", "WhatsApp já cadastrado")
-          : existingEmails.has(emailKey) && emailKey
-            ? t("Email ya registrado", "Email already exists", "Email já cadastrado")
-            : existingNames.has(nameKey) || seenNames.has(nameKey)
-              ? t("Nombre y grupo repetidos", "Duplicate name and group", "Nome e grupo repetidos")
-              : seenPhones.has(phoneKey) && phoneKey
-                ? t("WhatsApp repetido en el archivo", "Duplicate WhatsApp in file", "WhatsApp repetido no arquivo")
-                : seenEmails.has(emailKey) && emailKey
-                  ? t("Email repetido en el archivo", "Duplicate email in file", "Email repetido no arquivo")
-                  : "";
-        const errors: string[] = [];
-        if (!/^\+\d{1,4}$/.test(guest.phoneCountryCode))
-          errors.push(t("Código de país inválido", "Invalid country code", "Código de país inválido"));
-        const seats = Number(guest.seats);
-        if (!Number.isInteger(seats) || seats < 1 || seats > 20)
-          errors.push(t("Cupos fuera de rango", "Seats out of range", "Vagas fora do limite"));
-        seenNames.add(nameKey);
-        if (phoneKey) seenPhones.add(phoneKey);
-        if (emailKey) seenEmails.add(emailKey);
-        return { guest, duplicate, errors };
-      });
-      setImportPreview({ fileName: file.name, rows: previewRows });
+      const detected: Record<string, number> = { name: nameIndex };
+      const aliases: Record<string, string[]> = { group: ["grupo", "grupo de invitacion", "grupo invitacion", "familia"], socialCircle: ["circulo", "circulo social"], phone: ["whatsapp", "telefono", "celular"], phoneCountryCode: ["codigo pais", "codigo de pais", "pais", "caracteristica"], seats: ["cupos", "personas", "cantidad"], email: ["email", "correo"], identificationType: ["tipo identificacion", "tipo de identificacion", "documento"], identificationNumber: ["identificacion", "numero identificacion", "numero de identificacion"], food: ["restriccion", "restricciones", "alimentacion", "dieta"], invitedBy: ["invitado por", "invita", "responsable"], companionOf: ["acompanante de", "invitado principal"] };
+      Object.entries(aliases).forEach(([field, names]) => { detected[field] = column(...names); });
+      setImportMapping({ fileName: file.name, rows, columns: detected });
       setShowAddGuests(false);
-      setShowPasteGuests(false);
       setNotice("");
     } catch (importError) {
       setError(
@@ -2628,7 +2588,7 @@ function Guests({
           <div className="modal paste-guests-modal" onMouseDown={(event) => event.stopPropagation()}>
             <button className="modal-close" type="button" onClick={() => setShowPasteGuests(false)} aria-label={t("Cerrar", "Close", "Fechar")}>×</button>
             <button className="modal-back-link" type="button" onClick={() => { setShowPasteGuests(false); setShowAddGuests(true); }}>← {t("Volver", "Back", "Voltar")}</button>
-            <span className="eyebrow">{t("Paso 1 de 2 · Pegar lista", "Step 1 of 2 · Paste list", "Etapa 1 de 2 · Colar lista")}</span>
+            <span className="eyebrow">{t("Paso 1 de 3 · Pegar lista", "Step 1 of 3 · Paste list", "Etapa 1 de 3 · Colar lista")}</span>
             <h2 id="paste-guests-title">{t("Pegá tus invitados", "Paste your guests", "Cole seus convidados")}</h2>
             <p>{t("Usá una fila por invitado. Las columnas pueden ser Nombre, WhatsApp y Grupo, en ese orden.", "Use one row per guest. Columns can be Name, WhatsApp and Group, in that order.", "Use uma linha por convidado. As colunas podem ser Nome, WhatsApp e Grupo, nessa ordem.")}</p>
             <textarea className="paste-guests-input" value={pastedGuests} onChange={(event) => setPastedGuests(event.target.value)} autoFocus placeholder={t("María Pérez    099123456    Familia Pérez\nJuan Gómez     098654321    Amigos", "Maria Perez    5551234    Perez family\nJohn Smith     5559876    Friends", "Maria Pérez    1199123456    Família Pérez\nJoão Silva     1198765432    Amigos")} />
@@ -2637,6 +2597,34 @@ function Guests({
             <div className="modal-actions">
               <button className="outline-button" type="button" onClick={() => setShowPasteGuests(false)}>{t("Cancelar", "Cancel", "Cancelar")}</button>
               <button className="primary-button small" type="button" disabled={saving || !pastedGuests.trim()} onClick={previewPastedGuests}>{saving ? t("Procesando…", "Processing…", "Processando…") : t("Revisar lista", "Review list", "Revisar lista")}</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {importMapping && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="map-columns-title" onMouseDown={() => setImportMapping(null)}>
+          <div className="modal import-mapping-modal" onMouseDown={(event) => event.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setImportMapping(null)} aria-label={t("Cerrar", "Close", "Fechar")}>×</button>
+            <span className="eyebrow">{t("Paso 2 de 3 · Asociar columnas", "Step 2 of 3 · Match columns", "Etapa 2 de 3 · Associar colunas")}</span>
+            <h2 id="map-columns-title">{t("Decinos qué contiene cada columna", "Tell us what each column contains", "Informe o que contém cada coluna")}</h2>
+            <p>{t("Detectamos los encabezados automáticamente. Corregí únicamente los que no coincidan; solo el nombre es obligatorio.", "We detected the headers automatically. Fix only those that do not match; only the name is required.", "Detectamos os cabeçalhos automaticamente. Corrija apenas os que não correspondem; somente o nome é obrigatório.")}</p>
+            <div className="import-file-chip"><span>▦</span><strong>{importMapping.fileName}</strong><small>{importMapping.rows.length - 1} {t("filas encontradas", "rows found", "linhas encontradas")}</small></div>
+            <div className="import-mapping-grid">
+              {guestImportFields.map(([field, label]) => (
+                <label key={field}>
+                  <span>{label}{field === "name" && <b> *</b>}</span>
+                  <select value={importMapping.columns[field] ?? -1} onChange={(event) => setImportMapping((current) => current ? { ...current, columns: { ...current.columns, [field]: Number(event.target.value) } } : current)}>
+                    <option value={-1}>{t("No importar", "Do not import", "Não importar")}</option>
+                    {importMapping.rows[0].map((header, index) => <option key={`${header}-${index}`} value={index}>{header || `${t("Columna", "Column", "Coluna")} ${index + 1}`}</option>)}
+                  </select>
+                  <small>{(importMapping.columns[field] ?? -1) >= 0 ? `${t("Ejemplo", "Example", "Exemplo")}: ${importMapping.rows[1]?.[importMapping.columns[field]] || "—"}` : t("Se dejará vacío", "It will be left empty", "Será deixado vazio")}</small>
+                </label>
+              ))}
+            </div>
+            {error && <p className="table-error" role="alert">{error}</p>}
+            <div className="modal-actions">
+              <button className="outline-button" type="button" onClick={() => { setImportMapping(null); setShowAddGuests(true); }}>{t("Volver", "Back", "Voltar")}</button>
+              <button className="primary-button small" type="button" disabled={(importMapping.columns.name ?? -1) < 0} onClick={() => { try { setError(""); buildGuestImportPreview(importMapping.fileName, importMapping.rows, importMapping.columns); } catch (mappingError) { setError(mappingError instanceof Error ? mappingError.message : t("Revisá las columnas.", "Review the columns.", "Revise as colunas.")); } }}>{t("Revisar invitados", "Review guests", "Revisar convidados")}</button>
             </div>
           </div>
         </div>
@@ -2747,7 +2735,7 @@ function Guests({
           <div className="modal-backdrop" onMouseDown={() => setImportPreview(null)}>
             <div className="modal import-preview-modal" onMouseDown={(event) => event.stopPropagation()}>
               <button className="modal-close" type="button" onClick={() => setImportPreview(null)}>×</button>
-              <span className="eyebrow">{t("Paso 2 de 2 · Revisión", "Step 2 of 2 · Review", "Etapa 2 de 2 · Revisão")}</span>
+              <span className="eyebrow">{t("Paso 3 de 3 · Revisión", "Step 3 of 3 · Review", "Etapa 3 de 3 · Revisão")}</span>
               <h2>{t("Revisá antes de importar", "Review before importing", "Revise antes de importar")}</h2>
               <p className="import-preview-file">{importPreview.fileName}</p>
               <div className="import-preview-summary">
