@@ -60,7 +60,10 @@ mostrar si cada mensaje fue enviado, entregado, leído o rechazado. Sin la
 configuración Business, el panel abre WhatsApp manualmente y lo identifica como
 un envío preparado, no como una entrega confirmada.
 
-Las comunicaciones programadas se ejecutan automáticamente cada cinco minutos.
+Las comunicaciones programadas se ejecutan automáticamente una vez al día, a
+las 11:00 UTC (08:00 de Montevideo), por la limitación de cron de Vercel Hobby.
+Para despachos con precisión de cinco minutos se requiere Vercel Pro o un
+programador externo que invoque `/api/cron-communications` con `CRON_SECRET`.
 Cada plantilla específica debe estar aprobada por Meta y recibir, en este orden,
 cinco variables de cuerpo: nombre del invitado, nombre del evento, mensaje,
 despedida y enlace. Si usa una cabecera de imagen, debe ser de tipo `IMAGE`.

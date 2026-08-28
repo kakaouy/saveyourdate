@@ -8,7 +8,7 @@
   },
   "crons": [
     { "path": "/api/cron-reminders", "schedule": "0 12 * * *" },
-    { "path": "/api/cron-communications", "schedule": "*/5 * * * *" }
+    { "path": "/api/cron-communications", "schedule": "0 11 * * *" }
   ],
   "rewrites": [
     { "source": "/estado", "destination": "/index.html" },
