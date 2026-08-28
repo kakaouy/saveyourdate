@@ -29,12 +29,15 @@ async function handler(request: Request) {
   const whatsappSending = hasEnv(
     'WHATSAPP_ACCESS_TOKEN',
     'WHATSAPP_PHONE_NUMBER_ID',
-    'WHATSAPP_TEMPLATE_NAME',
-    'WHATSAPP_GRAPH_VERSION'
+    'WHATSAPP_GRAPH_VERSION',
+    'WHATSAPP_INVITE_TEMPLATE_NAME',
+    'WHATSAPP_REMINDER_TEMPLATE_NAME',
+    'WHATSAPP_NOTICE_TEMPLATE_NAME',
+    'WHATSAPP_THANKS_TEMPLATE_NAME'
   );
   const whatsappTracking = hasEnv('WHATSAPP_APP_SECRET', 'WHATSAPP_WEBHOOK_VERIFY_TOKEN');
   const whatsapp: ServiceStatus = !whatsappSending
-    ? { status: 'error', detail: 'Falta configuración' }
+    ? { status: 'error', detail: 'Faltan credenciales o plantillas de Meta' }
     : !whatsappTracking
       ? { status: 'warning', detail: 'Envío listo; falta seguimiento' }
       : { status: 'ok', detail: 'Envío y seguimiento listos' };

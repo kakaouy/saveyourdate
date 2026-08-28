@@ -418,7 +418,13 @@ async function handler(request: Request) {
         await logAdminActivity(session, isReminder ? "guest.reminder_prepared" : "guest.invitation_prepared", "guest", id, {
           channel: String(body.channel || "manual"),
         });
-        return json({ guest: clientGuest(rows[0], "prepared") });
+        return json({
+          guest: clientGuest(rows[0], {
+            status: "prepared",
+            statusAt: preparedAt,
+            errorDetail: null,
+          }),
+        });
       }
       if (["check-in", "undo-check-in", "bulk-check-in", "bulk-undo-check-in"].includes(String(body.action))) {
         const ids = String(body.action).startsWith("bulk-")

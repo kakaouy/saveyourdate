@@ -75,8 +75,8 @@ test('rechazar una invitación limpia datos operativos ocultos', () => {
   assert.match(rsvpApi, /guest_notes: status === 'Confirmado'/);
 });
 
-test('el diagnóstico distingue envío y seguimiento de WhatsApp', () => {
-  for (const variable of ['WHATSAPP_ACCESS_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'WHATSAPP_TEMPLATE_NAME', 'WHATSAPP_GRAPH_VERSION', 'WHATSAPP_APP_SECRET', 'WHATSAPP_WEBHOOK_VERIFY_TOKEN']) {
+test('el diagnóstico distingue envío, plantillas y seguimiento de WhatsApp', () => {
+  for (const variable of ['WHATSAPP_ACCESS_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'WHATSAPP_GRAPH_VERSION', 'WHATSAPP_INVITE_TEMPLATE_NAME', 'WHATSAPP_REMINDER_TEMPLATE_NAME', 'WHATSAPP_NOTICE_TEMPLATE_NAME', 'WHATSAPP_THANKS_TEMPLATE_NAME', 'WHATSAPP_APP_SECRET', 'WHATSAPP_WEBHOOK_VERIFY_TOKEN']) {
     assert.match(healthApi, new RegExp(variable));
   }
   assert.match(healthApi, /status: 'warning'/);

@@ -60,6 +60,9 @@ mostrar si cada mensaje fue enviado, entregado, leído o rechazado. Sin la
 configuración Business, el panel abre WhatsApp manualmente y lo identifica como
 un envío preparado, no como una entrega confirmada.
 
+La definición y el orden de variables de las cuatro plantillas están en
+[`docs/meta-whatsapp-templates.md`](docs/meta-whatsapp-templates.md).
+
 Las comunicaciones programadas se ejecutan automáticamente una vez al día, a
 las 11:00 UTC (08:00 de Montevideo), por la limitación de cron de Vercel Hobby.
 Para despachos con precisión de cinco minutos se requiere Vercel Pro o un
