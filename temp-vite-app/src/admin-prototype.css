@@ -1717,6 +1717,33 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .assignment-save-status button
 ) { font-size: 11px; }
 
+/* Legibilidad de comunicaciones y entregables. Las vistas previas pueden ser
+   compactas, pero la información que guía una decisión nunca baja de 11 px. */
+.admin-shell :is(
+  .guest-reminder-schedule-controls > label:not(.guest-reminder-toggle),
+  .guest-reminder-toggle,.guest-reminder-due span,
+  .export-audience,.export-readiness strong,.export-readiness p,
+  .export-options-grid p,.export-picker b,.export-picker small,
+  .export-detail-copy > p,.export-detail-copy ul,
+  .export-document-preview > span,.export-preview-metrics small,
+  .export-document-preview > p,.export-sheet-preview > div,
+  .export-sheet-preview > div:first-child,.export-sheet-preview > small,
+  .export-layout-preview > small,.export-private-review strong,
+  .export-private-review span
+) { font-size: 11px; }
+
+.admin-shell :is(
+  .communication-kind-tabs button,.communication-extra-options button,
+  .communication-selection-bar button,.communication-history-actions button,
+  .export-picker button,.export-card-actions button
+) { min-height: 40px; }
+
+.communications-table :is(td,th),
+.communication-history-item,
+.communication-selection-bar,
+.export-options-grid article,
+.export-detail { overflow-wrap: anywhere; }
+
 .group-search-results { gap: 9px; padding: 15px 12px 12px; }
 .group-search-results > strong { display: block; margin: 0; line-height: 1.35; }
 .group-search-results label { padding: 10px; }

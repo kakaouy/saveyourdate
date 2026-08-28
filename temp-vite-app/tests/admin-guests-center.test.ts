@@ -955,6 +955,14 @@ test('entregables guía la elección y muestra una vista previa enfocada', () =>
   assert.match(styles, /\.export-detail \{ display: grid; grid-template-columns:/);
 });
 
+test('comunicaciones y entregables mantienen una escala operativa legible', () => {
+  assert.match(styles, /Legibilidad de comunicaciones y entregables/);
+  assert.match(styles, /\.guest-reminder-schedule-controls > label:not\(\.guest-reminder-toggle\)/);
+  assert.match(styles, /\.export-audience[\s\S]*\.export-private-review span[\s\S]*\) \{ font-size: 11px; \}/);
+  assert.match(styles, /\.communication-kind-tabs button[\s\S]*\.export-card-actions button[\s\S]*\) \{ min-height: 40px; \}/);
+  assert.match(styles, /\.communications-table :is\(td,th\)[\s\S]*overflow-wrap: anywhere/);
+});
+
 test('el centro de invitados distingue el recorrido y permite programar recordatorios', () => {
   assert.match(source, /className={`guest-reminder-schedule/);
   assert.match(source, /Recordatorio automático por email/);
