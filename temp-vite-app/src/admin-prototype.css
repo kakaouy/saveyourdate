@@ -1637,3 +1637,75 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .guests-table .guest-status-column { padding-right: 0!important; text-align: left; }
   .guests-table .guest-status-column .status-select,.guests-table .guest-status-column .status { width: 100%; }
 }
+
+/* Reordena Invitados antes de que las ocho columnas empiecen a recortarse. */
+@media (max-width: 1180px) {
+  .guests-panel .table-scroll { overflow: visible; }
+  .guests-table { display: block; min-width: 0; }
+  .guests-table thead { display: none; }
+  .guests-table tbody { display: grid; gap: 12px; }
+  .guests-table tbody > tr:not(.guest-empty-row) {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(220px,1.35fr) minmax(150px,1fr) minmax(120px,.75fr);
+    gap: 14px 18px;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(17,48,67,.05);
+  }
+  .guests-table tbody > tr:not(.guest-empty-row) > td {
+    display: grid;
+    grid-template-columns: minmax(112px,.7fr) minmax(0,1fr);
+    align-items: center;
+    gap: 8px;
+    width: auto!important;
+    min-width: 0;
+    padding: 0!important;
+    border: 0;
+    white-space: normal;
+  }
+  .guests-table tbody > tr:not(.guest-empty-row) > td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+  }
+  .guests-table .guest-person-column { grid-column: 1 / 3; display: block!important; padding-right: 42px!important; }
+  .guests-table .guest-person-column::before,.guests-table .guest-select-column::before { display: none; }
+  .guests-table .guest-status-column { grid-column: 3; grid-row: 1; display: block!important; padding-right: 36px!important; text-align: right; }
+  .guests-table .guest-status-column::before { display: none; }
+  .guests-table .guest-group-column,.guests-table .guest-circle-column,.guests-table .guest-seats-column { grid-row: 2; }
+  .guests-table .guest-follow-up-column { display: grid!important; grid-column: 1 / 3; grid-row: 3; padding-top: 12px!important; border-top: 1px solid #edf1f3!important; }
+  .guests-table .guest-actions-column { grid-column: 3; grid-row: 3; display: block!important; padding-top: 12px!important; border-top: 1px solid #edf1f3!important; }
+  .guests-table .guest-actions-column::before { display: none; }
+  .guests-table .guest-actions-column .row-actions { justify-content: flex-end; }
+  .guests-table .guest-select-column { position: absolute; top: 18px; right: 16px; z-index: 1; display: block!important; }
+  .guest-follow-up { min-width: 0; flex-wrap: wrap; }
+  .guest-delivery-status { max-width: 100%; white-space: normal; }
+  .guest-delivery-status strong,.guest-delivery-status small { font-size: 12px; line-height: 1.3; }
+}
+
+@media (max-width: 700px) {
+  .guests-table tbody > tr:not(.guest-empty-row) { grid-template-columns: 1fr; gap: 13px; }
+  .guests-table .guest-person-column,.guests-table .guest-status-column,
+  .guests-table .guest-group-column,.guests-table .guest-circle-column,
+  .guests-table .guest-seats-column,.guests-table .guest-follow-up-column,
+  .guests-table .guest-actions-column { grid-column: 1; grid-row: auto; }
+  .guests-table .guest-status-column { padding-right: 0!important; text-align: left; }
+  .guests-table .guest-status-column .status-select,.guests-table .guest-status-column .status { width: min(100%,280px); max-width: 100%; }
+  .guests-table .guest-follow-up-column,.guests-table .guest-actions-column { border-top: 1px solid #edf1f3!important; }
+  .guests-table .guest-actions-column .row-actions { justify-content: flex-start; }
+}
+
+@media (max-width: 430px) {
+  .guests-table tbody > tr:not(.guest-empty-row) { padding: 14px; }
+  .guests-table tbody > tr:not(.guest-empty-row) > td { grid-template-columns: 1fr; gap: 5px; }
+  .guests-table .guest-person-column { padding-right: 38px!important; }
+  .guests-table .guest-follow-up { align-items: stretch; }
+  .guests-table .guest-follow-up > button { width: 100%; white-space: normal; }
+}

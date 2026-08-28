@@ -138,9 +138,10 @@ export default function PlatformLandingConcept() {
       </article>
     </section>
 
-    <section className="concept-connected" id="como-funciona">
+    <section className="concept-how-intro" id="como-funciona"><p>Cómo funciona</p><div className="concept-how-card"><header><small>UN RECORRIDO CONECTADO</small><h3>De la primera lista al evento listo para compartir</h3><p>Cargá la información una vez y usala durante toda la organización.</p></header><ol><li><b>01</b><div><strong>Configurá e importá</strong><span>Completá los datos principales o subí tu lista de invitados.</span></div></li><li><b>02</b><div><strong>Ordená personas y grupos</strong><span>Reuní acompañantes, círculos sociales y confirmaciones.</span></div></li><li><b>03</b><div><strong>Diseñá mesas y salón</strong><span>Ubicá invitados y adaptá cada elemento al espacio real.</span></div></li><li><b>04</b><div><strong>Revisá y compartí</strong><span>Generá entregables claros para coordinación y proveedores.</span></div></li></ol></div></section>
+
+    <section className="concept-connected">
       <div className="concept-modules" id="modulos">
-        <div className="concept-how-intro"><p>Cómo funciona</p><div className="concept-how-card"><header><small>UN RECORRIDO CONECTADO</small><h3>De la primera lista al evento listo para compartir</h3><p>Cargá la información una vez y usala durante toda la organización.</p></header><ol><li><b>01</b><div><strong>Configurá e importá</strong><span>Completá los datos principales o subí tu lista de invitados.</span></div></li><li><b>02</b><div><strong>Ordená personas y grupos</strong><span>Reuní acompañantes, círculos sociales y confirmaciones.</span></div></li><li><b>03</b><div><strong>Diseñá mesas y salón</strong><span>Ubicá invitados y adaptá cada elemento al espacio real.</span></div></li><li><b>04</b><div><strong>Revisá y compartí</strong><span>Generá entregables claros para coordinación y proveedores.</span></div></li></ol></div></div>
         <header><h2>Todo tu evento,<br /><em>en un solo lugar.</em></h2><div><p>Tres momentos conectados para configurar, organizar y preparar el evento sin repetir información ni depender de herramientas separadas.</p><a href="/?demo=panel">Recorrer la demostración →</a></div></header>
         <div className="concept-journey-grid">{platformJourneys.map((journey) => <article className="concept-journey-card" key={journey.title}>
           <div className={`concept-journey-preview is-${journey.preview}`} aria-hidden="true">

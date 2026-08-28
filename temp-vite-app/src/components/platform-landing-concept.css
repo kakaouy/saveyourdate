@@ -122,8 +122,8 @@
 @media(max-width:700px){.concept-preview-invite{min-height:0}.concept-journey-copy{padding:34px 24px}}
 
 /* Cómo funciona vive sobre crema; el azul comienza con los recorridos del producto. */
-.concept-modules{padding-top:0}.concept-how-intro{margin-inline:calc(clamp(24px,7vw,110px) * -1);margin-bottom:clamp(70px,8vw,115px);padding:clamp(62px,7vw,105px) clamp(24px,7vw,110px);color:var(--ink);background:var(--cream)}.concept-how-intro>p{margin:0 0 28px;color:#647b82;font-size:10px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.concept-how-intro>.concept-how-card{display:grid;grid-template-columns:minmax(260px,.72fr) minmax(520px,1.28fr);gap:clamp(30px,5vw,80px);max-width:none;margin:0;padding:clamp(30px,4vw,58px);border-radius:18px;color:var(--ink);background:#fff;box-shadow:0 26px 70px rgba(23,56,75,.1)}.concept-modules>header{margin-bottom:clamp(50px,7vw,90px)}
-@media(max-width:900px){.concept-how-intro>.concept-how-card{grid-template-columns:1fr}.concept-how-intro{margin-inline:-20px;padding-inline:20px}}
+.concept-how-intro{margin:0;padding:clamp(62px,7vw,105px) clamp(24px,7vw,110px);color:var(--ink);background:var(--cream)}.concept-how-intro>p{margin:0 0 28px;color:#647b82;font-size:10px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.concept-how-intro>.concept-how-card{display:grid;grid-template-columns:minmax(260px,.72fr) minmax(520px,1.28fr);gap:clamp(30px,5vw,80px);max-width:none;margin:0;padding:clamp(30px,4vw,58px);border-radius:18px;color:var(--ink);background:#fff;box-shadow:0 26px 70px rgba(23,56,75,.1)}.concept-modules>header{margin-bottom:clamp(50px,7vw,90px)}
+@media(max-width:900px){.concept-how-intro>.concept-how-card{grid-template-columns:1fr}.concept-how-intro{padding-inline:20px}}
 @media(max-width:560px){.concept-how-intro{padding-block:54px}.concept-how-intro>.concept-how-card{padding:25px 20px}.concept-modules>header{padding-top:0}}
 
 /* Vista simplificada del organizador real de invitados y mesas. */
@@ -226,10 +226,6 @@
 .concept-plans-footnote{margin:16px 0 0;font-size:11px}
 .concept-plan-actions a{min-height:44px;display:grid;place-items:center}
 @media(max-width:560px){.concept-plans-modal{padding:52px 16px 20px}.concept-plan-shared{display:grid;grid-template-columns:1fr 1fr}.concept-plan-shared b{grid-column:1/-1}.concept-plan-shared span{padding:7px 8px}.concept-plan-grid article{padding:20px 18px}.concept-plan-actions{grid-template-columns:1fr}.concept-plans-footnote{text-align:left}}
-
-/* Keep the transition from the overview into the workflow completely flush. */
-.concept-connected .concept-modules{padding-block-start:0!important}
-.concept-connected .concept-how-intro{margin-block-start:0;transform:none}
 
 /* One editorial scale for every landing section eyebrow. */
 .concept-kicker,
