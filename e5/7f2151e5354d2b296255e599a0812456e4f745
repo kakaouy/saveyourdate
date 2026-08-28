@@ -1,0 +1,62 @@
+temp-vite-app/tests/admin-guests-center.test.ts
+  s_7bf15498a84739::t_ca871ea68cf90a 1018-1019,1024
+  s_7bf15498a84739::t_3d813500cd57d1 1044
+  s_7bf15498a84739::t_328b6450a3439f 1020-1023
+  s_7bf15498a84739::t_8dc0de46032db2 1047
+  s_7bf15498a84739::t_6092fd8b44be51 1026,1037-1038
+temp-vite-app/tests/scheduled-communications.test.ts
+  s_7bf15498a84739::t_ca871ea68cf90a 10
+  s_7bf15498a84739::t_2bd339b61a7f5f 11-14
+temp-vite-app/supabase/migrations/20260828010000_event_whatsapp_connections.sql
+  s_7bf15498a84739::t_18cd94e92c4c61 1-24
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7bf15498a84739::t_328b6450a3439f 6960-6966,6974-6981,7000-7001
+  s_7bf15498a84739::t_d5a603c203e94a 6590-6591,8018-8019,8057-8061,8070,8194-8196,8214
+  s_7bf15498a84739::t_680bd0e42d3585 6547-6552,6554,6587-6589
+  s_7bf15498a84739::t_da86596ba1bf39 8186-8193,8197-8198,8218,8222-8223
+  s_7bf15498a84739::t_5d91fbcb6fc1db 6553,6555,6603-6682,6989,6994-6996
+  s_7bf15498a84739::t_9d24af9f67f5c6 6967-6973,6982-6988,6990-6993,6997-6999
+  s_7bf15498a84739::t_d7d2d2c5ec37ac 6592
+temp-vite-app/api/cron-communications.ts
+  s_7bf15498a84739::t_e42b00d75178cf 3,9,78,96-102,145-149
+  s_7bf15498a84739::t_da86596ba1bf39 79-81
+  s_7bf15498a84739::t_2bd339b61a7f5f 103-109
+temp-vite-app/api/_lib/whatsapp.ts
+  s_7bf15498a84739::t_e42b00d75178cf 71,81,87-90,112,114
+temp-vite-app/docs/meta-whatsapp-templates.md
+  s_7bf15498a84739::t_436f9e47ea2250 3-10,77,80-84,94-98,102-111
+temp-vite-app/src/admin-prototype.css
+  s_7bf15498a84739::t_da86596ba1bf39 499-508,555-557
+  s_7bf15498a84739::t_5e7253fa535155 1825-1827,1829-1844
+  s_7bf15498a84739::t_9d24af9f67f5c6 1828
+temp-vite-app/api/_lib/admin/communications.ts
+  s_7bf15498a84739::t_9665133b3147bd 91-94
+  s_7bf15498a84739::t_479744b75908d4 90,95-97,106,119
+temp-vite-app/api/admin/[action].ts
+  s_7bf15498a84739::t_18cd94e92c4c61 23,49
+temp-vite-app/PRODUCTION_CHECKLIST.md
+  s_7bf15498a84739::t_436f9e47ea2250 18-20,39-45
+temp-vite-app/tests/event-whatsapp-connection.test.ts
+  s_7bf15498a84739::t_d13602909376a6 1-27
+temp-vite-app/api/_lib/admin/whatsapp-connection.ts
+  s_7bf15498a84739::t_18cd94e92c4c61 1-46,48-113
+  s_7bf15498a84739::t_5d91fbcb6fc1db 47
+temp-vite-app/api/_lib/event-whatsapp-crypto.ts
+  s_7bf15498a84739::t_18cd94e92c4c61 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e57f2151e5354d2b296255e599a0812456e4f745",
+  "prompts": {},
+  "sessions": {
+    "s_7bf15498a84739": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04384-e93b-7e52-b32b-d6b49a0c1989",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
