@@ -64,7 +64,7 @@ test('sólo quienes editan pueden iniciar invitaciones por WhatsApp', () => {
 });
 
 test('WhatsApp manual no se presenta como entrega confirmada', () => {
-  assert.match(guestsApi, /clientGuest\(updatedRows\[0\], "manual"\)/);
+  assert.match(guestsApi, /clientGuest\(updatedRows\[0\], \{\s*status: "manual",\s*statusAt: remindedAt,\s*errorDetail: null,\s*\}\)/);
   assert.match(admin, /Preparado manualmente/);
 });
 

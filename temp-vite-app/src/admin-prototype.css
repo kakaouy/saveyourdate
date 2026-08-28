@@ -459,9 +459,12 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .guest-contact-history li div { position: relative; z-index: 1; min-width: 0; padding-right: 8px; background: #fbfcfc; }
 .guest-contact-history strong,.guest-contact-history small { display: block; overflow-wrap: anywhere; }
 .guest-contact-history strong { color: var(--ink); font-size: 9px; }
+.guest-contact-history em { display: block; margin-bottom: 3px; color: var(--teal-dark); font-size: 7px; font-style: normal; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
 .guest-contact-history small { margin-top: 3px; font-size: 8px; }
 .delivery-verification-note { margin: -8px 0 17px; padding-left: 20px; color: var(--muted); font-size: 8px; line-height: 1.45; }
 .delivery-verification-note::before { content: "ⓘ"; float: left; margin-left: -20px; color: var(--teal); font-weight: 800; }
+.guest-contact-history li.has-error > span { background: #a54a42; box-shadow: 0 0 0 4px #fff0ee; }
+.guest-contact-history li.has-error strong,.guest-contact-history li.has-error small { color: #a54a42; }
 .whatsapp-review-modal { width: min(610px,calc(100vw - 32px)); }
 .whatsapp-review-recipient { display: flex; align-items: center; gap: 10px; margin: 15px 0 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #f7faf9; }
 .whatsapp-review-recipient > span { display: grid; gap: 2px; }
@@ -488,6 +491,23 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .seating-search { margin-bottom: 12px; }
 .heading-actions, .floor-plan-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
 .guest-operation-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.guest-reminder-schedule { display: grid; grid-template-columns: minmax(280px,1fr) auto auto; align-items: center; gap: 16px; margin: -4px 0 18px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+.guest-reminder-schedule.is-enabled { border-color: #a9dcd4; background: #f3fbf9; }
+.guest-reminder-schedule > div:first-child { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.guest-reminder-schedule-icon { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 10px; color: var(--teal-dark); background: #def3f0; font-size: 18px; }
+.guest-reminder-schedule p,.guest-reminder-schedule small { display: block; margin: 0; }
+.guest-reminder-schedule p { min-width: 0; }
+.guest-reminder-schedule strong { color: var(--ink); font-size: 11px; }
+.guest-reminder-schedule small { margin-top: 3px; color: var(--muted); font-size: 9px; line-height: 1.4; }
+.guest-reminder-schedule-controls { display: flex; align-items: end; gap: 8px; }
+.guest-reminder-schedule-controls > label:not(.guest-reminder-toggle) { display: grid; gap: 3px; color: var(--muted); font-size: 8px; font-weight: 800; }
+.guest-reminder-schedule-controls input[type="number"] { width: 74px; min-height: 34px; padding: 0 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: #fff; font: inherit; }
+.guest-reminder-toggle { display: flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: #fff; font-size: 9px; font-weight: 800; }
+.guest-reminder-toggle input { accent-color: var(--teal); }
+.guest-reminder-due { display: flex; align-items: center; gap: 7px; min-height: 40px; padding: 7px 10px; border: 1px solid #ead9ae; border-radius: 10px; color: #765e28; background: #fffaf0; cursor: pointer; }
+.guest-reminder-due.active { border-color: var(--teal); color: var(--teal-dark); background: #eaf8f6; }
+.guest-reminder-due strong { font: 20px Georgia,serif; }
+.guest-reminder-due span { max-width: 90px; font-size: 8px; font-weight: 800; line-height: 1.25; text-align: left; }
 .guest-operation-summary button { display: grid; gap: 5px; min-width: 0; padding: 15px 17px; border: 1px solid var(--line); border-radius: 12px; background: white; color: var(--ink); text-align: left; cursor: pointer; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
 .guest-operation-summary button:hover { transform: translateY(-1px); border-color: var(--teal); box-shadow: 0 8px 22px rgba(25,53,77,.08); }
 .guest-operation-summary button.active { border-color: var(--teal); box-shadow: inset 0 0 0 1px var(--teal); background: #f5ffff; }
@@ -498,6 +518,10 @@ td { padding: 12px 16px; border-top: 1px solid #edf1f3; color: #4c6070; white-sp
 .delivery-status.guest-delivery-status { display: inline-grid; align-items: center; width: max-content; min-width: 0; max-width: 100%; gap: 0; padding: 6px 10px; border-radius: 12px; background: #f2f5f6; color: var(--muted); font-size: 11px; line-height: 1.2; font-weight: 700; white-space: normal; }
 .guest-delivery-status strong { font-size: 11px; line-height: 1.2; }
 .guest-delivery-status small { margin-top: 2px; color: currentColor; font-size: 10px; line-height: 1.25; white-space: normal; }
+.guest-delivery-status.is-delivered { background: #eaf7f1; color: #31775d; }
+.guest-delivery-status.is-read { background: #f1ebf8; color: #694f86; }
+.guest-delivery-status.is-failed { background: #fff0ee; color: #a54a42; }
+.guest-delivery-error { font-weight: 800; }
 .delivery-status.sent { background: #eef8fb; color: #26728a; }
 .delivery-status.opened { background: #fff7df; color: #9a6b00; }
 .delivery-status.responded { background: #eaf8ef; color: #27804d; }
@@ -1377,6 +1401,8 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   .topbar .language-switcher select { min-width: 72px; }
   .admin-content { padding: 24px 18px; }
   .guest-operation-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .guest-reminder-schedule { grid-template-columns: minmax(0,1fr) auto; }
+  .guest-reminder-schedule-controls { grid-column: 1 / -1; justify-content: flex-start; }
   .guest-contact-history ol { grid-template-columns: 1fr; gap: 10px; }
   .guest-contact-history li:not(:last-child)::after { top: 6px; left: 5px; width: 1px; height: calc(100% + 10px); }
 }
@@ -1492,6 +1518,11 @@ footer span { color: var(--ink); font-family: Georgia, serif; font-size: 13px; }
   :is(.font-small,.font-comfortable) .getting-started-panel nav { grid-template-columns: 1fr; }
   .guest-operation-summary { display: flex; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x proximity; }
   .guest-operation-summary button { flex: 0 0 145px; scroll-snap-align: start; }
+  .guest-reminder-schedule { grid-template-columns: 1fr; align-items: stretch; gap: 12px; padding: 13px; }
+  .guest-reminder-schedule-controls { grid-column: auto; align-items: stretch; flex-wrap: wrap; }
+  .guest-reminder-schedule-controls > label:not(.guest-reminder-toggle) { flex: 1 1 90px; }
+  .guest-reminder-schedule-controls input[type="number"] { width: 100%; }
+  .guest-reminder-due { justify-content: center; }
   .import-preview-summary { grid-template-columns: 1fr; }
 }
 

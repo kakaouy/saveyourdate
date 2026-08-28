@@ -56,7 +56,7 @@ test('el seguimiento RSVP distingue el recorrido y recomienda la próxima acció
 
 test('el seguimiento separa el estado de la fecha y evita texto operativo diminuto', () => {
   assert.match(source, /className=\{`delivery-status guest-delivery-status/);
-  assert.match(source, /<strong>\{guest\.respondedAt/);
+  assert.match(source, /<strong>\{guest\.whatsappStatus/);
   assert.match(source, /<small>\{reportDate/);
   assert.match(styles, /\.guest-delivery-status small \{[^}]*font-size: 10px/);
   assert.match(styles, /\.status-select \{[^}]*font-size: 11px/);
@@ -68,8 +68,8 @@ test('el seguimiento usa mensajes por etapa y muestra el historial de contacto',
   assert.match(source, /guest\.invitationOpenedAt\s*\?\s*t\(/);
   assert.match(source, /Te reenviamos la invitación/);
   assert.match(source, /className="guest-contact-history"/);
-  assert.match(source, /WhatsApp preparado/);
-  assert.match(source, /Invitación vista/);
+  assert.match(source, /Preparado para WhatsApp/);
+  assert.match(source, /Abrió el enlace/);
   assert.match(source, /Respuesta recibida/);
   assert.match(styles, /\.guest-contact-history ol/);
   assert.match(source, /whatsAppReviewGuest/);
@@ -77,7 +77,7 @@ test('el seguimiento usa mensajes por etapa y muestra el historial de contacto',
   assert.match(source, /Continuar en WhatsApp/);
   assert.match(source, /Podrás editarlo antes de enviarlo/);
   assert.match(styles, /\.whatsapp-message-preview/);
-  assert.match(source, /El envío efectivo dentro de WhatsApp no puede verificarse/);
+  assert.match(source, /no significa que WhatsApp haya marcado el mensaje como leído/);
   assert.match(source, /WhatsApp registrado como preparado/);
   assert.match(source, /action: "mark-whatsapp-prepared"/);
   assert.match(source, /kind: guest\.invitationSentAt \? "reminder" : "invitation"/);
@@ -941,4 +941,32 @@ test('entregables guía la elección y muestra una vista previa enfocada', () =>
   assert.match(source, /PLANO SIN DATOS PRIVADOS/);
   assert.match(styles, /\.export-workspace/);
   assert.match(styles, /\.export-detail \{ display: grid; grid-template-columns:/);
+});
+
+test('el centro de invitados distingue el recorrido y permite programar recordatorios', () => {
+  assert.match(source, /className={`guest-reminder-schedule/);
+  assert.match(source, /Recordatorio automático por email/);
+  assert.match(source, /filter === "Necesitan recordatorio"/);
+  assert.match(source, /fetch\("\/api\/admin\/settings", \{/);
+  assert.match(source, /method: "PATCH"/);
+  assert.match(source, /Preparado para WhatsApp/);
+  assert.match(source, /Invitación web/);
+  assert.match(source, /Abrió el enlace/);
+  assert.match(source, /no significa que WhatsApp haya marcado el mensaje como leído/);
+  assert.match(styles, /\.guest-reminder-schedule/);
+  assert.match(styles, /\.guest-contact-history em/);
+});
+
+test('el centro de invitados muestra el seguimiento oficial de WhatsApp separado de la apertura web', () => {
+  const guestsApi = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'guests.ts'), 'utf8');
+  const webhook = readFileSync(path.join(appRoot, 'api', '_lib', 'admin', 'whatsapp-webhook.ts'), 'utf8');
+  assert.match(guestsApi, /select=guest_id,status,status_at,error_detail/);
+  assert.match(guestsApi, /whatsappStatusAt: whatsappTracking\.statusAt/);
+  assert.match(guestsApi, /whatsappErrorDetail: whatsappTracking\.errorDetail/);
+  assert.match(source, /guest\.whatsappStatus\s*\? whatsappStatus\(guest\.whatsappStatus\)\[0\]/);
+  assert.match(source, /Meta no pudo entregar el mensaje/);
+  assert.match(webhook, /x-hub-signature-256/);
+  assert.match(webhook, /\['sent', 'delivered', 'read', 'failed'\]/);
+  assert.match(styles, /\.guest-delivery-status\.is-read/);
+  assert.match(styles, /\.guest-delivery-status\.is-failed/);
 });

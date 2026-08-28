@@ -46,6 +46,8 @@ type Guest = {
   guestType: "adult" | "teen" | "child";
   updatedAt: string;
   whatsappStatus?: string;
+  whatsappStatusAt?: string;
+  whatsappErrorDetail?: unknown;
   invitedBy: string;
   companionOfId: string;
   thankedAt?: string;
@@ -1420,6 +1422,17 @@ function Guests({
   canEdit: boolean;
 }) {
   const { text: t, language } = useAdminI18n();
+  const whatsappStatus = (value = "") =>
+    (
+      ({
+        accepted: [adminStatus(language, "accepted"), "pending"],
+        sent: [adminStatus(language, "sent"), "sent"],
+        delivered: [adminStatus(language, "delivered"), "delivered"],
+        read: [adminStatus(language, "read"), "read"],
+        failed: [adminStatus(language, "failed"), "failed"],
+        manual: [t("Preparado manualmente", "Prepared manually", "Preparado manualmente"), "pending"],
+      }) as Record<string, [string, string]>
+    )[value] || [t("Sin envío", "Not sent", "Não enviado"), "empty"];
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("Todos");
   const [sortBy, setSortBy] = useState<"name" | "group" | "food" | "status">("name");
@@ -1453,6 +1466,14 @@ function Guests({
   const [customGuestCode, setCustomGuestCode] = useState("");
   const [newCustomSocialCircle, setNewCustomSocialCircle] = useState(false);
   const [editCustomSocialCircle, setEditCustomSocialCircle] = useState(false);
+  const [reminderSettings, setReminderSettings] = useState<{
+    defaultPhoneCountryCode: string;
+    eventName: string;
+    eventDate: string;
+    reminderDaysBefore: number;
+    automaticRemindersEnabled: boolean;
+  } | null>(null);
+  const [savingReminderSettings, setSavingReminderSettings] = useState(false);
   const importInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (!showModal) setNewCustomSocialCircle(false);
@@ -1463,6 +1484,13 @@ function Guests({
   useEffect(() => {
     setDetailsSocialCircle(inspectingGuest?.socialCircle || "");
   }, [inspectingGuest]);
+  useEffect(() => {
+    fetch("/api/admin/settings", { cache: "no-store" }).then(async (response) => {
+      if (!response.ok) return;
+      const settings = await response.json() as NonNullable<typeof reminderSettings>;
+      setReminderSettings(settings);
+    }).catch(() => undefined);
+  }, []);
   const activeGuests = guests.filter((guest) => !guest.archivedAt);
   const selectedGuests = activeGuests.filter((guest) => selected.includes(guest.id));
   const bulkReminderRecipients = selectedGuests.filter((guest) => guest.status === "Pendiente" && !guest.respondedAt && Boolean(guest.phone) && Boolean(guest.inviteToken));
@@ -1491,6 +1519,9 @@ function Guests({
   const openedPendingInvitations = activeGuests.filter(
     (guest) => guest.status === "Pendiente" && Boolean(guest.invitationOpenedAt),
   ).length;
+  const remindersDue = activeGuests.filter(
+    (guest) => guest.status === "Pendiente" && Boolean(guest.invitationSentAt) && !guest.reminded,
+  ).length;
   const filtered = guests
     .filter((guest) => {
       const matches = `${guest.name} ${guest.group} ${guest.socialCircle}`
@@ -1503,6 +1534,7 @@ function Guests({
         filter === "Sin enviar" ||
         filter === "Enviadas pendientes" ||
         filter === "Vistas pendientes" ||
+        filter === "Necesitan recordatorio" ||
         guest.status === filter ||
         (filter === "Restricciones" && hasGuestRestriction(guest)) ||
         (filter === "Respondieron" && guest.status !== "Pendiente");
@@ -1516,6 +1548,8 @@ function Guests({
             ? guest.status === "Pendiente" && Boolean(guest.invitationSentAt)
             : filter === "Vistas pendientes"
               ? guest.status === "Pendiente" && Boolean(guest.invitationOpenedAt)
+            : filter === "Necesitan recordatorio"
+              ? guest.status === "Pendiente" && Boolean(guest.invitationSentAt) && !guest.reminded
             : true;
       const matchesArchive = filter === "Archivados" ? Boolean(guest.archivedAt) : !guest.archivedAt;
       return matches && matchesView && matchesDelivery && matchesArchive && matchesLogistics;
@@ -1540,6 +1574,30 @@ function Guests({
         { sensitivity: "base" },
       ),
     );
+
+  const saveReminderSettings = async () => {
+    if (!reminderSettings) return;
+    setSavingReminderSettings(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reminderSettings),
+      });
+      const result = await readApiJson<NonNullable<typeof reminderSettings> & { error?: string }>(response, t("La configuración de recordatorios no está disponible.", "Reminder settings are unavailable.", "A configuração de lembretes não está disponível."));
+      if (!response.ok || !result.eventName) throw new Error(result.error || t("No pudimos guardar los recordatorios.", "We couldn't save reminder settings.", "Não foi possível salvar os lembretes."));
+      setReminderSettings(result);
+      setNotice(result.automaticRemindersEnabled
+        ? t("Recordatorio automático activado.", "Automatic reminder enabled.", "Lembrete automático ativado.")
+        : t("Recordatorio automático desactivado.", "Automatic reminder disabled.", "Lembrete automático desativado."));
+    } catch (settingsError) {
+      setError(settingsError instanceof Error ? settingsError.message : t("No pudimos guardar los recordatorios.", "We couldn't save reminder settings.", "Não foi possível salvar os lembretes."));
+    } finally {
+      setSavingReminderSettings(false);
+    }
+  };
 
   const addGuest = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -2299,6 +2357,34 @@ function Guests({
           <small>{t("invitaciones", "invitations", "convites")}</small>
         </button>
       </section>
+      {reminderSettings && (
+        <section className={`guest-reminder-schedule ${reminderSettings.automaticRemindersEnabled ? "is-enabled" : ""}`} aria-label={t("Recordatorios programados", "Scheduled reminders", "Lembretes programados")}>
+          <div>
+            <span className="guest-reminder-schedule-icon" aria-hidden="true">◷</span>
+            <p>
+              <strong>{t("Recordatorio automático por email", "Automatic email reminder", "Lembrete automático por email")}</strong>
+              <small>{reminderSettings.eventDate
+                ? t(`Se enviará una vez a quienes sigan pendientes, ${reminderSettings.reminderDaysBefore} días antes del evento.`, `It will be sent once to guests still pending, ${reminderSettings.reminderDaysBefore} days before the event.`, `Será enviado uma vez a quem continuar pendente, ${reminderSettings.reminderDaysBefore} dias antes do evento.`)
+                : t("Agregá la fecha del evento en Configuración para poder programarlo.", "Add the event date in Settings to schedule it.", "Adicione a data do evento em Configurações para programá-lo.")}</small>
+            </p>
+          </div>
+          {canEdit && <div className="guest-reminder-schedule-controls">
+            <label>
+              <span>{t("Días antes", "Days before", "Dias antes")}</span>
+              <input type="number" min="1" max="60" value={reminderSettings.reminderDaysBefore} disabled={!reminderSettings.automaticRemindersEnabled || savingReminderSettings} onChange={(event) => setReminderSettings((current) => current ? { ...current, reminderDaysBefore: Math.max(1, Math.min(60, Number(event.target.value) || 1)) } : current)} />
+            </label>
+            <label className="guest-reminder-toggle">
+              <input type="checkbox" checked={reminderSettings.automaticRemindersEnabled} disabled={!reminderSettings.eventDate || savingReminderSettings} onChange={(event) => setReminderSettings((current) => current ? { ...current, automaticRemindersEnabled: event.target.checked } : current)} />
+              <span>{reminderSettings.automaticRemindersEnabled ? t("Activado", "Enabled", "Ativado") : t("Desactivado", "Disabled", "Desativado")}</span>
+            </label>
+            <button className="outline-button compact" type="button" disabled={savingReminderSettings || !reminderSettings.eventDate} onClick={() => void saveReminderSettings()}>{savingReminderSettings ? t("Guardando…", "Saving…", "Salvando…") : t("Guardar", "Save", "Salvar")}</button>
+          </div>}
+          <button type="button" className={`guest-reminder-due ${filter === "Necesitan recordatorio" ? "active" : ""}`} onClick={() => setFilter("Necesitan recordatorio")}>
+            <strong>{remindersDue}</strong>
+            <span>{t("necesitan recordatorio", "need a reminder", "precisam de lembrete")}</span>
+          </button>
+        </section>
+      )}
       <section className="panel table-panel">
         <div className="table-tools">
           <label className="search">
@@ -2314,7 +2400,7 @@ function Guests({
             />
           </label>
           <div className="filter-pills">
-            {["Todos", "Sin enviar", "Enviadas pendientes", "Vistas pendientes", "Confirmado", "Pendiente", "No asiste", "Respondieron", "Restricciones", "Logística", "Archivados"].map((item) => (
+            {["Todos", "Sin enviar", "Enviadas pendientes", "Vistas pendientes", "Necesitan recordatorio", "Confirmado", "Pendiente", "No asiste", "Respondieron", "Restricciones", "Logística", "Archivados"].map((item) => (
               <button
                 key={item}
                 className={filter === item ? "active" : ""}
@@ -2328,6 +2414,8 @@ function Guests({
                       ? t("Preparadas, sin respuesta", "Prepared, no response", "Preparados, sem resposta")
                     : item === "Vistas pendientes"
                       ? t("Vistas, sin respuesta", "Opened, no response", "Visualizados, sem resposta")
+                    : item === "Necesitan recordatorio"
+                      ? t("Necesitan recordatorio", "Need a reminder", "Precisam de lembrete")
                   : item === "Respondieron"
                     ? t("Respondieron", "Responded", "Responderam")
                     : item === "Restricciones"
@@ -2593,15 +2681,18 @@ function Guests({
                     )}
                   </td>
                   <td className="guest-secondary-column guest-follow-up-column" data-label={t("Seguimiento", "Tracking", "Acompanhamento")}>
-                    <div className="guest-follow-up"><span className={`delivery-status guest-delivery-status ${guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
-                      <strong>{guest.respondedAt
+                    <div className="guest-follow-up"><span className={`delivery-status guest-delivery-status ${guest.whatsappStatus ? `is-${whatsappStatus(guest.whatsappStatus)[1]}` : guest.respondedAt ? "responded" : guest.invitationOpenedAt ? "opened" : guest.invitationSentAt ? "sent" : "unsent"}`}>
+                      <strong>{guest.whatsappStatus
+                        ? whatsappStatus(guest.whatsappStatus)[0]
+                        : guest.respondedAt
                         ? t("Respondió", "Responded", "Respondeu")
                         : guest.invitationOpenedAt
                           ? t("Abrió", "Opened", "Abriu")
                           : guest.invitationSentAt
                             ? t("Preparada", "Prepared", "Preparado")
                             : t("Sin enviar", "Not sent", "Não enviado")}</strong>
-                      {(guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt) && <small>{reportDate(guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt || "", language)}</small>}
+                      {(guest.whatsappStatusAt || guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt) && <small>{reportDate(guest.whatsappStatusAt || guest.respondedAt || guest.invitationOpenedAt || guest.invitationSentAt || "", language)}</small>}
+                      {guest.whatsappStatus === "failed" && <small className="guest-delivery-error">{t("Meta no pudo entregar el mensaje", "Meta could not deliver the message", "A Meta não conseguiu entregar a mensagem")}</small>}
                       {guest.status === "Pendiente" && guest.reminded && <small className="guest-last-reminder">{t("Último recordatorio", "Last reminder", "Último lembrete")} · {reportDate(guest.reminded, language)}</small>}
                     </span>{guest.status === "Pendiente" && <button type="button" disabled={!guest.phone || updatingId === guest.id} onClick={() => setWhatsAppReviewGuest(guest)}>{!guest.phone ? t("Falta WhatsApp", "WhatsApp missing", "Falta WhatsApp") : guest.invitationOpenedAt ? t("Recordar respuesta", "Remind to respond", "Lembrar resposta") : guest.invitationSentAt ? t("Reenviar invitación", "Resend invitation", "Reenviar convite") : t("Enviar invitación", "Send invitation", "Enviar convite")}</button>}</div>
                   </td>
@@ -2822,15 +2913,16 @@ function Guests({
               {meaningfulGuestValue(inspectingGuest.guestNotes) && <div className="is-wide"><dt>{t("Otras respuestas u observaciones", "Other answers or notes", "Outras respostas ou observações")}</dt><dd>{inspectingGuest.guestNotes}</dd></div>}
             </dl>
             <section className="guest-contact-history" aria-label={t("Historial de contacto", "Contact history", "Histórico de contato")}>
-              <h3>{t("Historial de contacto", "Contact history", "Histórico de contato")}</h3>
+              <h3>{t("Recorrido de la invitación", "Invitation journey", "Percurso do convite")}</h3>
               <ol>
-                <li className={inspectingGuest.invitationSentAt ? "is-complete" : ""}><span /> <div><strong>{t("WhatsApp preparado", "WhatsApp prepared", "WhatsApp preparado")}</strong><small>{inspectingGuest.invitationSentAt ? reportDate(inspectingGuest.invitationSentAt, language) : t("Todavía no se preparó", "Not prepared yet", "Ainda não preparado")}</small></div></li>
-                <li className={inspectingGuest.invitationOpenedAt ? "is-complete" : ""}><span /> <div><strong>{t("Invitación vista", "Invitation viewed", "Convite visualizado")}</strong><small>{inspectingGuest.invitationOpenedAt ? reportDate(inspectingGuest.invitationOpenedAt, language) : t("Sin apertura registrada", "No view recorded", "Sem visualização registrada")}</small></div></li>
-                <li className={inspectingGuest.respondedAt ? "is-complete" : ""}><span /> <div><strong>{t("Respuesta recibida", "Response received", "Resposta recebida")}</strong><small>{inspectingGuest.respondedAt ? `${adminStatus(language, inspectingGuest.status)} · ${reportDate(inspectingGuest.respondedAt, language)}` : t("Respuesta pendiente", "Response pending", "Resposta pendente")}</small></div></li>
-                {inspectingGuest.reminded && <li className="is-complete"><span /><div><strong>{t("Último recordatorio", "Last reminder", "Último lembrete")}</strong><small>{reportDate(inspectingGuest.reminded, language)}</small></div></li>}
+                <li className={inspectingGuest.invitationSentAt ? "is-complete" : ""}><span /> <div><em>{t("Mensaje", "Message", "Mensagem")}</em><strong>{t("Preparado para WhatsApp", "Prepared for WhatsApp", "Preparado para WhatsApp")}</strong><small>{inspectingGuest.invitationSentAt ? reportDate(inspectingGuest.invitationSentAt, language) : t("Todavía no se preparó", "Not prepared yet", "Ainda não preparado")}</small></div></li>
+                {inspectingGuest.whatsappStatus && <li className={inspectingGuest.whatsappStatus === "failed" ? "has-error" : "is-complete"}><span /> <div><em>WhatsApp Business</em><strong>{whatsappStatus(inspectingGuest.whatsappStatus)[0]}</strong><small>{inspectingGuest.whatsappStatusAt ? reportDate(inspectingGuest.whatsappStatusAt, language) : t("Actualización recibida de Meta", "Update received from Meta", "Atualização recebida da Meta")}</small>{inspectingGuest.whatsappStatus === "failed" && <small>{t("Meta no pudo entregar el mensaje", "Meta could not deliver the message", "A Meta não conseguiu entregar a mensagem")}</small>}</div></li>}
+                <li className={inspectingGuest.invitationOpenedAt ? "is-complete" : ""}><span /> <div><em>{t("Invitación web", "Web invitation", "Convite web")}</em><strong>{t("Abrió el enlace", "Opened the link", "Abriu o link")}</strong><small>{inspectingGuest.invitationOpenedAt ? reportDate(inspectingGuest.invitationOpenedAt, language) : t("Sin apertura registrada", "No view recorded", "Sem visualização registrada")}</small></div></li>
+                <li className={inspectingGuest.respondedAt ? "is-complete" : ""}><span /> <div><em>RSVP</em><strong>{t("Respuesta recibida", "Response received", "Resposta recebida")}</strong><small>{inspectingGuest.respondedAt ? `${adminStatus(language, inspectingGuest.status)} · ${reportDate(inspectingGuest.respondedAt, language)}` : t("Respuesta pendiente", "Response pending", "Resposta pendente")}</small></div></li>
+                <li className={inspectingGuest.reminded ? "is-complete" : ""}><span /><div><em>{t("Seguimiento", "Follow-up", "Acompanhamento")}</em><strong>{t("Último recordatorio", "Last reminder", "Último lembrete")}</strong><small>{inspectingGuest.reminded ? reportDate(inspectingGuest.reminded, language) : t("Todavía no se recordó", "No reminder yet", "Ainda sem lembrete")}</small></div></li>
               </ol>
             </section>
-            <p className="delivery-verification-note">{t("Save Your Date puede confirmar cuándo se preparó el mensaje y cuándo se abrió la invitación. El envío efectivo dentro de WhatsApp no puede verificarse desde el panel.", "Save Your Date can confirm when the message was prepared and when the invitation was opened. Sending inside WhatsApp cannot be verified from the panel.", "A Save Your Date confirma quando a mensagem foi preparada e quando o convite foi aberto. O envio dentro do WhatsApp não pode ser verificado pelo painel.")}</p>
+            <p className="delivery-verification-note">{t("“Preparado” registra la salida desde el panel. “Abrió el enlace” confirma una visita a la invitación web; no significa que WhatsApp haya marcado el mensaje como leído.", "“Prepared” records the action from the dashboard. “Opened the link” confirms a visit to the web invitation; it does not mean WhatsApp marked the message as read.", "“Preparado” registra a ação no painel. “Abriu o link” confirma uma visita ao convite web; não significa que o WhatsApp marcou a mensagem como lida.")}</p>
             <div className="modal-actions"><button className="outline-button" type="button" onClick={() => setInspectingGuest(null)}>{t("Cerrar", "Close", "Fechar")}</button>{canEdit && <button className="primary-button small" type="button" onClick={() => { setEditingGuest(inspectingGuest); setInspectingGuest(null); }}>{t("Editar datos", "Edit details", "Editar dados")}</button>}</div>
           </div>
         </div>

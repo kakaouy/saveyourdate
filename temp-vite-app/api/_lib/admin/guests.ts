@@ -83,7 +83,16 @@ type GuestRow = {
   checked_in_at?: string | null;
 };
 
-const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
+type WhatsAppTracking = {
+  status: string;
+  statusAt: string;
+  errorDetail: unknown;
+};
+
+const clientGuest = (
+  row: GuestRow,
+  whatsappTracking: WhatsAppTracking = { status: "", statusAt: "", errorDetail: null },
+) => ({
   id: row.id,
   inviteToken: row.invite_token,
   name: row.name,
@@ -115,7 +124,9 @@ const clientGuest = (row: GuestRow, whatsappStatus = "") => ({
   socialSeparateFrom: row.social_separate_from || "",
   preferredTableName: row.preferred_table_name || "",
   updatedAt: row.updated_at,
-  whatsappStatus,
+  whatsappStatus: whatsappTracking.status,
+  whatsappStatusAt: whatsappTracking.statusAt,
+  whatsappErrorDetail: whatsappTracking.errorDetail,
   invitedBy: row.invited_by || "",
   companionOfId: row.companion_of_id || "",
   thankedAt: row.thanked_at || "",
@@ -141,24 +152,29 @@ async function handler(request: Request) {
           `event_guests?order_number=eq.${encodeURIComponent(session.order_number)}&select=*&order=created_at.asc&limit=500`,
         ),
         supabaseRequest(
-          `whatsapp_message_log?order_number=eq.${encodeURIComponent(session.order_number)}&select=guest_id,status&order=created_at.desc&limit=500`,
+          `whatsapp_message_log?order_number=eq.${encodeURIComponent(session.order_number)}&select=guest_id,status,status_at,error_detail&order=status_at.desc&limit=500`,
         ),
       ]);
       const messages = (await messagesResponse.json()) as Array<{
         guest_id: string | null;
         status: string;
+        status_at: string;
+        error_detail: unknown;
       }>;
-      const latestStatus = new Map<string, string>();
+      const latestStatus = new Map<string, WhatsAppTracking>();
       messages.forEach((message) => {
         if (message.guest_id && !latestStatus.has(message.guest_id))
-          latestStatus.set(message.guest_id, message.status);
+          latestStatus.set(message.guest_id, {
+            status: message.status,
+            statusAt: message.status_at || "",
+            errorDetail: message.error_detail || null,
+          });
       });
       return json({
         guests: ((await response.json()) as GuestRow[]).map((guest) =>
           clientGuest(
             guest,
-            latestStatus.get(guest.id) ||
-              (guest.status === "Confirmado" ? "sent" : ""),
+            latestStatus.get(guest.id),
           ),
         ),
       });
@@ -623,7 +639,11 @@ async function handler(request: Request) {
           const manualMessage = `${baseMessage}${giftText ? `\n\nSi querés hacerme un regalo te dejo mis datos:\n${giftText}` : ""}`;
           return json({
             mode: "manual",
-            guest: clientGuest(updatedRows[0], "manual"),
+            guest: clientGuest(updatedRows[0], {
+              status: "manual",
+              statusAt: remindedAt,
+              errorDetail: null,
+            }),
             url: `https://api.whatsapp.com/send/?phone=${phone}&text=${encodeURIComponent(manualMessage)}&type=phone_number&app_absent=0`,
           });
         }
@@ -656,7 +676,14 @@ async function handler(request: Request) {
           channel: "whatsapp_business",
           messageId: delivery.messageId,
         });
-        return json({ guest: clientGuest(rows[0]), mode: "business" });
+        return json({
+          guest: clientGuest(rows[0], {
+            status: "accepted",
+            statusAt: remindedAt,
+            errorDetail: null,
+          }),
+          mode: "business",
+        });
       }
       const status = String(body.status || "");
       if (!id || !["Confirmado", "Pendiente", "No asiste"].includes(status)) {
