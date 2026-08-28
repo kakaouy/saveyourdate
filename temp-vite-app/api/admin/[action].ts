@@ -19,6 +19,7 @@ import events from '../_lib/admin/events.js';
 import resources from '../_lib/admin/resources.js';
 import modules from '../_lib/admin/modules.js';
 import communications from '../_lib/admin/communications.js';
+import orderProgress from '../_lib/admin/order-progress.js';
 import { json } from '../_lib/orders.js';
 
 const handlers: Record<string, { fetch: (request: Request) => Promise<Response> }> = {
@@ -43,6 +44,7 @@ const handlers: Record<string, { fetch: (request: Request) => Promise<Response> 
   , resources
   , modules
   , communications
+  , 'order-progress': orderProgress
 };
 
 async function handler(request: Request) {

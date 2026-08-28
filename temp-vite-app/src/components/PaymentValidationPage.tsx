@@ -81,7 +81,7 @@ export default function PaymentValidationPage() {
     setError('');
     setProgressSuccess('');
     try {
-      const response = await fetch('/api/orders/progress', {
+      const response = await fetch('/api/admin/order-progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, event })

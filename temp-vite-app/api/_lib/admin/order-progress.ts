@@ -8,7 +8,7 @@ import {
   json,
   previewTokenFor,
   sendEmail
-} from '../_lib/orders.js';
+} from '../orders.js';
 
 async function handler(request: Request) {
   if (request.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
@@ -40,12 +40,7 @@ async function handler(request: Request) {
       to: order.customer_email,
       subject: copy[0],
       idempotencyKey: `progress-${event}-${order.order_number}-${Date.now()}`,
-      html: emailShell(
-        copy[1],
-        `<p>${copy[2]}</p>
-         ${emailButton(copy[3], previewUrl)}
-         ${customerHelpHtml(order.language, order.order_number)}`
-      )
+      html: emailShell(copy[1], `<p>${copy[2]}</p>${emailButton(copy[3], previewUrl)}${customerHelpHtml(order.language, order.order_number)}`)
     });
     return json({ ok: true });
   } catch (error) {
