@@ -2,7 +2,7 @@ import { supabaseRequest } from '../orders.js';
 import { levels, microChecks } from '../../../detectives/case.js';
 import type { GameState } from '../../../detectives/game-state.js';
 import validHashes from './access-codes.json' with { type: 'json' };
-export class GameError extends Error { constructor(message: string, public status = 400) { super(message); } }
+export class GameError extends Error { constructor(message: string, public status = 400, public code?: string) { super(message); } }
 export const normalize = (value: string) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().replace(/\s+/g,' ');
 export async function hashCode(code: string) {
   const bytes = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(code.trim().toUpperCase()));
@@ -60,7 +60,7 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
     const answer=normalize(String(body.answer||''));
     const numeric=['numeric','safe','mechanical'].includes(levels[level-1].lock);
     const cleaned=numeric ? answer.replace(/[\s:\-]/g,'') : answer;
-    if(!levels[level-1].answer.some(a=>normalize(a)===cleaned)) throw new GameError('Ese código no abre el candado. Revisá las pruebas o pedí una pista.');
+    if(!levels[level-1].answer.some(a=>normalize(a)===cleaned)) throw new GameError('Ese código no abre el candado. Revisá las pruebas o pedí una pista.',400,'WRONG_ANSWER');
     state.highestLevel=level+1;return state;
   }
   throw new GameError('Acción no válida.');

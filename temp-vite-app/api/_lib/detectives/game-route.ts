@@ -1,7 +1,7 @@
 import { activate, GameError, readGame, sessionHash, updateGame } from './game.js';
 
 function response(data:unknown,status=200,extra:Record<string,string>={}) { return Response.json(data,{status,headers:{'Cache-Control':'no-store',...extra}}); }
-function failure(error:unknown) { if(error instanceof GameError) return response({error:error.message},error.status); console.error('Game storage operation failed');return response({error:'No pudimos guardar en este momento. Conservamos tu respuesta; volvé a intentar.'},503); }
+function failure(error:unknown) { if(error instanceof GameError) return response({error:error.message,code:error.code},error.status); console.error('Game storage operation failed');return response({error:'No pudimos guardar en este momento. Conservamos tu respuesta; volvé a intentar.'},503); }
 export async function GET(request:Request) {try{return response((await readGame(await sessionHash(request))).state);}catch(error){return failure(error);}}
 export async function POST(request:Request) {
   try {

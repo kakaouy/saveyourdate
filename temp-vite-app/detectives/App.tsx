@@ -1,3 +1,5 @@
+import FedericaFeedback from './FedericaFeedback';
+import { isAlibiName, type AlibiName } from './alibi-feedback';
 import MissionMap from './MissionMap';
 'use client';
 
@@ -71,6 +73,7 @@ export default function Home() {
   const [answer, setAnswer] = useState('');
   const [message, setMessage] = useState('');
   const [hints, setHints] = useState<Record<number, number>>({});
+  const [alibiResponse, setAlibiResponse] = useState<AlibiName | null>(null);
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
   const [finalAnswers, setFinalAnswers] = useState({ who: '', how: '', where: '' });
   const [musicOn, setMusicOn] = useState(false);
@@ -105,7 +108,10 @@ export default function Home() {
     setBusy(true); setMessage(''); setSaveStatus('Guardando…');
     try {
       const response = await fetch('/los-archivos-f/api/game', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const data = await response.json() as GameState & {error?:string};
+      const data = await response.json() as GameState & {error?:string;code?:string};
+      if (response.status === 400 && data.code === 'WRONG_ANSWER' && body.action === 'unlock' && body.level === 2 && isAlibiName(body.answer)) {
+        setAlibiResponse(body.answer); setSaveStatus('Progreso conservado'); return null;
+      }
       if (!response.ok) throw new Error(data.error || 'No pudimos guardar. Volvé a intentar.');
       receiveState(data); setSaveStatus('Progreso guardado'); return data as GameState;
     } catch(error) {
@@ -148,6 +154,8 @@ export default function Home() {
 
   async function submitLevel(event: FormEvent) {
     event.preventDefault();
+    if (busy) return;
+    if (!answer.trim()) { setMessage('Elegí una respuesta antes de verificar.'); return; }
     if (await gameAction({action:'unlock',level,answer})) { setMessage(`Desbloqueaste: ${levels[level-1].unlock}.`); setAnswer(''); }
   }
 
@@ -256,6 +264,7 @@ export default function Home() {
         </div>
       </section>}
 
+      {alibiResponse !== null && <FedericaFeedback suspect={alibiResponse} onClose={() => { setAlibiResponse(null); setAnswer(''); requestAnimationFrame(() => { const button = document.querySelector<HTMLButtonElement>('.suspect-file'); button?.focus({preventScroll:true}); button?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',block:'center'}); }); }} />}
       {selectedStatement !== null && <InterrogationDialog index={selectedStatement} onClose={() => setSelectedStatement(null)} />}
 
       {showAccess && <div className="modal-backdrop" onMouseDown={() => {setShowAccess(false); setMessage('');}}><form className="access-card" onSubmit={access} onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowAccess(false)}>×</button><p className="eyebrow dark">ACCESO RESTRINGIDO</p><h2>Identificate, agente.</h2><p>Ingresá el código impreso debajo del QR de tu carpeta.</p><label htmlFor="agent-code">Código del expediente</label><input id="agent-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="F01-XXXX-XXXX-XXXX-XXXX" autoComplete="off" /><label htmlFor="agent-name">Nombre o alias</label><input id="agent-name" value={agent} onChange={(e) => setAgent(e.target.value)} placeholder="Tu nombre o alias de agente" maxLength={48} autoComplete="off" />{message && <p className="form-error">{message}</p>}<button className="primary-button full" type="submit">ACTIVAR INVESTIGACIÓN <span>→</span></button><small>No necesitás cuenta de ChatGPT. Cada código abre una partida compartida por tu familia. Usá un alias; no hace falta dar el nombre completo. Guardá tu tarjeta para recuperar el avance.</small></form></div>}
