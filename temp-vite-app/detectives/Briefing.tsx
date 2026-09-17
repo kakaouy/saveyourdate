@@ -1,3 +1,4 @@
+import TransmissionPlayer from './TransmissionPlayer';
 import Typewriter from './Typewriter';
 import { useState, useRef } from 'react';
 import { briefing } from './mission-script';
@@ -12,6 +13,7 @@ export default function Briefing({agent,onComplete}:{agent:string;onComplete:()=
  const [ready,setReady]=useState(false);
  const [reading,setReading]=useState(false);
  const [audioFailed,setAudioFailed]=useState(false);
+ const [playing,setPlaying]=useState(false);
  const [radioOpen,setRadioOpen]=useState(false);
  const [selected,setSelected]=useState<number|null>(null);
  const [discovered,setDiscovered]=useState<number[]>([]);
@@ -26,10 +28,17 @@ export default function Briefing({agent,onComplete}:{agent:string;onComplete:()=
  }
  function discover(index:number){setSelected(index);setDiscovered(previous=>previous.includes(index)?previous:[...previous,index]);}
  return <section className="briefing-page discovery-briefing">
-  <figure className="federica-scene"><img src="/los-archivos-f/images/federica-referencia.jpeg" alt="Federica te espera en el archivo del faro con una carpeta confidencial y una radio"/><button className="scene-hotspot radio-hotspot" onClick={toggleRadio} aria-expanded={radioOpen} aria-controls="federica-transmission"><span>◉</span> Sintonizar radio</button><button className="scene-hotspot folder-hotspot" onClick={()=>{setReading(true);discover(2);revealArea('dossier-content');}}><span>⌕</span> Examinar archivos</button><figcaption><span className="signal-dot"/> CONTACTO ESTABLECIDO <b>AGENTE FEDERICA · AGENCIA F</b></figcaption></figure>
+  <figure className="federica-scene"><div className="federica-scene-visual"><img src="/los-archivos-f/images/federica-referencia.jpeg" alt="Federica te espera en el archivo del faro con una carpeta confidencial y una radio"/><span className="lighthouse-beam" aria-hidden="true"/><span className="lighthouse-lamp" aria-hidden="true"/><button className="scene-hotspot radio-hotspot" onClick={toggleRadio} aria-expanded={radioOpen} aria-controls="federica-transmission"><span>◉</span> Sintonizar radio</button><button className="scene-hotspot folder-hotspot" onClick={()=>{setReading(true);discover(2);revealArea('dossier-content');}}><span>⌕</span> Examinar archivos</button></div><figcaption><span className="signal-dot"/> CONTACTO ESTABLECIDO <b>AGENTE FEDERICA · AGENCIA F</b></figcaption></figure>
   <div className="briefing-copy"><p className="eyebrow">EXPLORÁ EL PUESTO SECRETO</p><h1>Agente {agent},<br/>hay algo que debés descubrir.</h1><p className="briefing-deck"><Typewriter text="Federica dejó una transmisión y cuatro documentos. Elegí por dónde empezar: tocá la radio, abrí los archivos y reuní los detalles de tu misión."/></p>
-   <button className="transmission-trigger" onClick={toggleRadio} aria-expanded={radioOpen} aria-controls="federica-transmission"><span className="signal-dot"/><span>TRANSMISIÓN DE FEDERICA<small>{radioOpen?'Ocultar receptor':'Señal detectada · tocar para sintonizar'}</small></span><b>{radioOpen?'−':'+'}</b></button>
-   <div id="federica-transmission" hidden={!radioOpen} className="briefing-player"><label htmlFor="federica-audio">Escuchá el mensaje completo de Federica</label><audio id="federica-audio" ref={audio} controls preload="metadata" src="/los-archivos-f/audio/federica-bienvenida-v2.wav" onEnded={()=>setReady(true)} onError={()=>{setAudioFailed(true);setReading(true);}}/><small>También podés descubrir el mensaje en los cuatro documentos.</small></div>
+   <div className={`transmission-receiver ${playing?'is-playing':''}`}>
+    <button className="transmission-trigger" onClick={toggleRadio} aria-expanded={radioOpen} aria-controls="federica-transmission">
+      <span className="transmitter-icon"><img src="/los-archivos-f/images/transmisor-federica.png" alt=""/><i/><i/></span>
+      <span>TRANSMISIÓN DE FEDERICA<small>{radioOpen?'Ocultar receptor':'Señal detectada · tocar para sintonizar'}</small></span><b>{radioOpen?'−':'+'}</b>
+    </button>
+    <div id="federica-transmission" hidden={!radioOpen} className="briefing-player">
+      <TransmissionPlayer audioRef={audio} onEnded={()=>setReady(true)} onPlaying={setPlaying} onError={()=>{setAudioFailed(true);setReading(true);}}/>
+    </div>
+   </div>
    {!reading&&<button className="reading-choice" onClick={()=>{audio.current?.pause();setReading(true);}}>Prefiero leer y explorar la misión</button>}
    {audioFailed&&<p role="status">No pudimos cargar el audio. Podés explorar los cuatro documentos y continuar por lectura.</p>}
    <div className="discovery-heading"><span>DOCUMENTOS CONFIDENCIALES</span><span aria-live="polite">{discovered.length}/4 descubiertos</span></div>
