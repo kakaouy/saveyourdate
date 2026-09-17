@@ -1,0 +1,26 @@
+temp-vite-app/api/_lib/admin/tables.ts
+  s_a6a684b26211ff::t_835b12b5468c8a 80-83,97,108
+temp-vite-app/supabase/migrations/20260809040000_floor_plan_permissions.sql
+  s_a6a684b26211ff::t_835b12b5468c8a 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "9d81c62040b3b037a23cda43c764e562bddea8d5",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  },
+  "sessions": {
+    "s_a6a684b26211ff": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fe7c2-981a-7ce2-af98-2c7ae7f7f82d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

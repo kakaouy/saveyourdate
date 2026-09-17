@@ -1,0 +1,39 @@
+conductor/plan.md
+  s_8575eec0671a49::t_7239fbf807943d 1-54
+temp-vite-app/src/App.tsx
+  s_8575eec0671a49::t_820ae043f7cc88 1053-1054
+  s_8575eec0671a49::t_b3bd7aadb6dae4 1235-1275,1293-1592,1612-1653,1666-1701
+  s_8575eec0671a49::t_af72a68877dcea 613-616
+  s_8575eec0671a49::t_8ce1505085f39b 270-309
+  s_8575eec0671a49::t_91e78ac59e651c 1031-1052,1055-1060
+  s_8575eec0671a49::t_497293c7469900 1720
+  s_8575eec0671a49::t_be9bf3f21ea18a 916-919
+  s_8575eec0671a49::t_b8bd2795f47d1f 1593-1611,1654-1665
+  s_8575eec0671a49::t_1cbfd735153e74 1276-1289
+  s_8575eec0671a49::t_71cc84a23aeb03 875-915,920-922
+  s_8575eec0671a49::t_54057c216e7372 573-612
+  s_8575eec0671a49::t_be82b078d843e1 19-20
+  s_8575eec0671a49::t_be1540d41f7a2e 628-629
+  s_8575eec0671a49::t_66cdbe469b8561 1757
+  s_8575eec0671a49::t_e690cdd1d8b16e 325-326
+  s_8575eec0671a49::t_276cd77842ba77 310-313
+  s_8575eec0671a49::t_486431ff3c8169 1702
+temp-vite-app/src/App.css
+  s_8575eec0671a49::t_ca8612b1be5e6b 1671-1916
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "527f487d1cefb6f72792bde4b8e10219429488bd",
+  "prompts": {},
+  "sessions": {
+    "s_8575eec0671a49": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "d0f62db8-0451-4f80-a80c-5b960bd2b2f8",
+        "model": "gemini-3.5-flash"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

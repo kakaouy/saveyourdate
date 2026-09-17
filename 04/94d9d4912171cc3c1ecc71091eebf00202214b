@@ -1,0 +1,14 @@
+AI/Specs/Ravendell-spec.md
+  h_978362ea3daf54 1-1331
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0494d9d4912171cc3c1ecc71091eebf00202214b",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

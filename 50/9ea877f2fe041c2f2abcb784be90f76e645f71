@@ -1,0 +1,19 @@
+temp-vite-app/src/domain/section-dom-order.ts
+  s_39b35e1573391e::t_7ca40cc3dedf84 28,36,42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "509ea877f2fe041c2f2abcb784be90f76e645f71",
+  "prompts": {},
+  "sessions": {
+    "s_39b35e1573391e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffb74-e2d1-7630-9fd7-5d766363c852",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

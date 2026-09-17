@@ -1,0 +1,25 @@
+temp-vite-app/public/desarrollo/quince/invite_001/index.html
+  s_9d12dacf17b748::t_475759dadcd371 1387-1389
+temp-vite-app/src/App.css
+  s_9d12dacf17b748::t_0c34187ffa5d26 4317-4327
+temp-vite-app/src/App.tsx
+  s_9d12dacf17b748::t_db5a0d3ce9cf35 2181
+temp-vite-app/src/data/models.ts
+  s_9d12dacf17b748::t_4eac900dc1202f 273
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f167aeae665224f2d133fc64050c00f299f3da48",
+  "prompts": {},
+  "sessions": {
+    "s_9d12dacf17b748": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9134-eb50-7093-94a7-61a0dda45bbf",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

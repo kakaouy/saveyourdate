@@ -1,0 +1,15 @@
+temp-vite-app/public/rosewood/index.html
+  h_978362ea3daf54 1369-1371,1373-1374,1376-1394,1396-1407,1429,1564,1568
+  h_978362ea3daf54 1395
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "3a0896f8adea55c27fad78af7895a5c0f51ec393",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

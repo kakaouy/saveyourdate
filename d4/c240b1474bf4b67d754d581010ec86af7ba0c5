@@ -1,0 +1,14 @@
+temp-vite-app/public/rivendell/index.html
+  h_978362ea3daf54 1-1953
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "d4c240b1474bf4b67d754d581010ec86af7ba0c5",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

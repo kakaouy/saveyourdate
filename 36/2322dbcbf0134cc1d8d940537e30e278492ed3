@@ -1,0 +1,23 @@
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7d428c8dc67b21::t_ee3422fee8d1f2 926-934,944,946,949,986
+temp-vite-app/api/_lib/admin/settings.ts
+  s_7d428c8dc67b21::t_ee3422fee8d1f2 15-18,24,26-27,30-34,36-37
+temp-vite-app/api/cron-reminders.ts
+  s_7d428c8dc67b21::t_ee3422fee8d1f2 34,47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "362322dbcbf0134cc1d8d940537e30e278492ed3",
+  "prompts": {},
+  "sessions": {
+    "s_7d428c8dc67b21": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa190-3325-7952-a15c-acd4c3daf656",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

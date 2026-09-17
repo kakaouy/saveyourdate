@@ -1,0 +1,23 @@
+temp-vite-app/src/domain/invitation-builder.ts
+  s_39b35e1573391e::t_4b2410fdeadc47 70-71,75,80-81,84
+temp-vite-app/tests/aurora-builder.test.ts
+  s_39b35e1573391e::t_30fa7dae81201a 28-31
+temp-vite-app/src/components/aurora/builder.ts
+  s_39b35e1573391e::t_4b2410fdeadc47 14-15,19,71-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "363e1098a095f6d9d3d7d8224d4958c1cdae7dd9",
+  "prompts": {},
+  "sessions": {
+    "s_39b35e1573391e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffb74-e2d1-7630-9fd7-5d766363c852",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

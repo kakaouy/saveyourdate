@@ -1,0 +1,24 @@
+temp-vite-app/src/components/PaymentValidationPage.tsx
+  s_7bf15498a84739::t_2ca1f4a3400c0c 84
+temp-vite-app/api/_lib/admin/order-progress.ts
+  s_7bf15498a84739::t_c9d4b05f3d42fb 11
+  s_7bf15498a84739::t_2ca1f4a3400c0c 43
+temp-vite-app/api/admin/[action].ts
+  s_7bf15498a84739::t_2ca1f4a3400c0c 22,47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "32ba797d68a3fc2a104c6a90b5aad731629f9737",
+  "prompts": {},
+  "sessions": {
+    "s_7bf15498a84739": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04384-e93b-7e52-b32b-d6b49a0c1989",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+temp-vite-app/src/App.tsx
+  s_ac1fd0eccfada9::t_ccb30b69ae9829 1930-1931
+  s_ac1fd0eccfada9::t_7f5e8f3b5c2f49 848-855
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "146c13cc67fb12f086da76f8ea50ef9437b7abb2",
+  "prompts": {},
+  "sessions": {
+    "s_ac1fd0eccfada9": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "8ba338bb-0e56-4289-a59e-c2ddfb58ca02",
+        "model": "gemini-3.5-flash"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

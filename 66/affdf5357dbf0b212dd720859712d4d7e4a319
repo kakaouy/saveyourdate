@@ -1,0 +1,32 @@
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7d428c8dc67b21::t_c66ac9567c0d77 535-536
+  s_7d428c8dc67b21::t_bb308ecf59bdbf 523-524
+  s_7d428c8dc67b21::t_1043d84481c14e 12-13,107-109,340,418-420,446-447,470-471,478-480
+temp-vite-app/api/rsvp.ts
+  s_7d428c8dc67b21::t_6b18f25fc6fe6f 13-14,19,52,73-74
+  s_7d428c8dc67b21::t_b2d81a08bcd4fc 50-51
+temp-vite-app/src/components/GuestRsvpPage.tsx
+  s_7d428c8dc67b21::t_c66ac9567c0d77 9,20-21,35-36,49,73-74
+temp-vite-app/api/_lib/admin/guests.ts
+  s_7d428c8dc67b21::t_6b18f25fc6fe6f 6,18-19,60-61,87-88
+  s_7d428c8dc67b21::t_f6b17d59dc10de 117,139-140
+temp-vite-app/supabase/orders.sql
+  s_7d428c8dc67b21::t_6b18f25fc6fe6f 109-110,128-130
+  s_7d428c8dc67b21::t_14c57f38626fe5 131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "66affdf5357dbf0b212dd720859712d4d7e4a319",
+  "prompts": {},
+  "sessions": {
+    "s_7d428c8dc67b21": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa190-3325-7952-a15c-acd4c3daf656",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7bf15498a84739::t_57d90508903989 4144-4153,4155-4159,4161,4697
+  s_7bf15498a84739::t_058054a117fc18 1414,1431-1433,1744-1772,2409-2410,2421,2467-2468,2656
+  s_7bf15498a84739::t_66cb1c8669075a 3930,3936-3943,3946-3947,3955-3956,3997-3998,4001,4010-4011,4014,4120-4121,4181-4190
+  s_7bf15498a84739::t_0c55bea333807e 4437-4458,4460-4463,4466
+  s_7bf15498a84739::t_d5e48ee3b6d467 3405,3647-3649,4426,4429-4436,4459,4464-4465,4467-4469
+  s_7bf15498a84739::t_a94b8c8ed6fb27 4108-4110,4113,4227-4229,4232,4658-4662,4665-4668
+temp-vite-app/src/admin-prototype.css
+  s_7bf15498a84739::t_058054a117fc18 327-328,374-377
+temp-vite-app/supabase/migrations/20260827041000_separate_social_circle_from_invitation_group.sql
+  s_7bf15498a84739::t_058054a117fc18 1-8
+temp-vite-app/tests/admin-guests-center.test.ts
+  s_7bf15498a84739::t_a94b8c8ed6fb27 394-396
+  s_7bf15498a84739::t_0c55bea333807e 426-428
+  s_7bf15498a84739::t_57d90508903989 438-441
+  s_7bf15498a84739::t_d5e48ee3b6d467 422-425,429
+  s_7bf15498a84739::t_6158ee7aa1e8ef 665,668-674
+  s_7bf15498a84739::t_19ed5d2f57ea47 666-667
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c7de6c3ebbae4041fb619a17c3e118a18e28bceb",
+  "prompts": {},
+  "sessions": {
+    "s_7bf15498a84739": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04384-e93b-7e52-b32b-d6b49a0c1989",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

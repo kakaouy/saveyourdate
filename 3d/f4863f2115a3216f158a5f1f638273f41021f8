@@ -1,0 +1,21 @@
+temp-vite-app/api/_lib/admin/access.ts
+  s_7d428c8dc67b21::t_c34cf56a4ecd4a 44-67,70-76,79-84
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7d428c8dc67b21::t_c34cf56a4ecd4a 940,969-992,1000-1001
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "3df4863f2115a3216f158a5f1f638273f41021f8",
+  "prompts": {},
+  "sessions": {
+    "s_7d428c8dc67b21": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa190-3325-7952-a15c-acd4c3daf656",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

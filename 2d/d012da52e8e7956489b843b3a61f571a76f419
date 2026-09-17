@@ -1,0 +1,23 @@
+temp-vite-app/vercel.json
+  s_7bf15498a84739::t_fa46ce0804b5ca 17
+temp-vite-app/src/main.tsx
+  s_7bf15498a84739::t_fa46ce0804b5ca 23
+temp-vite-app/tests/rsvp-experience.test.ts
+  s_7bf15498a84739::t_fa46ce0804b5ca 9-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "2dd012da52e8e7956489b843b3a61f571a76f419",
+  "prompts": {},
+  "sessions": {
+    "s_7bf15498a84739": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04384-e93b-7e52-b32b-d6b49a0c1989",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
