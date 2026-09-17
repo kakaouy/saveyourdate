@@ -256,7 +256,7 @@ export default function Home() {
       </section>}
 
       {screen === 'game' && <section className="game-page">
-        <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} saveStatus={saveStatus} visitLevel={visitLevel} onLibrary={()=>setScreen('library')}/>
+        <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={requestHint}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onLibrary={()=>setScreen('library')}/>
 
         <div className="investigation-panel">
           {level <= 7 && <figure className={`scene-frame ${level === 0 ? 'storm-layer' : level === 4 || level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt="Escena del Museo del Faro vinculada con la investigación" /><span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
@@ -265,7 +265,6 @@ export default function Home() {
 
           {level >= 1 && level <= 7 && (() => {
             const current = levels[level - 1];
-            const shown = hints[level] || 0;
             const unlockedMessage = unlockMessages[level - 1];
             const checkIndex = unlocked ? microChecks[level - 1].length : checkProgress[level] || 0;
             const currentCheck = microChecks[level - 1][checkIndex];
@@ -283,7 +282,6 @@ export default function Home() {
               {unlocked && level === 2 && <div className="physical-brief"><span>ACLARACIÓN DE MARTINA</span><p>“Sí, pasé mi tarjeta. Había dejado la medicina en mi bolso, en el taller. El registro demuestra que abrí una puerta, no que robé el rubí.”</p><p>La contradicción es un indicio. Todavía falta probar el método y encontrar el original.</p></div>}
               {unlocked && <details className="completed-deductions"><summary>Consultar deducciones resueltas</summary>{microChecks[level - 1].map((check) => <div key={check.question}><h3>{check.question}</h3><p>✓ {check.success}</p></div>)}</details>}
               {unlocked && <div className="unlock-reveal"><div className="unlock-icon">✓</div><p className="eyebrow dark">MENSAJE DE FEDE DESBLOQUEADO</p><h2>{current.unlock}</h2><audio key={unlockedMessage.audio} className="unlock-audio" controls src={unlockedMessage.audio}>Tu navegador no puede reproducir este audio.</audio><p>“{unlockedMessage.text}”</p><button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button></div>}
-              {(!unlocked || shown > 0) && <HintLenses key={level} hints={current.hints} used={shown} busy={busy} canRequest={!unlocked} onRequest={requestHint}/>}
             </section>;
           })()}
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { levels } from './case';
 
 export function MissionIcon({stage}: {stage:number}) {
@@ -17,9 +17,13 @@ export function MissionIcon({stage}: {stage:number}) {
  return <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{art[stage]}</svg>;
 }
 
-type Props={level:number;highestLevel:number;hintsUsed:number;saveStatus:string;visitLevel:(n:number)=>void;onLibrary:()=>void};
-export default function MissionMap({level,highestLevel,hintsUsed,saveStatus,visitLevel,onLibrary}:Props) {
+type Props={hintPanel:ReactNode;level:number;highestLevel:number;hintsUsed:number;saveStatus:string;visitLevel:(n:number)=>void;onLibrary:()=>void};
+export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,saveStatus,visitLevel,onLibrary}:Props) {
  const [open,setOpen]=useState(false);
+ const [hintsOpen,setHintsOpen]=useState(false);
+ const hintsDialog=useRef<HTMLDialogElement>(null);
+ const hintsTrigger=useRef<HTMLButtonElement>(null);
+ useEffect(()=>{if(!hintsOpen)return;hintsDialog.current?.showModal();const before=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{hintsDialog.current?.close();document.body.style.overflow=before;hintsTrigger.current?.focus();};},[hintsOpen]);
  const dialog=useRef<HTMLDialogElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
  const done=Math.max(0,Math.min(highestLevel-1,7));
@@ -31,7 +35,7 @@ export default function MissionMap({level,highestLevel,hintsUsed,saveStatus,visi
  },[open]);
  const nodes=[{title:'La misión',number:0},...levels.map((l,i)=>({title:l.title,number:i+1})),{title:'Acusación final',number:8},{title:'Resolución',number:9}];
  return <>
-  <div className="mission-toolbar"><button ref={trigger} className={`mission-toggle ${open?'is-open':''}`} aria-expanded={open} aria-controls="mission-map" aria-haspopup="dialog" onClick={()=>setOpen(!open)}><span className="mission-toggle-icon"><MissionIcon stage={0}/></span><span><b>MISIÓN</b><small>{done}/7 niveles resueltos</small></span><span className="mission-chevron">⌄</span></button><div className="mission-current"><small>ARCHIVO F-01 · {highestLevel===9?'CASO CERRADO':'EN INVESTIGACIÓN'}</small><span>{nodes[level]?.title}</span></div><button className="back-link" onClick={onLibrary}>← Biblioteca</button></div>
+  <div className="mission-toolbar"><button ref={trigger} className={`mission-toggle ${open?'is-open':''}`} aria-expanded={open} aria-controls="mission-map" aria-haspopup="dialog" onClick={()=>setOpen(!open)}><span className="mission-toggle-icon"><MissionIcon stage={0}/></span><span><b>MISIÓN</b><small>{done}/7 niveles resueltos</small></span><span className="mission-chevron">⌄</span></button><div className="mission-current"><small>ARCHIVO F-01 · {highestLevel===9?'CASO CERRADO':'EN INVESTIGACIÓN'}</small><span>{nodes[level]?.title}</span></div><div className="mission-toolbar-actions"><button className="back-link" onClick={onLibrary}>← Biblioteca</button><button ref={hintsTrigger} className="toolbar-hint-lens" aria-label="Abrir pistas" aria-haspopup="dialog" aria-expanded={hintsOpen} onClick={()=>setHintsOpen(true)}><img src="/los-archivos-f/images/lupa-pista.png" alt=""/></button></div></div>
   {open && <dialog ref={dialog} id="mission-map" className="mission-map" aria-labelledby="mission-map-title" onCancel={()=>setOpen(false)} onClick={e=>{if(e.target===e.currentTarget)setOpen(false);}}>
    <div className="mission-map-paper"><header className="mission-map-heading"><div><p className="eyebrow">AGENCIA F · MAPA DE LA INVESTIGACIÓN</p><h2 id="mission-map-title">El robo del Rubí del Faro</h2></div><button className="mission-fold" onClick={()=>setOpen(false)} aria-label="Plegar menú de misión"><MissionIcon stage={0}/><span>MISIÓN <b>⌃</b></span></button></header>
    <div className="mission-progress" role="progressbar" aria-label="Niveles resueltos" aria-valuemin={0} aria-valuemax={7} aria-valuenow={done}><span style={{width:`${done/7*100}%`}}/></div><p className="mission-summary">{highestLevel===9?'Caso cerrado':`${done} de 7 niveles resueltos`} · {hintsUsed} pistas usadas</p>
@@ -40,7 +44,9 @@ export default function MissionMap({level,highestLevel,hintsUsed,saveStatus,visi
     const status=!available?'Bloqueado':number===0?'Mensaje de Fede':number===9?'Caso cerrado':completed?'Resuelto · volver a consultar':'Disponible · investigar';
     return <button key={number} disabled={!available} className={`mission-node ${completed?'solved':''} ${number===level?'selected':''} ${number===9?'ruby-node':''}`} aria-current={number===level?'step':undefined} aria-label={`${title}. ${status}`} onClick={()=>{visitLevel(number);setOpen(false);}}><span className="mission-orb"><MissionIcon stage={number}/><span className="mission-badge">{!available?'⌑':completed?'✓':number||'F'}</span></span><span className="mission-node-copy"><small>{number>0&&number<8?`ETAPA 0${number}`:number===0?'EL COMIENZO':'ARCHIVO F-01'}</small><strong>{title}</strong><span>{status}</span></span>{!available&&<svg className="mission-padlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>}</button>;
    })}</nav>
+   <div className="mission-hints"><h3>Pistas · {nodes[level]?.title}</h3>{hintPanel}</div>
    <footer className="mission-map-footer"><button className="back-link" onClick={()=>{setOpen(false);onLibrary();}}>← Biblioteca</button><p><span className="signal-dot"/>{saveStatus||'Tu avance se guarda al resolver cada desafío.'}</p><p>{highestLevel>=7?'Tenés autorización para abrir el sobre negro.':'El sobre negro permanece cerrado hasta recibir autorización.'}</p></footer></div>
   </dialog>}
+ {hintsOpen&&<dialog ref={hintsDialog} className="hints-dialog" aria-labelledby="hints-dialog-title" onCancel={()=>setHintsOpen(false)} onClick={e=>{if(e.target===e.currentTarget)setHintsOpen(false);}}><div className="hints-dialog-paper"><header><h2 id="hints-dialog-title">Pistas · {nodes[level]?.title}</h2><button aria-label="Cerrar pistas" onClick={()=>setHintsOpen(false)}>×</button></header>{hintPanel}</div></dialog>}
  </>;
 }
