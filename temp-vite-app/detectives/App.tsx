@@ -1,3 +1,4 @@
+import MissionMap from './MissionMap';
 'use client';
 
 import Briefing from './Briefing';
@@ -218,17 +219,7 @@ export default function Home() {
       </section>}
 
       {screen === 'game' && <section className="game-page">
-        <aside className="case-sidebar"><button className="back-link" onClick={() => setScreen('library')}>← Biblioteca</button><p className="eyebrow">ARCHIVO F-01</p><h2>El robo del <br />Rubí del Faro</h2><div className="progress-track"><span style={{width:`${Math.min(highestLevel,8)/8*100}%`}} /></div><p className="progress-label">{highestLevel === 9 ? 'Caso cerrado' : `${Math.max(0, Math.min(highestLevel - 1, 7))} de 7 niveles resueltos`} · {hintsUsed} pistas usadas</p><nav className="level-navigation" aria-label="Niveles del caso">
-          <button onClick={() => visitLevel(0)} aria-current={level === 0 ? 'step' : undefined}><span className="level-number">F</span><span>La misión<small>Mensaje de Fede</small></span></button>
-          {levels.map((item, index) => {
-            const number = index + 1;
-            const available = number <= highestLevel;
-            const completed = number < highestLevel;
-            return <button key={item.title} disabled={!available} onClick={() => visitLevel(number)} aria-current={level === number ? 'step' : undefined} aria-label={`Nivel ${number}: ${item.title}. ${completed ? 'Resuelto' : available ? 'Disponible' : 'Bloqueado'}`}><span className="level-number">{completed ? '✓' : number}</span><span>{item.title}<small>{completed ? 'Resuelto · volver a consultar' : available ? 'En investigación' : 'Bloqueado'}</small></span>{!available && <svg className="level-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>}</button>;
-          })}
-          <button disabled={highestLevel < 8} onClick={() => visitLevel(8)} aria-current={level === 8 ? 'step' : undefined}><span className="level-number">F</span><span>Acusación final<small>{highestLevel < 8 ? 'Bloqueada' : highestLevel === 9 ? 'Resuelta' : 'Disponible'}</small></span></button>
-          {highestLevel === 9 && <button onClick={() => visitLevel(9)} aria-current={level === 9 ? 'step' : undefined}><span className="level-number">✓</span><span>Resolución<small>Caso cerrado</small></span></button>}
-        </nav><div className="evidence-reminder"><b>Recordatorio</b><p>{highestLevel >= 7 ? 'Ya tenés autorización para abrir el sobre negro.' : 'No abras el sobre negro hasta recibir autorización.'}</p></div><p className="save-status" role="status">{saveStatus}</p><button className="save-button" onClick={() => setScreen('library')}>Volver a la biblioteca</button></aside>
+        <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} saveStatus={saveStatus} visitLevel={visitLevel} onLibrary={()=>setScreen('library')}/>
 
         <div className="investigation-panel">
           {level <= 7 && <figure className={`scene-frame ${level === 0 ? 'storm-layer' : level === 4 || level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt="Escena del Museo del Faro vinculada con la investigación" /><span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
