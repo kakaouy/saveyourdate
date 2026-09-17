@@ -1,0 +1,23 @@
+temp-vite-app/detectives/FedericaFeedback.tsx
+  s_baef4ba8b2ecee::t_8361d88080cec7 24
+temp-vite-app/detectives/App.tsx
+  s_baef4ba8b2ecee::t_8361d88080cec7 79-80,125-156,224-229,238
+temp-vite-app/detectives/Briefing.tsx
+  s_baef4ba8b2ecee::t_8361d88080cec7 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ec256148714be16f0051ad5b040654bba8b5eaad",
+  "prompts": {},
+  "sessions": {
+    "s_baef4ba8b2ecee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0af29-ccdc-7862-8d12-45d6d01c6460",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
