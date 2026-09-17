@@ -76,7 +76,8 @@ export default function Home() {
   const [alibiResponse, setAlibiResponse] = useState<AlibiName | null>(null);
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
   const [finalAnswers, setFinalAnswers] = useState({ who: '', how: '', where: '' });
-  const [musicOn, setMusicOn] = useState(false);
+  const [musicOn, setMusicOn] = useState(true);
+  const musicEnabled = useRef(true);
   const musicRef = useRef<HTMLAudioElement>(null);
   const [checkProgress, setCheckProgress] = useState<Record<number, number>>({});
   const [checkSelection, setCheckSelection] = useState<number | null>(null);
@@ -121,15 +122,38 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (musicRef.current) musicRef.current.volume = selectedStatement === null ? 0.22 : 0.04;
-  }, [selectedStatement]);
-
-  useEffect(() => {
-    if(screen === 'briefing') { musicRef.current?.pause(); setMusicOn(false); }
-    const pause = () => { musicRef.current?.pause(); setMusicOn(false); };
-    window.addEventListener('briefing-play', pause);
-    return () => window.removeEventListener('briefing-play', pause);
-  }, [screen]);
+    const player = musicRef.current;
+    if (!player) return;
+    // Keep one ambient player mounted across access, briefing and case screens.
+    const syncVolume = () => {
+      const speaking = Array.from(document.querySelectorAll('audio')).some(audio => audio !== player && !audio.paused && !audio.ended);
+      player.volume = speaking ? 0.04 : 0.22;
+    };
+    const start = () => {
+      if (!musicEnabled.current || !player.paused) return;
+      syncVolume();
+      void player.play().then(() => { if (!musicEnabled.current) player.pause(); }).catch(() => {
+        // Autoplay may be blocked; a subsequent gesture retries without resetting time.
+      });
+    };
+    const gesture = (event: Event) => {
+      if (event.target instanceof Element && event.target.closest('.music-button')) return;
+      start();
+    };
+    document.addEventListener('pointerdown', gesture, true);
+    document.addEventListener('keydown', gesture, true);
+    for (const type of ['play', 'pause', 'ended', 'emptied']) document.addEventListener(type, syncVolume, true);
+    const observer = new MutationObserver(syncVolume);
+    observer.observe(document.body, {childList:true,subtree:true});
+    start();
+    return () => {
+      document.removeEventListener('pointerdown', gesture, true);
+      document.removeEventListener('keydown', gesture, true);
+      for (const type of ['play', 'pause', 'ended', 'emptied']) document.removeEventListener(type, syncVolume, true);
+      observer.disconnect();
+      player.pause();
+    };
+  }, []);
 
   function visitLevel(destination: number) {
     if (destination < 0 || destination > highestLevel) return;
@@ -197,9 +221,12 @@ export default function Home() {
   async function toggleMusic() {
     const player = musicRef.current;
     if (!player) return;
-    if (musicOn) { player.pause(); setMusicOn(false); return; }
-    player.volume = 0.22;
-    try { await player.play(); setMusicOn(true); } catch { setMusicOn(false); }
+    const enabled = !musicEnabled.current;
+    musicEnabled.current = enabled;
+    setMusicOn(enabled);
+    if (!enabled) { player.pause(); return; }
+    try { await player.play(); if (!musicEnabled.current) player.pause(); }
+    catch { /* Retry on the next user gesture if the browser blocks playback. */ }
   }
 
   return (
@@ -208,7 +235,7 @@ export default function Home() {
         <button className="brand brand-button" onClick={() => setScreen('home')}><img className="brand-logo" src="/los-archivos-f/images/logo-archivos-f.png" alt=""/><span>LOS ARCHIVOS F</span></button>
         <div className="nav-meta"><span>10 OCT</span><span className="nav-dot" /><span>FEDE · 11 AÑOS</span></div>
         <div className="nav-tools"><button className={`music-button ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn}>{musicOn ? '♫ AMBIENTE ON' : '♪ ACTIVAR MISTERIO'}</button>{activeSession && screen !== 'home' && screen !== 'briefing' && <button className="agent-chip" onClick={() => setScreen('library')}>AGENTE {agent.toUpperCase()}</button>}</div>
-        <audio ref={musicRef} src="/los-archivos-f/audio/ambiente-faro.wav" loop preload="metadata" />
+        <audio ref={musicRef} src="/los-archivos-f/audio/ambiente-faro.wav" loop preload="auto" />
       </nav>
 
       {screen === 'home' && <section className="welcome-page">
