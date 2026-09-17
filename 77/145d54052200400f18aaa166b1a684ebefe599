@@ -1,0 +1,23 @@
+temp-vite-app/detectives/Briefing.tsx
+  s_baef4ba8b2ecee::t_f651f6a1de5dc0 1,16,31,33-41
+temp-vite-app/detectives/style.css
+  s_baef4ba8b2ecee::t_f651f6a1de5dc0 343-353
+temp-vite-app/detectives/TransmissionPlayer.tsx
+  s_baef4ba8b2ecee::t_f651f6a1de5dc0 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "77145d54052200400f18aaa166b1a684ebefe599",
+  "prompts": {},
+  "sessions": {
+    "s_baef4ba8b2ecee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0af29-ccdc-7862-8d12-45d6d01c6460",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
