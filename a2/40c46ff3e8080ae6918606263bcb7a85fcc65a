@@ -1,0 +1,23 @@
+temp-vite-app/detectives/HintLenses.tsx
+  s_baef4ba8b2ecee::t_f5cd63aa82e5b0 1,28-30
+temp-vite-app/detectives/Briefing.tsx
+  s_baef4ba8b2ecee::t_f5cd63aa82e5b0 46,48
+temp-vite-app/detectives/style.css
+  s_baef4ba8b2ecee::t_f5cd63aa82e5b0 363-368
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a240c46ff3e8080ae6918606263bcb7a85fcc65a",
+  "prompts": {},
+  "sessions": {
+    "s_baef4ba8b2ecee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0af29-ccdc-7862-8d12-45d6d01c6460",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
