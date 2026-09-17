@@ -30,7 +30,7 @@ export async function activate(code: string, agent: string, legacy?: Partial<Gam
   if (code.trim().toUpperCase()==='F01-FEDE-11' && legacy) {
     state.highestLevel=Math.max(0,Math.min(9,Math.floor(Number(legacy.highestLevel)||0)));
     for(let n=1;n<=7;n++) {
-      state.hints[n]=Math.max(0,Math.min(3,Math.floor(Number(legacy.hints?.[n])||0)));
+      state.hints[n]=Math.max(0,Math.min(levels[n-1].hints.length,Math.floor(Number(legacy.hints?.[n])||0)));
       state.checkProgress[n]=n<state.highestLevel ? microChecks[n-1].length : Math.max(0,Math.min(microChecks[n-1].length,Math.floor(Number(legacy.checkProgress?.[n])||0)));
     }
     if(state.highestLevel===9) state.completedAt=new Date().toISOString();
@@ -48,7 +48,7 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
   }
   if(!Number.isInteger(level)||level<1||level>7||level>state.highestLevel) throw new GameError('Este nivel todavía está bloqueado.',403);
   if(level<state.highestLevel) return state;
-  if(body.action==='hint') { state.hints[level]=Math.min(3,(state.hints[level]||0)+1);return state; }
+  if(body.action==='hint') { state.hints[level]=Math.min(levels[level-1].hints.length,(state.hints[level]||0)+1);return state; }
   if(body.action==='deduction') {
     const index=Number(body.index), expected=state.checkProgress[level]||0;
     if(index<expected) return state;

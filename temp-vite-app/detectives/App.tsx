@@ -1,3 +1,4 @@
+import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import FedericaFeedback from './FedericaFeedback';
 import { isAlibiName, type AlibiName } from './alibi-feedback';
@@ -200,7 +201,7 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function requestHint() { await gameAction({action:'hint',level}); }
+  async function requestHint() { return Boolean(await gameAction({action:'hint',level})); }
 
   async function submitFinal(event: FormEvent) {
     event.preventDefault();
@@ -282,7 +283,7 @@ export default function Home() {
               {unlocked && level === 2 && <div className="physical-brief"><span>ACLARACIÓN DE MARTINA</span><p>“Sí, pasé mi tarjeta. Había dejado la medicina en mi bolso, en el taller. El registro demuestra que abrí una puerta, no que robé el rubí.”</p><p>La contradicción es un indicio. Todavía falta probar el método y encontrar el original.</p></div>}
               {unlocked && <details className="completed-deductions"><summary>Consultar deducciones resueltas</summary>{microChecks[level - 1].map((check) => <div key={check.question}><h3>{check.question}</h3><p>✓ {check.success}</p></div>)}</details>}
               {unlocked && <div className="unlock-reveal"><div className="unlock-icon">✓</div><p className="eyebrow dark">MENSAJE DE FEDE DESBLOQUEADO</p><h2>{current.unlock}</h2><audio key={unlockedMessage.audio} className="unlock-audio" controls src={unlockedMessage.audio}>Tu navegador no puede reproducir este audio.</audio><p>“{unlockedMessage.text}”</p><button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button></div>}
-              {!unlocked && <div className="hint-box"><div><b>¿Necesitás una pista?</b><span>Podés pedir hasta tres ayudas en este nivel.</span></div><button onClick={requestHint} disabled={shown >= 3}>PEDIR PISTA {Math.min(shown + 1,3)}/3</button>{shown > 0 && <ol>{current.hints.slice(0, shown).map((hint, i) => <li key={hint}><b>PISTA {i + 1}</b>{hint}</li>)}</ol>}</div>}
+              {(!unlocked || shown > 0) && <HintLenses key={level} hints={current.hints} used={shown} busy={busy} canRequest={!unlocked} onRequest={requestHint}/>}
             </section>;
           })()}
 
