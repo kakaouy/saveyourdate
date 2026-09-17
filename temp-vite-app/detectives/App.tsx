@@ -1,11 +1,12 @@
 'use client';
 
+import Briefing from './Briefing';
 import { levels, unlockMessages, microChecks } from './case';
 import type { GameState } from './game-state';
 
 import { type FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 
-type Screen = 'home' | 'library' | 'game';
+type Screen = 'home' | 'briefing' | 'library' | 'game';
 
 
 
@@ -91,10 +92,10 @@ export default function Home() {
         if (!queryCode) { setAgent(legacy.agent || ''); setCode(legacy.code || ''); }
       }
     } catch { /* A new family session does not require local storage. */ }
-    if (queryCode) { setCode(queryCode.toUpperCase()); setShowAccess(true); history.replaceState(null, '', window.location.pathname); return; }
+    if (queryCode) { setCode(queryCode.toUpperCase()); history.replaceState(null, '', window.location.pathname); return; }
     setBusy(true);
     fetch('/los-archivos-f/api/game').then(async response => {
-      if (response.ok) { const state = await response.json() as GameState; receiveState(state); setLevel(state.highestLevel); setScreen('library'); setSaveStatus('Partida recuperada'); }
+      if (response.ok) { const state = await response.json() as GameState; receiveState(state); setLevel(state.highestLevel); setSaveStatus('Partida recuperada'); }
       else if (response.status !== 401) setSaveStatus('No pudimos recuperar la partida. Volvé a ingresar con tu código.');
     }).catch(() => setSaveStatus('No hay conexión. Volvé a ingresar cuando se restablezca.')).finally(() => setBusy(false));
   }, []);
@@ -116,6 +117,13 @@ export default function Home() {
     if (musicRef.current) musicRef.current.volume = selectedStatement === null ? 0.22 : 0.04;
   }, [selectedStatement]);
 
+  useEffect(() => {
+    if(screen === 'briefing') { musicRef.current?.pause(); setMusicOn(false); }
+    const pause = () => { musicRef.current?.pause(); setMusicOn(false); };
+    window.addEventListener('briefing-play', pause);
+    return () => window.removeEventListener('briefing-play', pause);
+  }, [screen]);
+
   function visitLevel(destination: number) {
     if (destination < 0 || destination > highestLevel) return;
     setLevel(destination); setAnswer(''); setMessage(''); setCheckSelection(null); setCheckFeedback(''); setCheckPassed(false); setSelectedStatement(null);
@@ -129,7 +137,7 @@ export default function Home() {
     if (!agent.trim()) { setMessage('Escribí tu nombre o alias de agente.'); return; }
     const state = await gameAction({action:'activate',code,agent,legacy:legacyRef.current?.code === code ? legacyRef.current : undefined});
     if (!state) return;
-    setLevel(state.highestLevel); setAnswer(''); setSelectedStatement(null); setShowAccess(false); setScreen('library');
+    setLevel(state.highestLevel); setAnswer(''); setSelectedStatement(null); setShowAccess(false); setScreen('briefing'); window.scrollTo(0,0);
     setCheckSelection(null); setCheckPassed(false); setCheckFeedback(''); setFinalAnswers({who:'',how:'',where:''});
   }
 
@@ -190,18 +198,16 @@ export default function Home() {
       <nav className="topbar" aria-label="Navegación principal">
         <button className="brand brand-button" onClick={() => setScreen('home')}><span className="brand-mark">F</span><span>LOS ARCHIVOS F</span></button>
         <div className="nav-meta"><span>10 OCT</span><span className="nav-dot" /><span>FEDE · 11 AÑOS</span></div>
-        <div className="nav-tools"><button className={`music-button ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn}>{musicOn ? '♫ AMBIENTE ON' : '♪ ACTIVAR MISTERIO'}</button>{activeSession && <button className="agent-chip" onClick={() => setScreen('library')}>AGENTE {agent.toUpperCase()}</button>}</div>
+        <div className="nav-tools"><button className={`music-button ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn}>{musicOn ? '♫ AMBIENTE ON' : '♪ ACTIVAR MISTERIO'}</button>{activeSession && screen !== 'home' && screen !== 'briefing' && <button className="agent-chip" onClick={() => setScreen('library')}>AGENTE {agent.toUpperCase()}</button>}</div>
         <audio ref={musicRef} src="/los-archivos-f/audio/ambiente-faro.wav" loop preload="metadata" />
       </nav>
 
-      {screen === 'home' && <>
-        <section className="hero">
-          <div className="beam beam-one" /><div className="beam beam-two" />
-          <div className="hero-copy"><p className="eyebrow">UNA MISIÓN ESPECIAL DE CUMPLEAÑOS</p><h1>Fede abrió un caso.<br />Ahora te toca a vos.</h1><p className="intro">Si recibiste una carpeta, ya sos parte de la Agencia F. Prepará las pruebas, reuní a tu equipo y descubrí qué ocurrió en el Museo del Faro.</p><div className="hero-actions"><button className="primary-button" onClick={() => { if(activeSession) setScreen('library'); else setShowAccess(true); }}>INGRESAR A LA AGENCIA <span>→</span></button><a className="text-button" href="#como-jugar">¿Qué necesito para jugar?</a></div><div className="mission-facts"><span>1 expediente físico</span><span>60–90 minutos</span><span>Para jugar en familia</span></div></div>
-          <div className="hero-art" aria-hidden="true"><img src="/los-archivos-f/images/hero-archivos-f.png" alt="" /><div className="case-stamp">ARCHIVO<br /><strong>F-01</strong></div></div>
-        </section>
-        <section id="como-jugar" className="how-section"><p className="eyebrow dark">TU CARPETA + ESTA WEB</p><h2>La investigación sucede en los dos mundos.</h2><div className="steps"><article><b>01</b><h3>Escaneá</h3><p>Usá el QR único incluido en tu expediente.</p></article><article><b>02</b><h3>Investigá</h3><p>Combiná audios digitales con pruebas impresas.</p></article><article><b>03</b><h3>Desbloqueá</h3><p>Ingresá códigos para abrir cada nuevo nivel.</p></article></div></section>
-      </>}
+      {screen === 'home' && <section className="welcome-page">
+        <div className="welcome-heading"><p className="eyebrow">AGENCIA F · ACCESO CONFIDENCIAL</p><h1>Bienvenido a<br/><em>Los Archivos F</em></h1><p>Una misión especial por los <strong>11 años de Fede.</strong></p><span className="welcome-seal">TU AVENTURA COMIENZA ACÁ</span></div>
+        <form className="access-card welcome-access" onSubmit={access}><p className="eyebrow dark">IDENTIFICATE, AGENTE</p><h2>¿Listo para el misterio?</h2><p>Ingresá tu nombre y el código de acceso de tu carpeta.</p><label htmlFor="welcome-name">Tu nombre o alias</label><input id="welcome-name" value={agent} onChange={e=>setAgent(e.target.value)} placeholder="¿Cómo te llamás, agente?" required maxLength={48} autoComplete="nickname"/><label htmlFor="welcome-code">Código de acceso</label><input id="welcome-code" value={code} onChange={e=>setCode(e.target.value.toUpperCase())} placeholder="F01-XXXX-XXXX-XXXX-XXXX" required autoComplete="off" autoCapitalize="characters" spellCheck={false}/>{message && <p className="form-error" role="alert">{message}</p>}<button className="primary-button full" type="submit">RECIBIR MI MISIÓN <span>→</span></button><small>Encontrá tu código debajo del QR. No necesitás una cuenta. Podés usar un alias y volver con el mismo código para recuperar tu partida.</small>{activeSession && <button type="button" className="resume-welcome" onClick={()=>{setScreen('briefing');window.scrollTo(0,0);}}>Continuar con mi partida guardada →</button>}</form>
+      </section>}
+
+      {screen === 'briefing' && <Briefing agent={agent} onComplete={()=>{setScreen('library');window.scrollTo(0,0);}}/>}
 
       {screen === 'library' && <section className="library-page">
         <p className="save-status" role="status">{saveStatus}</p><div className="page-heading"><p className="eyebrow dark">BIENVENIDO, AGENTE {agent.toUpperCase()}</p><h1>Biblioteca de casos</h1><p>Tu expediente está guardado. Podés continuar en otro dispositivo usando el mismo código de tu tarjeta.</p></div>
@@ -227,7 +233,7 @@ export default function Home() {
         <div className="investigation-panel">
           {level <= 7 && <figure className={`scene-frame ${level === 0 ? 'storm-layer' : level === 4 || level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt="Escena del Museo del Faro vinculada con la investigación" /><span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
           
-          {level === 0 && <section className="mission-intro"><p className="eyebrow dark">TRANSMISIÓN DE FEDE · 00:42</p><h1>Si recibiste esta carpeta, todavía puedo confiar en alguien.</h1><div className="audio-card real-audio"><div><b>Mensaje inicial de Fede</b><span>Voz provisoria · transcripción disponible</span></div><audio controls preload="metadata" src="/los-archivos-f/audio/fede-mision-inicial.wav">Tu navegador no puede reproducir este audio.</audio></div><blockquote>“El Rubí de la Tempestad fue cambiado por una copia. Cuatro personas pudieron acercarse a la sala y cada una asegura tener una coartada. No abras el sobre negro hasta que yo te lo indique.”</blockquote><div className="prep-list"><b>Antes de comenzar</b><span>✓ Carpeta y evidencias A–I</span><span>✓ Acetato y filtro rojo</span><span>✓ Papel y lápiz</span><span>✓ Sobre negro cerrado</span></div><button className="primary-button" onClick={startInvestigation}>COMENZAR INVESTIGACIÓN <span>→</span></button></section>}
+          {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p>Tu primera misión: descubrir a qué hora comenzó realmente el apagón. Buscá la fotografía de la sala y el registro eléctrico en tus archivos confidenciales.</p><div className="prep-list"><b>Antes de comenzar</b><span>✓ Carpeta y evidencias A–I</span><span>✓ Acetato y filtro rojo</span><span>✓ Papel y lápiz</span><span>✓ Sobre negro cerrado</span></div><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>setScreen('briefing')}>Volver a escuchar a Federica</button></section>}
 
           {level >= 1 && level <= 7 && (() => {
             const current = levels[level - 1];
