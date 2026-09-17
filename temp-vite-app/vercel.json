@@ -7,36 +7,119 @@
     }
   },
   "crons": [
-    { "path": "/api/cron-reminders", "schedule": "0 12 * * *" },
-    { "path": "/api/cron-communications", "schedule": "0 11 * * *" }
+    {
+      "path": "/api/cron-reminders",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron-communications",
+      "schedule": "0 11 * * *"
+    }
   ],
   "rewrites": [
-    { "source": "/estado", "destination": "/index.html" },
-    { "source": "/consultar", "destination": "/index.html" },
-    { "source": "/admin", "destination": "/index.html" },
-    { "source": "/confirmar", "destination": "/index.html" },
-    { "source": "/rsvp", "destination": "/index.html" },
-    { "source": "/validar-pago", "destination": "/index.html" },
-    { "source": "/preparando", "destination": "/index.html" },
-    { "source": "/i/:order", "destination": "/index.html" },
-    { "source": "/revision-invitacion", "destination": "/index.html" }
+    {
+      "source": "/los-archivos-f/api/game",
+      "destination": "/api/admin/game"
+    },
+    {
+      "source": "/los-archivos-f/api/diploma",
+      "destination": "/api/admin/diploma"
+    },
+    {
+      "source": "/los-archivos-f/",
+      "destination": "/los-archivos-f/index.html"
+    },
+    {
+      "source": "/estado",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/consultar",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/confirmar",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/rsvp",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/validar-pago",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/preparando",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/i/:order",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/revision-invitacion",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
       "source": "/admin",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" },
-        { "key": "CDN-Cache-Control", "value": "no-store" },
-        { "key": "Vercel-CDN-Cache-Control", "value": "no-store" }
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0, must-revalidate"
+        },
+        {
+          "key": "CDN-Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "Vercel-CDN-Cache-Control",
+          "value": "no-store"
+        }
       ]
     },
     {
       "source": "/index.html",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" },
-        { "key": "CDN-Cache-Control", "value": "no-store" },
-        { "key": "Vercel-CDN-Cache-Control", "value": "no-store" }
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0, must-revalidate"
+        },
+        {
+          "key": "CDN-Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "Vercel-CDN-Cache-Control",
+          "value": "no-store"
+        }
       ]
+    },
+    {
+      "source": "/los-archivos-f/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/los-archivos-f",
+      "destination": "/los-archivos-f/",
+      "permanent": true
     }
   ]
 }

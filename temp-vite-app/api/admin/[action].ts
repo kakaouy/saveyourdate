@@ -1,3 +1,5 @@
+import game from '../_lib/detectives/game-route.js';
+import diploma from '../_lib/detectives/diploma-route.js';
 import access from '../_lib/admin/access.js';
 import activity from '../_lib/admin/activity.js';
 import backup from '../_lib/admin/backup.js';
@@ -24,6 +26,8 @@ import whatsappConnection from '../_lib/admin/whatsapp-connection.js';
 import { json } from '../_lib/orders.js';
 
 const handlers: Record<string, { fetch: (request: Request) => Promise<Response> }> = {
+  game,
+  diploma,
   access,
   activity,
   backup,
