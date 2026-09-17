@@ -1,0 +1,11 @@
+LOS ARCHIVOS F - ENTREGA REVISADA
+
+01: 24 páginas de jugadores, un juego por familia. A4, una cara, 100 %, orientación automática.
+02: una página de ACETATO por familia. No imprimir en papel.
+03: calibración del filtro, una copia piloto privada.
+04: imprimir UNA VEZ sus 4 páginas para obtener 20 tarjetas distintas.
+05: guía PRIVADA con soluciones y armado; no entregar.
+06: diploma de MUESTRA; cada familia descarga el personalizado al terminar.
+
+Probar una carpeta completa antes de preparar veinte. Plano/fragmento/acetato: barras de 50 mm. Comprobar filtro y mecanismo real.
+Códigos de validación: PRUEBA y PRUEBA1 a PRUEBA20. Cada código es una partida independiente y conserva avances después de usarlo.

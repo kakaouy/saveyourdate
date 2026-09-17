@@ -383,3 +383,39 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 @keyframes guide-arrow-point{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
 @media(max-width:600px){.toolbar-hint-lens{width:44px;min-height:54px}.toolbar-hint-lens img{width:40px;height:40px}.toolbar-hint-lens>span{font-size:7px}.document-guide-message{font-size:14px}.document-guide-message svg{width:44px}}
 @media(prefers-reduced-motion:reduce){.document-guide-message svg{animation:none}}
+/* Etiquetas e iconos comparten altura y línea de base. */
+.mission-toolbar-actions{align-items:flex-end}.mission-toolbar-actions .library-icon-button,.mission-toolbar-actions .toolbar-hint-lens{width:68px;min-width:68px;height:74px;min-height:74px;padding:3px 6px;gap:3px;justify-content:flex-end}.mission-toolbar-actions .library-icon-button img,.mission-toolbar-actions .toolbar-hint-lens img{width:56px;height:56px;flex-shrink:0}.mission-toolbar-actions .library-icon-button>span,.mission-toolbar-actions .toolbar-hint-lens>span{font:8px/12px Arial,sans-serif;letter-spacing:.12em;height:12px}
+@media(max-width:600px){.mission-toolbar-actions .library-icon-button,.mission-toolbar-actions .toolbar-hint-lens{width:46px;min-width:46px;height:59px;min-height:59px;padding:2px;gap:3px}.mission-toolbar-actions .library-icon-button img,.mission-toolbar-actions .toolbar-hint-lens img{width:42px;height:42px}.mission-toolbar-actions .library-icon-button>span,.mission-toolbar-actions .toolbar-hint-lens>span{font-size:7px}}
+
+/* Compact receiver: the written signal remains available without motion. */
+.light-signal { border:1px solid #9d8249; border-radius:12px; padding:18px; background:#09202a; color:#eadab9; }
+.light-signal-head { display:flex; align-items:center; gap:14px; }
+.light-signal-head b { font-size:12px; letter-spacing:.14em; }
+.light-signal-head small { display:block; margin-top:5px; color:#b7ceca; }
+.signal-lamp { flex:0 0 32px; height:32px; border:3px solid #aa8745; border-radius:50%; background:#31433e; }
+.signal-lamp.is-lit { background:#ffe4a0; box-shadow:0 0 20px #e6ba5b99; }
+.signal-groups { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:6px; margin:20px 0; }
+.signal-groups > span { display:flex; justify-content:center; align-items:center; gap:3px; min-height:42px; border-bottom:2px solid #516564; background:#ffffff05; }
+.signal-groups > span.receiving { border-color:#e5bd68; background:#e5bd6814; }
+.signal-groups i { font:normal clamp(14px,2vw,21px) monospace; }
+.signal-groups i.lit-symbol { color:#ffe4a0; text-shadow:0 0 8px #e5bd68; }
+.light-signal p { font-size:13px; line-height:1.6; color:#b7ceca; margin-bottom:0; }
+@media(max-width:480px) { .light-signal { padding:12px; } .signal-groups { gap:3px; } .signal-groups > span { gap:1px; } }
+
+.final-statement { margin:24px 0; border-color:#b39655; }
+.final-statement-body { padding:clamp(16px,3vw,28px); }
+.final-statement-person { display:flex; align-items:center; gap:18px; }
+.final-statement-person img { width:88px; height:108px; object-fit:cover; border:2px solid #b39655; flex-shrink:0; }
+.final-statement-person h2 { margin:4px 0; }
+.final-statement-person p { margin:5px 0; }
+.final-statement-body blockquote { margin:22px 0; padding:0 0 0 18px; border-left:2px solid #b39655; }
+.final-statement-body blockquote p { line-height:1.7; }
+.statement-task { padding-top:16px; border-top:1px solid #b3965550; }
+@media(max-width:480px) { .final-statement-person { align-items:flex-start; gap:12px; } .final-statement-person img { width:64px; height:84px; } }
+
+.diploma-preview { position:relative; padding:36px 125px 36px 30px; background:#f2e8cf; color:#183036; border:4px double #9e7b45; box-shadow:inset 0 0 0 8px #eadcbb; }
+.diploma-preview .diploma-preview-title { font-family:Georgia,serif; font-size:clamp(19px,3vw,26px); letter-spacing:0; }
+.diploma-preview h2 { overflow-wrap:anywhere; }
+.diploma-ink-seal { position:absolute; right:18px; top:30px; display:grid; place-content:center; width:86px; height:86px; border:5px double #992c35; outline:2px dashed #992c35; outline-offset:3px; border-radius:50%; color:#992c35; font:bold 12px/1.35 monospace; transform:rotate(-12deg); text-align:center; }
+.diploma-download-note { font-size:14px; line-height:1.6; }
+@media(max-width:480px) { .diploma-preview { padding:25px 20px 125px; } .diploma-ink-seal { top:auto; bottom:22px; right:calc(50% - 43px); } }
