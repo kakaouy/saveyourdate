@@ -1,0 +1,99 @@
+temp-vite-app/detectives/App.tsx
+  s_baef4ba8b2ecee::t_8544ab48a084be 292
+  s_baef4ba8b2ecee::t_4966aaf51f8a3c 2,277
+  s_baef4ba8b2ecee::t_c07602a059bce4 1,290
+temp-vite-app/tests/detectives-final-statement.test.ts
+  s_baef4ba8b2ecee::t_78e4642bfa7aa5 1-22
+temp-vite-app/tests/detectives-final-reconstruction.test.ts
+  s_baef4ba8b2ecee::t_ecf4962542853b 1-24
+temp-vite-app/tests/detectives-hints.test.ts
+  s_baef4ba8b2ecee::t_bd9ad122b1c5d9 19-20
+  s_baef4ba8b2ecee::t_701d0c237c2bf3 1-2,4,6-7,9,12,16,21-22
+  s_baef4ba8b2ecee::t_573bd78bf417f4 3,5,8,10-11,13-15,17-18
+temp-vite-app/tests/detectives-workshop-level.test.ts
+  s_baef4ba8b2ecee::t_3d754060a8e340 1-21
+temp-vite-app/tests/detectives-compartment-level.test.ts
+  s_baef4ba8b2ecee::t_37cf37a61913e6 1-22
+temp-vite-app/api/_lib/detectives/diploma.mjs
+  s_baef4ba8b2ecee::t_f11cbe406fef4c 1-3,5-6,8-12,16-38,40-81,83-90
+  s_baef4ba8b2ecee::t_10db0d4aba85d9 39
+temp-vite-app/detectives/HintLenses.tsx
+  s_baef4ba8b2ecee::t_573bd78bf417f4 8,13,17,22
+  s_baef4ba8b2ecee::t_701d0c237c2bf3 10-11,19-20,24,30
+temp-vite-app/tests/detectives-first-level.test.ts
+  s_baef4ba8b2ecee::t_7b9cb12dfe1fb2 1-18
+temp-vite-app/detectives/case.ts
+  s_baef4ba8b2ecee::t_28066b9ce5ca93 6-7,9,86-87
+  s_baef4ba8b2ecee::t_4966aaf51f8a3c 26,29
+  s_baef4ba8b2ecee::t_cda03ddf18818a 56-57,59
+  s_baef4ba8b2ecee::t_f4afe3cc5196c6 35-37,39
+  s_baef4ba8b2ecee::t_3d754060a8e340 46-47,49,100
+  s_baef4ba8b2ecee::t_9c6443f89a7196 16-17,90
+  s_baef4ba8b2ecee::t_37cf37a61913e6 66-67,69
+temp-vite-app/tests/detectives-hideout-level.test.ts
+  s_baef4ba8b2ecee::t_cda03ddf18818a 1-22
+temp-vite-app/detectives/FinalStatement.tsx
+  s_baef4ba8b2ecee::t_c07602a059bce4 1-18
+temp-vite-app/detectives/style.css
+  s_baef4ba8b2ecee::t_4966aaf51f8a3c 389-403
+  s_baef4ba8b2ecee::t_c07602a059bce4 404-414
+  s_baef4ba8b2ecee::t_701d0c237c2bf3 386-388
+  s_baef4ba8b2ecee::t_565258d6af64f8 415-421
+temp-vite-app/tests/detectives-map-level.test.ts
+  s_baef4ba8b2ecee::t_f4afe3cc5196c6 1-18
+temp-vite-app/tests/detectives-alibi-level.test.ts
+  s_baef4ba8b2ecee::t_65dfd676913c59 1-21
+temp-vite-app/api/_lib/detectives/access-codes.json
+  s_baef4ba8b2ecee::t_573bd78bf417f4 23
+  s_baef4ba8b2ecee::t_bd9ad122b1c5d9 24-44
+temp-vite-app/detectives/LightSignal.tsx
+  s_baef4ba8b2ecee::t_dbf64eaba38dba 1,4,9-14,36
+  s_baef4ba8b2ecee::t_4966aaf51f8a3c 2-3,5-8,15-35,37-44
+temp-vite-app/tests/detectives-signal-level.test.ts
+  s_baef4ba8b2ecee::t_dbf64eaba38dba 1-10,12-25
+  s_baef4ba8b2ecee::t_bd9ad122b1c5d9 11
+docs/los-archivos-f/README.md
+  s_baef4ba8b2ecee::t_f6ec026a56a95a 1-7
+docs/los-archivos-f/entrega/01-CARPETA-JUGADORES-24-PAGINAS.pdf
+  s_baef4ba8b2ecee::t_26a6a3c6bf9c46 1-1383
+docs/los-archivos-f/entrega/02-ACETATO-C03-UNA-PAGINA.pdf
+  s_baef4ba8b2ecee::t_3e35bfdfb1692b 1-110
+docs/los-archivos-f/entrega/03-CALIBRACION-FILTRO-SOLO-ORGANIZACION.pdf
+  s_baef4ba8b2ecee::t_3e3ff2964c19d2 1-110
+docs/los-archivos-f/entrega/04-TARJETAS-20-FAMILIAS.pdf
+  s_baef4ba8b2ecee::t_b1c6c2af129bc2 1-143
+docs/los-archivos-f/entrega/05-GUIA-PRIVADA-SOLUCIONES-Y-FLUJO.pdf
+  s_baef4ba8b2ecee::t_730b74fffc11f3 1-271
+docs/los-archivos-f/entrega/LEEME-IMPRIMIR.txt
+  s_baef4ba8b2ecee::t_5f94c60a0feaca 1-11
+docs/los-archivos-f/entrega/SOLUCIONES-Y-FLUJO.md
+  s_baef4ba8b2ecee::t_3acf9f218e5d53 1-355
+docs/los-archivos-f/fuentes/generar_cierre_caso.py
+  s_baef4ba8b2ecee::t_15cd84a6e8062a 1-65
+docs/los-archivos-f/fuentes/generar_compartimento.py
+  s_baef4ba8b2ecee::t_58400bcced5a33 1-92
+docs/los-archivos-f/fuentes/generar_prueba_escondite.py
+  s_baef4ba8b2ecee::t_df1b51f24d3c47 1-82
+docs/los-archivos-f/fuentes/generar_prueba_taller.py
+  s_baef4ba8b2ecee::t_86a19531e9112f 1-106
+docs/los-archivos-f/fuentes/generar_senales_y_plano.py
+  s_baef4ba8b2ecee::t_c23bf7414f2909 1-131
+temp-vite-app/tests/detectives-diploma.test.ts
+  s_baef4ba8b2ecee::t_7a9765cde786b7 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c56743b50dcb159747866f9750f41888819e7414",
+  "prompts": {},
+  "sessions": {
+    "s_baef4ba8b2ecee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0af29-ccdc-7862-8d12-45d6d01c6460",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
