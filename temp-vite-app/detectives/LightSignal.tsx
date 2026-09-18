@@ -1,44 +1,38 @@
-import {useEffect, useRef, useState} from 'react';
+import {useState} from 'react';
 
-export default function LightSignal({sequence}: {sequence:string}) {
-  const receiver = useRef<HTMLElement>(null);
-  const groups = sequence.split('/').map(group => group.trim().split(/\s+/));
-  const [playing, setPlaying] = useState(false);
-  const [position, setPosition] = useState({group:-1, symbol:-1, lit:false});
-  useEffect(() => {
-    const envelope = receiver.current?.closest('details');
-    const close = () => { if (!envelope?.open) { setPlaying(false); setPosition({group:-1,symbol:-1,lit:false}); } };
-    envelope?.addEventListener('toggle',close);
-    return () => envelope?.removeEventListener('toggle',close);
-  }, []);
-  useEffect(() => {
-    if (!playing) return;
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout>;
-    const frames: Array<{group:number; symbol:number; lit:boolean; duration:number}> = [];
-    groups.forEach((symbols, group) => symbols.forEach((symbol, index) => {
-      frames.push({group,symbol:index,lit:true,duration:symbol === 'o' ? 450 : 1350});
-      frames.push({group,symbol:index,lit:false,duration:index === symbols.length - 1 ? 1800 : 450});
-    }));
-    let index = 0;
-    function step() {
-      if (cancelled) return;
-      const frame = frames[index++];
-      if (!frame) { setPlaying(false); setPosition({group:-1,symbol:-1,lit:false}); return; }
-      setPosition(frame);
-      timer = setTimeout(step, frame.duration);
-    }
-    step();
-    return () => { cancelled = true; clearTimeout(timer); };
-    // Sequence is fixed for the current receiver; restarting always begins at group one.
-  }, [playing, sequence]);
-  const stop = () => { setPlaying(false); setPosition({group:-1,symbol:-1,lit:false}); };
-  return <section ref={receiver} className="light-signal" aria-label="Receptor de señales luminosas">
-    <div className="light-signal-head"><span className={`signal-lamp ${position.lit ? 'is-lit' : ''}`} aria-hidden="true"/><div><b>SEÑAL INTERCEPTADA</b><small>{playing ? `Recibiendo grupo ${position.group + 1} de ${groups.length}` : 'Receptor listo · seis grupos'}</small></div></div>
-    <div className="signal-groups" aria-label={`Secuencia: ${sequence}`}>
-      {groups.map((symbols, group) => <span key={group} className={position.group === group ? 'receiving' : ''} aria-hidden="true">{symbols.map((symbol,index) => <i key={index} className={position.lit && position.group === group && position.symbol === index ? 'lit-symbol' : ''}>{symbol}</i>)}</span>)}
+type Signal = {id:string; name:string; symbol:string; pattern:string};
+const signals: Signal[] = [
+  {id:'anchor',name:'Ancla',symbol:'⚓',pattern:'o — o'},
+  {id:'wave-a',name:'Ola A',symbol:'≋',pattern:'— o —'},
+  {id:'compass',name:'Brújula',symbol:'✥',pattern:'—'},
+  {id:'key',name:'Llave',symbol:'⚿',pattern:'o o —'},
+  {id:'lantern',name:'Farol',symbol:'⌑',pattern:'o —'},
+  {id:'wave-b',name:'Ola B',symbol:'≋',pattern:'— o —'},
+];
+
+export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void}) {
+  const [available,setAvailable]=useState(signals);
+  const [ordered,setOrdered]=useState<Signal[]>([]);
+  const [feedback,setFeedback]=useState('');
+  const [dragged,setDragged]=useState<string|null>(null);
+  function add(signal:Signal){setAvailable(items=>items.filter(item=>item.id!==signal.id));setOrdered(items=>[...items,signal]);setFeedback('');onSolved(false);}
+  function remove(signal:Signal){setOrdered(items=>items.filter(item=>item.id!==signal.id));setAvailable(items=>[...items,signal]);setFeedback('');onSolved(false);}
+  function move(index:number,direction:-1|1){const target=index+direction;if(target<0||target>=ordered.length)return;setOrdered(items=>{const next=[...items];[next[index],next[target]]=[next[target],next[index]];return next;});setFeedback('');onSolved(false);}
+  function analyze(){
+    if(ordered.length<signals.length){setFeedback('Ubicá las seis señales antes de analizar la secuencia.');return;}
+    const ids=ordered.map(item=>item.id);
+    const correct=ids[0]==='compass'&&ids[1]==='lantern'&&ids.slice(2,4).every(id=>id.startsWith('wave-'))&&ids[4]==='key'&&ids[5]==='anchor';
+    if(!correct){setFeedback('Las señales pueden estar bien interpretadas y aun así formar un mensaje incorrecto. Revisá las anotaciones de la cafetería.');onSolved(false);return;}
+    setFeedback('Secuencia reconstruida. Ya podés ingresar el lugar señalado.');onSolved(true);
+  }
+  return <section className="signal-workbench" aria-label="Receptor de seis señales desordenadas">
+    <header><span className="signal-lamp is-lit" aria-hidden="true"/><div><b>SEIS REGISTROS RECUPERADOS</b><small>Guardados fuera de secuencia</small></div></header>
+    <p className="signal-instruction">Seleccioná una tarjeta para llevarla a la bandeja. También podés arrastrarla y ajustar su posición con las flechas.</p>
+    <div className="signal-pool" aria-label="Señales sin ordenar">{available.map((signal,index)=><button draggable key={signal.id} onDragStart={()=>setDragged(signal.id)} onClick={()=>add(signal)} className="signal-card"><small>S-{String(index+1).padStart(2,'0')}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><code>{signal.pattern}</code></button>)}</div>
+    <div className="signal-sequence" onDragOver={event=>event.preventDefault()} onDrop={()=>{const signal=available.find(item=>item.id===dragged);if(signal)add(signal);setDragged(null);}} aria-label="Secuencia reconstruida">
+      {Array.from({length:6},(_,index)=>{const signal=ordered[index];return <div className={`signal-slot ${signal?'filled':''}`} key={signal?.id||index}>{signal?<><button className="signal-card" onClick={()=>remove(signal)} aria-label={`Quitar ${signal.name} de la posición ${index+1}`}><small>POSICIÓN {index+1}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><code>{signal.pattern}</code></button><span className="signal-movers"><button onClick={()=>move(index,-1)} disabled={index===0} aria-label={`Mover ${signal.name} a la izquierda`}>←</button><button onClick={()=>move(index,1)} disabled={index===ordered.length-1} aria-label={`Mover ${signal.name} a la derecha`}>→</button></span></>:<span>{index+1}</span>}</div>})}
     </div>
-    <button type="button" className="unlock-button" onClick={() => playing ? stop() : setPlaying(true)}>{playing ? 'DETENER SEÑAL' : 'REPRODUCIR SEÑAL'}</button>
-    <p>Podés repetirla o leer los símbolos sin reproducir. Buscá su significado en la guía G-01.</p>
+    <button type="button" className="unlock-button" onClick={analyze}>ANALIZAR SECUENCIA</button>
+    {feedback&&<p className={feedback.startsWith('Secuencia')?'signal-success':'signal-feedback'} role="status">{feedback}</p>}
   </section>;
 }

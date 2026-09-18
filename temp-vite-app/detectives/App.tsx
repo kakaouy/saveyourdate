@@ -84,12 +84,21 @@ export default function Home() {
   const [checkSelection, setCheckSelection] = useState<number | null>(null);
   const [checkFeedback, setCheckFeedback] = useState('');
   const [checkPassed, setCheckPassed] = useState(false);
+  const [levelThreeReady, setLevelThreeReady] = useState(false);
 
   function receiveState(state: GameState) {
     setAgent(state.agent); setHighestLevel(state.highestLevel); setHints(state.hints); setCheckProgress(state.checkProgress); setCompletedAt(state.completedAt); setActiveSession(true);
   }
 
   useEffect(() => {
+    const localPreview = import.meta.env.DEV ? new URLSearchParams(window.location.search).get('preview') : null;
+    if (localPreview) {
+      setAgent('Filo'); setActiveSession(true); setHighestLevel(localPreview === 'briefing' ? 0 : localPreview === 'level3-done' ? 4 : localPreview === 'level2-done' ? 3 : localPreview.startsWith('level3') ? 3 : 2);
+      if (localPreview === 'library') setScreen('library');
+      else if (localPreview === 'briefing') setScreen('briefing');
+      else { setScreen('game'); setLevel(localPreview === 'level1' ? 1 : localPreview.startsWith('level3') ? 3 : 2); }
+      return;
+    }
     const queryCode = new URLSearchParams(window.location.search).get('codigo');
     try {
       const legacy = JSON.parse(localStorage.getItem('archivos-f-demo') || 'null');
@@ -155,7 +164,7 @@ export default function Home() {
 
   function visitLevel(destination: number) {
     if (destination < 0 || destination > highestLevel) return;
-    setLevel(destination); setAnswer(''); setMessage(''); setCheckSelection(null); setCheckFeedback(''); setCheckPassed(false); setSelectedStatement(null);
+    setLevel(destination); setAnswer(''); setMessage(''); setCheckSelection(null); setCheckFeedback(''); setCheckPassed(false); setSelectedStatement(null); setLevelThreeReady(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -269,16 +278,18 @@ export default function Home() {
             return <section className="level-card">
               <p className="eyebrow dark">{current.kicker}</p><h1>{current.title}</h1>
               {level === 2 && <div className={`level-two-fede ${unlocked ? 'success' : ''}`}><img src={unlocked ? '/los-archivos-f/images/federica-nivel-2-exito-v1.png' : '/los-archivos-f/images/federica-nivel-2-inicio-v1.png'} alt="Federica en la sala de entrevistas del museo"/><div><p className="eyebrow">MENSAJE DE FEDE</p><h2>{unlocked ? 'Coartada verificada.' : 'Una declaración no alcanza.'}</h2><p>{unlocked ? 'Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.' : 'Tenemos cuatro declaraciones, pero una declaración no alcanza para descartar a nadie. Compará lo que dicen con los registros disponibles y averiguá quién puede demostrar dónde estuvo durante todo el intervalo del apagón.'}</p>{unlocked && <button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button>}</div></div>}
+              {level === 3 && <div className={`level-two-fede level-three-fede ${unlocked ? 'success' : ''}`}><img src={unlocked ? '/los-archivos-f/images/federica-presentadora-v1.png' : '/los-archivos-f/images/federica-terminal-v1.png'} alt="Federica junto al receptor de señales del museo"/><div><p className="eyebrow">MENSAJE DE FEDE</p><h2>{unlocked ? 'Señal reconstruida.' : 'Seis señales fuera de secuencia.'}</h2><p>{unlocked ? '¡TALLER! Las señales no eran un mensaje al azar: estaban marcando el Taller de Mantenimiento. Si alguien conocía ese sistema durante el apagón, pudo haber dejado allí otra parte del recorrido. Vamos a revisar el taller.' : 'Encontramos la servilleta que León mencionó. Al mismo tiempo, el receptor recuperó seis señales del apagón, pero quedaron guardadas fuera de secuencia. Descubrí qué significa cada señal y averiguá si las anotaciones de León permiten reconstruir el mensaje.'}</p>{unlocked && <button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button>}</div></div>}
               {level === 2 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Descartar exactamente a una persona comprobando su recorrido completo entre las 19:30 y las 19:50.</p></div>}
-              {level !== 2 && <div className="challenge-counter"><span>COMPROBACIONES {Math.min(checkIndex, completedChecks)}/{completedChecks}</span><span>CANDADO FINAL {unlocked ? 'RESUELTO' : currentCheck ? 'BLOQUEADO' : 'DISPONIBLE'}</span></div>}
-              <details key={`digital-${level}`} className="clue-envelope digital-envelope"><summary><span>◉</span><b>Interceptar archivo digital<small>Una señal de Federica · tocar para revelar</small></b><span>+</span></summary><div className="digital-brief">{level === 3 ? <LightSignal sequence={current.digital}/> : <p><Typewriter text={current.digital}/></p>}</div></details>
+              {level === 3 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Interpretar las seis señales y reconstruir el orden del mensaje interceptado.</p></div>}
+              {level !== 2 && level !== 3 && <div className="challenge-counter"><span>COMPROBACIONES {Math.min(checkIndex, completedChecks)}/{completedChecks}</span><span>CANDADO FINAL {unlocked ? 'RESUELTO' : currentCheck ? 'BLOQUEADO' : 'DISPONIBLE'}</span></div>}
+              <details key={`digital-${level}`} className="clue-envelope digital-envelope"><summary><span>◉</span><b>{level===3?'Abrir receptor de señales':'Interceptar archivo digital'}<small>{level===3?'Seis registros recuperados · tocar para examinar':'Una señal de Federica · tocar para revelar'}</small></b><span>+</span></summary><div className="digital-brief">{level === 3 ? <LightSignal onSolved={setLevelThreeReady}/> : <p><Typewriter text={current.digital}/></p>}</div></details>
               {level === 2 && <section className="suspect-board" aria-label="Panel de sospechosos"><div className="suspect-board-heading"><h2>Cuatro versiones. El mismo intervalo.</h2><p>Abrí cada ficha, observá la escena completa y compará cada declaración con sus registros.</p></div><div className="suspect-grid">{statements.map((person, index) => <button className="suspect-file" key={person.name} onClick={() => setSelectedStatement(index)} aria-label={`Abrir ficha de ${person.name}`}><div className="suspect-file-photo"><span className="suspect-file-id">{person.code}</span><img src={person.image} alt="" /></div><div className="suspect-file-caption"><span>{person.role}</span><h3>{person.name}</h3><p>Leer declaración <span aria-hidden="true">↗</span></p></div></button>)}</div></section>}
 
-              {level !== 2 && <details key={`physical-${level}`} className="clue-envelope physical-envelope"><summary><span>⌕</span><b>Examinar documentos físicos<small>Descubrí qué pruebas necesitás en esta etapa</small></b><span>+</span></summary><div className="physical-brief">{current.evidence.map((item) => <b key={item}>{item}</b>)}</div></details>}
+              {level !== 2 && level !== 3 && <details key={`physical-${level}`} className="clue-envelope physical-envelope"><summary><span>⌕</span><b>Examinar documentos físicos<small>Descubrí qué pruebas necesitás en esta etapa</small></b><span>+</span></summary><div className="physical-brief">{current.evidence.map((item) => <b key={item}>{item}</b>)}</div></details>}
               {!unlocked && currentCheck && <div className="micro-challenge"><p className="eyebrow dark">COMPROBACIÓN {checkIndex + 1} DE {completedChecks}</p><h2><Typewriter text={currentCheck.question}/></h2><div className="micro-options">{currentCheck.options.map((option, index) => <button key={option} className={checkSelection === index ? 'selected' : ''} onClick={() => { if (!checkPassed) { setCheckSelection(index); setCheckFeedback(''); } }}>{option}</button>)}</div>{checkFeedback && <p className={checkPassed ? 'micro-success' : 'micro-error'}>{checkPassed ? currentCheck.success : checkFeedback}</p>}{checkPassed ? <button className="primary-button" onClick={continueMicroCheck}>REGISTRAR COMPROBACIÓN <span>→</span></button> : <button className="unlock-button" onClick={() => verifyMicroCheck(currentCheck.correct)}>VERIFICAR</button>}</div>}
-              {!unlocked && !currentCheck && <form className={`lock-panel lock-${current.lock}`} onSubmit={submitLevel}><div className="lock-ready">✓ INVESTIGACIÓN COMPLETA · CANDADO HABILITADO</div><label htmlFor="level-answer"><Typewriter text={current.prompt}/></label><input id="level-answer" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={current.placeholder} autoComplete="off" /><button className="unlock-button" type="submit">DESBLOQUEAR NIVEL</button></form>}
+              {!unlocked && !currentCheck && (level!==3||levelThreeReady) && <form className={`lock-panel lock-${current.lock}`} onSubmit={submitLevel}><div className="lock-ready">✓ INVESTIGACIÓN COMPLETA · CANDADO HABILITADO</div><label htmlFor="level-answer"><Typewriter text={current.prompt}/></label><input id="level-answer" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={current.placeholder} autoComplete="off" /><button className="unlock-button" type="submit">DESBLOQUEAR NIVEL</button></form>}
               {message && <p className={message.startsWith('Desbloqueaste') ? 'success-message' : 'error-message'}>{message}</p>}
-              {unlocked && level !== 2 && <div className="unlock-reveal"><div className="unlock-icon">✓</div><p className="eyebrow dark">MENSAJE DE FEDE DESBLOQUEADO</p><h2>{current.unlock}</h2><audio key={unlockedMessage.audio} className="unlock-audio" controls src={unlockedMessage.audio}>Tu navegador no puede reproducir este audio.</audio><p>“{unlockedMessage.text}”</p><button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button></div>}
+              {unlocked && level !== 2 && level !== 3 && <div className="unlock-reveal"><div className="unlock-icon">✓</div><p className="eyebrow dark">MENSAJE DE FEDE DESBLOQUEADO</p><h2>{current.unlock}</h2><audio key={unlockedMessage.audio} className="unlock-audio" controls src={unlockedMessage.audio}>Tu navegador no puede reproducir este audio.</audio><p>“{unlockedMessage.text}”</p><button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button></div>}
             </section>;
           })()}
 

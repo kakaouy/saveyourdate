@@ -20,14 +20,14 @@ export const levels = [
     unlock: 'Coartada verificada · nueva pista recuperada',
   },
   {
-    title: 'La señal del faro',
-    kicker: 'NIVEL 3 · RECEPTOR LUMINOSO',
-    prompt: '¿Qué lugar señala el mensaje de luces?',
-    evidence: ['Evidencia G-01 · Guía de señales luminosas del museo', 'S-01 · Nota encontrada en la cafetería'],
-    digital: '—  /  o —  /  — o —  /  — o —  /  o o —  /  o — o',
-    placeholder: '6 letras', answer: ['taller', 'el taller', 'taller de restauracion'], lock: 'letters',
-    hints: ['La secuencia está formada por seis grupos.', 'Traducí cada grupo con G-01: es el código luminoso propio del museo. La nota S-01 te ayuda a interpretar las pausas.', 'Las tres primeras letras son T-A-L.'],
-    unlock: 'Audio de Fede sobre un corredor oculto',
+    title: 'Señales desordenadas',
+    kicker: 'NIVEL 3 · RECEPTOR MARÍTIMO',
+    prompt: '¿Qué lugar del faro señala el mensaje reconstruido?',
+    evidence: [],
+    digital: 'Seis registros luminosos recuperados fuera de secuencia.',
+    placeholder: '6 caracteres', answer: ['taller', 'el taller', 'taller de restauracion'], lock: 'letters',
+    hints: ['Cada patrón de destellos representa una letra. Hay una guía entre tus evidencias que puede ayudarte.', 'Saber las seis letras no alcanza: los registros llegaron desordenados. León dejó reglas sobre la posición de los símbolos.', 'La Brújula abre el mensaje. Las dos Olas deben quedar juntas y el Ancla cierra la señal.', 'El Farol queda antes de las dos Olas y la Llave está inmediatamente antes del Ancla.'],
+    unlock: 'Destino de las señales identificado',
   },
   {
     title: 'El corredor oculto',
@@ -74,7 +74,7 @@ export const levels = [
 export const unlockMessages = [
   { audio: '/los-archivos-f/audio/fede-nivel-1.wav', text: 'Siete minutos pueden parecer poco, pero alcanzan para cruzar la sala y utilizar el corredor. Ahora compará las declaraciones.' },
   { audio: '/los-archivos-f/audio/fede-nivel-2.wav', text: 'Coartada verificada. Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.' },
-  { audio: '/los-archivos-f/audio/fede-nivel-3.wav', text: 'El mensaje señala el taller. Buscá el plano y el acetato para encontrar la salida que no figura en el plano público.' },
+  { audio: '/los-archivos-f/audio/fede-nivel-3.wav', text: '¡TALLER! Las señales no eran un mensaje al azar: estaban marcando el Taller de Mantenimiento. Si alguien conocía ese sistema durante el apagón, pudo haber dejado allí otra parte del recorrido. Vamos a revisar el taller.' },
   { audio: '/los-archivos-f/audio/fede-nivel-4.wav', text: 'La ruta 418 conecta el taller con la sala del rubí. Ahora debemos demostrar qué ocurrió dentro de la vitrina.' },
   { audio: '/los-archivos-f/audio/fede-nivel-5.wav', text: 'En el taller fabricaron una réplica. Falta encontrar dónde ocultaron el rubí original.' },
   { audio: '/los-archivos-f/audio/fede-nivel-6.wav', text: 'Llegaste al mismo punto que yo. Tenés autorización para abrir el sobre negro.' },
@@ -84,9 +84,7 @@ export const unlockMessages = [
 export const microChecks = [
   [],
   [],
-  [
-    { question: 'Antes de traducir la señal, ¿cómo debe dividirse?', options: ['En seis grupos separados por pausas largas', 'En pares de colores', 'En tres números'], correct: 0, success: 'Cada grupo corresponde a una letra del código físico.' },
-  ],
+  [],
   [
     { question: '¿Qué referencias deben coincidir para que el acetato esté bien colocado?', options: ['Solamente la flecha norte', 'Norte y las tres boyas', 'Las paredes de la cafetería'], correct: 1, success: 'Cuatro referencias evitan obtener una posición falsa.' },
   ],
