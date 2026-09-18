@@ -59,7 +59,7 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
     if((state.checkProgress[level]||0)<microChecks[level-1].length) throw new GameError('Completá las deducciones antes de abrir el candado.');
     const answer=normalize(String(body.answer||''));
     const numeric=['numeric','safe','mechanical'].includes(levels[level-1].lock);
-    const cleaned=numeric ? answer.replace(/[\s:\-]/g,'') : answer;
+    const cleaned=numeric ? answer.replace(/\D/g,'') : answer;
     if(!levels[level-1].answer.some(a=>normalize(a)===cleaned)) throw new GameError(level === 1 ? 'Todavía no recuperamos el acceso. No te rindas: compará los detalles y probá otra combinación.' : 'Ese código no abre el candado. Revisá las pruebas o pedí una pista.',400,'WRONG_ANSWER');
     state.highestLevel=level+1;return state;
   }

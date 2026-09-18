@@ -253,7 +253,8 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .suspect-file:hover { transform:translateY(-3px); border-color:#ebbf66; }
 .suspect-file-photo { aspect-ratio:4/5; position:relative; overflow:hidden; background:radial-gradient(ellipse at 50% 45%,#4a5655,#13272f 78%); border:1px solid #8b79584d; }
 .suspect-file-photo::after { content:""; position:absolute; inset:0; pointer-events:none; box-shadow:inset 0 -24px 24px -20px #081b23; }
-.suspect-file-photo img { width:100%; height:100%; object-fit:contain; object-position:center bottom; display:block; }
+.suspect-file-photo img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition:transform .8s ease,filter .35s ease; animation:suspect-breathe 7s ease-in-out infinite alternate; }
+.suspect-file:hover .suspect-file-photo img { transform:scale(1.045); filter:saturate(1.08) brightness(1.04); }
 .suspect-file-id { position:absolute; top:12px; left:12px; z-index:1; padding:6px 8px; background:#0b202be6; border:1px solid #d1b16a66; color:#e7d5ae; font:12px/1.2 monospace; letter-spacing:.08em; }
 .suspect-file-caption { padding:18px 10px 10px; }
 .suspect-file-caption>span { color:#dcbd7d; text-transform:uppercase; font-size:12px; letter-spacing:.12em; }
@@ -266,6 +267,9 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .interrogation-close span { font-size:24px; line-height:1; }
 .interrogation-portrait { position:relative; min-height:650px; margin:0; background:#122932; }
 .interrogation-portrait img { position:absolute; width:100%; height:100%; object-fit:cover; object-position:center; }
+.interrogation-portrait.is-speaking img { animation:suspect-talk 1.5s ease-in-out infinite; }
+.voice-ripple { position:absolute; z-index:2; left:50%; top:38%; width:16px; height:7px; border-radius:50%; transform:translate(-50%,-50%); opacity:0; box-shadow:0 0 0 0 #f1c87866; pointer-events:none; }
+.interrogation-portrait.is-speaking .voice-ripple { animation:voice-ripple 1.15s ease-out infinite; }
 .interrogation-portrait::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg,#071922b3,transparent 35%); }
 .interrogation-portrait figcaption { position:absolute; left:24px; bottom:24px; z-index:1; font:12px/1.5 monospace; letter-spacing:.13em; color:#f5ddb0; }
 .interrogation-content { padding:78px clamp(24px,4vw,58px) 38px; background:linear-gradient(#0b222bee,#0b222bf5),url('/los-archivos-f/images/folder-archivo-f.jpg') center/cover; }
@@ -278,6 +282,22 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .interrogation-content p { font-size:16px; line-height:1.65; color:#d0ddde; }
 .interrogation-recording { margin-top:28px; }
 .interrogation-recording audio { width:100%; margin-top:4px; }
+.interrogation-recording.is-speaking h3 { color:#79ddd5; }
+.level-two-fede { position:relative; min-height:360px; margin:28px 0; overflow:hidden; border:1px solid #b9985f88; background:#0a2029; }
+.level-two-fede>img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; animation:fede-room-drift 13s ease-in-out infinite alternate; }
+.level-two-fede::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent 15%,#071821d9 58%,#071821f5); }
+.level-two-fede.success::after { background:linear-gradient(90deg,#071821f5,#071821c7 48%,transparent 88%); }
+.level-two-fede>div { position:relative; z-index:2; width:46%; margin-left:auto; padding:72px 38px 38px; }
+.level-two-fede.success>div { margin-left:0; }
+.level-two-fede h2 { margin:8px 0 14px; font:500 clamp(27px,3.5vw,42px)/1.08 Georgia,serif; color:#f0cd86; }
+.level-two-fede p { color:#d4e2e1; line-height:1.55; }
+.level-mission { margin:24px 0 30px; padding:20px 24px; border-left:4px solid #d4ad61; background:#071b2488; }
+.level-mission span { color:#7ed9d2; font:800 11px Arial,sans-serif; letter-spacing:.18em; }
+.level-mission p { margin:8px 0 0; font:500 21px/1.45 Georgia,serif; color:#f4ead7; }
+@keyframes suspect-breathe{from{transform:scale(1)}to{transform:scale(1.018) translateY(-2px)}}
+@keyframes suspect-talk{0%,100%{transform:scale(1.015) translateY(0)}35%{transform:scale(1.022) translateY(-2px)}65%{transform:scale(1.018) translateX(1px)}}
+@keyframes voice-ripple{0%{opacity:.8;box-shadow:0 0 0 0 #f1c87888}100%{opacity:0;box-shadow:0 0 0 22px #f1c87800}}
+@keyframes fede-room-drift{from{transform:scale(1)}to{transform:scale(1.045) translateX(-1%)}}
 .interrogation-content .recording-note { font-size:12px; color:#a6bbc2; }
 .interrogation-transcript { margin:22px 0; border-block:1px solid #3b535d; padding:16px 0; }
 .interrogation-transcript summary { cursor:pointer; font-size:16px; }
@@ -289,7 +309,8 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .completed-deductions p { font-size:16px; line-height:1.5; color:#a9d5cb; }
 @media(min-width:1450px){.suspect-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:1050px){.case-grid{grid-template-columns:1fr 1fr}.case-card.active{grid-column:1/-1}.interrogation-layout{grid-template-columns:38% 62%}.interrogation-content{padding-left:24px;padding-right:24px}}
-@media(max-width:720px){.case-grid{grid-template-columns:1fr}.case-sidebar{max-height:none}.level-navigation{grid-template-columns:repeat(2,minmax(0,1fr));margin-inline:0}.level-navigation button{padding:10px 7px;gap:7px;font-size:13px}.level-navigation small{font-size:12px}.level-navigation .level-number{width:24px;height:24px}.case-sidebar h2 br{display:none}.interrogation-dialog{width:96vw;height:94dvh}.interrogation-layout{grid-template-columns:1fr}.interrogation-portrait{min-height:0;height:42dvh}.interrogation-portrait img{object-position:center 36%}.interrogation-content{padding:28px 22px}.interrogation-content h2{font-size:42px}.interrogation-close{position:sticky;top:10px;grid-column:1;justify-self:end;margin:10px 0 -54px}.suspect-file-caption{padding:14px 5px 7px}.suspect-file-caption p{font-size:13px}.suspect-grid{gap:12px}.suspect-file-id{font-size:10px;top:6px;left:6px}.suspect-details{grid-template-columns:1fr}.suspect-board-heading h2{font-size:25px}}
+@media(max-width:720px){.case-grid{grid-template-columns:1fr}.case-sidebar{max-height:none}.level-navigation{grid-template-columns:repeat(2,minmax(0,1fr));margin-inline:0}.level-navigation button{padding:10px 7px;gap:7px;font-size:13px}.level-navigation small{font-size:12px}.level-navigation .level-number{width:24px;height:24px}.case-sidebar h2 br{display:none}.interrogation-dialog{width:96vw;height:94dvh}.interrogation-layout{grid-template-columns:1fr}.interrogation-portrait{min-height:0;height:42dvh}.interrogation-portrait img{object-position:center 36%}.interrogation-content{padding:28px 22px}.interrogation-content h2{font-size:42px}.interrogation-close{position:sticky;top:10px;grid-column:1;justify-self:end;margin:10px 0 -54px}.suspect-file-caption{padding:14px 5px 7px}.suspect-file-caption p{font-size:13px}.suspect-grid{gap:12px}.suspect-file-id{font-size:10px;top:6px;left:6px}.suspect-details{grid-template-columns:1fr}.suspect-board-heading h2{font-size:25px}.level-two-fede{min-height:440px}.level-two-fede>img{object-position:18% center}.level-two-fede.success>img{object-position:72% center}.level-two-fede::after,.level-two-fede.success::after{background:linear-gradient(0deg,#071821f4 8%,#071821cc 55%,transparent 90%)}.level-two-fede>div,.level-two-fede.success>div{width:auto;margin:0;padding:250px 22px 22px}.level-two-fede h2{font-size:29px}}
+@media(prefers-reduced-motion:reduce){.suspect-file-photo img,.interrogation-portrait.is-speaking img,.voice-ripple,.level-two-fede>img{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.suspect-file{transition:none}}
 .case-visual>span { left:auto; right:18px; }
 .interrogation-dialog { margin:auto; }

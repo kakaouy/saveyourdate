@@ -12,12 +12,12 @@ export const levels = [
   {
     title: 'Las coartadas',
     kicker: 'NIVEL 2 · PANEL DE SOSPECHOSOS',
-    prompt: '¿Qué declaración contradice directamente el registro?',
-    evidence: ['Evidencias D-01 a D-04 · Fichas de sospechosos', 'Evidencia E-01 · Registro de accesos y actividad'],
-    digital: 'Escuchá las cuatro declaraciones y contrastalas con los horarios y lugares del registro E-01. Buscá qué afirmación necesita una explicación. Detectar una contradicción es un paso de la investigación: todavía no demuestra quién robó el rubí.',
-    options: ['Bruno Vidal', 'Vera Salas', 'León Costa', 'Martina Ríos'], answer: ['martina rios'], lock: 'choice',
-    hints: ['Compará cada declaración con las horas del registro.', 'Buscá quién niega haber entrado a un lugar registrado.', 'La tarjeta de Martina abrió el corredor del taller a las 19:39.'],
-    unlock: 'Fotograma recuperado del corredor',
+    prompt: 'Ingresá el código de credencial de la persona cuyo recorrido queda demostrado durante todo el intervalo.',
+    evidence: [],
+    digital: 'El intervalo crítico va de 19:30 a 19:50. Una marca aislada prueba un momento; para descartar a alguien necesitás cubrir el recorrido completo, sin huecos.',
+    placeholder: 'Código de 4 cifras', answer: ['1888'], lock: 'numeric',
+    hints: ['Una entrada, una salida o una foto aislada solo prueban un momento.', 'Buscá registros distintos que se completen entre sí, sin dejar huecos en el intervalo.', 'Compará los dos tramos de entrevista de León con su breve paso por la cafetería.'],
+    unlock: 'Coartada verificada · nueva pista recuperada',
   },
   {
     title: 'La señal del faro',
@@ -73,7 +73,7 @@ export const levels = [
 
 export const unlockMessages = [
   { audio: '/los-archivos-f/audio/fede-nivel-1.wav', text: 'Siete minutos pueden parecer poco, pero alcanzan para cruzar la sala y utilizar el corredor. Ahora compará las declaraciones.' },
-  { audio: '/los-archivos-f/audio/fede-nivel-2.wav', text: 'Martina se contradijo, aunque todavía no demuestra el robo. Recuperé una señal luminosa del corredor.' },
+  { audio: '/los-archivos-f/audio/fede-nivel-2-v2.wav', text: 'Las entrevistas y el registro de la cafetería se superponen y cubren todo el intervalo. León queda descartado. Su anotación en una servilleta abre la próxima pista.' },
   { audio: '/los-archivos-f/audio/fede-nivel-3.wav', text: 'El mensaje señala el taller. Buscá el plano y el acetato para encontrar la salida que no figura en el plano público.' },
   { audio: '/los-archivos-f/audio/fede-nivel-4.wav', text: 'La ruta 418 conecta el taller con la sala del rubí. Ahora debemos demostrar qué ocurrió dentro de la vitrina.' },
   { audio: '/los-archivos-f/audio/fede-nivel-5.wav', text: 'En el taller fabricaron una réplica. Falta encontrar dónde ocultaron el rubí original.' },
@@ -83,10 +83,7 @@ export const unlockMessages = [
 
 export const microChecks = [
   [],
-  [
-    { question: '¿Qué entrada de E-01 coincide con el equipo que Bruno dice haber instalado en la terraza?', options: ['Una compra en la cafetería', 'Una fotografía automática a las 19:38', 'La tarjeta del generador'], correct: 1, success: 'E-01 registra una fotografía automática en la terraza a las 19:38. Confirma actividad del equipo; por sí sola, esa entrada no demuestra que Bruno permaneciera allí durante todo el apagón.' },
-    { question: '¿Quién registra una entrada y una salida de la sala del generador?', options: ['Vera Salas', 'León Costa', 'Martina Ríos'], correct: 0, success: 'Los dos registros de Vera son compatibles con su declaración.' },
-  ],
+  [],
   [
     { question: 'Antes de traducir la señal, ¿cómo debe dividirse?', options: ['En seis grupos separados por pausas largas', 'En pares de colores', 'En tres números'], correct: 0, success: 'Cada grupo corresponde a una letra del código físico.' },
   ],

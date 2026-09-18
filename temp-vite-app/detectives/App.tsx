@@ -3,8 +3,6 @@ import FinalStatement from './FinalStatement';
 import LightSignal from './LightSignal';
 import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
-import FedericaFeedback from './FedericaFeedback';
-import { isAlibiName, type AlibiName } from './alibi-feedback';
 import MissionMap from './MissionMap';
 'use client';
 
@@ -19,10 +17,10 @@ type Screen = 'home' | 'briefing' | 'library' | 'game';
 
 
 const statements = [
-  { name: 'Bruno Vidal', role: 'Fotógrafo', location: 'Terraza del museo', summary: 'Afirma que intentaba fotografiar un relámpago. Su cámara automática podría respaldar su ubicación.', image: '/los-archivos-f/images/bruno-portrait.jpg', audio: '/los-archivos-f/audio/interrogatorio-bruno.wav', text: 'Cuando se cortó la luz estaba en la terraza intentando fotografiar el relámpago. Una de mis cámaras toma imágenes automáticamente cada dos minutos.' },
-  { name: 'Vera Salas', role: 'Seguridad', location: 'Sala del generador', summary: 'Afirma que estuvo en el generador y que utilizó su tarjeta al entrar y salir.', image: '/los-archivos-f/images/vera-portrait.jpg', audio: '/los-archivos-f/audio/interrogatorio-vera.wav', text: 'Yo estaba en la sala del generador. Usé mi tarjeta para entrar y salir. Conocía la prueba eléctrica, pero pensé que había sido cancelada.' },
-  { name: 'León Costa', role: 'Historiador', location: 'Estudio de entrevistas', summary: 'Afirma que dio una entrevista grabada y que no abandonó el estudio.', image: '/los-archivos-f/images/leon-portrait.jpg', audio: '/los-archivos-f/audio/interrogatorio-leon.wav', text: 'Estaba dando una entrevista sobre la historia del rubí. La periodista grabó todo. Discutí con el director, pero no salí del estudio.' },
-  { name: 'Martina Ríos', role: 'Restauradora', location: 'Cafetería', summary: 'Afirma que permaneció en la cafetería durante todo el apagón y niega haber vuelto al taller.', image: '/los-archivos-f/images/martina-portrait.jpg', audio: '/los-archivos-f/audio/interrogatorio-martina.wav', text: 'Permanecí en la cafetería durante todo el apagón. No volví al taller ni me acerqué a la sala del rubí.' },
+  { name: 'Bruno Vidal', code:'BV-3049', role: 'Fotógrafo e inventarista', location: 'Sala de inventario', summary: 'Trabajaba con el registro fotográfico de las piezas antes y después del corte.', image: '/los-archivos-f/images/bruno-ficha-v2.png', audio: '/los-archivos-f/audio/nivel-2-bruno.wav', text: 'Estuve tomando fotos para el inventario antes y después del corte. La cámara guarda la hora de cada toma.' },
+  { name: 'Vera Salas', code:'VS-8124', role: 'Encargada del archivo', location: 'Archivo Histórico', summary: 'Había entrado al archivo y afirma que salió cuando regresó la luz.', image: '/los-archivos-f/images/vera-ficha-v2.png', audio: '/los-archivos-f/audio/nivel-2-vera.wav', text: 'Entré al Archivo Histórico antes del apagón y salí cuando volvió la luz. Mi tarjeta registró los dos movimientos.' },
+  { name: 'León Costa', code:'LC-1888', role: 'Prensa y entrevistas', location: 'Sala de entrevistas y cafetería', summary: 'Participaba en entrevistas y recuerda una pausa breve en la cafetería.', image: '/los-archivos-f/images/leon-ficha-v2.png', audio: '/los-archivos-f/audio/nivel-2-leon.wav', text: 'Estaba con las entrevistas. Hicimos una pausa corta en la cafetería y después seguimos. Vi unas señales extrañas y las anoté en una servilleta.' },
+  { name: 'Martina Ríos', code:'MR-5092', role: 'Restauradora', location: 'Taller de restauración', summary: 'Ordenaba materiales del taller y cerró el lote al terminar el apagón.', image: '/los-archivos-f/images/martina-ficha-v2.png', audio: '/los-archivos-f/audio/nivel-2-martina.wav', text: 'Estuve trabajando en restauración. Ordené los materiales antes del apagón y cerré el lote después. La terminal del taller registra los movimientos.' },
 ];
 
 const levelVisuals = ['/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-hidden-corridor.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/bg-hidden-corridor.png'];
@@ -32,6 +30,7 @@ const successVisuals = ['/los-archivos-f/images/bruno-storm.jpg', '/los-archivos
 
 function InterrogationDialog({ index, onClose }: { index: number; onClose: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [speaking, setSpeaking] = useState(false);
   const person = statements[index];
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -48,15 +47,15 @@ function InterrogationDialog({ index, onClose }: { index: number; onClose: () =>
   return <dialog ref={dialogRef} className="interrogation-dialog" aria-labelledby="interrogation-name" onCancel={onClose} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
     <div className="interrogation-layout">
       <button className="interrogation-close" onClick={onClose} autoFocus aria-label="Cerrar interrogatorio">Cerrar <span aria-hidden="true">×</span></button>
-      <figure className="interrogation-portrait"><img src={person.image} alt={person.name} /><figcaption>ARCHIVO F-01 / SUJETO 0{index + 1}</figcaption></figure>
+      <figure className={`interrogation-portrait ${speaking ? 'is-speaking' : ''}`}><img src={person.image} alt={person.name} /><span className="voice-ripple" aria-hidden="true"/><figcaption>ARCHIVO F-01 / SUJETO 0{index + 1}</figcaption></figure>
       <div className="interrogation-content">
         <p className="eyebrow">REGISTRO DE INTERROGATORIO · 0{index + 1}</p>
         <h2 id="interrogation-name">{person.name}</h2>
-        <dl className="suspect-details"><div><dt>Ocupación</dt><dd>{person.role}</dd></div><div><dt>Ubicación declarada durante el apagón</dt><dd>{person.location}</dd></div></dl>
+        <dl className="suspect-details"><div><dt>Ocupación</dt><dd>{person.role}</dd></div><div><dt>Credencial</dt><dd>{person.code}</dd></div><div><dt>Ubicación declarada</dt><dd>{person.location}</dd></div></dl>
         <section><h3>Resumen de la declaración</h3><p>{person.summary}</p></section>
-        <section className="interrogation-recording"><h3>Escuchá el interrogatorio</h3><audio controls preload="metadata" src={person.audio} aria-label={`Interrogatorio de ${person.name}`} /><p className="recording-note">Voz provisoria · Declaración 0{index + 1} de 04</p></section>
+        <section className={`interrogation-recording ${speaking ? 'is-speaking' : ''}`}><h3>{speaking ? `${person.name} está hablando…` : 'Escuchá el interrogatorio'}</h3><audio controls preload="metadata" src={person.audio} aria-label={`Interrogatorio de ${person.name}`} onPlay={()=>setSpeaking(true)} onPause={()=>setSpeaking(false)} onEnded={()=>setSpeaking(false)} /><p className="recording-note">DECLARACIÓN 0{index + 1} DE 04</p></section>
         <details className="interrogation-transcript"><summary>Leer declaración</summary><blockquote>“{person.text}”</blockquote></details>
-        <p className="interrogation-instruction">Contrastá esta versión con la Evidencia E de tu carpeta. Una declaración todavía no es una prueba.</p>
+        <p className="interrogation-instruction">Una declaración orienta la investigación, pero los registros deciden qué puede demostrarse.</p>
       </div>
     </div>
   </dialog>;
@@ -78,7 +77,6 @@ export default function Home() {
   const [answer, setAnswer] = useState('');
   const [message, setMessage] = useState('');
   const [hints, setHints] = useState<Record<number, number>>({});
-  const [alibiResponse, setAlibiResponse] = useState<AlibiName | null>(null);
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
   const [finalAnswers, setFinalAnswers] = useState({ who: '', how: '', where: '' });
   const [musicOn, setMusicOn] = useState(true);
@@ -115,9 +113,6 @@ export default function Home() {
     try {
       const response = await fetch('/los-archivos-f/api/game', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       const data = await response.json() as GameState & {error?:string;code?:string};
-      if (response.status === 400 && data.code === 'WRONG_ANSWER' && body.action === 'unlock' && body.level === 2 && isAlibiName(body.answer)) {
-        setAlibiResponse(body.answer); setSaveStatus('Progreso conservado'); return null;
-      }
       if (!response.ok) throw new Error(data.error || 'No pudimos guardar. Volvé a intentar.');
       receiveState(data); setSaveStatus('Progreso guardado'); return data as GameState;
     } catch(error) {
@@ -262,7 +257,7 @@ export default function Home() {
         <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={requestHint}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onMission={()=>{setScreen('briefing');window.scrollTo(0,0);}} onLibrary={()=>{setScreen('library');window.scrollTo(0,0);}}/>
 
         <div className="investigation-panel">
-          {level !== 1 && level <= 7 && <figure className={`scene-frame ${level === 0 ? 'storm-layer' : level === 4 || level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt="Escena del Museo del Faro vinculada con la investigación" /><span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
+          {level !== 1 && level !== 2 && level <= 7 && <figure className={`scene-frame ${level === 0 ? 'storm-layer' : level === 4 || level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt="Escena del Museo del Faro vinculada con la investigación" /><span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
           
           {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p><Typewriter text="Robaron el Rubí del Faro. El archivo de las personas presentes quedó bloqueado después del apagón. Recuperá el acceso para comenzar a reconstruir lo que pasó."/></p><p>No abras el sobre negro hasta recibir la autorización de Fede.</p><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>setScreen('briefing')}>Volver a escuchar a Federica</button></section>}
 
@@ -275,15 +270,16 @@ export default function Home() {
             const completedChecks = microChecks[level - 1].length;
             return <section className="level-card">
               <p className="eyebrow dark">{current.kicker}</p><h1>{current.title}</h1>
-              <div className="challenge-counter"><span>DEDUCCIONES {Math.min(checkIndex, completedChecks)}/{completedChecks}</span><span>CANDADO FINAL {unlocked ? 'RESUELTO' : currentCheck ? 'BLOQUEADO' : 'DISPONIBLE'}</span></div>
+              {level === 2 && <div className={`level-two-fede ${unlocked ? 'success' : ''}`}><img src={unlocked ? '/los-archivos-f/images/federica-nivel-2-exito-v1.png' : '/los-archivos-f/images/federica-nivel-2-inicio-v1.png'} alt="Federica en la sala de entrevistas del museo"/><div><p className="eyebrow">MENSAJE DE FEDE</p><h2>{unlocked ? 'Una coartada quedó verificada.' : 'No alcanza con recordar: hay que demostrar.'}</h2><p>{unlocked ? 'Los registros se superponen y cubren todo el intervalo. Esa persona queda descartada de esta parte de la investigación.' : 'Escuchá las cuatro declaraciones y compará sus recorridos. Buscá quién puede demostrar dónde estuvo durante todo el intervalo crítico.'}</p></div></div>}
+              {level === 2 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Descartar exactamente a una persona comprobando su recorrido completo entre las 19:30 y las 19:50.</p></div>}
+              {level !== 2 && <div className="challenge-counter"><span>DEDUCCIONES {Math.min(checkIndex, completedChecks)}/{completedChecks}</span><span>CANDADO FINAL {unlocked ? 'RESUELTO' : currentCheck ? 'BLOQUEADO' : 'DISPONIBLE'}</span></div>}
               <details key={`digital-${level}`} className="clue-envelope digital-envelope"><summary><span>◉</span><b>Interceptar archivo digital<small>Una señal de Federica · tocar para revelar</small></b><span>+</span></summary><div className="digital-brief">{level === 3 ? <LightSignal sequence={current.digital}/> : <p><Typewriter text={current.digital}/></p>}</div></details>
-              {level === 2 && <section className="suspect-board" aria-label="Panel de sospechosos"><div className="suspect-board-heading"><h2>Cuatro versiones. Una investigación.</h2><p>Abrí cada ficha para escuchar su coartada.</p></div><div className="suspect-grid">{statements.map((person, index) => <button className="suspect-file" key={person.name} onClick={() => setSelectedStatement(index)} aria-label={`Abrir interrogatorio de ${person.name}`}><div className="suspect-file-photo"><span className="suspect-file-id">SUJETO 0{index + 1}</span><img src={person.image.replace('-portrait.jpg', '-cutout.png')} alt="" /></div><div className="suspect-file-caption"><span>{person.role}</span><h3>{person.name}</h3><p>Ver ficha e interrogatorio <span aria-hidden="true">↗</span></p></div></button>)}</div></section>}
+              {level === 2 && <section className="suspect-board" aria-label="Panel de sospechosos"><div className="suspect-board-heading"><h2>Cuatro versiones. El mismo intervalo.</h2><p>Abrí cada ficha, observá la escena completa y escuchá a cada persona.</p></div><div className="suspect-grid">{statements.map((person, index) => <button className="suspect-file" key={person.name} onClick={() => setSelectedStatement(index)} aria-label={`Abrir interrogatorio de ${person.name}`}><div className="suspect-file-photo"><span className="suspect-file-id">{person.code}</span><img src={person.image} alt="" /></div><div className="suspect-file-caption"><span>{person.role}</span><h3>{person.name}</h3><p>Escuchar declaración <span aria-hidden="true">↗</span></p></div></button>)}</div></section>}
 
-              <details key={`physical-${level}`} className="clue-envelope physical-envelope"><summary><span>⌕</span><b>Examinar documentos físicos<small>Descubrí qué pruebas necesitás en esta etapa</small></b><span>+</span></summary><div className="physical-brief">{current.evidence.map((item) => <b key={item}>{item}</b>)}</div></details>
+              {level !== 2 && <details key={`physical-${level}`} className="clue-envelope physical-envelope"><summary><span>⌕</span><b>Examinar documentos físicos<small>Descubrí qué pruebas necesitás en esta etapa</small></b><span>+</span></summary><div className="physical-brief">{current.evidence.map((item) => <b key={item}>{item}</b>)}</div></details>}
               {!unlocked && currentCheck && <div className="micro-challenge"><p className="eyebrow dark">DEDUCCIÓN {checkIndex + 1} DE {completedChecks}</p><h2><Typewriter text={currentCheck.question}/></h2><div className="micro-options">{currentCheck.options.map((option, index) => <button key={option} className={checkSelection === index ? 'selected' : ''} onClick={() => { if (!checkPassed) { setCheckSelection(index); setCheckFeedback(''); } }}>{option}</button>)}</div>{checkFeedback && <p className={checkPassed ? 'micro-success' : 'micro-error'}>{checkPassed ? currentCheck.success : checkFeedback}</p>}{checkPassed ? <button className="primary-button" onClick={continueMicroCheck}>REGISTRAR DEDUCCIÓN <span>→</span></button> : <button className="unlock-button" onClick={() => verifyMicroCheck(currentCheck.correct)}>VERIFICAR DEDUCCIÓN</button>}</div>}
-              {!unlocked && !currentCheck && <form className={`lock-panel lock-${current.lock}`} onSubmit={submitLevel}><div className="lock-ready">✓ DEDUCCIONES COMPLETADAS · CANDADO HABILITADO</div><label htmlFor="level-answer"><Typewriter text={current.prompt}/></label>{current.options ? <div className="suspect-options">{current.options.map((option) => <button type="button" className={answer === option ? 'selected' : ''} onClick={() => setAnswer(option)} key={option}>{option}</button>)}</div> : <input id="level-answer" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={current.placeholder} autoComplete="off" />}<button className="unlock-button" type="submit">DESBLOQUEAR NIVEL</button></form>}
+              {!unlocked && !currentCheck && <form className={`lock-panel lock-${current.lock}`} onSubmit={submitLevel}><div className="lock-ready">✓ INVESTIGACIÓN COMPLETA · CANDADO HABILITADO</div><label htmlFor="level-answer"><Typewriter text={current.prompt}/></label><input id="level-answer" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={current.placeholder} autoComplete="off" /><button className="unlock-button" type="submit">DESBLOQUEAR NIVEL</button></form>}
               {message && <p className={message.startsWith('Desbloqueaste') ? 'success-message' : 'error-message'}>{message}</p>}
-              {unlocked && level === 2 && <div className="physical-brief"><span>ACLARACIÓN DE MARTINA</span><p>“Sí, pasé mi tarjeta. Había dejado la medicina en mi bolso, en el taller. El registro demuestra que abrí una puerta, no que robé el rubí.”</p><p>La contradicción es un indicio. Todavía falta probar el método y encontrar el original.</p></div>}
               {unlocked && <details className="completed-deductions"><summary>Consultar deducciones resueltas</summary>{microChecks[level - 1].map((check) => <div key={check.question}><h3>{check.question}</h3><p>✓ {check.success}</p></div>)}</details>}
               {unlocked && <div className="unlock-reveal"><div className="unlock-icon">✓</div><p className="eyebrow dark">MENSAJE DE FEDE DESBLOQUEADO</p><h2>{current.unlock}</h2><audio key={unlockedMessage.audio} className="unlock-audio" controls src={unlockedMessage.audio}>Tu navegador no puede reproducir este audio.</audio><p>“{unlockedMessage.text}”</p><button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button></div>}
             </section>;
@@ -295,7 +291,6 @@ export default function Home() {
         </div>
       </section>}
 
-      {alibiResponse !== null && <FedericaFeedback suspect={alibiResponse} onClose={() => { setAlibiResponse(null); setAnswer(''); requestAnimationFrame(() => { const button = document.querySelector<HTMLButtonElement>('.suspect-file'); button?.focus({preventScroll:true}); button?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',block:'center'}); }); }} />}
       {selectedStatement !== null && <InterrogationDialog index={selectedStatement} onClose={() => setSelectedStatement(null)} />}
 
       {showAccess && <div className="modal-backdrop" onMouseDown={() => {setShowAccess(false); setMessage('');}}><form className="access-card" onSubmit={access} onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowAccess(false)}>×</button><p className="eyebrow dark">ACCESO RESTRINGIDO</p><h2>Identificate, agente.</h2><p>Ingresá el código impreso debajo del QR de tu carpeta.</p><label htmlFor="agent-code">Código del expediente</label><input id="agent-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="F01-XXXX-XXXX-XXXX-XXXX" autoComplete="off" /><label htmlFor="agent-name">Nombre o alias</label><input id="agent-name" value={agent} onChange={(e) => setAgent(e.target.value)} placeholder="Tu nombre o alias de agente" maxLength={48} autoComplete="off" />{message && <p className="form-error">{message}</p>}<button className="primary-button full" type="submit">ACTIVAR INVESTIGACIÓN <span>→</span></button><small>No necesitás cuenta de ChatGPT. Cada código abre una partida compartida por tu familia. Usá un alias; no hace falta dar el nombre completo. Guardá tu tarjeta para recuperar el avance.</small></form></div>}
