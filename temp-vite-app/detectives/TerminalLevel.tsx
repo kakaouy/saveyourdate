@@ -21,7 +21,6 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
    <p>{success?terminalSuccess:terminalIntro}</p>
    <TransmissionPlayer audioRef={audio} source={`/los-archivos-f/audio/fede-terminal-${success?'exito':'inicio'}-v1.wav`} title="Mensaje de Federica" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setBlocked(true)}/>
    {blocked&&<small>Tocá reproducir para escuchar el mensaje. También podés leerlo.</small>}
-   {success&&<div className="terminal-findings"><b>EXPEDIENTE ACTUALIZADO</b><span>Hallazgo: inicio del apagón · 19:37</span><span>Habilitado: expedientes de cuatro sospechosos</span></div>}
    <button className="primary-button" onClick={onClose} autoFocus>{success?'CONTINUAR':'INVESTIGAR'} →</button></div>
   </div>
  </dialog>;

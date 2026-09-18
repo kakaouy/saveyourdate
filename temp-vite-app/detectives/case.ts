@@ -12,7 +12,7 @@ export const levels = [
   {
     title: 'Las coartadas',
     kicker: 'NIVEL 2 · PANEL DE SOSPECHOSOS',
-    prompt: 'Ingresá el código de credencial de la persona cuyo recorrido queda demostrado durante todo el intervalo.',
+    prompt: 'Ingresá el código de 4 cifras que permite cerrar esta parte de la investigación.',
     evidence: [],
     digital: 'El intervalo crítico va de 19:30 a 19:50. Una marca aislada prueba un momento; para descartar a alguien necesitás cubrir el recorrido completo, sin huecos.',
     placeholder: 'Código de 4 cifras', answer: ['1888'], lock: 'numeric',

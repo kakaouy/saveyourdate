@@ -26,10 +26,22 @@ const statements = [
 const levelVisuals = ['/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-hidden-corridor.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/bg-hidden-corridor.png'];
 const successVisuals = ['/los-archivos-f/images/bruno-storm.jpg', '/los-archivos-f/images/suspects-group.jpg', '/los-archivos-f/images/control-room.jpg', '/los-archivos-f/images/corridor-spoiler-418.jpg', '/los-archivos-f/images/martina-dark.jpg', '/los-archivos-f/images/lens-workshop.jpg', '/los-archivos-f/images/evidence-spread-spoiler.jpg'];
 
+function SimulatedPlayer({label,onPlaying}:{label:string;onPlaying?:(value:boolean)=>void}){
+  const [playing,setPlaying]=useState(false);
+  const toggle=()=>{const next=!playing;setPlaying(next);onPlaying?.(next);};
+  return <div className={`simulated-player ${playing?'is-playing':''}`} role="group" aria-label={`${label}. Audio pendiente de producción`}><button type="button" onClick={toggle} aria-label={playing?'Pausar simulación':'Reproducir simulación'}>{playing?'Ⅱ':'▶'}</button><span>{playing?'REPRODUCIENDO MENSAJE…':'AUDIO EN PREPARACIÓN'}</span><i><b/></i><small>--:-- / --:--</small></div>;
+}
+
+function LevelTwoSuccessDialog({onContinue}:{onContinue:()=>void}){
+  const ref=useRef<HTMLDialogElement>(null);const [playing,setPlaying]=useState(false);
+  useEffect(()=>{ref.current?.showModal();return()=>ref.current?.close();},[]);
+  return <dialog ref={ref} className="level-two-success-dialog" aria-labelledby="level-two-success-title" onCancel={event=>event.preventDefault()}><div className="level-two-success-visual"><img src="/los-archivos-f/images/federica-nivel-2-exito-v1.png" alt="Federica junto al reloj del museo"/><span className={`fede-mouth ${playing?'talking':''}`} aria-hidden="true"/><span className="fede-hair" aria-hidden="true"/><span className="unlock-beacon" aria-hidden="true"/></div><div className="level-two-success-copy"><p className="eyebrow">AGENCIA F · NIVEL DESBLOQUEADO</p><h2 id="level-two-success-title">Coartada verificada.</h2><p>Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.</p><SimulatedPlayer label="Mensaje final de Fede" onPlaying={setPlaying}/><button className="primary-button" onClick={onContinue}>CONTINUAR AL NIVEL 3 <span>→</span></button></div></dialog>;
+}
 
 
 function InterrogationDialog({ index, onClose }: { index: number; onClose: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [speaking,setSpeaking]=useState(false);
   const person = statements[index];
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -46,13 +58,13 @@ function InterrogationDialog({ index, onClose }: { index: number; onClose: () =>
   return <dialog ref={dialogRef} className="interrogation-dialog" aria-labelledby="interrogation-name" onCancel={onClose} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
     <div className="interrogation-layout">
       <button className="interrogation-close" onClick={onClose} autoFocus aria-label="Cerrar interrogatorio">Cerrar <span aria-hidden="true">×</span></button>
-      <figure className="interrogation-portrait portrait-alive"><img src={person.image} alt={person.name} /><figcaption>ARCHIVO F-01 / SUJETO 0{index + 1}</figcaption></figure>
+      <figure className={`interrogation-portrait portrait-alive ${speaking?'is-speaking':''}`}><img src={person.image} alt={person.name} /><span className={`suspect-mouth suspect-mouth-${index+1}`} aria-hidden="true"/><figcaption>ARCHIVO F-01 / SUJETO 0{index + 1}</figcaption></figure>
       <div className="interrogation-content">
         <p className="eyebrow">REGISTRO DE INTERROGATORIO · 0{index + 1}</p>
         <h2 id="interrogation-name">{person.name}</h2>
         <dl className="suspect-details"><div><dt>Ocupación</dt><dd>{person.role}</dd></div><div><dt>Credencial</dt><dd>{person.code}</dd></div><div><dt>Ubicación declarada</dt><dd>{person.location}</dd></div></dl>
         <section className="statement-text"><h3>Declaración</h3><blockquote>“{person.text}”</blockquote></section>
-        <section className="timeline-records"><h3>Registros disponibles</h3><div>{person.records.map(record=><span key={record}>{record}</span>)}</div><small>INTERVALO CRÍTICO · 19:30–19:50</small></section>
+        <section className="statement-simulation"><h3>Declaración registrada</h3><SimulatedPlayer label={`Declaración de ${person.name}`} onPlaying={setSpeaking}/></section>
         <p className="interrogation-instruction">Una declaración orienta la investigación, pero los registros deciden qué puede demostrarse.</p>
       </div>
     </div>
@@ -85,6 +97,8 @@ export default function Home() {
   const [checkFeedback, setCheckFeedback] = useState('');
   const [checkPassed, setCheckPassed] = useState(false);
   const [levelThreeReady, setLevelThreeReady] = useState(false);
+  const [levelTwoSuccess,setLevelTwoSuccess]=useState(()=>import.meta.env.DEV&&new URLSearchParams(window.location.search).get('preview')==='level2-unlock');
+  const [levelTwoSpeaking,setLevelTwoSpeaking]=useState(false);
 
   function receiveState(state: GameState) {
     setAgent(state.agent); setHighestLevel(state.highestLevel); setHints(state.hints); setCheckProgress(state.checkProgress); setCompletedAt(state.completedAt); setActiveSession(true);
@@ -187,7 +201,7 @@ export default function Home() {
     event.preventDefault();
     if (busy) return;
     if (!answer.trim()) { setMessage('Elegí una respuesta antes de verificar.'); return; }
-    if (await gameAction({action:'unlock',level,answer})) { setMessage(`Desbloqueaste: ${levels[level-1].unlock}.`); setAnswer(''); }
+    if (await gameAction({action:'unlock',level,answer})) { setMessage(`Desbloqueaste: ${levels[level-1].unlock}.`); setAnswer(''); if(level===2)setLevelTwoSuccess(true); }
   }
 
   function continueInvestigation() {
@@ -277,13 +291,13 @@ export default function Home() {
             const completedChecks = microChecks[level - 1].length;
             return <section className="level-card">
               <p className="eyebrow dark">{current.kicker}</p><h1>{current.title}</h1>
-              {level === 2 && <div className={`level-two-fede ${unlocked ? 'success' : ''}`}><img src={unlocked ? '/los-archivos-f/images/federica-nivel-2-exito-v1.png' : '/los-archivos-f/images/federica-nivel-2-inicio-v1.png'} alt="Federica en la sala de entrevistas del museo"/><div><p className="eyebrow">MENSAJE DE FEDE</p><h2>{unlocked ? 'Coartada verificada.' : 'Una declaración no alcanza.'}</h2><p>{unlocked ? 'Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.' : 'Tenemos cuatro declaraciones, pero una declaración no alcanza para descartar a nadie. Compará lo que dicen con los registros disponibles y averiguá quién puede demostrar dónde estuvo durante todo el intervalo del apagón.'}</p>{unlocked && <button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button>}</div></div>}
+              {level === 2 && <div className={`level-two-fede ${unlocked?'success':''}`}><img src={unlocked?'/los-archivos-f/images/federica-nivel-2-exito-v1.png':'/los-archivos-f/images/federica-nivel-2-inicio-v1.png'} alt="Federica en la sala de entrevistas del museo"/><span className={`fede-mouth ${levelTwoSpeaking?'talking':''}`} aria-hidden="true"/><span className="fede-hair" aria-hidden="true"/><div><p className="eyebrow">MENSAJE DE FEDE</p><h2>{unlocked?'Coartada verificada.':'Una declaración no alcanza.'}</h2><p>{unlocked?'Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.':'Tenemos cuatro declaraciones, pero una declaración no alcanza para descartar a nadie. Compará lo que dicen con los registros disponibles y averiguá quién puede demostrar dónde estuvo durante todo el intervalo del apagón.'}</p><SimulatedPlayer label={unlocked?'Mensaje final del nivel 2':'Presentación del nivel 2'} onPlaying={setLevelTwoSpeaking}/>{unlocked&&<button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button>}</div></div>}
               {level === 3 && <div className={`level-two-fede level-three-fede ${unlocked ? 'success' : ''}`}><img src={unlocked ? '/los-archivos-f/images/federica-presentadora-v1.png' : '/los-archivos-f/images/federica-terminal-v1.png'} alt="Federica junto al receptor de señales del museo"/><div><p className="eyebrow">MENSAJE DE FEDE</p><h2>{unlocked ? 'Señal reconstruida.' : 'Seis señales fuera de secuencia.'}</h2><p>{unlocked ? '¡TALLER! Las señales no eran un mensaje al azar: estaban marcando el Taller de Mantenimiento. Si alguien conocía ese sistema durante el apagón, pudo haber dejado allí otra parte del recorrido. Vamos a revisar el taller.' : 'Encontramos la servilleta que León mencionó. Al mismo tiempo, el receptor recuperó seis señales del apagón, pero quedaron guardadas fuera de secuencia. Descubrí qué significa cada señal y averiguá si las anotaciones de León permiten reconstruir el mensaje.'}</p>{unlocked && <button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button>}</div></div>}
               {level === 2 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Descartar exactamente a una persona comprobando su recorrido completo entre las 19:30 y las 19:50.</p></div>}
               {level === 3 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Interpretar las seis señales y reconstruir el orden del mensaje interceptado.</p></div>}
               {level !== 2 && level !== 3 && <div className="challenge-counter"><span>COMPROBACIONES {Math.min(checkIndex, completedChecks)}/{completedChecks}</span><span>CANDADO FINAL {unlocked ? 'RESUELTO' : currentCheck ? 'BLOQUEADO' : 'DISPONIBLE'}</span></div>}
               <details key={`digital-${level}`} className="clue-envelope digital-envelope"><summary><span>◉</span><b>{level===3?'Abrir receptor de señales':'Interceptar archivo digital'}<small>{level===3?'Seis registros recuperados · tocar para examinar':'Una señal de Federica · tocar para revelar'}</small></b><span>+</span></summary><div className="digital-brief">{level === 3 ? <LightSignal onSolved={setLevelThreeReady}/> : <p><Typewriter text={current.digital}/></p>}</div></details>
-              {level === 2 && <section className="suspect-board" aria-label="Panel de sospechosos"><div className="suspect-board-heading"><h2>Cuatro versiones. El mismo intervalo.</h2><p>Abrí cada ficha, observá la escena completa y compará cada declaración con sus registros.</p></div><div className="suspect-grid">{statements.map((person, index) => <button className="suspect-file" key={person.name} onClick={() => setSelectedStatement(index)} aria-label={`Abrir ficha de ${person.name}`}><div className="suspect-file-photo"><span className="suspect-file-id">{person.code}</span><img src={person.image} alt="" /></div><div className="suspect-file-caption"><span>{person.role}</span><h3>{person.name}</h3><p>Leer declaración <span aria-hidden="true">↗</span></p></div></button>)}</div></section>}
+              {level === 2 && <section className="suspect-board" aria-label="Panel de sospechosos"><div className="suspect-board-heading"><h2>Cuatro versiones. El mismo intervalo.</h2><p>Abrí cada ficha, observá la escena completa y escuchá con atención lo que declara cada persona.</p></div><div className="suspect-grid">{statements.map((person, index) => <button className="suspect-file" key={person.name} onClick={() => setSelectedStatement(index)} aria-label={`Abrir ficha de ${person.name}`}><div className="suspect-file-photo"><span className="suspect-file-id">{person.code}</span><img src={person.image} alt="" /></div><div className="suspect-file-caption"><span>{person.role}</span><h3>{person.name}</h3><p>Abrir declaración <span aria-hidden="true">↗</span></p></div></button>)}</div></section>}
 
               {level !== 2 && level !== 3 && <details key={`physical-${level}`} className="clue-envelope physical-envelope"><summary><span>⌕</span><b>Examinar documentos físicos<small>Descubrí qué pruebas necesitás en esta etapa</small></b><span>+</span></summary><div className="physical-brief">{current.evidence.map((item) => <b key={item}>{item}</b>)}</div></details>}
               {!unlocked && currentCheck && <div className="micro-challenge"><p className="eyebrow dark">COMPROBACIÓN {checkIndex + 1} DE {completedChecks}</p><h2><Typewriter text={currentCheck.question}/></h2><div className="micro-options">{currentCheck.options.map((option, index) => <button key={option} className={checkSelection === index ? 'selected' : ''} onClick={() => { if (!checkPassed) { setCheckSelection(index); setCheckFeedback(''); } }}>{option}</button>)}</div>{checkFeedback && <p className={checkPassed ? 'micro-success' : 'micro-error'}>{checkPassed ? currentCheck.success : checkFeedback}</p>}{checkPassed ? <button className="primary-button" onClick={continueMicroCheck}>REGISTRAR COMPROBACIÓN <span>→</span></button> : <button className="unlock-button" onClick={() => verifyMicroCheck(currentCheck.correct)}>VERIFICAR</button>}</div>}
@@ -300,6 +314,7 @@ export default function Home() {
       </section>}
 
       {selectedStatement !== null && <InterrogationDialog index={selectedStatement} onClose={() => setSelectedStatement(null)} />}
+      {levelTwoSuccess&&<LevelTwoSuccessDialog onContinue={()=>{setLevelTwoSuccess(false);continueInvestigation();}}/>}
 
       {showAccess && <div className="modal-backdrop" onMouseDown={() => {setShowAccess(false); setMessage('');}}><form className="access-card" onSubmit={access} onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowAccess(false)}>×</button><p className="eyebrow dark">ACCESO RESTRINGIDO</p><h2>Identificate, agente.</h2><p>Ingresá el código impreso debajo del QR de tu carpeta.</p><label htmlFor="agent-code">Código del expediente</label><input id="agent-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="F01-XXXX-XXXX-XXXX-XXXX" autoComplete="off" /><label htmlFor="agent-name">Nombre o alias</label><input id="agent-name" value={agent} onChange={(e) => setAgent(e.target.value)} placeholder="Tu nombre o alias de agente" maxLength={48} autoComplete="off" />{message && <p className="form-error">{message}</p>}<button className="primary-button full" type="submit">ACTIVAR INVESTIGACIÓN <span>→</span></button><small>No necesitás cuenta de ChatGPT. Cada código abre una partida compartida por tu familia. Usá un alias; no hace falta dar el nombre completo. Guardá tu tarjeta para recuperar el avance.</small></form></div>}
     {busy && <div className="connection-status" role="status">Conectando con la Agencia F…</div>}
