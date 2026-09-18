@@ -52,7 +52,7 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
   if(body.action==='deduction') {
     const index=Number(body.index), expected=state.checkProgress[level]||0;
     if(index<expected) return state;
-    if(index!==expected||microChecks[level-1][index]?.correct!==body.selection) throw new GameError('La deducción no coincide con las pruebas.');
+    if(index!==expected||microChecks[level-1][index]?.correct!==body.selection) throw new GameError('La comprobación no coincide con las pruebas.');
     state.checkProgress[level]=expected+1;return state;
   }
   if(body.action==='unlock') {

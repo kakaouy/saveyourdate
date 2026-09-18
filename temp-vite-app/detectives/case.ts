@@ -73,7 +73,7 @@ export const levels = [
 
 export const unlockMessages = [
   { audio: '/los-archivos-f/audio/fede-nivel-1.wav', text: 'Siete minutos pueden parecer poco, pero alcanzan para cruzar la sala y utilizar el corredor. Ahora compará las declaraciones.' },
-  { audio: '/los-archivos-f/audio/fede-nivel-2-v2.wav', text: 'Las entrevistas y el registro de la cafetería se superponen y cubren todo el intervalo. León queda descartado. Su anotación en una servilleta abre la próxima pista.' },
+  { audio: '/los-archivos-f/audio/fede-nivel-2.wav', text: 'Coartada verificada. Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.' },
   { audio: '/los-archivos-f/audio/fede-nivel-3.wav', text: 'El mensaje señala el taller. Buscá el plano y el acetato para encontrar la salida que no figura en el plano público.' },
   { audio: '/los-archivos-f/audio/fede-nivel-4.wav', text: 'La ruta 418 conecta el taller con la sala del rubí. Ahora debemos demostrar qué ocurrió dentro de la vitrina.' },
   { audio: '/los-archivos-f/audio/fede-nivel-5.wav', text: 'En el taller fabricaron una réplica. Falta encontrar dónde ocultaron el rubí original.' },
