@@ -443,6 +443,7 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 @keyframes lighthouse-pulse{0%,100%{opacity:.38}50%{opacity:.92}}@keyframes story-beam-sweep{from{transform:rotate(-4deg);opacity:.35}to{transform:rotate(5deg);opacity:.85}}@keyframes signal-confirmation{0%,100%{opacity:.35}50%{opacity:1}}
 .level-three-story-dialog.is-success .level-three-story-visual>.fede-mouth{left:34%;top:31%;width:3.5%}.level-three-story-dialog.is-success .level-three-story-visual>.fede-hair{left:22%;top:10%}
 @media(max-width:760px){.level-three-story-dialog[open]{grid-template-columns:1fr;height:92dvh;overflow-y:auto}.level-three-story-visual{height:300px}.level-three-story-copy{padding:26px 22px}.level-three-story-copy>p:not(.eyebrow){font-size:15px}.level-three-story-visual>img{object-position:30% 28%}}
+@media(max-width:760px){.level-three-story-dialog.is-intro .level-three-story-visual>.fede-mouth{left:30%;top:42%;width:3.8%}.level-three-story-dialog.is-intro .level-three-story-visual>.fede-hair{left:20%;top:9%}}
 @media(prefers-reduced-motion:reduce){.scene-frame.level-three-weather::before,.scene-frame.level-three-weather::after,.level-three-story-visual>img,.story-rain,.story-beam,.signal-confirmation{animation:none!important}}
 .level-two-success-dialog{box-sizing:border-box;width:min(980px,92vw)}.level-two-success-copy{min-width:0;overflow-wrap:anywhere}
 
