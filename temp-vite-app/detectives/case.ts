@@ -1,11 +1,11 @@
 export const levels = [
   {
-    title: 'La hora verdadera',
-    kicker: 'NIVEL 1 · CANDADO DE CÁMARA',
-    prompt: '¿A qué hora comenzó realmente el apagón?',
+    title: 'Acceso restringido',
+    kicker: 'NIVEL 1 · TERMINAL DE ARCHIVO',
+    prompt: 'Clave de emergencia: instante de interrupción',
     evidence: ['Lote A · Cinco capturas de seguridad (A-01 a A-05)', 'Evidencia B-01 · Registro del corte eléctrico'],
-    digital: 'El registro del corte perdió un dato importante. Revisá las cinco capturas y las observaciones técnicas del informe B-01. Buscá qué evidencia permite reconstruir la hora real; para el candado necesitás solo horas y minutos.',
-    placeholder: '4 cifras', answer: ['1937'], lock: 'numeric',
+    digital: 'El archivo de las personas presentes quedó bloqueado después del apagón. Recuperá el acceso para continuar la investigación.',
+    placeholder: '4 caracteres', answer: ['1937'], lock: 'numeric',
     hints: ['Buscá en las capturas una forma de leer la hora que no dependa del rótulo de la cámara.', 'El informe B-01 explica que el reloj de pared de la Sala del Rubí se detuvo al cortarse la energía. Buscalo en A-01.', 'El minutero apunta a la segunda marca después del 7 y la aguja corta está entre el 7 y el 8: son las 19:37. Ingresá 1937.'],
     unlock: 'Declaraciones de los cuatro sospechosos',
   },
@@ -82,10 +82,7 @@ export const unlockMessages = [
 ];
 
 export const microChecks = [
-  [
-    { question: 'Según las observaciones del informe B-01, ¿qué evidencia conserva la hora del inicio del apagón?', options: ['El rótulo horario de CAM 01', 'El reloj de pared de la Sala del Rubí', 'La hora de encendido del generador auxiliar'], correct: 1, success: 'El reloj de pared se detuvo al cortarse la energía. El rótulo de CAM 01 no estaba sincronizado.' },
-    { question: 'En A-01, compará solo horas y minutos del reloj de pared y del rótulo de CAM 01. ¿Cuántos minutos de atraso muestra la cámara?', options: ['5 minutos', '7 minutos', '14 minutos'], correct: 1, success: 'Al comparar horas y minutos, el rótulo de CAM 01 está siete minutos atrasado. Usá la hora del reloj de pared para abrir el candado.' },
-  ],
+  [],
   [
     { question: '¿Qué entrada de E-01 coincide con el equipo que Bruno dice haber instalado en la terraza?', options: ['Una compra en la cafetería', 'Una fotografía automática a las 19:38', 'La tarjeta del generador'], correct: 1, success: 'E-01 registra una fotografía automática en la terraza a las 19:38. Confirma actividad del equipo; por sí sola, esa entrada no demuestra que Bruno permaneciera allí durante todo el apagón.' },
     { question: '¿Quién registra una entrada y una salida de la sala del generador?', options: ['Vera Salas', 'León Costa', 'Martina Ríos'], correct: 0, success: 'Los dos registros de Vera son compatibles con su declaración.' },

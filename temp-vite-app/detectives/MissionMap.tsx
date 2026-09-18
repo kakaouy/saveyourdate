@@ -4,7 +4,7 @@ import { levels } from './case';
 export function MissionIcon({stage}: {stage:number}) {
  const art = [
   <g><path d="M8 22V14h16l5 6h25v30H8Z"/><path d="m8 29 7-6h40l-6 27H8"/><circle cx="34" cy="36" r="13"/><path className="compass-needle" d="m40 29-3 10-10 5 4-11Z"/></g>,
-  <g><circle cx="32" cy="35" r="20"/><path d="M26 8h12M32 8v7M45 17l5-5M17 20l-4-4M32 19v3M48 35h-3M32 51v-3M16 35h3"/><path className="clock-hand" d="M32 24v11l8 5"/><circle cx="32" cy="35" r="2"/></g>,
+  <g><rect x="6" y="10" width="52" height="36" rx="4"/><path d="M12 16h40v23H12ZM25 46v7m14-7v7M18 55h28M19 23l5 5-5 5m11 0h10"/></g>,
   <g><path d="m7 15 16-5 18 6 16-5v39l-16 5-18-6-16 5ZM23 10v39M41 16v39"/><ellipse cx="29" cy="27" rx="4" ry="7" transform="rotate(-25 29 27)"/><ellipse cx="38" cy="41" rx="4" ry="7" transform="rotate(25 38 41)"/><path d="m25 17-2-3m16 17 2-3"/></g>,
   <g><path d="m22 53 5-32h10l5 32M25 21v-9h14v9ZM23 12l9-7 9 7M17 55h30M29 47v-7h6v7M28 29h8"/><path className="lighthouse-rays" d="m18 16-12-5m12 10-12 4m40-9 12-5m-12 10 12 4"/></g>,
   <g><path d="M9 52V10h31v13M15 47V16h19M15 16l10 6v24l-10 1"/><circle cx="40" cy="36" r="12"/><path d="m49 45 10 12M35 36h10m-5-5v10"/></g>,

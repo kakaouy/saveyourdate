@@ -60,7 +60,7 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
     const answer=normalize(String(body.answer||''));
     const numeric=['numeric','safe','mechanical'].includes(levels[level-1].lock);
     const cleaned=numeric ? answer.replace(/[\s:\-]/g,'') : answer;
-    if(!levels[level-1].answer.some(a=>normalize(a)===cleaned)) throw new GameError('Ese código no abre el candado. Revisá las pruebas o pedí una pista.',400,'WRONG_ANSWER');
+    if(!levels[level-1].answer.some(a=>normalize(a)===cleaned)) throw new GameError(level === 1 ? 'Todavía no recuperamos el acceso. No te rindas: compará los detalles y probá otra combinación.' : 'Ese código no abre el candado. Revisá las pruebas o pedí una pista.',400,'WRONG_ANSWER');
     state.highestLevel=level+1;return state;
   }
   throw new GameError('Acción no válida.');

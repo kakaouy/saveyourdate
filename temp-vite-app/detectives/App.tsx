@@ -1,3 +1,4 @@
+import TerminalLevel from './TerminalLevel';
 import FinalStatement from './FinalStatement';
 import LightSignal from './LightSignal';
 import HintLenses from './HintLenses';
@@ -252,7 +253,7 @@ export default function Home() {
       {screen === 'library' && <section className="library-page">
         <p className="save-status" role="status">{saveStatus}</p><div className="page-heading"><p className="eyebrow dark">BIENVENIDO, AGENTE {agent.toUpperCase()}</p><img className="library-emblem" src="/los-archivos-f/images/emblema-archivos-f.png" alt="Sello de Los Archivos F"/><h1>La cámara de los expedientes</h1><p><Typewriter text="Un archivo te está esperando. Examiná su portada y abrilo para seguir el rastro. Tu avance queda guardado con el código de tu carpeta."/></p></div>
         <button className="switch-code" onClick={() => {setCode(''); setMessage(''); setShowAccess(true);}}>Ingresar otro código de carpeta</button><div className="case-grid">
-          <article className="case-card active"><div className="case-visual"><img src="/los-archivos-f/images/hero-archivos-f.png" alt="El rubí rojo sobre un mapa y el faro iluminado junto al mar" /><span>F-01</span></div><div className="case-copy"><small>CASO DISPONIBLE · DIFICULTAD MEDIA</small><h2>El robo del Rubí del Faro</h2><p>Una gema sustituida, cuatro sospechosos y siete minutos sin cámaras.</p><ul><li>7 niveles</li><li>16 desafíos</li><li>60–90 min</li><li>Físico + digital</li></ul><button className="primary-button" onClick={() => { setLevel(level || 0); setScreen('game'); }}>ABRIR EXPEDIENTE <span>→</span></button></div></article>
+          <article className="case-card active"><div className="case-visual"><img src="/los-archivos-f/images/hero-archivos-f.png" alt="El rubí rojo sobre un mapa y el faro iluminado junto al mar" /><span>F-01</span></div><div className="case-copy"><small>CASO DISPONIBLE · DIFICULTAD MEDIA</small><h2>El robo del Rubí del Faro</h2><p>Un rubí robado, cuatro sospechosos y un apagón que investigar.</p><ul><li>7 niveles</li><li>16 desafíos</li><li>60–90 min</li><li>Físico + digital</li></ul><button className="primary-button" onClick={() => { setLevel(level || 0); setScreen('game'); }}>ABRIR EXPEDIENTE <span>→</span></button></div></article>
           {[2,3].map((n) => <article className="case-card locked" key={n}><div className="locked-mark">F-0{n}</div><small>EXPEDIENTE CLASIFICADO</small><h2>Próximamente</h2><p>Tu autorización para este caso todavía no fue emitida.</p></article>)}
         </div>
       </section>}
@@ -261,11 +262,12 @@ export default function Home() {
         <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={requestHint}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onLibrary={()=>setScreen('library')}/>
 
         <div className="investigation-panel">
-          {level <= 7 && <figure className={`scene-frame ${level === 0 ? 'storm-layer' : level === 4 || level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt="Escena del Museo del Faro vinculada con la investigación" /><span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
+          {level !== 1 && level <= 7 && <figure className={`scene-frame ${level === 0 ? 'storm-layer' : level === 4 || level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt="Escena del Museo del Faro vinculada con la investigación" /><span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
           
-          {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p><Typewriter text="Tu primera misión: descubrir a qué hora comenzó realmente el apagón. Buscá la fotografía de la sala y el registro eléctrico en tus archivos confidenciales."/></p><div className="prep-list"><b>Antes de comenzar</b><span>✓ Carpeta y evidencias A–I</span><span>✓ Acetato y filtro rojo</span><span>✓ Papel y lápiz</span><span>✓ Sobre negro cerrado</span></div><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>setScreen('briefing')}>Volver a escuchar a Federica</button></section>}
+          {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p><Typewriter text="Robaron el Rubí del Faro. El archivo de las personas presentes quedó bloqueado después del apagón. Recuperá el acceso para comenzar a reconstruir lo que pasó."/></p><p>No abras el sobre negro hasta recibir la autorización de Fede.</p><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>setScreen('briefing')}>Volver a escuchar a Federica</button></section>}
 
-          {level >= 1 && level <= 7 && (() => {
+          {level === 1 && <TerminalLevel unlocked={unlocked} busy={busy} message={message} onUnlock={async value=>Boolean(await gameAction({action:"unlock",level:1,answer:value}))} onContinue={continueInvestigation}/>}
+          {level >= 2 && level <= 7 && (() => {
             const current = levels[level - 1];
             const unlockedMessage = unlockMessages[level - 1];
             const checkIndex = unlocked ? microChecks[level - 1].length : checkProgress[level] || 0;
