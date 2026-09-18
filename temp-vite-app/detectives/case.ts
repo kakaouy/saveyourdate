@@ -6,7 +6,7 @@ export const levels = [
     evidence: ['Lote A · Cinco capturas de seguridad (A-01 a A-05)', 'Evidencia B-01 · Registro del corte eléctrico'],
     digital: 'El archivo de las personas presentes quedó bloqueado después del apagón. Recuperá el acceso para continuar la investigación.',
     placeholder: '4 caracteres', answer: ['1937'], lock: 'numeric',
-    hints: ['Buscá en las capturas una forma de leer la hora que no dependa del rótulo de la cámara.', 'El informe B-01 explica que el reloj de pared de la Sala del Rubí se detuvo al cortarse la energía. Buscalo en A-01.', 'El minutero apunta a la segunda marca después del 7 y la aguja corta está entre el 7 y el 8: son las 19:37. Ingresá 1937.'],
+    hints: ['Hay más de una referencia temporal entre las evidencias. No todas tienen el mismo grado de confianza.', 'Pensá qué objeto de la sala pudo quedar congelado exactamente cuando se interrumpió la energía.', 'Compará las dos horas y decidí cuál representa el instante real del corte. La terminal espera cuatro caracteres.'],
     unlock: 'Declaraciones de los cuatro sospechosos',
   },
   {
@@ -103,4 +103,3 @@ export const microChecks = [
     { question: '¿Qué líneas se doblan en el mecanismo del sobre negro?', options: ['Las líneas continuas', 'Las líneas punteadas', 'Todas las líneas rojas'], correct: 1, success: 'Las líneas punteadas son pliegues; las continuas delimitan la pieza.' },
   ],
 ];
-

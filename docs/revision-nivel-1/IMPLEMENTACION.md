@@ -24,6 +24,18 @@ Edit target: this detective computer desk. Keep entire composition, monitor exac
 
 La extracción generativa de huella falló; no se incorporó ninguna salida de ese intento. Se utiliza la referencia original mediante CSS.
 
-Cambios locales pendientes de revisión; no publicados ni mezclados con main.
+La primera revisión se publicó en `main` con el commit `ff07f91`.
 
-Validación: compilación correcta, 184 pruebas unitarias correctas. Navegación automatizada local con API simulada (sin modificar partidas reales): lectura secuencial, popup inicial, clave incorrecta y reintento, desbloqueo directo, popup final y acceso al nivel 2. Comprobación móvil 390 px sin desbordamiento horizontal. Audio cargado con duración real, salto al párrafo sincroniza tarjeta y lectura manual pausa voz. Corregido colapso de terminal al redimensionar eliminando contención CSS. No se verificó despliegue porque no se publicó.
+Validación inicial: compilación correcta, 184 pruebas unitarias correctas. Navegación automatizada local con API simulada (sin modificar partidas reales): lectura secuencial, popup inicial, clave incorrecta y reintento, desbloqueo directo, popup final y acceso al nivel 2. Comprobación móvil 390 px sin desbordamiento horizontal. Audio cargado con duración real, salto al párrafo sincroniza tarjeta y lectura manual pausa voz. Corregido colapso de terminal al redimensionar eliminando contención CSS.
+
+## Segunda revisión visual
+
+- Flujo reorganizado: acceso, Cámara de los expedientes, selección de El robo del Rubí del Faro, misión de Fede y Nivel 1.
+- Biblioteca vuelve a la Cámara; Misión vuelve a la explicación completa y a cómo jugar.
+- Los cuatro documentos confidenciales conservan la narración corrida y suman un audio individual por documento. Para aceptar alcanza con abrir los cuatro; no es obligatorio escuchar cada audio completo.
+- Pistas del Nivel 1 reescritas para orientar sin revelar el reloj, la lectura exacta ni la clave.
+- Apertura del Nivel 1: nueva escena de Fede con fondo de archivo y carpeta de evidencias, movimiento ambiental, destellos, partículas y parpadeo sutil.
+- Cierre del Nivel 1: Fede cambia de lado y aparece junto al reloj detenido, con la carpeta; la escena tiene movimiento ambiental independiente.
+- Ambos mensajes se cierran con una cruz, Escape o clic fuera del cuadro.
+- Terminal reforzada con lluvia, pulso de luz, barrido de pantalla y señal animada.
+- Validación local: 184 pruebas correctas, compilación correcta, lint sin errores y recorrido visual simulado completo.

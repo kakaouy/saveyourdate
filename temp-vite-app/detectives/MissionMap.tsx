@@ -17,8 +17,8 @@ export function MissionIcon({stage}: {stage:number}) {
  return <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{art[stage]}</svg>;
 }
 
-type Props={hintPanel:ReactNode;level:number;highestLevel:number;hintsUsed:number;saveStatus:string;visitLevel:(n:number)=>void;onLibrary:()=>void};
-export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,saveStatus,visitLevel,onLibrary}:Props) {
+type Props={hintPanel:ReactNode;level:number;highestLevel:number;hintsUsed:number;saveStatus:string;visitLevel:(n:number)=>void;onMission:()=>void;onLibrary:()=>void};
+export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,saveStatus,visitLevel,onMission,onLibrary}:Props) {
  const [open,setOpen]=useState(false);
  const [hintsOpen,setHintsOpen]=useState(false);
  const hintsDialog=useRef<HTMLDialogElement>(null);
@@ -42,7 +42,7 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,saveS
    <nav className="mission-path" aria-label="Niveles del caso">{nodes.map(({number,title})=>{
     const available=number<=highestLevel,completed=number>0&&(number<highestLevel||number===9&&highestLevel===9);
     const status=!available?'Bloqueado':number===0?'Mensaje de Fede':number===9?'Caso cerrado':completed?'Resuelto · volver a consultar':'Disponible · investigar';
-    return <button key={number} disabled={!available} className={`mission-node ${completed?'solved':''} ${number===level?'selected':''} ${number===9?'ruby-node':''}`} aria-current={number===level?'step':undefined} aria-label={`${title}. ${status}`} onClick={()=>{visitLevel(number);setOpen(false);}}><span className="mission-orb"><MissionIcon stage={number}/><span className="mission-badge">{!available?'⌑':completed?'✓':number||'F'}</span></span><span className="mission-node-copy"><small>{number>0&&number<8?`ETAPA 0${number}`:number===0?'EL COMIENZO':'ARCHIVO F-01'}</small><strong>{title}</strong><span>{status}</span></span>{!available&&<svg className="mission-padlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>}</button>;
+    return <button key={number} disabled={!available} className={`mission-node ${completed?'solved':''} ${number===level?'selected':''} ${number===9?'ruby-node':''}`} aria-current={number===level?'step':undefined} aria-label={`${title}. ${status}`} onClick={()=>{setOpen(false);if(number===0)onMission();else visitLevel(number);}}><span className="mission-orb"><MissionIcon stage={number}/><span className="mission-badge">{!available?'⌑':completed?'✓':number||'F'}</span></span><span className="mission-node-copy"><small>{number>0&&number<8?`ETAPA 0${number}`:number===0?'CÓMO JUGAR':'ARCHIVO F-01'}</small><strong>{title}</strong><span>{number===0?'Volver a escuchar y revisar cómo jugar':status}</span></span>{!available&&<svg className="mission-padlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>}</button>;
    })}</nav>
    <div className="mission-hints"><h3>Pistas · {nodes[level]?.title}</h3>{hintPanel}</div>
    <footer className="mission-map-footer"><button className="library-icon-button" aria-label="Biblioteca: abrir catálogo de juegos" onClick={()=>{setOpen(false);onLibrary();}}><img src="/los-archivos-f/images/biblioteca-libros.png" alt=""/><span>BIBLIOTECA</span></button><p><span className="signal-dot"/>{saveStatus||'Tu avance se guarda al resolver cada desafío.'}</p><p>{highestLevel>=7?'Tenés autorización para abrir el sobre negro.':'El sobre negro permanece cerrado hasta recibir autorización.'}</p></footer></div>

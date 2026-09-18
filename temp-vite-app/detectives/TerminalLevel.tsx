@@ -14,10 +14,10 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
   void player?.play().catch(()=>setBlocked(true));
   return ()=>{player?.pause();element?.close();previous?.focus();};
  },[]);
- return <dialog ref={dialog} className="terminal-dialog" aria-labelledby="terminal-fede-title" onCancel={event=>{event.preventDefault();onClose();}}>
+ return <dialog ref={dialog} className={`terminal-dialog terminal-dialog-${success?'success':'intro'}`} aria-labelledby="terminal-fede-title" onCancel={event=>{event.preventDefault();onClose();}} onClick={event=>{if(event.target===event.currentTarget)onClose();}}>
   <div className="terminal-dialog-layout">
    <FedericaPortrait audioRef={audio} kind={success?'success':'intro'}/>
-   <div><p className="eyebrow">AGENCIA F · TRANSMISIÓN RECUPERADA</p><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2>
+   <div><button className="terminal-dialog-close" type="button" aria-label="Cerrar mensaje de Federica" onClick={onClose}>×</button><p className="eyebrow">AGENCIA F · TRANSMISIÓN RECUPERADA</p><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2>
    <p>{success?terminalSuccess:terminalIntro}</p>
    <TransmissionPlayer audioRef={audio} source={`/los-archivos-f/audio/fede-terminal-${success?'exito':'inicio'}-v1.wav`} title="Mensaje de Federica" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setBlocked(true)}/>
    {blocked&&<small>Tocá reproducir para escuchar el mensaje. También podés leerlo.</small>}
@@ -47,6 +47,7 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
   <div className="terminal-heading"><p className="eyebrow">NIVEL 1 · ARCHIVO F-01</p><button className="reading-choice" onClick={()=>setIntro(true)}>◉ Escuchar a Fede</button></div>
   <div className={`terminal-scene ${lighting?'terminal-illuminated':''}`}>
    <img src="/los-archivos-f/images/terminal-recuperacion-v1.png" alt="Computadora antigua del archivo, junto a una lámpara y una ventana lluviosa"/>
+   <span className="terminal-rain" aria-hidden="true"/><span className="terminal-lamp-pulse" aria-hidden="true"/><span className="terminal-scanlines" aria-hidden="true"/>
    <form className="terminal-screen" onSubmit={submit}>
     <h1>{unlocked?'ACCESO RECUPERADO':'RECUPERACIÓN DE ACCESO'}</h1>
     {!unlocked?<><label htmlFor="terminal-password">Clave de emergencia:<br/>instante de interrupción</label><div className="terminal-entry"><input ref={input} id="terminal-password" aria-label="Código de acceso de cuatro caracteres" maxLength={4} minLength={4} required autoComplete="off" spellCheck={false} value={answer} placeholder="_ _ _ _" onChange={e=>setAnswer(e.target.value)} disabled={busy||lighting}/><span aria-hidden="true" className="terminal-cursor">▍</span></div><button type="submit" disabled={busy||lighting||answer.trim().length!==4}>{busy?'VERIFICANDO…':'ACCEDER'}</button></>:<><p>ARCHIVO DE PERSONAL HABILITADO</p><button type="button" onClick={()=>setSuccess(true)}>ESCUCHAR INFORME</button></>}
