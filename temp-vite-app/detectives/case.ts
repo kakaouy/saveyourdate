@@ -33,10 +33,10 @@ export const levels = [
     title: 'El corredor oculto',
     kicker: 'NIVEL 4 · CAJA FUERTE',
     prompt: '¿Qué código de tres cifras revela el recorrido desde INICIO?',
-    evidence: ['C-01 · Plano público incompleto', 'C-02 · Fragmento recuperado', 'C-03 · Trazado en acetato transparente'],
-    digital: 'Al plano público le falta una parte. Completalo con el fragmento recuperado y después superponé el acetato. Usá las marcas de referencia para reconstruir el recorrido oculto; seguí sus flechas desde INICIO.',
-    placeholder: '3 cifras', answer: ['418'], lock: 'safe',
-    hints: ['Primero encajá C-02 en el espacio faltante de C-01: sus paredes y líneas deben continuar las del plano.', 'Colocá C-03 encima. La marca del norte y las tres boyas deben coincidir al mismo tiempo; una boya está en el fragmento.', 'Desde INICIO, seguí las flechas y anotá solo los números dentro de los tres círculos, en ese orden. No leas el recorrido desde FIN.'],
+    evidence: ['Plano público incompleto', 'Lámina transparente de calibración'],
+    digital: 'Al plano público le falta una parte del sector de mantenimiento. Reconstruí sus conexiones y observá qué función puede tener la lámina transparente.',
+    placeholder: '3 cifras', answer: ['937'], lock: 'safe',
+    hints: ['El fragmento correcto tiene que continuar todo lo que llega hasta los bordes del hueco.', 'No mires solamente el pasillo. También hay una pared y un conducto que deben continuar correctamente.', 'La lámina tiene tres marcas. Buscá tres puntos equivalentes en el plano.', 'Cuando las marcas coincidan, fijate en el símbolo donde comienza la trayectoria.', 'El recorrido comienza en el Generador y atraviesa tres habitaciones numeradas. Leé esos números en el orden del recorrido.'],
     unlock: 'Recorrido del pasadizo confirmado',
   },
   {
@@ -75,7 +75,7 @@ export const unlockMessages = [
   { audio: '/los-archivos-f/audio/fede-nivel-1.wav', text: 'Siete minutos pueden parecer poco, pero alcanzan para cruzar la sala y utilizar el corredor. Ahora compará las declaraciones.' },
   { audio: '/los-archivos-f/audio/fede-nivel-2.wav', text: 'Coartada verificada. Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.' },
   { audio: '/los-archivos-f/audio/fede-nivel-3.wav', text: '¡TALLER! Las señales no eran un mensaje al azar: estaban marcando el Taller de Mantenimiento. Si alguien conocía ese sistema durante el apagón, pudo haber dejado allí otra parte del recorrido. Vamos a revisar el taller.' },
-  { audio: '/los-archivos-f/audio/fede-nivel-4.wav', text: 'La ruta 418 conecta el taller con la sala del rubí. Ahora debemos demostrar qué ocurrió dentro de la vitrina.' },
+  { audio: '/los-archivos-f/audio/fede-nivel-4.wav', text: '¡Lo tenemos! La ruta oculta atraviesa 9, 3 y 7. El código abrió el conducto de mantenimiento. Este pasaje lleva hacia una zona que no aparece en el plano público del faro. Sigamos el corredor.' },
   { audio: '/los-archivos-f/audio/fede-nivel-5.wav', text: 'En el taller fabricaron una réplica. Falta encontrar dónde ocultaron el rubí original.' },
   { audio: '/los-archivos-f/audio/fede-nivel-6.wav', text: 'Llegaste al mismo punto que yo. Tenés autorización para abrir el sobre negro.' },
   { audio: '/los-archivos-f/audio/fede-nivel-7.wav', text: 'El rubí estaba en la base de la lente. Ya podés presentar una acusación completa.' },
@@ -86,6 +86,7 @@ export const microChecks = [
   [],
   [],
   [
+    { question: '¿Qué fragmento conserva la continuidad del pasillo, la pared y el conducto?', options: ['Fragmento A', 'Fragmento B', 'Fragmento C', 'Fragmento D'], correct: 2, success: 'Reconstrucción compatible.' },
     { question: '¿Qué referencias deben coincidir para que el acetato esté bien colocado?', options: ['Solamente la flecha norte', 'Norte y las tres boyas', 'Las paredes de la cafetería'], correct: 1, success: 'Cuatro referencias evitan obtener una posición falsa.' },
   ],
   [
