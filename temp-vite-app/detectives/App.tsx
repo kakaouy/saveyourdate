@@ -38,6 +38,16 @@ function LevelTwoSuccessDialog({onContinue}:{onContinue:()=>void}){
   return <dialog ref={ref} className="level-two-success-dialog" aria-labelledby="level-two-success-title" onCancel={event=>event.preventDefault()}><div className="level-two-success-visual"><img src="/los-archivos-f/images/federica-nivel-2-exito-v1.png" alt="Federica junto al reloj del museo"/><span className={`fede-mouth ${playing?'talking':''}`} aria-hidden="true"/><span className="fede-hair" aria-hidden="true"/><span className="unlock-beacon" aria-hidden="true"/></div><div className="level-two-success-copy"><p className="eyebrow">AGENCIA F · NIVEL DESBLOQUEADO</p><h2 id="level-two-success-title">Coartada verificada.</h2><p>Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.</p><SimulatedPlayer label="Mensaje final de Fede" onPlaying={setPlaying}/><button className="primary-button" onClick={onContinue}>CONTINUAR AL NIVEL 3 <span>→</span></button></div></dialog>;
 }
 
+function LevelThreeStoryDialog({kind,onContinue}:{kind:'intro'|'success';onContinue:()=>void}){
+  const ref=useRef<HTMLDialogElement>(null);const [playing,setPlaying]=useState(false);
+  const success=kind==='success';
+  useEffect(()=>{ref.current?.showModal();return()=>ref.current?.close();},[]);
+  return <dialog ref={ref} className={`level-three-story-dialog ${success?'is-success':'is-intro'}`} aria-labelledby="level-three-story-title" onCancel={event=>event.preventDefault()}>
+    <div className="level-three-story-visual"><img src={success?'/los-archivos-f/images/federica-nivel-3-exito-v1.png':'/los-archivos-f/images/federica-nivel-3-inicio-v1.png'} alt={success?'Federica junto al receptor de señales encendido':'Federica en la cafetería sosteniendo una servilleta blanca'}/><span className="story-rain" aria-hidden="true"/><span className="story-beam" aria-hidden="true"/><span className={`fede-mouth ${playing?'talking':''}`} aria-hidden="true"/><span className="fede-hair" aria-hidden="true"/>{success&&<span className="signal-confirmation" aria-hidden="true"/>}</div>
+    <div className="level-three-story-copy"><p className="eyebrow">{success?'AGENCIA F · NIVEL DESBLOQUEADO':'AGENCIA F · INICIO DEL NIVEL 3'}</p><h2 id="level-three-story-title">{success?'¡Excelente trabajo, agente!':'La tormenta dejó un mensaje.'}</h2><p>{success?'Reconstruiste la secuencia: las seis señales marcan el TALLER. No era un mensaje al azar. Alguien que conocía el sistema pudo dejar allí otra parte del recorrido. Vamos a comprobarlo.':'León dejó esta servilleta en la cafetería y el receptor recuperó seis señales durante el apagón. Tu misión es interpretar cada señal y reconstruir su orden para descubrir qué lugar del faro están señalando.'}</p><SimulatedPlayer label={success?'Mensaje final de Fede · Nivel 3':'Bienvenida de Fede · Nivel 3'} onPlaying={setPlaying}/><button className="primary-button" type="button" onClick={onContinue}>{success?'CONTINUAR AL NIVEL 4':'COMENZAR LA MISIÓN'} <span>→</span></button></div>
+  </dialog>;
+}
+
 
 function InterrogationDialog({ index, onClose }: { index: number; onClose: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -99,6 +109,7 @@ export default function Home() {
   const [levelThreeReady, setLevelThreeReady] = useState(false);
   const [levelTwoSuccess,setLevelTwoSuccess]=useState(()=>import.meta.env.DEV&&new URLSearchParams(window.location.search).get('preview')==='level2-unlock');
   const [levelTwoSpeaking,setLevelTwoSpeaking]=useState(false);
+  const [levelThreeDialog,setLevelThreeDialog]=useState<'intro'|'success'|null>(()=>{if(!import.meta.env.DEV)return null;const preview=new URLSearchParams(window.location.search).get('preview');return preview==='level3'?'intro':preview==='level3-done'?'success':null;});
 
   function receiveState(state: GameState) {
     setAgent(state.agent); setHighestLevel(state.highestLevel); setHints(state.hints); setCheckProgress(state.checkProgress); setCompletedAt(state.completedAt); setActiveSession(true);
@@ -179,6 +190,7 @@ export default function Home() {
   function visitLevel(destination: number) {
     if (destination < 0 || destination > highestLevel) return;
     setLevel(destination); setAnswer(''); setMessage(''); setCheckSelection(null); setCheckFeedback(''); setCheckPassed(false); setSelectedStatement(null); setLevelThreeReady(false);
+    setLevelThreeDialog(destination===3&&highestLevel<=3?'intro':null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -201,7 +213,7 @@ export default function Home() {
     event.preventDefault();
     if (busy) return;
     if (!answer.trim()) { setMessage('Elegí una respuesta antes de verificar.'); return; }
-    if (await gameAction({action:'unlock',level,answer})) { setMessage(`Desbloqueaste: ${levels[level-1].unlock}.`); setAnswer(''); if(level===2)setLevelTwoSuccess(true); }
+    if (await gameAction({action:'unlock',level,answer})) { setMessage(`Desbloqueaste: ${levels[level-1].unlock}.`); setAnswer(''); if(level===2)setLevelTwoSuccess(true);if(level===3)setLevelThreeDialog('success'); }
   }
 
   function continueInvestigation() {
@@ -278,7 +290,7 @@ export default function Home() {
         <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={requestHint}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onMission={()=>{setScreen('briefing');window.scrollTo(0,0);}} onLibrary={()=>{setScreen('library');window.scrollTo(0,0);}}/>
 
         <div className="investigation-panel">
-          {level !== 1 && level !== 2 && level <= 7 && <figure className={`scene-frame ${level === 0 ? 'storm-layer' : level === 4 || level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt="Escena del Museo del Faro vinculada con la investigación" /><span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
+          {level !== 1 && level !== 2 && level <= 7 && <figure className={`scene-frame ${level === 3?'level-three-weather':level === 0 ? 'storm-layer' : level === 4 || level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : level===3 ? levelVisuals[2] : unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt="Escena del Museo del Faro vinculada con la investigación" /><span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
           
           {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p><Typewriter text="Robaron el Rubí del Faro. El archivo de las personas presentes quedó bloqueado después del apagón. Recuperá el acceso para comenzar a reconstruir lo que pasó."/></p><p>No abras el sobre negro hasta recibir la autorización de Fede.</p><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>setScreen('briefing')}>Volver a escuchar a Federica</button></section>}
 
@@ -292,7 +304,6 @@ export default function Home() {
             return <section className="level-card">
               <p className="eyebrow dark">{current.kicker}</p><h1>{current.title}</h1>
               {level === 2 && <div className={`level-two-fede ${unlocked?'success':''}`}><img src={unlocked?'/los-archivos-f/images/federica-nivel-2-exito-v1.png':'/los-archivos-f/images/federica-nivel-2-inicio-v1.png'} alt="Federica en la sala de entrevistas del museo"/><span className={`fede-mouth ${levelTwoSpeaking?'talking':''}`} aria-hidden="true"/><span className="fede-hair" aria-hidden="true"/><div><p className="eyebrow">MENSAJE DE FEDE</p><h2>{unlocked?'Coartada verificada.':'Una declaración no alcanza.'}</h2><p>{unlocked?'Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.':'Tenemos cuatro declaraciones, pero una declaración no alcanza para descartar a nadie. Compará lo que dicen con los registros disponibles y averiguá quién puede demostrar dónde estuvo durante todo el intervalo del apagón.'}</p><SimulatedPlayer label={unlocked?'Mensaje final del nivel 2':'Presentación del nivel 2'} onPlaying={setLevelTwoSpeaking}/>{unlocked&&<button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button>}</div></div>}
-              {level === 3 && <div className={`level-two-fede level-three-fede ${unlocked ? 'success' : ''}`}><img src={unlocked ? '/los-archivos-f/images/federica-presentadora-v1.png' : '/los-archivos-f/images/federica-terminal-v1.png'} alt="Federica junto al receptor de señales del museo"/><div><p className="eyebrow">MENSAJE DE FEDE</p><h2>{unlocked ? 'Señal reconstruida.' : 'Seis señales fuera de secuencia.'}</h2><p>{unlocked ? '¡TALLER! Las señales no eran un mensaje al azar: estaban marcando el Taller de Mantenimiento. Si alguien conocía ese sistema durante el apagón, pudo haber dejado allí otra parte del recorrido. Vamos a revisar el taller.' : 'Encontramos la servilleta que León mencionó. Al mismo tiempo, el receptor recuperó seis señales del apagón, pero quedaron guardadas fuera de secuencia. Descubrí qué significa cada señal y averiguá si las anotaciones de León permiten reconstruir el mensaje.'}</p>{unlocked && <button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button>}</div></div>}
               {level === 2 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Descartar exactamente a una persona comprobando su recorrido completo entre las 19:30 y las 19:50.</p></div>}
               {level === 3 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Interpretar las seis señales y reconstruir el orden del mensaje interceptado.</p></div>}
               {level !== 2 && level !== 3 && <div className="challenge-counter"><span>COMPROBACIONES {Math.min(checkIndex, completedChecks)}/{completedChecks}</span><span>CANDADO FINAL {unlocked ? 'RESUELTO' : currentCheck ? 'BLOQUEADO' : 'DISPONIBLE'}</span></div>}
@@ -302,7 +313,7 @@ export default function Home() {
               {level !== 2 && level !== 3 && <details key={`physical-${level}`} className="clue-envelope physical-envelope"><summary><span>⌕</span><b>Examinar documentos físicos<small>Descubrí qué pruebas necesitás en esta etapa</small></b><span>+</span></summary><div className="physical-brief">{current.evidence.map((item) => <b key={item}>{item}</b>)}</div></details>}
               {!unlocked && currentCheck && <div className="micro-challenge"><p className="eyebrow dark">COMPROBACIÓN {checkIndex + 1} DE {completedChecks}</p><h2><Typewriter text={currentCheck.question}/></h2><div className="micro-options">{currentCheck.options.map((option, index) => <button key={option} className={checkSelection === index ? 'selected' : ''} onClick={() => { if (!checkPassed) { setCheckSelection(index); setCheckFeedback(''); } }}>{option}</button>)}</div>{checkFeedback && <p className={checkPassed ? 'micro-success' : 'micro-error'}>{checkPassed ? currentCheck.success : checkFeedback}</p>}{checkPassed ? <button className="primary-button" onClick={continueMicroCheck}>REGISTRAR COMPROBACIÓN <span>→</span></button> : <button className="unlock-button" onClick={() => verifyMicroCheck(currentCheck.correct)}>VERIFICAR</button>}</div>}
               {!unlocked && !currentCheck && (level!==3||levelThreeReady) && <form className={`lock-panel lock-${current.lock}`} onSubmit={submitLevel}><div className="lock-ready">✓ INVESTIGACIÓN COMPLETA · CANDADO HABILITADO</div><label htmlFor="level-answer"><Typewriter text={current.prompt}/></label><input id="level-answer" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={current.placeholder} autoComplete="off" /><button className="unlock-button" type="submit">DESBLOQUEAR NIVEL</button></form>}
-              {message && <p className={message.startsWith('Desbloqueaste') ? 'success-message' : 'error-message'}>{message}</p>}
+              {message && level!==3 && <p className={message.startsWith('Desbloqueaste') ? 'success-message' : 'error-message'}>{message}</p>}
               {unlocked && level !== 2 && level !== 3 && <div className="unlock-reveal"><div className="unlock-icon">✓</div><p className="eyebrow dark">MENSAJE DE FEDE DESBLOQUEADO</p><h2>{current.unlock}</h2><audio key={unlockedMessage.audio} className="unlock-audio" controls src={unlockedMessage.audio}>Tu navegador no puede reproducir este audio.</audio><p>“{unlockedMessage.text}”</p><button className="primary-button" onClick={continueInvestigation}>CONTINUAR <span>→</span></button></div>}
             </section>;
           })()}
@@ -315,6 +326,7 @@ export default function Home() {
 
       {selectedStatement !== null && <InterrogationDialog index={selectedStatement} onClose={() => setSelectedStatement(null)} />}
       {levelTwoSuccess&&<LevelTwoSuccessDialog onContinue={()=>{setLevelTwoSuccess(false);continueInvestigation();}}/>}
+      {levelThreeDialog&&<LevelThreeStoryDialog kind={levelThreeDialog} onContinue={()=>{if(levelThreeDialog==='success'){setLevelThreeDialog(null);continueInvestigation();}else setLevelThreeDialog(null);}}/>}
 
       {showAccess && <div className="modal-backdrop" onMouseDown={() => {setShowAccess(false); setMessage('');}}><form className="access-card" onSubmit={access} onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowAccess(false)}>×</button><p className="eyebrow dark">ACCESO RESTRINGIDO</p><h2>Identificate, agente.</h2><p>Ingresá el código impreso debajo del QR de tu carpeta.</p><label htmlFor="agent-code">Código del expediente</label><input id="agent-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="F01-XXXX-XXXX-XXXX-XXXX" autoComplete="off" /><label htmlFor="agent-name">Nombre o alias</label><input id="agent-name" value={agent} onChange={(e) => setAgent(e.target.value)} placeholder="Tu nombre o alias de agente" maxLength={48} autoComplete="off" />{message && <p className="form-error">{message}</p>}<button className="primary-button full" type="submit">ACTIVAR INVESTIGACIÓN <span>→</span></button><small>No necesitás cuenta de ChatGPT. Cada código abre una partida compartida por tu familia. Usá un alias; no hace falta dar el nombre completo. Guardá tu tarjeta para recuperar el avance.</small></form></div>}
     {busy && <div className="connection-status" role="status">Conectando con la Agencia F…</div>}
