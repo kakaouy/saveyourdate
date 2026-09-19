@@ -1,0 +1,45 @@
+temp-vite-app/detectives/FedericaPortrait.tsx
+  s_92b1cd3453e863::t_c9e9fdf3c6e0f4 4
+temp-vite-app/detectives/style.css
+  s_92b1cd3453e863::t_8ad6b8b41977be 620-636,642
+  s_92b1cd3453e863::t_2f4eb7308e0a47 637-641
+  s_92b1cd3453e863::t_d7e0198671f15a 582-619
+  s_92b1cd3453e863::t_ffe05fb41e8e02 526-529
+  s_92b1cd3453e863::t_4f7406e3c89051 511-512,520,558
+temp-vite-app/detectives/LevelFourPlan.tsx
+  s_92b1cd3453e863::t_630ed7c47950aa 3,6-9
+  s_92b1cd3453e863::t_aeef1e776a9e49 13
+  s_92b1cd3453e863::t_81cc1deb0f2721 20,24,26
+temp-vite-app/detectives/case.ts
+  s_92b1cd3453e863::t_fe91b208f4b66b 36-37,39
+  s_92b1cd3453e863::t_9745ab8b2d89fd 43,45-50,53,56-60,66-69,79-81,93,96,99
+temp-vite-app/detectives/App.tsx
+  s_92b1cd3453e863::t_af00a97e85549a 366
+  s_92b1cd3453e863::t_5bb7786b30c001 83-84,86-88
+  s_92b1cd3453e863::t_755bc36a5837c7 65,354
+  s_92b1cd3453e863::t_6738f1c819d152 365
+  s_92b1cd3453e863::t_c66167e72281e0 355-357,368,383
+  s_92b1cd3453e863::t_af0968df3934ce 154,163-164,167,238,262
+  s_92b1cd3453e863::t_81fd99adf2802d 362
+  s_92b1cd3453e863::t_1e729b570a5d9f 66,68-82,85
+  s_92b1cd3453e863::t_310b26636d7b89 11
+  s_92b1cd3453e863::t_02115d9aa7587c 67
+temp-vite-app/detectives/MissionMap.tsx
+  s_92b1cd3453e863::t_4f7406e3c89051 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d509d8d281e9714cd6c8b046e10eac5dc90e5ff8",
+  "prompts": {},
+  "sessions": {
+    "s_92b1cd3453e863": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0b612-e708-79a1-bb71-1ae16f7e1271",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
