@@ -5,7 +5,7 @@ type FragmentOption={id:string;corridor:string;wall:string;pipe:string;cable:str
 const fragments:FragmentOption[]=[
   {id:'A',corridor:'M0 35C24 35 24 65 50 65S76 35 100 35',wall:'M35 0C35 28 65 28 65 50S35 72 35 100',pipe:'M0 70C25 70 27 45 50 45S75 70 100 70',cable:'M82 0C82 25 18 76 18 100',number:8,star:[72,72],eye:[28,24],mark:'doble curva'},
   {id:'B',corridor:'M0 35H28V62H72V35H100',wall:'M35 0V30H65V70H35V100',pipe:'M0 70C30 70 30 48 50 48S70 70 100 70',cable:'M82 0C58 20 42 80 18 100',number:5,star:[25,30],eye:[70,70],mark:'paso escalonado'},
-  {id:'C',corridor:'M0 35C25 35 30 62 50 62S76 35 100 35',wall:'M35 0C35 30 65 30 65 50S35 70 35 100',pipe:'M0 70C25 70 32 45 50 45S76 70 100 70',cable:'M82 0C70 28 30 72 18 100',number:3,star:[72,23],eye:[72,65],mark:'curva de faro'},
+  {id:'C',corridor:'M0 35C25 35 30 65 50 65S76 65 100 65',wall:'M35 0C35 30 65 30 65 50V100',pipe:'M0 70C25 70 32 45 50 45S76 55 100 55',cable:'M82 0C70 28 95 62 100 82',number:3,star:[72,23],eye:[72,65],mark:'continuidad completa'},
   {id:'D',corridor:'M0 35H38L62 65H100',wall:'M35 0L65 32V68L35 100',pipe:'M0 70C20 50 38 50 50 70S80 88 100 70',cable:'M82 0C40 18 60 82 18 100',number:1,star:[30,68],eye:[70,28],mark:'cruce diagonal'},
 ];
 
