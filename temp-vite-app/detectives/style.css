@@ -626,6 +626,8 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .late-fede-mouth{position:absolute;left:55.5%;top:31%;width:5.2%;height:.7%;border-radius:50%;background:#713436;opacity:0;transform-origin:center}
 .late-fede-character.is-speaking .late-fede-mouth{opacity:.95;animation:fede-mouth-talk .26s ease-in-out infinite alternate}
 .late-story-visual .story-light,.late-story-visual .story-dust{z-index:2}
+.level-five-image-mouth{position:absolute;z-index:6;left:33.3%;top:39.2%;width:2.8%;height:.48%;border-radius:50%;background:#713436;opacity:0;transform-origin:center}
+.level-five-image-mouth.talking{opacity:.95;animation:fede-mouth-talk .26s ease-in-out infinite alternate}
 
 .movement-register{margin:26px 0;padding:clamp(18px,3vw,30px);border:1px solid #9c814d;background:linear-gradient(145deg,#102c34,#071a23);color:#e9dec6}
 .movement-register h2{margin:8px 0 18px;font:500 clamp(25px,3vw,36px)/1.15 Georgia,serif;color:#edcf91}
@@ -654,3 +656,4 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 @keyframes red-warning-pulse{0%,100%{opacity:.45}50%{opacity:1}}
 @keyframes red-corridor-breathe{from{transform:scale(1.01)}to{transform:scale(1.04);filter:saturate(.85) sepia(.25) hue-rotate(315deg) contrast(1.25)}}
 @media(prefers-reduced-motion:reduce){.scene-frame.level-five-red-corridor img,.scene-frame.level-five-red-corridor::before{animation:none}}
+.scene-frame.level-six-flags{background:#060f17}.scene-frame.level-six-flags img{object-fit:contain;object-position:center}
