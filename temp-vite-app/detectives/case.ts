@@ -40,7 +40,7 @@ export const levels = [
     unlock: 'Recorrido del pasadizo confirmado',
   },
   {
-    title: 'El rastro de R-17',
+    title: 'El registro oculto',
     kicker: 'NIVEL 5 · LABORATORIO',
     prompt: '¿A qué destino fue enviado el registro R-17?',
     evidence: ['Informe de Conservación', 'Material de lectura del nivel 5'],
@@ -87,7 +87,6 @@ export const microChecks = [
   [],
   [
     { question: '¿Qué fragmento conserva la continuidad del pasillo, la pared y el conducto?', options: ['Fragmento A', 'Fragmento B', 'Fragmento C', 'Fragmento D'], correct: 2, success: 'Reconstrucción compatible.' },
-    { question: '¿Qué referencias deben coincidir para que el acetato esté bien colocado?', options: ['Solamente la flecha norte', 'Norte y las tres boyas', 'Las paredes de la cafetería'], correct: 1, success: 'Cuatro referencias evitan obtener una posición falsa.' },
   ],
   [
     { question: '¿Qué sospechosa viste trabajando con Resina RX-4?', options: ['Vera', 'Martina', 'Bruno', 'León'], correct: 1, success: 'La ficha de Martina contiene Resina RX-4. T-04 queda asociado provisionalmente con ella.' },

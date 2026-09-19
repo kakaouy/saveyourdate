@@ -640,3 +640,17 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .movement-check .unlock-button{justify-self:start}
 .movement-feedback{padding:12px 15px;border-left:3px solid #d0aa5d;background:#061820;color:#d7e8df!important}
 @media(max-width:700px){.late-fede-character{width:58%;left:-2%}.movement-register{padding:15px}.movement-register th,.movement-register td{padding:10px}}
+
+/* Nivel 5: el corredor y el informe conducen visualmente al filtro rojo sin que Fede permanezca en la página. */
+.scene-frame.level-five-red-corridor{background:#250607}
+.scene-frame.level-five-red-corridor img{filter:saturate(.72) sepia(.2) hue-rotate(315deg) contrast(1.18);animation:red-corridor-breathe 7s ease-in-out infinite alternate}
+.scene-frame.level-five-red-corridor::before{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at 20% 44%,#ff2828cc 0 1.8%,transparent 7%),radial-gradient(circle at 51% 35%,#ff3a32b8 0 1.5%,transparent 6%),radial-gradient(circle at 81% 55%,#ff1e24d1 0 2%,transparent 8%),linear-gradient(100deg,#5e000033,#ff180026 52%,#35000066);mix-blend-mode:screen;animation:red-warning-pulse 1.8s ease-in-out infinite}
+.red-report-puzzle{margin:26px 0;padding:clamp(20px,3vw,32px);border:1px solid #a94242;background:linear-gradient(145deg,#310d12,#10090d);color:#ead8cb}
+.red-report-puzzle h2{font:500 clamp(25px,3vw,38px)/1.2 Georgia,serif;color:#f0c78f}
+.red-report-sheet{position:relative;isolation:isolate;min-height:210px;margin:22px 0;padding:28px;border:1px solid #9c5d54;background:#dfcdb0;color:#402e2b;overflow:hidden;box-shadow:inset 0 0 30px #6d151544}
+.red-report-sheet p{font:700 12px monospace;letter-spacing:.16em}.red-report-sheet strong{position:absolute;z-index:1;left:50%;top:55%;transform:translate(-50%,-50%);font:800 clamp(22px,4vw,44px) Georgia,serif;letter-spacing:.08em;color:#652c2c;filter:blur(3px);opacity:.25;white-space:nowrap}
+.red-interference{position:absolute;z-index:2;inset:-20%;background:repeating-linear-gradient(8deg,transparent 0 5px,#b20f1fbb 6px 9px,transparent 10px 14px),repeating-linear-gradient(94deg,#7e081655 0 2px,transparent 3px 10px);mix-blend-mode:multiply;transform:rotate(-2deg)}
+.recovered-record{margin:0 0 18px;padding:12px 15px;border-left:4px solid #d64a46;background:#52151c;color:#ffe1c2;letter-spacing:.08em}
+@keyframes red-warning-pulse{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes red-corridor-breathe{from{transform:scale(1.01)}to{transform:scale(1.04);filter:saturate(.85) sepia(.25) hue-rotate(315deg) contrast(1.25)}}
+@media(prefers-reduced-motion:reduce){.scene-frame.level-five-red-corridor img,.scene-frame.level-five-red-corridor::before{animation:none}}
