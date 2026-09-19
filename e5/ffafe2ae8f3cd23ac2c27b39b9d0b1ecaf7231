@@ -1,0 +1,40 @@
+temp-vite-app/detectives/HintLenses.tsx
+  s_92b1cd3453e863::t_d2d02451ea8122 11,13,16,20,24-25
+temp-vite-app/detectives/LightSignal.tsx
+  s_92b1cd3453e863::t_d2d02451ea8122 13-15,17-19,38,40
+  s_92b1cd3453e863::t_02fcc793e68272 1,16
+temp-vite-app/detectives/App.tsx
+  s_92b1cd3453e863::t_d2d02451ea8122 46-49,127,213,350
+  s_92b1cd3453e863::t_61e45de1228752 37-39,43-44,57,65,88,332
+  s_92b1cd3453e863::t_2e52bdfc4a6135 92
+  s_92b1cd3453e863::t_8e4edc6d4bf654 14,36
+  s_92b1cd3453e863::t_3d6ad9a7f96204 313
+  s_92b1cd3453e863::t_02fcc793e68272 326
+  s_92b1cd3453e863::t_f6073e68d5029c 45
+temp-vite-app/detectives/FedericaPortrait.tsx
+  s_92b1cd3453e863::t_953acaeb23ed81 12
+temp-vite-app/detectives/LevelFourPlan.tsx
+  s_92b1cd3453e863::t_caa9be18e41d00 25
+  s_92b1cd3453e863::t_47aad74dfd9c3d 3-9,12-13,20,24,26
+temp-vite-app/detectives/style.css
+  s_92b1cd3453e863::t_3aae0a251612c0 506,512-519,550,552
+  s_92b1cd3453e863::t_02fcc793e68272 556-570
+  s_92b1cd3453e863::t_7357d98b7cddca 502-505,507-511,520-549,551,553-555
+  s_92b1cd3453e863::t_35c2a888351add 571-577
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e5ffafe2ae8f3cd23ac2c27b39b9d0b1ecaf7231",
+  "prompts": {},
+  "sessions": {
+    "s_92b1cd3453e863": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0b612-e708-79a1-bb71-1ae16f7e1271",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
