@@ -499,3 +499,79 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 @keyframes terminal-signal{0%,100%{opacity:.35;transform:scale(.75)}50%{opacity:1;transform:scale(1.2)}}
 @media(max-width:700px){.terminal-scanlines{left:8%;top:18%;width:84%;height:65%}.terminal-rain{left:0;opacity:.35}}
 @media(prefers-reduced-motion:reduce){.terminal-rain,.terminal-lamp-pulse,.terminal-scanlines,.terminal-level .terminal-heading .reading-choice::before{animation:none}}
+
+/* Retratos narrativos: la animación se ancla a la imagen completa para que la boca no se desplace al cambiar el tamaño. */
+.fede-artwork{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;isolation:isolate;background:#071a23;flex-shrink:0}
+.fede-artwork>img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center!important;animation:story-scene-breathe 9s ease-in-out infinite alternate}
+.fede-mouth{position:absolute;z-index:7;height:.48%;border-radius:50%;background:#713436;opacity:0;transform-origin:center;pointer-events:none}
+.fede-mouth.talking{opacity:.95;animation:fede-mouth-talk .26s ease-in-out infinite alternate}
+.fede-hair{position:absolute;z-index:6;width:8%;height:17%;border-radius:55% 45% 65% 35%;background:linear-gradient(90deg,transparent,#25181945,transparent);transform-origin:top center;animation:fede-hair-sway 4.8s ease-in-out infinite alternate;pointer-events:none}
+@keyframes fede-mouth-talk{from{transform:scaleX(.88) scaleY(.45)}to{transform:scaleX(1.04) scaleY(1.45)}}
+@keyframes fede-hair-sway{from{transform:rotate(-1deg)}to{transform:rotate(1.4deg)}}
+.fede-artwork.level-1-intro,.fede-artwork.level-1-success{aspect-ratio:3/4}
+.fede-artwork.level-1-intro .fede-mouth{left:48%;top:35.5%;width:4%}
+.fede-artwork.level-1-success .fede-mouth{left:59.8%;top:31.5%;width:4%}
+.fede-artwork.level-2-intro .fede-mouth{left:23.2%;top:34.8%;width:2.6%}
+.fede-artwork.level-2-success .fede-mouth{left:68.3%;top:38.5%;width:2.6%}
+.fede-artwork.level-3-intro .fede-mouth{left:25.1%;top:38%;width:2.4%}
+.fede-artwork.level-3-success .fede-mouth{left:21.9%;top:32%;width:2.5%}
+.fede-artwork.level-4-intro .fede-mouth{left:24.3%;top:34%;width:2.5%}
+.fede-artwork.level-4-success .fede-mouth{left:21.9%;top:33%;width:2.5%}
+.fede-artwork.level-1-intro .fede-hair{left:31%;top:10%}.fede-artwork.level-1-success .fede-hair{left:51%;top:8%}
+.fede-artwork.level-2-intro .fede-hair,.fede-artwork.level-3-intro .fede-hair,.fede-artwork.level-4-intro .fede-hair{left:15%;top:10%}
+.fede-artwork.level-2-success .fede-hair{left:59%;top:9%}.fede-artwork.level-3-success .fede-hair,.fede-artwork.level-4-success .fede-hair{left:13%;top:8%}
+
+.federica-story-scene{min-height:0;display:grid;place-items:center;padding:0}
+.federica-story-scene>.fede-artwork{height:min(70dvh,570px);width:auto;max-width:100%}
+.federica-story-scene>.fede-artwork::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent 62%,#081d2777),linear-gradient(0deg,#04101866,transparent 36%)}
+.level-two-fede{display:grid;grid-template-columns:52% 48%;min-height:0}
+.level-two-fede::after{display:none}
+.level-two-fede>.fede-artwork{grid-column:1;grid-row:1;align-self:center}
+.level-two-fede>div:last-child{position:relative;z-index:3;grid-column:2;grid-row:1;width:auto;margin:0;padding:clamp(24px,4vw,48px);align-self:center}
+.level-two-fede.success>.fede-artwork{grid-column:2}.level-two-fede.success>div:last-child{grid-column:1}
+.level-two-success-dialog{height:auto;max-height:90dvh;overflow:auto}
+.level-two-success-visual{display:grid;place-items:center;overflow:hidden}
+.level-three-story-dialog{height:auto;max-height:92dvh;overflow:auto}
+.level-three-story-dialog[open]{grid-template-columns:minmax(0,49%) minmax(0,51%)}
+.level-three-story-visual{display:grid;place-items:center;align-self:center;overflow:hidden}
+.level-three-story-visual>.fede-artwork{width:100%}
+
+/* La credencial forma parte del retrato: nombre y código se descubren observando la imagen. */
+.interrogation-portrait{display:grid;place-items:center;overflow:hidden}
+.suspect-artwork{position:relative;height:100%;max-width:100%;aspect-ratio:3/4;overflow:hidden}
+.suspect-artwork>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.suspect-id-evidence{position:absolute;z-index:8;left:5%;bottom:6%;width:min(70%,250px);box-sizing:border-box;padding:9px 12px;border:3px double #8d7040;background:#eee4cc;color:#17313a;box-shadow:0 6px 18px #0008;transform:rotate(-2deg);font-family:Arial,sans-serif;text-align:left}
+.suspect-id-evidence::before{content:'';position:absolute;left:50%;top:-18px;width:2px;height:18px;background:#adbaa9;box-shadow:0 0 0 1px #24383a}
+.suspect-id-evidence small,.suspect-id-evidence b,.suspect-id-evidence code{display:block}
+.suspect-id-evidence small{font-size:8px;letter-spacing:.16em;color:#5b695f}
+.suspect-id-evidence b{margin:4px 0 3px;font:700 15px/1.15 Georgia,serif;color:#1b3034}
+.suspect-id-evidence code{font:700 13px/1.2 monospace;letter-spacing:.12em;color:#7c312b}
+.interrogation-portrait figcaption{top:18px;bottom:auto}
+.suspect-mouth{position:absolute;z-index:7;height:.45%;border-radius:50%;background:#713436;opacity:0;transform-origin:center;pointer-events:none}
+.interrogation-portrait.is-speaking .suspect-mouth{opacity:.92;animation:fede-mouth-talk .25s ease-in-out infinite alternate}
+.suspect-mouth-1{left:48%;top:42.5%;width:4%}.suspect-mouth-2{left:48%;top:32%;width:4%}.suspect-mouth-3{left:49%;top:38%;width:4%}.suspect-mouth-4{left:48%;top:34%;width:4%}
+
+@media(max-width:760px){.level-two-fede,.level-two-fede.success{grid-template-columns:1fr}.level-two-fede>.fede-artwork,.level-two-fede.success>.fede-artwork{grid-column:1;grid-row:1}.level-two-fede>div:last-child,.level-two-fede.success>div:last-child{grid-column:1;grid-row:2;padding:24px 22px}.level-three-story-dialog[open]{grid-template-columns:1fr}.level-three-story-visual{height:auto}.level-three-story-visual>.fede-artwork{width:100%;height:auto}.federica-story-scene>.fede-artwork{height:260px;width:195px}.suspect-id-evidence{bottom:4%;padding:7px 9px}.suspect-id-evidence b{font-size:13px}.suspect-id-evidence code{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.fede-artwork>img,.fede-hair{animation:none}.fede-mouth.talking,.interrogation-portrait.is-speaking .suspect-mouth{animation:fede-mouth-talk .6s ease-in-out infinite alternate}}
+
+/* Nivel 2: la sala pertenece a los sospechosos; Fede aparece únicamente en sus mensajes modales. */
+.level-two-group-scene{position:relative;margin:28px 0;overflow:hidden;border:1px solid #b9985f88;background:#071a23}
+.level-two-group-scene img{display:block;width:100%;aspect-ratio:16/8.7;object-fit:cover;object-position:center 38%;animation:suspects-room-drift 12s ease-in-out infinite alternate}
+.level-two-group-scene figcaption{position:absolute;left:0;right:0;bottom:0;padding:18px 22px;background:linear-gradient(transparent,#06141deb);color:#ead49d;font:9px/1.4 Arial,sans-serif;letter-spacing:.17em}
+.level-two-intro-dialog .level-two-success-visual{order:0}.level-two-intro-dialog .level-two-success-copy{order:1}
+@keyframes suspects-room-drift{from{transform:scale(1.01)}to{transform:scale(1.045) translateY(-.6%)}}
+
+/* El patrón vuelve a leerse como luz: puntos cortos y barras largas se encienden en secuencia. */
+.light-pattern{display:flex!important;align-items:center;justify-content:center;gap:7px;min-height:20px;padding:5px 7px;border:1px solid #927a4e66;border-radius:12px;background:#031117;overflow:hidden}
+.light-pattern i{display:block;flex:none;height:8px;border-radius:999px;background:#5d624f;box-shadow:inset 0 0 0 1px #c1a25b55;animation:signal-light-pulse 2.4s ease-in-out infinite;animation-delay:calc(var(--pulse-index) * .34s)}
+.light-pattern i.short{width:8px}.light-pattern i.long{width:25px}
+@keyframes signal-light-pulse{0%,18%,100%{background:#4f584d;box-shadow:inset 0 0 0 1px #9d875566}30%,48%{background:#ffe29a;box-shadow:0 0 7px #ffd36f,0 0 15px #eabf5966}}
+@media(max-width:760px){.level-two-group-scene img{aspect-ratio:4/3}.light-pattern{gap:5px;padding-inline:5px}.light-pattern i.long{width:19px}}
+@media(prefers-reduced-motion:reduce){.level-two-group-scene img,.light-pattern i{animation:none}.light-pattern i{background:#ffe29a;box-shadow:0 0 7px #ffd36f}}
+
+/* Nivel 4: plano de cuatro redes. Las piezas comparten silueta y difieren sólo en una continuidad. */
+.scene-frame.level-four-maps::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(110deg,transparent 45%,#9bdce216 55%,transparent 64%);animation:story-light-sweep 8s ease-in-out infinite;pointer-events:none}
+.complex-plan{height:360px;background-size:18px 18px}.complex-plan .plan-network{position:absolute;inset:0;width:100%;height:100%;z-index:1}.complex-plan .plan-hole{left:36%;top:24%;width:28%;height:52%;z-index:4;background:#6b3e3645;box-shadow:0 0 0 7px #d8c9a3,0 0 0 9px #844f43;border:2px dashed #733d33;clip-path:polygon(1% 4%,11% 0,24% 4%,37% 1%,49% 5%,63% 1%,76% 4%,90% 0,99% 7%,96% 20%,100% 35%,96% 49%,100% 63%,97% 78%,100% 94%,89% 99%,75% 96%,62% 100%,48% 96%,34% 100%,21% 96%,8% 100%,1% 92%,4% 78%,0 64%,4% 49%,0 34%,4% 19%)}.complex-plan .plan-hole b,.complex-plan .plan-hole small{display:block}.complex-plan .plan-hole small{font:8px/1.4 Arial,sans-serif;letter-spacing:.08em}.complex-plan .plan-room{z-index:3;background:#d8c9a3dd}.complex-plan .room-one{left:4%;top:8%;width:19%;height:20%}.complex-plan .room-two{right:4%;bottom:7%;width:19%;height:20%}.complex-plan .room-three{left:5%;bottom:7%;width:18%;height:18%}.complex-plan .room-four{right:6%;top:7%;width:20%;height:19%}.complex-plan .room-five{left:7%;top:39%;width:17%;height:17%}.plan-legend{position:absolute;z-index:5;right:3%;bottom:2%;display:flex;align-items:center;gap:5px;padding:5px 7px;background:#e7d8b5cc;color:#344744;font:7px/1 Arial,sans-serif;letter-spacing:.06em}.plan-legend i{display:inline-block;width:16px;height:4px}.legend-corridor{background:#5c716c}.legend-wall{border-top:3px double #293e3c}.legend-pipe{background:#a6553e}.legend-cable{background:#326d83}
+.plan-network path,.plan-fragments svg path,.plan-fragments svg circle{fill:none;vector-effect:non-scaling-stroke}.fragment-grid{stroke:#435a5729!important;stroke-width:1!important}.fragment-corridor{stroke:#5c716c!important;stroke-width:11!important}.fragment-wall{stroke:#293e3c!important;stroke-width:5!important;stroke-dasharray:1 2}.fragment-pipe{stroke:#a6553e!important;stroke-width:3!important}.fragment-cable{stroke:#326d83!important;stroke-width:2!important;stroke-dasharray:5 3}.fragment-paper{fill:#d9c9a4!important;stroke:#465956!important;stroke-width:2}.fragment-mark{fill:#d9c9a4!important;stroke:#7d6138!important;stroke-width:2!important}.plan-fragments button{position:relative}.plan-fragments button small{display:block;margin-top:4px;color:#91aaa5;font:8px/1.3 Arial,sans-serif;letter-spacing:.06em}.plan-fragments button::after{content:'';position:absolute;inset:8px 8px 34px;pointer-events:none;box-shadow:inset 0 0 14px #6e573a36}
+@media(max-width:760px){.complex-plan{height:300px}.complex-plan .plan-room{font-size:7px}.complex-plan .plan-room b{font-size:17px}.complex-plan .room-five{display:none}.plan-legend{display:none}}
+@media(prefers-reduced-motion:reduce){.scene-frame.level-four-maps::before{animation:none}}

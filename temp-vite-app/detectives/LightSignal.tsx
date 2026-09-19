@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, type CSSProperties} from 'react';
 
 type Signal = {id:string; name:string; symbol:string; pattern:string};
 const signals: Signal[] = [
@@ -9,6 +9,13 @@ const signals: Signal[] = [
   {id:'lantern',name:'Farol',symbol:'⌑',pattern:'o —'},
   {id:'wave-b',name:'Ola B',symbol:'≋',pattern:'— o —'},
 ];
+
+function SignalPattern({pattern}:{pattern:string}) {
+  const pulses=pattern.split(' ').filter(Boolean);
+  return <span className="light-pattern" aria-label={`Destellos ${pattern}`}>
+    {pulses.map((pulse,index)=><i key={`${pulse}-${index}`} className={pulse==='—'?'long':'short'} style={{'--pulse-index':index} as CSSProperties}/>) }
+  </span>;
+}
 
 export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void}) {
   const [available,setAvailable]=useState(signals);
@@ -28,9 +35,9 @@ export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void
   return <section className="signal-workbench" aria-label="Receptor de seis señales desordenadas">
     <header><span className="signal-lamp is-lit" aria-hidden="true"/><div><b>SEIS REGISTROS RECUPERADOS</b><small>Guardados fuera de secuencia</small></div></header>
     <p className="signal-instruction">Seleccioná una tarjeta para llevarla a la bandeja. También podés arrastrarla y ajustar su posición con las flechas.</p>
-    <div className="signal-pool" aria-label="Señales sin ordenar">{available.map((signal,index)=><button draggable key={signal.id} onDragStart={()=>setDragged(signal.id)} onClick={()=>add(signal)} className="signal-card"><small>S-{String(index+1).padStart(2,'0')}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><code>{signal.pattern}</code></button>)}</div>
+    <div className="signal-pool" aria-label="Señales sin ordenar">{available.map((signal,index)=><button draggable key={signal.id} onDragStart={()=>setDragged(signal.id)} onClick={()=>add(signal)} className="signal-card"><small>S-{String(index+1).padStart(2,'0')}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><SignalPattern pattern={signal.pattern}/></button>)}</div>
     <div className="signal-sequence" onDragOver={event=>event.preventDefault()} onDrop={()=>{const signal=available.find(item=>item.id===dragged);if(signal)add(signal);setDragged(null);}} aria-label="Secuencia reconstruida">
-      {Array.from({length:6},(_,index)=>{const signal=ordered[index];return <div className={`signal-slot ${signal?'filled':''}`} key={signal?.id||index}>{signal?<><button className="signal-card" onClick={()=>remove(signal)} aria-label={`Quitar ${signal.name} de la posición ${index+1}`}><small>POSICIÓN {index+1}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><code>{signal.pattern}</code></button><span className="signal-movers"><button onClick={()=>move(index,-1)} disabled={index===0} aria-label={`Mover ${signal.name} a la izquierda`}>←</button><button onClick={()=>move(index,1)} disabled={index===ordered.length-1} aria-label={`Mover ${signal.name} a la derecha`}>→</button></span></>:<span>{index+1}</span>}</div>})}
+      {Array.from({length:6},(_,index)=>{const signal=ordered[index];return <div className={`signal-slot ${signal?'filled':''}`} key={signal?.id||index}>{signal?<><button className="signal-card" onClick={()=>remove(signal)} aria-label={`Quitar ${signal.name} de la posición ${index+1}`}><small>POSICIÓN {index+1}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><SignalPattern pattern={signal.pattern}/></button><span className="signal-movers"><button onClick={()=>move(index,-1)} disabled={index===0} aria-label={`Mover ${signal.name} a la izquierda`}>←</button><button onClick={()=>move(index,1)} disabled={index===ordered.length-1} aria-label={`Mover ${signal.name} a la derecha`}>→</button></span></>:<span>{index+1}</span>}</div>})}
     </div>
     <button type="button" className="unlock-button" onClick={analyze}>ANALIZAR SECUENCIA</button>
     {feedback&&<p className={feedback.startsWith('Secuencia')?'signal-success':'signal-feedback'} role="status">{feedback}</p>}
