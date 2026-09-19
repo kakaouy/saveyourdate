@@ -508,8 +508,8 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .fede-hair{position:absolute;z-index:6;width:8%;height:17%;border-radius:55% 45% 65% 35%;background:linear-gradient(90deg,transparent,#25181945,transparent);transform-origin:top center;animation:fede-hair-sway 4.8s ease-in-out infinite alternate;pointer-events:none}
 @keyframes fede-mouth-talk{from{transform:scaleX(.88) scaleY(.45)}to{transform:scaleX(1.04) scaleY(1.45)}}
 @keyframes fede-hair-sway{from{transform:rotate(-1deg)}to{transform:rotate(1.4deg)}}
-.fede-artwork.level-1-intro,.fede-artwork.level-1-success{aspect-ratio:3/4}
-.fede-artwork.level-1-intro .fede-mouth{left:48%;top:35.5%;width:4%}
+.fede-artwork.level-1-intro{aspect-ratio:4/3}.fede-artwork.level-1-success{aspect-ratio:3/4}
+.fede-artwork.level-1-intro .fede-mouth{left:30.2%;top:29.8%;width:3.2%}
 .fede-artwork.level-1-success .fede-mouth{left:59.8%;top:31.5%;width:4%}
 .fede-artwork.level-2-intro .fede-mouth{left:23.2%;top:34.8%;width:2.6%}
 .fede-artwork.level-2-success .fede-mouth{left:68.3%;top:38.5%;width:2.6%}
@@ -517,12 +517,16 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .fede-artwork.level-3-success .fede-mouth{left:21.9%;top:32%;width:2.5%}
 .fede-artwork.level-4-intro .fede-mouth{left:24.3%;top:34%;width:2.5%}
 .fede-artwork.level-4-success .fede-mouth{left:21.9%;top:33%;width:2.5%}
-.fede-artwork.level-1-intro .fede-hair{left:31%;top:10%}.fede-artwork.level-1-success .fede-hair{left:51%;top:8%}
+.fede-artwork.level-1-intro .fede-hair{left:15%;top:7%}.fede-artwork.level-1-success .fede-hair{left:51%;top:8%}
 .fede-artwork.level-2-intro .fede-hair,.fede-artwork.level-3-intro .fede-hair,.fede-artwork.level-4-intro .fede-hair{left:15%;top:10%}
 .fede-artwork.level-2-success .fede-hair{left:59%;top:9%}.fede-artwork.level-3-success .fede-hair,.fede-artwork.level-4-success .fede-hair{left:13%;top:8%}
 
 .federica-story-scene{min-height:0;display:grid;place-items:center;padding:0}
 .federica-story-scene>.fede-artwork{height:min(70dvh,570px);width:auto;max-width:100%}
+.terminal-dialog-intro{overflow:auto}
+.terminal-dialog-intro .terminal-dialog-layout{grid-template-columns:1fr}
+.terminal-dialog-intro .federica-story-scene{align-self:auto}
+.federica-story-scene>.fede-artwork.level-1-intro{width:100%;height:auto;aspect-ratio:4/3}
 .federica-story-scene>.fede-artwork::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent 62%,#081d2777),linear-gradient(0deg,#04101866,transparent 36%)}
 .level-two-fede{display:grid;grid-template-columns:52% 48%;min-height:0}
 .level-two-fede::after{display:none}
@@ -551,7 +555,7 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .interrogation-portrait.is-speaking .suspect-mouth{opacity:.92;animation:fede-mouth-talk .25s ease-in-out infinite alternate}
 .suspect-mouth-1{left:48%;top:42.5%;width:4%}.suspect-mouth-2{left:48%;top:32%;width:4%}.suspect-mouth-3{left:49%;top:38%;width:4%}.suspect-mouth-4{left:48%;top:34%;width:4%}
 
-@media(max-width:760px){.level-two-fede,.level-two-fede.success{grid-template-columns:1fr}.level-two-fede>.fede-artwork,.level-two-fede.success>.fede-artwork{grid-column:1;grid-row:1}.level-two-fede>div:last-child,.level-two-fede.success>div:last-child{grid-column:1;grid-row:2;padding:24px 22px}.level-three-story-dialog[open]{grid-template-columns:1fr}.level-three-story-visual{height:auto}.level-three-story-visual>.fede-artwork{width:100%;height:auto}.federica-story-scene>.fede-artwork{height:260px;width:195px}.suspect-id-evidence{bottom:4%;padding:7px 9px}.suspect-id-evidence b{font-size:13px}.suspect-id-evidence code{font-size:11px}}
+@media(max-width:760px){.level-two-fede,.level-two-fede.success{grid-template-columns:1fr}.level-two-fede>.fede-artwork,.level-two-fede.success>.fede-artwork{grid-column:1;grid-row:1}.level-two-fede>div:last-child,.level-two-fede.success>div:last-child{grid-column:1;grid-row:2;padding:24px 22px}.level-three-story-dialog[open]{grid-template-columns:1fr}.level-three-story-visual{height:auto}.level-three-story-visual>.fede-artwork{width:100%;height:auto}.federica-story-scene>.fede-artwork{height:260px;width:195px}.federica-story-scene>.fede-artwork.level-1-intro{width:100%;height:auto;aspect-ratio:4/3}.suspect-id-evidence{bottom:4%;padding:7px 9px}.suspect-id-evidence b{font-size:13px}.suspect-id-evidence code{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.fede-artwork>img,.fede-hair{animation:none}.fede-mouth.talking,.interrogation-portrait.is-speaking .suspect-mouth{animation:fede-mouth-talk .6s ease-in-out infinite alternate}}
 
 /* Nivel 2: la sala pertenece a los sospechosos; Fede aparece únicamente en sus mensajes modales. */
@@ -575,3 +579,64 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .plan-network path,.plan-fragments svg path,.plan-fragments svg circle{fill:none;vector-effect:non-scaling-stroke}.fragment-grid{stroke:#435a5729!important;stroke-width:1!important}.fragment-corridor{stroke:#5c716c!important;stroke-width:11!important}.fragment-wall{stroke:#293e3c!important;stroke-width:5!important;stroke-dasharray:1 2}.fragment-pipe{stroke:#a6553e!important;stroke-width:3!important}.fragment-cable{stroke:#326d83!important;stroke-width:2!important;stroke-dasharray:5 3}.fragment-paper{fill:#d9c9a4!important;stroke:#465956!important;stroke-width:2}.fragment-mark{fill:#d9c9a4!important;stroke:#7d6138!important;stroke-width:2!important}.plan-fragments button{position:relative}.plan-fragments button small{display:block;margin-top:4px;color:#91aaa5;font:8px/1.3 Arial,sans-serif;letter-spacing:.06em}.plan-fragments button::after{content:'';position:absolute;inset:8px 8px 34px;pointer-events:none;box-shadow:inset 0 0 14px #6e573a36}
 @media(max-width:760px){.complex-plan{height:300px}.complex-plan .plan-room{font-size:7px}.complex-plan .plan-room b{font-size:17px}.complex-plan .room-five{display:none}.plan-legend{display:none}}
 @media(prefers-reduced-motion:reduce){.scene-frame.level-four-maps::before{animation:none}}
+
+/* Todos los mensajes de Fede se leen como una tarjeta vertical: imagen completa arriba y texto debajo. */
+.level-two-success-dialog,
+.level-three-story-dialog{
+  width:min(940px,94vw);
+  height:auto;
+  max-height:92dvh;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.level-two-success-dialog[open],
+.level-three-story-dialog[open]{display:block}
+.level-two-success-visual,
+.level-three-story-visual{width:100%;height:auto;aspect-ratio:4/3;overflow:hidden}
+.level-two-success-visual>.fede-artwork,
+.level-three-story-visual>.fede-artwork{width:100%;height:auto;aspect-ratio:4/3}
+.level-two-success-copy,
+.level-three-story-copy{padding:clamp(24px,4vw,48px)}
+@media(max-width:700px){
+  .level-two-success-dialog,.level-three-story-dialog{width:96vw;max-height:94dvh}
+  .level-two-success-visual,.level-three-story-visual{aspect-ratio:4/3;height:auto}
+  .level-two-success-copy,.level-three-story-copy{padding:24px 18px 30px}
+}
+
+/* Acetato del nivel 4: todas las piezas ajustan; el acertijo decide cuál conservar. */
+.acetate-riddle{position:relative;margin:20px 0;padding:18px 22px;border:1px solid #9edbd2aa;background:linear-gradient(135deg,#dffcf31f,#79cfc51a);box-shadow:inset 0 0 24px #b9fff01c;color:#d9eee7;transform:rotate(-.35deg)}
+.acetate-riddle::before{content:'';position:absolute;inset:7px;border:1px dashed #d9fff444;pointer-events:none}
+.acetate-riddle>span{font:700 9px/1.4 Arial,sans-serif;letter-spacing:.18em;color:#8fd6ce}
+.acetate-riddle p{margin:12px 0 8px;font:italic clamp(16px,2vw,21px)/1.55 Georgia,serif;color:#f0dfb6}
+.acetate-riddle small{color:#a9cbc5;letter-spacing:.05em}
+.fragment-star{fill:#8f5d29!important;font:15px Georgia,serif;text-anchor:middle}
+.fragment-eye path,.fragment-eye circle{stroke:#304a48!important;fill:none!important;stroke-width:1.6!important}
+.fragment-eye circle{fill:#304a48!important}
+.fragment-number-seal{fill:#efe0b8!important;stroke:#85493c!important;stroke-width:2!important}
+.fragment-number{fill:#71392f!important;font:700 12px Georgia,serif;text-anchor:middle}
+.plan-fragments button.selected .fragment-number-seal{filter:drop-shadow(0 0 4px #f1c96d)}
+
+/* Mensajes contextuales de Fede para los niveles finales. */
+.late-story-visual{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background-position:center;background-size:cover}
+.late-story-visual::after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,transparent 45%,#061923b8),linear-gradient(0deg,#04141c99,transparent 45%);pointer-events:none}
+.late-fede-character{position:absolute;z-index:3;left:4%;bottom:-5%;width:48%;height:94%}
+.late-fede-character>img{display:block;width:100%;height:100%;object-fit:contain;object-position:left bottom;filter:drop-shadow(15px 10px 25px #0009)}
+.late-fede-mouth{position:absolute;left:55.5%;top:31%;width:5.2%;height:.7%;border-radius:50%;background:#713436;opacity:0;transform-origin:center}
+.late-fede-character.is-speaking .late-fede-mouth{opacity:.95;animation:fede-mouth-talk .26s ease-in-out infinite alternate}
+.late-story-visual .story-light,.late-story-visual .story-dust{z-index:2}
+
+.movement-register{margin:26px 0;padding:clamp(18px,3vw,30px);border:1px solid #9c814d;background:linear-gradient(145deg,#102c34,#071a23);color:#e9dec6}
+.movement-register h2{margin:8px 0 18px;font:500 clamp(25px,3vw,36px)/1.15 Georgia,serif;color:#edcf91}
+.movement-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.movement-register table{width:100%;min-width:620px;border-collapse:collapse;background:#e8dcc0;color:#183638}
+.movement-register th,.movement-register td{padding:13px 15px;border:1px solid #8c7a57;text-align:left}
+.movement-register th{background:#173b40;color:#f0d493;font:700 10px Arial,sans-serif;letter-spacing:.12em}
+.movement-register>p:last-child{margin:16px 0 0;color:#afcac4;line-height:1.6}
+.movement-check{display:grid;gap:12px;margin-top:20px;padding:18px;border:1px solid #9c814d66;background:#03151d99}
+.movement-check label,.movement-check>b{font:600 18px/1.4 Georgia,serif;color:#ead39d}
+.movement-check input{padding:12px;border:1px solid #77918c;background:#071c25;color:#f3ead7;font-size:16px}
+.movement-check .unlock-button{justify-self:start}
+.movement-feedback{padding:12px 15px;border-left:3px solid #d0aa5d;background:#061820;color:#d7e8df!important}
+@media(max-width:700px){.late-fede-character{width:58%;left:-2%}.movement-register{padding:15px}.movement-register th,.movement-register td{padding:10px}}

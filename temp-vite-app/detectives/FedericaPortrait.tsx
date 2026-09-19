@@ -1,7 +1,7 @@
 import {useEffect,useState,type RefObject} from 'react';
 
 const scenes={
- intro:'/los-archivos-f/images/federica-nivel-1-inicio-v2.png',
+ intro:'/los-archivos-f/images/federica-nivel-1-inicio-v4.png',
  success:'/los-archivos-f/images/federica-nivel-1-exito-v2.png',
 };
 
