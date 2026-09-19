@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'vite';
 
-test('Corredor: alinear referencias es obligatorio y leer al revés no abre el candado', async()=>{
+test('Corredor: reconstruir el plano es obligatorio y leer al revés no abre el candado', async()=>{
  const server=await createServer({configFile:false,server:{middlewareMode:true},appType:'custom'});
  try {
   const {applyAction}=await server.ssrLoadModule('/api/_lib/detectives/game.ts');
@@ -10,8 +10,6 @@ test('Corredor: alinear referencias es obligatorio y leer al revés no abre el c
   assert.throws(()=>applyAction(state,{action:'unlock',level:4,answer:'937'}));
   assert.throws(()=>applyAction(state,{action:'deduction',level:4,index:0,selection:0}));
   applyAction(state,{action:'deduction',level:4,index:0,selection:2});
-  assert.throws(()=>applyAction(state,{action:'deduction',level:4,index:1,selection:0}));
-  applyAction(state,{action:'deduction',level:4,index:1,selection:1});
   const before=structuredClone(state);
   assert.throws(()=>applyAction(state,{action:'unlock',level:4,answer:'739'}));
   assert.deepEqual(state,before);

@@ -544,18 +544,12 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .interrogation-portrait{display:grid;place-items:center;overflow:hidden}
 .suspect-artwork{position:relative;height:100%;max-width:100%;aspect-ratio:3/4;overflow:hidden}
 .suspect-artwork>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.suspect-id-evidence{position:absolute;z-index:8;left:5%;bottom:6%;width:min(70%,250px);box-sizing:border-box;padding:9px 12px;border:3px double #8d7040;background:#eee4cc;color:#17313a;box-shadow:0 6px 18px #0008;transform:rotate(-2deg);font-family:Arial,sans-serif;text-align:left}
-.suspect-id-evidence::before{content:'';position:absolute;left:50%;top:-18px;width:2px;height:18px;background:#adbaa9;box-shadow:0 0 0 1px #24383a}
-.suspect-id-evidence small,.suspect-id-evidence b,.suspect-id-evidence code{display:block}
-.suspect-id-evidence small{font-size:8px;letter-spacing:.16em;color:#5b695f}
-.suspect-id-evidence b{margin:4px 0 3px;font:700 15px/1.15 Georgia,serif;color:#1b3034}
-.suspect-id-evidence code{font:700 13px/1.2 monospace;letter-spacing:.12em;color:#7c312b}
 .interrogation-portrait figcaption{top:18px;bottom:auto}
 .suspect-mouth{position:absolute;z-index:7;height:.45%;border-radius:50%;background:#713436;opacity:0;transform-origin:center;pointer-events:none}
 .interrogation-portrait.is-speaking .suspect-mouth{opacity:.92;animation:fede-mouth-talk .25s ease-in-out infinite alternate}
 .suspect-mouth-1{left:48%;top:42.5%;width:4%}.suspect-mouth-2{left:48%;top:32%;width:4%}.suspect-mouth-3{left:49%;top:38%;width:4%}.suspect-mouth-4{left:48%;top:34%;width:4%}
 
-@media(max-width:760px){.level-two-fede,.level-two-fede.success{grid-template-columns:1fr}.level-two-fede>.fede-artwork,.level-two-fede.success>.fede-artwork{grid-column:1;grid-row:1}.level-two-fede>div:last-child,.level-two-fede.success>div:last-child{grid-column:1;grid-row:2;padding:24px 22px}.level-three-story-dialog[open]{grid-template-columns:1fr}.level-three-story-visual{height:auto}.level-three-story-visual>.fede-artwork{width:100%;height:auto}.federica-story-scene>.fede-artwork{height:260px;width:195px}.federica-story-scene>.fede-artwork.level-1-intro{width:100%;height:auto;aspect-ratio:4/3}.suspect-id-evidence{bottom:4%;padding:7px 9px}.suspect-id-evidence b{font-size:13px}.suspect-id-evidence code{font-size:11px}}
+@media(max-width:760px){.level-two-fede,.level-two-fede.success{grid-template-columns:1fr}.level-two-fede>.fede-artwork,.level-two-fede.success>.fede-artwork{grid-column:1;grid-row:1}.level-two-fede>div:last-child,.level-two-fede.success>div:last-child{grid-column:1;grid-row:2;padding:24px 22px}.level-three-story-dialog[open]{grid-template-columns:1fr}.level-three-story-visual{height:auto}.level-three-story-visual>.fede-artwork{width:100%;height:auto}.federica-story-scene>.fede-artwork{height:260px;width:195px}.federica-story-scene>.fede-artwork.level-1-intro{width:100%;height:auto;aspect-ratio:4/3}}
 @media(prefers-reduced-motion:reduce){.fede-artwork>img,.fede-hair{animation:none}.fede-mouth.talking,.interrogation-portrait.is-speaking .suspect-mouth{animation:fede-mouth-talk .6s ease-in-out infinite alternate}}
 
 /* Nivel 2: la sala pertenece a los sospechosos; Fede aparece únicamente en sus mensajes modales. */

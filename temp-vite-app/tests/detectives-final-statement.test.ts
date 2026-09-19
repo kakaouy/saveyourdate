@@ -11,7 +11,7 @@ test('D-05 no se muestra antes de resolver el compartimento y no cierra la parti
   const {applyAction}=await server.ssrLoadModule('/api/_lib/detectives/game.ts');
   const state={agent:'Prueba',highestLevel:7,hints:{},checkProgress:{7:1},completedAt:null};
   assert.equal(renderToStaticMarkup(createElement(Statement,{highestLevel:state.highestLevel})), '');
-  applyAction(state,{action:'unlock',level:7,answer:'704'});
+  applyAction(state,{action:'unlock',level:7,answer:'18153'});
   const before=structuredClone(state);
   const markup=renderToStaticMarkup(createElement(Statement,{highestLevel:state.highestLevel}));
   for(const phrase of ['D-05','R-17','LF-04','medicina','K-01']) assert.ok(markup.includes(phrase));

@@ -8,15 +8,15 @@ test('Escondite: el sobre negro queda bloqueado hasta completar banderas', async
   const {applyAction}=await server.ssrLoadModule('/api/_lib/detectives/game.ts');
   const state={agent:'Prueba',highestLevel:6,hints:{6:1},checkProgress:{},completedAt:null};
   assert.throws(()=>applyAction(state,{action:'deduction',level:7,index:0,selection:1}));
-  assert.throws(()=>applyAction(state,{action:'unlock',level:6,answer:'lente'}));
+  assert.throws(()=>applyAction(state,{action:'unlock',level:6,answer:'farol'}));
   assert.throws(()=>applyAction(state,{action:'deduction',level:6,index:0,selection:0}));
   applyAction(state,{action:'deduction',level:6,index:0,selection:1});
   const before=structuredClone(state);
-  for(const answer of ['lent','letne','704']) {
+  for(const answer of ['far','farlo','lente']) {
    assert.throws(()=>applyAction(state,{action:'unlock',level:6,answer}));
    assert.deepEqual(state,before);
   }
-  for(const answer of ['LENTE','la lente','lente de Fresnel'])
+  for(const answer of ['FAROL','el farol'])
    assert.equal(applyAction(structuredClone(state),{action:'unlock',level:6,answer}).highestLevel,7);
  } finally {await server.close();}
 });
