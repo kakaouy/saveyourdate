@@ -277,6 +277,15 @@ export default function Home() {
     if (await gameAction({action:'start'})) setLevel(1);
   }
 
+  function openCaseFile() {
+    if(highestLevel===0){setScreen('briefing');}
+    else{
+      const destination=Math.max(1,level);
+      setLevel(destination);setLevelTwoIntro(destination===2);setLevelThreeDialog(destination===3?'intro':null);setLevelFourDialog(destination===4?'intro':null);setLateLevelDialog(destination>=5&&destination<=7?{level:destination as 5|6|7,kind:'intro'}:null);setScreen('game');
+    }
+    window.scrollTo(0,0);
+  }
+
   async function submitLevel(event: FormEvent) {
     event.preventDefault();
     if (busy) return;
@@ -349,7 +358,7 @@ export default function Home() {
       {screen === 'library' && <section className="library-page">
         <p className="save-status" role="status">{saveStatus}</p><div className="page-heading"><p className="eyebrow dark">BIENVENIDO, AGENTE {agent.toUpperCase()}</p><img className="library-emblem" src="/los-archivos-f/images/emblema-archivos-f.png" alt="Sello de Los Archivos F"/><h1>La cámara de los expedientes</h1><p><Typewriter text="Un archivo te está esperando. Examiná su portada y abrilo para seguir el rastro. Tu avance queda guardado con el código de tu carpeta."/></p></div>
         <button className="switch-code" onClick={() => {setCode(''); setMessage(''); setShowAccess(true);}}>Ingresar otro código de carpeta</button><div className="case-grid">
-          <article className="case-card active"><div className="case-visual"><img src="/los-archivos-f/images/hero-archivos-f.png" alt="El rubí rojo sobre un mapa y el faro iluminado junto al mar" /><i className="case-lighthouse-beam" aria-hidden="true"/><span>F-01</span></div><div className="case-copy"><small>CASO DISPONIBLE · DIFICULTAD MEDIA</small><h2>El robo del Rubí del Faro</h2><p>Un rubí robado, cuatro sospechosos y un apagón que investigar.</p><ul><li>7 niveles</li><li>16 desafíos</li><li>60–90 min</li><li>Físico + digital</li></ul><button className="primary-button" onClick={() => { if(highestLevel===0){setScreen('briefing');}else{const destination=Math.max(1,level);setLevel(destination);setLevelTwoIntro(destination===2);setLevelThreeDialog(destination===3?'intro':null);setLevelFourDialog(destination===4?'intro':null);setLateLevelDialog(destination>=5&&destination<=7?{level:destination as 5|6|7,kind:'intro'}:null);setScreen('game');} window.scrollTo(0,0); }}>ABRIR EXPEDIENTE <span>→</span></button></div></article>
+          <article className="case-card active"><div className="case-visual case-visual-link" role="button" tabIndex={0} aria-label="Abrir expediente El robo del Rubí del Faro" onClick={openCaseFile} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openCaseFile();}}}><img src="/los-archivos-f/images/hero-archivos-f.png" alt="El rubí rojo sobre un mapa y el faro iluminado junto al mar" /><i className="case-lighthouse-beam" aria-hidden="true"/><span>F-01</span></div><div className="case-copy"><small>CASO DISPONIBLE · DIFICULTAD MEDIA</small><h2>El robo del Rubí del Faro</h2><p>Un rubí robado, cuatro sospechosos y un apagón que investigar.</p><ul><li>7 niveles</li><li>16 desafíos</li><li>60–90 min</li><li>Físico + digital</li></ul><button className="primary-button" onClick={openCaseFile}>ABRIR EXPEDIENTE <span>→</span></button></div></article>
           {[2,3].map((n) => <article className="case-card locked" key={n}><div className="locked-mark">F-0{n}</div><small>EXPEDIENTE CLASIFICADO</small><h2>Próximamente</h2><p>Tu autorización para este caso todavía no fue emitida.</p></article>)}
         </div>
       </section>}
