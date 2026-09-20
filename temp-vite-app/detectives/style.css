@@ -1357,14 +1357,14 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 
 /* Compensación óptica: los PNG tienen cantidades distintas de transparencia interna. */
 .game-page .mission-toolbar-actions>button{width:76px!important;min-width:76px!important;height:92px!important;padding:4px!important;justify-content:flex-end!important}
-.game-page .mission-icon-button img{width:78px!important;height:78px!important}
-.game-page .library-icon-button img{width:66px!important;height:66px!important}
-.game-page .toolbar-hint-lens img{width:54px!important;height:54px!important}
-.game-page .toolbar-game-time img{width:48px!important;height:48px!important}
+.game-page .mission-icon-button img{width:58px!important;height:58px!important}
+.game-page .library-icon-button img{width:74px!important;height:74px!important}
+.game-page .toolbar-hint-lens img{width:81px!important;height:81px!important}
+.game-page .toolbar-game-time img{width:62px!important;height:62px!important}
 .game-page .mission-toolbar-actions>button>span{height:14px!important;font-size:9px!important;line-height:14px!important}
 @media(max-width:700px){
   .game-page .mission-toolbar-actions>button{width:58px!important;min-width:58px!important;height:72px!important;padding:2px!important}
-  .game-page .mission-icon-button img{width:60px!important;height:60px!important}.game-page .library-icon-button img{width:51px!important;height:51px!important}.game-page .toolbar-hint-lens img{width:43px!important;height:43px!important}.game-page .toolbar-game-time img{width:39px!important;height:39px!important}.game-page .mission-toolbar-actions>button>span{font-size:7px!important}
+  .game-page .mission-icon-button img{width:45px!important;height:45px!important}.game-page .library-icon-button img{width:57px!important;height:57px!important}.game-page .toolbar-hint-lens img{width:62px!important;height:62px!important}.game-page .toolbar-game-time img{width:48px!important;height:48px!important}.game-page .mission-toolbar-actions>button>span{font-size:7px!important}
 }
 
 /* Mensajes de Federica: composición abierta, sin una tarjeta exterior que agrupe todo. */
