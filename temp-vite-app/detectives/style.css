@@ -1477,3 +1477,53 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .level-two-success-dialog[open],
   .level-three-story-dialog[open]{min-height:calc(100dvh - 172px)!important}
 }
+
+/* La transmisión es una página continua: encabezado y contenido comparten
+   exactamente el mismo tono, y la barra de desplazamiento nace arriba. */
+body:has(.terminal-dialog[open]) .topbar,
+body:has(.level-two-success-dialog[open]) .topbar,
+body:has(.level-three-story-dialog[open]) .topbar{
+  background:#03131d!important;
+}
+.terminal-dialog,
+.level-two-success-dialog,
+.level-three-story-dialog{
+  height:100dvh!important;
+  margin:0!important;
+  padding:calc(164px + clamp(20px,2.5vw,44px)) clamp(20px,2.5vw,44px) clamp(24px,3vw,52px)!important;
+  background:linear-gradient(to bottom,transparent 0 164px,#03131d 164px 100%)!important;
+}
+.terminal-dialog::backdrop,
+.level-two-success-dialog::backdrop,
+.level-three-story-dialog::backdrop{background:transparent!important}
+.terminal-dialog[open] .terminal-dialog-layout,
+.level-two-success-dialog[open],
+.level-three-story-dialog[open]{
+  min-height:calc(100dvh - 164px - clamp(44px,5.5vw,96px))!important;
+}
+
+/* Orden editorial de todos los mensajes de Federica:
+   identificación, título, reproductor, transcripción y acción. */
+.terminal-dialog-kicker,.story-dialog-kicker{order:1!important;margin-bottom:16px!important}
+.terminal-dialog-title-row h2,.story-dialog-title-row h2{order:2!important}
+.terminal-dialog-copy .transmission-console,.simulated-player{order:3!important;margin:0 0 24px!important}
+.terminal-dialog-message,
+.level-two-success-copy>p:not(.story-dialog-kicker),
+.level-three-story-copy>p:not(.story-dialog-kicker){order:4!important}
+.story-mission-objective{order:5!important}
+.terminal-dialog-copy>small{order:6!important}
+.terminal-dialog-action,.story-dialog-title-row .primary-button{order:7!important}
+
+@media(max-width:700px),(orientation:portrait){
+  body:has(.terminal-dialog[open]) .topbar,
+  body:has(.level-two-success-dialog[open]) .topbar,
+  body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
+  .terminal-dialog,
+  .level-two-success-dialog,
+  .level-three-story-dialog{
+    height:100dvh!important;
+    margin:0!important;
+    padding:calc(130px + 14px) 12px 28px!important;
+    background:linear-gradient(to bottom,transparent 0 130px,#03131d 130px 100%)!important;
+  }
+}
