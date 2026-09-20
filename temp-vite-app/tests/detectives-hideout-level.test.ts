@@ -8,9 +8,6 @@ test('Escondite: el sobre negro queda bloqueado hasta completar banderas', async
   const {applyAction}=await server.ssrLoadModule('/api/_lib/detectives/game.ts');
   const state={agent:'Prueba',highestLevel:6,hints:{6:1},checkProgress:{},completedAt:null};
   assert.throws(()=>applyAction(state,{action:'deduction',level:7,index:0,selection:1}));
-  assert.throws(()=>applyAction(state,{action:'unlock',level:6,answer:'farol'}));
-  assert.throws(()=>applyAction(state,{action:'deduction',level:6,index:0,selection:0}));
-  applyAction(state,{action:'deduction',level:6,index:0,selection:1});
   const before=structuredClone(state);
   for(const answer of ['far','farlo','lente']) {
    assert.throws(()=>applyAction(state,{action:'unlock',level:6,answer}));

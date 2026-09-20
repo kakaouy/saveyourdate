@@ -91,9 +91,7 @@ export const microChecks = [
   [
     { question: '¿Qué sospechosa viste trabajando con Resina RX-4?', options: ['Vera', 'Martina', 'Bruno', 'León'], correct: 1, success: 'La ficha de Martina contiene Resina RX-4. T-04 queda asociado provisionalmente con ella.' },
   ],
-  [
-    { question: '¿Qué detalle de la sala permite descubrir el orden?', options: ['El tamaño de las telas', 'El recorrido desde la fuente de luz', 'El orden alfabético de los símbolos'], correct: 1, success: 'La luz fija un recorrido desde la bandera más cercana hacia abajo.' },
-  ],
+  [],
   [
     { question: '¿Qué confirma que LF-04 quedó correctamente colocada?', options: ['Se ven seis números y una regla completa', 'Todas las líneas desaparecen', 'La plantilla forma un círculo'], correct: 0, success: 'La alineación correcta revela los seis valores y el procedimiento de calibración.' },
   ],
