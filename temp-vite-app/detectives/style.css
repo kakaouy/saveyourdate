@@ -438,6 +438,36 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .ranking-dialog{padding:0;border:1px solid #c9a45d;border-radius:18px;background:#061923;color:#f3e6c9;width:min(820px,94vw);max-height:90dvh;box-shadow:0 28px 100px #000c;overflow:auto}.ranking-dialog::backdrop{background:#01070cdd;backdrop-filter:blur(5px)}.ranking-paper{position:relative;padding:34px clamp(18px,5vw,54px) 42px;text-align:center;background:radial-gradient(circle at 50% 0,#224b5b88,transparent 37%),linear-gradient(145deg,#0d2933,#061720)}.ranking-close{position:absolute;z-index:2;right:18px;top:18px;width:44px;height:44px;border:1px solid #c5a35d;border-radius:50%;background:#08222c;color:#f0cf86;font-size:28px;cursor:pointer}.ranking-cup{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 8px 14px #0008)}.ranking-paper h2{margin:8px 0 4px;color:#f2d394;font:500 clamp(36px,6vw,62px)/1 Georgia,serif}.ranking-subtitle{margin:0 0 26px;color:#acc8c3;font:italic 17px Georgia,serif}.ranking-table{border:1px solid #b8965555;border-radius:9px;overflow:hidden;text-align:left}.ranking-row{display:grid;grid-template-columns:64px minmax(0,1fr) 120px 80px;align-items:center;min-height:66px;border-top:1px solid #af945744;background:#0a2029;padding:0 18px;gap:12px}.ranking-row.heading{min-height:42px;border-top:0;color:#d9bd7e;font:700 10px Arial,sans-serif;letter-spacing:.12em}.ranking-row>strong{font:500 30px Georgia,serif;color:#d6b66e;text-align:center}.ranking-row>span{font:600 18px Georgia,serif;color:#f2dfb5}.ranking-row>span small{display:block;margin-top:4px;color:#84b9b2;font:700 8px Arial,sans-serif;letter-spacing:.1em}.ranking-row>b{font:600 15px monospace;color:#e9d39d}.ranking-row.place-1{background:linear-gradient(90deg,#60491c99,#182b2d);box-shadow:inset 0 0 18px #e4bd4d33}.ranking-row.place-2{background:linear-gradient(90deg,#5b697055,#10252d)}.ranking-row.place-3{background:linear-gradient(90deg,#67402066,#10252d)}.ranking-footer{margin:28px 0 0;color:#d9bd7e;font:italic 19px Georgia,serif}.ranking-status{padding:30px;color:#bad0cc}.ranking-dialog::-webkit-scrollbar{width:10px}.ranking-dialog::-webkit-scrollbar-track{background:#071820}.ranking-dialog::-webkit-scrollbar-thumb{border:2px solid #071820;border-radius:10px;background:#ae8c4f}
 @media(max-width:600px){.ranking-paper{padding:24px 10px 30px}.ranking-cup{width:72px;height:72px}.ranking-row{grid-template-columns:42px minmax(0,1fr) 82px 45px;padding:0 7px;gap:5px}.ranking-row>span{font-size:14px}.ranking-row>b{font-size:12px}.ranking-row>strong{font-size:24px}.ranking-row.heading{font-size:8px}.ranking-close{right:10px;top:10px}}
 
+/* Podio navegable y con la identidad editorial del archivo. */
+.ranking-dialog{z-index:10000!important;pointer-events:auto!important;overflow:hidden!important;overscroll-behavior:contain;background:#06131b url('/los-archivos-f/images/bg-hidden-corridor.png') center/cover no-repeat!important}
+.ranking-paper{box-sizing:border-box;max-height:90dvh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#d1ad62 #071820;background:linear-gradient(90deg,#06131bf2,#09212be8),radial-gradient(circle at 85% 10%,#c69c4c2c,transparent 28%)!important}
+.ranking-paper::-webkit-scrollbar{width:10px}.ranking-paper::-webkit-scrollbar-track{background:#071820}.ranking-paper::-webkit-scrollbar-thumb{border:2px solid #071820;border-radius:10px;background:linear-gradient(#edcd84,#967039)}
+.ranking-logo{position:absolute;left:20px;top:15px;width:150px;height:82px;object-fit:contain;mix-blend-mode:screen;filter:contrast(1.15) drop-shadow(0 4px 10px #000)}
+.ranking-cup{margin-top:2px}.ranking-close{position:sticky;float:right;right:0;top:0;z-index:20}
+.ranking-table{clear:both;border-color:#d1ad6266;box-shadow:0 18px 55px #0008,inset 0 0 35px #c2983420}.ranking-row{background:#071a22dc}.ranking-row.place-1{border-color:#f2cc61;box-shadow:inset 0 0 22px #e4bd4d42,0 0 10px #d2a93b28}.ranking-paper::after{content:'OBSERVÁ · PENSÁ · CONECTÁ · DESCUBRÍ';display:block;margin-top:24px;color:#a9874d;font:700 8px Arial,sans-serif;letter-spacing:.24em}
+
+/* La segunda fila del candado sólo nace al desplegar la solapa. */
+.level-side-tab:not(.is-open) .level-side-tab-trigger small{display:none}.level-side-tab.is-open .level-side-tab-trigger small{display:block}
+
+/* Plantilla única para todos los mensajes de Fede. */
+.story-rain{display:none!important}
+.terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{width:min(1160px,94vw)!important;height:auto!important;max-height:88dvh!important;border-radius:17px!important;background:linear-gradient(145deg,#0b2730,#061820)!important;overflow:hidden!important}
+@media(orientation:landscape) and (min-width:701px){
+  .terminal-dialog-layout,.terminal-dialog-intro .terminal-dialog-layout,.terminal-dialog-success .terminal-dialog-layout,.level-two-success-dialog[open],.level-three-story-dialog[open]{display:grid!important;grid-template-columns:minmax(360px,44%) minmax(0,56%)!important;height:min(720px,88dvh)!important;align-items:stretch!important}
+  .terminal-dialog-visual,.level-two-success-visual,.level-three-story-visual,.late-story-visual{height:100%!important;align-self:stretch!important;background:#061820!important}
+  .terminal-dialog-visual img,.level-two-success-visual img,.level-three-story-visual img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center top!important}
+  .terminal-dialog-copy,.level-two-success-copy,.level-three-story-copy{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-self:stretch!important;padding:clamp(34px,4vw,58px)!important;overflow-y:auto!important}
+  .story-dialog-title-row{margin-top:0!important;align-items:start!important}.story-dialog-title-row h2{align-self:start!important}
+}
+@media(orientation:portrait),(max-width:700px){
+  .terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{width:94vw!important;height:92dvh!important;max-height:92dvh!important;overflow-y:auto!important}
+  .terminal-dialog-layout,.level-two-success-dialog[open],.level-three-story-dialog[open]{display:flex!important;flex-direction:column!important;height:auto!important;min-height:100%!important}
+  .terminal-dialog-visual,.level-two-success-visual,.level-three-story-visual,.late-story-visual{width:100%!important;height:auto!important;aspect-ratio:4/3!important;background:#061820!important}
+  .terminal-dialog-visual img,.level-two-success-visual img,.level-three-story-visual img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center top!important}
+  .terminal-dialog-copy,.level-two-success-copy,.level-three-story-copy{padding:24px 20px 32px!important;overflow:visible!important}
+}
+@media(max-width:600px){.ranking-logo{position:static;display:block;width:125px;height:66px;margin:0 auto -4px}.ranking-close{margin-bottom:-44px}.ranking-paper::after{letter-spacing:.12em}}
+
 /* Compact receiver: the written signal remains available without motion. */
 .light-signal { border:1px solid #9d8249; border-radius:12px; padding:18px; background:#09202a; color:#eadab9; }
 .light-signal-head { display:flex; align-items:center; gap:14px; }
@@ -1198,3 +1228,45 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .level-side-tab.unlock-tab.is-open,.level-side-tab.unlock-tab:hover,.level-side-tab.unlock-tab:focus-within{transform:translateX(0)!important}
   .level-side-tab-trigger{grid-template-columns:minmax(0,1fr) 52px!important}
 }
+
+/* Encabezado editorial: marca, agente y estado del archivo permanecen juntos. */
+.topbar{box-sizing:border-box;height:auto!important;min-height:112px;padding:12px clamp(16px,4vw,64px)!important;align-items:stretch!important;gap:24px}
+.header-identity{display:grid;grid-template-columns:180px minmax(150px,auto);grid-template-rows:auto auto;align-items:center;column-gap:24px;row-gap:4px;min-width:0}
+.topbar .brand{grid-column:1;grid-row:1;display:block;width:180px;height:60px;padding:0;border:0;background:transparent;overflow:hidden}
+.topbar .brand-logo{display:block;width:100%!important;height:100%!important;object-fit:contain;object-position:left center}
+.header-agent{grid-column:2;grid-row:1;display:grid;gap:1px;justify-items:start;padding:5px 0;border:0;background:none;color:#f2d48f;cursor:pointer;text-align:left}
+.header-agent small{font:700 8px/1.2 Arial,sans-serif;letter-spacing:.2em;color:#75d3d5}.header-agent strong{font:700 clamp(16px,1.55vw,24px)/1.05 Georgia,serif;letter-spacing:.035em}
+.header-screen{grid-column:1/3;grid-row:2;display:flex;align-items:baseline;gap:12px;min-width:0;color:#e9e2d2}
+.header-screen small{font:700 8px/1.3 Arial,sans-serif;letter-spacing:.16em;color:#68cdd0;white-space:nowrap}.header-screen strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 14px/1.25 Georgia,serif;color:#f1d394}
+.topbar .nav-tools{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;margin-left:auto}
+.music-button.music-icon-only{display:grid;place-items:center;width:42px;height:42px;min-width:42px;padding:0!important;border-radius:50%;font-size:20px;line-height:1}
+.nav-celebration{color:#dce6e6;font:700 8px/1.2 Arial,sans-serif;letter-spacing:.13em;white-space:nowrap}
+
+/* La navegación del caso es una hilera única de accesos visuales. */
+.mission-toolbar{top:0!important;justify-content:flex-end!important;min-height:82px;padding:6px clamp(14px,4vw,56px)!important}
+.mission-toolbar-actions{margin-left:auto;gap:10px!important}
+.mission-icon-button{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;width:68px;min-width:68px;height:74px;padding:3px 6px;border:0;border-radius:7px;background:transparent;color:#e8cf95;cursor:pointer}
+.mission-icon-button img{display:block;width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 3px 5px #0007);animation:mission-scroll-breathe 4.4s ease-in-out infinite}
+.mission-icon-button span{height:12px;font:8px/12px Arial,sans-serif;letter-spacing:.12em}.mission-icon-button:focus-visible{outline:2px solid #dfc17c;outline-offset:2px}
+
+/* Movimiento sutil y específico para que cada herramienta parezca activa. */
+@keyframes mission-scroll-breathe{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-1.5deg)}}
+@keyframes hourglass-flow{0%,72%,100%{transform:rotate(0)}82%{transform:rotate(180deg)}92%{transform:rotate(180deg)}}
+@keyframes fede-tab-greet{0%,100%{transform:translateY(0) rotate(0)}45%{transform:translateY(-3px) rotate(-1deg)}55%{transform:translateY(-3px) rotate(1deg)}}
+@keyframes lock-tab-pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 5px 8px #0008)}50%{transform:scale(1.045);filter:drop-shadow(0 0 9px #d4b56288)}}
+@keyframes trophy-tab-shine{0%,100%{transform:translateY(0);filter:drop-shadow(0 5px 8px #0008)}50%{transform:translateY(-4px);filter:drop-shadow(0 0 11px #f0c85b99)}}
+.toolbar-game-time img{animation:hourglass-flow 7s ease-in-out infinite}
+.mission-tab .level-side-tab-trigger>img{animation:fede-tab-greet 4.3s ease-in-out infinite}
+.unlock-tab .level-side-tab-trigger>img{animation:lock-tab-pulse 3.8s ease-in-out infinite}
+.ranking-tab .level-side-tab-trigger>img{animation:trophy-tab-shine 3.5s ease-in-out infinite}
+
+/* Ningún mensaje de Fede recorta ni reencuadra su ilustración. */
+.terminal-dialog-visual img,.level-two-success-visual img,.level-three-story-visual img{object-fit:contain!important;object-position:center top!important}
+.late-story-visual{background-size:contain!important;background-position:center top!important;background-repeat:no-repeat!important}
+.late-fede-character{inset:0!important;width:100%!important;height:100%!important}.late-fede-character img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:left top!important;transform:none!important}
+
+@media(max-width:700px){
+  .topbar{min-height:104px;padding:9px 12px!important;gap:10px}.header-identity{grid-template-columns:118px minmax(90px,1fr);column-gap:10px}.topbar .brand{width:118px;height:48px}.header-agent strong{font-size:15px}.header-screen{gap:7px}.header-screen small{font-size:6px}.header-screen strong{font-size:11px}.music-button.music-icon-only{width:36px;height:36px;min-width:36px}.nav-celebration{max-width:92px;white-space:normal;text-align:center;font-size:6px}
+  .mission-toolbar{min-height:67px!important;padding:4px 8px!important}.mission-toolbar-actions{gap:3px!important}.mission-icon-button{width:46px;min-width:46px;height:59px;padding:2px}.mission-icon-button img{width:42px;height:42px}.mission-icon-button span{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){.mission-icon-button img,.toolbar-game-time img,.mission-tab .level-side-tab-trigger>img,.unlock-tab .level-side-tab-trigger>img,.ranking-tab .level-side-tab-trigger>img{animation:none!important}}

@@ -361,12 +361,23 @@ export default function Home() {
     catch { /* Retry on the next user gesture if the browser blocks playback. */ }
   }
 
+  const headerStatus = screen === 'game'
+    ? { kicker: `ARCHIVO F-01 · ${highestLevel === 9 ? 'CASO CERRADO' : 'EN INVESTIGACIÓN'}`, title: level === 0 ? 'Acceso restringido' : level === 8 ? 'Acusación final' : level === 9 ? 'Caso cerrado' : levels[level - 1]?.title || 'Acceso restringido' }
+    : screen === 'library'
+      ? { kicker: 'ARCHIVO F-01 · EXPEDIENTES', title: 'Cámara de expedientes' }
+      : screen === 'briefing'
+        ? { kicker: 'AGENCIA F · TRANSMISIÓN', title: 'Mensaje de Federica' }
+        : { kicker: 'AGENCIA F · ACCESO', title: 'Acceso confidencial' };
+
   return (
     <main className="site-shell" aria-busy={busy}><fieldset className="app-controls" disabled={busy}>
       <nav className="topbar" aria-label="Navegación principal">
-        <button className="brand brand-button" onClick={() => setScreen('home')}><img className="brand-logo" src="/los-archivos-f/images/logo-archivos-f.png" alt=""/><span>LOS ARCHIVOS F</span></button>
-        <div className="nav-meta"><span>10 OCT</span><span className="nav-dot" /><span>FEDE · 11 AÑOS</span></div>
-        <div className="nav-tools"><button className={`music-button ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn}>{musicOn ? '♫ AMBIENTE ON' : '♪ ACTIVAR MISTERIO'}</button>{activeSession && screen !== 'home' && screen !== 'briefing' && <button className="agent-chip" onClick={() => setScreen('library')}>AGENTE {agent.toUpperCase()}</button>}</div>
+        <div className="header-identity">
+          <button className="brand brand-button" onClick={() => setScreen('home')} aria-label="Ir al inicio"><img className="brand-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F"/></button>
+          {activeSession && <button className="header-agent" onClick={() => setScreen('library')}><small>AGENTE</small><strong>{agent.toUpperCase()}</strong></button>}
+          <div className="header-screen"><small>{headerStatus.kicker}</small><strong>{headerStatus.title}</strong></div>
+        </div>
+        <div className="nav-tools"><button className={`music-button music-icon-only ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn} aria-label={musicOn?'Desactivar música ambiente':'Activar música ambiente'} title={musicOn?'Ambiente encendido':'Activar ambiente'}>{musicOn ? '♫' : '♪'}</button><div className="nav-celebration">10 OCT · FEDE · 11 AÑOS</div></div>
         <audio ref={musicRef} src="/los-archivos-f/audio/ambiente-faro.wav" loop preload="auto" />
       </nav>
 
