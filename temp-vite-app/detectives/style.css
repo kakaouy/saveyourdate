@@ -1320,3 +1320,19 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 @media(max-width:700px),(orientation:portrait){
   .topbar{min-height:130px!important}.topbar .brand{width:min(345px,54vw)!important;height:104px!important;max-width:none!important}.topbar .nav-tools{gap:13px!important}.nav-celebration{max-width:none!important;font-size:9px!important;white-space:normal!important;text-align:right!important}.music-button.music-icon-only{width:40px!important;height:40px!important;min-width:40px!important}.welcome-page,.library-page,.briefing-page,.game-page{padding-top:130px!important}
 }
+
+/* Las transmisiones se abren debajo de la identidad del sitio, que permanece visible. */
+.terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{margin:170px auto 12px!important;height:min(720px,calc(100dvh - 184px))!important;max-height:calc(100dvh - 184px)!important;background:#061d26!important}
+.terminal-dialog[open] .terminal-dialog-layout,.level-two-success-dialog[open],.level-three-story-dialog[open]{height:100%!important}
+.terminal-dialog::backdrop,.level-two-success-dialog::backdrop,.level-three-story-dialog::backdrop{background:linear-gradient(to bottom,transparent 0 164px,#01070ceb 164px 100%)!important;backdrop-filter:none!important}
+.terminal-dialog-copy,.level-two-success-copy,.level-three-story-copy{justify-content:center!important}
+.terminal-dialog-copy .transmission-console,.simulated-player{order:1!important;margin:0 0 22px!important}
+.terminal-dialog-kicker,.story-dialog-kicker{order:2!important}
+.terminal-dialog-title-row h2,.story-dialog-title-row h2{order:3!important}
+.terminal-dialog-message,.level-two-success-copy>p:not(.story-dialog-kicker),.level-three-story-copy>p:not(.story-dialog-kicker){order:4!important}
+.story-mission-objective{order:5!important}.terminal-dialog-copy>small{order:6!important}.terminal-dialog-action,.story-dialog-title-row .primary-button{order:7!important;margin-top:28px!important}
+
+@media(max-width:700px),(orientation:portrait){
+  .terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{margin:136px auto 8px!important;height:calc(100dvh - 144px)!important;max-height:calc(100dvh - 144px)!important}
+  .terminal-dialog::backdrop,.level-two-success-dialog::backdrop,.level-three-story-dialog::backdrop{background:linear-gradient(to bottom,transparent 0 130px,#01070ceb 130px 100%)!important}
+}
