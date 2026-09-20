@@ -366,9 +366,8 @@ export default function Home() {
       <nav className="topbar" aria-label="Navegación principal">
         <div className="header-identity">
           <button className="brand brand-button" onClick={() => setScreen('home')} aria-label="Ir al inicio"><img className="brand-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F"/></button>
-          {activeSession && <button className="header-agent" onClick={() => setScreen('library')}><small>AGENTE</small><strong>{agent.toUpperCase()}</strong></button>}
         </div>
-        <div className="nav-tools"><button className={`music-button music-icon-only ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn} aria-label={musicOn?'Desactivar música ambiente':'Activar música ambiente'} title={musicOn?'Ambiente encendido':'Activar ambiente'}>{musicOn ? '♫' : '♪'}</button><div className="nav-celebration">10 OCT · FEDE · 11 AÑOS</div></div>
+        <div className="nav-tools"><div className="nav-celebration">10 OCT · FEDE · 11 AÑOS</div><button className={`music-button music-icon-only ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn} aria-label={musicOn?'Desactivar música ambiente':'Activar música ambiente'} title={musicOn?'Ambiente encendido':'Activar ambiente'}>{musicOn ? '♫' : '♪'}</button></div>
         <audio ref={musicRef} src="/los-archivos-f/audio/ambiente-faro.wav" loop preload="auto" />
       </nav>
 

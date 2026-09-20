@@ -1306,3 +1306,17 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .terminal-dialog-copy,.level-two-success-copy,.level-three-story-copy{flex:0 0 auto!important;width:100%!important;height:auto!important;min-height:0!important;padding:30px 26px 38px!important;overflow:visible!important}
   .terminal-dialog-title-row h2,.story-dialog-title-row h2{font-size:clamp(36px,8vw,58px)!important}.terminal-dialog-message,.level-two-success-copy>p:not(.story-dialog-kicker),.level-three-story-copy>p:not(.story-dialog-kicker){font-size:18px!important}
 }
+
+/* Encabezado final: marca protagonista, efeméride y sonido. */
+.topbar{min-height:164px!important}
+.header-identity{display:block!important;min-width:0!important}
+.topbar .brand{width:486px!important;height:132px!important;max-width:52vw!important}
+.topbar .brand-logo{object-position:left center!important}
+.header-agent{display:none!important}
+.topbar .nav-tools{flex-direction:row!important;gap:30px!important}
+.nav-celebration{order:1;font-size:13px!important;line-height:1.3!important;white-space:nowrap!important}
+.music-button.music-icon-only{order:2;width:50px!important;height:50px!important;min-width:50px!important}
+.welcome-page,.library-page,.briefing-page,.game-page{padding-top:164px!important}
+@media(max-width:700px),(orientation:portrait){
+  .topbar{min-height:130px!important}.topbar .brand{width:min(345px,54vw)!important;height:104px!important;max-width:none!important}.topbar .nav-tools{gap:13px!important}.nav-celebration{max-width:none!important;font-size:9px!important;white-space:normal!important;text-align:right!important}.music-button.music-icon-only{width:40px!important;height:40px!important;min-width:40px!important}.welcome-page,.library-page,.briefing-page,.game-page{padding-top:130px!important}
+}
