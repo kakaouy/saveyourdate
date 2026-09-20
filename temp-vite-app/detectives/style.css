@@ -910,3 +910,13 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .briefing-tour.tour-step-1 .federica-scene,.briefing-tour.tour-step-1 .briefing-heading{z-index:10022}
 }
 @media(prefers-reduced-motion:reduce){.briefing-tour-shade{animation:none}.briefing-tour *{transition:none!important}}
+
+/* Las fotografías ya contienen tormenta: evitamos rayas artificiales superpuestas. */
+.briefing-window-rain,
+.story-rain,
+.level-one-window-rain,
+.terminal-rain,
+.scene-frame.storm-layer::before,
+.scene-frame.level-three-weather::before {
+  display:none!important;
+}

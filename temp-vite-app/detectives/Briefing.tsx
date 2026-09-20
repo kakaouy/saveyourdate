@@ -24,7 +24,8 @@ export default function Briefing({agent,alreadyAccepted,onComplete}:{agent:strin
  const documentAudio=useRef<HTMLAudioElement>(null);
  const [documentPlaying,setDocumentPlaying]=useState(false);
  const [guideOpen,setGuideOpen]=useState(false);
- const [tourStep,setTourStep]=useState(alreadyAccepted?0:1);
+ // Mostramos la cámara completa desde el comienzo para permitir exploración libre.
+ const [tourStep,setTourStep]=useState(0);
  const [archiveRoute,setArchiveRoute]=useState(false);
  const guideTimer=useRef<ReturnType<typeof setTimeout> | null>(null);
  const documents=useRef<HTMLDivElement>(null);
