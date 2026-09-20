@@ -126,6 +126,7 @@ function InterrogationDialog({ index, onClose }: { index: number; onClose: () =>
 function SuspectImageViewer({initialIndex,onClose}:{initialIndex:number;onClose:()=>void}){
   const ref=useRef<HTMLDialogElement>(null);
   const [index,setIndex]=useState(initialIndex);
+  const [lens,setLens]=useState<{x:number;y:number}|null>(null);
   const person=statements[index];
   useEffect(()=>{ref.current?.showModal();return()=>ref.current?.close();},[]);
   useEffect(()=>{
@@ -136,7 +137,7 @@ function SuspectImageViewer({initialIndex,onClose}:{initialIndex:number;onClose:
     <div className="suspect-viewer-shell">
       <button className="suspect-viewer-close" type="button" onClick={onClose} aria-label="Cerrar fotografía ampliada">×</button>
       <button className="suspect-viewer-arrow previous" type="button" onClick={()=>setIndex(value=>(value+statements.length-1)%statements.length)} aria-label="Sospechoso anterior">‹</button>
-      <figure><img src={person.image} alt={`${person.name}, fotografía completa con su carné de identificación visible`}/><figcaption><small>FOTOGRAFÍA DE EVIDENCIA · {index+1}/{statements.length}</small><b>{person.name}</b><span>Usá la lupa del navegador o pellizcá la imagen para examinar el carné.</span></figcaption></figure>
+      <figure><div className="suspect-lens-stage" onPointerMove={event=>{const box=event.currentTarget.getBoundingClientRect();setLens({x:Math.max(0,Math.min(100,(event.clientX-box.left)/box.width*100)),y:Math.max(0,Math.min(100,(event.clientY-box.top)/box.height*100))});}} onPointerLeave={()=>setLens(null)}><img src={person.image} alt={`${person.name}, fotografía completa`}/>{lens&&<span className="suspect-detail-lens" aria-hidden="true" style={{left:`${lens.x}%`,top:`${lens.y}%`,backgroundImage:`url(${person.image})`,backgroundPosition:`${lens.x}% ${lens.y}%`}}/>}</div><figcaption><small>FOTOGRAFÍA DE EVIDENCIA · {index+1}/{statements.length}</small><b>{person.name}</b></figcaption></figure>
       <button className="suspect-viewer-arrow next" type="button" onClick={()=>setIndex(value=>(value+1)%statements.length)} aria-label="Siguiente sospechoso">›</button>
     </div>
   </dialog>;
@@ -254,10 +255,10 @@ export default function Home() {
   function visitLevel(destination: number) {
     if (destination < 0 || destination > highestLevel) return;
     setLevel(destination); setAnswer(''); setMessage(''); setCheckSelection(null); setCheckFeedback(''); setCheckPassed(false); setSelectedStatement(null); setLevelThreeReady(false);
-    setLevelThreeDialog(destination===3&&highestLevel<=3?'intro':null);
-    setLevelFourDialog(destination===4&&highestLevel<=4?'intro':null);
-    setLateLevelDialog(destination>=5&&destination<=7&&highestLevel<=destination?{level:destination as 5|6|7,kind:'intro'}:null);
-    setLevelTwoIntro(destination===2&&highestLevel<=2);
+    setLevelThreeDialog(destination===3?'intro':null);
+    setLevelFourDialog(destination===4?'intro':null);
+    setLateLevelDialog(destination>=5&&destination<=7?{level:destination as 5|6|7,kind:'intro'}:null);
+    setLevelTwoIntro(destination===2);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -348,7 +349,7 @@ export default function Home() {
       {screen === 'library' && <section className="library-page">
         <p className="save-status" role="status">{saveStatus}</p><div className="page-heading"><p className="eyebrow dark">BIENVENIDO, AGENTE {agent.toUpperCase()}</p><img className="library-emblem" src="/los-archivos-f/images/emblema-archivos-f.png" alt="Sello de Los Archivos F"/><h1>La cámara de los expedientes</h1><p><Typewriter text="Un archivo te está esperando. Examiná su portada y abrilo para seguir el rastro. Tu avance queda guardado con el código de tu carpeta."/></p></div>
         <button className="switch-code" onClick={() => {setCode(''); setMessage(''); setShowAccess(true);}}>Ingresar otro código de carpeta</button><div className="case-grid">
-          <article className="case-card active"><div className="case-visual"><img src="/los-archivos-f/images/hero-archivos-f.png" alt="El rubí rojo sobre un mapa y el faro iluminado junto al mar" /><i className="case-lighthouse-beam" aria-hidden="true"/><span>F-01</span></div><div className="case-copy"><small>CASO DISPONIBLE · DIFICULTAD MEDIA</small><h2>El robo del Rubí del Faro</h2><p>Un rubí robado, cuatro sospechosos y un apagón que investigar.</p><ul><li>7 niveles</li><li>16 desafíos</li><li>60–90 min</li><li>Físico + digital</li></ul><button className="primary-button" onClick={() => { if(highestLevel===0){setScreen('briefing');}else{setLevel(Math.max(1,level));setScreen('game');} window.scrollTo(0,0); }}>ABRIR EXPEDIENTE <span>→</span></button></div></article>
+          <article className="case-card active"><div className="case-visual"><img src="/los-archivos-f/images/hero-archivos-f.png" alt="El rubí rojo sobre un mapa y el faro iluminado junto al mar" /><i className="case-lighthouse-beam" aria-hidden="true"/><span>F-01</span></div><div className="case-copy"><small>CASO DISPONIBLE · DIFICULTAD MEDIA</small><h2>El robo del Rubí del Faro</h2><p>Un rubí robado, cuatro sospechosos y un apagón que investigar.</p><ul><li>7 niveles</li><li>16 desafíos</li><li>60–90 min</li><li>Físico + digital</li></ul><button className="primary-button" onClick={() => { if(highestLevel===0){setScreen('briefing');}else{const destination=Math.max(1,level);setLevel(destination);setLevelTwoIntro(destination===2);setLevelThreeDialog(destination===3?'intro':null);setLevelFourDialog(destination===4?'intro':null);setLateLevelDialog(destination>=5&&destination<=7?{level:destination as 5|6|7,kind:'intro'}:null);setScreen('game');} window.scrollTo(0,0); }}>ABRIR EXPEDIENTE <span>→</span></button></div></article>
           {[2,3].map((n) => <article className="case-card locked" key={n}><div className="locked-mark">F-0{n}</div><small>EXPEDIENTE CLASIFICADO</small><h2>Próximamente</h2><p>Tu autorización para este caso todavía no fue emitida.</p></article>)}
         </div>
       </section>}

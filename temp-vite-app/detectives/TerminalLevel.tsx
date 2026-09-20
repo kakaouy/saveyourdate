@@ -16,12 +16,17 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
  },[]);
  return <dialog ref={dialog} className={`terminal-dialog terminal-dialog-${success?'success':'intro'}`} aria-labelledby="terminal-fede-title" onCancel={event=>{event.preventDefault();onClose();}} onClick={event=>{if(event.target===event.currentTarget)onClose();}}>
   <div className="terminal-dialog-layout">
-   <FedericaPortrait audioRef={audio} kind={success?'success':'intro'}/>
-   <div><button className="terminal-dialog-close" type="button" aria-label="Cerrar mensaje de Federica" onClick={onClose}>×</button><p className="eyebrow">AGENCIA F · TRANSMISIÓN RECUPERADA</p><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2>
-   <p>{success?terminalSuccess:terminalIntro}</p>
+   <div className="terminal-dialog-visual">
+    <FedericaPortrait audioRef={audio} kind={success?'success':'intro'}/>
+    <p className="terminal-dialog-kicker">AGENCIA F · TRANSMISIÓN RECUPERADA</p>
+    <button className="terminal-dialog-close" type="button" aria-label="Cerrar mensaje de Federica" onClick={onClose}>×</button>
+   </div>
+   <div className="terminal-dialog-copy"><div className="terminal-dialog-title-row"><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2>
+   <button className="primary-button terminal-dialog-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'INVESTIGAR'} →</button></div>
+   <p className="terminal-dialog-message">{success?terminalSuccess:terminalIntro}</p>
    <TransmissionPlayer audioRef={audio} source={`/los-archivos-f/audio/fede-terminal-${success?'exito':'inicio'}-v1.wav`} title="Mensaje de Federica" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setBlocked(true)}/>
    {blocked&&<small>Tocá reproducir para escuchar el mensaje. También podés leerlo.</small>}
-   <button className="primary-button" onClick={onClose} autoFocus>{success?'CONTINUAR':'INVESTIGAR'} →</button></div>
+   </div>
   </div>
  </dialog>;
 }
