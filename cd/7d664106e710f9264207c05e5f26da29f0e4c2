@@ -1,0 +1,29 @@
+temp-vite-app/detectives/style.css
+  s_92b1cd3453e863::t_5c2677f7608e4e 923-1074
+  s_92b1cd3453e863::t_98df3842ef138b 1075-1097
+temp-vite-app/detectives/LevelSideTabs.tsx
+  s_92b1cd3453e863::t_9abca2d788cb68 1-49
+temp-vite-app/api/_lib/detectives/access-codes.json
+  s_92b1cd3453e863::t_49541f7fee794d 48-49
+temp-vite-app/detectives/App.tsx
+  s_92b1cd3453e863::t_9abca2d788cb68 8,50
+  s_92b1cd3453e863::t_a3bdca9dbe1d47 301-307,388-389,405
+temp-vite-app/detectives/TerminalLevel.tsx
+  s_92b1cd3453e863::t_eb2758b5b9af71 3,58,63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "cd7d664106e710f9264207c05e5f26da29f0e4c2",
+  "prompts": {},
+  "sessions": {
+    "s_92b1cd3453e863": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0b612-e708-79a1-bb71-1ae16f7e1271",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
