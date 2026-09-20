@@ -808,7 +808,7 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 }
 
 /* Regla estable para Fede: imagen completa y proporcional, nunca reencuadrada. */
-.terminal-dialog-visual,.level-two-success-visual,.level-three-story-visual,.late-story-visual{background:#04151d!important}
+.terminal-dialog-visual,.level-two-success-visual,.level-three-story-visual,.late-story-visual{background-color:#04151d!important}
 .terminal-dialog-visual .fede-artwork img,
 .level-two-success-visual .fede-artwork img,
 .level-three-story-visual .fede-artwork img{object-fit:contain!important;object-position:center!important;transform:none!important}
