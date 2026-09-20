@@ -19,10 +19,9 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
   <div className="terminal-dialog-layout">
    <div className="terminal-dialog-visual">
     <FedericaPortrait audioRef={audio} kind={success?'success':'intro'}/>
-    <p className="terminal-dialog-kicker">AGENCIA F · TRANSMISIÓN RECUPERADA</p>
     <button className="terminal-dialog-close" type="button" aria-label="Cerrar mensaje de Federica" onClick={onClose}>×</button>
    </div>
-   <div className="terminal-dialog-copy"><div className="terminal-dialog-title-row"><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2>
+   <div className="terminal-dialog-copy"><p className="terminal-dialog-kicker">AGENCIA F · TRANSMISIÓN RECUPERADA</p><div className="terminal-dialog-title-row"><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2>
    <button className="primary-button terminal-dialog-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'INVESTIGAR'} →</button></div>
    <p className="terminal-dialog-message">{success?terminalSuccess:terminalIntro}</p>
    <TransmissionPlayer audioRef={audio} source={`/los-archivos-f/audio/fede-terminal-${success?'exito':'inicio'}-v1.wav`} title="Mensaje de Federica" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setBlocked(true)}/>

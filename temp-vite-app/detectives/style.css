@@ -1270,3 +1270,39 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .mission-toolbar{min-height:67px!important;padding:4px 8px!important}.mission-toolbar-actions{gap:3px!important}.mission-icon-button{width:46px;min-width:46px;height:59px;padding:2px}.mission-icon-button img{width:42px;height:42px}.mission-icon-button span{font-size:7px}
 }
 @media(prefers-reduced-motion:reduce){.mission-icon-button img,.toolbar-game-time img,.mission-tab .level-side-tab-trigger>img,.unlock-tab .level-side-tab-trigger>img,.ranking-tab .level-side-tab-trigger>img{animation:none!important}}
+
+/* Encabezado superpuesto: el escenario comienza en el borde superior, sin franja divisoria. */
+.topbar{position:absolute!important;inset:0 0 auto 0!important;z-index:80!important;min-height:132px!important;padding:14px clamp(20px,4vw,68px)!important;background:linear-gradient(180deg,#03131dde 0%,#03131d9c 68%,transparent 100%)!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;pointer-events:none}
+.topbar>*{pointer-events:auto}
+.header-identity{grid-template-columns:324px minmax(180px,auto)!important;grid-template-rows:auto!important;column-gap:30px!important}
+.topbar .brand{grid-column:1!important;grid-row:1!important;width:324px!important;height:96px!important}
+.header-agent{grid-column:2!important;grid-row:1!important}.header-agent small{font-size:10px!important}.header-agent strong{font-size:clamp(23px,2vw,32px)!important}
+.header-screen{display:none!important}
+.topbar .nav-tools{flex-direction:row!important;gap:22px!important}
+.music-button.music-icon-only{font-size:22px!important}
+.music-button.music-icon-only::after{content:none!important;display:none!important}
+.nav-celebration{font-size:11px!important;letter-spacing:.16em!important}
+.welcome-page,.library-page,.briefing-page,.game-page{box-sizing:border-box;padding-top:132px!important;background-position:center top!important}
+.library-page .page-heading{padding-right:0!important}.library-emblem,.save-status{display:none!important}
+
+/* Una sola plantilla editorial para cada transmisión de Federica. */
+.terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{position:relative!important;width:min(1280px,95vw)!important;max-width:1280px!important;height:min(760px,90dvh)!important;max-height:90dvh!important}
+.terminal-dialog[open] .terminal-dialog-layout,.level-two-success-dialog[open],.level-three-story-dialog[open]{display:grid!important;grid-template-columns:minmax(380px,46%) minmax(0,54%)!important;grid-template-rows:100%!important;align-items:stretch!important;height:min(760px,90dvh)!important}
+.terminal-dialog-visual,.level-two-success-visual,.level-three-story-visual,.late-story-visual{grid-column:1!important;grid-row:1!important;width:100%!important;height:100%!important;aspect-ratio:auto!important;align-self:stretch!important;background:#061923!important}
+.terminal-dialog-copy,.level-two-success-copy,.level-three-story-copy{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:stretch!important;gap:0!important;height:100%!important;padding:clamp(34px,4vw,64px)!important;overflow-y:auto!important}
+.terminal-dialog-kicker,.story-dialog-kicker{position:static!important;inset:auto!important;order:1!important;margin:0 0 20px!important;padding:0!important;border:0!important;background:none!important;color:#6ed2d4!important;font:700 10px/1.35 Arial,sans-serif!important;letter-spacing:.2em!important}
+.terminal-dialog-title-row,.story-dialog-title-row{display:contents!important}
+.terminal-dialog-title-row h2,.story-dialog-title-row h2{order:2!important;margin:0 0 24px!important;font-size:clamp(38px,4.4vw,68px)!important;line-height:1.02!important}
+.terminal-dialog-message,.level-two-success-copy>p:not(.story-dialog-kicker),.level-three-story-copy>p:not(.story-dialog-kicker){order:3!important;margin:0 0 22px!important;font-size:clamp(17px,1.55vw,23px)!important;line-height:1.65!important}
+.story-mission-objective{order:4!important}.simulated-player,.terminal-dialog-copy .audio-player{order:5!important}.terminal-dialog-action,.story-dialog-title-row .primary-button{order:6!important;align-self:flex-start!important;margin-top:24px!important;min-width:220px!important}
+.story-dialog-close,.terminal-dialog-close{position:absolute!important;z-index:40!important;top:18px!important;right:18px!important;left:auto!important}
+.terminal-dialog-visual img,.level-two-success-visual img,.level-three-story-visual img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center top!important}
+
+@media(max-width:700px),(orientation:portrait){
+  .topbar{min-height:112px!important;padding:8px 12px!important}.header-identity{grid-template-columns:minmax(158px,1fr) minmax(100px,auto)!important;column-gap:10px!important}.topbar .brand{width:min(230px,48vw)!important;height:78px!important}.header-agent small{font-size:7px!important}.header-agent strong{font-size:17px!important}.topbar .nav-tools{gap:10px!important}.nav-celebration{max-width:118px!important;font-size:8px!important;line-height:1.35!important}.welcome-page,.library-page,.briefing-page,.game-page{padding-top:112px!important}
+  .terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{width:96vw!important;height:94dvh!important;max-height:94dvh!important;overflow-y:auto!important}
+  .terminal-dialog[open] .terminal-dialog-layout,.level-two-success-dialog[open],.level-three-story-dialog[open]{display:flex!important;flex-direction:column!important;height:auto!important;min-height:100%!important}
+  .terminal-dialog-visual,.level-two-success-visual,.level-three-story-visual,.late-story-visual{flex:0 0 auto!important;width:100%!important;height:auto!important;aspect-ratio:4/3!important}
+  .terminal-dialog-copy,.level-two-success-copy,.level-three-story-copy{flex:0 0 auto!important;width:100%!important;height:auto!important;min-height:0!important;padding:30px 26px 38px!important;overflow:visible!important}
+  .terminal-dialog-title-row h2,.story-dialog-title-row h2{font-size:clamp(36px,8vw,58px)!important}.terminal-dialog-message,.level-two-success-copy>p:not(.story-dialog-kicker),.level-three-story-copy>p:not(.story-dialog-kicker){font-size:18px!important}
+}
