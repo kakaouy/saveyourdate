@@ -1336,3 +1336,21 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{margin:136px auto 8px!important;height:calc(100dvh - 144px)!important;max-height:calc(100dvh - 144px)!important}
   .terminal-dialog::backdrop,.level-two-success-dialog::backdrop,.level-three-story-dialog::backdrop{background:linear-gradient(to bottom,transparent 0 130px,#01070ceb 130px 100%)!important}
 }
+
+/* Navegación sin barra: herramientas alineadas con la marca y sonido persistente. */
+.music-button.music-icon-only{position:fixed!important;z-index:300!important;right:max(18px,env(safe-area-inset-right))!important;bottom:max(18px,env(safe-area-inset-bottom))!important;top:auto!important;margin:0!important;width:54px!important;height:54px!important;min-width:54px!important;background:#071d27e8!important;box-shadow:0 8px 28px #0009,0 0 0 4px #07131d99!important;backdrop-filter:blur(8px)}
+.topbar .nav-tools{margin-left:auto!important}.nav-celebration{margin-right:0!important}
+.game-page .mission-toolbar{position:absolute!important;z-index:90!important;top:18px!important;right:clamp(24px,4vw,68px)!important;left:auto!important;width:auto!important;min-height:132px!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important}
+.game-page .mission-toolbar-actions{margin:0!important;align-items:center!important}
+
+/* En anchos utilizables, el mensaje conserva siempre la composición de la referencia. */
+@media(min-width:701px){
+  .terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{width:min(1420px,96vw)!important}
+  .terminal-dialog[open] .terminal-dialog-layout,.level-two-success-dialog[open],.level-three-story-dialog[open]{display:grid!important;grid-template-columns:minmax(390px,46%) minmax(0,54%)!important;grid-template-rows:100%!important;height:100%!important}
+  .terminal-dialog-visual,.level-two-success-visual,.level-three-story-visual,.late-story-visual{grid-column:1!important;grid-row:1!important;width:100%!important;height:100%!important;aspect-ratio:auto!important;border-right:1px solid #b7935144!important;padding:18px!important;box-sizing:border-box!important;background:#03141d!important}
+  .terminal-dialog-visual .federica-story-scene,.terminal-dialog-visual .fede-artwork,.level-two-success-visual>.fede-artwork,.level-three-story-visual>.fede-artwork{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;border:1px solid #b9975855!important;border-radius:4px!important;overflow:hidden!important;background:#071923!important}
+  .terminal-dialog-copy,.level-two-success-copy,.level-three-story-copy{grid-column:2!important;grid-row:1!important;width:100%!important;height:100%!important;padding:clamp(32px,4vw,62px)!important;overflow-y:auto!important}
+}
+@media(max-width:700px){
+  .game-page .mission-toolbar{position:absolute!important;top:12px!important;right:8px!important;min-height:108px!important}.music-button.music-icon-only{width:46px!important;height:46px!important;min-width:46px!important}
+}

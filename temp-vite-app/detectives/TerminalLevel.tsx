@@ -48,7 +48,7 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
   }else{submitted.current=false;input.current?.focus();}
  }
  return <section className="terminal-level">
-  <div className="terminal-heading"><p className="eyebrow">NIVEL 1 · ARCHIVO F-01</p><button className="reading-choice" onClick={()=>setIntro(true)}>◉ Escuchar a Fede</button></div>
+  <div className="terminal-heading"><p className="eyebrow">NIVEL 1 · ARCHIVO F-01</p></div>
   <div className={`terminal-scene ${lighting?'terminal-illuminated':''}`}>
    <img src="/los-archivos-f/images/terminal-recuperacion-v1.png" alt="Computadora antigua del archivo, junto a una lámpara y una ventana lluviosa"/>
    <span className="terminal-rain" aria-hidden="true"/><span className="terminal-lamp-pulse" aria-hidden="true"/><span className="terminal-scanlines" aria-hidden="true"/>

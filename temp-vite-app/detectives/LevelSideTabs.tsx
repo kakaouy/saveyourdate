@@ -32,12 +32,14 @@ export default function LevelSideTabs({
   const [rankingOpen,setRankingOpen]=useState(false);
   const [ranking,setRanking]=useState<RankingEntry[]>([]);
   const [rankingStatus,setRankingStatus]=useState('');
+  const tabsRef=useRef<HTMLElement>(null);
   const rankingDialog=useRef<HTMLDialogElement>(null);
   useEffect(()=>{if(!rankingOpen)return;rankingDialog.current?.showModal();const overflow=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{rankingDialog.current?.close();document.body.style.overflow=overflow;};},[rankingOpen]);
+  useEffect(()=>{const close=(event:PointerEvent)=>{if(open&&!tabsRef.current?.contains(event.target as Node))setOpen(null);};document.addEventListener('pointerdown',close);return()=>document.removeEventListener('pointerdown',close);},[open]);
   async function showRanking(){setOpen('ranking');setRankingOpen(true);setRankingStatus('Recuperando posiciones…');try{const response=await fetch('/los-archivos-f/api/game?view=leaderboard');if(!response.ok)throw new Error();setRanking(await response.json() as RankingEntry[]);setRankingStatus('');}catch{setRankingStatus('No pudimos recuperar las posiciones. Volvé a intentar.');}}
-  return <aside className="level-side-tabs" aria-label={`Acciones del nivel ${level}`} onMouseLeave={()=>setOpen(null)}>
+  return <aside ref={tabsRef} className="level-side-tabs" aria-label={`Acciones del nivel ${level}`}>
     <section className={`level-side-tab mission-tab ${open==='mission'?'is-open':''}`}>
-      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='mission'} onMouseEnter={()=>setOpen('mission')} onFocus={()=>setOpen('mission')} onClick={()=>{setOpen('mission');onReplay();}}>
+      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='mission'} onMouseEnter={()=>setOpen('mission')} onFocus={()=>setOpen('mission')} onClick={()=>{if(open==='mission'){setOpen(null);return;}setOpen('mission');onReplay();}}>
         <img src="/los-archivos-f/images/fede-mission-tab.png" alt=""/>
         <span><b>MISIÓN NIVEL {level}</b><small>Escuchar mensaje de Fede</small></span>
       </button>
