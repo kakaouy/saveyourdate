@@ -1384,3 +1384,96 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .terminal-dialog[open] .terminal-dialog-layout,.level-two-success-dialog[open],.level-three-story-dialog[open]{gap:22px!important}
   .terminal-dialog-copy,.level-two-success-copy,.level-three-story-copy{padding:0 4px 28px!important}
 }
+
+/* Ajuste final: herramientas con el mismo peso visual y transmisiones que
+   desplazan la pantalla completa, no una columna interior. */
+.game-page .library-icon-button img{width:78px!important;height:78px!important}
+.game-page .toolbar-hint-lens img{width:62px!important;height:62px!important}
+
+.terminal-dialog,
+.level-two-success-dialog,
+.level-three-story-dialog{
+  box-sizing:border-box!important;
+  width:100vw!important;
+  max-width:none!important;
+  height:calc(100dvh - 164px)!important;
+  max-height:none!important;
+  margin:164px 0 0!important;
+  padding:clamp(20px,2.5vw,44px)!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  background:#03131d!important;
+}
+.terminal-dialog::backdrop,
+.level-two-success-dialog::backdrop,
+.level-three-story-dialog::backdrop{
+  background:linear-gradient(to bottom,transparent 0 164px,#03131d 164px 100%)!important;
+}
+.terminal-dialog[open] .terminal-dialog-layout,
+.level-two-success-dialog[open],
+.level-three-story-dialog[open]{
+  width:min(1420px,100%)!important;
+  height:auto!important;
+  min-height:calc(100dvh - 164px - clamp(40px,5vw,88px))!important;
+  margin:0 auto!important;
+  grid-template-rows:auto!important;
+  align-items:center!important;
+}
+.terminal-dialog-copy,
+.level-two-success-copy,
+.level-three-story-copy{
+  height:auto!important;
+  min-height:0!important;
+  overflow:visible!important;
+}
+.terminal-dialog-visual,
+.level-two-success-visual,
+.level-three-story-visual{
+  width:100%!important;
+  height:auto!important;
+  aspect-ratio:4/3!important;
+  align-self:center!important;
+}
+.terminal-dialog-visual:has(.level-1-success),
+.level-two-success-visual:has(.level-2-success){
+  width:min(100%,540px)!important;
+  aspect-ratio:3/4!important;
+  justify-self:center!important;
+}
+.terminal-dialog-visual .federica-story-scene,
+.terminal-dialog-visual .fede-artwork,
+.level-two-success-visual>.fede-artwork,
+.level-three-story-visual>.fede-artwork{
+  width:100%!important;
+  height:100%!important;
+}
+.terminal-dialog-visual img,
+.level-two-success-visual img,
+.level-three-story-visual img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+
+@media(max-width:700px),(orientation:portrait){
+  .game-page .library-icon-button img{width:60px!important;height:60px!important}
+  .game-page .toolbar-hint-lens img{width:48px!important;height:48px!important}
+  .terminal-dialog,
+  .level-two-success-dialog,
+  .level-three-story-dialog{
+    width:100vw!important;
+    height:calc(100dvh - 130px)!important;
+    max-height:none!important;
+    margin:130px 0 0!important;
+    padding:14px 12px 28px!important;
+  }
+  .terminal-dialog::backdrop,
+  .level-two-success-dialog::backdrop,
+  .level-three-story-dialog::backdrop{
+    background:linear-gradient(to bottom,transparent 0 130px,#03131d 130px 100%)!important;
+  }
+  .terminal-dialog[open] .terminal-dialog-layout,
+  .level-two-success-dialog[open],
+  .level-three-story-dialog[open]{min-height:calc(100dvh - 172px)!important}
+}
