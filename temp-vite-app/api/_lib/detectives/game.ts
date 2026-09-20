@@ -25,7 +25,7 @@ export async function activate(code: string, agent: string, legacy?: Partial<Gam
   const hash = await hashCode(code);
   if (!validHashes.includes(hash)) throw new GameError('No encontramos ese código. Revisá la tarjeta de tu carpeta.');
   if (!/^[A-Za-zÀ-ÖØ-öø-ÿ0-9 ._\-]{1,48}$/.test(agent.trim())) throw new GameError('Usá un alias de hasta 48 letras o números, sin símbolos especiales.');
-  const state: GameState = {agent:agent.trim(),highestLevel:0,hints:{},checkProgress:{},completedAt:null};
+  const state: GameState = {agent:agent.trim(),highestLevel:0,hints:{},checkProgress:{},completedAt:null,elapsedSeconds:0};
   // Preserve only the organiser’s earlier prototype; family codes always begin empty.
   if (code.trim().toUpperCase()==='F01-FEDE-11' && legacy) {
     state.highestLevel=Math.max(0,Math.min(9,Math.floor(Number(legacy.highestLevel)||0)));
@@ -39,6 +39,7 @@ export async function activate(code: string, agent: string, legacy?: Partial<Gam
   return (await readGame(hash)).state;
 }
 export function applyAction(state: GameState, body: Record<string, unknown>) {
+  if(body.action==='timer') { state.elapsedSeconds=Math.max(Math.floor(Number(state.elapsedSeconds)||0),Math.min(86400,Math.floor(Number(body.elapsedSeconds)||0)));return state; }
   const level=Number(body.level);
   if(body.action==='start') { state.highestLevel=Math.max(1,state.highestLevel); return state; }
   if(body.action==='final') {
@@ -56,7 +57,7 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
     state.checkProgress[level]=expected+1;return state;
   }
   if(body.action==='unlock') {
-    if((state.checkProgress[level]||0)<microChecks[level-1].length) throw new GameError('Completá las deducciones antes de abrir el candado.');
+    if(level!==7&&(state.checkProgress[level]||0)<microChecks[level-1].length) throw new GameError('Completá las deducciones antes de abrir el candado.');
     const answer=normalize(String(body.answer||''));
     const numeric=['numeric','safe','mechanical'].includes(levels[level-1].lock);
     const cleaned=numeric ? answer.replace(/\D/g,'') : answer;
@@ -64,6 +65,11 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
     state.highestLevel=level+1;return state;
   }
   throw new GameError('Acción no válida.');
+}
+export async function leaderboard() {
+  const response=await supabaseRequest('detective_games?select=state&order=updated_at.asc&limit=200');
+  const rows=await response.json() as Array<{state:GameState}>;
+  return rows.map(({state})=>({agent:String(state.agent||'Agente').slice(0,48),elapsedSeconds:Math.max(0,Math.floor(Number(state.elapsedSeconds)||0)),hintsUsed:Object.values(state.hints||{}).reduce((sum,value)=>sum+(Number(value)||0),0),completed:Boolean(state.completedAt),highestLevel:Number(state.highestLevel)||0})).filter(item=>item.highestLevel>0).sort((a,b)=>Number(b.completed)-Number(a.completed)||a.elapsedSeconds-b.elapsedSeconds||a.hintsUsed-b.hintsUsed).slice(0,50);
 }
 export async function updateGame(hash: string, body: Record<string, unknown>) {
   for(let attempt=0;attempt<3;attempt++) {
