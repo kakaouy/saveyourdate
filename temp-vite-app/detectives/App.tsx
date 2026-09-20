@@ -5,6 +5,7 @@ import LevelFourPlan from './LevelFourPlan';
 import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import MissionMap from './MissionMap';
+import LevelSideTabs from './LevelSideTabs';
 'use client';
 
 import Briefing from './Briefing';
@@ -46,7 +47,7 @@ function LevelTwoSuccessDialog({onContinue}:{onContinue:()=>void}){
 function LevelTwoIntroDialog({onContinue}:{onContinue:()=>void}){
   const ref=useRef<HTMLDialogElement>(null);const [playing,setPlaying]=useState(false);
   useEffect(()=>{ref.current?.showModal();return()=>ref.current?.close();},[]);
-  return <dialog ref={ref} className="level-two-success-dialog level-two-intro-dialog" aria-labelledby="level-two-intro-title" onCancel={event=>event.preventDefault()}><div className="level-two-success-visual"><FedeArtwork src="/los-archivos-f/images/federica-nivel-2-inicio-v1.png" alt="Federica presenta la investigación desde la sala de entrevistas" playing={playing} variant="level-2-intro"/><p className="story-dialog-kicker">AGENCIA F · INICIO DEL NIVEL 2</p></div><div className="level-two-success-copy"><div className="story-dialog-title-row"><h2 id="level-two-intro-title">Una declaración no alcanza.</h2><button className="primary-button" type="button" onClick={onContinue}>COMENZAR LA MISIÓN <span>→</span></button></div><p>Tenemos cuatro declaraciones, pero una declaración no alcanza para descartar a nadie. Compará lo que dicen con los registros disponibles y averiguá quién puede demostrar dónde estuvo durante todo el intervalo del apagón.</p><SimulatedPlayer label="Presentación del nivel 2" onPlaying={setPlaying}/></div></dialog>;
+  return <dialog ref={ref} className="level-two-success-dialog level-two-intro-dialog" aria-labelledby="level-two-intro-title" onCancel={event=>event.preventDefault()}><div className="level-two-success-visual"><FedeArtwork src="/los-archivos-f/images/federica-nivel-2-inicio-v1.png" alt="Federica presenta la investigación desde la sala de entrevistas" playing={playing} variant="level-2-intro"/><p className="story-dialog-kicker">AGENCIA F · INICIO DEL NIVEL 2</p></div><div className="level-two-success-copy"><div className="story-dialog-title-row"><h2 id="level-two-intro-title">Una declaración no alcanza.</h2><button className="primary-button" type="button" onClick={onContinue}>COMENZAR LA MISIÓN <span>→</span></button></div><p>Tenemos cuatro declaraciones, pero una declaración no alcanza para descartar a nadie. Compará lo que dicen con los registros disponibles y averiguá quién puede demostrar dónde estuvo durante todo el intervalo del apagón.</p><div className="story-mission-objective"><span>MISIÓN DEL NIVEL</span><p>Descartar exactamente a una persona comprobando su recorrido completo entre las 19:30 y las 19:50.</p></div><SimulatedPlayer label="Presentación del nivel 2" onPlaying={setPlaying}/></div></dialog>;
 }
 
 function LevelThreeStoryDialog({kind,onContinue}:{kind:'intro'|'success';onContinue:()=>void}){
@@ -297,6 +298,13 @@ export default function Home() {
     visitLevel(level + 1);
   }
 
+  function replayLevelIntro() {
+    if(level===2)setLevelTwoIntro(true);
+    else if(level===3)setLevelThreeDialog('intro');
+    else if(level===4)setLevelFourDialog('intro');
+    else if(level>=5&&level<=7)setLateLevelDialog({level:level as 5|6|7,kind:'intro'});
+  }
+
   function verifyMicroCheck(correct: number) {
     if (checkSelection === null) { setCheckFeedback('Elegí una opción antes de verificar.'); return; }
     if (checkSelection !== correct) { setCheckFeedback('Esa comprobación no coincide con las pruebas. Revisá el material y probá otra opción.'); setCheckPassed(false); return; }
@@ -377,10 +385,10 @@ export default function Home() {
             const checkIndex = unlocked ? microChecks[level - 1].length : checkProgress[level] || 0;
             const currentCheck = microChecks[level - 1][checkIndex];
             const completedChecks = microChecks[level - 1].length;
-            return <section className="level-card">
+            const canUnlock=!unlocked&&level!==5&&!currentCheck&&(level!==3||levelThreeReady);
+            return <><section className="level-card">
               <p className="eyebrow dark">{current.kicker}</p><h1>{current.title}</h1>
               {level === 2 && <figure className="level-two-group-scene"><img src="/los-archivos-f/images/suspects-group.jpg" alt="Los cuatro sospechosos reunidos en la sala de entrevistas"/><figcaption>{unlocked?'COARTADA VERIFICADA · REGISTRO CONSERVADO':'REGISTRO DE ENTREVISTAS · CUATRO PERSONAS PRESENTES'}</figcaption></figure>}
-              {level === 2 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Descartar exactamente a una persona comprobando su recorrido completo entre las 19:30 y las 19:50.</p></div>}
               {level === 3 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Interpretar las seis señales y reconstruir el orden del mensaje interceptado.</p></div>}
               {level === 4 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Reconstruir correctamente el sector faltante y descubrir qué oculta el plano completo.</p></div>}
               {level === 5 && !unlocked && <div className="level-mission"><span>MISIÓN DEL NIVEL</span><p>Identificar el registro incompleto y reconstruir adónde conduce.</p></div>}
@@ -392,10 +400,9 @@ export default function Home() {
               {level === 5 && !unlocked && <LevelFiveMovements busy={busy} onComplete={async()=>{if(!await gameAction({action:'deduction',level:5,index:0,selection:1}))return;if(await gameAction({action:'unlock',level:5,answer:'banderas'})){setLateLevelDialog({level:5,kind:'success'});}}}/>}
 
               {!unlocked && currentCheck && level!==5 && !(level===4&&checkIndex===0) && <div className="micro-challenge"><p className="eyebrow dark">COMPROBACIÓN {checkIndex + 1} DE {completedChecks}</p><h2><Typewriter text={currentCheck.question}/></h2><div className="micro-options">{currentCheck.options.map((option, index) => <button key={option} className={checkSelection === index ? 'selected' : ''} onClick={() => { if (!checkPassed) { setCheckSelection(index); setCheckFeedback(''); } }}>{option}</button>)}</div>{checkFeedback && <p className={checkPassed ? 'micro-success' : 'micro-error'}>{checkPassed ? currentCheck.success : checkFeedback}</p>}{checkPassed ? <button className="primary-button" onClick={continueMicroCheck}>REGISTRAR COMPROBACIÓN <span>→</span></button> : <button className="unlock-button" onClick={() => verifyMicroCheck(currentCheck.correct)}>VERIFICAR</button>}</div>}
-              {!unlocked && level!==5 && !currentCheck && (level!==3||levelThreeReady) && <form className={`lock-panel lock-${current.lock}`} onSubmit={submitLevel}><div className="lock-ready">✓ INVESTIGACIÓN COMPLETA · CANDADO HABILITADO</div><label htmlFor="level-answer"><Typewriter text={current.prompt}/></label><input id="level-answer" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={current.placeholder} autoComplete="off" /><button className="unlock-button" type="submit">DESBLOQUEAR NIVEL</button></form>}
               {message && level!==3 && level!==4 && <p className={message.startsWith('Desbloqueaste') ? 'success-message' : 'error-message'}>{message}</p>}
               {unlocked && level >=5 && level<=7 && <div className="unlock-reveal compact"><div className="unlock-icon">✓</div><p className="eyebrow dark">MENSAJE DE FEDE DISPONIBLE</p><h2>{current.unlock}</h2><button className="primary-button" onClick={()=>setLateLevelDialog({level:level as 5|6|7,kind:'success'})}>ESCUCHAR A FEDE <span>→</span></button></div>}
-            </section>;
+            </section><LevelSideTabs level={level} prompt={current.prompt} placeholder={current.placeholder} answer={answer} busy={busy} unlocked={unlocked} canUnlock={canUnlock} message={message} onAnswer={setAnswer} onReplay={replayLevelIntro} onUnlock={submitLevel}/></>;
           })()}
 
           {level === 8 && <section className="level-card final-card"><p className="eyebrow dark">ACUSACIÓN FINAL</p><h1>Reconstruí los hechos.</h1><p className="final-intro"><Typewriter text="Una acusación completa debe explicar quién retiró el rubí, cómo lo hizo y dónde escondió el original."/></p><FinalStatement highestLevel={highestLevel}/><details className="completed-deductions"><summary>Preparar la reconstrucción · hoja K-01</summary><p>Antes de enviar, anotá en K-01 qué evidencia sostiene cada respuesta. Podés volver a los niveles resueltos desde Misión.</p><ul><li>Persona: contrastá la nueva declaración D-05 con las fichas D-01 a D-04 y el registro E-01. Separá lo que reconoce Martina de las pruebas que lo corroboran.</li><li>Método: reuní la hora del apagón, el recorrido del plano y lo descubierto en F-01 y H-01.</li><li>Escondite: relacioná I-01, G-02 y el compartimento LF-04.</li></ul><p>Una contradicción por sí sola no demuestra el robo. Buscá una explicación que conecte todas las pruebas.</p></details><form className="final-form" onSubmit={submitFinal}><label>¿Quién retiró el rubí?<select required value={finalAnswers.who} onChange={(e) => setFinalAnswers({...finalAnswers,who:e.target.value})}><option value="">Elegí una persona</option><option value="bruno">Bruno Vidal</option><option value="vera">Vera Salas</option><option value="leon">León Costa</option><option value="martina">Martina Ríos</option></select></label><label>¿Cómo realizó el cambio?<select required value={finalAnswers.how} onChange={(e) => setFinalAnswers({...finalAnswers,how:e.target.value})}><option value="">Elegí una reconstrucción</option><option value="cafeteria">Entró antes y lo escondió en la cafetería</option><option value="corredor">Usó el apagón, el corredor y dejó una réplica</option><option value="terraza">Salió por la terraza con ayuda de seguridad</option></select></label><label>¿Dónde escondió el original?<select required value={finalAnswers.where} onChange={(e) => setFinalAnswers({...finalAnswers,where:e.target.value})}><option value="">Elegí un lugar</option><option value="bolso">En el bolso de trabajo</option><option value="generador">En la sala del generador</option><option value="lente">En la base de la lente de Fresnel</option></select></label><button className="primary-button" type="submit" disabled={busy}>PRESENTAR ACUSACIÓN <span>→</span></button></form>{message && <p className="error-message">{message}</p>}</section>}

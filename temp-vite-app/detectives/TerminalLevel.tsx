@@ -1,5 +1,6 @@
 import FedericaPortrait from './FedericaPortrait';
 import TransmissionPlayer from './TransmissionPlayer';
+import LevelSideTabs from './LevelSideTabs';
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {terminalIntro,terminalSuccess} from './terminal-script';
 
@@ -54,11 +55,12 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
    <span className="terminal-rain" aria-hidden="true"/><span className="terminal-lamp-pulse" aria-hidden="true"/><span className="terminal-scanlines" aria-hidden="true"/>
    <form className="terminal-screen" onSubmit={submit}>
     <h1>{unlocked?'ACCESO RECUPERADO':'RECUPERACIÓN DE ACCESO'}</h1>
-    {!unlocked?<><label htmlFor="terminal-password">Clave de emergencia:<br/>instante de interrupción</label><div className="terminal-entry"><input ref={input} id="terminal-password" aria-label="Código de acceso de cuatro caracteres" maxLength={4} minLength={4} required autoComplete="off" spellCheck={false} value={answer} placeholder="_ _ _ _" onChange={e=>setAnswer(e.target.value)} disabled={busy||lighting}/><span aria-hidden="true" className="terminal-cursor">▍</span></div><button type="submit" disabled={busy||lighting||answer.trim().length!==4}>{busy?'VERIFICANDO…':'ACCEDER'}</button></>:<><p>ARCHIVO DE PERSONAL HABILITADO</p><button type="button" onClick={()=>setSuccess(true)}>ESCUCHAR INFORME</button></>}
+    {!unlocked?<><label>Clave de emergencia:<br/>instante de interrupción</label><p>INGRESO DISPONIBLE EN EL CANDADO LATERAL</p></>:<><p>ARCHIVO DE PERSONAL HABILITADO</p><button type="button" onClick={()=>setSuccess(true)}>ESCUCHAR INFORME</button></>}
    </form>
   </div>
   {message&&!unlocked&&<p className="terminal-error" role="status">{message}</p>}
   {unlocked&&!lighting&&<button className="primary-button" onClick={onContinue}>CONTINUAR LA INVESTIGACIÓN →</button>}
+  <LevelSideTabs level={1} prompt="Ingresá el código de 4 cifras que permite cerrar esta parte de la investigación." placeholder="Código de 4 cifras" answer={answer} busy={busy||lighting} unlocked={unlocked} canUnlock={!unlocked} message={message} onAnswer={setAnswer} onReplay={()=>setIntro(true)} onUnlock={submit}/>
   {intro&&<FedeTransmission success={false} onClose={()=>{setIntro(false);requestAnimationFrame(()=>input.current?.focus());}}/>}
   {success&&<FedeTransmission success onClose={()=>{setSuccess(false);onContinue();}}/>}
  </section>;
