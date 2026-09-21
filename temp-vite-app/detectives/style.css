@@ -1209,7 +1209,11 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .coartada-story-frames>.coartada-story-frame-2{animation-delay:-3s!important}
 .coartada-story-frames>.coartada-story-frame-3{animation-delay:-2s!important}
 .coartada-story-frames>.coartada-story-frame-4{animation-delay:-1s!important}
-@keyframes coartada-story-frames{0%,15%{opacity:1;transform:scale(1)}20%,98%{opacity:0;transform:scale(1.002)}100%{opacity:1;transform:scale(1)}}
+@keyframes coartada-story-frames{
+  0%{opacity:0}
+  8%,20%{opacity:1}
+  30%,100%{opacity:0}
+}
 @media(prefers-reduced-motion:reduce){
   .coartada-story-frames>.coartada-story-frame{animation:none!important;opacity:0!important}
   .coartada-story-frames>.coartada-story-frame-0{opacity:1!important}
@@ -1235,7 +1239,11 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .servilleta-interior-lights{position:absolute!important;z-index:2!important;inset:0!important;pointer-events:none;background:radial-gradient(circle at 20% 10%,#ffd57946 0 2%,transparent 11%),radial-gradient(circle at 46% 10%,#ffd57958 0 2%,transparent 12%),radial-gradient(circle at 39% 18%,#ffd57942 0 1.4%,transparent 8%),radial-gradient(circle at 44% 47%,#ffc65b38 0 1.5%,transparent 8%),radial-gradient(circle at 56% 49%,#ffc65b32 0 1.5%,transparent 8%),radial-gradient(circle at 67% 47%,#ffc65b32 0 1.5%,transparent 8%);mix-blend-mode:screen;animation:servilleta-interior-flicker 1.35s steps(2,end) infinite!important}
 .servilleta-lighthouse-beam{position:absolute!important;z-index:3!important;right:21.7%!important;top:15.4%!important;width:49%!important;height:14%!important;pointer-events:none;background:linear-gradient(90deg,transparent 3%,#d9efff32 55%,#fff0b89c 100%);clip-path:polygon(0 5%,100% 47%,100% 54%,0 96%);transform-origin:100% 50%;mix-blend-mode:screen;animation:servilleta-lighthouse-sweep 6.4s ease-in-out infinite alternate!important}
 .servilleta-lighthouse-lamp{position:absolute!important;z-index:4!important;left:78.3%!important;top:20.4%!important;width:2.7%!important;aspect-ratio:1;border-radius:50%;pointer-events:none;background:#fff2ba;box-shadow:0 0 8px 3px #ffe5a7a6,0 0 22px 9px #ffd76f45;mix-blend-mode:screen;animation:servilleta-lighthouse-glow 2.8s ease-in-out infinite!important}
-@keyframes servilleta-story-frames{0%,10%{opacity:1;transform:scale(1)}14%,98%{opacity:0;transform:scale(1.003)}100%{opacity:1;transform:scale(1)}}
+@keyframes servilleta-story-frames{
+  0%{opacity:0}
+  7%,14%{opacity:1}
+  22%,100%{opacity:0}
+}
 @keyframes servilleta-interior-flicker{0%,100%{opacity:.4;filter:brightness(.84)}45%{opacity:.88;filter:brightness(1.18)}58%{opacity:.55;filter:brightness(.94)}70%{opacity:1;filter:brightness(1.28)}}
 @keyframes servilleta-lighthouse-sweep{from{transform:rotate(-6deg);opacity:.28}45%{opacity:.94}to{transform:rotate(7deg);opacity:.4}}
 @keyframes servilleta-lighthouse-glow{0%,100%{opacity:.52;filter:brightness(.9)}50%{opacity:1;filter:brightness(1.36)}}
@@ -2057,9 +2065,9 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
 .fede-artwork.level-1-intro>.level-one-window-frame-2{animation-delay:-3.2s!important}
 .fede-artwork.level-1-intro>.level-one-window-frame-3{animation-delay:-1.6s!important}
 @keyframes level-one-window-frames{
-  0%,20%{opacity:1;transform:scale(1)}
-  25%,95%{opacity:0;transform:scale(1.004)}
-  100%{opacity:1;transform:scale(1)}
+  0%{opacity:0}
+  8%,25%{opacity:1}
+  35%,100%{opacity:0}
 }
 
 /* La escena principal del nivel 3 vuelve a ocupar el ancho del panel. */
@@ -2152,9 +2160,9 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
 }
 .federica-scene-visual.transmitter-story-frames .scene-hotspot{z-index:6!important}
 @keyframes transmitter-story-frames{
-  0%,12%{opacity:1;transform:scale(1)}
-  16%,98%{opacity:0;transform:scale(1.003)}
-  100%{opacity:1;transform:scale(1)}
+  0%{opacity:0}
+  7%,16.7%{opacity:1}
+  26%,100%{opacity:0}
 }
 @keyframes transmitter-lighthouse-sweep{
   from{transform:rotate(-6deg);opacity:.3}45%{opacity:.94}to{transform:rotate(7deg);opacity:.4}
