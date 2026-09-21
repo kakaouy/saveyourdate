@@ -873,6 +873,54 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .terminal-dialog-visual .fede-artwork img,.level-two-success-visual .fede-artwork img,.level-three-story-visual .fede-artwork img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}
 }
 
+/* Interruptor integrado en la fotografía: la zona táctil coincide con el
+   botón físico y la imagen alterna entre el estado apagado y encendido. */
+.terminal-scene::before{display:none!important}
+.terminal-power-button{
+  left:58.25%!important;
+  top:75.2%!important;
+  width:4.2%!important;
+  height:7.2%!important;
+  min-width:34px!important;
+  min-height:34px!important;
+  aspect-ratio:auto!important;
+  padding:0!important;
+  border:1px solid transparent!important;
+  border-radius:8px!important;
+  background:transparent!important;
+  color:transparent!important;
+  box-shadow:none!important;
+  animation:none!important;
+  transform:none!important;
+  cursor:pointer!important;
+  touch-action:manipulation;
+}
+.terminal-power-button:hover,
+.terminal-power-button:focus-visible{
+  border-color:#ffc66d99!important;
+  background:radial-gradient(circle,#ffb34230,transparent 66%)!important;
+  box-shadow:0 0 10px #ffad3f99,0 0 22px #ffad3f55!important;
+  outline:0;
+  animation:terminal-switch-hover .85s ease-in-out infinite alternate!important;
+}
+.terminal-power-button:active{transform:scale(.9)!important}
+@keyframes terminal-switch-hover{from{filter:brightness(.8)}to{filter:brightness(1.45)}}
+@media(hover:none),(pointer:coarse){
+  .terminal-power-button{
+    border-color:#ffc66d4d!important;
+    background:radial-gradient(circle,#ffb34220,transparent 68%)!important;
+    animation:terminal-switch-touch 2s ease-in-out infinite!important;
+  }
+  @keyframes terminal-switch-touch{0%,100%{box-shadow:0 0 0 #ffad3f00}50%{box-shadow:0 0 16px #ffad3f77}}
+}
+@media(max-width:700px){
+  .terminal-scene{min-height:0!important;aspect-ratio:1698/926!important}
+  .terminal-scene>img{position:static!important;width:100%!important;height:100%!important;max-width:100%!important;object-fit:contain!important;transform:none!important;opacity:1!important}
+  .terminal-screen{left:26%!important;top:22%!important;width:31%!important;height:43%!important;padding:4px!important;border:0!important;border-radius:0!important;background:transparent!important}
+  .terminal-screen h1{font-size:clamp(7px,2.4vw,12px)!important}.terminal-screen label,.terminal-screen p{font-size:clamp(6px,2vw,10px)!important}
+  .terminal-power-button{left:58.25%!important;right:auto!important;top:75.2%!important;bottom:auto!important;width:7%!important;height:12%!important;min-width:30px!important;min-height:30px!important}
+}
+
 /* Movimiento ambiental por nivel. Las capas no alteran rostros ni revelan respuestas. */
 .fede-artwork,.level-two-group-scene,.scene-frame,.late-story-visual{isolation:isolate}
 .fede-artwork::before{content:'';position:absolute;z-index:4;inset:0;pointer-events:none;opacity:.65;transition:opacity .35s,filter .35s}

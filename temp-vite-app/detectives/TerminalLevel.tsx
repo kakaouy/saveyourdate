@@ -50,14 +50,14 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
  return <section className="terminal-level">
   <div className="terminal-heading"><p className="eyebrow">NIVEL 1 · ARCHIVO F-01</p></div>
   <div className={`terminal-scene ${powered?'terminal-powered':'terminal-off'} ${lighting?'terminal-illuminated':''}`}>
-   <img src="/los-archivos-f/images/terminal-recuperacion-v1.png" alt="Computadora antigua del archivo, junto a una lámpara y una ventana lluviosa"/>
+   <img src={powered?'/los-archivos-f/images/terminal-encendida-v1.png':'/los-archivos-f/images/terminal-recuperacion-v1.png'} alt={`Computadora antigua del archivo ${powered?'encendida':'apagada'}, junto a una lámpara y una ventana`}/>
    <span className="terminal-lamp-pulse" aria-hidden="true"/><span className="terminal-scanlines" aria-hidden="true"/>
    {powered&&<form className="terminal-screen" onSubmit={submit}>
     <h1>{unlocked?'ACCESO RECUPERADO':'RECUPERACIÓN DE ACCESO'}</h1>
     {!unlocked?<><label>Clave de emergencia:<br/>instante de interrupción</label><p>INGRESO DISPONIBLE EN EL CANDADO LATERAL</p></>:<><p>ARCHIVO DE PERSONAL HABILITADO</p><button type="button" onClick={()=>setSuccess(true)}>ESCUCHAR INFORME</button></>}
     <span className="terminal-command-cursor" aria-hidden="true">▌</span>
    </form>}
-   <button type="button" className="terminal-power-button" aria-label={powered?'Computadora encendida':'Encender computadora'} aria-pressed={powered} onClick={()=>setPowered(true)} disabled={powered}><span aria-hidden="true">⏻</span></button>
+   <button type="button" className="terminal-power-button" aria-label={powered?'Apagar computadora':'Encender computadora'} aria-pressed={powered} onClick={()=>setPowered(current=>!current)}><span className="sr-only">{powered?'Apagar':'Encender'}</span></button>
   </div>
   {message&&!unlocked&&<p className="terminal-error" role="status">{message}</p>}
   {unlocked&&!lighting&&<button className="primary-button" onClick={onContinue}>CONTINUAR LA INVESTIGACIÓN →</button>}
