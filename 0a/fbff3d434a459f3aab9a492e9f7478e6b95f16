@@ -1,0 +1,22 @@
+temp-vite-app/detectives/App.tsx
+  s_92b1cd3453e863::t_a802d1c983b041 393
+temp-vite-app/detectives/style.css
+  s_92b1cd3453e863::t_c306d7337af016 1969
+  s_92b1cd3453e863::t_a802d1c983b041 1960-1968,1970-1976
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0afbff3d434a459f3aab9a492e9f7478e6b95f16",
+  "prompts": {},
+  "sessions": {
+    "s_92b1cd3453e863": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0b612-e708-79a1-bb71-1ae16f7e1271",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
