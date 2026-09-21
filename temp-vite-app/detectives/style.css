@@ -946,19 +946,6 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 }
 @media(prefers-reduced-motion:reduce){.terminal-lamp-chain-button{animation:none!important}}
 
-/* La acción sigue el flujo de lectura y permanece debajo del mensaje. */
-@media(min-width:900px) and (orientation:landscape){
-  .story-visual-action,
-  .level-two-success-copy>.primary-button,
-  .level-three-story-copy>.primary-button{
-    grid-column:2!important;
-    grid-row:6!important;
-    justify-self:start!important;
-    align-self:start!important;
-    margin:22px 0 0!important;
-  }
-}
-
 /* Movimiento ambiental por nivel. Las capas no alteran rostros ni revelan respuestas. */
 .fede-artwork,.level-two-group-scene,.scene-frame,.late-story-visual{isolation:isolate}
 .fede-artwork::before{content:'';position:absolute;z-index:4;inset:0;pointer-events:none;opacity:.65;transition:opacity .35s,filter .35s}
@@ -1949,4 +1936,24 @@ body:has(.level-three-story-dialog[open]) .topbar{
   .level-three-story-dialog::backdrop{
     background:linear-gradient(to bottom,transparent 0 130px,#03131d 130px 100%)!important;
   }
+}
+
+/* Cascada final para el viewport de los mensajes. */
+body:has(.terminal-dialog[open]),body:has(.level-two-success-dialog[open]),body:has(.level-three-story-dialog[open]){overflow:hidden!important}
+.terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{position:fixed!important;inset:164px 0 0!important;width:100vw!important;max-width:none!important;height:calc(100dvh - 164px)!important;max-height:none!important;margin:0!important;padding:clamp(22px,3vw,46px)!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;background-position:center!important;background-size:cover!important}
+.terminal-dialog::backdrop,.level-two-success-dialog::backdrop,.level-three-story-dialog::backdrop{background:#03131d!important}
+.terminal-dialog[open] .terminal-dialog-layout,.level-two-success-dialog[open],.level-three-story-dialog[open]{width:min(1420px,100%)!important;min-height:100%!important;margin:0 auto!important;align-content:center!important}
+.terminal-dialog-title-row h2,.story-dialog-title-row h2{max-width:100%!important;font-size:clamp(38px,4.4vw,64px)!important;line-height:1.02!important;overflow-wrap:normal!important;word-break:normal!important}
+.simulated-player{grid-template-columns:42px minmax(150px,auto) minmax(80px,1fr) auto!important;min-width:0!important}.simulated-player>span{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+@media(min-width:1101px){.story-visual-action,.level-two-success-copy>.primary-button,.level-three-story-copy>.primary-button{grid-column:2!important;grid-row:6!important;justify-self:start!important;align-self:start!important;margin:22px 0 0!important}}
+@media(max-width:1100px){
+  .terminal-dialog[open] .terminal-dialog-layout,.level-two-success-dialog[open],.level-three-story-dialog[open]{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;gap:24px!important;height:auto!important}
+  .terminal-dialog-visual,.level-two-success-visual,.level-three-story-visual,.late-story-visual{flex:0 0 auto!important;width:100%!important;height:auto!important;aspect-ratio:4/3!important;order:1!important}
+  .terminal-dialog-copy,.level-two-success-copy,.level-three-story-copy{display:flex!important;flex-direction:column!important;width:100%!important;height:auto!important;order:2!important;padding:0 0 30px!important}
+  .story-visual-action{order:3!important;align-self:flex-start!important;margin:0 0 30px!important}
+}
+@media(max-width:600px){
+  .terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{inset:130px 0 0!important;height:calc(100dvh - 130px)!important;padding:14px 12px 28px!important}
+  .terminal-dialog-title-row h2,.story-dialog-title-row h2{font-size:clamp(32px,10vw,48px)!important}
+  .simulated-player{grid-template-columns:40px minmax(0,1fr) auto!important}.simulated-player>span{grid-column:2/-1!important}.simulated-player>i{grid-column:2!important}.simulated-player>small{grid-column:3!important}
 }
