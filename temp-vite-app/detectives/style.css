@@ -2072,3 +2072,47 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
     width:100%!important;height:auto!important;aspect-ratio:4/3!important;flex:0 0 auto!important
   }
 }
+
+/* Puesto secreto: los cuatro fotogramas entregados animan mar y lluvia sin
+   encoger la ilustración. Las luces se posicionan sobre el faro y el farol. */
+.federica-scene-visual.transmitter-story-frames{position:relative;isolation:isolate}
+.federica-scene-visual.transmitter-story-frames>.transmitter-story-frame{
+  position:absolute!important;z-index:0!important;inset:0!important;
+  display:block!important;width:100%!important;height:100%!important;
+  object-fit:cover!important;object-position:center!important;opacity:0;
+  animation:transmitter-story-frames 5.6s linear infinite!important;
+  will-change:opacity,transform
+}
+.federica-scene-visual.transmitter-story-frames>.transmitter-story-frame-0{animation-delay:0s!important}
+.federica-scene-visual.transmitter-story-frames>.transmitter-story-frame-1{animation-delay:-4.2s!important}
+.federica-scene-visual.transmitter-story-frames>.transmitter-story-frame-2{animation-delay:-2.8s!important}
+.federica-scene-visual.transmitter-story-frames>.transmitter-story-frame-3{animation-delay:-1.4s!important}
+.federica-scene-visual.transmitter-story-frames .lighthouse-lamp{
+  z-index:4!important;left:81.8%!important;top:24.1%!important;width:3.4%!important;
+  animation:transmitter-lighthouse-glow 2.8s ease-in-out infinite!important
+}
+.federica-scene-visual.transmitter-story-frames .lighthouse-beam{
+  z-index:3!important;right:18.2%!important;top:18.4%!important;width:50%!important;height:14%!important;
+  animation:transmitter-lighthouse-sweep 5.6s ease-in-out infinite alternate!important
+}
+.federica-scene-visual.transmitter-story-frames .briefing-lantern-glow{
+  z-index:3!important;animation:transmitter-lantern-pulse 2.4s ease-in-out infinite!important
+}
+.federica-scene-visual.transmitter-story-frames .scene-hotspot{z-index:6!important}
+@keyframes transmitter-story-frames{
+  0%,20%{opacity:1;transform:scale(1)}
+  25%,95%{opacity:0;transform:scale(1.003)}
+  100%{opacity:1;transform:scale(1)}
+}
+@keyframes transmitter-lighthouse-sweep{
+  from{transform:rotate(-6deg);opacity:.3}45%{opacity:.94}to{transform:rotate(7deg);opacity:.4}
+}
+@keyframes transmitter-lighthouse-glow{0%,100%{opacity:.56;filter:brightness(.94)}50%{opacity:1;filter:brightness(1.35)}}
+@keyframes transmitter-lantern-pulse{0%,100%{opacity:.42}48%{opacity:1}56%{opacity:.68}}
+@media(prefers-reduced-motion:reduce){
+  .federica-scene-visual.transmitter-story-frames>.transmitter-story-frame{animation:none!important;opacity:0!important}
+  .federica-scene-visual.transmitter-story-frames>.transmitter-story-frame-0{opacity:1!important}
+  .federica-scene-visual.transmitter-story-frames .lighthouse-lamp,
+  .federica-scene-visual.transmitter-story-frames .lighthouse-beam,
+  .federica-scene-visual.transmitter-story-frames .briefing-lantern-glow{animation:none!important}
+}
