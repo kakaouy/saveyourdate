@@ -1974,3 +1974,16 @@ body:has(.terminal-dialog[open]),body:has(.level-two-success-dialog[open]),body:
 @media(prefers-reduced-motion:reduce){
   .scene-frame.level-three-weather>.storm-frame{animation:none!important;opacity:0!important}.scene-frame.level-three-weather>.storm-frame-0{opacity:1!important}.scene-frame.level-three-weather>.scene-lightning-flash,.scene-frame.level-three-weather>.scene-lighthouse-beam{animation:none!important}.scene-frame.level-three-weather>.scene-lightning-flash{display:none!important}
 }
+
+/* Durante una transmisión solo permanece visible la marca del encabezado. */
+body:has(.terminal-dialog[open]) .game-page .mission-toolbar,
+body:has(.level-two-success-dialog[open]) .game-page .mission-toolbar,
+body:has(.level-three-story-dialog[open]) .game-page .mission-toolbar,
+body:has(.terminal-dialog[open]) .music-button,
+body:has(.level-two-success-dialog[open]) .music-button,
+body:has(.level-three-story-dialog[open]) .music-button{visibility:hidden!important;pointer-events:none!important}
+body:has(.terminal-dialog[open]) .topbar,
+body:has(.level-two-success-dialog[open]) .topbar,
+body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
+.terminal-dialog::backdrop,.level-two-success-dialog::backdrop,.level-three-story-dialog::backdrop{background:linear-gradient(to bottom,transparent 0 164px,#03131d 164px 100%)!important}
+@media(max-width:600px){.terminal-dialog::backdrop,.level-two-success-dialog::backdrop,.level-three-story-dialog::backdrop{background:linear-gradient(to bottom,transparent 0 130px,#03131d 130px 100%)!important}}
