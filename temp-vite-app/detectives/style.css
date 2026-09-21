@@ -1774,3 +1774,62 @@ body:has(.level-three-story-dialog[open]) .topbar{
 @media(max-width:700px),(orientation:portrait){
   .terminal-dialog,.level-two-success-dialog,.level-three-story-dialog{background-position:left 130px,center 130px!important;background-size:100% calc(100% - 130px),100% calc(100% - 130px)!important}
 }
+
+/* Level 1: one contextual canvas, interactive CRT startup and a folded replay tab. */
+.site-shell,.app-controls{min-height:100dvh;background:#03131d}
+.game-page:has(.terminal-level){
+  min-height:100dvh!important;
+  background:
+    linear-gradient(90deg,rgba(2,13,20,.88),rgba(3,19,28,.76)),
+    url('/los-archivos-f/images/bg-security-room.png') center/cover fixed!important;
+}
+.game-page:has(.terminal-level)>.investigation-panel{
+  min-height:calc(100dvh - 164px)!important;
+  box-sizing:border-box;
+  background:transparent!important;
+}
+.terminal-scene::before{
+  content:'';
+  position:absolute;
+  z-index:4;
+  left:26%;top:22%;width:31%;height:43%;
+  border-radius:8% / 12%;
+  background:radial-gradient(ellipse at 50% 43%,#14201f 0,#07100f 58%,#020606 100%);
+  box-shadow:inset 0 0 38px #000,0 0 8px #000;
+  pointer-events:none;
+  transition:opacity .28s ease;
+}
+.terminal-scene.terminal-powered::before{opacity:0;animation:terminal-boot-flash .72s steps(2,end)}
+.terminal-off .terminal-screen,.terminal-off .terminal-scanlines{visibility:hidden;opacity:0}
+.terminal-powered .terminal-screen{animation:terminal-content-boot .68s steps(3,end),terminal-screen-breathe 4s ease-in-out .7s infinite}
+.terminal-powered .terminal-scanlines{animation:terminal-scan 5s linear infinite,terminal-interference 7s steps(1,end) infinite}
+.terminal-power-button{
+  position:absolute;z-index:9;left:59%;top:79%;
+  width:clamp(30px,3vw,48px);aspect-ratio:1;border-radius:50%;
+  border:1px solid #cf9954;background:#111b19;color:#f5bd67;
+  display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 0 0 4px #050908aa,0 0 18px #ffb94c99,inset 0 0 10px #000;
+  animation:terminal-power-prompt 1.7s ease-in-out infinite;
+}
+.terminal-power-button span{font-size:clamp(15px,1.7vw,25px);line-height:1}
+.terminal-power-button:disabled{cursor:default;color:#91efbd;animation:none;box-shadow:0 0 0 4px #050908aa,0 0 12px #69d99a66,inset 0 0 10px #000}
+.terminal-command-cursor{font:clamp(12px,1.1vw,18px)/1 monospace;color:#ffd18a;animation:terminalBlink .8s steps(1,end) infinite}
+.terminal-lamp-pulse{animation:terminal-lamp 3.4s ease-in-out infinite,terminal-lamp-flicker 9s steps(1,end) infinite!important}
+.level-side-tab.mission-tab.suppress-hover:not(.is-open),
+.level-side-tab.mission-tab.suppress-hover:hover:not(.is-open),
+.level-side-tab.mission-tab.suppress-hover:focus-within:not(.is-open){transform:translateX(calc(-100% + 82px))!important}
+@keyframes terminal-boot-flash{0%{opacity:1}18%{opacity:.15}35%{opacity:.92}55%{opacity:.38}100%{opacity:0}}
+@keyframes terminal-content-boot{0%,20%{opacity:0;transform:scaleY(.02)}45%{opacity:.9;transform:scaleY(.04)}70%{opacity:.45;transform:scaleY(1)}100%{opacity:1;transform:none}}
+@keyframes terminal-interference{0%,91%,100%{filter:none}92%{filter:brightness(1.8);transform:translateX(1px)}93%{filter:contrast(1.7);transform:translateX(-2px)}94%{filter:none;transform:none}}
+@keyframes terminal-power-prompt{0%,100%{filter:brightness(.82);transform:scale(.96)}50%{filter:brightness(1.35);transform:scale(1.04)}}
+@keyframes terminal-lamp-flicker{0%,73%,75%,100%{filter:none}74%{filter:brightness(.7)}}
+@media(max-width:700px){
+  .terminal-scene::before{left:8%;top:18%;width:84%;height:65%;border-radius:20px}
+  .terminal-power-button{left:auto;right:8%;top:auto;bottom:7%}
+  .level-side-tab.mission-tab.suppress-hover:not(.is-open),
+  .level-side-tab.mission-tab.suppress-hover:hover:not(.is-open),
+  .level-side-tab.mission-tab.suppress-hover:focus-within:not(.is-open){transform:translateX(calc(-100% + 68px))!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .terminal-powered .terminal-screen,.terminal-powered .terminal-scanlines,.terminal-power-button,.terminal-lamp-pulse,.terminal-command-cursor{animation:none!important}
+}

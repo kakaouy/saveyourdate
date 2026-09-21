@@ -31,6 +31,7 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
 }
 export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue}:{unlocked:boolean;busy:boolean;message:string;onUnlock:(answer:string)=>Promise<boolean>;onContinue:()=>void}) {
  const [intro,setIntro]=useState(!unlocked);
+ const [powered,setPowered]=useState(false);
  const [answer,setAnswer]=useState('');
  const [lighting,setLighting]=useState(false);
  const [success,setSuccess]=useState(false);
@@ -48,17 +49,19 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
  }
  return <section className="terminal-level">
   <div className="terminal-heading"><p className="eyebrow">NIVEL 1 · ARCHIVO F-01</p></div>
-  <div className={`terminal-scene ${lighting?'terminal-illuminated':''}`}>
+  <div className={`terminal-scene ${powered?'terminal-powered':'terminal-off'} ${lighting?'terminal-illuminated':''}`}>
    <img src="/los-archivos-f/images/terminal-recuperacion-v1.png" alt="Computadora antigua del archivo, junto a una lámpara y una ventana lluviosa"/>
-   <span className="terminal-rain" aria-hidden="true"/><span className="terminal-lamp-pulse" aria-hidden="true"/><span className="terminal-scanlines" aria-hidden="true"/>
-   <form className="terminal-screen" onSubmit={submit}>
+   <span className="terminal-lamp-pulse" aria-hidden="true"/><span className="terminal-scanlines" aria-hidden="true"/>
+   {powered&&<form className="terminal-screen" onSubmit={submit}>
     <h1>{unlocked?'ACCESO RECUPERADO':'RECUPERACIÓN DE ACCESO'}</h1>
     {!unlocked?<><label>Clave de emergencia:<br/>instante de interrupción</label><p>INGRESO DISPONIBLE EN EL CANDADO LATERAL</p></>:<><p>ARCHIVO DE PERSONAL HABILITADO</p><button type="button" onClick={()=>setSuccess(true)}>ESCUCHAR INFORME</button></>}
-   </form>
+    <span className="terminal-command-cursor" aria-hidden="true">▌</span>
+   </form>}
+   <button type="button" className="terminal-power-button" aria-label={powered?'Computadora encendida':'Encender computadora'} aria-pressed={powered} onClick={()=>setPowered(true)} disabled={powered}><span aria-hidden="true">⏻</span></button>
   </div>
   {message&&!unlocked&&<p className="terminal-error" role="status">{message}</p>}
   {unlocked&&!lighting&&<button className="primary-button" onClick={onContinue}>CONTINUAR LA INVESTIGACIÓN →</button>}
-  <LevelSideTabs level={1} prompt="Ingresá el código de 4 cifras que permite cerrar esta parte de la investigación." placeholder="Código de 4 cifras" answer={answer} busy={busy||lighting} unlocked={unlocked} canUnlock={!unlocked} message={message} onAnswer={setAnswer} onReplay={()=>setIntro(true)} onUnlock={submit}/>
+  <LevelSideTabs level={1} prompt="Ingresá el código de 4 cifras que permite cerrar esta parte de la investigación." placeholder="Código de 4 cifras" answer={answer} busy={busy||lighting} unlocked={unlocked} canUnlock={!unlocked} message={message} missionMessageOpen={intro||success} onAnswer={setAnswer} onReplay={()=>setIntro(true)} onUnlock={submit}/>
   {intro&&<FedeTransmission success={false} onClose={()=>{setIntro(false);requestAnimationFrame(()=>input.current?.focus());}}/>}
   {success&&<FedeTransmission success onClose={()=>{setSuccess(false);onContinue();}}/>}
  </section>;

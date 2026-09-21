@@ -12,6 +12,7 @@ export default function LevelSideTabs({
   unlocked,
   canUnlock,
   message,
+  missionMessageOpen=false,
   onAnswer,
   onReplay,
   onUnlock,
@@ -24,6 +25,7 @@ export default function LevelSideTabs({
   unlocked:boolean;
   canUnlock:boolean;
   message:string;
+  missionMessageOpen?:boolean;
   onAnswer:(value:string)=>void;
   onReplay:()=>void;
   onUnlock:(event:FormEvent)=>void;
@@ -32,13 +34,19 @@ export default function LevelSideTabs({
   const [rankingOpen,setRankingOpen]=useState(false);
   const [ranking,setRanking]=useState<RankingEntry[]>([]);
   const [rankingStatus,setRankingStatus]=useState('');
+  const [missionHoverSuppressed,setMissionHoverSuppressed]=useState(false);
   const tabsRef=useRef<HTMLElement>(null);
+  const previousMissionMessageOpen=useRef(missionMessageOpen);
   const rankingDialog=useRef<HTMLDialogElement>(null);
   useEffect(()=>{if(!rankingOpen)return;rankingDialog.current?.showModal();const overflow=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{rankingDialog.current?.close();document.body.style.overflow=overflow;};},[rankingOpen]);
   useEffect(()=>{const close=(event:PointerEvent)=>{if(open&&!tabsRef.current?.contains(event.target as Node))setOpen(null);};document.addEventListener('pointerdown',close);return()=>document.removeEventListener('pointerdown',close);},[open]);
+  useEffect(()=>{
+    if(previousMissionMessageOpen.current&&!missionMessageOpen){setOpen(null);setMissionHoverSuppressed(true);}
+    previousMissionMessageOpen.current=missionMessageOpen;
+  },[missionMessageOpen]);
   async function showRanking(){setOpen(null);setRankingOpen(true);setRankingStatus('Recuperando posiciones…');try{const response=await fetch('/los-archivos-f/api/game?view=leaderboard');if(!response.ok)throw new Error();setRanking(await response.json() as RankingEntry[]);setRankingStatus('');}catch{setRankingStatus('No pudimos recuperar las posiciones. Volvé a intentar.');}}
   return <aside ref={tabsRef} className="level-side-tabs" aria-label={`Acciones del nivel ${level}`}>
-    <section className={`level-side-tab mission-tab ${open==='mission'?'is-open':''}`}>
+    <section className={`level-side-tab mission-tab ${open==='mission'?'is-open':''} ${missionHoverSuppressed?'suppress-hover':''}`} onPointerLeave={()=>setMissionHoverSuppressed(false)}>
       <button type="button" className="level-side-tab-trigger" aria-expanded={open==='mission'} onClick={()=>{setOpen(null);onReplay();}}>
         <img src="/los-archivos-f/images/fede-mission-tab.png" alt=""/>
         <span><b>MISIÓN NIVEL {level}</b><small>Escuchar mensaje de Fede</small></span>
