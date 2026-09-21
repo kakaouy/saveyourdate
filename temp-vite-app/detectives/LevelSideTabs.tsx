@@ -36,16 +36,16 @@ export default function LevelSideTabs({
   const rankingDialog=useRef<HTMLDialogElement>(null);
   useEffect(()=>{if(!rankingOpen)return;rankingDialog.current?.showModal();const overflow=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{rankingDialog.current?.close();document.body.style.overflow=overflow;};},[rankingOpen]);
   useEffect(()=>{const close=(event:PointerEvent)=>{if(open&&!tabsRef.current?.contains(event.target as Node))setOpen(null);};document.addEventListener('pointerdown',close);return()=>document.removeEventListener('pointerdown',close);},[open]);
-  async function showRanking(){setOpen('ranking');setRankingOpen(true);setRankingStatus('Recuperando posiciones…');try{const response=await fetch('/los-archivos-f/api/game?view=leaderboard');if(!response.ok)throw new Error();setRanking(await response.json() as RankingEntry[]);setRankingStatus('');}catch{setRankingStatus('No pudimos recuperar las posiciones. Volvé a intentar.');}}
+  async function showRanking(){setOpen(null);setRankingOpen(true);setRankingStatus('Recuperando posiciones…');try{const response=await fetch('/los-archivos-f/api/game?view=leaderboard');if(!response.ok)throw new Error();setRanking(await response.json() as RankingEntry[]);setRankingStatus('');}catch{setRankingStatus('No pudimos recuperar las posiciones. Volvé a intentar.');}}
   return <aside ref={tabsRef} className="level-side-tabs" aria-label={`Acciones del nivel ${level}`}>
     <section className={`level-side-tab mission-tab ${open==='mission'?'is-open':''}`}>
-      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='mission'} onMouseEnter={()=>setOpen('mission')} onFocus={()=>setOpen('mission')} onClick={()=>{if(open==='mission'){setOpen(null);return;}setOpen('mission');onReplay();}}>
+      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='mission'} onClick={()=>{setOpen(null);onReplay();}}>
         <img src="/los-archivos-f/images/fede-mission-tab.png" alt=""/>
         <span><b>MISIÓN NIVEL {level}</b><small>Escuchar mensaje de Fede</small></span>
       </button>
     </section>
     <section className={`level-side-tab unlock-tab ${open==='unlock'?'is-open':''}`}>
-      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='unlock'} onMouseEnter={()=>setOpen('unlock')} onFocus={()=>setOpen('unlock')} onClick={()=>setOpen(open==='unlock'?null:'unlock')}>
+      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='unlock'} onClick={()=>setOpen('unlock')}>
         <img src="/los-archivos-f/images/unlock-level-tab.png" alt=""/>
         <span><b>{unlocked?'NIVEL RESUELTO':'DESBLOQUEAR'}</b><small>{unlocked?'Investigación registrada':'Ingresar resultado'}</small></span>
       </button>
@@ -57,7 +57,7 @@ export default function LevelSideTabs({
       </form>}
     </section>
     <section className={`level-side-tab ranking-tab ${open==='ranking'?'is-open':''}`}>
-      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='ranking'} onMouseEnter={()=>setOpen('ranking')} onFocus={()=>setOpen('ranking')} onClick={showRanking}>
+      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='ranking'} onClick={showRanking}>
         <img src="/los-archivos-f/images/copa-ranking.png" alt=""/>
         <span><b>PODIO</b><small>Ver tiempos y pistas</small></span>
       </button>
