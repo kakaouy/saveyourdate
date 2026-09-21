@@ -1219,6 +1219,36 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .coartada-lighthouse-beam,.coartada-lighthouse-lamp{animation:none!important}
 }
 
+/* Nivel 3, servilleta: la tormenta evoluciona con los ocho fotogramas reales.
+   Un titileo cálido acompaña las lámparas interiores y el faro barre la ventana. */
+.servilleta-story-frames{position:relative!important;isolation:isolate!important;background:#06131b}
+.servilleta-story-frames>.servilleta-story-frame{
+  position:absolute!important;z-index:0!important;inset:0!important;
+  width:100%!important;height:100%!important;object-fit:cover!important;
+  opacity:0;animation:servilleta-story-frames 6.4s linear infinite!important;
+  will-change:opacity,transform
+}
+.servilleta-story-frames>.servilleta-story-frame-0{animation-delay:0s!important}
+.servilleta-story-frames>.servilleta-story-frame-1{animation-delay:-5.6s!important}
+.servilleta-story-frames>.servilleta-story-frame-2{animation-delay:-4.8s!important}
+.servilleta-story-frames>.servilleta-story-frame-3{animation-delay:-4s!important}
+.servilleta-story-frames>.servilleta-story-frame-4{animation-delay:-3.2s!important}
+.servilleta-story-frames>.servilleta-story-frame-5{animation-delay:-2.4s!important}
+.servilleta-story-frames>.servilleta-story-frame-6{animation-delay:-1.6s!important}
+.servilleta-story-frames>.servilleta-story-frame-7{animation-delay:-.8s!important}
+.servilleta-interior-lights{position:absolute!important;z-index:2!important;inset:0!important;pointer-events:none;background:radial-gradient(circle at 20% 10%,#ffd57946 0 2%,transparent 11%),radial-gradient(circle at 46% 10%,#ffd57958 0 2%,transparent 12%),radial-gradient(circle at 39% 18%,#ffd57942 0 1.4%,transparent 8%),radial-gradient(circle at 44% 47%,#ffc65b38 0 1.5%,transparent 8%),radial-gradient(circle at 56% 49%,#ffc65b32 0 1.5%,transparent 8%),radial-gradient(circle at 67% 47%,#ffc65b32 0 1.5%,transparent 8%);mix-blend-mode:screen;animation:servilleta-interior-flicker 1.35s steps(2,end) infinite!important}
+.servilleta-lighthouse-beam{position:absolute!important;z-index:3!important;right:21.7%!important;top:15.4%!important;width:49%!important;height:14%!important;pointer-events:none;background:linear-gradient(90deg,transparent 3%,#d9efff32 55%,#fff0b89c 100%);clip-path:polygon(0 5%,100% 47%,100% 54%,0 96%);transform-origin:100% 50%;mix-blend-mode:screen;animation:servilleta-lighthouse-sweep 6.4s ease-in-out infinite alternate!important}
+.servilleta-lighthouse-lamp{position:absolute!important;z-index:4!important;left:78.3%!important;top:20.4%!important;width:2.7%!important;aspect-ratio:1;border-radius:50%;pointer-events:none;background:#fff2ba;box-shadow:0 0 8px 3px #ffe5a7a6,0 0 22px 9px #ffd76f45;mix-blend-mode:screen;animation:servilleta-lighthouse-glow 2.8s ease-in-out infinite!important}
+@keyframes servilleta-story-frames{0%,10%{opacity:1;transform:scale(1)}14%,98%{opacity:0;transform:scale(1.003)}100%{opacity:1;transform:scale(1)}}
+@keyframes servilleta-interior-flicker{0%,100%{opacity:.4;filter:brightness(.84)}45%{opacity:.88;filter:brightness(1.18)}58%{opacity:.55;filter:brightness(.94)}70%{opacity:1;filter:brightness(1.28)}}
+@keyframes servilleta-lighthouse-sweep{from{transform:rotate(-6deg);opacity:.28}45%{opacity:.94}to{transform:rotate(7deg);opacity:.4}}
+@keyframes servilleta-lighthouse-glow{0%,100%{opacity:.52;filter:brightness(.9)}50%{opacity:1;filter:brightness(1.36)}}
+@media(prefers-reduced-motion:reduce){
+  .servilleta-story-frames>.servilleta-story-frame{animation:none!important;opacity:0!important}
+  .servilleta-story-frames>.servilleta-story-frame-0{opacity:1!important}
+  .servilleta-interior-lights,.servilleta-lighthouse-beam,.servilleta-lighthouse-lamp{animation:none!important}
+}
+
 /* Transmisiones contextuales: la escena ocupa todo el lienzo inferior y la
    imagen de Federica comienza a la misma altura que el subtítulo. */
 .terminal-dialog,
