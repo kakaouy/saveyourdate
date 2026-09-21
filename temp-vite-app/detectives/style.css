@@ -921,6 +921,31 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   .terminal-power-button{left:58.25%!important;right:auto!important;top:75.2%!important;bottom:auto!important;width:7%!important;height:12%!important;min-width:30px!important;min-height:30px!important}
 }
 
+.terminal-power-button .sr-only,.terminal-lamp-chain-button .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.terminal-off .terminal-power-button::after{
+  content:'';position:absolute;left:25%;top:12%;width:34%;height:48%;border-radius:2px;
+  background:#080b0a;box-shadow:inset 0 0 4px #000;pointer-events:none;
+}
+.terminal-lamp-chain-button{
+  position:absolute;z-index:9;left:83.5%;top:35%;width:5%;height:15%;min-width:36px;min-height:54px;
+  padding:0;border:1px solid transparent;border-radius:18px;background:transparent;cursor:pointer;
+  touch-action:manipulation;transform-origin:50% 5%;
+}
+.terminal-lamp-chain-button:hover,.terminal-lamp-chain-button:focus-visible{
+  outline:0;border-color:#ffd99155;background:radial-gradient(circle at 50% 78%,#ffd77b3b,transparent 32%);
+  animation:terminal-chain-swing 1.15s ease-in-out infinite alternate;
+}
+.terminal-lamp-chain-button:active{transform:translateY(5px) rotate(1deg)}
+@keyframes terminal-chain-swing{from{transform:rotate(-.7deg)}to{transform:rotate(.7deg);filter:brightness(1.35)}}
+@media(hover:none),(pointer:coarse){
+  .terminal-lamp-chain-button{background:radial-gradient(circle at 50% 78%,#ffd77b24,transparent 32%);animation:terminal-chain-touch 2.2s ease-in-out infinite}
+  @keyframes terminal-chain-touch{0%,100%{filter:brightness(.85)}50%{filter:brightness(1.35)}}
+}
+@media(max-width:700px){
+  .terminal-lamp-chain-button{left:82.5%;top:33%;width:8%;height:20%;min-width:34px;min-height:46px}
+}
+@media(prefers-reduced-motion:reduce){.terminal-lamp-chain-button{animation:none!important}}
+
 /* Movimiento ambiental por nivel. Las capas no alteran rostros ni revelan respuestas. */
 .fede-artwork,.level-two-group-scene,.scene-frame,.late-story-visual{isolation:isolate}
 .fede-artwork::before{content:'';position:absolute;z-index:4;inset:0;pointer-events:none;opacity:.65;transition:opacity .35s,filter .35s}
