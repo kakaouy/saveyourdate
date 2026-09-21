@@ -15,17 +15,16 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
   void player?.play().catch(()=>setBlocked(true));
   return ()=>{player?.pause();element?.close();previous?.focus();};
  },[]);
- return <dialog ref={dialog} className={`terminal-dialog terminal-dialog-${success?'success':'intro'}`} aria-labelledby="terminal-fede-title" onCancel={event=>{event.preventDefault();onClose();}} onClick={event=>{if(event.target===event.currentTarget)onClose();}}>
+ return <dialog ref={dialog} className={`terminal-dialog terminal-dialog-${success?'success':'intro'}`} aria-labelledby="terminal-fede-title" onCancel={event=>event.preventDefault()}>
   <div className="terminal-dialog-layout">
    <div className="terminal-dialog-visual">
     <FedericaPortrait audioRef={audio} kind={success?'success':'intro'}/>
-    <button className="terminal-dialog-close" type="button" aria-label="Cerrar mensaje de Federica" onClick={onClose}>×</button>
    </div>
-   <div className="terminal-dialog-copy"><p className="terminal-dialog-kicker">AGENCIA F · TRANSMISIÓN RECUPERADA</p><div className="terminal-dialog-title-row"><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2>
-   <button className="primary-button terminal-dialog-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'INVESTIGAR'} →</button></div>
-   <p className="terminal-dialog-message">{success?terminalSuccess:terminalIntro}</p>
+   <div className="terminal-dialog-copy"><p className="terminal-dialog-kicker">AGENCIA F · TRANSMISIÓN RECUPERADA</p><div className="terminal-dialog-title-row"><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2></div>
    <TransmissionPlayer audioRef={audio} source={`/los-archivos-f/audio/fede-terminal-${success?'exito':'inicio'}-v1.wav`} title="Mensaje de Federica" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setBlocked(true)}/>
+   <p className="terminal-dialog-message">{success?terminalSuccess:terminalIntro}</p>
    {blocked&&<small>Tocá reproducir para escuchar el mensaje. También podés leerlo.</small>}
+   <button className="primary-button terminal-dialog-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'COMENZAR LA MISIÓN'} →</button>
    </div>
   </div>
  </dialog>;

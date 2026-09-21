@@ -1513,6 +1513,13 @@ body:has(.level-three-story-dialog[open]) .topbar{
 .story-mission-objective{order:5!important}
 .terminal-dialog-copy>small{order:6!important}
 .terminal-dialog-action,.story-dialog-title-row .primary-button{order:7!important}
+.level-two-success-copy>.primary-button,
+.level-three-story-copy>.primary-button{
+  order:7!important;
+  align-self:flex-start!important;
+  margin-top:28px!important;
+  min-width:220px!important;
+}
 
 @media(max-width:700px),(orientation:portrait){
   body:has(.terminal-dialog[open]) .topbar,
