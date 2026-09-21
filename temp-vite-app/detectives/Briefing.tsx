@@ -10,7 +10,7 @@ const dossiers=[
  {title:'Los archivos',subtitle:'¿Dónde buscar las pistas?',icon:2,paragraphs:[2,3]},
  {title:'El juramento',subtitle:'¿Cuál es tu misión?',icon:8,paragraphs:[4,5,6]},
 ];
-const transmitterFrames=[1,2,3,4].map(frame=>`/los-archivos-f/images/federica-transmisor-frame-${frame}.png`);
+const transmitterFrames=[1,2,3,4,5,6].map(frame=>`/los-archivos-f/images/federica-transmisor-frame-${frame}.png`);
 export default function Briefing({agent,alreadyAccepted,onComplete}:{agent:string;alreadyAccepted:boolean;onComplete:()=>void}) {
  const [available,setAvailable]=useState(0);
  const [following,setFollowing]=useState(false);
