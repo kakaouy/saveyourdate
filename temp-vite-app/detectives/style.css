@@ -946,6 +946,19 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 }
 @media(prefers-reduced-motion:reduce){.terminal-lamp-chain-button{animation:none!important}}
 
+/* La acción sigue el flujo de lectura y permanece debajo del mensaje. */
+@media(min-width:900px) and (orientation:landscape){
+  .story-visual-action,
+  .level-two-success-copy>.primary-button,
+  .level-three-story-copy>.primary-button{
+    grid-column:2!important;
+    grid-row:6!important;
+    justify-self:start!important;
+    align-self:start!important;
+    margin:22px 0 0!important;
+  }
+}
+
 /* Movimiento ambiental por nivel. Las capas no alteran rostros ni revelan respuestas. */
 .fede-artwork,.level-two-group-scene,.scene-frame,.late-story-visual{isolation:isolate}
 .fede-artwork::before{content:'';position:absolute;z-index:4;inset:0;pointer-events:none;opacity:.65;transition:opacity .35s,filter .35s}
