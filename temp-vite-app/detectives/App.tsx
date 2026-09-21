@@ -27,7 +27,7 @@ const statements = [
 
 const levelVisuals = ['/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-hidden-corridor.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/nivel-6-sala-banderas-v1.png', '/los-archivos-f/images/lens-workshop.jpg'];
 const successVisuals = ['/los-archivos-f/images/bruno-storm.jpg', '/los-archivos-f/images/suspects-group.jpg', '/los-archivos-f/images/control-room.jpg', '/los-archivos-f/images/corridor-spoiler-418.jpg', '/los-archivos-f/images/martina-dark.jpg', '/los-archivos-f/images/lens-workshop.jpg', '/los-archivos-f/images/evidence-spread-spoiler.jpg'];
-const coartadaFrames=[1,2,3,4].map(frame=>`/los-archivos-f/images/federica-nivel-1-ventana-${frame}.png`);
+const coartadaFrames=[1,2,3,4,5].map(frame=>`/los-archivos-f/images/federica-coartadas-frame-${frame}.png`);
 const servilletaFrames=[1,2,3,4,5,6,7,8].map(frame=>`/los-archivos-f/images/federica-servilleta-frame-${frame}.png`);
 
 function SimulatedPlayer({label,onPlaying}:{label:string;onPlaying?:(value:boolean)=>void}){
@@ -41,9 +41,8 @@ function FedeArtwork({src,alt,playing,variant,children}:{src:string;alt:string;p
 }
 
 function CoartadaArtwork(){
-  return <div className="fede-artwork level-2-success coartada-story-frames" role="img" aria-label="Federica sostiene la carpeta de evidencias frente a la ventana del faro">
+  return <div className="fede-artwork level-2-success coartada-story-frames" role="img" aria-label="Federica presenta las coartadas mientras la lluvia cae sobre el museo y los monitores parpadean">
     {coartadaFrames.map((src,index)=><img className={`coartada-story-frame coartada-story-frame-${index}`} src={src} alt="" aria-hidden="true" key={src}/>)}
-    <span className="coartada-lighthouse-beam" aria-hidden="true"/><span className="coartada-lighthouse-lamp" aria-hidden="true"/>
   </div>;
 }
 
