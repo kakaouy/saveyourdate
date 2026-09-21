@@ -1960,12 +1960,12 @@ body:has(.terminal-dialog[open]),body:has(.level-two-success-dialog[open]),body:
 
 /* Nivel 3: secuencia fotográfica de tormenta, relámpagos ambientales y faro. */
 .scene-frame.level-three-weather{position:relative;isolation:isolate;aspect-ratio:1800/1013;background:#06131b}
-.scene-frame.level-three-weather>.storm-frame{position:absolute!important;z-index:0;inset:0;width:100%!important;height:100%!important;object-fit:cover!important;opacity:0;animation:level-three-storm-frames 12s linear infinite;will-change:opacity,transform}
+.scene-frame.level-three-weather>.storm-frame{position:absolute!important;z-index:0;inset:0;width:100%!important;height:100%!important;object-fit:cover!important;opacity:0;animation:level-three-storm-frames 6.4s linear infinite;will-change:opacity,transform}
 .scene-frame.level-three-weather>.storm-frame-0{animation-delay:0s}
-.scene-frame.level-three-weather>.storm-frame-1{animation-delay:-9s}
-.scene-frame.level-three-weather>.storm-frame-2{animation-delay:-6s}
-.scene-frame.level-three-weather>.storm-frame-3{animation-delay:-3s}
-.scene-frame.level-three-weather>.scene-lightning-flash{position:absolute;z-index:2;inset:0;pointer-events:none;background:radial-gradient(circle at 70% 17%,#e5f4ffb8 0,transparent 22%),linear-gradient(105deg,#d9efff55,transparent 52%);mix-blend-mode:screen;opacity:0;animation:level-three-room-flash 12s steps(1,end) infinite}
+.scene-frame.level-three-weather>.storm-frame-1{animation-delay:-4.8s}
+.scene-frame.level-three-weather>.storm-frame-2{animation-delay:-3.2s}
+.scene-frame.level-three-weather>.storm-frame-3{animation-delay:-1.6s}
+.scene-frame.level-three-weather>.scene-lightning-flash{position:absolute;z-index:2;inset:0;pointer-events:none;background:radial-gradient(circle at 70% 17%,#e5f4ffb8 0,transparent 22%),linear-gradient(105deg,#d9efff55,transparent 52%);mix-blend-mode:screen;opacity:0;animation:level-three-room-flash 6.4s steps(1,end) infinite}
 .scene-frame.level-three-weather>.scene-lighthouse-beam{z-index:3!important;left:29%!important;top:25%!important;width:58%!important;height:18%!important;background:linear-gradient(90deg,transparent,#d9eeff32 55%,#fff2bd99)!important;clip-path:polygon(0 0,100% 48%,100% 52%,0 100%)!important;transform-origin:100% 50%!important;animation:level-three-lighthouse-sweep 6.8s ease-in-out infinite alternate!important}
 .scene-frame.level-three-weather>span{z-index:5!important}
 @keyframes level-three-storm-frames{0%,21%{opacity:1;transform:scale(1)}25%,96%{opacity:0;transform:scale(1.006)}100%{opacity:1;transform:scale(1)}}
@@ -1999,13 +1999,13 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
 .fede-artwork.level-1-intro>.level-one-window-frame{
   position:absolute!important;z-index:0!important;inset:0!important;
   width:100%!important;height:100%!important;object-fit:cover!important;
-  opacity:0;animation:level-one-window-frames 14s linear infinite!important;
+  opacity:0;animation:level-one-window-frames 6.4s linear infinite!important;
   will-change:opacity,transform
 }
 .fede-artwork.level-1-intro>.level-one-window-frame-0{animation-delay:0s!important}
-.fede-artwork.level-1-intro>.level-one-window-frame-1{animation-delay:-10.5s!important}
-.fede-artwork.level-1-intro>.level-one-window-frame-2{animation-delay:-7s!important}
-.fede-artwork.level-1-intro>.level-one-window-frame-3{animation-delay:-3.5s!important}
+.fede-artwork.level-1-intro>.level-one-window-frame-1{animation-delay:-4.8s!important}
+.fede-artwork.level-1-intro>.level-one-window-frame-2{animation-delay:-3.2s!important}
+.fede-artwork.level-1-intro>.level-one-window-frame-3{animation-delay:-1.6s!important}
 @keyframes level-one-window-frames{
   0%,20%{opacity:1;transform:scale(1)}
   25%,95%{opacity:0;transform:scale(1.004)}
