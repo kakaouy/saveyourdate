@@ -1122,6 +1122,38 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   }
 }
 
+/* Cámara de expedientes en pantallas anchas: bienvenida a la izquierda y
+   catálogo a la derecha. En vertical se conserva el flujo original. */
+@media(min-width:1100px) and (orientation:landscape){
+  .library-page{
+    display:grid!important;
+    grid-template-columns:minmax(350px,.78fr) minmax(680px,1.42fr)!important;
+    align-items:start!important;
+    column-gap:clamp(42px,5vw,96px)!important;
+    padding-left:clamp(48px,6vw,120px)!important;
+    padding-right:clamp(48px,6vw,120px)!important;
+  }
+  .library-intro{
+    min-width:0;
+    padding-top:clamp(42px,8vh,110px);
+  }
+  .library-page .page-heading{max-width:620px!important}
+  .library-page .case-grid{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:18px!important;
+    width:100%!important;
+    margin-top:clamp(34px,6vh,78px)!important;
+  }
+  .library-page .case-card.active{
+    grid-column:1/-1!important;
+    min-height:480px;
+  }
+  .library-page .case-card.locked{
+    grid-column:auto!important;
+    min-height:280px;
+  }
+}
+
 /* Modal de Fede: se conserva el escenario oscurecido y existe una sola
    superficie de desplazamiento, siempre pegada al borde de la ventana. */
 html,body{overflow-x:hidden}
