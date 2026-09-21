@@ -24,8 +24,8 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
    <TransmissionPlayer audioRef={audio} source={`/los-archivos-f/audio/fede-terminal-${success?'exito':'inicio'}-v1.wav`} title="Mensaje de Federica" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setBlocked(true)}/>
    <p className="terminal-dialog-message">{success?terminalSuccess:terminalIntro}</p>
    {blocked&&<small>Tocá reproducir para escuchar el mensaje. También podés leerlo.</small>}
-   <button className="primary-button terminal-dialog-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'COMENZAR LA MISIÓN'} →</button>
    </div>
+   <button className="primary-button terminal-dialog-action story-visual-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'COMENZAR LA MISIÓN'} →</button>
   </div>
  </dialog>;
 }
