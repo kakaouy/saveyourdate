@@ -1156,6 +1156,24 @@ body:has(.level-three-story-dialog[open]){
 .level-three-story-copy .transmission-label{
   display:none!important;
 }
+
+/* El mensaje sustituye visualmente al contenido del nivel: solo permanece el
+   encabezado y, debajo, un único lienzo opaco del mismo color. */
+.terminal-dialog,
+.level-two-success-dialog,
+.level-three-story-dialog{
+  background:linear-gradient(to bottom,transparent 0 164px,#03131d 164px 100%)!important;
+}
+.story-dialog-close,
+.terminal-dialog-close{display:none!important}
+
+@media(max-width:700px),(orientation:portrait){
+  .terminal-dialog,
+  .level-two-success-dialog,
+  .level-three-story-dialog{
+    background:linear-gradient(to bottom,transparent 0 130px,#03131d 130px 100%)!important;
+  }
+}
 @media(prefers-reduced-motion:reduce){.terminal-dialog-visual::after{animation:none!important}}
 
 .story-mission-objective{margin:18px 0 4px;padding:15px 17px;border-left:3px solid #68d0d0;background:#051820;color:#efe6d3}
