@@ -1121,6 +1121,41 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
     padding:clamp(20px,5vw,34px)!important;
   }
 }
+
+/* Modal de Fede: se conserva el escenario oscurecido y existe una sola
+   superficie de desplazamiento, siempre pegada al borde de la ventana. */
+html,body{overflow-x:hidden}
+body:has(.terminal-dialog[open]),
+body:has(.level-two-success-dialog[open]),
+body:has(.level-three-story-dialog[open]){
+  overflow:hidden!important;
+}
+.terminal-dialog,
+.level-two-success-dialog,
+.level-three-story-dialog{
+  position:fixed!important;
+  inset:0!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  margin:0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  background:linear-gradient(rgba(3,19,29,.84),rgba(3,19,29,.84))!important;
+}
+.terminal-dialog::backdrop,
+.level-two-success-dialog::backdrop,
+.level-three-story-dialog::backdrop{
+  background:transparent!important;
+}
+.terminal-dialog-copy .transmission-label,
+.level-two-success-copy .transmission-label,
+.level-three-story-copy .transmission-label{
+  display:none!important;
+}
 @media(prefers-reduced-motion:reduce){.terminal-dialog-visual::after{animation:none!important}}
 
 .story-mission-objective{margin:18px 0 4px;padding:15px 17px;border-left:3px solid #68d0d0;background:#051820;color:#efe6d3}
