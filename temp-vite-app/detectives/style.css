@@ -2116,3 +2116,20 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
   .federica-scene-visual.transmitter-story-frames .lighthouse-beam,
   .federica-scene-visual.transmitter-story-frames .briefing-lantern-glow{animation:none!important}
 }
+
+/* Acción de cada mensaje: siempre visible en el encabezado propio de la página,
+   sin depender del largo del texto ni del desplazamiento vertical. */
+html:has(.story-page-view),body:has(.story-page-view){height:auto!important;min-height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important}
+.site-shell:has(.story-page-view),.site-shell:has(.story-page-view) .app-controls{height:auto!important;min-height:100dvh!important;overflow:visible!important}
+.story-page-view .story-page-action{
+  position:fixed!important;z-index:10040!important;top:clamp(22px,3vw,42px)!important;right:clamp(20px,4vw,68px)!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  min-width:min(270px,34vw)!important;margin:0!important;padding:16px 22px!important;
+  white-space:nowrap!important;box-shadow:0 12px 30px #0008!important
+}
+@media(max-width:700px),(orientation:portrait){
+  .story-page-view .story-page-action{
+    top:18px!important;right:12px!important;min-width:0!important;max-width:52vw!important;
+    padding:12px 14px!important;font-size:9px!important;letter-spacing:.08em!important
+  }
+}

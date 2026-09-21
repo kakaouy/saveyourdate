@@ -22,7 +22,7 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
    <p className="terminal-dialog-message">{success?terminalSuccess:terminalIntro}</p>
    {blocked&&<small>Tocá reproducir para escuchar el mensaje. También podés leerlo.</small>}
    </div>
-   <button className="primary-button terminal-dialog-action story-visual-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'COMENZAR LA MISIÓN'} →</button>
+   <button className="primary-button terminal-dialog-action story-visual-action story-page-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'COMENZAR LA MISIÓN'} →</button>
   </div>
  </section>;
 }
