@@ -48,6 +48,8 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
    timer.current=setTimeout(()=>{setLighting(false);setSuccess(true);},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:900);
   }else{submitted.current=false;input.current?.focus();}
  }
+ if(intro)return <FedeTransmission success={false} onClose={()=>{setIntro(false);requestAnimationFrame(()=>input.current?.focus());}}/>;
+ if(success)return <FedeTransmission success onClose={()=>{setSuccess(false);onContinue();}}/>;
  return <section className="terminal-level">
   <div className="terminal-heading"><p className="eyebrow">NIVEL 1 · ARCHIVO F-01</p></div>
   <div className={`terminal-scene ${powered?'terminal-powered':'terminal-off'} ${lighting?'terminal-illuminated':''}`}>
@@ -64,7 +66,5 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
   {message&&!unlocked&&<p className="terminal-error" role="status">{message}</p>}
   {unlocked&&!lighting&&<button className="primary-button" onClick={onContinue}>CONTINUAR LA INVESTIGACIÓN →</button>}
   <LevelSideTabs level={1} prompt="Ingresá el código de 4 cifras que permite cerrar esta parte de la investigación." placeholder="Código de 4 cifras" answer={answer} busy={busy||lighting} unlocked={unlocked} canUnlock={!unlocked} message={message} missionMessageOpen={intro||success} onAnswer={setAnswer} onReplay={()=>setIntro(true)} onUnlock={submit}/>
-  {intro&&<FedeTransmission success={false} onClose={()=>{setIntro(false);requestAnimationFrame(()=>input.current?.focus());}}/>}
-  {success&&<FedeTransmission success onClose={()=>{setSuccess(false);onContinue();}}/>}
  </section>;
 }

@@ -1987,3 +1987,38 @@ body:has(.level-two-success-dialog[open]) .topbar,
 body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
 .terminal-dialog::backdrop,.level-two-success-dialog::backdrop,.level-three-story-dialog::backdrop{background:linear-gradient(to bottom,transparent 0 164px,#03131d 164px 100%)!important}
 @media(max-width:600px){.terminal-dialog::backdrop,.level-two-success-dialog::backdrop,.level-three-story-dialog::backdrop{background:linear-gradient(to bottom,transparent 0 130px,#03131d 130px 100%)!important}}
+
+/* Los mensajes son páginas completas: el juego se desmonta mientras están
+   abiertos y la superficie del mensaje cubre todo lo que queda bajo el logo. */
+.site-shell.story-page-active{min-height:100dvh;background:#03131d!important}
+.site-shell.story-page-active .topbar{background:#03131d!important}
+
+/* Nivel 1: cuatro fotogramas reales para que mar, lluvia y luz exterior tengan
+   movimiento sin agregar una capa de lluvia artificial sobre Federica. */
+.fede-artwork.level-1-intro{position:relative;isolation:isolate;background:#06131b}
+.fede-artwork.level-1-intro>.level-one-window-frame{
+  position:absolute!important;z-index:0!important;inset:0!important;
+  width:100%!important;height:100%!important;object-fit:cover!important;
+  opacity:0;animation:level-one-window-frames 14s linear infinite!important;
+  will-change:opacity,transform
+}
+.fede-artwork.level-1-intro>.level-one-window-frame-0{animation-delay:0s!important}
+.fede-artwork.level-1-intro>.level-one-window-frame-1{animation-delay:-10.5s!important}
+.fede-artwork.level-1-intro>.level-one-window-frame-2{animation-delay:-7s!important}
+.fede-artwork.level-1-intro>.level-one-window-frame-3{animation-delay:-3.5s!important}
+@keyframes level-one-window-frames{
+  0%,20%{opacity:1;transform:scale(1)}
+  25%,95%{opacity:0;transform:scale(1.004)}
+  100%{opacity:1;transform:scale(1)}
+}
+
+/* La escena principal del nivel 3 vuelve a ocupar el ancho del panel. */
+.game-page .scene-frame.level-three-weather{
+  width:100%!important;max-width:none!important;height:auto!important;
+  aspect-ratio:1800/1013!important
+}
+
+@media(prefers-reduced-motion:reduce){
+  .fede-artwork.level-1-intro>.level-one-window-frame{animation:none!important;opacity:0!important}
+  .fede-artwork.level-1-intro>.level-one-window-frame-0{opacity:1!important}
+}

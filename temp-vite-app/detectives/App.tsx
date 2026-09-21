@@ -361,8 +361,10 @@ export default function Home() {
     catch { /* Retry on the next user gesture if the browser blocks playback. */ }
   }
 
+  const storyPageOpen=Boolean(levelTwoIntro||levelTwoSuccess||levelThreeDialog||levelFourDialog||lateLevelDialog);
+
   return (
-    <main className="site-shell" aria-busy={busy}><fieldset className="app-controls" disabled={busy}>
+    <main className={`site-shell ${storyPageOpen?'story-page-active':''}`} aria-busy={busy}><fieldset className="app-controls" disabled={busy}>
       <nav className="topbar" aria-label="Navegación principal">
         <div className="header-identity">
           <button className="brand brand-button" onClick={() => setScreen('home')} aria-label="Ir al inicio"><img className="brand-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F"/></button>
@@ -386,7 +388,7 @@ export default function Home() {
         </div>
       </section>}
 
-      {screen === 'game' && <section className="game-page">
+      {screen === 'game' && !storyPageOpen && <section className="game-page">
         <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} elapsedSeconds={elapsedSeconds} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={requestHint}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onMission={()=>{setScreen('briefing');window.scrollTo(0,0);}} onLibrary={()=>{setScreen('library');window.scrollTo(0,0);}}/>
 
         <div className="investigation-panel">
