@@ -2022,3 +2022,53 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
   .fede-artwork.level-1-intro>.level-one-window-frame{animation:none!important;opacity:0!important}
   .fede-artwork.level-1-intro>.level-one-window-frame-0{opacity:1!important}
 }
+
+/* Vistas narrativas reales. Ya no son dialogs ni capas del top layer: ocupan
+   una rama exclusiva de la página y utilizan únicamente el scroll del body. */
+.story-page-view{
+  position:relative!important;inset:auto!important;box-sizing:border-box!important;
+  display:grid!important;width:100%!important;max-width:none!important;
+  min-height:100dvh!important;height:auto!important;max-height:none!important;
+  margin:0!important;padding:calc(164px + clamp(22px,3vw,46px)) clamp(22px,4vw,68px) clamp(34px,4vw,70px)!important;
+  border:0!important;border-radius:0!important;overflow:visible!important;
+  box-shadow:none!important;background-position:left 164px,center 164px!important;
+  background-size:100% calc(100% - 164px),cover!important;background-repeat:no-repeat!important
+}
+.terminal-dialog.story-page-view .terminal-dialog-layout,
+.level-two-success-dialog.story-page-view,
+.level-three-story-dialog.story-page-view{
+  width:100%!important;min-height:calc(100dvh - 164px - clamp(56px,7vw,116px))!important;
+  align-content:center!important
+}
+.terminal-dialog.story-page-view .terminal-dialog-layout{
+  display:grid!important;grid-template-columns:minmax(360px,46%) minmax(0,54%)!important;
+  column-gap:clamp(34px,4vw,70px)!important;margin:0 auto!important;max-width:1500px!important
+}
+.level-two-success-dialog.story-page-view,.level-three-story-dialog.story-page-view{
+  grid-template-columns:minmax(360px,46%) minmax(0,54%)!important;
+  column-gap:clamp(34px,4vw,70px)!important;margin:0 auto!important
+}
+.site-shell:has(.story-page-view) .music-button,
+.game-page:has(.story-page-view) .mission-toolbar{display:none!important}
+.game-page:has(.story-page-view){padding-top:0!important;background:#03131d!important}
+.game-page:has(.story-page-view)>.investigation-panel{
+  width:100%!important;max-width:none!important;min-height:100dvh!important;padding:0!important;background:#03131d!important
+}
+
+@media(max-width:899px),(orientation:portrait){
+  .story-page-view{
+    display:flex!important;flex-direction:column!important;
+    padding:calc(130px + 18px) 16px 36px!important;
+    background-position:left 130px,center 130px!important;
+    background-size:100% calc(100% - 130px),cover!important
+  }
+  .terminal-dialog.story-page-view .terminal-dialog-layout,
+  .level-two-success-dialog.story-page-view,
+  .level-three-story-dialog.story-page-view{
+    display:flex!important;flex-direction:column!important;width:100%!important;
+    min-height:calc(100dvh - 130px - 54px)!important;gap:24px!important;align-content:initial!important
+  }
+  .terminal-dialog-visual,.level-two-success-visual,.level-three-story-visual,.late-story-visual{
+    width:100%!important;height:auto!important;aspect-ratio:4/3!important;flex:0 0 auto!important
+  }
+}

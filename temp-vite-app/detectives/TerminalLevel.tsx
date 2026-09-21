@@ -5,17 +5,14 @@ import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {terminalIntro,terminalSuccess} from './terminal-script';
 
 function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) {
- const dialog=useRef<HTMLDialogElement>(null);
  const audio=useRef<HTMLAudioElement>(null);
  const [blocked,setBlocked]=useState(false);
  useEffect(()=>{
-  const previous=document.activeElement as HTMLElement|null;
-  const element=dialog.current; const player=audio.current;
-  element?.showModal();
+  const player=audio.current;
   void player?.play().catch(()=>setBlocked(true));
-  return ()=>{player?.pause();element?.close();previous?.focus();};
+  return ()=>{player?.pause();};
  },[]);
- return <dialog ref={dialog} className={`terminal-dialog terminal-dialog-${success?'success':'intro'}`} aria-labelledby="terminal-fede-title" onCancel={event=>event.preventDefault()}>
+ return <section className={`terminal-dialog story-page-view terminal-dialog-${success?'success':'intro'}`} aria-labelledby="terminal-fede-title">
   <div className="terminal-dialog-layout">
    <div className="terminal-dialog-visual">
     <FedericaPortrait audioRef={audio} kind={success?'success':'intro'}/>
@@ -27,7 +24,7 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
    </div>
    <button className="primary-button terminal-dialog-action story-visual-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'COMENZAR LA MISIÓN'} →</button>
   </div>
- </dialog>;
+ </section>;
 }
 export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue}:{unlocked:boolean;busy:boolean;message:string;onUnlock:(answer:string)=>Promise<boolean>;onContinue:()=>void}) {
  const [intro,setIntro]=useState(!unlocked);
