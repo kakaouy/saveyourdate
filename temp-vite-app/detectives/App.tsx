@@ -27,6 +27,7 @@ const statements = [
 
 const levelVisuals = ['/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-hidden-corridor.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/nivel-6-sala-banderas-v1.png', '/los-archivos-f/images/lens-workshop.jpg'];
 const successVisuals = ['/los-archivos-f/images/bruno-storm.jpg', '/los-archivos-f/images/suspects-group.jpg', '/los-archivos-f/images/control-room.jpg', '/los-archivos-f/images/corridor-spoiler-418.jpg', '/los-archivos-f/images/martina-dark.jpg', '/los-archivos-f/images/lens-workshop.jpg', '/los-archivos-f/images/evidence-spread-spoiler.jpg'];
+const coartadaFrames=[1,2,3,4].map(frame=>`/los-archivos-f/images/federica-nivel-1-ventana-${frame}.png`);
 
 function SimulatedPlayer({label,onPlaying}:{label:string;onPlaying?:(value:boolean)=>void}){
   const [playing,setPlaying]=useState(false);
@@ -38,9 +39,16 @@ function FedeArtwork({src,alt,playing,variant,children}:{src:string;alt:string;p
   return <div className={`fede-artwork ${variant}`}><img src={src} alt={alt}/><span className={`fede-mouth ${playing?'talking':''}`} aria-hidden="true"/><span className="fede-hair" aria-hidden="true"/>{children}</div>;
 }
 
+function CoartadaArtwork(){
+  return <div className="fede-artwork level-2-success coartada-story-frames" role="img" aria-label="Federica sostiene la carpeta de evidencias frente a la ventana del faro">
+    {coartadaFrames.map((src,index)=><img className={`coartada-story-frame coartada-story-frame-${index}`} src={src} alt="" aria-hidden="true" key={src}/>)}
+    <span className="coartada-lighthouse-beam" aria-hidden="true"/><span className="coartada-lighthouse-lamp" aria-hidden="true"/>
+  </div>;
+}
+
 function LevelTwoSuccessDialog({onContinue}:{onContinue:()=>void}){
-  const [playing,setPlaying]=useState(false);
-  return <section className="level-two-success-dialog story-page-view" aria-labelledby="level-two-success-title"><div className="level-two-success-visual"><FedeArtwork src="/los-archivos-f/images/federica-nivel-2-exito-v1.png" alt="Federica junto al reloj del museo" playing={playing} variant="level-2-success"><span className="unlock-beacon" aria-hidden="true"/></FedeArtwork></div><div className="level-two-success-copy"><p className="story-dialog-kicker">AGENCIA F · NIVEL DESBLOQUEADO</p><div className="story-dialog-title-row"><h2 id="level-two-success-title">Coartada verificada.</h2></div><SimulatedPlayer label="Mensaje final de Fede" onPlaying={setPlaying}/><p>Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.</p><button className="primary-button story-page-action" onClick={onContinue}>CONTINUAR AL NIVEL 3 <span>→</span></button></div></section>;
+  const [,setPlaying]=useState(false);
+  return <section className="level-two-success-dialog story-page-view" aria-labelledby="level-two-success-title"><div className="level-two-success-visual"><CoartadaArtwork/></div><div className="level-two-success-copy"><p className="story-dialog-kicker">AGENCIA F · NIVEL DESBLOQUEADO</p><div className="story-dialog-title-row"><h2 id="level-two-success-title">Coartada verificada.</h2></div><SimulatedPlayer label="Mensaje final de Fede" onPlaying={setPlaying}/><p>Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.</p><button className="primary-button story-page-action" onClick={onContinue}>CONTINUAR AL NIVEL 3 <span>→</span></button></div></section>;
 }
 
 function LevelTwoIntroDialog({onContinue}:{onContinue:()=>void}){

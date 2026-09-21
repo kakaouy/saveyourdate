@@ -1195,6 +1195,30 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   }
 }
 
+/* Mensaje final de las coartadas: fotogramas reales de ventana y farol,
+   acompañados solo por el barrido de la luz del faro. */
+.coartada-story-frames{position:relative!important;isolation:isolate!important;background:#06131b}
+.coartada-story-frames>.coartada-story-frame{
+  position:absolute!important;z-index:0!important;inset:0!important;
+  width:100%!important;height:100%!important;object-fit:cover!important;
+  opacity:0;animation:coartada-story-frames 5.6s linear infinite!important;
+  will-change:opacity,transform
+}
+.coartada-story-frames>.coartada-story-frame-0{animation-delay:0s!important}
+.coartada-story-frames>.coartada-story-frame-1{animation-delay:-4.2s!important}
+.coartada-story-frames>.coartada-story-frame-2{animation-delay:-2.8s!important}
+.coartada-story-frames>.coartada-story-frame-3{animation-delay:-1.4s!important}
+.coartada-lighthouse-beam{position:absolute!important;z-index:3!important;left:42.5%!important;top:10%!important;width:23%!important;height:16%!important;pointer-events:none;background:linear-gradient(90deg,#fff1b8a8,transparent 78%);clip-path:polygon(0 46%,100% 4%,100% 94%,0 55%);transform-origin:16% 55%;mix-blend-mode:screen;animation:coartada-lighthouse-sweep 5.6s ease-in-out infinite alternate!important}
+.coartada-lighthouse-lamp{position:absolute!important;z-index:4!important;left:46.1%!important;top:17%!important;width:2.1%!important;aspect-ratio:1;border-radius:50%;pointer-events:none;background:#fff2ba;box-shadow:0 0 8px 3px #ffe5a7a6,0 0 21px 8px #ffd76f45;mix-blend-mode:screen;animation:coartada-lighthouse-glow 2.8s ease-in-out infinite!important}
+@keyframes coartada-story-frames{0%,20%{opacity:1;transform:scale(1)}25%,95%{opacity:0;transform:scale(1.003)}100%{opacity:1;transform:scale(1)}}
+@keyframes coartada-lighthouse-sweep{from{transform:rotate(-7deg);opacity:.28}45%{opacity:.9}to{transform:rotate(8deg);opacity:.38}}
+@keyframes coartada-lighthouse-glow{0%,100%{opacity:.52;filter:brightness(.9)}50%{opacity:1;filter:brightness(1.35)}}
+@media(prefers-reduced-motion:reduce){
+  .coartada-story-frames>.coartada-story-frame{animation:none!important;opacity:0!important}
+  .coartada-story-frames>.coartada-story-frame-0{opacity:1!important}
+  .coartada-lighthouse-beam,.coartada-lighthouse-lamp{animation:none!important}
+}
+
 /* Transmisiones contextuales: la escena ocupa todo el lienzo inferior y la
    imagen de Federica comienza a la misma altura que el subtítulo. */
 .terminal-dialog,
