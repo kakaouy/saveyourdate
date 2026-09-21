@@ -1833,3 +1833,34 @@ body:has(.level-three-story-dialog[open]) .topbar{
 @media(prefers-reduced-motion:reduce){
   .terminal-powered .terminal-screen,.terminal-powered .terminal-scanlines,.terminal-power-button,.terminal-lamp-pulse,.terminal-command-cursor{animation:none!important}
 }
+
+/* Los mensajes sustituyen visualmente al nivel: debajo del encabezado no se
+   transparentan cards, solapas ni textos de la pantalla anterior. */
+.terminal-dialog::backdrop,
+.level-two-success-dialog::backdrop,
+.level-three-story-dialog::backdrop{
+  background:linear-gradient(to bottom,transparent 0 164px,#03131d 164px 100%)!important;
+  backdrop-filter:none!important;
+}
+.terminal-dialog{
+  background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/bg-security-room.png')!important;
+}
+.level-two-success-dialog{
+  background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/suspects-group.jpg')!important;
+}
+.level-three-story-dialog{
+  background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/control-room.jpg')!important;
+}
+.level-four-story-dialog{
+  background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/nivel-4-sala-planos-v1.png')!important;
+}
+.late-level-5{background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/bg-hidden-corridor.png')!important}
+.late-level-6{background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/nivel-6-sala-banderas-v1.png')!important}
+.late-level-7{background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/lens-workshop.jpg')!important}
+@media(max-width:700px),(orientation:portrait){
+  .terminal-dialog::backdrop,
+  .level-two-success-dialog::backdrop,
+  .level-three-story-dialog::backdrop{
+    background:linear-gradient(to bottom,transparent 0 130px,#03131d 130px 100%)!important;
+  }
+}
