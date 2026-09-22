@@ -2176,6 +2176,22 @@ html:has(.story-page-view),body:has(.story-page-view){height:auto!important;min-
   align-items:center!important;
   column-gap:clamp(28px,4vw,72px)!important;
 }
+
+/* Secuencias generadas desde los fotogramas de Fede, con alternativa fija
+   para quienes prefieren reducir movimiento. */
+.fede-artwork>.fede-artwork-loop{
+  position:absolute!important;
+  inset:0!important;
+  z-index:0!important;
+  display:block!important;
+}
+.fede-artwork>.fede-artwork-loop>img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
 .terminal-dialog.story-page-view .terminal-dialog-layout{display:contents!important}
 .story-page-view .terminal-dialog-visual,
 .story-page-view .level-two-success-visual,
