@@ -2167,3 +2167,108 @@ html:has(.story-page-view),body:has(.story-page-view){height:auto!important;min-
     padding:12px 14px!important;font-size:9px!important;letter-spacing:.08em!important
   }
 }
+
+/* Plantilla única para cada mensaje de Fede: retrato + informe.
+   En horizontal conviven en dos columnas; en vertical se apilan sin cambiar
+   el orden de lectura ni recortar la interfaz. */
+.story-page-view{
+  grid-template-columns:minmax(280px,4fr) minmax(0,5fr)!important;
+  align-items:center!important;
+  column-gap:clamp(28px,4vw,72px)!important;
+}
+.terminal-dialog.story-page-view .terminal-dialog-layout{display:contents!important}
+.story-page-view .terminal-dialog-visual,
+.story-page-view .level-two-success-visual,
+.story-page-view .level-three-story-visual,
+.story-page-view .late-story-visual{
+  grid-column:1!important;grid-row:1!important;
+  width:100%!important;max-width:620px!important;aspect-ratio:4/5!important;
+  height:auto!important;max-height:min(72dvh,760px)!important;
+  justify-self:center!important;align-self:center!important;
+  overflow:hidden!important;border:1px solid #bd9a56!important;border-radius:8px!important;
+  background:#061923!important;box-shadow:0 20px 60px #0009!important;
+}
+.story-page-view .terminal-dialog-visual .federica-story-scene,
+.story-page-view .terminal-dialog-visual .fede-artwork,
+.story-page-view .level-two-success-visual>.fede-artwork,
+.story-page-view .level-three-story-visual>.fede-artwork{
+  width:100%!important;height:100%!important;min-height:0!important;
+  margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+}
+.story-page-view .terminal-dialog-visual img,
+.story-page-view .level-two-success-visual img,
+.story-page-view .level-three-story-visual img{
+  width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;
+}
+.story-page-view .terminal-dialog-copy,
+.story-page-view .level-two-success-copy,
+.story-page-view .level-three-story-copy{
+  grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;
+  align-self:center!important;justify-content:center!important;min-width:0!important;
+  min-height:min(52dvh,620px)!important;padding:clamp(28px,4vw,64px)!important;
+  background:linear-gradient(135deg,#051a26f2,#06131de8)!important;
+  box-sizing:border-box!important;box-shadow:0 20px 55px #0005!important;
+}
+.story-page-view .terminal-dialog-kicker,
+.story-page-view .story-dialog-kicker{position:static!important;margin:0 0 18px!important}
+.story-page-view .terminal-dialog-title-row,
+.story-page-view .story-dialog-title-row{display:block!important;margin:0!important}
+.story-page-view .terminal-dialog-title-row h2,
+.story-page-view .story-dialog-title-row h2{margin:0 0 22px!important}
+.story-page-view .terminal-dialog-message,
+.story-page-view .level-two-success-copy>p:not(.story-dialog-kicker),
+.story-page-view .level-three-story-copy>p:not(.story-dialog-kicker){max-width:38rem!important}
+
+@media(max-width:899px),(orientation:portrait){
+  .story-page-view{display:flex!important;flex-direction:column!important;gap:0!important;align-items:stretch!important}
+  .story-page-view .terminal-dialog-visual,
+  .story-page-view .level-two-success-visual,
+  .story-page-view .level-three-story-visual,
+  .story-page-view .late-story-visual{
+    order:1!important;width:100%!important;max-width:none!important;aspect-ratio:4/5!important;
+    max-height:none!important;align-self:auto!important;flex:0 0 auto!important;
+  }
+  .story-page-view .terminal-dialog-copy,
+  .story-page-view .level-two-success-copy,
+  .story-page-view .level-three-story-copy{
+    order:2!important;width:100%!important;min-height:0!important;padding:28px 16px 36px!important;
+    box-shadow:none!important;
+  }
+}
+
+/* Las orientaciones que aparecen durante el juego usan exactamente la misma
+   lectura editorial, aun cuando se abren como un diálogo. */
+body:has(.federica-feedback[open]){overflow:hidden!important}
+.federica-feedback[open]{
+  position:fixed!important;inset:164px 0 0!important;width:100vw!important;max-width:none!important;
+  height:calc(100dvh - 164px)!important;max-height:none!important;margin:0!important;
+  padding:clamp(22px,3vw,46px)!important;border:0!important;border-radius:0!important;
+  overflow-y:auto!important;background:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/suspects-group.jpg') center/cover!important;
+}
+.federica-feedback::backdrop{background:linear-gradient(to bottom,transparent 0 164px,#03131d 164px 100%)!important}
+.federica-feedback[open] .federica-coach-layout{
+  display:grid!important;grid-template-columns:minmax(280px,4fr) minmax(0,5fr)!important;
+  gap:clamp(28px,4vw,72px)!important;align-items:center!important;width:min(1420px,100%)!important;
+  min-height:100%!important;margin:0 auto!important;
+}
+.federica-feedback[open] .federica-coach-cutout{
+  grid-column:1!important;width:100%!important;max-width:620px!important;aspect-ratio:4/5!important;
+  height:auto!important;max-height:min(72dvh,760px)!important;justify-self:center!important;
+  object-fit:cover!important;object-position:center!important;padding:0!important;border:1px solid #bd9a56!important;
+  border-radius:8px!important;background:#061923!important;box-shadow:0 20px 60px #0009!important;
+}
+.federica-feedback[open] .federica-speech{
+  grid-column:2!important;display:flex!important;flex-direction:column!important;justify-content:center!important;
+  min-height:min(52dvh,620px)!important;margin:0!important;padding:clamp(28px,4vw,64px)!important;
+  background:linear-gradient(135deg,#051a26f2,#06131de8)!important;border-radius:0!important;box-shadow:0 20px 55px #0005!important;
+}
+.federica-feedback[open] .coach-close{display:none!important}
+.federica-feedback[open] .coach-action{position:fixed!important;z-index:10040!important;top:clamp(22px,3vw,42px)!important;right:clamp(20px,4vw,68px)!important;margin:0!important}
+@media(max-width:899px),(orientation:portrait){
+  .federica-feedback[open]{inset:130px 0 0!important;height:calc(100dvh - 130px)!important;padding:18px 16px 36px!important}
+  .federica-feedback::backdrop{background:linear-gradient(to bottom,transparent 0 130px,#03131d 130px 100%)!important}
+  .federica-feedback[open] .federica-coach-layout{display:flex!important;flex-direction:column!important;gap:0!important}
+  .federica-feedback[open] .federica-coach-cutout{width:100%!important;max-width:none!important;aspect-ratio:4/5!important;max-height:none!important}
+  .federica-feedback[open] .federica-speech{width:100%!important;min-height:0!important;padding:28px 16px 36px!important;box-sizing:border-box!important;box-shadow:none!important}
+  .federica-feedback[open] .coach-action{top:18px!important;right:12px!important;max-width:52vw!important;padding:12px 14px!important;font-size:9px!important;letter-spacing:.08em!important}
+}

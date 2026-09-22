@@ -24,7 +24,7 @@ export default function FedericaFeedback({ suspect, onClose }: { suspect: AlibiN
         <audio controls preload="none" src={`/los-archivos-f/audio/federica-ayuda-${feedback.id}.wav`} aria-label="Escuchar la orientación de Federica" />
         <small>Voz sintética provisoria · También podés leer el mensaje.</small>
         <p className="coach-progress">Tu progreso sigue guardado. Esta orientación no consume pistas.</p>
-        <button className="primary-button" onClick={onClose} autoFocus>VOLVER A REVISAR LAS COARTADAS <span>↗</span></button>
+        <button className="primary-button story-page-action coach-action" onClick={onClose} autoFocus>VOLVER A REVISAR LAS COARTADAS <span>↗</span></button>
       </div>
     </div>
   </dialog>;
