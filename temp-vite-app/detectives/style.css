@@ -2078,24 +2078,10 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
 .site-shell.story-page-active{min-height:100dvh;background:#03131d!important}
 .site-shell.story-page-active .topbar{background:#03131d!important}
 
-/* Nivel 1: cuatro fotogramas reales para que mar, lluvia y luz exterior tengan
-   movimiento sin agregar una capa de lluvia artificial sobre Federica. */
+/* Nivel 1: un loop continuo con los veinte fotogramas de Fede, la tormenta y el faro. */
 .fede-artwork.level-1-intro{position:relative;isolation:isolate;background:#06131b}
-.fede-artwork.level-1-intro>.level-one-window-frame{
-  position:absolute!important;z-index:0!important;inset:0!important;
-  width:100%!important;height:100%!important;object-fit:cover!important;
-  opacity:0;animation:level-one-window-frames 6.4s linear infinite!important;
-  will-change:opacity,transform
-}
-.fede-artwork.level-1-intro>.level-one-window-frame-0{animation-delay:0s!important}
-.fede-artwork.level-1-intro>.level-one-window-frame-1{animation-delay:-4.8s!important}
-.fede-artwork.level-1-intro>.level-one-window-frame-2{animation-delay:-3.2s!important}
-.fede-artwork.level-1-intro>.level-one-window-frame-3{animation-delay:-1.6s!important}
-@keyframes level-one-window-frames{
-  0%{opacity:0}
-  8%,25%{opacity:1}
-  35%,100%{opacity:0}
-}
+.fede-artwork.level-1-intro>.level-one-intro-loop{position:absolute!important;z-index:0!important;inset:0!important;display:block!important}
+.fede-artwork.level-1-intro>.level-one-intro-loop>img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}
 
 /* La escena principal del nivel 3 vuelve a ocupar el ancho del panel. */
 .game-page .scene-frame.level-three-weather{
@@ -2103,10 +2089,6 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
   aspect-ratio:1800/1013!important
 }
 
-@media(prefers-reduced-motion:reduce){
-  .fede-artwork.level-1-intro>.level-one-window-frame{animation:none!important;opacity:0!important}
-  .fede-artwork.level-1-intro>.level-one-window-frame-0{opacity:1!important}
-}
 
 /* Vistas narrativas reales. Ya no son dialogs ni capas del top layer: ocupan
    una rama exclusiva de la página y utilizan únicamente el scroll del body. */
