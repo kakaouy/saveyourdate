@@ -2257,3 +2257,8 @@ body:has(.federica-feedback[open]){overflow:hidden!important}
 @keyframes plan-piece-lock{from{filter:brightness(1.8)}to{filter:brightness(1)}}
 @media(max-width:760px){.plan-fragments{gap:12px}.plan-piece-label{font-size:7px;letter-spacing:.06em}.plan-reconstruction-reveal{gap:12px;padding:18px 14px}.plan-reconstruction-check{flex-basis:36px;width:36px;height:36px;font-size:22px}}
 @media(prefers-reduced-motion:reduce){.plan-reconstruction-reveal,.complex-plan .plan-hole.is-placed{animation:none}.plan-hole-piece,.plan-fragment-visual,.plan-fragments .plan-fragment-card{transition:none}}
+
+/* El mensaje final del nivel 4 recorre en bucle los diez fotogramas de Fede. */
+.fede-artwork-frame-sequence>img{position:absolute;inset:0;opacity:0;animation:fede-level-four-final-loop 5.5s steps(1,end) infinite}
+@keyframes fede-level-four-final-loop{0%,9.99%{opacity:1}10%,100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.fede-artwork-frame-sequence>img{animation:none}.fede-artwork-frame-sequence>img:first-child{opacity:1}}
