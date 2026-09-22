@@ -1195,30 +1195,6 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   }
 }
 
-/* Mensaje final de las coartadas: fotogramas reales de lluvia, monitores y luces.
-   Todos conservan el mismo encuadre para que Fede permanezca fija. */
-.coartada-story-frames{position:relative!important;isolation:isolate!important;background:#06131b}
-.coartada-story-frames>.coartada-story-frame{
-  position:absolute!important;z-index:0!important;inset:0!important;
-  width:100%!important;height:100%!important;object-fit:cover!important;
-  opacity:0;animation:coartada-story-frames 5s linear infinite!important;
-  will-change:opacity,transform
-}
-.coartada-story-frames>.coartada-story-frame-0{animation-delay:0s!important}
-.coartada-story-frames>.coartada-story-frame-1{animation-delay:-4s!important}
-.coartada-story-frames>.coartada-story-frame-2{animation-delay:-3s!important}
-.coartada-story-frames>.coartada-story-frame-3{animation-delay:-2s!important}
-.coartada-story-frames>.coartada-story-frame-4{animation-delay:-1s!important}
-@keyframes coartada-story-frames{
-  0%{opacity:0}
-  8%,20%{opacity:1}
-  30%,100%{opacity:0}
-}
-@media(prefers-reduced-motion:reduce){
-  .coartada-story-frames>.coartada-story-frame{animation:none!important;opacity:0!important}
-.coartada-story-frames>.coartada-story-frame-0{opacity:1!important}
-}
-
 /* Mensaje final del nivel 3: los seis fotogramas muestran lluvia, olas,
    barrido del faro y actividad real del transmisor, sin capas sobre la imagen. */
 .receiver-story-frames{position:relative!important;isolation:isolate!important;background:#06131b}

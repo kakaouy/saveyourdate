@@ -27,7 +27,6 @@ const statements = [
 
 const levelVisuals = ['/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-hidden-corridor.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/nivel-6-sala-banderas-v1.png', '/los-archivos-f/images/lens-workshop.jpg'];
 const successVisuals = ['/los-archivos-f/images/bruno-storm.jpg', '/los-archivos-f/images/suspects-group.jpg', '/los-archivos-f/images/control-room.jpg', '/los-archivos-f/images/corridor-spoiler-418.jpg', '/los-archivos-f/images/martina-dark.jpg', '/los-archivos-f/images/lens-workshop.jpg', '/los-archivos-f/images/evidence-spread-spoiler.jpg'];
-const coartadaFrames=[1,2,3,4,5].map(frame=>`/los-archivos-f/images/federica-coartadas-frame-${frame}.png`);
 const servilletaFrames=[1,2,3,4,5,6,7,8].map(frame=>`/los-archivos-f/images/federica-servilleta-frame-${frame}.png`);
 const receiverFrames=[1,2,3,4,5,6].map(frame=>`/los-archivos-f/images/federica-receptor-frame-${frame}.png`);
 
@@ -40,12 +39,6 @@ function SimulatedPlayer({label,onPlaying}:{label:string;onPlaying?:(value:boole
 function FedeArtwork({src,alt,playing,variant,children,staticSrc}:{src:string;alt:string;playing:boolean;variant:string;children?:ReactNode;staticSrc?:string}){
   const isSequence=Boolean(staticSrc);
   return <div className={`fede-artwork ${variant}`}>{staticSrc?<picture className="fede-artwork-loop"><source media="(prefers-reduced-motion: reduce)" srcSet={staticSrc}/><img src={src} alt={alt}/></picture>:<img src={src} alt={alt}/>} {!isSequence&&<><span className={`fede-mouth ${playing?'talking':''}`} aria-hidden="true"/><span className="fede-hair" aria-hidden="true"/></>}{children}</div>;
-}
-
-function CoartadaArtwork(){
-  return <div className="fede-artwork level-2-success coartada-story-frames" role="img" aria-label="Federica presenta las coartadas mientras la lluvia cae sobre el museo y los monitores parpadean">
-    {coartadaFrames.map((src,index)=><img className={`coartada-story-frame coartada-story-frame-${index}`} src={src} alt="" aria-hidden="true" key={src}/>)}
-  </div>;
 }
 
 function ServilletaArtwork(){
@@ -62,8 +55,8 @@ function ReceiverArtwork(){
 }
 
 function LevelTwoSuccessDialog({onContinue}:{onContinue:()=>void}){
-  const [,setPlaying]=useState(false);
-  return <section className="level-two-success-dialog story-page-view" aria-labelledby="level-two-success-title"><div className="level-two-success-visual"><CoartadaArtwork/></div><div className="level-two-success-copy"><p className="story-dialog-kicker">AGENCIA F · NIVEL DESBLOQUEADO</p><div className="story-dialog-title-row"><h2 id="level-two-success-title">Coartada verificada.</h2></div><SimulatedPlayer label="Mensaje final de Fede" onPlaying={setPlaying}/><p>Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.</p><button className="primary-button story-page-action" onClick={onContinue}>CONTINUAR AL NIVEL 3 <span>→</span></button></div></section>;
+  const [playing,setPlaying]=useState(false);
+  return <section className="level-two-success-dialog story-page-view" aria-labelledby="level-two-success-title"><div className="level-two-success-visual"><FedeArtwork src="/los-archivos-f/images/federica-nivel-2-final-loop.webp" staticSrc="/los-archivos-f/images/federica-nivel-2-final-frame-1.webp" alt="Federica presenta el resultado de las coartadas frente al tablero de sospechosos" playing={playing} variant="level-2-success"/></div><div className="level-two-success-copy"><p className="story-dialog-kicker">AGENCIA F · NIVEL DESBLOQUEADO</p><div className="story-dialog-title-row"><h2 id="level-two-success-title">Coartada verificada.</h2></div><SimulatedPlayer label="Mensaje final de Fede" onPlaying={setPlaying}/><p>Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.</p><button className="primary-button story-page-action" onClick={onContinue}>CONTINUAR AL NIVEL 3 <span>→</span></button></div></section>;
 }
 
 function LevelTwoIntroDialog({onContinue}:{onContinue:()=>void}){
