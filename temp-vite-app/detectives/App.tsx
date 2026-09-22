@@ -201,8 +201,9 @@ export default function Home() {
   useEffect(() => {
     const localPreview = import.meta.env.DEV ? new URLSearchParams(window.location.search).get('preview') : null;
     if (localPreview) {
-      const previewLevel=Number(localPreview.match(/^level([1-7])/)?.[1]||2);const previewDone=localPreview.endsWith('-done');
+      const previewLevel=Number(localPreview.match(/^level([1-7])/)?.[1]||2);const previewDone=localPreview.endsWith('-done')&&localPreview!=='level4-plan-done';
       setAgent('Filo'); setActiveSession(true); setHighestLevel(localPreview === 'briefing' ? 0 : previewLevel+(previewDone?1:0));
+      if(localPreview==='level4-plan-done')setCheckProgress({4:1});
       if (localPreview === 'library') setScreen('library');
       else if (localPreview === 'briefing') setScreen('briefing');
       else { setScreen('game'); setLevel(previewLevel); }

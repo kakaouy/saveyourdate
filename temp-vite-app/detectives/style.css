@@ -2237,3 +2237,42 @@ body:has(.federica-feedback[open]){overflow:hidden!important}
   .federica-feedback[open] .federica-speech{width:100%!important;min-height:0!important;padding:28px 16px 36px!important;box-sizing:border-box!important;box-shadow:none!important}
   .federica-feedback[open] .coach-action{top:18px!important;right:12px!important;max-width:52vw!important;padding:12px 14px!important;font-size:9px!important;letter-spacing:.08em!important}
 }
+
+/* Nivel 4: fragmentos giratorios, encaje visible y revelación del número. */
+.plan-reconstruction-reveal{display:flex;align-items:flex-start;gap:18px;margin:22px 0 0;padding:22px clamp(18px,3vw,30px);border:2px solid #9be8ce;border-radius:10px;background:linear-gradient(120deg,#113d39,#0b2b32 66%,#194a48);box-shadow:0 0 0 5px #70dcc321,0 16px 38px #0006;color:#e7f8e9;animation:plan-reveal-enter .45s ease-out both}
+.plan-reconstruction-check{flex:0 0 46px;display:grid;place-items:center;width:46px;height:46px;border:2px solid #c9f2db;border-radius:50%;background:#a2e4ca;color:#07372f;font-size:27px;font-weight:800;box-shadow:0 0 20px #86eec668}
+.plan-reconstruction-kicker{color:#a9eddb;font:800 10px/1.3 Arial,sans-serif;letter-spacing:.18em}
+.plan-reconstruction-reveal h3{margin:7px 0 9px;color:#f5db9b;font:700 clamp(21px,2.8vw,32px)/1.13 Georgia,serif;letter-spacing:.035em}
+.plan-reconstruction-reveal p{max-width:68ch;margin:0;color:#e4f0e6;line-height:1.55}
+.plan-reconstruction-reveal+.complex-plan{margin-top:20px}
+.complex-plan .plan-hole.has-preview{transform:none;border:0;background:#d9c9a4;box-shadow:0 0 0 6px #e4d7b3,0 0 0 9px #806245,0 8px 24px #3d29235c;transition:box-shadow .25s}
+.complex-plan .plan-hole.is-placed{box-shadow:0 0 0 6px #f7e4af,0 0 0 10px #479989,0 0 28px 12px #7defd770;animation:plan-piece-lock .55s ease-out both}
+.plan-hole-piece{position:absolute;inset:0;display:block;transition:transform .28s ease-out}
+.plan-hole-piece svg{display:block;width:100%;height:100%}
+.plan-hole-piece svg path{fill:none;vector-effect:non-scaling-stroke}
+.fragment-number-seal circle{fill:#f9e6b1!important;stroke:#985f39!important;stroke-width:2.5!important}
+.fragment-number-seal text{fill:#73361e;font:italic 700 31px/1 Georgia,serif;paint-order:stroke;stroke:#f9e6b1;stroke-width:1px}
+.plan-hole-piece .fragment-number-seal{filter:drop-shadow(0 2px 3px #291c1699)}
+.plan-piece-label{position:absolute;z-index:6;left:50%;bottom:3%;min-width:max-content;padding:6px 10px;transform:translateX(-50%);border:1px solid #8d6a43;border-radius:3px;background:#f0dfb9ed;color:#4b3d2c;font:800 9px/1.2 Arial,sans-serif;letter-spacing:.12em;box-shadow:0 2px 8px #1d241d42}
+.plan-piece-label.is-confirmed{border-color:#2b8075;background:#144d48;color:#dffce8;box-shadow:0 0 14px #57b5a28c}
+.plan-fragments .plan-fragment-card{position:relative;min-width:0;padding:7px;border:2px solid #695b43;border-radius:9px;background:#0a2029;transition:transform .25s,border-color .25s,box-shadow .25s,opacity .25s}
+.plan-fragments .plan-fragment-card.is-selected{z-index:2;transform:translateY(-6px) scale(1.025);border-color:#f5d786;background:#193c42;box-shadow:0 0 0 4px #f0cd7652,0 12px 24px #0008,0 0 28px #efcc7166}
+.plan-fragments .plan-fragment-card.is-solved{border-color:#a6efcf;background:#1d5147;box-shadow:0 0 0 4px #8ee4c576,0 12px 24px #0008,0 0 32px #68ddb991}
+.plan-fragments .plan-fragment-card.is-dismissed{opacity:.44;filter:saturate(.55)}
+.plan-fragments .plan-fragment-select{display:block;width:100%;padding:6px 6px 10px;border:0;border-radius:5px;background:transparent;text-align:center;box-shadow:none;color:#f4dfaf}
+.plan-fragments .plan-fragment-select:hover,.plan-fragments .plan-fragment-select:focus-visible{border:0;background:#ffffff0e;box-shadow:none;outline:2px solid #e7cb80;outline-offset:-2px}
+.plan-fragment-visual{display:block;width:100%;aspect-ratio:1;transition:transform .28s ease-out}
+.plan-fragment-visual svg{width:100%;height:100%;background:#d9c9a4;box-shadow:0 2px 8px #0008}
+.plan-fragments .plan-fragment-select b{margin-top:11px;font-size:11px;letter-spacing:.12em}
+.plan-fragments .plan-fragment-select small{min-height:1.3em;color:#b6c9bb;font-size:9px}
+.plan-fragment-selected-tag{display:block;margin:9px 0 0;padding:6px 4px;border-radius:3px;background:#ecd188;color:#173a3d;font:900 9px/1 Arial,sans-serif;letter-spacing:.12em}
+.is-solved .plan-fragment-selected-tag{background:#abedcd;color:#16463b}
+.plan-fragments .plan-fragment-turn{display:block;width:100%;min-height:34px;margin-top:4px;padding:7px 5px;border:1px solid #b99b60;border-radius:4px;background:#17343a;color:#f3d995;font:800 9px/1 Arial,sans-serif;letter-spacing:.1em;cursor:pointer}
+.plan-fragments .plan-fragment-turn:hover:not(:disabled),.plan-fragments .plan-fragment-turn:focus-visible:not(:disabled){border-color:#ffe2a1;background:#28515a;box-shadow:0 0 12px #dfc87866}
+.plan-fragments .plan-fragment-turn span{font-size:16px;vertical-align:-1px}
+.plan-fragments .plan-fragment-turn:disabled{opacity:.5;cursor:default}
+.plan-fragments .plan-fragment-turn::after{content:none}
+@keyframes plan-reveal-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes plan-piece-lock{from{filter:brightness(1.8)}to{filter:brightness(1)}}
+@media(max-width:760px){.plan-fragments{gap:12px}.plan-piece-label{font-size:7px;letter-spacing:.06em}.plan-reconstruction-reveal{gap:12px;padding:18px 14px}.plan-reconstruction-check{flex-basis:36px;width:36px;height:36px;font-size:22px}}
+@media(prefers-reduced-motion:reduce){.plan-reconstruction-reveal,.complex-plan .plan-hole.is-placed{animation:none}.plan-hole-piece,.plan-fragment-visual,.plan-fragments .plan-fragment-card{transition:none}}
