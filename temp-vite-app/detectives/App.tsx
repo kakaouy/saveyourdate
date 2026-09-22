@@ -28,7 +28,6 @@ const statements = [
 const levelVisuals = ['/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-hidden-corridor.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/nivel-6-sala-banderas-v1.png', '/los-archivos-f/images/lens-workshop.jpg'];
 const successVisuals = ['/los-archivos-f/images/bruno-storm.jpg', '/los-archivos-f/images/suspects-group.jpg', '/los-archivos-f/images/control-room.jpg', '/los-archivos-f/images/corridor-spoiler-418.jpg', '/los-archivos-f/images/martina-dark.jpg', '/los-archivos-f/images/lens-workshop.jpg', '/los-archivos-f/images/evidence-spread-spoiler.jpg'];
 const servilletaFrames=[1,2,3,4,5,6,7,8].map(frame=>`/los-archivos-f/images/federica-servilleta-frame-${frame}.png`);
-const receiverFrames=[1,2,3,4,5,6].map(frame=>`/los-archivos-f/images/federica-receptor-frame-${frame}.png`);
 
 function SimulatedPlayer({label,onPlaying}:{label:string;onPlaying?:(value:boolean)=>void}){
   const [playing,setPlaying]=useState(false);
@@ -48,12 +47,6 @@ function ServilletaArtwork(){
   </div>;
 }
 
-function ReceiverArtwork(){
-  return <div className="fede-artwork level-3-success receiver-story-frames" role="img" aria-label="Federica presenta el receptor de señales mientras la lluvia y el faro se mueven tras la ventana">
-    {receiverFrames.map((src,index)=><img className={`receiver-story-frame receiver-story-frame-${index}`} src={src} alt="" aria-hidden="true" key={src}/>)}
-  </div>;
-}
-
 function LevelTwoSuccessDialog({onContinue}:{onContinue:()=>void}){
   const [playing,setPlaying]=useState(false);
   return <section className="level-two-success-dialog story-page-view" aria-labelledby="level-two-success-title"><div className="level-two-success-visual"><FedeArtwork src="/los-archivos-f/images/federica-nivel-2-final-loop.webp" staticSrc="/los-archivos-f/images/federica-nivel-2-final-frame-1.webp" alt="Federica presenta el resultado de las coartadas frente al tablero de sospechosos" playing={playing} variant="level-2-success"/></div><div className="level-two-success-copy"><p className="story-dialog-kicker">AGENCIA F · NIVEL DESBLOQUEADO</p><div className="story-dialog-title-row"><h2 id="level-two-success-title">Coartada verificada.</h2></div><SimulatedPlayer label="Mensaje final de Fede" onPlaying={setPlaying}/><p>Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.</p><button className="primary-button story-page-action" onClick={onContinue}>CONTINUAR AL NIVEL 3 <span>→</span></button></div></section>;
@@ -66,9 +59,10 @@ function LevelTwoIntroDialog({onContinue}:{onContinue:()=>void}){
 
 function LevelThreeStoryDialog({kind,onContinue}:{kind:'intro'|'success';onContinue:()=>void}){
   const success=kind==='success';
+  const [playing,setPlaying]=useState(false);
   return <section className={`level-three-story-dialog story-page-view ${success?'is-success':'is-intro'}`} aria-labelledby="level-three-story-title">
-    <div className="level-three-story-visual">{success?<ReceiverArtwork/>:<ServilletaArtwork/>}</div>
-    <div className="level-three-story-copy"><p className="story-dialog-kicker">{success?'AGENCIA F · NIVEL DESBLOQUEADO':'AGENCIA F · INICIO DEL NIVEL 3'}</p><div className="story-dialog-title-row"><h2 id="level-three-story-title">{success?'¡Excelente trabajo, agente!':'La tormenta dejó un mensaje.'}</h2></div><SimulatedPlayer label={success?'Mensaje final de Fede · Nivel 3':'Bienvenida de Fede · Nivel 3'}/><p>{success?'Reconstruiste la secuencia: las seis señales marcan el TALLER. No era un mensaje al azar. Alguien que conocía el sistema pudo dejar allí otra parte del recorrido. Vamos a comprobarlo.':'León dejó esta servilleta en la cafetería y el receptor recuperó seis señales durante el apagón. Tu misión es interpretar cada señal y reconstruir su orden para descubrir qué lugar del faro están señalando.'}</p><button className="primary-button story-page-action" type="button" onClick={onContinue}>{success?'CONTINUAR AL NIVEL 4':'COMENZAR LA MISIÓN'} <span>→</span></button></div>
+    <div className="level-three-story-visual">{success?<FedeArtwork src="/los-archivos-f/images/federica-nivel-3-final-loop.webp" staticSrc="/los-archivos-f/images/federica-nivel-3-final-frame-1.webp" alt="Federica escucha las señales del receptor y anota el mensaje mientras observa el faro" playing={playing} variant="level-3-success"/>:<ServilletaArtwork/>}</div>
+    <div className="level-three-story-copy"><p className="story-dialog-kicker">{success?'AGENCIA F · NIVEL DESBLOQUEADO':'AGENCIA F · INICIO DEL NIVEL 3'}</p><div className="story-dialog-title-row"><h2 id="level-three-story-title">{success?'¡Excelente trabajo, agente!':'La tormenta dejó un mensaje.'}</h2></div><SimulatedPlayer label={success?'Mensaje final de Fede · Nivel 3':'Bienvenida de Fede · Nivel 3'} onPlaying={setPlaying}/><p>{success?'Reconstruiste la secuencia: las seis señales marcan el TALLER. No era un mensaje al azar. Alguien que conocía el sistema pudo dejar allí otra parte del recorrido. Vamos a comprobarlo.':'León dejó esta servilleta en la cafetería y el receptor recuperó seis señales durante el apagón. Tu misión es interpretar cada señal y reconstruir su orden para descubrir qué lugar del faro están señalando.'}</p><button className="primary-button story-page-action" type="button" onClick={onContinue}>{success?'CONTINUAR AL NIVEL 4':'COMENZAR LA MISIÓN'} <span>→</span></button></div>
   </section>;
 }
 

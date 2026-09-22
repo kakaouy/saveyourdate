@@ -1195,33 +1195,6 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   }
 }
 
-/* Mensaje final del nivel 3: los seis fotogramas muestran lluvia, olas,
-   barrido del faro y actividad real del transmisor, sin capas sobre la imagen. */
-.receiver-story-frames{position:relative!important;isolation:isolate!important;background:#06131b}
-.receiver-story-frames::before{display:none!important}
-.receiver-story-frames>.receiver-story-frame{
-  position:absolute!important;z-index:0!important;inset:0!important;
-  width:100%!important;height:100%!important;object-fit:cover!important;
-  object-position:center!important;opacity:0;
-  animation:receiver-story-frames 5.4s linear infinite!important;
-  will-change:opacity
-}
-.receiver-story-frames>.receiver-story-frame-0{animation-delay:0s!important}
-.receiver-story-frames>.receiver-story-frame-1{animation-delay:-4.5s!important}
-.receiver-story-frames>.receiver-story-frame-2{animation-delay:-3.6s!important}
-.receiver-story-frames>.receiver-story-frame-3{animation-delay:-2.7s!important}
-.receiver-story-frames>.receiver-story-frame-4{animation-delay:-1.8s!important}
-.receiver-story-frames>.receiver-story-frame-5{animation-delay:-.9s!important}
-@keyframes receiver-story-frames{
-  0%{opacity:0}
-  7%,16.7%{opacity:1}
-  26%,100%{opacity:0}
-}
-@media(prefers-reduced-motion:reduce){
-  .receiver-story-frames>.receiver-story-frame{animation:none!important;opacity:0!important}
-  .receiver-story-frames>.receiver-story-frame-0{opacity:1!important}
-}
-
 /* Nivel 3, servilleta: la tormenta evoluciona con los ocho fotogramas reales.
    Un titileo cálido acompaña las lámparas interiores y el faro barre la ventana. */
 .servilleta-story-frames{position:relative!important;isolation:isolate!important;background:#06131b}
