@@ -2027,10 +2027,10 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
 .site-shell.story-page-active{min-height:100dvh;background:#03131d!important}
 .site-shell.story-page-active .topbar{background:#03131d!important}
 
-/* Nivel 1: un loop continuo con los veinte fotogramas de Fede, la tormenta y el faro. */
-.fede-artwork.level-1-intro{position:relative;isolation:isolate;background:#06131b}
-.fede-artwork.level-1-intro>.level-one-intro-loop{position:absolute!important;z-index:0!important;inset:0!important;display:block!important}
-.fede-artwork.level-1-intro>.level-one-intro-loop>img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}
+/* Nivel 1: los mensajes de apertura y cierre usan sus propios loops. */
+.fede-artwork.level-1-intro,.fede-artwork.level-1-success{position:relative;isolation:isolate;background:#06131b}
+.fede-artwork.level-1-intro>.level-one-story-loop,.fede-artwork.level-1-success>.level-one-story-loop{position:absolute!important;z-index:0!important;inset:0!important;display:block!important}
+.fede-artwork.level-1-intro>.level-one-story-loop>img,.fede-artwork.level-1-success>.level-one-story-loop>img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}
 
 /* La escena principal del nivel 3 vuelve a ocupar el ancho del panel. */
 .game-page .scene-frame.level-three-weather{
