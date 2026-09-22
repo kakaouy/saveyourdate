@@ -2158,27 +2158,16 @@ body:has(.level-three-story-dialog[open]) .topbar{background:#03131d!important}
   }
 }
 
-/* Puesto secreto: 20 fotogramas consecutivos de Fede con el transmisor.
-   La lluvia, las olas, el faro, el farol y su gesto ya viven en las imágenes. */
+/* Puesto secreto: bucle continuo generado con los 20 fotogramas originales. */
 .federica-scene-visual.transmitter-story-frames{position:relative;isolation:isolate}
-.federica-scene-visual.transmitter-story-frames>.transmitter-story-frame{
-  position:absolute!important;z-index:0!important;inset:0!important;
+.federica-scene-visual.transmitter-story-frames>picture{
+  position:absolute!important;z-index:0!important;inset:0!important;display:block!important
+}
+.federica-scene-visual.transmitter-story-frames .transmitter-story-loop{
   display:block!important;width:100%!important;height:100%!important;
-  object-fit:cover!important;object-position:center!important;opacity:0;
-  animation:transmitter-story-frames 8s linear infinite!important;
-  animation-delay:var(--transmitter-frame-delay)!important;
-  will-change:opacity
+  object-fit:cover!important;object-position:center!important
 }
 .federica-scene-visual.transmitter-story-frames .scene-hotspot{z-index:6!important}
-@keyframes transmitter-story-frames{
-  0%{opacity:0}
-  1.25%,4.25%{opacity:1}
-  5.5%,100%{opacity:0}
-}
-@media(prefers-reduced-motion:reduce){
-  .federica-scene-visual.transmitter-story-frames>.transmitter-story-frame{animation:none!important;opacity:0!important}
-  .federica-scene-visual.transmitter-story-frames>.transmitter-story-frame:first-child{opacity:1!important}
-}
 
 /* Acción de cada mensaje: siempre visible en el encabezado propio de la página,
    sin depender del largo del texto ni del desplazamiento vertical. */
