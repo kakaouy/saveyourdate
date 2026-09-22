@@ -274,6 +274,7 @@ export default function Home() {
   function visitLevel(destination: number) {
     if (destination < 0 || destination > highestLevel) return;
     setLevel(destination); setAnswer(''); setMessage(''); setCheckSelection(null); setCheckFeedback(''); setCheckPassed(false); setSelectedStatement(null); setLevelThreeReady(false);
+    setLevelTwoSuccess(false);
     setLevelThreeDialog(destination===3?'intro':null);
     setLevelFourDialog(destination===4?'intro':null);
     setLateLevelDialog(destination>=5&&destination<=7?{level:destination as 5|6|7,kind:'intro'}:null);
@@ -283,12 +284,18 @@ export default function Home() {
 
   const hintsUsed = useMemo(() => Object.values(hints).reduce((a, b) => a + b, 0), [hints]);
 
+  function leaveGame(destination: Exclude<Screen, 'game'>) {
+    setLevelTwoIntro(false); setLevelTwoSuccess(false); setLevelThreeDialog(null); setLevelFourDialog(null); setLateLevelDialog(null); setSelectedStatement(null);
+    setScreen(destination);
+    window.scrollTo(0, 0);
+  }
+
   async function access(event: FormEvent) {
     event.preventDefault();
     if (!agent.trim()) { setMessage('Escribí tu nombre o alias de agente.'); return; }
     const state = await gameAction({action:'activate',code,agent,legacy:legacyRef.current?.code === code ? legacyRef.current : undefined});
     if (!state) return;
-    setLevel(state.highestLevel); setAnswer(''); setSelectedStatement(null); setShowAccess(false); setScreen('library'); window.scrollTo(0,0);
+    setLevel(state.highestLevel); setAnswer(''); setShowAccess(false); leaveGame('library');
     setCheckSelection(null); setCheckPassed(false); setCheckFeedback(''); setFinalAnswers({who:'',how:'',where:''});
   }
 
@@ -297,10 +304,10 @@ export default function Home() {
   }
 
   function openCaseFile() {
-    if(highestLevel===0){setScreen('briefing');}
+    if(highestLevel===0){leaveGame('briefing');}
     else{
       const destination=Math.max(1,level);
-      setLevel(destination);setLevelTwoIntro(destination===2);setLevelThreeDialog(destination===3?'intro':null);setLevelFourDialog(destination===4?'intro':null);setLateLevelDialog(destination>=5&&destination<=7?{level:destination as 5|6|7,kind:'intro'}:null);setScreen('game');
+      setLevel(destination);setLevelTwoIntro(destination===2);setLevelTwoSuccess(false);setLevelThreeDialog(destination===3?'intro':null);setLevelFourDialog(destination===4?'intro':null);setLateLevelDialog(destination>=5&&destination<=7?{level:destination as 5|6|7,kind:'intro'}:null);setScreen('game');
     }
     window.scrollTo(0,0);
   }
@@ -365,13 +372,18 @@ export default function Home() {
     catch { /* Retry on the next user gesture if the browser blocks playback. */ }
   }
 
-  const storyPageOpen=Boolean(levelTwoIntro||levelTwoSuccess||levelThreeDialog||levelFourDialog||lateLevelDialog);
+  const showLevelTwoSuccess=screen==='game'&&level===2&&levelTwoSuccess;
+  const showLevelTwoIntro=screen==='game'&&level===2&&levelTwoIntro&&!showLevelTwoSuccess;
+  const showLevelThreeDialog=screen==='game'&&level===3&&Boolean(levelThreeDialog);
+  const showLevelFourDialog=screen==='game'&&level===4&&Boolean(levelFourDialog);
+  const showLateLevelDialog=screen==='game'&&lateLevelDialog?.level===level;
+  const storyPageOpen=showLevelTwoIntro||showLevelTwoSuccess||showLevelThreeDialog||showLevelFourDialog||showLateLevelDialog;
 
   return (
     <main className={`site-shell ${storyPageOpen?'story-page-active':''}`} aria-busy={busy}><fieldset className="app-controls" disabled={busy}>
       <nav className="topbar" aria-label="Navegación principal">
         <div className="header-identity">
-          <button className="brand brand-button" onClick={() => setScreen('home')} aria-label="Ir al inicio"><img className="brand-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F"/></button>
+          <button className="brand brand-button" onClick={() => leaveGame('home')} aria-label="Ir al inicio"><img className="brand-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F"/></button>
         </div>
         <div className="nav-tools">{(screen==='home'||screen==='library')&&<div className="nav-celebration">10 OCT · FEDE · 11 AÑOS</div>}<button className={`music-button music-icon-only ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn} aria-label={musicOn?'Desactivar música ambiente':'Activar música ambiente'} title={musicOn?'Ambiente encendido':'Activar ambiente'}>{musicOn ? '♫' : '♪'}</button></div>
         <audio ref={musicRef} src="/los-archivos-f/audio/ambiente-faro.wav" loop preload="auto" />
@@ -379,7 +391,7 @@ export default function Home() {
 
       {screen === 'home' && <section className="welcome-page">
         <div className="welcome-heading"><p className="eyebrow">AGENCIA F · ACCESO CONFIDENCIAL</p><h1 className="welcome-title">Bienvenido a Los Archivos F</h1><img className="welcome-logo" src="/los-archivos-f/images/logo-archivos-f.png" alt="Los Archivos F · Escape room digital"/><p>Una misión especial por los <strong>11 años de Fede.</strong></p><span className="welcome-seal">TU AVENTURA COMIENZA ACÁ</span></div>
-        <form className="access-card welcome-access" onSubmit={access}><p className="eyebrow dark">IDENTIFICATE, AGENTE</p><h2>¿Listo para el misterio?</h2><p><Typewriter text="Ingresá tu nombre y el código de acceso de tu carpeta."/></p><label htmlFor="welcome-name">Tu nombre o alias</label><input id="welcome-name" value={agent} onChange={e=>setAgent(e.target.value)} placeholder="¿Cómo te llamás, agente?" required maxLength={48} autoComplete="nickname"/><label htmlFor="welcome-code">Código de acceso</label><input id="welcome-code" value={code} onChange={e=>setCode(e.target.value.toUpperCase())} placeholder="F01-XXXX-XXXX-XXXX-XXXX" required autoComplete="off" autoCapitalize="characters" spellCheck={false}/>{message && <p className="form-error" role="alert">{message}</p>}<button className="primary-button full" type="submit">ENTRAR A LA CÁMARA DE EXPEDIENTES <span>→</span></button><small>Encontrá tu código debajo del QR. No necesitás una cuenta. Podés usar un alias y volver con el mismo código para recuperar tu partida.</small>{activeSession && <button type="button" className="resume-welcome" onClick={()=>{setScreen('library');window.scrollTo(0,0);}}>Continuar con mi partida guardada →</button>}</form>
+        <form className="access-card welcome-access" onSubmit={access}><p className="eyebrow dark">IDENTIFICATE, AGENTE</p><h2>¿Listo para el misterio?</h2><p><Typewriter text="Ingresá tu nombre y el código de acceso de tu carpeta."/></p><label htmlFor="welcome-name">Tu nombre o alias</label><input id="welcome-name" value={agent} onChange={e=>setAgent(e.target.value)} placeholder="¿Cómo te llamás, agente?" required maxLength={48} autoComplete="nickname"/><label htmlFor="welcome-code">Código de acceso</label><input id="welcome-code" value={code} onChange={e=>setCode(e.target.value.toUpperCase())} placeholder="F01-XXXX-XXXX-XXXX-XXXX" required autoComplete="off" autoCapitalize="characters" spellCheck={false}/>{message && <p className="form-error" role="alert">{message}</p>}<button className="primary-button full" type="submit">ENTRAR A LA CÁMARA DE EXPEDIENTES <span>→</span></button><small>Encontrá tu código debajo del QR. No necesitás una cuenta. Podés usar un alias y volver con el mismo código para recuperar tu partida.</small>{activeSession && <button type="button" className="resume-welcome" onClick={()=>leaveGame('library')}>Continuar con mi partida guardada →</button>}</form>
       </section>}
 
       {screen === 'briefing' && <Briefing agent={agent} alreadyAccepted={highestLevel>0} onComplete={async()=>{if(highestLevel===0)await startInvestigation();setScreen('game');window.scrollTo(0,0);}}/>}
@@ -393,12 +405,12 @@ export default function Home() {
       </section>}
 
       {screen === 'game' && !storyPageOpen && <section className="game-page">
-        <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} elapsedSeconds={elapsedSeconds} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={requestHint}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onMission={()=>{setScreen('briefing');window.scrollTo(0,0);}} onLibrary={()=>{setScreen('library');window.scrollTo(0,0);}}/>
+        <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} elapsedSeconds={elapsedSeconds} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={requestHint}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onMission={()=>leaveGame('briefing')} onLibrary={()=>leaveGame('library')}/>
 
         <div className="investigation-panel">
           {level !== 1 && level !== 2 && level <= 7 && <figure className={`scene-frame ${level === 3?'level-three-weather':level === 4?'level-four-maps':level===5?'level-five-red-corridor':level===6?'level-six-flags':level === 0 ? 'storm-layer' : level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img className={level===3?'storm-frame storm-frame-0':undefined} src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : level===3 ? levelVisuals[2] : level===4&&!unlocked ? '/los-archivos-f/images/nivel-4-sala-planos-v1.png' : level===5&&!unlocked?'/los-archivos-f/images/bg-hidden-corridor.png':level===6&&!unlocked?'/los-archivos-f/images/nivel-6-sala-banderas-v1.png':unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt={level===4?'Sala de cartografía del museo con un plano incompleto sobre la mesa':level===5?'Corredor de mantenimiento iluminado por señales rojas':level===6?'Sala del faro con cinco banderas a distintas alturas y el cartel Seguí la luz':'Escena del Museo del Faro vinculada con la investigación'} />{level===3&&['nivel-3-tormenta-2.png','nivel-3-tormenta-3.png','nivel-3-tormenta-4.png'].map((frame,index)=><img className={`storm-frame storm-frame-${index+1}`} src={`/los-archivos-f/images/${frame}`} alt="" aria-hidden="true" key={frame}/>)}{level===3&&<i className="scene-lightning-flash" aria-hidden="true"/>}{(level===3||level===6)&&<i className="scene-lighthouse-beam" aria-hidden="true"/>}<span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
           
-          {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p><Typewriter text="Robaron el Rubí del Faro. El archivo de las personas presentes quedó bloqueado después del apagón. Recuperá el acceso para comenzar a reconstruir lo que pasó."/></p><p>No abras el sobre negro hasta recibir la autorización de Fede.</p><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>setScreen('briefing')}>Volver a escuchar a Federica</button></section>}
+          {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p><Typewriter text="Robaron el Rubí del Faro. El archivo de las personas presentes quedó bloqueado después del apagón. Recuperá el acceso para comenzar a reconstruir lo que pasó."/></p><p>No abras el sobre negro hasta recibir la autorización de Fede.</p><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>leaveGame('briefing')}>Volver a escuchar a Federica</button></section>}
 
           {level === 1 && <TerminalLevel unlocked={unlocked} busy={busy} message={message} onUnlock={async value=>Boolean(await gameAction({action:"unlock",level:1,answer:value}))} onContinue={continueInvestigation}/>}
           {level >= 2 && level <= 7 && (() => {
@@ -428,12 +440,12 @@ export default function Home() {
         </div>
       </section>}
 
-      {selectedStatement !== null && <InterrogationDialog index={selectedStatement} onClose={() => setSelectedStatement(null)} />}
-      {levelTwoIntro&&<LevelTwoIntroDialog onContinue={()=>setLevelTwoIntro(false)}/>}
-      {levelTwoSuccess&&<LevelTwoSuccessDialog onContinue={()=>{setLevelTwoSuccess(false);continueInvestigation();}}/>}
-      {levelThreeDialog&&<LevelThreeStoryDialog kind={levelThreeDialog} onContinue={()=>{if(levelThreeDialog==='success'){setLevelThreeDialog(null);continueInvestigation();}else setLevelThreeDialog(null);}}/>}
-      {levelFourDialog&&<LevelFourStoryDialog kind={levelFourDialog} onContinue={()=>{if(levelFourDialog==='success'){setLevelFourDialog(null);continueInvestigation();}else setLevelFourDialog(null);}}/>}
-      {lateLevelDialog&&<LateLevelStoryDialog level={lateLevelDialog.level} kind={lateLevelDialog.kind} onContinue={()=>{const success=lateLevelDialog.kind==='success';setLateLevelDialog(null);if(success)continueInvestigation();}}/>}
+      {screen==='game'&&level===2&&selectedStatement !== null && <InterrogationDialog index={selectedStatement} onClose={() => setSelectedStatement(null)} />}
+      {showLevelTwoIntro&&<LevelTwoIntroDialog onContinue={()=>setLevelTwoIntro(false)}/>}
+      {showLevelTwoSuccess&&<LevelTwoSuccessDialog onContinue={()=>{setLevelTwoSuccess(false);continueInvestigation();}}/>}
+      {showLevelThreeDialog&&levelThreeDialog&&<LevelThreeStoryDialog kind={levelThreeDialog} onContinue={()=>{if(levelThreeDialog==='success'){setLevelThreeDialog(null);continueInvestigation();}else setLevelThreeDialog(null);}}/>}
+      {showLevelFourDialog&&levelFourDialog&&<LevelFourStoryDialog kind={levelFourDialog} onContinue={()=>{if(levelFourDialog==='success'){setLevelFourDialog(null);continueInvestigation();}else setLevelFourDialog(null);}}/>}
+      {showLateLevelDialog&&lateLevelDialog&&<LateLevelStoryDialog level={lateLevelDialog.level} kind={lateLevelDialog.kind} onContinue={()=>{const success=lateLevelDialog.kind==='success';setLateLevelDialog(null);if(success)continueInvestigation();}}/>}
 
       {showAccess && <div className="modal-backdrop" onMouseDown={() => {setShowAccess(false); setMessage('');}}><form className="access-card" onSubmit={access} onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowAccess(false)}>×</button><p className="eyebrow dark">ACCESO RESTRINGIDO</p><h2>Identificate, agente.</h2><p>Ingresá el código impreso debajo del QR de tu carpeta.</p><label htmlFor="agent-code">Código del expediente</label><input id="agent-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="F01-XXXX-XXXX-XXXX-XXXX" autoComplete="off" /><label htmlFor="agent-name">Nombre o alias</label><input id="agent-name" value={agent} onChange={(e) => setAgent(e.target.value)} placeholder="Tu nombre o alias de agente" maxLength={48} autoComplete="off" />{message && <p className="form-error">{message}</p>}<button className="primary-button full" type="submit">ACTIVAR INVESTIGACIÓN <span>→</span></button></form></div>}
     {busy && <div className="connection-status" role="status">Conectando con la Agencia F…</div>}
