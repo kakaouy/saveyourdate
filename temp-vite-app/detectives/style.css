@@ -2258,7 +2258,15 @@ body:has(.federica-feedback[open]){overflow:hidden!important}
 @media(max-width:760px){.plan-fragments{gap:12px}.plan-piece-label{font-size:7px;letter-spacing:.06em}.plan-reconstruction-reveal{gap:12px;padding:18px 14px}.plan-reconstruction-check{flex-basis:36px;width:36px;height:36px;font-size:22px}}
 @media(prefers-reduced-motion:reduce){.plan-reconstruction-reveal,.complex-plan .plan-hole.is-placed{animation:none}.plan-hole-piece,.plan-fragment-visual,.plan-fragments .plan-fragment-card{transition:none}}
 
-/* El mensaje final del nivel 4 recorre en bucle los diez fotogramas de Fede. */
-.fede-artwork-frame-sequence>img{position:absolute;inset:0;opacity:0;animation:fede-level-four-final-loop 5.5s steps(1,end) infinite}
+/* Las secuencias de fotogramas se sincronizan con su duración y vuelven a empezar sin fundidos. */
+.fede-artwork-frame-sequence>img{position:absolute;inset:0;opacity:0;animation:fede-level-four-final-loop steps(1,end) infinite}
 @keyframes fede-level-four-final-loop{0%,9.99%{opacity:1}10%,100%{opacity:0}}
+.level-7-intro .fede-artwork-frame-sequence>img{animation-name:fede-level-seven-intro-loop}
+@keyframes fede-level-seven-intro-loop{0%,2.76%{opacity:1}2.78%,100%{opacity:0}}
+.late-story-visual.level-seven-intro-artwork{aspect-ratio:3/4}
+.late-story-visual.level-seven-intro-artwork>.fede-artwork{position:absolute;inset:0;width:100%;height:100%}
+.late-story-visual.level-seven-intro-artwork .fede-artwork-frame-sequence{width:100%;height:100%}
+.late-story-visual.level-seven-intro-artwork .fede-artwork-frame-sequence>img{width:100%;height:100%;object-fit:contain}
+.late-story-visual.level-seven-intro-artwork:has(.level-7-intro){aspect-ratio:3/4!important;max-height:88dvh!important}
+@media(max-width:700px),(orientation:portrait){.late-story-visual.level-seven-intro-artwork:has(.level-7-intro){aspect-ratio:3/4!important;max-height:none!important}}
 @media(prefers-reduced-motion:reduce){.fede-artwork-frame-sequence>img{animation:none}.fede-artwork-frame-sequence>img:first-child{opacity:1}}
