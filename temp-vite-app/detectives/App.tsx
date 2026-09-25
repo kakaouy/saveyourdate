@@ -27,15 +27,11 @@ const statements = [
 
 const levelVisuals = ['/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-hidden-corridor.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/nivel-6-sala-banderas-v1.png', '/los-archivos-f/images/lens-workshop.jpg'];
 const successVisuals = ['/los-archivos-f/images/bruno-storm.jpg', '/los-archivos-f/images/suspects-group.jpg', '/los-archivos-f/images/control-room.jpg', '/los-archivos-f/images/corridor-spoiler-418.jpg', '/los-archivos-f/images/martina-dark.jpg', '/los-archivos-f/images/lens-workshop.jpg', '/los-archivos-f/images/evidence-spread-spoiler.jpg'];
-const levelFourFinalFrames = Array.from({length:10},(_,index)=>`/los-archivos-f/images/federica-nivel-4-final-frames/frame-${String(index+1).padStart(2,'0')}.jpg`);
-const levelSevenIntroSourceFrames = Array.from({length:19},(_,index)=>`/los-archivos-f/images/federica-nivel-7-inicio-frames/frame-${String(index+1).padStart(2,'0')}.jpg`);
-const levelSevenIntroFrames = [...levelSevenIntroSourceFrames,...levelSevenIntroSourceFrames.slice(1,-1).reverse()];
-const levelSevenFinalSourceFrames = Array.from({length:23},(_,index)=>`/los-archivos-f/images/federica-nivel-7-final-frames/frame-${String(index+1).padStart(2,'0')}.jpg`);
-const levelSevenFinalFrames = [...levelSevenFinalSourceFrames,...levelSevenFinalSourceFrames.slice(1,-1).reverse()];
-const levelSixIntroSourceFrames = Array.from({length:10},(_,index)=>`/los-archivos-f/images/federica-nivel-6-inicio-frames/frame-${String(index+1).padStart(2,'0')}.jpg`);
-const levelSixIntroFrames = [...levelSixIntroSourceFrames,...levelSixIntroSourceFrames.slice(1,-1).reverse()];
-const levelSixFinalSourceFrames = Array.from({length:10},(_,index)=>`/los-archivos-f/images/federica-nivel-6-final-frames/frame-${String(index+1).padStart(2,'0')}.jpg`);
-const levelSixFinalFrames = [...levelSixFinalSourceFrames,...levelSixFinalSourceFrames.slice(1,-1).reverse()];
+const levelFourFinalFrames = ['/los-archivos-f/images/federica-nivel-4-final-loop.webp','/los-archivos-f/images/federica-nivel-4-final-frame-1.webp'];
+const levelSevenIntroFrames = ['/los-archivos-f/images/federica-nivel-7-inicio-loop.webp','/los-archivos-f/images/federica-nivel-7-inicio-frame-1.webp'];
+const levelSevenFinalFrames = ['/los-archivos-f/images/federica-nivel-7-final-loop.webp','/los-archivos-f/images/federica-nivel-7-final-frame-1.webp'];
+const levelSixIntroFrames = ['/los-archivos-f/images/federica-nivel-6-inicio-loop.webp','/los-archivos-f/images/federica-nivel-6-inicio-frame-1.webp'];
+const levelSixFinalFrames = ['/los-archivos-f/images/federica-nivel-6-final-loop.webp','/los-archivos-f/images/federica-nivel-6-final-frame-1.webp'];
 
 function SimulatedPlayer({label,onPlaying}:{label:string;onPlaying?:(value:boolean)=>void}){
   const [playing,setPlaying]=useState(false);
@@ -43,9 +39,11 @@ function SimulatedPlayer({label,onPlaying}:{label:string;onPlaying?:(value:boole
   return <div className={`simulated-player ${playing?'is-playing':''}`} role="group" aria-label={`${label}. Audio pendiente de producción`}><button type="button" onClick={toggle} aria-label={playing?'Pausar simulación':'Reproducir simulación'}>{playing?'Ⅱ':'▶'}</button><span>{playing?'REPRODUCIENDO MENSAJE…':'AUDIO EN PREPARACIÓN'}</span><i><b/></i><small>--:-- / --:--</small></div>;
 }
 
-function FedeArtwork({src,alt,playing,variant,children,staticSrc,frames,frameDuration=0.55}:{src:string;alt:string;playing:boolean;variant:string;children?:ReactNode;staticSrc?:string;frames?:string[];frameDuration?:number}){
+function FedeArtwork({src,alt,playing,variant,children,staticSrc,frames}:{src:string;alt:string;playing:boolean;variant:string;children?:ReactNode;staticSrc?:string;frames?:string[];frameDuration?:number}){
   const isSequence=Boolean(staticSrc||frames?.length);
-  return <div className={`fede-artwork ${variant}`}>{frames?.length?<div className="fede-artwork-loop fede-artwork-frame-sequence" role="img" aria-label={alt}>{frames.map((frame,index)=><img key={`${index}-${frame}`} src={frame} alt="" aria-hidden="true" style={{animationDelay:`${index*frameDuration}s`,animationDuration:`${frames.length*frameDuration}s`}}/>)}</div>:staticSrc?<picture className="fede-artwork-loop"><source media="(prefers-reduced-motion: reduce)" srcSet={staticSrc}/><img src={src} alt={alt}/></picture>:<img src={src} alt={alt}/>} {!isSequence&&<><span className={`fede-mouth ${playing?'talking':''}`} aria-hidden="true"/><span className="fede-hair" aria-hidden="true"/></>}{children}</div>;
+  const loopSrc=frames?.[0]??src;
+  const stillSrc=frames?.[1]??staticSrc;
+  return <div className={`fede-artwork ${variant}`}>{isSequence?<picture className="fede-artwork-loop">{stillSrc&&<source media="(prefers-reduced-motion: reduce)" srcSet={stillSrc}/>}<img src={loopSrc} alt={alt}/></picture>:<img src={src} alt={alt}/>} {!isSequence&&<><span className={`fede-mouth ${playing?'talking':''}`} aria-hidden="true"/><span className="fede-hair" aria-hidden="true"/></>}{children}</div>;
 }
 
 function LevelTwoSuccessDialog({onContinue}:{onContinue:()=>void}){
