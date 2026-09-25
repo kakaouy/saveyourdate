@@ -177,6 +177,7 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .resolution-card::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 20% 10%,#27505b55,transparent 42%); pointer-events:none; }
 .resolution-card>* { position:relative; z-index:1; }
 .resolution-fede{margin:0 -48px 34px;position:relative;border-bottom:1px solid #a6874c;max-height:620px;overflow:hidden;background:#031018}
+.resolution-fede picture{display:block}
 .resolution-fede img{display:block;width:100%;height:min(62vw,620px);object-fit:cover;object-position:center 26%}
 .resolution-fede figcaption{position:absolute;left:24px;bottom:20px;padding:9px 12px;border:1px solid #c8a75999;background:#031820dd;color:#f0d38d;font:800 10px/1 Arial,sans-serif;letter-spacing:.15em}
 @keyframes cinematicDrift { from { transform:scale(1.01) translate3d(-.5%,0,0); } to { transform:scale(1.07) translate3d(.8%,-.5%,0); } }
