@@ -2265,10 +2265,12 @@ body:has(.federica-feedback[open]){overflow:hidden!important}
 @keyframes fede-level-seven-intro-loop{0%,2.76%{opacity:1}2.78%,100%{opacity:0}}
 .level-7-success .fede-artwork-frame-sequence>img{animation-name:fede-level-seven-final-loop}
 @keyframes fede-level-seven-final-loop{0%,2.26%{opacity:1}2.28%,100%{opacity:0}}
-.late-story-visual.level-seven-intro-artwork,.late-story-visual.level-seven-final-artwork{aspect-ratio:3/4}
-.late-story-visual.level-seven-intro-artwork>.fede-artwork,.late-story-visual.level-seven-final-artwork>.fede-artwork{position:absolute;inset:0;width:100%;height:100%}
-.late-story-visual.level-seven-intro-artwork .fede-artwork-frame-sequence,.late-story-visual.level-seven-final-artwork .fede-artwork-frame-sequence{width:100%;height:100%}
-.late-story-visual.level-seven-intro-artwork .fede-artwork-frame-sequence>img,.late-story-visual.level-seven-final-artwork .fede-artwork-frame-sequence>img{width:100%;height:100%;object-fit:contain}
-.late-story-visual.level-seven-intro-artwork:has(.level-7-intro),.late-story-visual.level-seven-final-artwork:has(.level-7-success){aspect-ratio:3/4!important;max-height:88dvh!important}
-@media(max-width:700px),(orientation:portrait){.late-story-visual.level-seven-intro-artwork:has(.level-7-intro),.late-story-visual.level-seven-final-artwork:has(.level-7-success){aspect-ratio:3/4!important;max-height:none!important}}
+.level-6-intro .fede-artwork-frame-sequence>img{animation-name:fede-level-six-intro-loop}
+@keyframes fede-level-six-intro-loop{0%,5.54%{opacity:1}5.56%,100%{opacity:0}}
+.late-story-visual.level-six-intro-artwork,.late-story-visual.level-seven-intro-artwork,.late-story-visual.level-seven-final-artwork{aspect-ratio:3/4}
+.late-story-visual.level-six-intro-artwork>.fede-artwork,.late-story-visual.level-seven-intro-artwork>.fede-artwork,.late-story-visual.level-seven-final-artwork>.fede-artwork{position:absolute;z-index:3;inset:0;width:100%;height:100%}
+.late-story-visual.level-six-intro-artwork .fede-artwork-frame-sequence,.late-story-visual.level-seven-intro-artwork .fede-artwork-frame-sequence,.late-story-visual.level-seven-final-artwork .fede-artwork-frame-sequence{width:100%;height:100%}
+.late-story-visual.level-six-intro-artwork .fede-artwork-frame-sequence>img,.late-story-visual.level-seven-intro-artwork .fede-artwork-frame-sequence>img,.late-story-visual.level-seven-final-artwork .fede-artwork-frame-sequence>img{width:100%;height:100%;object-fit:contain}
+.late-story-visual.level-six-intro-artwork:has(.level-6-intro),.late-story-visual.level-seven-intro-artwork:has(.level-7-intro),.late-story-visual.level-seven-final-artwork:has(.level-7-success){aspect-ratio:3/4!important;max-height:88dvh!important}
+@media(max-width:700px),(orientation:portrait){.late-story-visual.level-six-intro-artwork:has(.level-6-intro),.late-story-visual.level-seven-intro-artwork:has(.level-7-intro),.late-story-visual.level-seven-final-artwork:has(.level-7-success){aspect-ratio:3/4!important;max-height:none!important}}
 @media(prefers-reduced-motion:reduce){.fede-artwork-frame-sequence>img{animation:none}.fede-artwork-frame-sequence>img:first-child{opacity:1}}
