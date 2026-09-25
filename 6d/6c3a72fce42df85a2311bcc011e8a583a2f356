@@ -1,0 +1,21 @@
+temp-vite-app/detectives/style.css
+  s_92b1cd3453e863::t_0f9cc74ea50327 2268-2275
+temp-vite-app/detectives/App.tsx
+  s_92b1cd3453e863::t_6bcab1b8212295 35-36,82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6d6c3a72fce42df85a2311bcc011e8a583a2f356",
+  "prompts": {},
+  "sessions": {
+    "s_92b1cd3453e863": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0b612-e708-79a1-bb71-1ae16f7e1271",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
