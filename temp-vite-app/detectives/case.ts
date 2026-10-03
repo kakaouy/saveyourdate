@@ -53,10 +53,10 @@ export const levels = [
     title: 'La sala de banderas',
     kicker: 'NIVEL 6 · TABLERO DE BANDERAS',
     prompt: '¿Qué palabra forman las cinco banderas?',
-    evidence: ['G-02 · Guía de banderas del museo'],
-    digital: 'Cinco señales están izadas a distintas alturas. Traducirlas no alcanza: la propia sala conserva una indicación sobre el orden de lectura.',
+    evidence: ['G-02 · Disco decodificador'],
+    digital: 'Cinco señales numeradas están izadas a distintas alturas. La propia sala conserva una indicación sobre el orden de lectura.',
     placeholder: '5 letras', answer: ['farol', 'el farol'], lock: 'flags',
-    hints: ['Usá G-02 para traducir las banderas, pero todavía necesitás descubrir el orden.', 'Buscá en la sala una frase relacionada con el recorrido de la luz.', 'Empezá por la bandera más cercana a la fuente de luz y continuá hacia abajo.'],
+    hints: ['Usá G-02 para convertir cada número en una letra.', 'Buscá en la sala una frase relacionada con el recorrido de la luz.', 'Empezá por la bandera más cercana a la fuente de luz y continuá hacia abajo: 1, 22, 13, 10, 7.'],
     unlock: 'Ubicación indicada por las banderas',
   },
   {

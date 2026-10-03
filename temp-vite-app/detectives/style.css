@@ -1234,7 +1234,7 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
   background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/bg-hidden-corridor.png')!important;
 }
 .late-level-6{
-  background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/nivel-6-sala-banderas-v1.png')!important;
+  background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/nivel-6-sala-banderas-v2.png')!important;
 }
 .late-level-7{
   background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/lens-workshop.jpg')!important;
@@ -1836,7 +1836,7 @@ body:has(.level-three-story-dialog[open]) .topbar{
 .level-three-story-dialog{background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/control-room.jpg')!important}
 .level-four-story-dialog{background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/nivel-4-sala-planos-v1.png')!important}
 .late-level-5{background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/bg-hidden-corridor.png')!important}
-.late-level-6{background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/nivel-6-sala-banderas-v1.png')!important}
+.late-level-6{background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/nivel-6-sala-banderas-v2.png')!important}
 .late-level-7{background-image:linear-gradient(#03131de8,#03131df2),url('/los-archivos-f/images/lens-workshop.jpg')!important}
 
 @media(min-width:900px) and (orientation:landscape){
@@ -1941,7 +1941,7 @@ body:has(.level-three-story-dialog[open]) .topbar{
   background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/nivel-4-sala-planos-v1.png')!important;
 }
 .late-level-5{background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/bg-hidden-corridor.png')!important}
-.late-level-6{background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/nivel-6-sala-banderas-v1.png')!important}
+.late-level-6{background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/nivel-6-sala-banderas-v2.png')!important}
 .late-level-7{background-image:linear-gradient(#03131df3,#03131df8),url('/los-archivos-f/images/lens-workshop.jpg')!important}
 @media(max-width:700px),(orientation:portrait){
   .terminal-dialog::backdrop,
