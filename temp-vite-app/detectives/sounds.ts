@@ -74,6 +74,7 @@ function scheduleThunder(ctx: AudioContext, first = false) {
 export function startStormAmbience() {
   const ctx = audioContext();
   if (!ctx) return;
+  const wasEnabled = stormEnabled;
   stormEnabled = true;
   if (!stormSource) {
     const source = ctx.createBufferSource();
@@ -93,7 +94,7 @@ export function startStormAmbience() {
     stormGain = gain;
   }
   if (stormGain) stormGain.gain.setTargetAtTime(0.16, ctx.currentTime, 0.35);
-  scheduleThunder(ctx, true);
+  if (!wasEnabled || thunderTimer === null) scheduleThunder(ctx, true);
 }
 
 export function stopStormAmbience() {
