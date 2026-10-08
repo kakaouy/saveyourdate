@@ -3,6 +3,10 @@ type Effect = 'type' | 'unlock' | 'panel' | 'paper' | 'piece' | 'rotate' | 'sign
 let context: AudioContext | null = null;
 let lastTypeAt = 0;
 let effectsEnabled = true;
+let stormEnabled = false;
+let stormSource: AudioBufferSourceNode | null = null;
+let stormGain: GainNode | null = null;
+let thunderTimer: number | null = null;
 
 export function setEffectsEnabled(enabled: boolean) { effectsEnabled = enabled; }
 
@@ -11,6 +15,97 @@ function audioContext() {
   context ||= new AudioContext();
   if (context.state === 'suspended') void context.resume();
   return context;
+}
+
+function makeRainBuffer(ctx: AudioContext) {
+  const seconds = 7;
+  const buffer = ctx.createBuffer(2, ctx.sampleRate * seconds, ctx.sampleRate);
+  for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
+    const data = buffer.getChannelData(channel);
+    let previous = 0;
+    for (let index = 0; index < data.length; index += 1) {
+      const white = Math.random() * 2 - 1;
+      previous = previous * 0.82 + white * 0.18;
+      const drop = Math.random() < 0.0007 ? (Math.random() * 2 - 1) * 0.55 : 0;
+      data[index] = previous * 0.44 + white * 0.09 + drop;
+    }
+  }
+  return buffer;
+}
+
+function playThunder(ctx: AudioContext) {
+  if (!stormEnabled || ctx.state !== 'running') return;
+  const now = ctx.currentTime;
+  const duration = 4.2;
+  const noise = ctx.createBufferSource();
+  const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * duration), ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let rumble = 0;
+  for (let index = 0; index < data.length; index += 1) {
+    rumble = rumble * 0.985 + (Math.random() * 2 - 1) * 0.015;
+    data[index] = rumble;
+  }
+  noise.buffer = buffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 180;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.24, now + 0.08);
+  gain.gain.exponentialRampToValueAtTime(0.055, now + 0.8);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  noise.connect(filter).connect(gain).connect(ctx.destination);
+  noise.start(now);
+  noise.stop(now + duration);
+  tone(ctx, 42, now, 2.8, 0.08, 'sine');
+  window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity:0.65 + Math.random() * 0.35}}));
+}
+
+function scheduleThunder(ctx: AudioContext) {
+  if (thunderTimer !== null) window.clearTimeout(thunderTimer);
+  if (!stormEnabled) return;
+  thunderTimer = window.setTimeout(() => {
+    playThunder(ctx);
+    scheduleThunder(ctx);
+  }, 18000 + Math.random() * 26000);
+}
+
+export function startStormAmbience() {
+  const ctx = audioContext();
+  if (!ctx) return;
+  stormEnabled = true;
+  if (!stormSource) {
+    const source = ctx.createBufferSource();
+    source.buffer = makeRainBuffer(ctx);
+    source.loop = true;
+    const high = ctx.createBiquadFilter();
+    high.type = 'highpass';
+    high.frequency.value = 420;
+    const low = ctx.createBiquadFilter();
+    low.type = 'lowpass';
+    low.frequency.value = 7200;
+    const gain = ctx.createGain();
+    gain.gain.value = 0.16;
+    source.connect(high).connect(low).connect(gain).connect(ctx.destination);
+    source.start();
+    stormSource = source;
+    stormGain = gain;
+  }
+  if (stormGain) stormGain.gain.setTargetAtTime(0.16, ctx.currentTime, 0.35);
+  scheduleThunder(ctx);
+}
+
+export function stopStormAmbience() {
+  stormEnabled = false;
+  if (thunderTimer !== null) window.clearTimeout(thunderTimer);
+  thunderTimer = null;
+  const ctx = context;
+  if (ctx && stormGain) stormGain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.25);
+}
+
+export function setStormDucked(ducked: boolean) {
+  if (!context || !stormGain || !stormEnabled) return;
+  stormGain.gain.setTargetAtTime(ducked ? 0.045 : 0.16, context.currentTime, 0.3);
 }
 
 function tone(ctx: AudioContext, frequency: number, start: number, duration: number, volume: number, kind: OscillatorType = 'sine') {

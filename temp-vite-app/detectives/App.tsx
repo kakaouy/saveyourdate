@@ -6,7 +6,7 @@ import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import MissionMap from './MissionMap';
 import LevelSideTabs from './LevelSideTabs';
-import {playEffect,setEffectsEnabled} from './sounds';
+import {playEffect,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
 import FinalCaseAudio from './FinalCaseAudio';
 import PodiumAccess from './PodiumAccess';
 'use client';
@@ -90,7 +90,7 @@ const lateStories={
 function LateLevelStoryDialog({level,kind,onContinue}:{level:5|6|7;kind:'intro'|'success';onContinue:()=>void}){
   const [playing,setPlaying]=useState(false);const story=lateStories[level];const success=kind==='success';
   return <section className={`level-three-story-dialog late-level-story-dialog late-level-${level} story-page-view`} aria-labelledby="late-story-title">
-    <div className={`late-story-visual ${level===5&&!success?'level-five-intro-artwork':''} ${level===6&&!success?'level-six-intro-artwork':''} ${level===6&&success?'level-six-final-artwork':''} ${level===7&&!success?'level-seven-intro-artwork':''} ${level===7&&success?'level-seven-final-artwork':''}`} style={{backgroundImage:level===6?'none':`linear-gradient(#03101955,#03101988),url(${level===5&&!success?story.introArtwork:story.background})`}}>{level===6&&!success?<FedeArtwork src={levelSixIntroFrames[0]} frames={levelSixIntroFrames} frameDuration={0.28} alt="Fede presenta la sala de banderas mientras la tormenta continúa tras las ventanas" playing={playing} variant="level-6-intro"/>:level===6&&success?<FedeArtwork src={levelSixFinalFrames[0]} frames={levelSixFinalFrames} frameDuration={0.28} alt="Fede concluye el caso de las banderas en la sala del faro" playing={playing} variant="level-6-success"/>:level===7&&!success?<FedeArtwork src={levelSevenIntroFrames[0]} frames={levelSevenIntroFrames} frameDuration={0.28} alt="Fede señala el tablero y presenta el último código" playing={playing} variant="level-7-intro"/>:level===7&&success?<FedeArtwork src={levelSevenFinalFrames[0]} frames={levelSevenFinalFrames} frameDuration={0.28} alt="Fede abre el compartimento secreto y celebra el hallazgo del diamante" playing={playing} variant="level-7-success"/>:level===5&&success?<FedeArtwork src="/los-archivos-f/images/federica-nivel-5-final-loop.webp" staticSrc="/los-archivos-f/images/federica-nivel-5-final-frame-1.webp" alt="Federica muestra el frasco de resina RX-4 en el taller" playing={playing} variant="level-5-final"/>:level===5?<picture className="level-five-intro-sequence"><source media="(prefers-reduced-motion: reduce)" srcSet="/los-archivos-f/images/federica-nivel-5-inicio-frame-1.webp"/><img src="/los-archivos-f/images/federica-nivel-5-inicio-loop.webp" alt="Federica presenta la entrada al pasillo oculto"/></picture>:<div className={`late-fede-character ${playing?'is-speaking':''}`}><img src="/los-archivos-f/images/federica-presentadora-v1.png" alt={`Federica presenta el ${success?'resultado':'objetivo'} del nivel ${level}`}/><span className="late-fede-mouth" aria-hidden="true"/></div>}{level===5&&!success&&<span className={`level-five-image-mouth ${playing?'talking':''}`} aria-hidden="true"/>}{level===6&&success&&<span className="story-beam" aria-hidden="true"/>}{level===7&&!success&&<div className="level-seven-board-copy" aria-label="Instrucción del mecanismo"><span>EL CÓDIGO DEL FARO</span><b>SUMÁ LOS IMPARES</b><b>SUMÁ LOS PARES</b><strong>UNÍ LOS DOS RESULTADOS</strong></div>}<span className="story-light" aria-hidden="true"/><span className="story-dust" aria-hidden="true"/></div>
+    <div className={`late-story-visual ${level===5&&!success?'level-five-intro-artwork':''} ${level===6&&!success?'level-six-intro-artwork':''} ${level===6&&success?'level-six-final-artwork':''} ${level===7&&!success?'level-seven-intro-artwork':''} ${level===7&&success?'level-seven-final-artwork':''}`} style={{backgroundImage:level===6?'none':`linear-gradient(#03101955,#03101988),url(${level===5&&!success?story.introArtwork:story.background})`}}>{level===6&&!success?<FedeArtwork src={levelSixIntroFrames[0]} frames={levelSixIntroFrames} frameDuration={0.28} alt="Fede presenta la sala de banderas mientras la tormenta continúa tras las ventanas" playing={playing} variant="level-6-intro"/>:level===6&&success?<FedeArtwork src={levelSixFinalFrames[0]} frames={levelSixFinalFrames} frameDuration={0.28} alt="Fede concluye el caso de las banderas en la sala del faro" playing={playing} variant="level-6-success"/>:level===7&&!success?<FedeArtwork src={levelSevenIntroFrames[0]} frames={levelSevenIntroFrames} frameDuration={0.28} alt="Fede señala el tablero y presenta el último código" playing={playing} variant="level-7-intro"/>:level===7&&success?<FedeArtwork src={levelSevenFinalFrames[0]} frames={levelSevenFinalFrames} frameDuration={0.28} alt="Fede abre el compartimento secreto y celebra el hallazgo del diamante" playing={playing} variant="level-7-success"/>:level===5&&success?<FedeArtwork src="/los-archivos-f/images/federica-nivel-5-final-loop.webp" staticSrc="/los-archivos-f/images/federica-nivel-5-final-frame-1.webp" alt="Federica muestra el frasco de resina RX-4 en el taller" playing={playing} variant="level-5-final"/>:level===5?<picture className="level-five-intro-sequence"><source media="(prefers-reduced-motion: reduce)" srcSet="/los-archivos-f/images/federica-nivel-5-inicio-frame-1.webp"/><img src="/los-archivos-f/images/federica-nivel-5-inicio-loop.webp" alt="Federica presenta la entrada al pasillo oculto"/></picture>:<div className={`late-fede-character ${playing?'is-speaking':''}`}><img src="/los-archivos-f/images/federica-presentadora-v1.png" alt={`Federica presenta el ${success?'resultado':'objetivo'} del nivel ${level}`}/><span className="late-fede-mouth" aria-hidden="true"/></div>}{level===5&&!success&&<span className={`level-five-image-mouth ${playing?'talking':''}`} aria-hidden="true"/>}{level===6&&success&&<span className="story-beam" aria-hidden="true"/>}{level===7&&!success&&<div className="level-seven-board-copy" aria-label="Objetivo del mecanismo"><span>OBJETIVO</span><b>Descubrir el código de acceso al compartimento.</b><strong>Calculá <em>IMPARES</em> y <em>PARES</em> para formar la combinación.</strong></div>}<span className="story-light" aria-hidden="true"/><span className="story-dust" aria-hidden="true"/></div>
     <div className="level-three-story-copy"><p className="story-dialog-kicker">AGENCIA F · {success?'NIVEL DESBLOQUEADO':`INICIO DEL NIVEL ${level}`}</p><div className="story-dialog-title-row"><h2 id="late-story-title">{success?story.successTitle:story.introTitle}</h2></div><SimulatedPlayer label={`${success?'Mensaje final':'Bienvenida'} de Fede · Nivel ${level}`} onPlaying={setPlaying}/><p>{success?story.successText:story.introText}</p><button className="primary-button story-page-action" type="button" onClick={onContinue}>{success?(level===7?'IR A LA ACUSACIÓN FINAL':`CONTINUAR AL NIVEL ${level+1}`):'COMENZAR LA MISIÓN'} <span>→</span></button></div>
   </section>;
 }
@@ -181,7 +181,7 @@ export default function Home() {
   const [musicOn, setMusicOn] = useState(true);
   const [effectsOn,setEffectsOn]=useState(true);
   const musicEnabled = useRef(true);
-  const musicRef = useRef<HTMLAudioElement>(null);
+  const [stormPulse,setStormPulse]=useState(0);
   const [checkProgress, setCheckProgress] = useState<Record<number, number>>({});
   const [checkSelection, setCheckSelection] = useState<number | null>(null);
   const [checkFeedback, setCheckFeedback] = useState('');
@@ -250,19 +250,14 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const player = musicRef.current;
-    if (!player) return;
-    // Keep one ambient player mounted across access, briefing and case screens.
     const syncVolume = () => {
-      const speaking = Array.from(document.querySelectorAll('audio')).some(audio => audio !== player && !audio.paused && !audio.ended);
-      player.volume = speaking ? 0.04 : 0.22;
+      const speaking = Array.from(document.querySelectorAll('audio')).some(audio => !audio.paused && !audio.ended);
+      setStormDucked(speaking);
     };
     const start = () => {
-      if (!musicEnabled.current || !player.paused) return;
+      if (!musicEnabled.current) return;
+      startStormAmbience();
       syncVolume();
-      void player.play().then(() => { if (!musicEnabled.current) player.pause(); }).catch(() => {
-        // Autoplay may be blocked; a subsequent gesture retries without resetting time.
-      });
     };
     const gesture = (event: Event) => {
       if (event.target instanceof Element && event.target.closest('.music-button')) return;
@@ -273,13 +268,16 @@ export default function Home() {
     for (const type of ['play', 'pause', 'ended', 'emptied']) document.addEventListener(type, syncVolume, true);
     const observer = new MutationObserver(syncVolume);
     observer.observe(document.body, {childList:true,subtree:true});
+    const thunder=()=>setStormPulse(value=>value+1);
+    window.addEventListener('archivos-f-thunder',thunder);
     start();
     return () => {
       document.removeEventListener('pointerdown', gesture, true);
       document.removeEventListener('keydown', gesture, true);
       for (const type of ['play', 'pause', 'ended', 'emptied']) document.removeEventListener(type, syncVolume, true);
       observer.disconnect();
-      player.pause();
+      window.removeEventListener('archivos-f-thunder',thunder);
+      stopStormAmbience();
     };
   }, []);
 
@@ -362,27 +360,12 @@ export default function Home() {
     if (await gameAction({action:'final',...finalAnswers})) setLevel(9);
   }
 
-  async function downloadDiploma() {
-    setBusy(true); setMessage('');
-    try {
-      const response = await fetch('/los-archivos-f/api/diploma');
-      if(!response.ok) throw new Error('No pudimos preparar el diploma. Volvé a intentar.');
-      const url=URL.createObjectURL(await response.blob());
-      const link=document.createElement('a'); link.href=url; link.download='Diploma-Agencia-F.pdf'; link.click();
-      setTimeout(()=>URL.revokeObjectURL(url),10000);
-    } catch(error) { setMessage(error instanceof Error ? error.message : 'No se pudo descargar el diploma.'); }
-    finally { setBusy(false); }
-  }
-
   async function toggleMusic() {
-    const player = musicRef.current;
-    if (!player) return;
     const enabled = !musicEnabled.current;
     musicEnabled.current = enabled;
     setMusicOn(enabled);
-    if (!enabled) { player.pause(); return; }
-    try { await player.play(); if (!musicEnabled.current) player.pause(); }
-    catch { /* Retry on the next user gesture if the browser blocks playback. */ }
+    if (!enabled) { stopStormAmbience(); return; }
+    startStormAmbience();
   }
 
   const showLevelTwoSuccess=screen==='game'&&level===2&&levelTwoSuccess;
@@ -393,13 +376,12 @@ export default function Home() {
   const storyPageOpen=showLevelTwoIntro||showLevelTwoSuccess||showLevelThreeDialog||showLevelFourDialog||showLateLevelDialog;
 
   return (
-    <main className={`site-shell ${storyPageOpen?'story-page-active':''}`} aria-busy={busy}><fieldset className="app-controls" disabled={busy}>
+    <main className={`site-shell ${storyPageOpen?'story-page-active':''}`} aria-busy={busy}><span key={stormPulse} className={`storm-flash ${stormPulse?'is-active':''}`} aria-hidden="true"/><fieldset className="app-controls" disabled={busy}>
       <nav className="topbar" aria-label="Navegación principal">
         <div className="header-identity">
           <button className="brand brand-button" onClick={() => leaveGame('home')} aria-label="Ir al inicio"><img className="brand-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F"/></button>
         </div>
-        <div className="nav-tools">{(screen==='home'||screen==='library')&&<div className="nav-celebration">10 OCT · FEDE · 11 AÑOS</div>}<button className={`music-button sfx-button ${effectsOn?'on':''}`} onClick={()=>{const next=!effectsOn;setEffectsOn(next);setEffectsEnabled(next);if(next)playEffect('panel');}} aria-pressed={effectsOn} aria-label={effectsOn?'Desactivar efectos de sonido':'Activar efectos de sonido'} title={effectsOn?'Efectos encendidos':'Activar efectos'}>SFX</button><button className={`music-button music-icon-only ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn} aria-label={musicOn?'Desactivar música ambiente':'Activar música ambiente'} title={musicOn?'Ambiente encendido':'Activar ambiente'}>{musicOn ? '♫' : '♪'}</button></div>
-        <audio ref={musicRef} src="/los-archivos-f/audio/ambiente-faro.wav" loop preload="auto" />
+        <div className="nav-tools">{(screen==='home'||screen==='library')&&<div className="nav-celebration">10 OCT · FEDE · 11 AÑOS</div>}<button className={`music-button sfx-button ${effectsOn?'on':''}`} onClick={()=>{const next=!effectsOn;setEffectsOn(next);setEffectsEnabled(next);if(next)playEffect('panel');}} aria-pressed={effectsOn} aria-label={effectsOn?'Desactivar efectos de sonido':'Activar efectos de sonido'} title={effectsOn?'Efectos encendidos':'Activar efectos'}>SFX</button><button className={`music-button music-icon-only ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn} aria-label={musicOn?'Desactivar lluvia y truenos':'Activar lluvia y truenos'} title={musicOn?'Lluvia y truenos encendidos':'Activar lluvia y truenos'}>{musicOn ? '🌧' : '☁'}</button></div>
       </nav>
 
       {screen === 'home' && <section className="welcome-page">
@@ -451,7 +433,7 @@ export default function Home() {
 
           {level === 8 && <section className="level-card final-card"><p className="eyebrow dark">ACUSACIÓN FINAL</p><h1>Presentá tu acusación.</h1><p className="final-instruction">Completá las tres tarjetas del expediente. La acusación debe explicar quién actuó, cómo lo hizo y dónde terminó la gema original.</p><FinalStatement highestLevel={highestLevel}/><form className="final-form accusation-builder" onSubmit={submitFinal}><label><span>01 · RESPONSABLE</span>¿Quién retiró el rubí?<select required value={finalAnswers.who} onChange={(e) => setFinalAnswers({...finalAnswers,who:e.target.value})}><option value="">Elegí una persona</option><option value="bruno">Bruno Vidal</option><option value="vera">Vera Salas</option><option value="leon">León Costa</option><option value="martina">Martina Ríos</option></select></label><label><span>02 · MÉTODO</span>¿Cómo realizó el cambio?<select required value={finalAnswers.how} onChange={(e) => setFinalAnswers({...finalAnswers,how:e.target.value})}><option value="">Elegí una reconstrucción</option><option value="cafeteria">Alteró el registro y trasladó la gema durante la restauración</option><option value="corredor">Usó el apagón, atravesó el corredor y dejó una réplica</option><option value="terraza">Manipuló los horarios de las fotografías y salió por la terraza</option></select></label><label><span>03 · ESCONDITE</span>¿Dónde escondió el original?<select required value={finalAnswers.where} onChange={(e) => setFinalAnswers({...finalAnswers,where:e.target.value})}><option value="">Elegí un lugar</option><option value="bolso">Dentro de un lote de materiales del taller</option><option value="generador">En el conducto junto a la sala del generador</option><option value="lente">En la base de la lente de Fresnel</option></select></label><div className="accusation-summary" aria-live="polite"><b>EXPEDIENTE FINAL</b><span>{[finalAnswers.who,finalAnswers.how,finalAnswers.where].filter(Boolean).length}/3 conexiones registradas</span></div><button className="primary-button" type="submit" disabled={busy}>PRESENTAR ACUSACIÓN <span>→</span></button></form>{message && <p className="error-message">{message}</p>}</section>}
 
-          {level === 9 && <section className="resolution-card"><figure className="resolution-fede"><picture><source media="(prefers-reduced-motion: reduce)" srcSet={finalCaseStill}/><img src={finalCaseLoop} alt="Federica sonríe y presenta el sello de Caso cerrado"/></picture><figcaption>MENSAJE FINAL DE FEDERICA · AGENCIA F</figcaption></figure><div className="resolved-seal">CASO<br /><strong>CERRADO</strong></div><p className="eyebrow">ARCHIVO F-01 RESUELTO</p><h1>Excelente trabajo,<br />agente {agent}.</h1><p>Martina Ríos fabricó una réplica, utilizó el corredor durante el apagón y escondió el rubí original en la base de la lente de Fresnel.</p><p>Quería forzar una investigación sobre la procedencia de la gema. Eso explica su motivo, pero no justifica el robo. El museo deberá aclarar el origen del rubí.</p><p><Typewriter text="Fede está a salvo: fue al faro antiguo a comprobar una teoría y la tormenta la dejó sin señal."/></p><FinalCaseAudio/><div className="final-envelope-callout"><span aria-hidden="true">✉</span><div><p className="eyebrow">ÚLTIMA INSTRUCCIÓN</p><h2>Ya podés abrir el sobre final.</h2><p>Adentro te espera la nota de cierre y la gema de recuerdo.</p></div></div><blockquote>“Un buen detective no solo descubre quién hizo algo. También se pregunta cómo pudo hacerlo, qué pruebas lo demuestran y por qué tomó esa decisión.” <b>— Fede</b></blockquote><div className="result-stats"><span><b>{hintsUsed}</b>Pistas utilizadas</span><span><b>{hintsUsed <= 1 ? 'Detective del Faro' : hintsUsed <= 3 ? 'Especialista en Evidencias' : 'Agente de Investigación'}</b>Rango obtenido</span></div><PodiumAccess/><figure className="diploma-preview official-diploma"><img src="/los-archivos-f/images/diploma-comunicado-final.jpg" alt="Comunicado final del Archivo F-01, misión cumplida y caso cerrado"/><figcaption><span>AGENTES:</span><b>{agent}</b></figcaption></figure><p className="diploma-download-note">El comunicado descargable lleva el nombre de esta partida sobre el documento oficial.</p><button className="primary-button" disabled={busy} onClick={downloadDiploma}>{busy ? 'PREPARANDO DIPLOMA…' : 'DESCARGAR DIPLOMA PDF'} <span>↓</span></button>{message && <p className="error-message" role="alert">{message}</p>}</section>}
+          {level === 9 && <section className="resolution-card"><figure className="resolution-fede"><picture><source media="(prefers-reduced-motion: reduce)" srcSet={finalCaseStill}/><img src={finalCaseLoop} alt="Federica sonríe y presenta el sello de Caso cerrado"/></picture><figcaption>MENSAJE FINAL DE FEDERICA · AGENCIA F</figcaption></figure><div className="resolved-seal">CASO<br /><strong>CERRADO</strong></div><p className="eyebrow">ARCHIVO F-01 RESUELTO</p><h1>Excelente trabajo,<br />agente {agent}.</h1><p>Martina Ríos fabricó una réplica, utilizó el corredor durante el apagón y escondió el rubí original en la base de la lente de Fresnel.</p><p>Quería forzar una investigación sobre la procedencia de la gema. Eso explica su motivo, pero no justifica el robo. El museo deberá aclarar el origen del rubí.</p><p><Typewriter text="Fede está a salvo: fue al faro antiguo a comprobar una teoría y la tormenta la dejó sin señal."/></p><FinalCaseAudio/><div className="final-envelope-callout"><span aria-hidden="true">✉</span><div><p className="eyebrow">MISIÓN CUMPLIDA</p><h2>Ya pueden abrir el sobre.</h2></div></div><blockquote>“Un buen detective no solo descubre quién hizo algo. También se pregunta cómo pudo hacerlo, qué pruebas lo demuestran y por qué tomó esa decisión.” <b>— Fede</b></blockquote><div className="result-stats"><span><b>{hintsUsed}</b>Pistas utilizadas</span><span><b>{hintsUsed <= 1 ? 'Detective del Faro' : hintsUsed <= 3 ? 'Especialista en Evidencias' : 'Agente de Investigación'}</b>Rango obtenido</span></div><PodiumAccess/>{message && <p className="error-message" role="alert">{message}</p>}</section>}
         </div>
       </section>}
 
