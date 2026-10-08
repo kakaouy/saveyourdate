@@ -69,7 +69,10 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
 export async function leaderboard() {
   const response=await supabaseRequest('detective_games?select=state&order=updated_at.asc&limit=200');
   const rows=await response.json() as Array<{state:GameState}>;
-  return rows.map(({state})=>({agent:String(state.agent||'Agente').slice(0,48),elapsedSeconds:Math.max(0,Math.floor(Number(state.elapsedSeconds)||0)),hintsUsed:Object.values(state.hints||{}).reduce((sum,value)=>sum+(Number(value)||0),0),completed:Boolean(state.completedAt),highestLevel:Number(state.highestLevel)||0})).filter(item=>item.highestLevel>0).sort((a,b)=>Number(b.completed)-Number(a.completed)||a.elapsedSeconds-b.elapsedSeconds||a.hintsUsed-b.hintsUsed).slice(0,50);
+  return rows.map(({state})=>({agent:String(state.agent||'Agente').slice(0,48),elapsedSeconds:Math.max(0,Math.floor(Number(state.elapsedSeconds)||0)),hintsUsed:Object.values(state.hints||{}).reduce((sum,value)=>sum+(Number(value)||0),0),completed:Boolean(state.completedAt),highestLevel:Number(state.highestLevel)||0})).filter(item=>item.highestLevel>0).sort(compareLeaderboardEntries).slice(0,50);
+}
+export function compareLeaderboardEntries(a:{completed:boolean;hintsUsed:number;elapsedSeconds:number},b:{completed:boolean;hintsUsed:number;elapsedSeconds:number}) {
+  return Number(b.completed)-Number(a.completed)||a.hintsUsed-b.hintsUsed||a.elapsedSeconds-b.elapsedSeconds;
 }
 export async function updateGame(hash: string, body: Record<string, unknown>) {
   for(let attempt=0;attempt<3;attempt++) {

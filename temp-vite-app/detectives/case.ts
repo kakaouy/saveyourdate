@@ -6,7 +6,7 @@ export const levels = [
     evidence: ['Lote A · Cinco capturas de seguridad (A-01 a A-05)', 'Evidencia B-01 · Registro del corte eléctrico'],
     digital: 'El archivo de las personas presentes quedó bloqueado después del apagón. Recuperá el acceso para continuar la investigación.',
     placeholder: '4 caracteres', answer: ['1937'], lock: 'numeric',
-    hints: ['Hay más de una referencia temporal entre las evidencias. No todas tienen el mismo grado de confianza.', 'Pensá qué objeto de la sala pudo quedar congelado exactamente cuando se interrumpió la energía.', 'Compará las dos horas y decidí cuál representa el instante real del corte. La terminal espera cuatro caracteres.'],
+    hints: ['Hay más de una referencia temporal entre las evidencias. No todas tienen el mismo grado de confianza.', 'Pensá qué objeto de la sala pudo quedar congelado exactamente cuando se interrumpió la energía.', 'Compará las dos horas y decidí cuál representa el instante real del corte. La terminal espera cuatro caracteres.', 'SOLUCIÓN DIRECTA · El corte ocurrió a las 19:37. Ingresá 1937.'],
     unlock: 'Declaraciones de los cuatro sospechosos',
   },
   {
@@ -16,7 +16,7 @@ export const levels = [
     evidence: [],
     digital: 'El intervalo crítico va de 19:30 a 19:50. Una marca aislada prueba un momento; para descartar a alguien necesitás cubrir el recorrido completo, sin huecos.',
     placeholder: 'Código de 4 cifras', answer: ['1888'], lock: 'numeric',
-    hints: ['Una entrada, una salida o una foto aislada solo prueban un momento.', 'Buscá registros distintos que se completen entre sí, sin dejar huecos en el intervalo.', 'Compará los dos tramos de entrevista de León con su breve paso por la cafetería.'],
+    hints: ['Una entrada, una salida o una foto aislada solo prueban un momento.', 'Buscá registros distintos que se completen entre sí, sin dejar huecos en el intervalo.', 'Compará los dos tramos de entrevista de León con su breve paso por la cafetería.', 'SOLUCIÓN DIRECTA · La coartada completa es la de León Costa. Ingresá el código LC-1888 o 1888.'],
     unlock: 'Coartada verificada · nueva pista recuperada',
   },
   {
@@ -26,7 +26,7 @@ export const levels = [
     evidence: [],
     digital: 'Seis registros luminosos recuperados fuera de secuencia.',
     placeholder: '6 caracteres', answer: ['taller', 'el taller', 'taller de restauracion'], lock: 'letters',
-    hints: ['Cada patrón de destellos representa una letra. Hay una guía entre tus evidencias que puede ayudarte.', 'Saber las seis letras no alcanza: los registros llegaron desordenados. León dejó reglas sobre la posición de los símbolos.', 'La Brújula abre el mensaje. Las dos Olas deben quedar juntas y el Ancla cierra la señal.', 'El Farol queda antes de las dos Olas y la Llave está inmediatamente antes del Ancla.'],
+    hints: ['Cada patrón de destellos representa una letra. Hay una guía entre tus evidencias que puede ayudarte.', 'Saber las seis letras no alcanza: los registros llegaron desordenados. León dejó reglas sobre la posición de los símbolos.', 'La Brújula abre el mensaje. Las dos Olas deben quedar juntas y el Ancla cierra la señal.', 'El Farol queda antes de las dos Olas y la Llave está inmediatamente antes del Ancla.', 'SOLUCIÓN DIRECTA · Las seis señales forman la palabra TALLER.'],
     unlock: 'Destino de las señales identificado',
   },
   {
@@ -36,7 +36,7 @@ export const levels = [
     evidence: ['Sobre de evidencias del nivel 4', 'Material de reconstrucción sin clasificar'],
     digital: 'Al plano público le falta una parte del sector de mantenimiento. Reconstruí sus conexiones antes de examinar el resto de las evidencias.',
     placeholder: '3 cifras', answer: ['937'], lock: 'safe',
-    hints: ['Que el fragmento entre por su forma no alcanza. Observá las líneas que llegan a cada borde del hueco.', 'El pasillo, la pared y el conducto deben continuar sin quedar cortados ni atravesarse.', 'Después de reconstruir el plano, compará las marcas y la orientación de los materiales disponibles.', 'El punto de inicio comparte un símbolo con una de las salas del plano.', 'Seguí la trayectoria desde ese símbolo y leé los números de las habitaciones en el orden del recorrido.'],
+    hints: ['Que el fragmento entre por su forma no alcanza. Observá las líneas que llegan a cada borde del hueco.', 'El pasillo, la pared y el conducto deben continuar sin quedar cortados ni atravesarse.', 'Después de reconstruir el plano, compará las marcas y la orientación de los materiales disponibles.', 'El punto de inicio comparte un símbolo con una de las salas del plano.', 'Seguí la trayectoria desde ese símbolo y leé los números de las habitaciones en el orden del recorrido.', 'SOLUCIÓN DIRECTA · El recorrido pasa por 9, 3 y 7. Ingresá 937.'],
     unlock: 'Recorrido del pasadizo confirmado',
   },
   {
@@ -46,7 +46,7 @@ export const levels = [
     evidence: ['Informe de Conservación', 'Material de lectura del nivel 5'],
     digital: 'Los movimientos del taller registran código, operador, material y destino. Recuperá primero el dato oculto del informe y después buscalo en la tabla.',
     placeholder: 'Destino', answer: ['banderas', 'sala de banderas', 'la sala de banderas'], lock: 'label',
-    hints: ['Hay información que no se distingue a simple vista en el informe.', 'Cuando recuperes un código, buscalo en la primera columna de la tabla de movimientos.', 'R-17 fue enviado a la Sala de Banderas. Después observá el material y el operador de esa misma fila.'],
+    hints: ['Hay información que no se distingue a simple vista en el informe.', 'Cuando recuperes un código, buscalo en la primera columna de la tabla de movimientos.', 'En la fila de R-17, relacioná el material Resina RX-4 con la sospechosa que viste trabajar con él.', 'SOLUCIÓN DIRECTA · Registrá R-17, elegí a Martina y confirmá la conexión. El destino es la Sala de Banderas.'],
     unlock: 'Destino de R-17 identificado',
   },
   {
@@ -56,7 +56,7 @@ export const levels = [
     evidence: ['G-02 · Disco decodificador'],
     digital: 'Cinco señales numeradas están izadas a distintas alturas. La propia sala conserva una indicación sobre el orden de lectura.',
     placeholder: '5 letras', answer: ['farol', 'el farol'], lock: 'flags',
-    hints: ['Usá G-02 para convertir cada número en una letra.', 'Buscá en la sala una frase relacionada con el recorrido de la luz.', 'Empezá por la bandera más cercana a la fuente de luz y continuá hacia abajo: 1, 22, 13, 10, 7.'],
+    hints: ['Usá G-02 para convertir cada número en una letra.', 'Buscá en la sala una frase relacionada con el recorrido de la luz.', 'Empezá por la bandera más cercana a la fuente de luz y continuá hacia abajo: 1, 22, 13, 10, 7.', 'SOLUCIÓN DIRECTA · Las cinco banderas forman FAROL.'],
     unlock: 'Ubicación indicada por las banderas',
   },
   {
@@ -66,7 +66,7 @@ export const levels = [
     evidence: ['Sobre negro autorizado', 'Plantilla de calibración LF-04, ya preparada'],
     digital: 'Mecanismo LF-04 detectado. La combinación no está registrada en el sistema. La plantilla física contiene el procedimiento de calibración.',
     placeholder: '5 cifras', answer: ['11820'], lock: 'mechanical',
-    hints: ['La pieza ya está recortada. Observá qué parte puede moverse y qué marcas permiten alinearla.', 'Separá los números en dos grupos: impares y pares.', 'Sumá 19 + 21 + 23 + 25 + 30. Después sumá 2 + 4 + 6 + 8 + 0. Uní ambos resultados, en ese orden.'],
+    hints: ['La pieza ya está recortada. Observá qué parte puede moverse y qué marcas permiten alinearla.', 'La alineación revela dos recorridos rotulados IMPARES y PARES. Respetá qué valores quedan señalados en cada uno.', 'El recorrido IMPARES da un resultado de tres cifras y el recorrido PARES uno de dos. Escribilos juntos, en ese orden.', 'SOLUCIÓN DIRECTA · 19 + 21 + 23 + 25 + 30 = 118; 2 + 4 + 6 + 8 + 0 = 20. Ingresá 11820.'],
     unlock: 'Acceso a la acusación final',
   },
 ];

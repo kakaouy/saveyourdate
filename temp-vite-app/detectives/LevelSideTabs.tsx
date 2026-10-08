@@ -1,4 +1,5 @@
 import {type FormEvent, useEffect, useRef, useState} from 'react';
+import {playEffect} from './sounds';
 
 type RankingEntry={agent:string;elapsedSeconds:number;hintsUsed:number;completed:boolean;highestLevel:number};
 const formatTime=(seconds:number)=>`${Math.floor(seconds/3600).toString().padStart(2,'0')}:${Math.floor(seconds%3600/60).toString().padStart(2,'0')}:${Math.floor(seconds%60).toString().padStart(2,'0')}`;
@@ -44,16 +45,16 @@ export default function LevelSideTabs({
     if(previousMissionMessageOpen.current&&!missionMessageOpen){setOpen(null);setMissionHoverSuppressed(true);}
     previousMissionMessageOpen.current=missionMessageOpen;
   },[missionMessageOpen]);
-  async function showRanking(){setOpen(null);setRankingOpen(true);setRankingStatus('Recuperando posiciones…');try{const response=await fetch('/los-archivos-f/api/game?view=leaderboard');if(!response.ok)throw new Error();setRanking(await response.json() as RankingEntry[]);setRankingStatus('');}catch{setRankingStatus('No pudimos recuperar las posiciones. Volvé a intentar.');}}
+  async function showRanking(){playEffect('panel');setOpen(null);setRankingOpen(true);setRankingStatus('Recuperando posiciones…');try{const response=await fetch('/los-archivos-f/api/game?view=leaderboard');if(!response.ok)throw new Error();setRanking(await response.json() as RankingEntry[]);setRankingStatus('');}catch{setRankingStatus('No pudimos recuperar las posiciones. Volvé a intentar.');}}
   return <aside ref={tabsRef} className="level-side-tabs" aria-label={`Acciones del nivel ${level}`}>
     <section className={`level-side-tab mission-tab ${open==='mission'?'is-open':''} ${missionHoverSuppressed?'suppress-hover':''}`} onPointerLeave={()=>setMissionHoverSuppressed(false)}>
-      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='mission'} onClick={()=>{setOpen(null);onReplay();}}>
+      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='mission'} onClick={()=>{playEffect('panel');setOpen(null);onReplay();}}>
         <img src="/los-archivos-f/images/fede-mission-tab.png" alt=""/>
         <span><b>MISIÓN NIVEL {level}</b><small>Escuchar mensaje de Fede</small></span>
       </button>
     </section>
     <section className={`level-side-tab unlock-tab ${open==='unlock'?'is-open':''}`}>
-      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='unlock'} onClick={()=>setOpen('unlock')}>
+      <button type="button" className="level-side-tab-trigger" aria-expanded={open==='unlock'} onClick={()=>{playEffect('panel');setOpen('unlock');}}>
         <img src="/los-archivos-f/images/unlock-level-tab.png" alt=""/>
         <span><b>{unlocked?'NIVEL RESUELTO':'DESBLOQUEAR'}</b><small>{unlocked?'Investigación registrada':'Ingresar resultado'}</small></span>
       </button>
@@ -70,6 +71,6 @@ export default function LevelSideTabs({
         <span><b>PODIO</b><small>Ver tiempos y pistas</small></span>
       </button>
     </section>
-    {rankingOpen&&<dialog ref={rankingDialog} className="ranking-dialog" aria-labelledby="ranking-title" onCancel={()=>setRankingOpen(false)} onClick={event=>{if(event.target===event.currentTarget)setRankingOpen(false);}}><div className="ranking-paper"><button className="ranking-close" type="button" onClick={()=>setRankingOpen(false)} aria-label="Cerrar tabla de posiciones">×</button><img className="ranking-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F · Misterios que dejan huella"/><img className="ranking-cup" src="/los-archivos-f/images/copa-ranking.png" alt=""/><p className="eyebrow">AGENCIA F · CLASIFICACIÓN</p><h2 id="ranking-title">Podio de detectives</h2><p className="ranking-subtitle">Mejores tiempos y pistas utilizadas</p>{rankingStatus?<p className="ranking-status">{rankingStatus}</p>:ranking.length?<div className="ranking-table" role="table" aria-label="Posiciones de detectives"><div className="ranking-row heading" role="row"><span>POS.</span><span>JUGADOR</span><span>TIEMPO</span><span>PISTAS</span></div>{ranking.map((entry,index)=><div className={`ranking-row ${index<3?'place-'+(index+1):''}`} role="row" key={`${entry.agent}-${index}`}><strong>{index+1}</strong><span>{entry.agent}<small>{entry.completed?'CASO CERRADO':`NIVEL ${Math.min(entry.highestLevel,7)}`}</small></span><b>{formatTime(entry.elapsedSeconds)}</b><b>{entry.hintsUsed}</b></div>)}</div>:<p className="ranking-status">Todavía no hay partidas registradas.</p>}<p className="ranking-footer">¿Podrás superar el récord?</p></div></dialog>}
+    {rankingOpen&&<dialog ref={rankingDialog} className="ranking-dialog" aria-labelledby="ranking-title" onCancel={()=>setRankingOpen(false)} onClick={event=>{if(event.target===event.currentTarget)setRankingOpen(false);}}><div className="ranking-paper"><button className="ranking-close" type="button" onClick={()=>setRankingOpen(false)} aria-label="Cerrar tabla de posiciones">×</button><img className="ranking-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F · Misterios que dejan huella"/><img className="ranking-cup" src="/los-archivos-f/images/copa-ranking.png" alt=""/><p className="eyebrow">AGENCIA F · CLASIFICACIÓN</p><h2 id="ranking-title">Podio de detectives</h2><p className="ranking-subtitle">Primero se ordena por menos pistas; ante un empate, por mejor tiempo.</p>{rankingStatus?<p className="ranking-status">{rankingStatus}</p>:ranking.length?<div className="ranking-table" role="table" aria-label="Posiciones de detectives"><div className="ranking-row heading" role="row"><span>POS.</span><span>JUGADOR</span><span>TIEMPO</span><span>PISTAS</span></div>{ranking.map((entry,index)=><div className={`ranking-row ${index<3?'place-'+(index+1):''}`} role="row" key={`${entry.agent}-${index}`}><strong>{index+1}</strong><span>{entry.agent}<small>{entry.completed?'CASO CERRADO':`NIVEL ${Math.min(entry.highestLevel,7)}`}</small></span><b>{formatTime(entry.elapsedSeconds)}</b><b>{entry.hintsUsed}</b></div>)}</div>:<p className="ranking-status">Todavía no hay partidas registradas.</p>}<p className="ranking-footer">Resolver sin pistas siempre conserva la ventaja.</p></div></dialog>}
   </aside>;
 }

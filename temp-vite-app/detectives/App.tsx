@@ -6,6 +6,7 @@ import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import MissionMap from './MissionMap';
 import LevelSideTabs from './LevelSideTabs';
+import {playEffect} from './sounds';
 'use client';
 
 import Briefing from './Briefing';
@@ -231,6 +232,7 @@ export default function Home() {
       const response = await fetch('/los-archivos-f/api/game', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       const data = await response.json() as GameState & {error?:string;code?:string};
       if (!response.ok) throw new Error(data.error || 'No pudimos guardar. Volvé a intentar.');
+      if(body.action==='unlock'||body.action==='final') playEffect('unlock');
       receiveState(data); setSaveStatus('Progreso guardado'); return data as GameState;
     } catch(error) {
       const text = error instanceof Error ? error.message : 'No hay conexión. Volvé a intentar.';
@@ -423,7 +425,7 @@ export default function Home() {
               <p className="eyebrow dark">{current.kicker}</p><h1>{current.title}</h1>
               {level === 2 && <figure className="level-two-group-scene"><img src="/los-archivos-f/images/suspects-group.jpg" alt="Los cuatro sospechosos reunidos en la sala de entrevistas"/><figcaption>{unlocked?'COARTADA VERIFICADA · REGISTRO CONSERVADO':'REGISTRO DE ENTREVISTAS · CUATRO PERSONAS PRESENTES'}</figcaption></figure>}
               {level === 6 && !unlocked && <><aside className="level-six-physical-prompt" aria-label="Pista para usar los materiales impresos"><span>PISTA FÍSICA · PIEZA G-02</span><h2>Los dos círculos no son decorativos.</h2><p>Buscá el instrumento de señales y la etiqueta de inventario que recibiste impresos. Examiná ambos lados de la etiqueta: su consigna explica qué marca orienta los discos y dónde buscar los números que revelan el mensaje.</p><small>Primero orientá el instrumento. Después relacioná el resultado con las señales que ondean en lo alto.</small></aside><div className="investigation-question"><span>PREGUNTA DE INVESTIGACIÓN</span><p>¿Qué mensaje revelan las banderas después de orientar correctamente los círculos?</p></div></>}
-              {level === 7 && !unlocked && <aside className="level-seven-mechanical-prompt" aria-label="Consigna del compartimento mecánico"><span>COMPARTIMENTO MECÁNICO · LF-04</span><h2>Dos grupos abren una sola cerradura.</h2><p>Separá los números del mecanismo en impares y pares. Sumá cada grupo por separado y escribí los dos resultados juntos, en ese orden, para formar el código de cinco cifras.</p><small>Primero el resultado de los impares. Inmediatamente después, el resultado de los pares.</small></aside>}
+              {level === 7 && !unlocked && <aside className="level-seven-mechanical-prompt" aria-label="Consigna del compartimento mecánico"><span>COMPARTIMENTO MECÁNICO · LF-04</span><h2>Dos recorridos abren una sola cerradura.</h2><p>Seguí los valores que el mecanismo reúne bajo IMPARES y PARES. Sumá cada recorrido por separado y escribí los dos resultados juntos, en ese orden, para formar el código de cinco cifras.</p><small>Respetá las marcas del mecanismo: primero el recorrido IMPARES y, a continuación, el recorrido PARES.</small></aside>}
               {level===3&&<details key={`digital-${level}`} className="clue-envelope digital-envelope"><summary><span>◉</span><b>Abrir receptor de señales<small>Seis registros recuperados · tocar para examinar</small></b><span>+</span></summary><div className="digital-brief"><LightSignal onSolved={setLevelThreeReady}/></div></details>}
               {level === 2 && <section className="suspect-board" aria-label="Panel de sospechosos"><div className="suspect-board-heading"><h2>Cuatro versiones. El mismo intervalo.</h2><p>Abrí cada ficha, observá la escena completa y escuchá con atención lo que declara cada persona.</p></div><div className="suspect-grid">{statements.map((person, index) => <button className="suspect-file" key={person.name} onClick={() => setSelectedStatement(index)} aria-label={`Abrir ficha de ${person.name}`}><div className="suspect-file-photo"><img src={person.image} alt="" /></div><div className="suspect-file-caption"><span>{person.role}</span><h3>{person.name}</h3><p>Abrir declaración <span aria-hidden="true">↗</span></p></div></button>)}</div></section>}
               {level === 4 && !unlocked && <LevelFourPlan solved={checkIndex>0} busy={busy} onSolved={async()=>{if(await gameAction({action:'deduction',level:4,index:0,selection:2})){setCheckSelection(null);setCheckFeedback('');setCheckPassed(false);}}}/>}

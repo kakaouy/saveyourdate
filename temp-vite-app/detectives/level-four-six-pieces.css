@@ -121,6 +121,20 @@
   .diploma-preview .diploma-ink-seal { top:auto; right:calc(50% - 48px); bottom:26px; }
 }
 
+.hint-lens.solution-lens {
+  border-style: dashed;
+  border-color: #b94a55;
+  background: linear-gradient(145deg,#321b25,#142b32);
+  color: #ffd4c8;
+}
+.hint-lens.solution-lens img { filter: sepia(.7) saturate(1.7) hue-rotate(300deg) drop-shadow(0 0 7px #d64b5966); }
+.hint-lens.solution-lens.sealed { opacity:.3; }
+.hint-lens.solution-lens.available { box-shadow:0 0 0 2px #b94a5538,0 0 24px #b94a5545; }
+.hint-lens.solution-lens.used { background:#2d2027; border-color:#9e7472; color:#d8b8af; }
+.hint-lens.solution-lens b { color:#ffb9ac; letter-spacing:.02em; }
+.hint-parchment.solution-parchment { border:2px dashed #8d2632; background:radial-gradient(ellipse at bottom right,#9f433a55,transparent 70%),#e5c99b; }
+.hint-parchment.solution-parchment > span { color:#8d2632; font-weight:900; }
+
 .level-seven-board-copy strong {
   margin-top: 0.4rem;
   padding-top: 0.65rem;
