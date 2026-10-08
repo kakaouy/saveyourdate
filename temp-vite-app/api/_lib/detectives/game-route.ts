@@ -1,4 +1,4 @@
-import { activate, deleteAllGames, GameError, leaderboard, readGame, sessionHash, updateGame } from './game.js';
+import { activate, GameError, leaderboard, readGame, sessionHash, updateGame } from './game.js';
 
 function response(data:unknown,status=200,extra:Record<string,string>={}) { return Response.json(data,{status,headers:{'Cache-Control':'no-store',...extra}}); }
 function failure(error:unknown) { if(error instanceof GameError) return response({error:error.message,code:error.code},error.status); console.error('Game storage operation failed');return response({error:'No pudimos guardar en este momento. Conservamos tu respuesta; volvé a intentar.'},503); }
@@ -8,10 +8,6 @@ export async function POST(request:Request) {
     if(request.headers.get('origin') && request.headers.get('origin')!==new URL(request.url).origin) throw new GameError('Origen no permitido.',403);
     const raw=await request.text();if(raw.length>8000)throw new GameError('Solicitud demasiado larga.');
     const body=JSON.parse(raw);
-    if(body.action==='deleteAllGames') {
-      if(!process.env.DETECTIVES_RESET_SECRET || request.headers.get('x-detectives-reset')!==process.env.DETECTIVES_RESET_SECRET) throw new GameError('No autorizado.',403);
-      return response({deleted:await deleteAllGames()});
-    }
     if(body.action==='activate') {
       const code=String(body.code||'').trim().toUpperCase();
       const state=await activate(code,String(body.agent||''),body.legacy);
