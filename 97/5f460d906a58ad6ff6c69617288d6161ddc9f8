@@ -1,0 +1,23 @@
+temp-vite-app/detectives/App.tsx
+  s_eb3608012a11e9::t_f250e42ca2062a 9,93,184,254-255,258-259,271-272,279-280,367-368,379,384,436
+temp-vite-app/detectives/sounds.ts
+  s_eb3608012a11e9::t_6f6d76d4d6650c 6-9,20-110
+temp-vite-app/detectives/style.css
+  s_eb3608012a11e9::t_62959e6dc39f7f 2281-2290
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "975f460d906a58ad6ff6c69617288d6161ddc9f8",
+  "prompts": {},
+  "sessions": {
+    "s_eb3608012a11e9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11d89-0e01-74e3-a373-9a80950c2664",
+        "model": "unknown"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
