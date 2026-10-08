@@ -719,7 +719,7 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 @keyframes red-warning-pulse{0%,100%{opacity:.45}50%{opacity:1}}
 @keyframes red-corridor-breathe{from{transform:scale(1.01)}to{transform:scale(1.04);filter:saturate(.85) sepia(.25) hue-rotate(315deg) contrast(1.25)}}
 @media(prefers-reduced-motion:reduce){.scene-frame.level-five-red-corridor img,.scene-frame.level-five-red-corridor::before{animation:none}}
-.scene-frame.level-six-flags{background:#060f17}.scene-frame.level-six-flags img{object-fit:contain;object-position:center}
+.scene-frame.level-six-flags{width:min(100%,1100px);aspect-ratio:16/9;margin-inline:auto;background:#060f17}.scene-frame.level-six-flags img{width:100%;height:100%;object-fit:cover;object-position:center}
 
 /* Los rostros permanecen naturales: el movimiento narrativo vive en el ambiente, no en la boca. */
 .fede-mouth,.story-mouth,.suspect-mouth,.late-fede-mouth,.level-five-image-mouth{display:none!important;animation:none!important}
@@ -989,8 +989,7 @@ blockquote { margin:22px 0; border-left:4px solid var(--gold); padding:6px 0 6px
 .scene-frame.level-five-red-corridor:hover::before{filter:brightness(1.45);animation-duration:1.05s}
 
 /* Nivel 6: luces a distintas alturas, balanceo óptico y cartel recuperado. */
-.scene-frame.level-six-flags::before{content:'';position:absolute;z-index:2;inset:0;pointer-events:none;background:radial-gradient(circle at 23% 28%,#ffe29296 0 1.2%,transparent 6%),radial-gradient(circle at 42% 39%,#ffe29275 0 1.2%,transparent 6%),radial-gradient(circle at 61% 23%,#ffe2928a 0 1.2%,transparent 6%),radial-gradient(circle at 77% 47%,#ffe29270 0 1.2%,transparent 6%);animation:flag-height-lights 4s ease-in-out infinite}
-.scene-frame.level-six-flags::after{content:'';position:absolute;z-index:2;left:27%;right:27%;bottom:9%;height:12%;pointer-events:none;background:linear-gradient(90deg,transparent,#f7dd8957,transparent);filter:blur(4px);animation:follow-light-sign 3s ease-in-out infinite}
+.scene-frame.level-six-flags::before,.scene-frame.level-six-flags::after{content:none}
 .scene-frame.level-six-flags img{animation:flag-room-breathe 9s ease-in-out infinite alternate}
 .scene-frame.level-six-flags:hover::before{filter:brightness(1.6)}
 @keyframes flag-height-lights{0%,100%{opacity:.25}25%{opacity:.8}50%{opacity:.38}75%{opacity:1}}
