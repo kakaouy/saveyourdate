@@ -1,7 +1,10 @@
-type Effect = 'type' | 'unlock' | 'panel';
+type Effect = 'type' | 'unlock' | 'panel' | 'paper' | 'piece' | 'rotate' | 'signal' | 'error';
 
 let context: AudioContext | null = null;
 let lastTypeAt = 0;
+let effectsEnabled = true;
+
+export function setEffectsEnabled(enabled: boolean) { effectsEnabled = enabled; }
 
 function audioContext() {
   if (typeof window === 'undefined') return null;
@@ -25,6 +28,7 @@ function tone(ctx: AudioContext, frequency: number, start: number, duration: num
 
 export function playEffect(effect: Effect) {
   try {
+    if (!effectsEnabled) return;
     const ctx = audioContext();
     if (!ctx || ctx.state !== 'running') return;
     const now = ctx.currentTime;
@@ -36,6 +40,20 @@ export function playEffect(effect: Effect) {
     } else if (effect === 'panel') {
       tone(ctx, 210, now, 0.045, 0.025, 'triangle');
       tone(ctx, 310, now + 0.035, 0.055, 0.018, 'sine');
+    } else if (effect === 'paper') {
+      tone(ctx, 680, now, 0.018, 0.006, 'triangle');
+      tone(ctx, 520, now + 0.025, 0.024, 0.005, 'sine');
+    } else if (effect === 'piece') {
+      tone(ctx, 125, now, 0.045, 0.018, 'triangle');
+      tone(ctx, 82, now + 0.018, 0.06, 0.014, 'sine');
+    } else if (effect === 'rotate') {
+      tone(ctx, 260, now, 0.025, 0.012, 'triangle');
+      tone(ctx, 210, now + 0.028, 0.035, 0.01, 'triangle');
+    } else if (effect === 'signal') {
+      tone(ctx, 740, now, 0.045, 0.012, 'sine');
+    } else if (effect === 'error') {
+      tone(ctx, 145, now, 0.07, 0.02, 'sawtooth');
+      tone(ctx, 112, now + 0.055, 0.08, 0.016, 'triangle');
     } else {
       tone(ctx, 196, now, 0.12, 0.035, 'triangle');
       tone(ctx, 294, now + 0.09, 0.14, 0.04, 'triangle');

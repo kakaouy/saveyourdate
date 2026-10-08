@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {playEffect} from './sounds';
 
 const pieces=[
   {id:'A1',slot:0,start:180},{id:'A3',slot:2,start:270},{id:'B3',slot:4,start:180},
@@ -22,7 +23,7 @@ export default function LevelFourPlan({solved,busy,onSolved}:{solved:boolean;bus
   function choose(id:string){
     const selected=pieces.find(piece=>piece.id===id);
     if(!selected||Object.values(placed).includes(id)||solved)return;
-    setActive(id);setRotation(selected.start);setFlipped(false);setWrongSlot(null);
+    playEffect('piece');setActive(id);setRotation(selected.start);setFlipped(false);setWrongSlot(null);
     setFeedback('Fragmento seleccionado. Giralo y probalo sobre el plano.');
   }
 
@@ -31,11 +32,11 @@ export default function LevelFourPlan({solved,busy,onSolved}:{solved:boolean;bus
     if(!activePiece){setFeedback('Primero elegí una pieza de la bandeja.');return;}
     if(placed[slot]){setFeedback('Ese sector ya está reconstruido. Probá en otro lugar.');return;}
     if(activePiece.slot!==slot||rotation%360!==0||flipped){
-      setWrongSlot(slot);
+      playEffect('error');setWrongSlot(slot);
       setFeedback(activePiece.slot===slot?'La posición coincide, pero la orientación no. Girá o invertí la pieza.':'Una pared o una marca queda cortada. Probá otro sector.');
       window.setTimeout(()=>setWrongSlot(null),650);return;
     }
-    const next={...placed,[slot]:activePiece.id};setPlaced(next);setActive(null);setWrongSlot(null);
+    playEffect('piece');const next={...placed,[slot]:activePiece.id};setPlaced(next);setActive(null);setWrongSlot(null);
     setFeedback(Object.keys(next).length===12?'Plano completo. Ahora seguí el recorrido desde INICIO.':`Fragmento confirmado. Faltan ${12-Object.keys(next).length} piezas.`);
   }
 
@@ -60,9 +61,9 @@ export default function LevelFourPlan({solved,busy,onSolved}:{solved:boolean;bus
         <button type="button" className={`level-four-room room-7 ${route.includes(7)?'visited':''}`} disabled={!aligned||solved} onClick={()=>visit(7)}>7<span>Escalera</span></button>
         <svg className={`level-four-route route-${route.length}`} viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden="true"><path d="M185 555 C310 510 365 430 500 390 S690 285 815 190"/></svg>
       </div></div>
-      <aside className="level-four-tray"><div><span>FRAGMENTOS</span><b>{12-Object.keys(placed).length} PENDIENTES</b></div><div className={`level-four-active-preview ${activePiece?'has-piece':''}`}>{activePiece?<><span className="level-four-active-image" style={{'--piece-x':`${(activePiece.slot%4)*33.333}%`,'--piece-y':`${Math.floor(activePiece.slot/4)*50}%`,transform:`rotate(${rotation}deg) scaleX(${flipped?-1:1})`} as React.CSSProperties}/><b>FRAGMENTO {activePiece.id}</b><small>{rotation}° {flipped?'· INVERTIDO':''}</small></>:<p>Seleccioná una pieza para verla ampliada.</p>}</div><div className="level-four-mobile-controls"><button type="button" onClick={()=>setRotation((rotation+90)%360)} disabled={!active||solved||busy}>↻ Girar 90°</button><button type="button" onClick={()=>setFlipped(!flipped)} disabled={!active||solved||busy}>⇆ Dar vuelta</button><output aria-live="polite">{active?`${active} · ${rotation}°${flipped?' · INVERTIDO':''}`:'Elegí una pieza'}</output></div><div className="level-four-pieces">{pieces.map(piece=><button type="button" key={piece.id} className={`${active===piece.id?'selected':''} ${Object.values(placed).includes(piece.id)?'used':''}`} disabled={solved||Object.values(placed).includes(piece.id)} onClick={()=>choose(piece.id)} aria-label={`Elegir fragmento ${piece.id}`}><span style={{'--piece-x':`${(piece.slot%4)*33.333}%`,'--piece-y':`${Math.floor(piece.slot/4)*50}%`,transform:`rotate(${piece.start}deg)`} as React.CSSProperties}/><b>{piece.id}</b></button>)}</div><p>Trabajá con una pieza por vez. Girala en la vista grande y comparala con las líneas visibles del plano.</p></aside>
+      <aside className="level-four-tray"><div><span>FRAGMENTOS</span><b>{12-Object.keys(placed).length} PENDIENTES</b></div><div className={`level-four-active-preview ${activePiece?'has-piece':''}`}>{activePiece?<><span className="level-four-active-image" style={{'--piece-x':`${(activePiece.slot%4)*33.333}%`,'--piece-y':`${Math.floor(activePiece.slot/4)*50}%`,transform:`rotate(${rotation}deg) scaleX(${flipped?-1:1})`} as React.CSSProperties}/><b>FRAGMENTO {activePiece.id}</b><small>{rotation}° {flipped?'· INVERTIDO':''}</small></>:<p>Seleccioná una pieza para verla ampliada.</p>}</div><div className="level-four-mobile-controls"><button type="button" onClick={()=>{playEffect('rotate');setRotation((rotation+90)%360);}} disabled={!active||solved||busy}>↻ Girar 90°</button><button type="button" onClick={()=>{playEffect('rotate');setFlipped(!flipped);}} disabled={!active||solved||busy}>⇆ Dar vuelta</button><output aria-live="polite">{active?`${active} · ${rotation}°${flipped?' · INVERTIDO':''}`:'Elegí una pieza'}</output></div><div className="level-four-pieces">{pieces.map(piece=><button type="button" key={piece.id} className={`${active===piece.id?'selected':''} ${Object.values(placed).includes(piece.id)?'used':''}`} disabled={solved||Object.values(placed).includes(piece.id)} onClick={()=>choose(piece.id)} aria-label={`Elegir fragmento ${piece.id}`}><span style={{'--piece-x':`${(piece.slot%4)*33.333}%`,'--piece-y':`${Math.floor(piece.slot/4)*50}%`,transform:`rotate(${piece.start}deg)`} as React.CSSProperties}/><b>{piece.id}</b></button>)}</div><p>Trabajá con una pieza por vez. Girala en la vista grande y comparala con las líneas visibles del plano.</p></aside>
     </div>
-    <div className="level-four-controls"><button type="button" onClick={()=>setRotation((rotation+90)%360)} disabled={!active||solved||busy}>↻ Girar 90°</button><button type="button" onClick={()=>setFlipped(!flipped)} disabled={!active||solved||busy}>⇆ Dar vuelta</button><div>{active?<>FRAGMENTO ACTIVO <b>{active}</b> · {rotation}° {flipped?'· INVERTIDO':''}</>:'SELECCIONÁ UN FRAGMENTO'}</div><output aria-live="polite">{feedback}</output></div>
+    <div className="level-four-controls"><button type="button" onClick={()=>{playEffect('rotate');setRotation((rotation+90)%360);}} disabled={!active||solved||busy}>↻ Girar 90°</button><button type="button" onClick={()=>{playEffect('rotate');setFlipped(!flipped);}} disabled={!active||solved||busy}>⇆ Dar vuelta</button><div>{active?<>FRAGMENTO ACTIVO <b>{active}</b> · {rotation}° {flipped?'· INVERTIDO':''}</>:'SELECCIONÁ UN FRAGMENTO'}</div><output aria-live="polite">{feedback}</output></div>
     <div className="level-four-ledger"><span className={aligned?'ok':''}>◇ Norte</span><span className={aligned?'ok':''}>◉ Marca I</span><span className={aligned?'ok':''}>◉ Marca II</span><span className={aligned?'ok':''}>◉ Marca III</span><b>{solved?'RUTA 937 · CONFIRMADA':aligned?`RECORRIDO ${route.join(' → ')||'POR TRAZAR'}`:`PIEZAS COLOCADAS ${Object.keys(placed).length-6}/6`}</b></div>
   </section>;
 }

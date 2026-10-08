@@ -3,6 +3,7 @@ import TransmissionPlayer from './TransmissionPlayer';
 import LevelSideTabs from './LevelSideTabs';
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {terminalIntro,terminalSuccess} from './terminal-script';
+import {playEffect} from './sounds';
 
 function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) {
  const audio=useRef<HTMLAudioElement>(null);
@@ -57,8 +58,8 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
     {!unlocked?<><label>Clave de emergencia:<br/>instante de interrupción</label><p>INGRESO DISPONIBLE EN EL CANDADO LATERAL</p></>:<><p>ARCHIVO DE PERSONAL HABILITADO</p><button type="button" onClick={()=>setSuccess(true)}>ESCUCHAR INFORME</button></>}
     <span className="terminal-command-cursor" aria-hidden="true">▌</span>
    </form>}
-   <button type="button" className="terminal-power-button" aria-label={powered?'Apagar computadora':'Encender computadora'} aria-pressed={powered} onClick={()=>setPowered(current=>!current)}><span className="sr-only">{powered?'Apagar':'Encender'}</span></button>
-   <button type="button" className="terminal-lamp-chain-button" aria-label={lightOn?'Apagar lámpara':'Encender lámpara'} aria-pressed={lightOn} onClick={()=>setLightOn(current=>!current)}><span className="sr-only">{lightOn?'Apagar':'Encender'} lámpara</span></button>
+   <button type="button" className="terminal-power-button" aria-label={powered?'Apagar computadora':'Encender computadora'} aria-pressed={powered} onClick={()=>{playEffect('panel');setPowered(current=>!current);}}><span className="sr-only">{powered?'Apagar':'Encender'}</span></button>
+   <button type="button" className="terminal-lamp-chain-button" aria-label={lightOn?'Apagar lámpara':'Encender lámpara'} aria-pressed={lightOn} onClick={()=>{playEffect('piece');setLightOn(current=>!current);}}><span className="sr-only">{lightOn?'Apagar':'Encender'} lámpara</span></button>
   </div>
   {message&&!unlocked&&<p className="terminal-error" role="status">{message}</p>}
   {unlocked&&!lighting&&<button className="primary-button" onClick={onContinue}>CONTINUAR LA INVESTIGACIÓN →</button>}

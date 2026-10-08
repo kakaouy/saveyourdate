@@ -1,4 +1,5 @@
 import { useRef, useState, type CSSProperties } from 'react';
+import {playEffect} from './sounds';
 
 export default function HintLenses({hints, used, busy, canRequest, onRequest}: {
   hints: string[]; used: number; busy: boolean; canRequest: boolean; onRequest: () => Promise<boolean>;
@@ -7,10 +8,10 @@ export default function HintLenses({hints, used, busy, canRequest, onRequest}: {
   const pending = useRef(false);
   const consulted = Array.from({length:used},(_,i)=>i);
   async function reveal(index: number) {
-    if (consulted.includes(index)) { setActive(index); return; }
+    if (consulted.includes(index)) { playEffect('paper'); setActive(index); return; }
     if (index !== used || pending.current || busy || !canRequest) return;
     pending.current = true;
-    try { if (await onRequest()) setActive(index); }
+    try { if (await onRequest()) { playEffect('paper'); setActive(index); } }
     finally { pending.current = false; }
   }
   return <section className="hint-lenses" aria-label="Pistas de la investigación" onKeyDown={e=>{if(e.key==='Escape')setActive(null);}}>

@@ -1,4 +1,5 @@
 import {useState, type CSSProperties} from 'react';
+import {playEffect} from './sounds';
 
 type Signal = {id:string; name:string; symbol:string; pattern:string};
 const signals: Signal[] = [
@@ -22,14 +23,14 @@ export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void
   const [ordered,setOrdered]=useState<Signal[]>([]);
   const [feedback,setFeedback]=useState('');
   const [dragged,setDragged]=useState<string|null>(null);
-  function add(signal:Signal){setAvailable(items=>items.filter(item=>item.id!==signal.id));setOrdered(items=>[...items,signal]);setFeedback('');onSolved(false);}
-  function remove(signal:Signal){setOrdered(items=>items.filter(item=>item.id!==signal.id));setAvailable(items=>[...items,signal]);setFeedback('');onSolved(false);}
-  function move(index:number,direction:-1|1){const target=index+direction;if(target<0||target>=ordered.length)return;setOrdered(items=>{const next=[...items];[next[index],next[target]]=[next[target],next[index]];return next;});setFeedback('');onSolved(false);}
+  function add(signal:Signal){playEffect('signal');setAvailable(items=>items.filter(item=>item.id!==signal.id));setOrdered(items=>[...items,signal]);setFeedback('');onSolved(false);}
+  function remove(signal:Signal){playEffect('paper');setOrdered(items=>items.filter(item=>item.id!==signal.id));setAvailable(items=>[...items,signal]);setFeedback('');onSolved(false);}
+  function move(index:number,direction:-1|1){const target=index+direction;if(target<0||target>=ordered.length)return;playEffect('rotate');setOrdered(items=>{const next=[...items];[next[index],next[target]]=[next[target],next[index]];return next;});setFeedback('');onSolved(false);}
   function analyze(){
-    if(ordered.length<signals.length){setFeedback('Ubicá las seis señales antes de analizar la secuencia.');return;}
+    if(ordered.length<signals.length){playEffect('error');setFeedback('Ubicá las seis señales antes de analizar la secuencia.');return;}
     const ids=ordered.map(item=>item.id);
     const correct=ids[0]==='compass'&&ids[1]==='lantern'&&ids.slice(2,4).every(id=>id.startsWith('wave-'))&&ids[4]==='key'&&ids[5]==='anchor';
-    if(!correct){setFeedback('Las señales pueden estar bien interpretadas y aun así formar un mensaje incorrecto. Revisá las anotaciones de la cafetería.');onSolved(false);return;}
+    if(!correct){playEffect('error');setFeedback('Las señales pueden estar bien interpretadas y aun así formar un mensaje incorrecto. Revisá las anotaciones de la cafetería.');onSolved(false);return;}
     setFeedback('Secuencia reconstruida. Ya podés ingresar el lugar señalado.');onSolved(true);
   }
   return <section className="signal-workbench" aria-label="Receptor de seis señales desordenadas">

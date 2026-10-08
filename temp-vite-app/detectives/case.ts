@@ -42,10 +42,10 @@ export const levels = [
   {
     title: 'El registro oculto',
     kicker: 'NIVEL 5 · LABORATORIO',
-    prompt: '¿A qué destino fue enviado el registro R-17?',
+    prompt: 'Registrá el código recuperado y conectalo con la persona asociada al material.',
     evidence: ['Informe de Conservación', 'Material de lectura del nivel 5'],
     digital: 'Los movimientos del taller registran código, operador, material y destino. Recuperá primero el dato oculto del informe y después buscalo en la tabla.',
-    placeholder: 'Destino', answer: ['banderas', 'sala de banderas', 'la sala de banderas'], lock: 'label',
+    placeholder: 'Conexión', answer: ['banderas', 'sala de banderas', 'la sala de banderas'], lock: 'label',
     hints: ['Hay información que no se distingue a simple vista en el informe.', 'Cuando recuperes un código, buscalo en la primera columna de la tabla de movimientos.', 'En la fila de R-17, relacioná el material Resina RX-4 con la sospechosa que viste trabajar con él.', 'SOLUCIÓN DIRECTA · Registrá R-17, elegí a Martina y confirmá la conexión. El destino es la Sala de Banderas.'],
     unlock: 'Destino de R-17 identificado',
   },
