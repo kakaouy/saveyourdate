@@ -1,0 +1,19 @@
+temp-vite-app/api/_lib/detectives/game.ts
+  s_6318414fcded59::t_25a58f30f46ee0 75-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "10b2344e791bd8644da1a646b800a9f7e0cfde04",
+  "prompts": {},
+  "sessions": {
+    "s_6318414fcded59": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11d31-77f1-7762-a5bf-0d80f5201f4c",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
