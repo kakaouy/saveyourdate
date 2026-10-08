@@ -50,6 +50,10 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
  if(success)return <FedeTransmission success onClose={()=>{setSuccess(false);onContinue();}}/>;
  return <section className="terminal-level">
   <div className="terminal-heading"><p className="eyebrow">NIVEL 1 · ARCHIVO F-01</p></div>
+  <div className="level-objective">
+   <span>OBJETIVO</span>
+   <p>Revisá los registros de las cámaras de seguridad y comparalos con las fotografías de los sobres de Información confidencial.</p>
+  </div>
   <div className={`terminal-scene ${powered?'terminal-powered':'terminal-off'} ${lighting?'terminal-illuminated':''}`}>
    <img src={!lightOn?'/los-archivos-f/images/terminal-lampara-apagada-v1.png':powered?'/los-archivos-f/images/terminal-encendida-v1.png':'/los-archivos-f/images/terminal-recuperacion-v1.png'} alt={`Computadora antigua del archivo ${powered?'encendida':'apagada'} y lámpara ${lightOn?'encendida':'apagada'}`}/>
    {lightOn&&<span className="terminal-lamp-pulse" aria-hidden="true"/>}<span className="terminal-scanlines" aria-hidden="true"/>
