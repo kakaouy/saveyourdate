@@ -1,0 +1,19 @@
+temp-vite-app/detectives/style.css
+  s_f291442a48892c::t_f7fd10551c9276 2275-2277
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1e9cdc3331462b92c5011895045b91ea25f81174",
+  "prompts": {},
+  "sessions": {
+    "s_f291442a48892c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11c36-2863-7a20-8ce6-3b2576b5a3ae",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
