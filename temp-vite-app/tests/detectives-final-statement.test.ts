@@ -4,7 +4,7 @@ import {createServer} from 'vite';
 import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 
-test('D-05 no se muestra antes de resolver el compartimento y no cierra la partida',async()=>{
+test('el audio final de Martina aparece después del compartimento y no cierra la partida',async()=>{
  const server=await createServer({configFile:false,server:{middlewareMode:true},appType:'custom'});
  try{
   const {default:Statement}=await server.ssrLoadModule('/detectives/FinalStatement.tsx');
@@ -14,9 +14,10 @@ test('D-05 no se muestra antes de resolver el compartimento y no cierra la parti
   applyAction(state,{action:'unlock',level:7,answer:'11820'});
   const before=structuredClone(state);
   const markup=renderToStaticMarkup(createElement(Statement,{highestLevel:state.highestLevel}));
-  for(const phrase of ['D-05','R-17','LF-04','medicina','K-01']) assert.ok(markup.includes(phrase));
+  for(const phrase of ['REGISTRO DE AUDIO','Martina Ríos','interrogatorio-martina.wav']) assert.ok(markup.includes(phrase));
+  for(const phrase of ['Nueva declaración','K-01','Preparar la reconstrucción']) assert.ok(!markup.includes(phrase));
   assert.deepEqual(state,before);
   assert.equal(state.completedAt,null);
-  assert.ok(!markup.includes('<audio'));
+  assert.ok(markup.includes('<audio'));
  }finally{await server.close();}
 });

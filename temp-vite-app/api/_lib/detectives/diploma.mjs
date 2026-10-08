@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
+import { readFile } from 'node:fs/promises';
 
 /** Diploma vectorial: texto personalizable y sellos originales, sin imágenes de stock. */
 export async function makeDiploma(state) {
@@ -9,6 +10,7 @@ export async function makeDiploma(state) {
   const italic=await pdf.embedFont(StandardFonts.TimesRomanItalic);
   const mono=await pdf.embedFont(StandardFonts.Courier);
   const monoBold=await pdf.embedFont(StandardFonts.CourierBold);
+  const logo=await pdf.embedPng(await readFile(new URL('../../../public/los-archivos-f/images/logo-archivos-f.png',import.meta.url)));
   const paper=rgb(.95,.91,.81), ink=rgb(.08,.18,.20), gold=rgb(.62,.48,.27), red=rgb(.59,.13,.16);
   const hints=Object.values(state.hints).reduce((a,b)=>a+b,0);
   const rank=hints<=1?'Detective del Faro':hints<=3?'Especialista en Evidencias':'Agente de Investigación';
@@ -27,23 +29,25 @@ export async function makeDiploma(state) {
   for(const x of [34,807.89]) for(const y of [34,561.28]) {
     page.drawCircle({x,y,size:3,color:gold});line(x-2,y,x+2,y,ink,.5);
   }
-  text('EXPEDIENTE F-01',49,537,9,monoBold);
-  text('ESTADO: RESUELTO',49,522,8,mono,red);
-  text('EDICIÓN ESPECIAL',642,537,8,monoBold);
-  text('11 AÑOS DE FEDE',642,522,8,mono);
-  center('LOS ARCHIVOS F',421,519,28,bold);
-  center('A G E N C I A   D E   I N V E S T I G A C I Ó N',421,500,8,mono);
-  line(49,484,793,484);
-  center('DIPLOMA DE RECONOCIMIENTO',351,450,12,monoBold);
-  center('Se reconoce la labor del agente o equipo',351,422,13,italic);
+  rect(36,479,769.89,78,ink);
+  page.drawImage(logo,{x:49,y:486,width:62,height:62});
+  text('EXPEDIENTE F-01',129,532,9,monoBold,paper);
+  text('ESTADO: CASO CERRADO',129,515,8,mono,red);
+  text('EDICIÓN ESPECIAL',670,532,8,monoBold,paper);
+  text('11 AÑOS DE FEDE',670,515,8,mono,paper);
+  center('LOS ARCHIVOS F',421,522,27,bold,paper);
+  center('A G E N C I A   D E   I N V E S T I G A C I Ó N',421,500,8,mono,gold);
+  line(49,470,793,470);
+  center('DIPLOMA DE RECONOCIMIENTO',351,446,12,monoBold,red);
+  center('Se reconoce la labor del agente o equipo',351,418,13,italic);
   const nameSize=Math.min(36,530/Math.max(1,bold.widthOfTextAtSize(alias,1)));
-  center(alias,351,377,nameSize,bold);
-  line(83,365,619,365);
-  center('Por observar con atención, comparar las pruebas y seguir',351,342,13,serif);
-  center('cada pista hasta reconstruir y resolver el caso',351,323,13,serif);
-  center('EL ROBO DEL RUBÍ DEL FARO',351,291,18,bold,red);
-  center(rank,351,259,18,italic);
-  center(`${hints} ${hints===1?'pista consultada':'pistas consultadas'} · Investigación completada`,351,241,9,mono);
+  center(alias,351,373,nameSize,bold);
+  line(83,361,619,361);
+  center('Por observar con atención, comparar las pruebas y seguir',351,338,13,serif);
+  center('cada pista hasta reconstruir y resolver el caso',351,319,13,serif);
+  center('EL ROBO DEL RUBÍ DEL FARO',351,287,18,bold,red);
+  center(rank,351,255,18,italic);
+  center(`${hints} ${hints===1?'pista consultada':'pistas consultadas'} · Investigación completada`,351,237,9,mono);
   // A worn circular ink stamp, drawn specifically for this game.
   const sx=715, sy=378, radius=67;
   for(let i=0;i<48;i++) {
