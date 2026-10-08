@@ -16,7 +16,7 @@ test('pistas: siempre secuenciales, conservan progreso y respetan el máximo', a
   const legacy={agent:'Prueba',highestLevel:1,hints:{1:1},checkProgress:{},completedAt:null};
   applyAction(legacy,{action:'hint',level:1});assert.equal(legacy.hints[1],2);
   const codes=JSON.parse(readFileSync(new URL('../api/_lib/detectives/access-codes.json',import.meta.url),'utf8'));
-  for(const code of ['PRUEBA',...Array.from({length:20},(_,i)=>`PRUEBA${i+1}`)]) assert.ok(codes.includes(await hashCode(` ${code.toLowerCase()} `)));
-  assert.ok(!codes.includes(await hashCode('PRUEBA21')));
+  for(const code of Array.from({length:10},(_,i)=>`C${i+1}`)) assert.ok(codes.includes(await hashCode(` ${code.toLowerCase()} `)));
+  assert.ok(!codes.includes(await hashCode('C11')));
  }finally{await server.close();}
 });
