@@ -1,0 +1,181 @@
+temp-vite-app/docs/modular-invitations.md
+  s_39b35e1573391e::t_2a9e1d9fcffe7b 1-42
+  s_39b35e1573391e::t_e837743fd726c8 43-46
+temp-vite-app/api/admin/[action].ts
+  s_39b35e1573391e::t_c966763d439987 18,41
+  s_39b35e1573391e::t_9cccd7c3189019 19,42
+  s_39b35e1573391e::t_ab2720b55e1f53 17,40
+  s_39b35e1573391e::t_17c1788447ff6c 20,43
+temp-vite-app/src/components/invitation-builder/templates.ts
+  s_39b35e1573391e::t_5f97dbf44d1d8c 14-17,54-63
+  s_39b35e1573391e::t_b9ae7ccb46c707 1-9,18-43,64-67
+  s_39b35e1573391e::t_18fc63117ea0c3 10-13,44-53
+temp-vite-app/src/domain/section-dom-order.ts
+  s_39b35e1573391e::t_c96a06bb0cef1f 1-7,9-18,22-23,25-27
+  s_39b35e1573391e::t_f9e76ea76e9c41 8,19-21,24
+  s_39b35e1573391e::t_260ed6294af9b4 28-42
+temp-vite-app/supabase/migrations/20260813000000_modular_invitations.sql
+  s_39b35e1573391e::t_67aa382751d433 15-22
+  s_39b35e1573391e::t_2a9e1d9fcffe7b 1-14,23-98,124-127,130-137,140-142,145-147
+  s_39b35e1573391e::t_1daba314ce4793 99-111,128,138,143,148-149
+  s_39b35e1573391e::t_9cccd7c3189019 112-123,129,139,144,150
+temp-vite-app/src/index.css
+  s_39b35e1573391e::t_eaf3d958895e69 43-52
+temp-vite-app/supabase/migrations/20260813020000_fix_atomic_table_assignments.sql
+  s_39b35e1573391e::t_cfcd503ea69b0b 1-92
+temp-vite-app/api/_lib/admin/resources.ts
+  s_39b35e1573391e::t_6d3291842e0706 39
+  s_39b35e1573391e::t_9cccd7c3189019 1-38,40-54
+temp-vite-app/supabase/migrations/20260813010000_invitation_review_events.sql
+  s_39b35e1573391e::t_bc9aea2ee89f34 1-20
+temp-vite-app/api/_lib/admin/events.ts
+  s_39b35e1573391e::t_c966763d439987 1-61
+temp-vite-app/src/components/astraea/AstraeaInvitation.tsx
+  s_39b35e1573391e::t_b9ae7ccb46c707 7
+temp-vite-app/src/components/invitation-builder/builder-persistence.css
+  s_39b35e1573391e::t_3b701a9e29393f 41-42
+  s_39b35e1573391e::t_8df0ba9995513c 1-17,21
+  s_39b35e1573391e::t_9c62c02cdaf450 18-20
+  s_39b35e1573391e::t_f9e76ea76e9c41 22-34
+  s_39b35e1573391e::t_829e23dd41d7f7 35-36
+  s_39b35e1573391e::t_8761ce6ba51e5c 37-40
+temp-vite-app/src/domain/invitation-builder.ts
+  s_39b35e1573391e::t_88d89a460b6921 1-104
+temp-vite-app/api/_lib/admin/session.ts
+  s_39b35e1573391e::t_0f61a4d8dff9b8 2-4,14-24,46,48
+temp-vite-app/api/_lib/admin-auth.ts
+  s_39b35e1573391e::t_07d6ad4bbd2884 4,10,46,84,113
+temp-vite-app/tests/aurora-builder.test.ts
+  s_39b35e1573391e::t_e0a10bcbb80513 4,16
+  s_39b35e1573391e::t_18fc63117ea0c3 7-8,38-46
+  s_39b35e1573391e::t_5f97dbf44d1d8c 9-10,47-55
+  s_39b35e1573391e::t_9eec8b668e0b38 1-2,11-15,17-28,56
+  s_39b35e1573391e::t_41ef4b88e08d1c 3,5-6,29-37
+temp-vite-app/src/components/aurora/AuroraInvitation.tsx
+  s_39b35e1573391e::t_2d89fbaf7cad80 32,48-49,153,155
+  s_39b35e1573391e::t_a4e72be38e59c9 154
+  s_39b35e1573391e::t_f9e76ea76e9c41 101
+  s_39b35e1573391e::t_c96a06bb0cef1f 16
+  s_39b35e1573391e::t_d4240da4e4787d 156
+temp-vite-app/src/components/varezzia/VarezziaInvitation.tsx
+  s_39b35e1573391e::t_260ed6294af9b4 6,9,11,28-29,33-36
+temp-vite-app/src/main.tsx
+  s_39b35e1573391e::t_eaf3d958895e69 4,6-13,37
+  s_39b35e1573391e::t_ba9fbaea47b3eb 29-30
+  s_39b35e1573391e::t_dccb5704667073 31-32
+temp-vite-app/src/components/aurora/builder.ts
+  s_39b35e1573391e::t_1b7a9f55fdb0f3 1-4
+  s_39b35e1573391e::t_e0a10bcbb80513 28
+  s_39b35e1573391e::t_9eec8b668e0b38 5-27,29-48,70-85
+  s_39b35e1573391e::t_37d3af23757c68 60
+  s_39b35e1573391e::t_b9ae7ccb46c707 49-59,61-69
+temp-vite-app/api/_lib/backup-validation.ts
+  s_39b35e1573391e::t_07d6ad4bbd2884 60
+temp-vite-app/src/components/invitation-builder/InvitationBuilderPage.tsx
+  s_39b35e1573391e::t_9c62c02cdaf450 11,23,77,80,116-118,174
+  s_39b35e1573391e::t_8c3f6698c04f6a 9,12,20,79,112-115,119-122,165-170,173
+  s_39b35e1573391e::t_829e23dd41d7f7 27-31,45-49,191-210,212-214,216,218-219,221
+  s_39b35e1573391e::t_8761ce6ba51e5c 50-51,53-59,211,215,217,220
+  s_39b35e1573391e::t_5ae1ce8141bc35 52
+  s_39b35e1573391e::t_5560dae05bcdb2 5,32-33,67-72,164,175,189,236
+  s_39b35e1573391e::t_d09a2145cf17cb 1,17-19,74-76,78,84-111,123,161
+  s_39b35e1573391e::t_8df0ba9995513c 7
+  s_39b35e1573391e::t_3b701a9e29393f 10,21-22,81-83,124-160,176-179
+  s_39b35e1573391e::t_2d89fbaf7cad80 2-4,6,8,13-16,24-26,34-44,60-66,73,162-163,171-172,180-188,190,222-235,237-240
+temp-vite-app/api/orders/review-invitation.ts
+  s_39b35e1573391e::t_1daba314ce4793 11-15,26,28-29,39-44,50
+  s_39b35e1573391e::t_dccb5704667073 1-10,16-25,27,30-38,45-49,51-57
+temp-vite-app/src/App.css
+  s_39b35e1573391e::t_3fb9ff74b69249 4790-4861,4922-4944,4958-4960
+  s_39b35e1573391e::t_9c62c02cdaf450 4862-4921,4945-4957
+  s_39b35e1573391e::t_eaf3d958895e69 1482
+  s_39b35e1573391e::t_43cca70547fe31 3288-3299
+temp-vite-app/api/invitation.ts
+  s_39b35e1573391e::t_ba9fbaea47b3eb 1-21
+temp-vite-app/vercel.json
+  s_39b35e1573391e::t_3fb9ff74b69249 18-20
+temp-vite-app/src/components/invitation-builder/invitation-builder.css
+  s_39b35e1573391e::t_2d89fbaf7cad80 1
+temp-vite-app/src/admin-prototype.css
+  s_39b35e1573391e::t_68f263bbda24ac 410-414
+temp-vite-app/api/_lib/admin/access.ts
+  s_39b35e1573391e::t_a4265e02ec36b6 5,17,23,38,50
+temp-vite-app/src/components/verona/VeronaInvitation.tsx
+  s_39b35e1573391e::t_260ed6294af9b4 6,9,11,28-29,33-36
+temp-vite-app/src/App.tsx
+  s_39b35e1573391e::t_1235245358a187 1832-1834
+  s_39b35e1573391e::t_624877f57ba47f 8-14,1707,3343,3578
+  s_39b35e1573391e::t_65c248f21495e6 2336,2342
+  s_39b35e1573391e::t_2d89fbaf7cad80 1229,1708
+  s_39b35e1573391e::t_3c1ee5e3546ffb 7
+temp-vite-app/api/_lib/admin/settings.ts
+  s_39b35e1573391e::t_a4265e02ec36b6 11
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_39b35e1573391e::t_845f405b56b9d9 247,253
+  s_39b35e1573391e::t_d7ed388353ff6e 307-316,6495-6498,6572,6611
+  s_39b35e1573391e::t_f3fadfbdeb3a4f 87,5816,5822,5985,6007-6009,6013-6018,6072,6085,6091-6092,6105,6224,6715-6716
+  s_39b35e1573391e::t_84efd187a4470a 6126
+  s_39b35e1573391e::t_17c1788447ff6c 5052,5059,5073,5117-5132,5401-5404,6774
+  s_39b35e1573391e::t_7d5c84e7780656 6489-6490,6499-6510,6602-6604
+  s_39b35e1573391e::t_0f61a4d8dff9b8 91
+temp-vite-app/src/components/rosewood/RosewoodInvitation.tsx
+  s_39b35e1573391e::t_f9e76ea76e9c41 73
+  s_39b35e1573391e::t_a4e72be38e59c9 69
+  s_39b35e1573391e::t_c96a06bb0cef1f 15,25,35-36,68,70
+  s_39b35e1573391e::t_147f6e1901d6df 71
+temp-vite-app/src/components/coruscant/CoruscantInvitation.tsx
+  s_39b35e1573391e::t_b9ae7ccb46c707 7
+temp-vite-app/src/components/InvitationReviewPage.tsx
+  s_39b35e1573391e::t_f1054be0041d02 30-32
+  s_39b35e1573391e::t_dccb5704667073 1-6,13-18,22,24-26,28-29,33-34,37-38,41-47,49,51
+  s_39b35e1573391e::t_1daba314ce4793 7-12,19-21,23,27,35-36,39-40,48,50
+temp-vite-app/src/domain/access-control.ts
+  s_39b35e1573391e::t_88d89a460b6921 1-98
+temp-vite-app/tests/invitation-builder.test.ts
+  s_39b35e1573391e::t_88d89a460b6921 1-45
+temp-vite-app/api/_lib/admin/invitation-builder.ts
+  s_39b35e1573391e::t_a4265e02ec36b6 69-70,118-120
+  s_39b35e1573391e::t_9c62c02cdaf450 111-113,127
+  s_39b35e1573391e::t_ab2720b55e1f53 1,3-12,15-26,34-53,75-78,84-85,89-110,114-117,121-123,138-148
+  s_39b35e1573391e::t_ba9fbaea47b3eb 2,131-137
+  s_39b35e1573391e::t_c966763d439987 27-29
+  s_39b35e1573391e::t_600c2a76776b37 30-33
+  s_39b35e1573391e::t_8c3f6698c04f6a 54-56,63,66-68,71-74
+  s_39b35e1573391e::t_1daba314ce4793 57-62,64-65,124-126,128-130
+  s_39b35e1573391e::t_41ef4b88e08d1c 14,79-83,86-88
+  s_39b35e1573391e::t_5f97dbf44d1d8c 13
+temp-vite-app/src/components/rivendell/RivendellInvitation.tsx
+  s_39b35e1573391e::t_f9e76ea76e9c41 73
+  s_39b35e1573391e::t_c96a06bb0cef1f 15,25,35-36,68-70
+  s_39b35e1573391e::t_2d9201288c54a7 71
+temp-vite-app/api/_lib/admin/request-code.ts
+  s_39b35e1573391e::t_07d6ad4bbd2884 6,28,33
+temp-vite-app/src/components/PublishedInvitationPage.tsx
+  s_39b35e1573391e::t_ba9fbaea47b3eb 1-30
+temp-vite-app/api/_lib/admin/audit.ts
+  s_39b35e1573391e::t_07d6ad4bbd2884 2,7
+temp-vite-app/src/components/PaymentValidationPage.tsx
+  s_39b35e1573391e::t_3fb9ff74b69249 130-136
+temp-vite-app/api/_lib/admin/modules.ts
+  s_39b35e1573391e::t_17c1788447ff6c 1-35
+temp-vite-app/supabase/orders.sql
+  s_39b35e1573391e::t_67aa382751d433 116,226
+temp-vite-app/tests/access-control.test.ts
+  s_39b35e1573391e::t_88d89a460b6921 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8770ca891c7d7fd24884bcdf5c81b14e1c4446b8",
+  "prompts": {},
+  "sessions": {
+    "s_39b35e1573391e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffb74-e2d1-7630-9fd7-5d766363c852",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

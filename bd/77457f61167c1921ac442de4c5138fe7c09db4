@@ -1,0 +1,27 @@
+temp-vite-app/detectives/App.tsx
+  s_92b1cd3453e863::t_8747b90697498c 31-32,40,42,78
+temp-vite-app/api/_lib/detectives/access-codes.json
+  s_92b1cd3453e863::t_1d492ec27e874c 80-90
+temp-vite-app/detectives/style.css
+  s_92b1cd3453e863::t_4c2befe08ffc16 2269-2271
+  s_92b1cd3453e863::t_110cf3cd68fb2a 2261-2262,2264-2268
+temp-vite-app/tests/detectives-access-codes.test.ts
+  s_92b1cd3453e863::t_d8faaf157e8b54 1-16,18,20-25,27-30
+  s_92b1cd3453e863::t_2535c840ac0178 17,19,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "bd77457f61167c1921ac442de4c5138fe7c09db4",
+  "prompts": {},
+  "sessions": {
+    "s_92b1cd3453e863": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0b612-e708-79a1-bb71-1ae16f7e1271",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

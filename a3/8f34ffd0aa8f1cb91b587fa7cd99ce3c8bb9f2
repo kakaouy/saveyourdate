@@ -1,0 +1,31 @@
+temp-vite-app/api/_lib/detectives/game.ts
+  s_92b1cd3453e863::t_7d26f21ac1d00f 62
+temp-vite-app/detectives/style.css
+  s_92b1cd3453e863::t_13b6eb39168794 312
+  s_92b1cd3453e863::t_17a59b6155a043 256-257,270-272,285-300,313
+temp-vite-app/tests/detectives-alibis.test.ts
+  s_92b1cd3453e863::t_2a122f5520f00d 5,9,11-13,15
+temp-vite-app/tests/detectives-alibi-level.test.ts
+  s_92b1cd3453e863::t_4915f65779464a 5,11,15
+temp-vite-app/detectives/App.tsx
+  s_92b1cd3453e863::t_798a7a1a53f1c4 20-23,33,50,54,56,58,260,273-275,277,279
+  s_92b1cd3453e863::t_4915f65779464a 281
+temp-vite-app/detectives/case.ts
+  s_92b1cd3453e863::t_e6d4c2bde73104 15-20,76,86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a38f34ffd0aa8f1cb91b587fa7cd99ce3c8bb9f2",
+  "prompts": {},
+  "sessions": {
+    "s_92b1cd3453e863": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0b612-e708-79a1-bb71-1ae16f7e1271",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

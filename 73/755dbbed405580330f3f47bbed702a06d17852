@@ -1,0 +1,21 @@
+temp-vite-app/detectives/FedericaPortrait.tsx
+  s_92b1cd3453e863::t_91442359721003 12
+temp-vite-app/detectives/style.css
+  s_92b1cd3453e863::t_91442359721003 2081,2083-2084
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "73755dbbed405580330f3f47bbed702a06d17852",
+  "prompts": {},
+  "sessions": {
+    "s_92b1cd3453e863": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0b612-e708-79a1-bb71-1ae16f7e1271",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

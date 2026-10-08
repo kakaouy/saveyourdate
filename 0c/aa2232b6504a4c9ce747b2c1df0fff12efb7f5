@@ -1,0 +1,33 @@
+temp-vite-app/detectives/App.tsx
+  s_92b1cd3453e863::t_35d3385e02ccf9 21-24,111
+temp-vite-app/api/_lib/detectives/access-codes.json
+  s_92b1cd3453e863::t_35d3385e02ccf9 44-45
+temp-vite-app/detectives/style.css
+  s_92b1cd3453e863::t_35d3385e02ccf9 552
+temp-vite-app/tests/detectives-compartment-level.test.ts
+  s_92b1cd3453e863::t_aea8a148222e81 5,11-12,14,18
+temp-vite-app/tests/detectives-final-statement.test.ts
+  s_92b1cd3453e863::t_aea8a148222e81 14
+temp-vite-app/tests/detectives-workshop-level.test.ts
+  s_92b1cd3453e863::t_edb1b3139a5c88 5,10,14,18
+temp-vite-app/tests/detectives-map-level.test.ts
+  s_92b1cd3453e863::t_edb1b3139a5c88 5
+temp-vite-app/tests/detectives-hideout-level.test.ts
+  s_92b1cd3453e863::t_aea8a148222e81 11,15,19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0caa2232b6504a4c9ce747b2c1df0fff12efb7f5",
+  "prompts": {},
+  "sessions": {
+    "s_92b1cd3453e863": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0b612-e708-79a1-bb71-1ae16f7e1271",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

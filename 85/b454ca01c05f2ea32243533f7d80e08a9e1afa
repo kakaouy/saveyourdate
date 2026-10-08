@@ -1,0 +1,33 @@
+temp-vite-app/package.json
+  s_7d428c8dc67b21::t_2f7ad3a73c2596 10
+temp-vite-app/api/_lib/reminder-rules.ts
+  s_7d428c8dc67b21::t_2f7ad3a73c2596 1-15
+temp-vite-app/tests/table-capacity.test.ts
+  s_7d428c8dc67b21::t_2f7ad3a73c2596 1-19
+temp-vite-app/api/_lib/admin/tables.ts
+  s_7d428c8dc67b21::t_2f7ad3a73c2596 4,86-88,114
+temp-vite-app/api/_lib/admin/capacity.ts
+  s_7d428c8dc67b21::t_2f7ad3a73c2596 1-13
+temp-vite-app/tests/reminder-rules.test.ts
+  s_7d428c8dc67b21::t_2f7ad3a73c2596 1-22
+temp-vite-app/api/cron-reminders.ts
+  s_7d428c8dc67b21::t_2f7ad3a73c2596 2,28,39
+.github/workflows/admin-quality.yml
+  s_7d428c8dc67b21::t_2f7ad3a73c2596 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "85b454ca01c05f2ea32243533f7d80e08a9e1afa",
+  "prompts": {},
+  "sessions": {
+    "s_7d428c8dc67b21": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa190-3325-7952-a15c-acd4c3daf656",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

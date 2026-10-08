@@ -1,0 +1,19 @@
+temp-vite-app/api/_lib/admin/guests.ts
+  s_38088f267ff88d::t_5ed6b9d574c3b1 165,255
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "ec2642246c099b391c82da5a4eea1bc10e30f49c",
+  "prompts": {},
+  "sessions": {
+    "s_38088f267ff88d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fe756-e55e-7b10-8f1e-6f9c58cdcaa3",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

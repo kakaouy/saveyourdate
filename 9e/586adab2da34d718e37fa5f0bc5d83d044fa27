@@ -1,0 +1,44 @@
+temp-vite-app/tests/admin-guests-center.test.ts
+  s_7bf15498a84739::t_e3f0f5117462e8 1034-1036
+  s_7bf15498a84739::t_0815e6359e5868 1031-1032
+  s_7bf15498a84739::t_def5c76ac454b8 939,941-942
+temp-vite-app/src/admin-prototype.css
+  s_7bf15498a84739::t_b946a9d79f0d1e 1732,1765,1771-1772,1796-1797,1801
+  s_7bf15498a84739::t_def5c76ac454b8 574
+temp-vite-app/tests/scheduled-communications.test.ts
+  s_7bf15498a84739::t_0815e6359e5868 18-20
+  s_7bf15498a84739::t_e3f0f5117462e8 1-17,21-30
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7bf15498a84739::t_5fa33f7f8aa0a8 107,8067-8068
+  s_7bf15498a84739::t_76dbc0151fded8 119,7931,7962
+  s_7bf15498a84739::t_e6d1fceafa1558 7954-7959
+temp-vite-app/api/_lib/whatsapp.ts
+  s_7bf15498a84739::t_f7dac9b877a457 60-120
+temp-vite-app/api/cron-communications.ts
+  s_7bf15498a84739::t_76dbc0151fded8 12-40,122,125
+  s_7bf15498a84739::t_91af79f2151da4 1-11,41-121,123-124,126-152
+temp-vite-app/vercel.json
+  s_7bf15498a84739::t_91af79f2151da4 10-11
+temp-vite-app/api/_lib/admin/communications.ts
+  s_7bf15498a84739::t_91af79f2151da4 17-19,42,112
+  s_7bf15498a84739::t_76dbc0151fded8 38,43-51,53,60-63,84,110
+  s_7bf15498a84739::t_5fa33f7f8aa0a8 52,72-73,76
+temp-vite-app/README.md
+  s_7bf15498a84739::t_e3f0f5117462e8 34-37,63-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "9e586adab2da34d718e37fa5f0bc5d83d044fa27",
+  "prompts": {},
+  "sessions": {
+    "s_7bf15498a84739": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04384-e93b-7e52-b32b-d6b49a0c1989",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

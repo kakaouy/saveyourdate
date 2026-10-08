@@ -1,0 +1,21 @@
+temp-vite-app/src/components/InvitationCatalogPage.tsx
+  s_7e134eb59f6c6b::t_e5432532e17493 1,36,38-65
+temp-vite-app/src/components/invitation-catalog.css
+  s_7e134eb59f6c6b::t_e5432532e17493 348-380
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "4deb17a3bd1e4cf1ae0889db53ac80fd6383f159",
+  "prompts": {},
+  "sessions": {
+    "s_7e134eb59f6c6b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffbfa-bee6-7ff0-8b85-3181a3e5bb50",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

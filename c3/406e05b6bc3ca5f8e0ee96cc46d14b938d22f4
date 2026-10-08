@@ -1,0 +1,40 @@
+temp-vite-app/tests/module-completion.test.ts
+  s_7bf15498a84739::t_6b179a88952649 60
+temp-vite-app/tests/admin-guests-center.test.ts
+  s_7bf15498a84739::t_2b05dd8e58f16f 938
+  s_7bf15498a84739::t_11f18085f12e89 995-1002
+  s_7bf15498a84739::t_6b179a88952649 85
+  s_7bf15498a84739::t_d1610adadae965 197
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7bf15498a84739::t_82b6bae62d22fe 2361-2363,2747-2753,2859-2867
+  s_7bf15498a84739::t_759653c3b1321d 6438-6440,8232
+  s_7bf15498a84739::t_3f58f6e43f6e65 8039,8190-8195
+  s_7bf15498a84739::t_84983bceff3bda 8322-8370,8393,8395,8504,8509-8510,8605,8620-8621,8690-8693
+  s_7bf15498a84739::t_2b05dd8e58f16f 2775,2796
+temp-vite-app/api/_lib/admin/settings.ts
+  s_7bf15498a84739::t_06d0ecbcc56ca3 33-35
+  s_7bf15498a84739::t_0d4767bed47457 17-22,51-79
+  s_7bf15498a84739::t_96f77dd684877d 80
+temp-vite-app/tests/admin-event-management.test.ts
+  s_7bf15498a84739::t_d6777ab8fe6ad9 1-35
+temp-vite-app/src/admin-prototype.css
+  s_7bf15498a84739::t_0108b9484cbf2f 1871-1899,1903,1908-1910
+  s_7bf15498a84739::t_076f0c64243e19 158,162,167,223
+  s_7bf15498a84739::t_11f18085f12e89 397-403
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c3406e05b6bc3ca5f8e0ee96cc46d14b938d22f4",
+  "prompts": {},
+  "sessions": {
+    "s_7bf15498a84739": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a04384-e93b-7e52-b32b-d6b49a0c1989",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

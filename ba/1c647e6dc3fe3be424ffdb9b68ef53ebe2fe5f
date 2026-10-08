@@ -1,0 +1,21 @@
+temp-vite-app/supabase/migrations/20260809000000_guest_management.sql
+  s_38088f267ff88d::t_2f22701c31fbd7 1-6
+temp-vite-app/.gitignore
+  s_38088f267ff88d::t_4d649cfa32384b 25-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "ba1c647e6dc3fe3be424ffdb9b68ef53ebe2fe5f",
+  "prompts": {},
+  "sessions": {
+    "s_38088f267ff88d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fe756-e55e-7b10-8f1e-6f9c58cdcaa3",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

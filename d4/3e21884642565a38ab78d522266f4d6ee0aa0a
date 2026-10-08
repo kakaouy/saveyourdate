@@ -1,0 +1,23 @@
+temp-vite-app/detectives/level-four-six-pieces.css
+  s_6318414fcded59::t_a94d9cec9f12c3 1-45
+temp-vite-app/detectives/LevelFourPlan.tsx
+  s_6318414fcded59::t_0306d4056f995c 4-5,8-9,11,15,39,52,66
+temp-vite-app/detectives/main.tsx
+  s_6318414fcded59::t_a94d9cec9f12c3 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d43e21884642565a38ab78d522266f4d6ee0aa0a",
+  "prompts": {},
+  "sessions": {
+    "s_6318414fcded59": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11d31-77f1-7762-a5bf-0d80f5201f4c",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+temp-vite-app/public/aurora/index.html
+  h_978362ea3daf54 1-2082
+temp-vite-app/public/rosewood/index.html
+  h_978362ea3daf54 1-1931
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "c470fd9622b66eb67179fb1eaadfe468a3e467b0",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

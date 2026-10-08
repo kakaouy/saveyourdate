@@ -1,0 +1,53 @@
+temp-vite-app/detectives/TransmissionPlayer.tsx
+  s_baef4ba8b2ecee::t_1ccce64da370cd 20
+  s_baef4ba8b2ecee::t_b86cf7df706a1f 1,3-4,6,16-17,27,34,36-37
+temp-vite-app/api/_lib/detectives/game.ts
+  s_baef4ba8b2ecee::t_1ccce64da370cd 63
+temp-vite-app/detectives/Briefing.tsx
+  s_baef4ba8b2ecee::t_1ccce64da370cd 2,8,11,14-16,40,45,47-48,55,58,62-63
+temp-vite-app/detectives/style.css
+  s_baef4ba8b2ecee::t_ef76b0b269eaa4 424
+  s_baef4ba8b2ecee::t_4882465385eef3 422-423,425-426
+  s_baef4ba8b2ecee::t_bc1cfed28b0c23 427-432
+temp-vite-app/tests/detectives-first-level.test.ts
+  s_baef4ba8b2ecee::t_4882465385eef3 4
+temp-vite-app/detectives/mission-script.ts
+  s_baef4ba8b2ecee::t_1ccce64da370cd 3-7
+temp-vite-app/detectives/TerminalLevel.tsx
+  s_baef4ba8b2ecee::t_4882465385eef3 3-18,20-21,23-60
+  s_baef4ba8b2ecee::t_b86cf7df706a1f 2,22
+  s_baef4ba8b2ecee::t_27cb0b4f5c7db3 1,19
+temp-vite-app/detectives/federica-envelope.json
+  s_baef4ba8b2ecee::t_b264a729484116 1
+temp-vite-app/detectives/terminal-script.ts
+  s_baef4ba8b2ecee::t_1ccce64da370cd 1-2
+temp-vite-app/detectives/case.ts
+  s_baef4ba8b2ecee::t_1ccce64da370cd 3-5,7-8,85
+docs/revision-nivel-1/IMPLEMENTACION.md
+  s_baef4ba8b2ecee::t_b4ccf4f138d1b4 28-29
+  s_baef4ba8b2ecee::t_39be95b1ca3f46 1-27
+temp-vite-app/detectives/MissionMap.tsx
+  s_baef4ba8b2ecee::t_4882465385eef3 7
+temp-vite-app/detectives/App.tsx
+  s_baef4ba8b2ecee::t_4882465385eef3 1,256,265,267,269-270
+temp-vite-app/detectives/FedericaPortrait.tsx
+  s_baef4ba8b2ecee::t_a86131f622656b 1-104
+temp-vite-app/detectives/briefing-cues.ts
+  s_baef4ba8b2ecee::t_0d2449a1c92665 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ff07f91ef5773b1c739628d47c834a5b266e6958",
+  "prompts": {},
+  "sessions": {
+    "s_baef4ba8b2ecee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0af29-ccdc-7862-8d12-45d6d01c6460",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

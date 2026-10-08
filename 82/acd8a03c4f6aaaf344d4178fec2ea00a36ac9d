@@ -1,0 +1,27 @@
+temp-vite-app/detectives/App.tsx
+  s_baef4ba8b2ecee::t_bd9c441d7b153f 1,204,286
+temp-vite-app/detectives/style.css
+  s_baef4ba8b2ecee::t_153b04da9d3cd4 361-362
+  s_baef4ba8b2ecee::t_4df6deb681d851 354-360
+temp-vite-app/api/_lib/detectives/game.ts
+  s_baef4ba8b2ecee::t_bd9c441d7b153f 33,51
+temp-vite-app/detectives/HintLenses.tsx
+  s_baef4ba8b2ecee::t_078c38ec54306d 9
+  s_baef4ba8b2ecee::t_e34642091ae2e3 1-8,10-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "82acd8a03c4f6aaaf344d4178fec2ea00a36ac9d",
+  "prompts": {},
+  "sessions": {
+    "s_baef4ba8b2ecee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0af29-ccdc-7862-8d12-45d6d01c6460",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

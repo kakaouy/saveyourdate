@@ -1,0 +1,52 @@
+temp-vite-app/src/data/models.ts
+  s_90e1bd0dcb31ab::t_3286f02f8a6856 665-670,675-698,703-720
+  s_90e1bd0dcb31ab::t_88a56afe0acecd 6,671-674,699-702
+temp-vite-app/src/App.css
+  s_90e1bd0dcb31ab::t_88a56afe0acecd 2774-2811
+temp-vite-app/public/siena/index.html
+  s_90e1bd0dcb31ab::t_0fa644cb9a70b9 2560-2561,2603-2604,2646-2647
+  s_90e1bd0dcb31ab::t_93f6d8363a24a3 2256,2264,2676,2687,3459
+  s_90e1bd0dcb31ab::t_cf90ec0603e56f 1449,2358,2571,2614,2657,2712
+  s_90e1bd0dcb31ab::t_bdfafa4bdfc945 2545,2588,2631,2810-2818
+temp-vite-app/docs/specs/siena.md
+  s_90e1bd0dcb31ab::t_93f6d8363a24a3 1-43
+temp-vite-app/docs/specs/amalfi.md
+  s_90e1bd0dcb31ab::t_93f6d8363a24a3 1-41
+temp-vite-app/tests/siena-amalfi.test.ts
+  s_90e1bd0dcb31ab::t_8a9b05970bd4cb 6,83-99
+  s_90e1bd0dcb31ab::t_d0612e3d8b485a 1-5,7-51,58-82
+  s_90e1bd0dcb31ab::t_cf90ec0603e56f 52-53
+  s_90e1bd0dcb31ab::t_051f871c34fb5e 54-57
+temp-vite-app/public/amalfi/index.html
+  s_90e1bd0dcb31ab::t_0fa644cb9a70b9 892-893,935-936,978-979
+  s_90e1bd0dcb31ab::t_93f6d8363a24a3 564,1008,1019,1576
+  s_90e1bd0dcb31ab::t_bdfafa4bdfc945 877,920,963,1142-1147,1199,1441,1460
+  s_90e1bd0dcb31ab::t_cf90ec0603e56f 667,903,946,989,1044
+temp-vite-app/src/App.tsx
+  s_90e1bd0dcb31ab::t_3286f02f8a6856 208-217,238-247,277,300
+temp-vite-app/src/components/OrderFlow.tsx
+  s_90e1bd0dcb31ab::t_88a56afe0acecd 26-67,505,508
+  s_90e1bd0dcb31ab::t_3286f02f8a6856 179-181,501-504,506-507,509-511
+  s_90e1bd0dcb31ab::t_913b485f23b394 565
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "33e5f750160c0bffa534edf980f9917767e75e0c",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  },
+  "sessions": {
+    "s_90e1bd0dcb31ab": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ff304-49f8-7222-af58-0e0a177186ca",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

@@ -1,0 +1,64 @@
+temp-vite-app/vercel.json
+  s_baef4ba8b2ecee::t_53c9922128c0c6 10-17,20-21,23-25,27-67,73-84,90-101,103-122
+  s_baef4ba8b2ecee::t_7aac05c9eda0cc 22,26
+temp-vite-app/tsconfig.app.json
+  s_baef4ba8b2ecee::t_7c7d3fa863fb56 25
+temp-vite-app/detectives/README.md
+  s_baef4ba8b2ecee::t_d62d4cc29efa60 1-4,6-9
+  s_baef4ba8b2ecee::t_6c1d0c44d7ada7 5
+temp-vite-app/api/_lib/detectives/access-codes.json
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1-23
+temp-vite-app/detectives/main.tsx
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1-4
+temp-vite-app/vite.config.ts
+  s_baef4ba8b2ecee::t_53c9922128c0c6 7
+temp-vite-app/api/_lib/detectives/diploma-route.ts
+  s_baef4ba8b2ecee::t_f791493dbc6c56 13
+  s_baef4ba8b2ecee::t_f2757cf3e22405 1-12
+temp-vite-app/api/_lib/detectives/game-route.ts
+  s_baef4ba8b2ecee::t_f791493dbc6c56 21
+  s_baef4ba8b2ecee::t_02b6ed0ee6661f 1-20
+temp-vite-app/api/_lib/detectives/game.ts
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1-3,5-76
+  s_baef4ba8b2ecee::t_9e43602aef4bcf 4
+temp-vite-app/detectives/case.ts
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1-109
+temp-vite-app/detectives/App.tsx
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1-268
+temp-vite-app/detectives/style.css
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1-307
+temp-vite-app/detectives/game-state.ts
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1-10
+temp-vite-app/api/_lib/detectives/diploma-background.mjs
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1
+temp-vite-app/supabase/migrations/20260917010000_detective_games.sql
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1-10
+temp-vite-app/api/_lib/detectives/diploma.mjs
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1-21
+temp-vite-app/los-archivos-f/index.html
+  s_baef4ba8b2ecee::t_53c9922128c0c6 1
+temp-vite-app/tests/detectives.test.ts
+  s_baef4ba8b2ecee::t_854543da900563 1-13
+temp-vite-app/package.json
+  s_baef4ba8b2ecee::t_9395836e1c813a 16
+temp-vite-app/api/admin/[action].ts
+  s_baef4ba8b2ecee::t_47c578deb6ee74 1-2,29-30
+temp-vite-app/package-lock.json
+  s_baef4ba8b2ecee::t_d232282c6ba565 13,439-456,1554-1571
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7f68afa2ec7eae0f9b2184828ab76401f33c051b",
+  "prompts": {},
+  "sessions": {
+    "s_baef4ba8b2ecee": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0af29-ccdc-7862-8d12-45d6d01c6460",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

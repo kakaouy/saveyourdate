@@ -1,0 +1,19 @@
+.gitignore
+  s_38088f267ff88d::t_33cc429b7fddd1 5-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "937c263aa8a8090e98b859fc3fe6610491333b24",
+  "prompts": {},
+  "sessions": {
+    "s_38088f267ff88d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fe756-e55e-7b10-8f1e-6f9c58cdcaa3",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+temp-vite-app/detectives/sounds.ts
+  s_6318414fcded59::t_15c567f9d4399b 1-47
+temp-vite-app/detectives/HintLenses.tsx
+  s_6318414fcded59::t_3003d205299a8c 23,31
+  s_6318414fcded59::t_15c567f9d4399b 21-22,27-28,32
+temp-vite-app/detectives/level-four-six-pieces.css
+  s_6318414fcded59::t_568deef7f27c3d 124-134,137
+  s_6318414fcded59::t_3003d205299a8c 135-136
+temp-vite-app/tests/detectives-hints.test.ts
+  s_6318414fcded59::t_568deef7f27c3d 15-16,24-53
+temp-vite-app/detectives/App.tsx
+  s_6318414fcded59::t_bea229936f9222 9,235
+  s_6318414fcded59::t_52023826f77c6a 428
+temp-vite-app/api/_lib/detectives/game.ts
+  s_6318414fcded59::t_15c567f9d4399b 72-75
+temp-vite-app/detectives/case.ts
+  s_6318414fcded59::t_bea229936f9222 9,19,29,39,49,59
+  s_6318414fcded59::t_6df67fdb4717ae 69
+temp-vite-app/detectives/Typewriter.tsx
+  s_6318414fcded59::t_15c567f9d4399b 2,21
+temp-vite-app/detectives/LevelSideTabs.tsx
+  s_6318414fcded59::t_15c567f9d4399b 2,48,51,57,74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0677500978a6a7b0424a18d933ea218023d1a4ad",
+  "prompts": {},
+  "sessions": {
+    "s_6318414fcded59": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11d31-77f1-7762-a5bf-0d80f5201f4c",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+temp-vite-app/supabase/orders.sql
+  s_7d428c8dc67b21::t_01704ee0988148 95-119
+temp-vite-app/api/admin/guests.ts
+  s_7d428c8dc67b21::t_01704ee0988148 1-66
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_7d428c8dc67b21::t_930c6e8795e496 270-271,277-301,320,327,533-539
+  s_7d428c8dc67b21::t_c0620302c46743 540
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "cac1f02a76c653581ae24d783a1c89ce2a84f4a1",
+  "prompts": {},
+  "sessions": {
+    "s_7d428c8dc67b21": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa190-3325-7952-a15c-acd4c3daf656",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}

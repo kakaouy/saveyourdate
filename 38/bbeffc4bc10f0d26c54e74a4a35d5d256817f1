@@ -1,0 +1,41 @@
+temp-vite-app/api/_lib/admin/guests.ts
+  s_a6a684b26211ff::t_d8bb9c4fea76de 249,407-409,414
+  s_a6a684b26211ff::t_b93e434246beef 410
+temp-vite-app/src/components/AdminPrototype.tsx
+  s_a6a684b26211ff::t_7d5b9290528333 3488,3507
+  s_a6a684b26211ff::t_ff990886e3ff4d 5191
+  s_a6a684b26211ff::t_cbf0b594c3ef85 2623-2635,2656,2686,2692,2825-2833,2838,2844-2902
+  s_a6a684b26211ff::t_d7998de6c4d26b 2000
+  s_a6a684b26211ff::t_b5f4546db822de 2926-2928,2933,2935-2947,2960-2963,3080-3087,3090,3092-3095,3099,3101,3104-3107,3110-3111
+  s_a6a684b26211ff::t_546d550d008d5a 3506,3798-3800,5189-5190,5198,5204-5205,5246,5248,5250
+  s_a6a684b26211ff::t_95f222523756c9 2903
+temp-vite-app/supabase/migrations/20260809030000_floor_plan_elements.sql
+  s_a6a684b26211ff::t_7b0f4e18789058 1-22
+temp-vite-app/src/admin-prototype.css
+  s_a6a684b26211ff::t_952d1a7e3af308 243,245,251-254,258-263,270-277,283
+  s_a6a684b26211ff::t_c2714e36fe99cd 535-537
+temp-vite-app/api/_lib/admin/tables.ts
+  s_a6a684b26211ff::t_65af8ce027a8bf 14-26,43-44,48-49,57-60,64-65,82-83,92-114,209-215
+  s_a6a684b26211ff::t_7dc0543dbe902f 68-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "38bbeffc4bc10f0d26c54e74a4a35d5d256817f1",
+  "prompts": {},
+  "humans": {
+    "h_978362ea3daf54": {
+      "author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  },
+  "sessions": {
+    "s_a6a684b26211ff": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fe7c2-981a-7ce2-af98-2c7ae7f7f82d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
