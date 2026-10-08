@@ -31,7 +31,7 @@ const statements = [
 const levelVisuals = ['/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-security-room.png', '/los-archivos-f/images/bg-hidden-corridor.png', '/los-archivos-f/images/bg-restoration-workshop.png', '/los-archivos-f/images/nivel-6-sala-banderas-v3.png', '/los-archivos-f/images/lens-workshop.jpg'];
 const successVisuals = ['/los-archivos-f/images/bruno-storm.jpg', '/los-archivos-f/images/suspects-group.jpg', '/los-archivos-f/images/control-room.jpg', '/los-archivos-f/images/corridor-spoiler-418.jpg', '/los-archivos-f/images/martina-dark.jpg', '/los-archivos-f/images/lens-workshop.jpg', '/los-archivos-f/images/evidence-spread-spoiler.jpg'];
 const levelFourFinalFrames = ['/los-archivos-f/images/federica-nivel-4-final-loop.webp','/los-archivos-f/images/federica-nivel-4-final-frame-1.webp'];
-const levelSevenIntroFrames = ['/los-archivos-f/images/federica-nivel-7-inicio-loop.webp','/los-archivos-f/images/federica-nivel-7-inicio-frame-1.webp'];
+const levelSevenIntroFrames = ['/los-archivos-f/images/federica-nivel-7-inicio-loop.webp?v=20261008b','/los-archivos-f/images/federica-nivel-7-inicio-frame-1.webp?v=20261008b'];
 const levelSevenFinalFrames = ['/los-archivos-f/images/federica-nivel-7-final-loop.webp','/los-archivos-f/images/federica-nivel-7-final-frame-1.webp'];
 const levelSixIntroFrames = ['/los-archivos-f/images/federica-nivel-6-inicio-loop.webp','/los-archivos-f/images/federica-nivel-6-inicio-frame-1.webp'];
 const levelSixFinalFrames = ['/los-archivos-f/images/federica-nivel-6-final-loop.webp','/los-archivos-f/images/federica-nivel-6-final-frame-1.webp'];
