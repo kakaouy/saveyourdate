@@ -5,6 +5,22 @@
   gap: 12px 18px;
   padding: 16px 18px;
 }
+
+/* Printed-material bridge for level six. */
+.level-six-physical-prompt {
+  margin: 20px 0 14px;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid #b89555;
+  border-left: 5px solid #d5b66f;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #112d35, #071922);
+  color: #d8e3dd;
+  box-shadow: 0 14px 32px #0005;
+}
+.level-six-physical-prompt > span { color: #d9bd78; font: 900 10px Arial, sans-serif; letter-spacing: .14em; }
+.level-six-physical-prompt h2 { margin: 10px 0; color: #f0d79f; font: 500 clamp(23px, 3vw, 32px)/1.15 Georgia, serif; }
+.level-six-physical-prompt p { margin: 0; font-size: 15px; line-height: 1.65; }
+.level-six-physical-prompt small { display: block; margin-top: 14px; padding-top: 12px; border-top: 1px solid #a98d5555; color: #9fc7be; font-size: 12px; line-height: 1.5; }
 .level-four-active-preview { width: 168px; height: 168px; }
 .level-four-active-image { inset: 10px; }
 .level-four-active-preview > b,
