@@ -72,7 +72,12 @@ export async function leaderboard() {
   return rows.map(({state})=>({agent:String(state.agent||'Agente').slice(0,48),elapsedSeconds:Math.max(0,Math.floor(Number(state.elapsedSeconds)||0)),hintsUsed:Object.values(state.hints||{}).reduce((sum,value)=>sum+(Number(value)||0),0),completed:Boolean(state.completedAt),highestLevel:Number(state.highestLevel)||0})).filter(item=>item.highestLevel>0).sort((a,b)=>Number(b.completed)-Number(a.completed)||a.elapsedSeconds-b.elapsedSeconds||a.hintsUsed-b.hintsUsed).slice(0,50);
 }
 export async function deleteAllGames() {
-  const response = await supabaseRequest('detective_games?code_hash=not.is.null', { method: 'DELETE', headers: { Prefer: 'return=representation' } });
+  const state: GameState = {agent:'',highestLevel:0,hints:{},checkProgress:{},completedAt:null,elapsedSeconds:0};
+  const response = await supabaseRequest('detective_games?code_hash=not.is.null', {
+    method: 'PATCH',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({state,version:0,updated_at:new Date().toISOString()})
+  });
   return (await response.json() as unknown[]).length;
 }
 export async function updateGame(hash: string, body: Record<string, unknown>) {
