@@ -1,0 +1,45 @@
+/* Six large, readable pieces for the level-four reconstruction. */
+.level-four-tray {
+  grid-template-columns: 190px minmax(0, 1fr);
+  grid-template-rows: auto 168px auto;
+  gap: 12px 18px;
+  padding: 16px 18px;
+}
+.level-four-active-preview { width: 168px; height: 168px; }
+.level-four-active-image { inset: 10px; }
+.level-four-active-preview > b,
+.level-four-active-preview > small { padding: 5px 7px; font-size: 9px; }
+.level-four-pieces {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(96px, 1fr));
+  gap: 12px;
+  overflow: visible;
+  padding: 0;
+}
+.level-four-pieces button {
+  width: 100%;
+  height: auto;
+  min-width: 96px;
+  min-height: 96px !important;
+  aspect-ratio: 1;
+  flex: none;
+}
+.level-four-pieces button > b { padding: 5px 7px; font-size: 10px; }
+.level-four-grid button.filled span { display: none; }
+
+@media (max-width: 900px) {
+  .level-four-tray { grid-template-columns: 170px minmax(0, 1fr); grid-template-rows: auto auto auto; }
+  .level-four-active-preview { width: 150px; height: 150px; }
+  .level-four-pieces { grid-template-columns: repeat(3, minmax(110px, 1fr)); }
+  .level-four-pieces button { min-width: 110px; min-height: 110px !important; }
+}
+
+@media (max-width: 600px) {
+  .level-four-tray { display: block; padding: 14px; }
+  .level-four-active-preview { width: min(100%, 260px); height: auto; margin: 14px auto; aspect-ratio: 1; }
+  .level-four-pieces { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; overflow: visible; }
+  .level-four-pieces button { width: 100%; min-width: 0; min-height: 128px !important; }
+  .level-four-tray > p { display: block; margin-top: 12px; }
+  .level-four-controls { position: static; }
+  .level-four-antique-map { width: 560px; min-width: 560px; }
+}
