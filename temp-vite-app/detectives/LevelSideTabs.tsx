@@ -17,6 +17,9 @@ export default function LevelSideTabs({
   onAnswer,
   onReplay,
   onUnlock,
+  missionTitle,
+  missionSubtitle,
+  showUnlock=true,
 }:{
   level:number;
   prompt:string;
@@ -30,6 +33,9 @@ export default function LevelSideTabs({
   onAnswer:(value:string)=>void;
   onReplay:()=>void;
   onUnlock:(event:FormEvent)=>void;
+  missionTitle?:string;
+  missionSubtitle?:string;
+  showUnlock?:boolean;
 }){
   const [open,setOpen]=useState<'mission'|'unlock'|'ranking'|null>(null);
   const [rankingOpen,setRankingOpen]=useState(false);
@@ -50,10 +56,10 @@ export default function LevelSideTabs({
     <section className={`level-side-tab mission-tab ${open==='mission'?'is-open':''} ${missionHoverSuppressed?'suppress-hover':''}`} onPointerLeave={()=>setMissionHoverSuppressed(false)}>
       <button type="button" className="level-side-tab-trigger" aria-expanded={open==='mission'} onClick={()=>{playEffect('panel');setOpen(null);onReplay();}}>
         <img src="/los-archivos-f/images/fede-mission-tab.png" alt=""/>
-        <span><b>MISIÓN NIVEL {level}</b><small>Escuchar mensaje de Fede</small></span>
+        <span><b>{missionTitle||`MISIÓN NIVEL ${level}`}</b><small>{missionSubtitle||'Escuchar mensaje de Fede'}</small></span>
       </button>
     </section>
-    <section className={`level-side-tab unlock-tab ${open==='unlock'?'is-open':''}`}>
+    {showUnlock&&<section className={`level-side-tab unlock-tab ${open==='unlock'?'is-open':''}`}>
       <button type="button" className="level-side-tab-trigger" aria-expanded={open==='unlock'} onClick={()=>{playEffect('panel');setOpen('unlock');}}>
         <img src="/los-archivos-f/images/unlock-level-tab.png" alt=""/>
         <span><b>{unlocked?'NIVEL RESUELTO':'DESBLOQUEAR'}</b><small>{unlocked?'Investigación registrada':'Ingresar resultado'}</small></span>
@@ -64,7 +70,7 @@ export default function LevelSideTabs({
         <button type="submit" disabled={!canUnlock||busy||!answer.trim()}>{busy?'VERIFICANDO…':'DESBLOQUEAR NIVEL'}</button>
         {message&&<p role="status">{message}</p>}
       </form>}
-    </section>
+    </section>}
     <section className={`level-side-tab ranking-tab ${open==='ranking'?'is-open':''}`}>
       <button type="button" className="level-side-tab-trigger" aria-expanded={open==='ranking'} onClick={showRanking}>
         <img src="/los-archivos-f/images/copa-ranking.png" alt=""/>
