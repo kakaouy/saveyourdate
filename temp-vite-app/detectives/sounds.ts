@@ -51,23 +51,24 @@ function playThunder(ctx: AudioContext) {
   filter.frequency.value = 180;
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.24, now + 0.08);
-  gain.gain.exponentialRampToValueAtTime(0.055, now + 0.8);
+  gain.gain.exponentialRampToValueAtTime(0.34, now + 0.08);
+  gain.gain.exponentialRampToValueAtTime(0.075, now + 0.8);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
   noise.connect(filter).connect(gain).connect(ctx.destination);
   noise.start(now);
   noise.stop(now + duration);
-  tone(ctx, 42, now, 2.8, 0.08, 'sine');
+  tone(ctx, 42, now, 2.8, 0.11, 'sine');
+  tone(ctx, 57, now + 0.17, 2.1, 0.065, 'triangle');
   window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity:0.65 + Math.random() * 0.35}}));
 }
 
-function scheduleThunder(ctx: AudioContext) {
+function scheduleThunder(ctx: AudioContext, first = false) {
   if (thunderTimer !== null) window.clearTimeout(thunderTimer);
   if (!stormEnabled) return;
   thunderTimer = window.setTimeout(() => {
     playThunder(ctx);
     scheduleThunder(ctx);
-  }, 18000 + Math.random() * 26000);
+  }, first ? 5500 + Math.random() * 6500 : 14000 + Math.random() * 17000);
 }
 
 export function startStormAmbience() {
@@ -92,7 +93,7 @@ export function startStormAmbience() {
     stormGain = gain;
   }
   if (stormGain) stormGain.gain.setTargetAtTime(0.16, ctx.currentTime, 0.35);
-  scheduleThunder(ctx);
+  scheduleThunder(ctx, true);
 }
 
 export function stopStormAmbience() {
