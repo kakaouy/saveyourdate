@@ -63,8 +63,8 @@ export const levels = [
     title: 'El compartimento',
     kicker: 'NIVEL 7 · CERRADURA MECÁNICA',
     prompt: '¿Cuál es el código del compartimento?',
-    evidence: ['Sobre negro autorizado', 'Plantilla de calibración LF-04, ya preparada'],
-    digital: 'Mecanismo LF-04 detectado. La combinación no está registrada en el sistema. La plantilla física contiene el procedimiento de calibración.',
+    evidence: ['Sobre negro autorizado', 'Mecanismo del compartimento preparado'],
+    digital: 'Mecanismo del compartimento detectado. La combinación no está registrada en el sistema. Seguí los recorridos IMPARES y PARES para reconstruirla.',
     placeholder: '5 cifras', answer: ['11820'], lock: 'mechanical',
     hints: ['La pieza ya está recortada. Observá qué parte puede moverse y qué marcas permiten alinearla.', 'La alineación revela dos recorridos rotulados IMPARES y PARES. Respetá qué valores quedan señalados en cada uno.', 'El recorrido IMPARES da un resultado de tres cifras y el recorrido PARES uno de dos. Escribilos juntos, en ese orden.', 'SOLUCIÓN DIRECTA · 19 + 21 + 23 + 25 + 30 = 118; 2 + 4 + 6 + 8 + 0 = 20. Ingresá 11820.'],
     unlock: 'Acceso a la acusación final',
@@ -93,6 +93,6 @@ export const microChecks = [
   ],
   [],
   [
-    { question: '¿Qué confirma que LF-04 quedó correctamente colocada?', options: ['Se ven seis números y una regla completa', 'Todas las líneas desaparecen', 'La plantilla forma un círculo'], correct: 0, success: 'La alineación correcta revela los seis valores y el procedimiento de calibración.' },
+    { question: '¿Qué confirma que el mecanismo está listo para calcular?', options: ['Se ven los números y ambos recorridos completos', 'Todas las líneas desaparecen', 'Las piezas forman un círculo'], correct: 0, success: 'La lectura correcta revela los valores de los recorridos IMPARES y PARES.' },
   ],
 ];

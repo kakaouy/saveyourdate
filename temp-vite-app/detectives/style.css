@@ -2287,3 +2287,8 @@ body:has(.federica-feedback[open]){overflow:hidden!important}
 @keyframes storm-camera-drift{from{transform:scale(1.015) translate3d(-.35%,.2%,0)}to{transform:scale(1.045) translate3d(.45%,-.3%,0)}}
 @keyframes board-breathe{0%,100%{filter:brightness(.94)}50%{filter:brightness(1.08)}}
 @media(prefers-reduced-motion:reduce){.storm-flash.is-active,.level-seven-intro-artwork .fede-artwork-loop,.level-seven-board-copy{animation:none!important}}
+.story-page-view .level-seven-intro-artwork{aspect-ratio:4/3!important;max-width:760px!important;max-height:min(64dvh,610px)!important}
+.story-page-view .level-seven-intro-artwork .fede-artwork-loop>img{object-fit:cover!important;object-position:76% center!important}
+.level-seven-intro-artwork .level-seven-board-copy{display:none!important}
+.level-seven-start-action{display:inline-flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+@media(max-width:899px),(orientation:portrait){.story-page-view .level-seven-intro-artwork{aspect-ratio:16/10!important;max-height:56dvh!important}.story-page-view .level-seven-intro-artwork .fede-artwork-loop>img{object-position:76% 48%!important}}
