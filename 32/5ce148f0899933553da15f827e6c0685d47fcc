@@ -1,0 +1,41 @@
+temp-vite-app/detectives/sounds.ts
+  s_6318414fcded59::t_8ada85a85ebcb3 1,5-7,31,43-56
+temp-vite-app/detectives/LevelFourPlan.tsx
+  s_6318414fcded59::t_8ada85a85ebcb3 2,26,35,39,64,66
+temp-vite-app/detectives/HintLenses.tsx
+  s_6318414fcded59::t_0d2a283a747d98 2,11,14
+temp-vite-app/api/_lib/detectives/diploma.mjs
+  s_6318414fcded59::t_4ac5a57ba4faf1 1,4,7-9,11-20
+temp-vite-app/detectives/TerminalLevel.tsx
+  s_6318414fcded59::t_fe426a05b0ee54 6,61-62
+temp-vite-app/detectives/LightSignal.tsx
+  s_6318414fcded59::t_8ada85a85ebcb3 2,26-28,30,33
+temp-vite-app/detectives/level-four-six-pieces.css
+  s_6318414fcded59::t_0d2a283a747d98 56-58
+  s_6318414fcded59::t_0b2b2737dbfa63 9-40,47-55,59
+  s_6318414fcded59::t_430726f75615a6 41-46
+temp-vite-app/detectives/App.tsx
+  s_6318414fcded59::t_fe426a05b0ee54 323
+  s_6318414fcded59::t_893c607541c5bd 9,42-50,182,290-294,401
+  s_6318414fcded59::t_5244665674bb42 436,440,452,454
+temp-vite-app/tests/detectives-diploma.test.ts
+  s_6318414fcded59::t_4ac5a57ba4faf1 6,11-12
+temp-vite-app/detectives/case.ts
+  s_6318414fcded59::t_8ada85a85ebcb3 45,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "325ce148f0899933553da15f827e6c0685d47fcc",
+  "prompts": {},
+  "sessions": {
+    "s_6318414fcded59": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11d31-77f1-7762-a5bf-0d80f5201f4c",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
