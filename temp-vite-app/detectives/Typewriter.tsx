@@ -18,7 +18,7 @@ function Reveal({ text }: { text: string }) {
       timer = setInterval(() => {
         position = Math.min(text.length, position + Math.max(1, Math.ceil(text.length / 180)));
         setCount(position);
-        if (position < text.length && text[position-1] !== ' ') playEffect('type');
+        if (position < text.length && position % 3 === 0 && text[position-1] !== ' ') playEffect('type');
         if (position === text.length) clearInterval(timer);
       }, 24);
     });

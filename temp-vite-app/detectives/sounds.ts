@@ -29,10 +29,10 @@ export function playEffect(effect: Effect) {
     if (!ctx || ctx.state !== 'running') return;
     const now = ctx.currentTime;
     if (effect === 'type') {
-      if (performance.now() - lastTypeAt < 42) return;
+      if (performance.now() - lastTypeAt < 78) return;
       lastTypeAt = performance.now();
-      tone(ctx, 150 + Math.random() * 35, now, 0.028, 0.018, 'square');
-      tone(ctx, 75, now, 0.035, 0.012, 'triangle');
+      tone(ctx, 920 + Math.random() * 180, now, 0.014, 0.007, 'sine');
+      tone(ctx, 1320 + Math.random() * 120, now + 0.004, 0.009, 0.004, 'triangle');
     } else if (effect === 'panel') {
       tone(ctx, 210, now, 0.045, 0.025, 'triangle');
       tone(ctx, 310, now + 0.035, 0.055, 0.018, 'sine');
