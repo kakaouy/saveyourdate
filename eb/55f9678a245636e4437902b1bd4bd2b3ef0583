@@ -1,0 +1,19 @@
+temp-vite-app/detectives/level-four-six-pieces.css
+  s_6318414fcded59::t_6f58d993ac1d7c 40-46,70-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eb55f9678a245636e4437902b1bd4bd2b3ef0583",
+  "prompts": {},
+  "sessions": {
+    "s_6318414fcded59": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11d31-77f1-7762-a5bf-0d80f5201f4c",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
