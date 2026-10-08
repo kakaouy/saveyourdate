@@ -26,6 +26,7 @@
 }
 .level-four-pieces button > b { padding: 5px 7px; font-size: 10px; }
 .level-four-grid button.filled span { display: none; }
+.level-four-mobile-controls { display: none; }
 
 @media (max-width: 900px) {
   .level-four-tray { grid-template-columns: 170px minmax(0, 1fr); grid-template-rows: auto auto auto; }
@@ -37,9 +38,32 @@
 @media (max-width: 600px) {
   .level-four-tray { display: block; padding: 14px; }
   .level-four-active-preview { width: min(100%, 260px); height: auto; margin: 14px auto; aspect-ratio: 1; }
+  .level-four-mobile-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 0 0 14px;
+  }
+  .level-four-mobile-controls button {
+    min-height: 48px;
+    border: 1px solid #b18d4d;
+    border-radius: 5px;
+    background: #153740;
+    color: #f0d38d;
+    font-weight: 800;
+  }
+  .level-four-mobile-controls button:disabled { opacity: .35; }
+  .level-four-mobile-controls output {
+    grid-column: 1 / -1;
+    padding: 8px 10px;
+    background: #0b2630;
+    color: #dce8e2;
+    font: 11px monospace;
+    text-align: center;
+  }
   .level-four-pieces { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; overflow: visible; }
   .level-four-pieces button { width: 100%; min-width: 0; min-height: 128px !important; }
   .level-four-tray > p { display: block; margin-top: 12px; }
-  .level-four-controls { position: static; }
+  .level-four-controls { display: none; }
   .level-four-antique-map { width: 560px; min-width: 560px; }
 }
