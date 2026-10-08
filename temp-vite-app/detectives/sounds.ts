@@ -36,30 +36,38 @@ function makeRainBuffer(ctx: AudioContext) {
 function playThunder(ctx: AudioContext) {
   if (!stormEnabled || ctx.state !== 'running') return;
   const now = ctx.currentTime;
-  const duration = 4.2;
+  const strength = Math.pow(Math.random(), 0.78);
+  const intensity = 0.28 + strength * 0.72;
+  const duration = 2.8 + strength * 3.4 + Math.random() * 0.8;
+  const attack = 0.045 + (1 - strength) * 0.24;
   const noise = ctx.createBufferSource();
   const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * duration), ctx.sampleRate);
   const data = buffer.getChannelData(0);
   let rumble = 0;
   for (let index = 0; index < data.length; index += 1) {
-    rumble = rumble * 0.985 + (Math.random() * 2 - 1) * 0.015;
-    data[index] = rumble;
+    rumble = rumble * (0.982 + strength * 0.009) + (Math.random() * 2 - 1) * (0.018 - strength * 0.007);
+    const roll = 0.72 + Math.sin(index / ctx.sampleRate * (8 + strength * 7)) * 0.2;
+    data[index] = rumble * roll;
   }
   noise.buffer = buffer;
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = 180;
+  filter.frequency.value = 115 + strength * 150;
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.34, now + 0.08);
-  gain.gain.exponentialRampToValueAtTime(0.075, now + 0.8);
+  gain.gain.exponentialRampToValueAtTime(0.12 + strength * 0.3, now + attack);
+  gain.gain.exponentialRampToValueAtTime(0.035 + strength * 0.075, now + 0.7 + strength * 0.55);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
   noise.connect(filter).connect(gain).connect(ctx.destination);
   noise.start(now);
   noise.stop(now + duration);
-  tone(ctx, 42, now, 2.8, 0.11, 'sine');
-  tone(ctx, 57, now + 0.17, 2.1, 0.065, 'triangle');
-  window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity:0.65 + Math.random() * 0.35}}));
+  tone(ctx, 34 + strength * 16, now, 1.9 + strength * 2.2, 0.04 + strength * 0.1, 'sine');
+  tone(ctx, 49 + Math.random() * 22, now + 0.12 + Math.random() * 0.22, 1.4 + strength * 1.8, 0.025 + strength * 0.07, 'triangle');
+  if (strength > 0.68) {
+    tone(ctx, 76 + Math.random() * 34, now, 0.11 + strength * 0.12, 0.035 + strength * 0.055, 'sawtooth');
+    tone(ctx, 46, now + 0.08, 0.5, 0.045 + strength * 0.04, 'triangle');
+  }
+  window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity}}));
 }
 
 function scheduleThunder(ctx: AudioContext, first = false) {
@@ -68,7 +76,7 @@ function scheduleThunder(ctx: AudioContext, first = false) {
   thunderTimer = window.setTimeout(() => {
     playThunder(ctx);
     scheduleThunder(ctx);
-  }, first ? 5500 + Math.random() * 6500 : 14000 + Math.random() * 17000);
+  }, first ? 4500 + Math.random() * 7000 : 9000 + Math.random() * 22000);
 }
 
 export function startStormAmbience() {
