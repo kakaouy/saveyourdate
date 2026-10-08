@@ -6,6 +6,61 @@
   padding: 16px 18px;
 }
 
+/* Nivel 7: tapa el texto incrustado del pizarrón sin reemplazar la animación. */
+.level-seven-board-copy {
+  position: absolute;
+  z-index: 8;
+  top: 17%;
+  left: 0;
+  width: 31.5%;
+  height: 61.5%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.25rem, 1.15vw, 0.75rem);
+  padding: 8% 2.25% 5%;
+  overflow: hidden;
+  color: #eee8d6;
+  background:
+    radial-gradient(circle at 28% 22%, rgb(255 255 255 / 5%), transparent 34%),
+    linear-gradient(92deg, #111818 0%, #172020 72%, #101616 100%);
+  border-right: 1px solid rgb(205 190 155 / 18%);
+  box-shadow: inset -10px 0 22px rgb(0 0 0 / 25%);
+  text-align: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  transform: rotate(-0.35deg);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+.level-seven-board-copy span {
+  margin-bottom: 0.25rem;
+  color: #f1b65d;
+  font-size: clamp(0.52rem, 1.45vw, 1.05rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.level-seven-board-copy b,
+.level-seven-board-copy strong {
+  display: block;
+  max-width: 100%;
+  font-size: clamp(0.54rem, 1.55vw, 1.12rem);
+  line-height: 1.2;
+  letter-spacing: 0.025em;
+  text-wrap: balance;
+}
+
+.level-seven-board-copy strong {
+  margin-top: 0.4rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgb(238 232 214 / 45%);
+  color: #fff8df;
+  font-size: clamp(0.58rem, 1.68vw, 1.2rem);
+}
+
 /* Printed-material bridge for level six. */
 .level-six-physical-prompt {
   margin: 20px 0 14px;

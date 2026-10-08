@@ -65,8 +65,8 @@ export const levels = [
     prompt: '¿Cuál es el código del compartimento?',
     evidence: ['Sobre negro autorizado', 'Plantilla de calibración LF-04, ya preparada'],
     digital: 'Mecanismo LF-04 detectado. La combinación no está registrada en el sistema. La plantilla física contiene el procedimiento de calibración.',
-    placeholder: '5 cifras', answer: ['18153'], lock: 'mechanical',
-    hints: ['La pieza ya está recortada. Observá qué parte puede moverse y qué marcas permiten alinearla.', 'Cuando esté bien colocada aparecerán seis números y una regla breve que separa dos grupos.', 'Sumá los pares para A, los impares para B y calculá A − B. Escribí A, B y la diferencia en ese orden.'],
+    placeholder: '5 cifras', answer: ['11820'], lock: 'mechanical',
+    hints: ['La pieza ya está recortada. Observá qué parte puede moverse y qué marcas permiten alinearla.', 'Separá los números en dos grupos: impares y pares.', 'Sumá 19 + 21 + 23 + 25 + 30. Después sumá 2 + 4 + 6 + 8 + 0. Uní ambos resultados, en ese orden.'],
     unlock: 'Acceso a la acusación final',
   },
 ];
