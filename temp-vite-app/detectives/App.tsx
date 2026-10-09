@@ -6,7 +6,7 @@ import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import MissionMap from './MissionMap';
 import LevelSideTabs from './LevelSideTabs';
-import {playEffect,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
+import {playEffect,playLevelComplete,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
 import FinalCaseAudio from './FinalCaseAudio';
 import PodiumAccess from './PodiumAccess';
 'use client';
@@ -159,6 +159,12 @@ function SuspectImageViewer({initialIndex,onClose}:{initialIndex:number;onClose:
   </dialog>;
 }
 
+const evidenceRewards=['CORTE · 19:37','COARTADA · LEÓN','DESTINO · TALLER','RUTA · 9 → 3 → 7','REGISTRO · R-17','UBICACIÓN · FAROL','COMPARTIMENTO · ABIERTO'];
+const achievementNames=['OJO DE FARO','COARTADA PERFECTA','RADIOOPERADOR','CARTÓGRAFO','RASTREADOR','SEÑALERO','MENTE MECÁNICA'];
+function LevelClearOverlay({level,onClose}:{level:number;onClose:()=>void}){
+ return <div className="level-clear-overlay" role="dialog" aria-modal="true" aria-label={`Prueba ${level} confirmada`}><div className="level-clear-flash"/><section><span className="level-clear-kicker">AGENCIA F · EVIDENCIA VERIFICADA</span><div className="level-clear-stamp">PRUEBA<br/><b>CONFIRMADA</b></div><div className="level-clear-evidence"><i aria-hidden="true">◆</i><span>NUEVA EVIDENCIA</span><b>{evidenceRewards[level-1]}</b></div><button className="primary-button" type="button" onClick={onClose}>CONTINUAR <span>→</span></button></section></div>;
+}
+
 export default function Home() {
   const [screen, setScreen] = useState<Screen>('home');
   const [showAccess, setShowAccess] = useState(false);
@@ -193,6 +199,16 @@ export default function Home() {
   const [levelThreeDialog,setLevelThreeDialog]=useState<'intro'|'success'|null>(()=>{if(!import.meta.env.DEV)return null;const preview=new URLSearchParams(window.location.search).get('preview');return preview==='level3'?'intro':preview==='level3-done'?'success':null;});
   const [levelFourDialog,setLevelFourDialog]=useState<'intro'|'success'|null>(()=>{if(!import.meta.env.DEV)return null;const preview=new URLSearchParams(window.location.search).get('preview');return preview==='level4'?'intro':preview==='level4-done'?'success':null;});
   const [lateLevelDialog,setLateLevelDialog]=useState<{level:5|6|7;kind:'intro'|'success'}|null>(()=>{if(!import.meta.env.DEV)return null;const preview=new URLSearchParams(window.location.search).get('preview')||'';const match=preview.match(/^level([567])(-done)?$/);return match?{level:Number(match[1]) as 5|6|7,kind:match[2]?'success':'intro'}:null;});
+  const [levelClear,setLevelClear]=useState<number|null>(()=>{if(!import.meta.env.DEV)return null;const match=new URLSearchParams(window.location.search).get('preview')?.match(/^level([1-7])-reward$/);return match?Number(match[1]):null;});
+  const [gameFeedback,setGameFeedback]=useState<'success'|'error'|''>('');
+  const [achievement,setAchievement]=useState('');
+  const [ambientEvent,setAmbientEvent]=useState<'beam'|'shadow'|'radio'|'ruby'|''>('');
+  const [marks,setMarks]=useState<number[]>(()=>{try{return JSON.parse(localStorage.getItem('archivos-f-secret-marks')||'[]') as number[];}catch{return [];}});
+
+  function unlockAchievement(name:string,show=true){
+    try{const current=JSON.parse(localStorage.getItem('archivos-f-achievements')||'[]') as string[];if(!current.includes(name))localStorage.setItem('archivos-f-achievements',JSON.stringify([...current,name]));}catch{/* Decorative progress must not interrupt the case. */}
+    if(show){setAchievement(name);window.setTimeout(()=>setAchievement(''),4200);}
+  }
 
   function receiveState(state: GameState) {
     const elapsed=Math.max(elapsedRef.current,Math.floor(Number(state.elapsedSeconds)||0));elapsedRef.current=elapsed;
@@ -242,11 +258,24 @@ export default function Home() {
       const response = await fetch('/los-archivos-f/api/game', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       const data = await response.json() as GameState & {error?:string;code?:string};
       if (!response.ok) throw new Error(data.error || 'No pudimos guardar. Volvé a intentar.');
-      if(body.action==='unlock'||body.action==='final') playEffect('unlock');
+      if(body.action==='unlock') playLevelComplete(Number(body.level));
+      else if(body.action==='final') playEffect('unlock');
+      if(body.action==='unlock'){
+        const solved=Number(body.level);setLevelClear(solved);setGameFeedback('success');
+        window.setTimeout(()=>setGameFeedback(''),900);
+        const award=achievementNames[solved-1];
+        if(award&&(hints[solved]||0)===0)unlockAchievement(award);
+      }
+      if(body.action==='final'){
+        unlockAchievement('EQUIPO IMPARABLE');
+        if(Object.values(hints).reduce((sum,value)=>sum+value,0)<=2)unlockAchievement('SIN DEJAR HUELLAS',false);
+      }
       receiveState(data); setSaveStatus('Progreso guardado'); return data as GameState;
     } catch(error) {
       const text = error instanceof Error ? error.message : 'No hay conexión. Volvé a intentar.';
-      setMessage(text); setSaveStatus('No se guardó el último cambio. Volvé a intentar.'); return null;
+      setMessage(text); setSaveStatus('No se guardó el último cambio. Volvé a intentar.');
+      if((error as {code?:string})?.code==='WRONG_ANSWER'||text.includes('no abre')||text.includes('no recuperamos')){playEffect('error');setGameFeedback('error');window.setTimeout(()=>setGameFeedback(''),700);}
+      return null;
     } finally { setBusy(false); }
   }
 
@@ -281,6 +310,18 @@ export default function Home() {
       stopStormAmbience();
     };
   }, []);
+
+  useEffect(()=>{
+    if(screen!=='game')return;
+    let timer=0;
+    const schedule=()=>{timer=window.setTimeout(()=>{const options=['beam','shadow','radio','ruby'] as const;const next=options[Math.floor(Math.random()*options.length)];setAmbientEvent(next);if(next==='radio')playEffect('signal');window.setTimeout(()=>setAmbientEvent(''),2200);schedule();},18000+Math.random()*30000);};
+    schedule();return()=>window.clearTimeout(timer);
+  },[screen]);
+
+  function collectMark(){
+    if(level<1||level>7||marks.includes(level))return;
+    const next=[...marks,level].sort();setMarks(next);localStorage.setItem('archivos-f-secret-marks',JSON.stringify(next));playEffect('signal');unlockAchievement(next.length===7?'GUARDIÁN DE LAS SIETE LUCES':`MARCA SECRETA ${next.length}/7`);
+  }
 
   function visitLevel(destination: number) {
     if (destination < 0 || destination > highestLevel) return;
@@ -377,7 +418,7 @@ export default function Home() {
   const storyPageOpen=showLevelTwoIntro||showLevelTwoSuccess||showLevelThreeDialog||showLevelFourDialog||showLateLevelDialog;
 
   return (
-    <main className={`site-shell ${storyPageOpen?'story-page-active':''}`} aria-busy={busy}><span key={stormFlash.key} className={`storm-flash storm-flash-${stormFlash.side} ${stormFlash.key?'is-active':''}`} style={{'--storm-intensity':stormFlash.intensity} as React.CSSProperties} aria-hidden="true"/><fieldset className="app-controls" disabled={busy}>
+    <main className={`site-shell ${storyPageOpen?'story-page-active':''} game-feedback-${gameFeedback}`} aria-busy={busy}><span key={stormFlash.key} className={`storm-flash storm-flash-${stormFlash.side} ${stormFlash.key?'is-active':''}`} style={{'--storm-intensity':stormFlash.intensity} as React.CSSProperties} aria-hidden="true"/><span className={`ambient-event ambient-${ambientEvent}`} aria-hidden="true"/><fieldset className="app-controls" disabled={busy}>
       <nav className="topbar" aria-label="Navegación principal">
         <div className="header-identity">
           <button className="brand brand-button" onClick={() => leaveGame('home')} aria-label="Ir al inicio"><img className="brand-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F"/></button>
@@ -403,6 +444,7 @@ export default function Home() {
         <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} elapsedSeconds={elapsedSeconds} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={()=>requestHint(false)} onRequestSolution={()=>requestHint(true)}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onMission={()=>leaveGame('briefing')} onLibrary={()=>leaveGame('library')}/>
 
         <div className="investigation-panel">
+          {level>=1&&level<=7&&!marks.includes(level)&&<button type="button" className={`secret-lighthouse secret-lighthouse-${level}`} onClick={collectMark} aria-label="Descubrir marca secreta del faro"><span>♜</span></button>}
           {level !== 1 && level !== 2 && level <= 7 && <figure className={`scene-frame ${level === 3?'level-three-weather':level === 4?'level-four-maps':level===5?'level-five-red-corridor':level===6?'level-six-flags':level === 0 ? 'storm-layer' : level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img className={level===3?'storm-frame storm-frame-0':undefined} src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : level===3 ? levelVisuals[2] : level===4&&!unlocked ? '/los-archivos-f/images/nivel-4-sala-planos-v1.png' : level===5&&!unlocked?'/los-archivos-f/images/bg-hidden-corridor.png':level===6&&!unlocked?'/los-archivos-f/images/nivel-6-sala-banderas-v3.png':unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt={level===4?'Sala de cartografía del museo con un plano incompleto sobre la mesa':level===5?'Corredor de mantenimiento iluminado por señales rojas':level===6?'Sala del faro con cinco banderas numeradas a distintas alturas y el cartel Seguí la luz':'Escena del Museo del Faro vinculada con la investigación'} />{level===3&&['nivel-3-tormenta-2.png','nivel-3-tormenta-3.png','nivel-3-tormenta-4.png'].map((frame,index)=><img className={`storm-frame storm-frame-${index+1}`} src={`/los-archivos-f/images/${frame}`} alt="" aria-hidden="true" key={frame}/>)}{level===3&&<i className="scene-lightning-flash" aria-hidden="true"/>}{level===3&&<i className="scene-lighthouse-beam" aria-hidden="true"/>}<span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
           
           {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p><Typewriter text="Robaron el Rubí del Faro durante el apagón y dejaron una copia. Cuatro personas quedaron bajo sospecha."/></p><p>Mantené cerrado el sobre dirigido al agente hasta que Fede lo indique.</p><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>leaveGame('briefing')}>Volver a escuchar a Federica</button></section>}
@@ -447,6 +489,7 @@ export default function Home() {
       {showLateLevelDialog&&lateLevelDialog&&<LateLevelStoryDialog level={lateLevelDialog.level} kind={lateLevelDialog.kind} onContinue={()=>{const success=lateLevelDialog.kind==='success';setLateLevelDialog(null);if(success)continueInvestigation();}}/>}
 
       {showAccess && <div className="modal-backdrop" onMouseDown={() => {setShowAccess(false); setMessage('');}}><form className="access-card" onSubmit={access} onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowAccess(false)}>×</button><p className="eyebrow dark">ACCESO RESTRINGIDO</p><h2>Identificate, agente.</h2><p>Ingresá el código impreso debajo del QR de tu carpeta.</p><label htmlFor="agent-code">Código del expediente</label><input id="agent-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="F01-XXXX-XXXX-XXXX-XXXX" autoComplete="off" /><label htmlFor="agent-name">Nombre o alias</label><input id="agent-name" value={agent} onChange={(e) => setAgent(e.target.value)} placeholder="Tu nombre o alias de agente" maxLength={48} autoComplete="off" />{message && <p className="form-error">{message}</p>}<button className="primary-button full" type="submit">ACTIVAR INVESTIGACIÓN <span>→</span></button></form></div>}
+    {levelClear&&<LevelClearOverlay level={levelClear} onClose={()=>setLevelClear(null)}/>} {achievement&&<aside className="achievement-toast" role="status"><span>✦ LOGRO DESBLOQUEADO</span><b>{achievement}</b></aside>}
     {busy && <div className="connection-status" role="status">Conectando con la Agencia F…</div>}
     </fieldset></main>
   );

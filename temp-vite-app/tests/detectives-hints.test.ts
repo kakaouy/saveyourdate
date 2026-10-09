@@ -18,8 +18,8 @@ test('pistas: avanzan en orden o registran todas al pedir la solución directa',
   applyAction(legacy,{action:'hint',level:1});assert.equal(legacy.hints[1],2);
   applyAction(legacy,{action:'hint',level:1,direct:true});assert.equal(legacy.hints[1],4);
   const codes=JSON.parse(readFileSync(new URL('../api/_lib/detectives/access-codes.json',import.meta.url),'utf8'));
-  for(const code of Array.from({length:10},(_,i)=>`C${i+1}`)) assert.ok(codes.includes(await hashCode(` ${code.toLowerCase()} `)));
-  assert.ok(!codes.includes(await hashCode('C11')));
+  for(const code of ['F01-D1-09B422','F01-D2-5AC2E6','F01-D3-EF2831','F01-D4-156647','F01-D5-9F02D6','F01-D6-F89950','F01-D7-40A208','F01-D8-513F49','F01-D9-1EDD66','F01-D10-0181BD']) assert.ok(codes.includes(await hashCode(` ${code.toLowerCase()} `)));
+  assert.ok(!codes.includes(await hashCode('F01-D11-INVALID')));
  }finally{await server.close();}
 });
 

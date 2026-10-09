@@ -35,42 +35,15 @@ function makeRainBuffer(ctx: AudioContext) {
 
 function playThunder(ctx: AudioContext) {
   if (!stormEnabled || ctx.state !== 'running') return;
-  const now = ctx.currentTime;
-  const strength = Math.pow(Math.random(), 0.78);
+  const strength = Math.pow(Math.random(), 0.72);
   const intensity = 0.28 + strength * 0.72;
   const side = Math.random()<.5?'left':'right';
-  const pan = (side==='left'?-1:1) * (0.35 + Math.random() * 0.55);
-  const duration = 2.8 + strength * 3.4 + Math.random() * 0.8;
-  const attack = 0.045 + (1 - strength) * 0.24;
-  const noise = ctx.createBufferSource();
-  const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * duration), ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  let rumble = 0;
-  for (let index = 0; index < data.length; index += 1) {
-    rumble = rumble * (0.982 + strength * 0.009) + (Math.random() * 2 - 1) * (0.018 - strength * 0.007);
-    const roll = 0.72 + Math.sin(index / ctx.sampleRate * (8 + strength * 7)) * 0.2;
-    data[index] = rumble * roll;
-  }
-  noise.buffer = buffer;
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 220 + strength * 360;
-  const gain = ctx.createGain();
-  const panner = ctx.createStereoPanner();
-  panner.pan.value=pan;
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.42 + strength * 0.5, now + attack);
-  gain.gain.exponentialRampToValueAtTime(0.09 + strength * 0.14, now + 0.7 + strength * 0.55);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-  noise.connect(filter).connect(gain).connect(panner).connect(ctx.destination);
-  noise.start(now);
-  noise.stop(now + duration);
-  tone(ctx, 44 + strength * 24, now, 1.9 + strength * 2.2, 0.1 + strength * 0.18, 'sine');
-  tone(ctx, 80 + Math.random() * 55, now + 0.08 + Math.random() * 0.16, 1.2 + strength * 1.5, 0.08 + strength * 0.13, 'triangle');
-  if (strength > 0.68) {
-    tone(ctx, 150 + Math.random() * 90, now, 0.13 + strength * 0.14, 0.12 + strength * 0.12, 'sawtooth');
-    tone(ctx, 62, now + 0.08, 0.65, 0.12 + strength * 0.09, 'triangle');
-  }
+  const close=strength>.58;
+  const thunder=new Audio(close?'/los-archivos-f/audio/thunder-clap.mp3':'/los-archivos-f/audio/thunder-rumble.mp3');
+  thunder.preload='auto';
+  thunder.volume=close?Math.min(1,.76+strength*.22):Math.min(1,.62+strength*.28);
+  thunder.playbackRate=.94+Math.random()*.1;
+  void thunder.play().catch(()=>{});
   window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity,side}}));
 }
 
@@ -170,5 +143,24 @@ export function playEffect(effect: Effect) {
     }
   } catch {
     // Audio effects are decorative and must never interrupt the game.
+  }
+}
+
+export function playLevelComplete(level: number) {
+  try {
+    if (!effectsEnabled) return;
+    const ctx = audioContext();
+    if (!ctx || ctx.state !== 'running') return;
+    const now = ctx.currentTime;
+    if (level === 1 || level === 5) {
+      [0, .075, .15].forEach((delay, index) => tone(ctx, 520 + index * 170, now + delay, .055, .024, 'square'));
+    } else if (level === 3 || level === 6) {
+      [0, .11, .22].forEach((delay, index) => tone(ctx, [690, 910, 780][index], now + delay, .09, .025, 'sine'));
+    } else {
+      [0, .08, .17].forEach((delay, index) => tone(ctx, [118, 164, 238][index], now + delay, .1 + index * .025, .035, 'triangle'));
+    }
+    tone(ctx, 392, now + .3, .32, .04, 'sine');
+  } catch {
+    // The reward sound is decorative and must never block progression.
   }
 }
