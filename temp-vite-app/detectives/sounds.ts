@@ -8,6 +8,7 @@ let stormSource: AudioBufferSourceNode | null = null;
 let stormGain: GainNode | null = null;
 let thunderTimer: number | null = null;
 let lastHintChime = 0;
+let lastButtonClick = 0;
 
 export function setEffectsEnabled(enabled: boolean) { effectsEnabled = enabled; }
 
@@ -22,6 +23,7 @@ function playAudioClip(source:string,volume:number,duration?:number,startAt=0) {
 export function playKeyboardKey(){playAudioClip('/los-archivos-f/audio/terminal-keyboard.mp3',.42,.16,Math.random()*.9);}
 export function playPowerSurge(){playAudioClip('/los-archivos-f/audio/terminal-power.mp3',.78);}
 export function playHintChime(){const now=performance.now();if(now-lastHintChime<1400)return;lastHintChime=now;playAudioClip('/los-archivos-f/audio/hint-chime.mp3',.34);}
+export function playButtonClick(){const now=performance.now();if(now-lastButtonClick<70)return;lastButtonClick=now;playAudioClip('/los-archivos-f/audio/ui-button-press.mp3',.18,.22);}
 
 function audioContext() {
   if (typeof window === 'undefined') return null;
@@ -133,23 +135,19 @@ export function playEffect(effect: Effect) {
       tone(ctx, 920 + Math.random() * 180, now, 0.014, 0.007, 'sine');
       tone(ctx, 1320 + Math.random() * 120, now + 0.004, 0.009, 0.004, 'triangle');
     } else if (effect === 'panel') {
-      tone(ctx, 210, now, 0.045, 0.025, 'triangle');
-      tone(ctx, 310, now + 0.035, 0.055, 0.018, 'sine');
+      playAudioClip('/los-archivos-f/audio/ui-mouse-click.mp3',.23,.24);
     } else if (effect === 'paper') {
-      tone(ctx, 680, now, 0.018, 0.006, 'triangle');
-      tone(ctx, 520, now + 0.025, 0.024, 0.005, 'sine');
+      playAudioClip('/los-archivos-f/audio/ui-mouse-click.mp3',.18,.18);
     } else if (effect === 'piece') {
-      tone(ctx, 125, now, 0.045, 0.018, 'triangle');
-      tone(ctx, 82, now + 0.018, 0.06, 0.014, 'sine');
+      playAudioClip('/los-archivos-f/audio/mechanism-lock-insert.mp3',.34,.48);
     } else if (effect === 'rotate') {
-      tone(ctx, 260, now, 0.025, 0.012, 'triangle');
-      tone(ctx, 210, now + 0.028, 0.035, 0.01, 'triangle');
+      playAudioClip('/los-archivos-f/audio/ui-interface-click.mp3',.35);
     } else if (effect === 'signal') {
       tone(ctx, 740, now, 0.045, 0.012, 'sine');
     } else if (effect === 'error') {
-      tone(ctx, 145, now, 0.07, 0.02, 'sawtooth');
-      tone(ctx, 112, now + 0.055, 0.08, 0.016, 'triangle');
+      playAudioClip('/los-archivos-f/audio/feedback-error-thud.mp3',.48,.5);
     } else {
+      playAudioClip('/los-archivos-f/audio/feedback-metal-unlock.mp3',.36,.85);
       tone(ctx, 196, now, 0.12, 0.035, 'triangle');
       tone(ctx, 294, now + 0.09, 0.14, 0.04, 'triangle');
       tone(ctx, 392, now + 0.19, 0.28, 0.045, 'sine');
@@ -165,6 +163,7 @@ export function playLevelComplete(level: number) {
     const ctx = audioContext();
     if (!ctx || ctx.state !== 'running') return;
     const now = ctx.currentTime;
+    playAudioClip('/los-archivos-f/audio/evidence-stamp.mp3',.58,.58);
     if (level === 1 || level === 5) {
       [0, .075, .15].forEach((delay, index) => tone(ctx, 520 + index * 170, now + delay, .055, .024, 'square'));
     } else if (level === 3 || level === 6) {

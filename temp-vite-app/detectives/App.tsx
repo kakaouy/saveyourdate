@@ -6,7 +6,7 @@ import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import MissionMap from './MissionMap';
 import LevelSideTabs from './LevelSideTabs';
-import {playEffect,playLevelComplete,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
+import {playButtonClick,playEffect,playLevelComplete,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
 import FinalCaseAudio from './FinalCaseAudio';
 import PodiumAccess from './PodiumAccess';
 'use client';
@@ -327,6 +327,11 @@ export default function Home() {
     const schedule=()=>{timer=window.setTimeout(()=>{const options=['beam','shadow','radio','ruby'] as const;const next=options[Math.floor(Math.random()*options.length)];setAmbientEvent(next);if(next==='radio')playEffect('signal');window.setTimeout(()=>setAmbientEvent(''),2200);schedule();},18000+Math.random()*30000);};
     schedule();return()=>window.clearTimeout(timer);
   },[screen]);
+
+  useEffect(()=>{
+    const click=(event:MouseEvent)=>{const button=event.target instanceof Element?event.target.closest('button'):null;if(button&&!button.hasAttribute('disabled'))playButtonClick();};
+    document.addEventListener('click',click,true);return()=>document.removeEventListener('click',click,true);
+  },[]);
 
   function collectMark(){
     if(level<1||level>7||marks.includes(level))return;
