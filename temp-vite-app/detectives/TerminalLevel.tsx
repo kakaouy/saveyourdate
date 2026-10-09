@@ -27,7 +27,7 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
   </div>
  </section>;
 }
-export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue}:{unlocked:boolean;busy:boolean;message:string;onUnlock:(answer:string)=>Promise<boolean>;onContinue:()=>void}) {
+export default function TerminalLevel({unlocked,busy,message,deferSuccess,onUnlock,onContinue}:{unlocked:boolean;busy:boolean;message:string;deferSuccess:boolean;onUnlock:(answer:string)=>Promise<boolean>;onContinue:()=>void}) {
  const [intro,setIntro]=useState(!unlocked);
  const [powered,setPowered]=useState(false);
  const [lightOn,setLightOn]=useState(false);
@@ -54,7 +54,7 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
   }else{submitted.current=false;setValidating(0);input.current?.focus();}
  }
  if(intro)return <FedeTransmission success={false} onClose={()=>{setIntro(false);requestAnimationFrame(()=>input.current?.focus());}}/>;
- if(success)return <FedeTransmission success onClose={()=>{setSuccess(false);onContinue();}}/>;
+ if(success&&!deferSuccess)return <FedeTransmission success onClose={()=>{setSuccess(false);onContinue();}}/>;
  return <section className="terminal-level">
   <div className="terminal-heading"><p className="eyebrow">NIVEL 1 · ARCHIVO F-01</p></div>
   <div className="level-objective">

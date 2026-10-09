@@ -11,6 +11,8 @@ let openingMusic: HTMLAudioElement | null = null;
 let lastHintChime = 0;
 let lastButtonClick = 0;
 let lastTimeBurn = 0;
+let lastMapPaper = 0;
+let lastEvidenceCard = 0;
 
 export function setEffectsEnabled(enabled: boolean) { effectsEnabled = enabled; }
 
@@ -19,20 +21,25 @@ function playAudioClip(source:string,volume:number,duration?:number,startAt=0) {
   const audio=new Audio(source);audio.volume=volume;audio.preload='auto';
   try{audio.currentTime=startAt;}catch{/* Metadata can arrive after playback starts. */}
   void audio.play().catch(()=>{});
-  if(duration) window.setTimeout(()=>{audio.pause();audio.currentTime=0;},duration*1000);
+  if(duration){
+    const totalMs=duration*1000;
+    // Todos los recortes terminan con una cola breve para evitar cortes digitales secos.
+    fadeAndStop(audio,totalMs,Math.min(360,Math.max(70,totalMs*.32)));
+  }
 }
 
 export function playKeyboardKey(){playAudioClip('/los-archivos-f/audio/terminal-keyboard.mp3',.42,.16,Math.random()*.9);}
 export function playPowerSurge(){playAudioClip('/los-archivos-f/audio/terminal-crt-startup.mp3',.5,3.2);playAudioClip('/los-archivos-f/audio/level1-electric-zap.mp3',.5,.75);window.setTimeout(()=>playAudioClip('/los-archivos-f/audio/terminal-power.mp3',.34,.7),180);}
 export function playHintChime(){const now=performance.now();if(now-lastHintChime<1400)return;lastHintChime=now;playAudioClip('/los-archivos-f/audio/hint-chime.mp3',.34);}
 export function playButtonClick(){const now=performance.now();if(now-lastButtonClick<70)return;lastButtonClick=now;playAudioClip('/los-archivos-f/audio/ui-button-press.mp3',.18,.22);}
-export function playMapUnfold(){playAudioClip('/los-archivos-f/audio/mission-map-unfold.mp3',.32,1.45);}
+export function playMapUnfold(){const now=performance.now();if(now-lastMapPaper<1100)return;lastMapPaper=now;playAudioClip('/los-archivos-f/audio/mission-map-unfold.mp3',.32,1.45);}
 export function playMapFold(){playAudioClip('/los-archivos-f/audio/mission-map-fold.mp3',.3,1.15,.15);}
 export function playAchievement(){playAudioClip('/los-archivos-f/audio/achievement-warm.mp3',.32,1.75,.05);}
 export function playSecretCollect(){playAudioClip('/los-archivos-f/audio/secret-mark-collect.mp3',.42,.86);}
 export function playHintReveal(){playAudioClip('/los-archivos-f/audio/hint-reveal.mp3',.24,1.2,.12);}
 export function playPlanPiece(){playAudioClip('/los-archivos-f/audio/level4-piece-place.mp3',.38,.44);}
 export function playPlanComplete(){playAudioClip('/los-archivos-f/audio/level4-plan-complete.mp3',.42,1.4);}
+export function playChoiceCorrect(){playAudioClip('/los-archivos-f/audio/level1-access-confirm.mp3',.34,.72,.05);}
 export function playTvShutdown(){playAudioClip('/los-archivos-f/audio/tv-signal-shutdown.mp3',.48,1.28);}
 export function playLampBuzz(){playAudioClip('/los-archivos-f/audio/terminal-lamp-buzz.mp3',.14,2.4,.2);}
 export function playCorridorDoor(){playAudioClip('/los-archivos-f/audio/corridor-door.mp3',.3,2.25,.08);}
@@ -48,6 +55,7 @@ export function playRadarConfirm(){playAudioClip('/los-archivos-f/audio/level3-r
 export function playLevelTransition(){playAudioClip('/los-archivos-f/audio/cross-level-transition.mp3',.34,1.2);}
 export function playFedeRadioBeep(){playAudioClip('/los-archivos-f/audio/fede-radio-beep.mp3',.3,.52);}
 export function playEvidenceSlide(){playAudioClip('/los-archivos-f/audio/evidence-paper-slide.mp3',.38,.84);}
+export function playEvidenceCardHover(){const now=performance.now();if(now-lastEvidenceCard<240)return;lastEvidenceCard=now;playAudioClip('/los-archivos-f/audio/evidence-card-hover.mp3',.22,.58,.04);}
 export function playTimeBurn(){const now=performance.now();if(now-lastTimeBurn<5000)return;lastTimeBurn=now;playAudioClip('/los-archivos-f/audio/time-burning-bubbles.mp3',.24,1.65,1.1);}
 
 export function startOpeningMusic(){

@@ -15,6 +15,7 @@ export default function LevelFourPlan({solved,busy,onSolved}:{solved:boolean;bus
   const [placed,setPlaced]=useState<Record<number,string>>(solved?solvedPlacement:fixedPlacement);
   const [wrongSlot,setWrongSlot]=useState<number|null>(null);
   const [route,setRoute]=useState<number[]>(solved?[9,3,7]:[]);
+  const [showRouteGuide,setShowRouteGuide]=useState(false);
   const [feedback,setFeedback]=useState(solved?'Ruta 937 confirmada. El corredor oculto quedó reconstruido.':'Elegí un fragmento, orientalo y buscá dónde continúan sus líneas.');
   const aligned=Object.keys(placed).length===12;
   const activePiece=pieces.find(piece=>piece.id===active);
@@ -36,7 +37,7 @@ export default function LevelFourPlan({solved,busy,onSolved}:{solved:boolean;bus
       window.setTimeout(()=>setWrongSlot(null),650);return;
     }
     const next={...placed,[slot]:activePiece.id};
-    if(Object.keys(next).length===12)playPlanComplete();else playPlanPiece();
+    if(Object.keys(next).length===12){playPlanComplete();setShowRouteGuide(true);}else playPlanPiece();
     setPlaced(next);setActive(null);setWrongSlot(null);
     setFeedback(Object.keys(next).length===12?'Plano completo. Ahora seguí el recorrido desde INICIO.':`Fragmento confirmado. Faltan ${12-Object.keys(next).length} piezas.`);
   }
@@ -51,6 +52,7 @@ export default function LevelFourPlan({solved,busy,onSolved}:{solved:boolean;bus
   }
 
   return <section className={`level-four-workbench ${aligned?'is-aligned':''} ${solved?'is-solved':''}`} aria-labelledby="level-four-map-title">
+    {showRouteGuide&&<div className="level-four-route-guide" role="dialog" aria-modal="true" aria-labelledby="route-guide-title"><div><span>PLANO COMPLETO</span><h2 id="route-guide-title">Empezá por INICIO.</h2><p>Seguí la conexión y marcá todos los números del recorrido para desbloquear la ruta.</p><i aria-hidden="true">↙</i><button type="button" className="primary-button" onClick={()=>setShowRouteGuide(false)}>MARCAR EL RECORRIDO <b>→</b></button></div><strong aria-hidden="true">INICIO</strong></div>}
     <header className="level-four-map-heading"><div><p className="eyebrow">ESTACIÓN CARTOGRÁFICA · PLANO 1898</p><h2 id="level-four-map-title">Reconstruí el plano intervenido</h2></div><p>{aligned?'El plano está completo. Seguí las habitaciones en el orden del recorrido.':'Se desprendieron seis fragmentos del plano. Compará paredes, manchas y anotaciones.'}</p></header>
     <div className="level-four-map-layout">
       <div className="level-four-map-stage"><div className="level-four-antique-map" aria-label="Plano histórico del sector de mantenimiento">

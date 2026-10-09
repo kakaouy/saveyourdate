@@ -1,5 +1,5 @@
 import type {FormEvent} from 'react';
-import {playEffect} from './sounds';
+import {playEffect,playEvidenceCardHover} from './sounds';
 
 export default function LevelSideTabs({level,onReplay,missionTitle,missionSubtitle,unlocked,message}:{
  level:number;prompt:string;placeholder:string;answer:string;busy:boolean;unlocked:boolean;canUnlock:boolean;message:string;missionMessageOpen?:boolean;
@@ -8,7 +8,7 @@ export default function LevelSideTabs({level,onReplay,missionTitle,missionSubtit
  const mood=unlocked?'solved':message?'thinking':'ready';
  return <aside className={`level-side-tabs compact-side-tabs fede-${mood}`} aria-label={`Mensaje del nivel ${level}`}>
   <section className="level-side-tab mission-tab">
-   <button type="button" className="level-side-tab-trigger" onClick={()=>{playEffect('panel');onReplay();}}>
+   <button type="button" className="level-side-tab-trigger" onMouseEnter={playEvidenceCardHover} onFocus={playEvidenceCardHover} onClick={()=>{playEffect('panel');onReplay();}}>
     <img src={unlocked?'/los-archivos-f/images/fede-nivel-verificado-v1.png':'/los-archivos-f/images/fede-mission-tab.png'} alt=""/>
     <span><b>{missionTitle||'FEDE'}</b><small>{missionSubtitle||'Repetir mensaje'}</small></span>
     <i className="fede-status-badge" aria-hidden="true">{unlocked?'✓':message?'?':'!'}</i>
