@@ -9,7 +9,7 @@ export default function LevelSideTabs({level,onReplay,missionTitle,missionSubtit
  return <aside className={`level-side-tabs compact-side-tabs fede-${mood}`} aria-label={`Mensaje del nivel ${level}`}>
   <section className="level-side-tab mission-tab">
    <button type="button" className="level-side-tab-trigger" onClick={()=>{playEffect('panel');onReplay();}}>
-    <img src="/los-archivos-f/images/fede-mission-tab.png" alt=""/>
+    <img src={unlocked?'/los-archivos-f/images/fede-nivel-verificado-v1.png':'/los-archivos-f/images/fede-mission-tab.png'} alt=""/>
     <span><b>{missionTitle||'FEDE'}</b><small>{missionSubtitle||'Repetir mensaje'}</small></span>
     <i className="fede-status-badge" aria-hidden="true">{unlocked?'✓':message?'?':'!'}</i>
    </button>

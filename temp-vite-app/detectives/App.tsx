@@ -217,7 +217,7 @@ export default function Home() {
 
   function unlockAchievement(name:string,show=true){
     try{const current=JSON.parse(localStorage.getItem('archivos-f-achievements')||'[]') as string[];if(!current.includes(name))localStorage.setItem('archivos-f-achievements',JSON.stringify([...current,name]));}catch{/* Decorative progress must not interrupt the case. */}
-    if(show){setAchievement(name);window.setTimeout(()=>setAchievement(''),4200);}
+    if(show){setAchievement(name);window.setTimeout(()=>setAchievement(''),9500);}
   }
 
   function receiveState(state: GameState) {
@@ -499,7 +499,7 @@ export default function Home() {
       {showLateLevelDialog&&lateLevelDialog&&<LateLevelStoryDialog level={lateLevelDialog.level} kind={lateLevelDialog.kind} onContinue={()=>{const success=lateLevelDialog.kind==='success';setLateLevelDialog(null);if(success)continueInvestigation();}}/>}
 
       {showAccess && <div className="modal-backdrop" onMouseDown={() => {setShowAccess(false); setMessage('');}}><form className="access-card" onSubmit={access} onMouseDown={(e) => e.stopPropagation()}><button className="modal-close" type="button" onClick={() => setShowAccess(false)}>×</button><p className="eyebrow dark">ACCESO RESTRINGIDO</p><h2>Identificate, agente.</h2><p>Ingresá el código impreso debajo del QR de tu carpeta.</p><label htmlFor="agent-code">Código del expediente</label><input id="agent-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="F01-XXXX-XXXX-XXXX-XXXX" autoComplete="off" /><label htmlFor="agent-name">Nombre o alias</label><input id="agent-name" value={agent} onChange={(e) => setAgent(e.target.value)} placeholder="Tu nombre o alias de agente" maxLength={48} autoComplete="off" />{message && <p className="form-error">{message}</p>}<button className="primary-button full" type="submit">ACTIVAR INVESTIGACIÓN <span>→</span></button></form></div>}
-    {levelClear&&<LevelClearOverlay level={levelClear} onClose={()=>setLevelClear(null)}/>} {achievement&&<aside className="achievement-toast" role="status"><span>✦ LOGRO DESBLOQUEADO</span><b>{achievement}</b></aside>}
+    {levelClear&&<LevelClearOverlay level={levelClear} onClose={()=>setLevelClear(null)}/>} {achievement&&<aside className="achievement-toast" role="status"><img src="/los-archivos-f/images/fede-logro-desbloqueado-v1.png" alt="Fede celebra el nuevo logro"/><div><span>✦ LOGRO DESBLOQUEADO</span><b>{achievement}</b><small>La Agencia F registró esta insignia en tu expediente.</small></div><button type="button" onClick={()=>setAchievement('')} aria-label="Cerrar logro">×</button></aside>}
     {busy && <div className="connection-status" role="status">Conectando con la Agencia F…</div>}
     </fieldset></main>
   );
