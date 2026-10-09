@@ -1,0 +1,57 @@
+temp-vite-app/api/_lib/detectives/game.ts
+  s_eb3608012a11e9::t_622ebe39a978e3 52
+temp-vite-app/detectives/sounds.ts
+  s_eb3608012a11e9::t_9d949a3a87b3bb 41-42,59-60,62,65,71-72,74,83
+temp-vite-app/detectives/LevelSideTabs.tsx
+  s_eb3608012a11e9::t_eb9f4c27fafef0 1,4-6,8-15
+temp-vite-app/detectives/LevelFourPlan.tsx
+  s_eb3608012a11e9::t_443b81f09638f5 25,33,63,65
+  s_eb3608012a11e9::t_f1c0ac92e93ea9 35
+temp-vite-app/detectives/case.ts
+  s_eb3608012a11e9::t_50b1b32e313a54 6-7,66
+  s_eb3608012a11e9::t_541d7a4d6eb3ab 56,59
+  s_eb3608012a11e9::t_0a65118a188c47 81
+temp-vite-app/detectives/terminal-script.ts
+  s_eb3608012a11e9::t_f1c0ac92e93ea9 1
+temp-vite-app/tests/detectives-hints.test.ts
+  s_eb3608012a11e9::t_834eb9e631479c 5,19
+temp-vite-app/detectives/TerminalLevel.tsx
+  s_eb3608012a11e9::t_50b1b32e313a54 62
+  s_eb3608012a11e9::t_aa758853146f17 65,69
+temp-vite-app/detectives/style.css
+  s_eb3608012a11e9::t_3124558e43bb6d 2302-2308
+temp-vite-app/detectives/mission-script.ts
+  s_eb3608012a11e9::t_0a65118a188c47 3,7
+  s_eb3608012a11e9::t_f1c0ac92e93ea9 4-5
+temp-vite-app/detectives/Briefing.tsx
+  s_eb3608012a11e9::t_472cd06a4c8904 2-3,6,9-11,13-23,25-26
+temp-vite-app/detectives/MissionMap.tsx
+  s_eb3608012a11e9::t_0a65118a188c47 50
+  s_eb3608012a11e9::t_6f33dc665907b8 40
+temp-vite-app/detectives/HintLenses.tsx
+  s_eb3608012a11e9::t_56b47cc751afbb 4-5,17-22,39
+  s_eb3608012a11e9::t_542b9a31afa67f 40
+temp-vite-app/tests/detectives-hideout-level.test.ts
+  s_eb3608012a11e9::t_f1c0ac92e93ea9 5
+temp-vite-app/detectives/LightSignal.tsx
+  s_eb3608012a11e9::t_e3851309e9fba8 29,44
+temp-vite-app/detectives/App.tsx
+  s_eb3608012a11e9::t_0a65118a188c47 87,408
+  s_eb3608012a11e9::t_c2c3d664343866 185,203-204,210,272,357,380,403,421,428-429,432
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9a3350dc1b88f25c84f7d87e57f8e3a2811ef686",
+  "prompts": {},
+  "sessions": {
+    "s_eb3608012a11e9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11d89-0e01-74e3-a373-9a80950c2664",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
