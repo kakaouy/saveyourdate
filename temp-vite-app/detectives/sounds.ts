@@ -9,6 +9,7 @@ let stormGain: GainNode | null = null;
 let thunderTimer: number | null = null;
 let lastHintChime = 0;
 let lastButtonClick = 0;
+let lastTimeBurn = 0;
 
 export function setEffectsEnabled(enabled: boolean) { effectsEnabled = enabled; }
 
@@ -37,6 +38,7 @@ export function playRadarConfirm(){playAudioClip('/los-archivos-f/audio/level3-r
 export function playLevelTransition(){playAudioClip('/los-archivos-f/audio/cross-level-transition.mp3',.34,1.2);}
 export function playFedeRadioBeep(){playAudioClip('/los-archivos-f/audio/fede-radio-beep.mp3',.3,.52);}
 export function playEvidenceSlide(){playAudioClip('/los-archivos-f/audio/evidence-paper-slide.mp3',.38,.84);}
+export function playTimeBurn(){const now=performance.now();if(now-lastTimeBurn<5000)return;lastTimeBurn=now;playAudioClip('/los-archivos-f/audio/time-burning-bubbles.mp3',.24,1.65,1.1);}
 
 function audioContext() {
   if (typeof window === 'undefined') return null;
@@ -72,6 +74,7 @@ function playThunder(ctx: AudioContext) {
   thunder.volume=close?Math.min(1,.76+strength*.22):Math.min(1,.62+strength*.28);
   thunder.playbackRate=.94+Math.random()*.1;
   void thunder.play().catch(()=>{});
+  window.setTimeout(()=>{thunder.pause();thunder.currentTime=0;},close?1800:2800);
   window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity,side}}));
 }
 
@@ -81,7 +84,7 @@ function scheduleThunder(ctx: AudioContext, first = false) {
   thunderTimer = window.setTimeout(() => {
     playThunder(ctx);
     scheduleThunder(ctx);
-  }, first ? 3500 + Math.random() * 7500 : 7000 + Math.random() * 21000);
+  }, first ? 7000 + Math.random() * 9000 : 18000 + Math.random() * 27000);
 }
 
 export function startStormAmbience() {
