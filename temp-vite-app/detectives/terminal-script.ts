@@ -1,2 +1,2 @@
 export const terminalIntro = "Agente, durante el apagón robaron el Rubí del Faro y dejaron una copia. Encendé la computadora y recuperá el acceso para comenzar la investigación.";
-export const terminalSuccess = "¡Acceso recuperado! El reloj de pared se detuvo al cortarse la electricidad: eran las siete y treinta y siete de la tarde. La cámara marcaba siete minutos menos. Esa diferencia no es la duración del apagón. Ya sabemos cuándo comenzó. Ahora están habilitados los expedientes de las cuatro personas presentes. Vamos a comparar sus declaraciones con las pruebas.";
+export const terminalSuccess = "Acceso recuperado. El corte fue a las 19:37. Ahora compará las cuatro declaraciones.";

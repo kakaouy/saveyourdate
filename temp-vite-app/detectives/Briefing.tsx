@@ -17,13 +17,13 @@ export default function Briefing({agent,alreadyAccepted,onComplete}:{agent:strin
   <div className="briefing-copy briefing-compact-copy">
    <p className="eyebrow">ARCHIVO F-01 · MENSAJE URGENTE</p>
    <h1>Agente {agent},<br/>robaron el Rubí del Faro.</h1>
-   <p className="briefing-deck">El apagón dejó siete minutos sin registro. Recuperá las pruebas, reconstruí el recorrido y descubrí quién cambió la gema.</p>
+   <p className="briefing-deck">Seguí las pruebas y descubrí quién cambió la gema.</p>
    <div className={`transmission-receiver ${radioOpen?'is-playing':''}`}>
     <button className="transmission-trigger" onClick={toggleRadio} aria-expanded={radioOpen} aria-controls="federica-transmission"><span className="transmitter-icon"><img src="/los-archivos-f/images/transmisor-federica.png" alt=""/><i/><i/></span><span>MENSAJE DE FEDERICA<small>{radioOpen?'Ocultar transmisión':'Audio opcional · tocar para escuchar'}</small></span><b>{radioOpen?'−':'+'}</b></button>
     <div id="federica-transmission" hidden={!radioOpen} className="briefing-player"><TransmissionPlayer audioRef={audio} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setAudioFailed(true)}/></div>
    </div>
    {audioFailed&&<p role="status">El audio no está disponible. Podés comenzar igualmente.</p>}
-   <section className="mission-acceptance dossier-folio briefing-fast-start"><h2>{alreadyAccepted?'La investigación te espera.':'¿Aceptás la misión?'}</h2><p>Tené cerca los sobres de Información confidencial. El juego te indicará cuándo consultarlos.</p><button className="primary-button" onClick={()=>{audio.current?.pause();onComplete();}}>{alreadyAccepted?'VOLVER A LA INVESTIGACIÓN':'ACEPTAR Y COMENZAR'} <span>→</span></button></section>
+   <section className="mission-acceptance dossier-folio briefing-fast-start"><h2>{alreadyAccepted?'Continuá la investigación.':'¿Aceptás la misión?'}</h2><p>Tené cerca los sobres. Te avisaremos cuándo usarlos.</p><button className="primary-button" onClick={()=>{audio.current?.pause();onComplete();}}>{alreadyAccepted?'CONTINUAR':'ACEPTAR Y COMENZAR'} <span>→</span></button></section>
   </div>
  </section>;
 }

@@ -54,22 +54,22 @@ function playThunder(ctx: AudioContext) {
   noise.buffer = buffer;
   const filter = ctx.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = 115 + strength * 150;
+  filter.frequency.value = 220 + strength * 360;
   const gain = ctx.createGain();
   const panner = ctx.createStereoPanner();
   panner.pan.value=pan;
   gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.18 + strength * 0.42, now + attack);
-  gain.gain.exponentialRampToValueAtTime(0.035 + strength * 0.075, now + 0.7 + strength * 0.55);
+  gain.gain.exponentialRampToValueAtTime(0.42 + strength * 0.5, now + attack);
+  gain.gain.exponentialRampToValueAtTime(0.09 + strength * 0.14, now + 0.7 + strength * 0.55);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
   noise.connect(filter).connect(gain).connect(panner).connect(ctx.destination);
   noise.start(now);
   noise.stop(now + duration);
-  tone(ctx, 34 + strength * 16, now, 1.9 + strength * 2.2, 0.04 + strength * 0.1, 'sine');
-  tone(ctx, 49 + Math.random() * 22, now + 0.12 + Math.random() * 0.22, 1.4 + strength * 1.8, 0.025 + strength * 0.07, 'triangle');
+  tone(ctx, 44 + strength * 24, now, 1.9 + strength * 2.2, 0.1 + strength * 0.18, 'sine');
+  tone(ctx, 80 + Math.random() * 55, now + 0.08 + Math.random() * 0.16, 1.2 + strength * 1.5, 0.08 + strength * 0.13, 'triangle');
   if (strength > 0.68) {
-    tone(ctx, 76 + Math.random() * 34, now, 0.11 + strength * 0.12, 0.055 + strength * 0.075, 'sawtooth');
-    tone(ctx, 46, now + 0.08, 0.5, 0.065 + strength * 0.055, 'triangle');
+    tone(ctx, 150 + Math.random() * 90, now, 0.13 + strength * 0.14, 0.12 + strength * 0.12, 'sawtooth');
+    tone(ctx, 62, now + 0.08, 0.65, 0.12 + strength * 0.09, 'triangle');
   }
   window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity,side}}));
 }
@@ -99,13 +99,13 @@ export function startStormAmbience() {
     low.type = 'lowpass';
     low.frequency.value = 7200;
     const gain = ctx.createGain();
-    gain.gain.value = 0.16;
+    gain.gain.value = 0.12;
     source.connect(high).connect(low).connect(gain).connect(ctx.destination);
     source.start();
     stormSource = source;
     stormGain = gain;
   }
-  if (stormGain) stormGain.gain.setTargetAtTime(0.16, ctx.currentTime, 0.35);
+  if (stormGain) stormGain.gain.setTargetAtTime(0.12, ctx.currentTime, 0.35);
   if (!wasEnabled || thunderTimer === null) scheduleThunder(ctx, true);
 }
 
@@ -119,7 +119,7 @@ export function stopStormAmbience() {
 
 export function setStormDucked(ducked: boolean) {
   if (!context || !stormGain || !stormEnabled) return;
-  stormGain.gain.setTargetAtTime(ducked ? 0.045 : 0.16, context.currentTime, 0.3);
+  stormGain.gain.setTargetAtTime(ducked ? 0.035 : 0.12, context.currentTime, 0.3);
 }
 
 function tone(ctx: AudioContext, frequency: number, start: number, duration: number, volume: number, kind: OscillatorType = 'sine') {
