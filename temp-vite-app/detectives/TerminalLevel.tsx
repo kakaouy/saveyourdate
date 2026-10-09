@@ -3,7 +3,7 @@ import TransmissionPlayer from './TransmissionPlayer';
 import LevelSideTabs from './LevelSideTabs';
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {terminalIntro,terminalSuccess} from './terminal-script';
-import {playEffect,playKeyboardKey,playPowerSurge,playTerminalConfirm,playTerminalDigital} from './sounds';
+import {playEffect,playKeyboardKey,playLampBuzz,playPowerSurge,playTerminalConfirm,playTerminalDigital} from './sounds';
 
 function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) {
  const audio=useRef<HTMLAudioElement>(null);
@@ -69,7 +69,7 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
     {!unlocked?<><label htmlFor="terminal-answer">Instante de interrupción</label><input ref={input} id="terminal-answer" inputMode="numeric" value={answer} onChange={event=>{const next=event.target.value.replace(/\D/g,'').slice(0,4);if(next.length>answer.length)playKeyboardKey();setAnswer(next);}} placeholder="____" maxLength={4} autoComplete="off" disabled={validating>0}/>{validating>0&&<span className="terminal-digit-validation" role="status" aria-live="polite">{answer.split('').map((digit,index)=><i className={index<validating?'confirmed':''} key={`${digit}-${index}`}>{digit}{index<validating&&<b>✓</b>}</i>)}</span>}<button type="submit" disabled={busy||validating>0||answer.length!==4}>{validating>0?`VALIDANDO ${validating}/4…`:busy?'VERIFICANDO…':'RECUPERAR ACCESO'}</button></>:<p className="terminal-confirmed-result">CORTE CONFIRMADO · 19:37</p>}
     <span className="terminal-command-cursor" aria-hidden="true">▌</span>
    </form>}
-   <button type="button" className="terminal-power-button" aria-label={powered?'Apagar computadora':'Encender computadora'} aria-pressed={powered} onClick={()=>{playEffect('panel');setPowered(current=>{const next=!current;setLightOn(next);if(next){playPowerSurge();setPowerSurge(true);window.setTimeout(()=>setPowerSurge(false),650);requestAnimationFrame(()=>input.current?.focus());}return next;});}}><span className="sr-only">{powered?'Apagar':'Encender'}</span></button>
+   <button type="button" className="terminal-power-button" aria-label={powered?'Apagar computadora':'Encender computadora'} aria-pressed={powered} onClick={()=>{playEffect('panel');setPowered(current=>{const next=!current;setLightOn(next);if(next){playPowerSurge();playLampBuzz();setPowerSurge(true);window.setTimeout(()=>setPowerSurge(false),650);requestAnimationFrame(()=>input.current?.focus());}return next;});}}><span className="sr-only">{powered?'Apagar':'Encender'}</span></button>
   </div>
   {message&&!unlocked&&<p className="terminal-error" role="status">{message}</p>}
   {unlocked&&!lighting&&<button className="primary-button" onClick={onContinue}>CONTINUAR LA INVESTIGACIÓN →</button>}

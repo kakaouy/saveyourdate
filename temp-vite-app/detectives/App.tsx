@@ -6,7 +6,7 @@ import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import MissionMap from './MissionMap';
 import LevelSideTabs from './LevelSideTabs';
-import {playAchievement,playButtonClick,playCameraShutter,playDossierOpen,playEffect,playEvidenceSlide,playFedeRadioBeep,playHintReveal,playLevelComplete,playLevelTransition,playPageTurn,playPenMark,playSecretCollect,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
+import {playAchievement,playButtonClick,playCameraShutter,playDossierOpen,playEffect,playEvidenceSlide,playFedeRadioBeep,playHintReveal,playLevelComplete,playLevelTransition,playPageTurn,playPenMark,playSecretCollect,playTvShutdown,setEffectsEnabled,setStormDucked,startOpeningMusic,startStormAmbience,stopOpeningMusic,stopStormAmbience} from './sounds';
 import FinalCaseAudio from './FinalCaseAudio';
 import PodiumAccess from './PodiumAccess';
 'use client';
@@ -197,6 +197,9 @@ export default function Home() {
   const [selectedStatement, setSelectedStatement] = useState<number | null>(null);
   const [finalAnswers, setFinalAnswers] = useState({ who: '', how: '', where: '' });
   const [musicOn, setMusicOn] = useState(true);
+  const [soundscape,setSoundscape]=useState<'opening'|'storm'>('opening');
+  const soundscapeRef=useRef<'opening'|'storm'>('opening');
+  const [closingCase,setClosingCase]=useState(false);
   const [effectsOn,setEffectsOn]=useState(true);
   const musicEnabled = useRef(true);
   const [stormFlash,setStormFlash]=useState({key:0,side:'right' as 'left'|'right',intensity:.7});
@@ -225,6 +228,8 @@ export default function Home() {
     const elapsed=Math.max(elapsedRef.current,Math.floor(Number(state.elapsedSeconds)||0));elapsedRef.current=elapsed;
     setAgent(state.agent); setHighestLevel(state.highestLevel); setHints(state.hints); setCheckProgress(state.checkProgress); setCompletedAt(state.completedAt); setElapsedSeconds(elapsed); setActiveSession(true);
   }
+
+  function useStormSoundscape(){soundscapeRef.current='storm';setSoundscape('storm');stopOpeningMusic();if(musicEnabled.current)startStormAmbience();}
 
   useEffect(()=>{
     if(!activeSession||highestLevel<1||completedAt||screen!=='game')return;
@@ -297,7 +302,7 @@ export default function Home() {
     };
     const start = () => {
       if (!musicEnabled.current) return;
-      startStormAmbience();
+      if(soundscapeRef.current==='opening')startOpeningMusic();else startStormAmbience();
       syncVolume();
     };
     const gesture = (event: Event) => {
@@ -319,6 +324,7 @@ export default function Home() {
       observer.disconnect();
       window.removeEventListener('archivos-f-thunder',thunder);
       stopStormAmbience();
+      stopOpeningMusic();
     };
   }, []);
 
@@ -364,12 +370,13 @@ export default function Home() {
     if (!agent.trim()) { setMessage('Escribí tu nombre o alias de agente.'); return; }
     const state = await gameAction({action:'activate',code,agent,legacy:legacyRef.current?.code === code ? legacyRef.current : undefined});
     if (!state) return;
+    useStormSoundscape();
     setLevel(state.highestLevel); setAnswer(''); setShowAccess(false); leaveGame('library');
     setCheckSelection(null); setCheckPassed(false); setCheckFeedback(''); setFinalAnswers({who:'',how:'',where:''});
   }
 
   async function startInvestigation() {
-    if (await gameAction({action:'start'})) setLevel(1);
+    if (await gameAction({action:'start'})) {useStormSoundscape();setLevel(1);}
   }
 
   function openCaseFile() {
@@ -423,8 +430,14 @@ export default function Home() {
     const enabled = !musicEnabled.current;
     musicEnabled.current = enabled;
     setMusicOn(enabled);
-    if (!enabled) { stopStormAmbience(); return; }
-    startStormAmbience();
+    if (!enabled) { stopStormAmbience();stopOpeningMusic();return; }
+    if(soundscape==='opening')startOpeningMusic();else startStormAmbience();
+  }
+
+  function closeCompletedCase(){
+    if(closingCase)return;
+    setClosingCase(true);playTvShutdown();stopStormAmbience();soundscapeRef.current='opening';setSoundscape('opening');
+    window.setTimeout(()=>{setScreen('home');setClosingCase(false);window.scrollTo(0,0);if(musicEnabled.current)startOpeningMusic();},1150);
   }
 
   const showLevelTwoSuccess=screen==='game'&&level===2&&levelTwoSuccess;
@@ -435,12 +448,12 @@ export default function Home() {
   const storyPageOpen=showLevelTwoIntro||showLevelTwoSuccess||showLevelThreeDialog||showLevelFourDialog||showLateLevelDialog;
 
   return (
-    <main className={`site-shell ${storyPageOpen?'story-page-active':''} game-feedback-${gameFeedback}`} aria-busy={busy}><span key={stormFlash.key} className={`storm-flash storm-flash-${stormFlash.side} ${stormFlash.key?'is-active':''}`} style={{'--storm-intensity':stormFlash.intensity} as React.CSSProperties} aria-hidden="true"/><span className={`ambient-event ambient-${ambientEvent}`} aria-hidden="true"/><fieldset className="app-controls" disabled={busy}>
+    <main className={`site-shell ${storyPageOpen?'story-page-active':''} ${closingCase?'signal-shutdown':''} game-feedback-${gameFeedback}`} aria-busy={busy}><span key={stormFlash.key} className={`storm-flash storm-flash-${stormFlash.side} ${stormFlash.key?'is-active':''}`} style={{'--storm-intensity':stormFlash.intensity} as React.CSSProperties} aria-hidden="true"/><span className={`ambient-event ambient-${ambientEvent}`} aria-hidden="true"/><fieldset className="app-controls" disabled={busy}>
       <nav className="topbar" aria-label="Navegación principal">
         <div className="header-identity">
           <button className="brand brand-button" onClick={() => leaveGame('home')} aria-label="Ir al inicio"><img className="brand-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F"/></button>
         </div>
-        <div className="nav-tools">{(screen==='home'||screen==='library')&&<div className="nav-celebration">10 OCT · FEDE · 11 AÑOS</div>}<div className="audio-controls"><button className={`music-button sfx-button ${effectsOn?'on':''}`} onClick={()=>{const next=!effectsOn;setEffectsOn(next);setEffectsEnabled(next);if(next)playEffect('panel');}} aria-pressed={effectsOn} aria-label={effectsOn?'Desactivar efectos de sonido':'Activar efectos de sonido'} title={effectsOn?'Efectos encendidos':'Activar efectos'}>SFX</button><button className={`music-button music-icon-only ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn} aria-label={musicOn?'Desactivar lluvia y truenos':'Activar lluvia y truenos'} title={musicOn?'Lluvia y truenos encendidos':'Activar lluvia y truenos'}>{musicOn ? '🌧' : '☁'}</button></div></div>
+        <div className="nav-tools">{(screen==='home'||screen==='library')&&<div className="nav-celebration">10 OCT · FEDE · 11 AÑOS</div>}<div className="audio-controls"><button className={`music-button sfx-button ${effectsOn?'on':''}`} onClick={()=>{const next=!effectsOn;setEffectsOn(next);setEffectsEnabled(next);if(next)playEffect('panel');}} aria-pressed={effectsOn} aria-label={effectsOn?'Desactivar efectos de sonido':'Activar efectos de sonido'} title={effectsOn?'Efectos encendidos':'Activar efectos'}>SFX</button><button className={`music-button music-icon-only ${musicOn ? 'on' : ''}`} onClick={toggleMusic} aria-pressed={musicOn} aria-label={musicOn?`Desactivar ${soundscape==='opening'?'música de inicio':'lluvia y truenos'}`:`Activar ${soundscape==='opening'?'música de inicio':'lluvia y truenos'}`} title={musicOn?`${soundscape==='opening'?'Música de inicio':'Lluvia y truenos'} encendida`:'Activar sonido ambiente'}>{musicOn ? (soundscape==='opening'?'♫':'🌧') : '☁'}</button></div></div>
       </nav>
 
       {screen === 'home' && <section className="welcome-page">
@@ -495,6 +508,7 @@ export default function Home() {
           {level === 8 && <><section className="level-card final-card"><p className="eyebrow dark">ACUSACIÓN FINAL</p><h1>Presentá tu acusación.</h1><p className="final-instruction">Completá las tres tarjetas del expediente. La acusación debe explicar quién actuó, cómo lo hizo y dónde terminó la gema original.</p><FinalStatement highestLevel={highestLevel}/><form className="final-form accusation-builder" onSubmit={submitFinal}><label><span>01 · RESPONSABLE</span>¿Quién retiró el rubí?<select required value={finalAnswers.who} onChange={(e) => setFinalAnswers({...finalAnswers,who:e.target.value})}><option value="">Elegí una persona</option><option value="bruno">Bruno Vidal</option><option value="vera">Vera Salas</option><option value="leon">León Costa</option><option value="martina">Martina Ríos</option></select></label><label><span>02 · MÉTODO</span>¿Cómo realizó el cambio?<select required value={finalAnswers.how} onChange={(e) => setFinalAnswers({...finalAnswers,how:e.target.value})}><option value="">Elegí una reconstrucción</option><option value="cafeteria">Alteró el registro y trasladó la gema durante la restauración</option><option value="corredor">Usó el apagón, atravesó el corredor y dejó una réplica</option><option value="terraza">Manipuló los horarios de las fotografías y salió por la terraza</option></select></label><label><span>03 · ESCONDITE</span>¿Dónde escondió el original?<select required value={finalAnswers.where} onChange={(e) => setFinalAnswers({...finalAnswers,where:e.target.value})}><option value="">Elegí un lugar</option><option value="bolso">Dentro de un lote de materiales del taller</option><option value="generador">En el conducto junto a la sala del generador</option><option value="lente">En la base de la lente de Fresnel</option></select></label><div className="accusation-summary" aria-live="polite"><b>EXPEDIENTE FINAL</b><span>{[finalAnswers.who,finalAnswers.how,finalAnswers.where].filter(Boolean).length}/3 conexiones registradas</span></div><button className="primary-button" type="submit" disabled={busy}>PRESENTAR ACUSACIÓN <span>→</span></button></form>{message && <p className="error-message">{message}</p>}</section><LevelSideTabs level={8} prompt="" placeholder="" answer="" busy={busy} unlocked canUnlock={false} message="" missionTitle="REVISAR EVIDENCIAS" missionSubtitle="Volver al nivel anterior" showUnlock={false} onAnswer={()=>{}} onReplay={()=>visitLevel(7)} onUnlock={event=>event.preventDefault()}/></>}
 
           {level === 9 && <section className="resolution-card"><figure className="resolution-fede"><picture><source media="(prefers-reduced-motion: reduce)" srcSet={finalCaseStill}/><img src={finalCaseLoop} alt="Federica sonríe y presenta el sello de Caso cerrado"/></picture><figcaption>MENSAJE FINAL DE FEDERICA · AGENCIA F</figcaption></figure><div className="resolved-seal">CASO<br /><strong>CERRADO</strong></div><p className="eyebrow">ARCHIVO F-01 RESUELTO</p><h1>Excelente trabajo,<br />agente {agent}.</h1><p>Martina Ríos fabricó una réplica, utilizó el corredor durante el apagón y escondió el rubí original en la base de la lente de Fresnel.</p><p>Quería forzar una investigación sobre la procedencia de la gema. Eso explica su motivo, pero no justifica el robo. El museo deberá aclarar el origen del rubí.</p><p><Typewriter text="Fede está a salvo: fue al faro antiguo a comprobar una teoría y la tormenta la dejó sin señal."/></p><FinalCaseAudio/><div className="final-envelope-callout"><span aria-hidden="true">✉</span><div><p className="eyebrow">MISIÓN CUMPLIDA</p><h2>Ya pueden abrir el sobre.</h2></div></div><blockquote>“Un buen detective no solo descubre quién hizo algo. También se pregunta cómo pudo hacerlo, qué pruebas lo demuestran y por qué tomó esa decisión.” <b>— Fede</b></blockquote><div className="result-stats"><span><b>{hintsUsed}</b>Pistas utilizadas</span><span><b>{hintsUsed <= 1 ? 'Detective del Faro' : hintsUsed <= 3 ? 'Especialista en Evidencias' : 'Agente de Investigación'}</b>Rango obtenido</span></div><PodiumAccess/>{message && <p className="error-message" role="alert">{message}</p>}</section>}
+          {level===9&&<button type="button" className="close-case-button primary-button" onClick={closeCompletedCase} disabled={closingCase}>{closingCase?'CERRANDO SEÑAL…':'CERRAR TRANSMISIÓN Y VOLVER AL INICIO'} <span>→</span></button>}
         </div>
       </section>}
 

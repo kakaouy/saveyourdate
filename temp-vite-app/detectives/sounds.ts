@@ -7,6 +7,7 @@ let stormEnabled = false;
 let stormSource: AudioBufferSourceNode | null = null;
 let stormGain: GainNode | null = null;
 let thunderTimer: number | null = null;
+let openingMusic: HTMLAudioElement | null = null;
 let lastHintChime = 0;
 let lastButtonClick = 0;
 let lastTimeBurn = 0;
@@ -32,6 +33,9 @@ export function playSecretCollect(){playAudioClip('/los-archivos-f/audio/secret-
 export function playHintReveal(){playAudioClip('/los-archivos-f/audio/hint-reveal.mp3',.24,1.2,.12);}
 export function playPlanPiece(){playAudioClip('/los-archivos-f/audio/level4-piece-place.mp3',.38,.44);}
 export function playPlanComplete(){playAudioClip('/los-archivos-f/audio/level4-plan-complete.mp3',.42,1.4);}
+export function playTvShutdown(){playAudioClip('/los-archivos-f/audio/tv-signal-shutdown.mp3',.48,1.28);}
+export function playLampBuzz(){playAudioClip('/los-archivos-f/audio/terminal-lamp-buzz.mp3',.14,2.4,.2);}
+export function playCorridorDoor(){playAudioClip('/los-archivos-f/audio/corridor-door.mp3',.3,2.25,.08);}
 export function playTerminalDigital(){playAudioClip('/los-archivos-f/audio/level1-digital-interface.mp3',.38,1.45);}
 export function playTerminalConfirm(){playAudioClip('/los-archivos-f/audio/level1-access-confirm.mp3',.46,1.05);}
 export function playDossierOpen(){playAudioClip('/los-archivos-f/audio/level2-file-slide.mp3',.38,.68);}
@@ -45,6 +49,14 @@ export function playLevelTransition(){playAudioClip('/los-archivos-f/audio/cross
 export function playFedeRadioBeep(){playAudioClip('/los-archivos-f/audio/fede-radio-beep.mp3',.3,.52);}
 export function playEvidenceSlide(){playAudioClip('/los-archivos-f/audio/evidence-paper-slide.mp3',.38,.84);}
 export function playTimeBurn(){const now=performance.now();if(now-lastTimeBurn<5000)return;lastTimeBurn=now;playAudioClip('/los-archivos-f/audio/time-burning-bubbles.mp3',.24,1.65,1.1);}
+
+export function startOpeningMusic(){
+  if(typeof Audio==='undefined')return;
+  openingMusic||=new Audio('/los-archivos-f/audio/opening-cinematic-drone.mp3');
+  openingMusic.loop=true;openingMusic.volume=.22;
+  void openingMusic.play().catch(()=>{});
+}
+export function stopOpeningMusic(){if(!openingMusic)return;openingMusic.pause();openingMusic.currentTime=0;}
 
 function audioContext() {
   if (typeof window === 'undefined') return null;
@@ -69,6 +81,20 @@ function makeRainBuffer(ctx: AudioContext) {
   return buffer;
 }
 
+function fadeAndStop(audio:HTMLAudioElement,totalMs:number,fadeMs:number) {
+  const initialVolume=audio.volume;
+  const fadeStart=window.setTimeout(()=>{
+    const started=performance.now();
+    const fade=window.setInterval(()=>{
+      const progress=Math.min(1,(performance.now()-started)/fadeMs);
+      // La curva cuadrática conserva el cuerpo del trueno y suaviza especialmente la cola.
+      audio.volume=initialVolume*Math.pow(1-progress,2);
+      if(progress>=1){window.clearInterval(fade);audio.pause();audio.currentTime=0;audio.volume=initialVolume;}
+    },40);
+  },Math.max(0,totalMs-fadeMs));
+  audio.addEventListener('ended',()=>window.clearTimeout(fadeStart),{once:true});
+}
+
 function playThunder(ctx: AudioContext) {
   if (!stormEnabled || ctx.state !== 'running') return;
   const strength = Math.pow(Math.random(), 0.72);
@@ -80,7 +106,7 @@ function playThunder(ctx: AudioContext) {
   thunder.volume=close?Math.min(1,.76+strength*.22):Math.min(1,.62+strength*.28);
   thunder.playbackRate=.94+Math.random()*.1;
   void thunder.play().catch(()=>{});
-  window.setTimeout(()=>{thunder.pause();thunder.currentTime=0;},close?1800:2800);
+  fadeAndStop(thunder,close?2300:3600,close?850:1400);
   window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity,side}}));
 }
 
@@ -167,7 +193,7 @@ export function playEffect(effect: Effect) {
     } else if (effect === 'signal') {
       tone(ctx, 740, now, 0.045, 0.012, 'sine');
     } else if (effect === 'error') {
-      playAudioClip('/los-archivos-f/audio/feedback-error-thud.mp3',.48,.5);
+      playAudioClip('/los-archivos-f/audio/error-notification.mp3',.4,1.02);
     } else {
       playAudioClip('/los-archivos-f/audio/cross-door-lock.mp3',.34,1.7);
       playAudioClip('/los-archivos-f/audio/feedback-metal-unlock.mp3',.36,.85);

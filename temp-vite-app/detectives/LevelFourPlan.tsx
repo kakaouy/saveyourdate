@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {playEffect,playPlanComplete,playPlanPiece} from './sounds';
+import {playCorridorDoor,playEffect,playPlanComplete,playPlanPiece} from './sounds';
 
 const pieces=[
   {id:'A1',slot:0,start:180},{id:'A3',slot:2,start:270},{id:'B3',slot:4,start:180},
@@ -46,7 +46,7 @@ export default function LevelFourPlan({solved,busy,onSolved}:{solved:boolean;bus
     const expected=[9,3,7];
     if(value!==expected[route.length]){setRoute([]);setFeedback('Ese recorrido termina en una zona pública. Volvé al punto de inicio.');return;}
     const next=[...route,value];setRoute(next);
-    if(next.length===3){setFeedback('Ruta 937 confirmada. El corredor oculto quedó reconstruido.');await onSolved();}
+    if(next.length===3){playCorridorDoor();setFeedback('Ruta 937 confirmada. El corredor oculto quedó reconstruido.');await onSolved();}
     else setFeedback(next.length===1?'Primer tramo confirmado. Seguí la conexión técnica.':'El recorrido continúa detrás del muro.');
   }
 
