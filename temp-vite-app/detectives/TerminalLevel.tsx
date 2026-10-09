@@ -3,7 +3,7 @@ import TransmissionPlayer from './TransmissionPlayer';
 import LevelSideTabs from './LevelSideTabs';
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {terminalIntro,terminalSuccess} from './terminal-script';
-import {playEffect,playKeyboardKey,playPowerSurge} from './sounds';
+import {playEffect,playKeyboardKey,playPowerSurge,playTerminalConfirm,playTerminalDigital} from './sounds';
 
 function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) {
  const audio=useRef<HTMLAudioElement>(null);
@@ -44,9 +44,11 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
   event.preventDefault();if(busy||submitted.current||answer.trim().length!==4)return;
   submitted.current=true;
   if(answer==='1937'){
+   playTerminalDigital();
    for(let digit=1;digit<=4;digit+=1){setValidating(digit);playKeyboardKey();await new Promise(resolve=>window.setTimeout(resolve,500));}
   }
   if(await onUnlock(answer)){
+   playTerminalConfirm();
    setLighting(true);
    timer.current=setTimeout(()=>{setLighting(false);onContinue();},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:900);
   }else{submitted.current=false;setValidating(0);input.current?.focus();}

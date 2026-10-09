@@ -6,7 +6,7 @@ import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import MissionMap from './MissionMap';
 import LevelSideTabs from './LevelSideTabs';
-import {playButtonClick,playEffect,playLevelComplete,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
+import {playButtonClick,playCameraShutter,playDossierOpen,playEffect,playLevelComplete,playPageTurn,playPenMark,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
 import FinalCaseAudio from './FinalCaseAudio';
 import PodiumAccess from './PodiumAccess';
 'use client';
@@ -125,7 +125,7 @@ function InterrogationDialog({ index, onClose }: { index: number; onClose: () =>
   return <dialog ref={dialogRef} className="interrogation-dialog" aria-labelledby="interrogation-name" onCancel={onClose} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
     <div className="interrogation-layout">
       <button className="interrogation-close" onClick={onClose} autoFocus aria-label="Cerrar interrogatorio">Cerrar <span aria-hidden="true">×</span></button>
-      <figure className={`interrogation-portrait portrait-alive ${speaking?'is-speaking':''}`}><div className="suspect-artwork"><img src={person.image} alt={person.name} /><span className={`suspect-mouth suspect-mouth-${index+1}`} aria-hidden="true"/><button className="suspect-magnifier" type="button" onClick={()=>setViewerIndex(index)} aria-label={`Ampliar fotografía de ${person.name}`}><span aria-hidden="true">⌕</span> AMPLIAR</button></div><figcaption>ARCHIVO F-01 / SUJETO 0{index + 1}</figcaption></figure>
+      <figure className={`interrogation-portrait portrait-alive ${speaking?'is-speaking':''}`}><div className="suspect-artwork"><img src={person.image} alt={person.name} /><span className={`suspect-mouth suspect-mouth-${index+1}`} aria-hidden="true"/><button className="suspect-magnifier" type="button" onClick={()=>{playCameraShutter();setViewerIndex(index);}} aria-label={`Ampliar fotografía de ${person.name}`}><span aria-hidden="true">⌕</span> AMPLIAR</button></div><figcaption>ARCHIVO F-01 / SUJETO 0{index + 1}</figcaption></figure>
       <div className="interrogation-content">
         <p className="eyebrow">REGISTRO DE INTERROGATORIO · 0{index + 1}</p>
         <h2 id="interrogation-name">{person.name}</h2>
@@ -152,9 +152,9 @@ function SuspectImageViewer({initialIndex,onClose}:{initialIndex:number;onClose:
   return <dialog ref={ref} className="suspect-image-viewer" aria-label={`Fotografía ampliada de ${person.name}`} onCancel={onClose} onClick={event=>{if(event.target===event.currentTarget)onClose();}}>
     <div className="suspect-viewer-shell">
       <button className="suspect-viewer-close" type="button" onClick={onClose} aria-label="Cerrar fotografía ampliada">×</button>
-      <button className="suspect-viewer-arrow previous" type="button" onClick={()=>setIndex(value=>(value+statements.length-1)%statements.length)} aria-label="Sospechoso anterior">‹</button>
+      <button className="suspect-viewer-arrow previous" type="button" onClick={()=>{playPageTurn();setIndex(value=>(value+statements.length-1)%statements.length);}} aria-label="Sospechoso anterior">‹</button>
       <figure><div className="suspect-lens-stage" onPointerMove={event=>{const box=event.currentTarget.getBoundingClientRect();setLens({x:Math.max(0,Math.min(100,(event.clientX-box.left)/box.width*100)),y:Math.max(0,Math.min(100,(event.clientY-box.top)/box.height*100))});}} onPointerLeave={()=>setLens(null)}><img src={person.image} alt={`${person.name}, fotografía completa`}/>{lens&&<span className="suspect-detail-lens" aria-hidden="true" style={{left:`${lens.x}%`,top:`${lens.y}%`,backgroundImage:`url(${person.image})`,backgroundPosition:`${lens.x}% ${lens.y}%`}}/>}</div><figcaption><small>FOTOGRAFÍA DE EVIDENCIA · {index+1}/{statements.length}</small><b>{person.name}</b></figcaption></figure>
-      <button className="suspect-viewer-arrow next" type="button" onClick={()=>setIndex(value=>(value+1)%statements.length)} aria-label="Siguiente sospechoso">›</button>
+      <button className="suspect-viewer-arrow next" type="button" onClick={()=>{playPageTurn();setIndex(value=>(value+1)%statements.length);}} aria-label="Siguiente sospechoso">›</button>
     </div>
   </dialog>;
 }
@@ -384,7 +384,7 @@ export default function Home() {
     event.preventDefault();
     if (busy) return;
     if (!answer.trim()) { setMessage('Elegí una respuesta antes de verificar.'); return; }
-    if (await gameAction({action:'unlock',level,answer})) { setMessage(`Desbloqueaste: ${levels[level-1].unlock}.`); setAnswer(''); if(level===2)setLevelTwoSuccess(true);if(level===3)setLevelThreeDialog('success');if(level===4)setLevelFourDialog('success');if(level>=5&&level<=7)setLateLevelDialog({level:level as 5|6|7,kind:'success'}); }
+    if (await gameAction({action:'unlock',level,answer})) { setMessage(`Desbloqueaste: ${levels[level-1].unlock}.`); setAnswer(''); if(level===2){playPenMark();setLevelTwoSuccess(true);}if(level===3)setLevelThreeDialog('success');if(level===4)setLevelFourDialog('success');if(level>=5&&level<=7)setLateLevelDialog({level:level as 5|6|7,kind:'success'}); }
   }
 
   function continueInvestigation() {
@@ -478,7 +478,7 @@ export default function Home() {
               {level === 6 && !unlocked && <aside className="level-six-physical-prompt" aria-label="Orientación para usar los materiales impresos"><span>MATERIAL IMPRESO</span><h2>Los dos círculos no son decorativos.</h2><p>Buscá el instrumento de señales y la etiqueta que recibiste. Examiná ambos lados, orientá los círculos y después observá las banderas.</p></aside>}
               {level===7&&!unlocked&&<MechanicalCodeBuilder onCode={setAnswer}/>}
               {level===3&&<div className="digital-brief compact-signal-brief"><LightSignal onSolved={setLevelThreeReady}/></div>}
-              {level === 2 && <section className="suspect-board" aria-label="Panel de sospechosos"><div className="suspect-board-heading"><h2>Cuatro versiones.</h2><p>Abrí cada ficha y compará su declaración.</p></div><div className="suspect-grid">{statements.map((person, index) => <button className="suspect-file" key={person.name} onClick={() => setSelectedStatement(index)} aria-label={`Abrir ficha de ${person.name}`}><div className="suspect-file-photo"><img src={person.image} alt="" /></div><div className="suspect-file-caption"><span>{person.role}</span><h3>{person.name}</h3><p>Abrir declaración <span aria-hidden="true">↗</span></p></div></button>)}</div></section>}
+              {level === 2 && <section className="suspect-board" aria-label="Panel de sospechosos"><div className="suspect-board-heading"><h2>Cuatro versiones.</h2><p>Abrí cada ficha y compará su declaración.</p></div><div className="suspect-grid">{statements.map((person, index) => <button className="suspect-file" key={person.name} onClick={() => {playDossierOpen();setSelectedStatement(index);}} aria-label={`Abrir ficha de ${person.name}`}><div className="suspect-file-photo"><img src={person.image} alt="" /></div><div className="suspect-file-caption"><span>{person.role}</span><h3>{person.name}</h3><p>Abrir declaración <span aria-hidden="true">↗</span></p></div></button>)}</div></section>}
               {level === 4 && !unlocked && <LevelFourPlan solved={checkIndex>0} busy={busy} onSolved={async()=>{if(!await gameAction({action:'deduction',level:4,index:0,selection:2}))return;setCheckSelection(null);setCheckFeedback('');setCheckPassed(false);if(await gameAction({action:'unlock',level:4,answer:'937'}))setLevelFourDialog('success');}}/>}
               {level === 5 && !unlocked && <LevelFiveMovements busy={busy} onComplete={async()=>{if(!await gameAction({action:'deduction',level:5,index:0,selection:1}))return;if(await gameAction({action:'unlock',level:5,answer:'banderas'})){setLateLevelDialog({level:5,kind:'success'});}}}/>}
 

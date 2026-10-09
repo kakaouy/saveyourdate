@@ -21,10 +21,19 @@ function playAudioClip(source:string,volume:number,duration?:number,startAt=0) {
 }
 
 export function playKeyboardKey(){playAudioClip('/los-archivos-f/audio/terminal-keyboard.mp3',.42,.16,Math.random()*.9);}
-export function playPowerSurge(){playAudioClip('/los-archivos-f/audio/terminal-crt-startup.mp3',.5,3.2);window.setTimeout(()=>playAudioClip('/los-archivos-f/audio/terminal-power.mp3',.42,.7),180);}
+export function playPowerSurge(){playAudioClip('/los-archivos-f/audio/terminal-crt-startup.mp3',.5,3.2);playAudioClip('/los-archivos-f/audio/level1-electric-zap.mp3',.5,.75);window.setTimeout(()=>playAudioClip('/los-archivos-f/audio/terminal-power.mp3',.34,.7),180);}
 export function playHintChime(){const now=performance.now();if(now-lastHintChime<1400)return;lastHintChime=now;playAudioClip('/los-archivos-f/audio/hint-chime.mp3',.34);}
 export function playButtonClick(){const now=performance.now();if(now-lastButtonClick<70)return;lastButtonClick=now;playAudioClip('/los-archivos-f/audio/ui-button-press.mp3',.18,.22);}
 export function playMapUnfold(){playAudioClip('/los-archivos-f/audio/mission-map-unfold.mp3',.32,1.45);}
+export function playTerminalDigital(){playAudioClip('/los-archivos-f/audio/level1-digital-interface.mp3',.38,1.45);}
+export function playTerminalConfirm(){playAudioClip('/los-archivos-f/audio/level1-access-confirm.mp3',.46,1.05);}
+export function playDossierOpen(){playAudioClip('/los-archivos-f/audio/level2-file-slide.mp3',.38,.68);}
+export function playPenMark(){playAudioClip('/los-archivos-f/audio/level2-pen-write.mp3',.28,.75,1.2);}
+export function playCameraShutter(){playAudioClip('/los-archivos-f/audio/level2-camera-shutter.mp3',.4,.65);}
+export function playPageTurn(){playAudioClip('/los-archivos-f/audio/level2-page-turn.mp3',.28,1.05);}
+export function playSignalBlip(){playAudioClip('/los-archivos-f/audio/level3-signal-blip.mp3',.3,.3);}
+export function playRadioStatic(){playAudioClip('/los-archivos-f/audio/level3-radio-static.mp3',.2,.7,Math.random()*3.5);}
+export function playRadarConfirm(){playAudioClip('/los-archivos-f/audio/level3-radar-confirm.mp3',.38,1.8);}
 
 function audioContext() {
   if (typeof window === 'undefined') return null;

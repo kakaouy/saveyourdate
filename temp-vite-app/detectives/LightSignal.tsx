@@ -1,5 +1,5 @@
 import {useState, type CSSProperties} from 'react';
-import {playEffect} from './sounds';
+import {playEffect,playRadarConfirm,playRadioStatic,playSignalBlip} from './sounds';
 
 type Signal = {id:string; name:string; symbol:string; pattern:string};
 const signals: Signal[] = [
@@ -23,7 +23,7 @@ export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void
   const [ordered,setOrdered]=useState<Signal[]>([]);
   const [feedback,setFeedback]=useState('');
   const [dragged,setDragged]=useState<string|null>(null);
-  function add(signal:Signal){playEffect('signal');setAvailable(items=>items.filter(item=>item.id!==signal.id));setOrdered(items=>[...items,signal]);setFeedback('');onSolved(false);}
+  function add(signal:Signal){playSignalBlip();setAvailable(items=>items.filter(item=>item.id!==signal.id));setOrdered(items=>[...items,signal]);setFeedback('');onSolved(false);}
   function remove(signal:Signal){playEffect('paper');setOrdered(items=>items.filter(item=>item.id!==signal.id));setAvailable(items=>[...items,signal]);setFeedback('');onSolved(false);}
   function dropAt(index:number){
     if(!dragged)return;
@@ -34,11 +34,12 @@ export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void
   }
   function reset(){playEffect('paper');setAvailable(signals);setOrdered([]);setFeedback('Secuencia reiniciada.');onSolved(false);}
   function analyze(){
+    playRadioStatic();
     if(ordered.length<signals.length){playEffect('error');setFeedback('Ubicá las seis señales antes de analizar la secuencia.');return;}
     const ids=ordered.map(item=>item.id);
     const correct=ids[0]==='compass'&&ids[1]==='lantern'&&ids.slice(2,4).every(id=>id.startsWith('wave-'))&&ids[4]==='key'&&ids[5]==='anchor';
     if(!correct){playEffect('error');setFeedback('Las señales pueden estar bien interpretadas y aun así formar un mensaje incorrecto. Revisá las anotaciones de la cafetería.');onSolved(false);return;}
-    setFeedback('Secuencia reconstruida. Ya podés ingresar el lugar señalado.');onSolved(true);
+    playRadarConfirm();setFeedback('Secuencia reconstruida. Ya podés ingresar el lugar señalado.');onSolved(true);
   }
   return <section className="signal-workbench" aria-label="Receptor de seis señales desordenadas">
     <header><span className="signal-lamp is-lit" aria-hidden="true"/><div><b>SEIS REGISTROS RECUPERADOS</b><small>Guardados fuera de secuencia</small></div></header>
