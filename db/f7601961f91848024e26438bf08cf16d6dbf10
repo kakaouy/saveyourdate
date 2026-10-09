@@ -1,0 +1,52 @@
+temp-vite-app/detectives/LevelFourPlan.tsx
+  s_ad2761a9c8222b::t_5ad987c9dec412 18,40,55
+temp-vite-app/detectives/TerminalLevel.tsx
+  s_ad2761a9c8222b::t_f748c006cc43ea 30,57
+temp-vite-app/detectives/style.css
+  s_ad2761a9c8222b::t_a0ea3d8b3e7f45 2374-2379
+  s_ad2761a9c8222b::t_c4fa09eadd64ee 2387-2388
+  s_ad2761a9c8222b::t_1695b1fd119c47 908-909
+  s_ad2761a9c8222b::t_630083b11cb29e 2385
+  s_ad2761a9c8222b::t_b80a3e18d787ea 176
+  s_ad2761a9c8222b::t_57ac78a9e7adab 2380-2383
+  s_ad2761a9c8222b::t_920fdcde42f137 2384,2386
+temp-vite-app/detectives/sounds.ts
+  s_ad2761a9c8222b::t_10fb39fb03714e 15,58
+  s_ad2761a9c8222b::t_a7d59f427947e5 42
+  s_ad2761a9c8222b::t_82a44e36a7b3aa 14,24-28,35
+temp-vite-app/detectives/MissionMap.tsx
+  s_ad2761a9c8222b::t_723a634b7c741f 52
+  s_ad2761a9c8222b::t_c4fa09eadd64ee 35,53
+  s_ad2761a9c8222b::t_10fb39fb03714e 3,63
+temp-vite-app/detectives/LevelSideTabs.tsx
+  s_ad2761a9c8222b::t_8d2bea20eccac2 2,11
+temp-vite-app/detectives/App.tsx
+  s_ad2761a9c8222b::t_561d8852201632 105
+  s_ad2761a9c8222b::t_b874c5b627a213 200,443-450
+  s_ad2761a9c8222b::t_4b81ade9a7fd68 9,50
+  s_ad2761a9c8222b::t_a7d59f427947e5 100,103
+  s_ad2761a9c8222b::t_e00970208a1f0e 276-284,286-289
+  s_ad2761a9c8222b::t_50ae769a0ebfb6 474-478
+  s_ad2761a9c8222b::t_d4e765d20b7d98 511
+  s_ad2761a9c8222b::t_bb3f49f1c1cdb3 520
+  s_ad2761a9c8222b::t_a0e9584657a354 537
+  s_ad2761a9c8222b::t_eb85af16238f5e 467,469-471
+  s_ad2761a9c8222b::t_0a92714d6a6f17 490
+  s_ad2761a9c8222b::t_3b51bd102d3e72 451-452
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dbf7601961f91848024e26438bf08cf16d6dbf10",
+  "prompts": {},
+  "sessions": {
+    "s_ad2761a9c8222b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11e3c-6733-7631-a227-de619d6c7cf4",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
