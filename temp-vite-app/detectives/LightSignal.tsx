@@ -26,6 +26,7 @@ export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void
   function add(signal:Signal){playEffect('signal');setAvailable(items=>items.filter(item=>item.id!==signal.id));setOrdered(items=>[...items,signal]);setFeedback('');onSolved(false);}
   function remove(signal:Signal){playEffect('paper');setOrdered(items=>items.filter(item=>item.id!==signal.id));setAvailable(items=>[...items,signal]);setFeedback('');onSolved(false);}
   function move(index:number,direction:-1|1){const target=index+direction;if(target<0||target>=ordered.length)return;playEffect('rotate');setOrdered(items=>{const next=[...items];[next[index],next[target]]=[next[target],next[index]];return next;});setFeedback('');onSolved(false);}
+  function reset(){playEffect('paper');setAvailable(signals);setOrdered([]);setFeedback('Secuencia reiniciada.');onSolved(false);}
   function analyze(){
     if(ordered.length<signals.length){playEffect('error');setFeedback('Ubicá las seis señales antes de analizar la secuencia.');return;}
     const ids=ordered.map(item=>item.id);
@@ -40,7 +41,7 @@ export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void
     <div className="signal-sequence" onDragOver={event=>event.preventDefault()} onDrop={()=>{const signal=available.find(item=>item.id===dragged);if(signal)add(signal);setDragged(null);}} aria-label="Secuencia reconstruida">
       {Array.from({length:6},(_,index)=>{const signal=ordered[index];return <div className={`signal-slot ${signal?'filled':''}`} key={signal?.id||index}>{signal?<><button className="signal-card" onClick={()=>remove(signal)} aria-label={`Quitar ${signal.name} de la posición ${index+1}`}><small>POSICIÓN {index+1}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><SignalPattern pattern={signal.pattern}/></button><span className="signal-movers"><button onClick={()=>move(index,-1)} disabled={index===0} aria-label={`Mover ${signal.name} a la izquierda`}>←</button><button onClick={()=>move(index,1)} disabled={index===ordered.length-1} aria-label={`Mover ${signal.name} a la derecha`}>→</button></span></>:<span>{index+1}</span>}</div>})}
     </div>
-    <button type="button" className="unlock-button" onClick={analyze}>ANALIZAR SECUENCIA</button>
+    <div className="signal-actions"><button type="button" className="reading-choice" onClick={reset} disabled={!ordered.length}>REINICIAR</button><button type="button" className="unlock-button" onClick={analyze}>ANALIZAR SECUENCIA</button></div>
     {feedback&&<p className={feedback.startsWith('Secuencia')?'signal-success':'signal-feedback'} role="status">{feedback}</p>}
   </section>;
 }

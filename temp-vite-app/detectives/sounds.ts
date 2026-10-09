@@ -38,6 +38,8 @@ function playThunder(ctx: AudioContext) {
   const now = ctx.currentTime;
   const strength = Math.pow(Math.random(), 0.78);
   const intensity = 0.28 + strength * 0.72;
+  const side = Math.random()<.5?'left':'right';
+  const pan = (side==='left'?-1:1) * (0.35 + Math.random() * 0.55);
   const duration = 2.8 + strength * 3.4 + Math.random() * 0.8;
   const attack = 0.045 + (1 - strength) * 0.24;
   const noise = ctx.createBufferSource();
@@ -54,20 +56,22 @@ function playThunder(ctx: AudioContext) {
   filter.type = 'lowpass';
   filter.frequency.value = 115 + strength * 150;
   const gain = ctx.createGain();
+  const panner = ctx.createStereoPanner();
+  panner.pan.value=pan;
   gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(0.12 + strength * 0.3, now + attack);
+  gain.gain.exponentialRampToValueAtTime(0.18 + strength * 0.42, now + attack);
   gain.gain.exponentialRampToValueAtTime(0.035 + strength * 0.075, now + 0.7 + strength * 0.55);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-  noise.connect(filter).connect(gain).connect(ctx.destination);
+  noise.connect(filter).connect(gain).connect(panner).connect(ctx.destination);
   noise.start(now);
   noise.stop(now + duration);
   tone(ctx, 34 + strength * 16, now, 1.9 + strength * 2.2, 0.04 + strength * 0.1, 'sine');
   tone(ctx, 49 + Math.random() * 22, now + 0.12 + Math.random() * 0.22, 1.4 + strength * 1.8, 0.025 + strength * 0.07, 'triangle');
   if (strength > 0.68) {
-    tone(ctx, 76 + Math.random() * 34, now, 0.11 + strength * 0.12, 0.035 + strength * 0.055, 'sawtooth');
-    tone(ctx, 46, now + 0.08, 0.5, 0.045 + strength * 0.04, 'triangle');
+    tone(ctx, 76 + Math.random() * 34, now, 0.11 + strength * 0.12, 0.055 + strength * 0.075, 'sawtooth');
+    tone(ctx, 46, now + 0.08, 0.5, 0.065 + strength * 0.055, 'triangle');
   }
-  window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity}}));
+  window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity,side}}));
 }
 
 function scheduleThunder(ctx: AudioContext, first = false) {
@@ -76,7 +80,7 @@ function scheduleThunder(ctx: AudioContext, first = false) {
   thunderTimer = window.setTimeout(() => {
     playThunder(ctx);
     scheduleThunder(ctx);
-  }, first ? 4500 + Math.random() * 7000 : 9000 + Math.random() * 22000);
+  }, first ? 3500 + Math.random() * 7500 : 7000 + Math.random() * 21000);
 }
 
 export function startStormAmbience() {

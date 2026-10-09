@@ -1,8 +1,8 @@
 import { useRef, useState, type CSSProperties } from 'react';
 import {playEffect} from './sounds';
 
-export default function HintLenses({hints, used, busy, canRequest, onRequest}: {
-  hints: string[]; used: number; busy: boolean; canRequest: boolean; onRequest: () => Promise<boolean>;
+export default function HintLenses({hints, used, busy, canRequest, onRequest,onRequestSolution}: {
+  hints: string[]; used: number; busy: boolean; canRequest: boolean; onRequest: () => Promise<boolean>;onRequestSolution:()=>Promise<boolean>;
 }) {
   const [active, setActive] = useState<number | null>(null);
   const pending = useRef(false);
@@ -13,6 +13,12 @@ export default function HintLenses({hints, used, busy, canRequest, onRequest}: {
     pending.current = true;
     try { if (await onRequest()) { playEffect('paper'); setActive(index); } }
     finally { pending.current = false; }
+  }
+  async function revealSolution(){
+    if(!canRequest||busy||pending.current)return;
+    if(!window.confirm('Esto registrará todas las pistas restantes. ¿Querés ver la solución directa?'))return;
+    pending.current=true;
+    try{if(await onRequestSolution())setActive(hints.length-1);}finally{pending.current=false;}
   }
   return <section className="hint-lenses" aria-label="Pistas de la investigación" onKeyDown={e=>{if(e.key==='Escape')setActive(null);}}>
     <div className="hint-lenses-heading"><div><h2>Una mirada más cerca</h2><p>Tocá una lupa activa para revelar la siguiente pista.</p></div><span>{used} / {hints.length} utilizadas</span></div>
@@ -30,6 +36,7 @@ export default function HintLenses({hints, used, busy, canRequest, onRequest}: {
       </button>;
     })}
     <div className="hint-popover" style={{'--hint-index':active ?? 0} as CSSProperties} aria-live="polite" aria-atomic="true">{active !== null && consulted.includes(active) && <aside id="hint-parchment" className={`hint-parchment ${active===hints.length-1?'solution-parchment':''}`}><span>AGENCIA F · {active===hints.length-1?'SOLUCIÓN DIRECTA':`PISTA ${active+1}`}</span><p>{hints[active]}</p><button aria-label="Cerrar pista" onClick={()=>setActive(null)}>×</button></aside>}</div></div>
-    <p className="hint-lenses-help">La solución directa se habilita únicamente después de revelar todas las pistas anteriores. Toda pista consultada influye en el podio.</p>
+    {canRequest&&used<hints.length-1&&<button type="button" className="hint-direct-solution" disabled={busy} onClick={()=>void revealSolution()}>Necesito la solución directa</button>}
+    <p className="hint-lenses-help">Podés avanzar pista por pista o registrar las restantes para ver la solución directa. Toda pista consultada influye en el podio.</p>
   </section>;
 }

@@ -59,14 +59,13 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
    {lightOn&&<span className="terminal-lamp-pulse" aria-hidden="true"/>}<span className="terminal-scanlines" aria-hidden="true"/>
    {powered&&<form className="terminal-screen" onSubmit={submit}>
     <h1>{unlocked?'ACCESO RECUPERADO':'RECUPERACIÓN DE ACCESO'}</h1>
-    {!unlocked?<><label>Clave de emergencia:<br/>instante de interrupción</label><p>INGRESO DISPONIBLE EN EL CANDADO LATERAL</p></>:<><p>ARCHIVO DE PERSONAL HABILITADO</p><button type="button" onClick={()=>setSuccess(true)}>ESCUCHAR INFORME</button></>}
+    {!unlocked?<><label htmlFor="terminal-answer">Instante de interrupción</label><input ref={input} id="terminal-answer" inputMode="numeric" value={answer} onChange={event=>setAnswer(event.target.value.replace(/\D/g,'').slice(0,4))} placeholder="____" maxLength={4} autoComplete="off"/><button type="submit" disabled={busy||answer.length!==4}>{busy?'VERIFICANDO…':'RECUPERAR ACCESO'}</button></>:<><p>REGISTROS HABILITADOS</p><button type="button" onClick={()=>setSuccess(true)}>VER INFORME</button></>}
     <span className="terminal-command-cursor" aria-hidden="true">▌</span>
    </form>}
-   <button type="button" className="terminal-power-button" aria-label={powered?'Apagar computadora':'Encender computadora'} aria-pressed={powered} onClick={()=>{playEffect('panel');setPowered(current=>!current);}}><span className="sr-only">{powered?'Apagar':'Encender'}</span></button>
-   <button type="button" className="terminal-lamp-chain-button" aria-label={lightOn?'Apagar lámpara':'Encender lámpara'} aria-pressed={lightOn} onClick={()=>{playEffect('piece');setLightOn(current=>!current);}}><span className="sr-only">{lightOn?'Apagar':'Encender'} lámpara</span></button>
+   <button type="button" className="terminal-power-button" aria-label={powered?'Apagar computadora':'Encender computadora'} aria-pressed={powered} onClick={()=>{playEffect('panel');setPowered(current=>{const next=!current;setLightOn(next);if(next)requestAnimationFrame(()=>input.current?.focus());return next;});}}><span className="sr-only">{powered?'Apagar':'Encender'}</span></button>
   </div>
   {message&&!unlocked&&<p className="terminal-error" role="status">{message}</p>}
   {unlocked&&!lighting&&<button className="primary-button" onClick={onContinue}>CONTINUAR LA INVESTIGACIÓN →</button>}
-  <LevelSideTabs level={1} prompt="Ingresá el código de 4 cifras que permite cerrar esta parte de la investigación." placeholder="Código de 4 cifras" answer={answer} busy={busy||lighting} unlocked={unlocked} canUnlock={!unlocked} message={message} missionMessageOpen={intro||success} onAnswer={setAnswer} onReplay={()=>setIntro(true)} onUnlock={submit}/>
+  <LevelSideTabs level={1} prompt="" placeholder="" answer={answer} busy={busy||lighting} unlocked={unlocked} canUnlock={false} message={message} missionMessageOpen={intro||success} onAnswer={setAnswer} onReplay={()=>setIntro(true)} onUnlock={submit} showUnlock={false}/>
  </section>;
 }

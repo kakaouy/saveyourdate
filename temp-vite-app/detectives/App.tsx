@@ -84,7 +84,7 @@ function LevelFourStoryDialog({kind,onContinue}:{kind:'intro'|'success';onContin
 const lateStories={
   5:{introTitle:'Un registro quedó oculto.',introText:'El corredor conserva una señal incompleta. Observá el entorno, recuperá el dato que falta y averiguá adónde conduce.',successTitle:'R-17 deja un nuevo rastro.',successText:'R-17 termina en la Sala de Banderas. El movimiento figura a nombre de T-04 y transporta Resina RX-4, el mismo material que vimos con Martina. Es una conexión importante, pero todavía no alcanza para acusarla.',background:'/los-archivos-f/images/bg-hidden-corridor.png',introArtwork:'/los-archivos-f/images/federica-nivel-5-inicio-v1.png'},
   6:{introTitle:'Cinco señales. Ningún orden visible.',introText:'Hay cinco señales izadas en el mástil, pero no sabemos qué mensaje forman. Observá con atención la sala, descubrí el orden y reconstruí el mensaje.',successTitle:'Las señales indican una ubicación.',successText:'FAROL no parece una contraseña. Es una ubicación. Las señales estaban indicando la linterna superior del faro. Vamos.',background:'/los-archivos-f/images/nivel-6-sala-banderas-v3.png',introArtwork:'/los-archivos-f/images/nivel-6-sala-banderas-v3.png'},
-  7:{introTitle:'El mecanismo no revela su clave.',introText:'Llegamos al mecanismo del farol. A simple vista no revela la combinación. Observá cómo está construido y seguí los recorridos marcados como IMPARES y PARES.',successTitle:'Compartimento desbloqueado.',successText:'La calibración funcionó. El mecanismo se abrió y ya tenés autorización para abrir el Sobre Negro. Conservá todas las evidencias: todavía falta reconstruir quién utilizó el corredor.',background:'/los-archivos-f/images/lens-workshop.jpg',introArtwork:'/los-archivos-f/images/lens-workshop.jpg'},
+  7:{introTitle:'El mecanismo no revela su clave.',introText:'Llegamos al mecanismo del farol. Observá cómo está construido y seguí los recorridos IMPARES y PARES.',successTitle:'Compartimento desbloqueado.',successText:'El mecanismo se abrió. Ya pueden abrir el sobre dirigido al agente. Conservá las evidencias para la acusación final.',background:'/los-archivos-f/images/lens-workshop.jpg',introArtwork:'/los-archivos-f/images/lens-workshop.jpg'},
 } as const;
 
 function LateLevelStoryDialog({level,kind,onContinue}:{level:5|6|7;kind:'intro'|'success';onContinue:()=>void}){
@@ -182,7 +182,7 @@ export default function Home() {
   const [musicOn, setMusicOn] = useState(true);
   const [effectsOn,setEffectsOn]=useState(true);
   const musicEnabled = useRef(true);
-  const [stormPulse,setStormPulse]=useState(0);
+  const [stormFlash,setStormFlash]=useState({key:0,side:'right' as 'left'|'right',intensity:.7});
   const [checkProgress, setCheckProgress] = useState<Record<number, number>>({});
   const [checkSelection, setCheckSelection] = useState<number | null>(null);
   const [checkFeedback, setCheckFeedback] = useState('');
@@ -200,14 +200,14 @@ export default function Home() {
   }
 
   useEffect(()=>{
-    if(!activeSession||highestLevel<1||completedAt)return;
-    const timer=window.setInterval(()=>{elapsedRef.current+=1;setElapsedSeconds(elapsedRef.current);},1000);
+    if(!activeSession||highestLevel<1||completedAt||screen!=='game')return;
+    const timer=window.setInterval(()=>{if(document.visibilityState!=='visible')return;elapsedRef.current+=1;setElapsedSeconds(elapsedRef.current);},1000);
     const persist=()=>{void fetch('/los-archivos-f/api/game',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'timer',elapsedSeconds:elapsedRef.current})});};
     const saver=window.setInterval(persist,30000);
     const visibility=()=>{if(document.visibilityState==='hidden')persist();};
     document.addEventListener('visibilitychange',visibility);
     return()=>{clearInterval(timer);clearInterval(saver);document.removeEventListener('visibilitychange',visibility);persist();};
-  },[activeSession,highestLevel,completedAt]);
+  },[activeSession,highestLevel,completedAt,screen]);
 
   useEffect(() => {
     const localPreview = import.meta.env.DEV ? new URLSearchParams(window.location.search).get('preview') : null;
@@ -269,7 +269,7 @@ export default function Home() {
     for (const type of ['play', 'pause', 'ended', 'emptied']) document.addEventListener(type, syncVolume, true);
     const observer = new MutationObserver(syncVolume);
     observer.observe(document.body, {childList:true,subtree:true});
-    const thunder=()=>setStormPulse(value=>value+1);
+    const thunder=(event:Event)=>{const detail=(event as CustomEvent<{side?:'left'|'right';intensity?:number}>).detail;setStormFlash(value=>({key:value.key+1,side:detail?.side||'right',intensity:detail?.intensity||.7}));};
     window.addEventListener('archivos-f-thunder',thunder);
     start();
     return () => {
@@ -354,7 +354,7 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function requestHint() { return Boolean(await gameAction({action:'hint',level})); }
+  async function requestHint(direct=false) { return Boolean(await gameAction({action:'hint',level,direct})); }
 
   async function submitFinal(event: FormEvent) {
     event.preventDefault();
@@ -377,7 +377,7 @@ export default function Home() {
   const storyPageOpen=showLevelTwoIntro||showLevelTwoSuccess||showLevelThreeDialog||showLevelFourDialog||showLateLevelDialog;
 
   return (
-    <main className={`site-shell ${storyPageOpen?'story-page-active':''}`} aria-busy={busy}><span key={stormPulse} className={`storm-flash ${stormPulse?'is-active':''}`} aria-hidden="true"/><fieldset className="app-controls" disabled={busy}>
+    <main className={`site-shell ${storyPageOpen?'story-page-active':''}`} aria-busy={busy}><span key={stormFlash.key} className={`storm-flash storm-flash-${stormFlash.side} ${stormFlash.key?'is-active':''}`} style={{'--storm-intensity':stormFlash.intensity} as React.CSSProperties} aria-hidden="true"/><fieldset className="app-controls" disabled={busy}>
       <nav className="topbar" aria-label="Navegación principal">
         <div className="header-identity">
           <button className="brand brand-button" onClick={() => leaveGame('home')} aria-label="Ir al inicio"><img className="brand-logo" src="/los-archivos-f/images/logo-ranking-archivos-f.png" alt="Los Archivos F"/></button>
@@ -400,12 +400,12 @@ export default function Home() {
       </section>}
 
       {screen === 'game' && !storyPageOpen && <section className="game-page">
-        <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} elapsedSeconds={elapsedSeconds} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={requestHint}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onMission={()=>leaveGame('briefing')} onLibrary={()=>leaveGame('library')}/>
+        <MissionMap level={level} highestLevel={highestLevel} hintsUsed={hintsUsed} elapsedSeconds={elapsedSeconds} hintPanel={level >= 1 && level <= 7 ? <HintLenses key={level} hints={levels[level-1].hints} used={hints[level] || 0} busy={busy} canRequest={!unlocked} onRequest={()=>requestHint(false)} onRequestSolution={()=>requestHint(true)}/> : <p className="no-stage-hints">Entrá a un nivel de la investigación para consultar sus pistas.</p>} saveStatus={saveStatus} visitLevel={visitLevel} onMission={()=>leaveGame('briefing')} onLibrary={()=>leaveGame('library')}/>
 
         <div className="investigation-panel">
           {level !== 1 && level !== 2 && level <= 7 && <figure className={`scene-frame ${level === 3?'level-three-weather':level === 4?'level-four-maps':level===5?'level-five-red-corridor':level===6?'level-six-flags':level === 0 ? 'storm-layer' : level === 7 ? 'beam-layer' : 'lamp-layer'}`}><img className={level===3?'storm-frame storm-frame-0':undefined} src={level === 0 ? '/los-archivos-f/images/control-room.jpg' : level===3 ? levelVisuals[2] : level===4&&!unlocked ? '/los-archivos-f/images/nivel-4-sala-planos-v1.png' : level===5&&!unlocked?'/los-archivos-f/images/bg-hidden-corridor.png':level===6&&!unlocked?'/los-archivos-f/images/nivel-6-sala-banderas-v3.png':unlocked ? successVisuals[level - 1] : levelVisuals[level - 1]} alt={level===4?'Sala de cartografía del museo con un plano incompleto sobre la mesa':level===5?'Corredor de mantenimiento iluminado por señales rojas':level===6?'Sala del faro con cinco banderas numeradas a distintas alturas y el cartel Seguí la luz':'Escena del Museo del Faro vinculada con la investigación'} />{level===3&&['nivel-3-tormenta-2.png','nivel-3-tormenta-3.png','nivel-3-tormenta-4.png'].map((frame,index)=><img className={`storm-frame storm-frame-${index+1}`} src={`/los-archivos-f/images/${frame}`} alt="" aria-hidden="true" key={frame}/>)}{level===3&&<i className="scene-lightning-flash" aria-hidden="true"/>}{level===3&&<i className="scene-lighthouse-beam" aria-hidden="true"/>}<span>{unlocked ? 'EVIDENCIA VISUAL DESBLOQUEADA' : 'REGISTRO VISUAL · ARCHIVO F-01'}</span></figure>}
           
-          {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p><Typewriter text="Robaron el Rubí del Faro. El archivo de las personas presentes quedó bloqueado después del apagón. Recuperá el acceso para comenzar a reconstruir lo que pasó."/></p><p>No abras el sobre negro hasta recibir la autorización de Fede.</p><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>leaveGame('briefing')}>Volver a escuchar a Federica</button></section>}
+          {level === 0 && <section className="mission-intro"><p className="eyebrow dark">ARCHIVO F-01 · MISIÓN ACEPTADA</p><h1>El robo del Rubí del Faro</h1><p><Typewriter text="Robaron el Rubí del Faro durante el apagón y dejaron una copia. Cuatro personas quedaron bajo sospecha."/></p><p>Mantené cerrado el sobre dirigido al agente hasta que Fede lo indique.</p><button className="primary-button" onClick={startInvestigation}>COMENZAR NIVEL 1 <span>→</span></button><button className="reading-choice" onClick={()=>leaveGame('briefing')}>Volver a escuchar a Federica</button></section>}
 
           {level === 1 && <TerminalLevel unlocked={unlocked} busy={busy} message={message} onUnlock={async value=>Boolean(await gameAction({action:"unlock",level:1,answer:value}))} onContinue={continueInvestigation}/>}
           {level >= 2 && level <= 7 && (() => {
@@ -418,16 +418,18 @@ export default function Home() {
               <p className="eyebrow dark">{current.kicker}</p><h1>{current.title}</h1>
               <div className="level-objective"><span>OBJETIVO</span><p>{level===2?'Descartá a una persona cubriendo todo el intervalo crítico.':level===3?'Ordená las seis señales y descubrí el lugar indicado.':level===4?'Reconstruí las seis piezas y seguí la ruta desde INICIO.':level===5?'Registrá R-17 y conectalo con la persona asociada al material.':level===6?'Orientá los círculos y traducí las cinco banderas.':'Calculá IMPARES y PARES para formar la combinación.'}</p></div>
               {level === 2 && <figure className="level-two-group-scene"><img src="/los-archivos-f/images/suspects-group.jpg" alt="Los cuatro sospechosos reunidos en la sala de entrevistas"/><figcaption>{unlocked?'COARTADA VERIFICADA · REGISTRO CONSERVADO':'REGISTRO DE ENTREVISTAS · CUATRO PERSONAS PRESENTES'}</figcaption></figure>}
-              {level === 6 && !unlocked && <><aside className="level-six-physical-prompt" aria-label="Pista para usar los materiales impresos"><span>PISTA FÍSICA · PIEZA G-02</span><h2>Los dos círculos no son decorativos.</h2><p>Buscá el instrumento de señales y la etiqueta de inventario que recibiste impresos. Examiná ambos lados de la etiqueta: su consigna explica qué marca orienta los discos y dónde buscar los números que revelan el mensaje.</p><small>Primero orientá el instrumento. Después relacioná el resultado con las señales que ondean en lo alto.</small></aside><div className="investigation-question"><span>PREGUNTA DE INVESTIGACIÓN</span><p>¿Qué mensaje revelan las banderas después de orientar correctamente los círculos?</p></div></>}
+              {level === 6 && !unlocked && <><aside className="level-six-physical-prompt" aria-label="Orientación para usar los materiales impresos"><span>MATERIAL IMPRESO</span><h2>Los dos círculos no son decorativos.</h2><p>Buscá el instrumento de señales y la etiqueta que recibiste. Examiná ambos lados, orientá los círculos y después observá las banderas.</p></aside><div className="investigation-question"><span>PREGUNTA</span><p>¿Qué palabra forman las banderas?</p></div></>}
               {level===7&&!unlocked&&<MechanicalCodeBuilder onCode={setAnswer}/>}
               {level===3&&<details key={`digital-${level}`} className="clue-envelope digital-envelope"><summary><span>◉</span><b>Abrir receptor de señales<small>Seis registros recuperados · tocar para examinar</small></b><span>+</span></summary><div className="digital-brief"><LightSignal onSolved={setLevelThreeReady}/></div></details>}
               {level === 2 && <section className="suspect-board" aria-label="Panel de sospechosos"><div className="suspect-board-heading"><h2>Cuatro versiones. El mismo intervalo.</h2><p>Abrí cada ficha, observá la escena completa y escuchá con atención lo que declara cada persona.</p></div><div className="suspect-grid">{statements.map((person, index) => <button className="suspect-file" key={person.name} onClick={() => setSelectedStatement(index)} aria-label={`Abrir ficha de ${person.name}`}><div className="suspect-file-photo"><img src={person.image} alt="" /></div><div className="suspect-file-caption"><span>{person.role}</span><h3>{person.name}</h3><p>Abrir declaración <span aria-hidden="true">↗</span></p></div></button>)}</div></section>}
               {level === 4 && !unlocked && <LevelFourPlan solved={checkIndex>0} busy={busy} onSolved={async()=>{if(await gameAction({action:'deduction',level:4,index:0,selection:2})){setCheckSelection(null);setCheckFeedback('');setCheckPassed(false);}}}/>}
               {level === 5 && !unlocked && <LevelFiveMovements busy={busy} onComplete={async()=>{if(!await gameAction({action:'deduction',level:5,index:0,selection:1}))return;if(await gameAction({action:'unlock',level:5,answer:'banderas'})){setLateLevelDialog({level:5,kind:'success'});}}}/>}
 
+              {!unlocked&&canUnlock&&level!==5&&<form className="inline-unlock" onSubmit={submitLevel}><label htmlFor={`level-answer-${level}`}><span>RESPUESTA DEL NIVEL</span>{current.prompt}</label><div><input id={`level-answer-${level}`} value={answer} onChange={event=>setAnswer(event.target.value)} placeholder={current.placeholder} autoComplete="off"/><button className="unlock-button" type="submit" disabled={busy||!answer.trim()}>{busy?'VERIFICANDO…':level===7?'PROBAR COMBINACIÓN':'VERIFICAR RESPUESTA'}</button></div></form>}
+
               {!unlocked && currentCheck && level!==5 && !(level===4&&checkIndex===0) && <div className="micro-challenge"><p className="eyebrow dark">COMPROBACIÓN {checkIndex + 1} DE {completedChecks}</p><h2><Typewriter text={currentCheck.question}/></h2><div className="micro-options">{currentCheck.options.map((option, index) => <button key={option} className={checkSelection === index ? 'selected' : ''} onClick={() => { if (!checkPassed) { setCheckSelection(index); setCheckFeedback(''); } }}>{option}</button>)}</div>{checkFeedback && <p className={checkPassed ? 'micro-success' : 'micro-error'}>{checkPassed ? currentCheck.success : checkFeedback}</p>}{checkPassed ? <button className="primary-button" onClick={continueMicroCheck}>REGISTRAR COMPROBACIÓN <span>→</span></button> : <button className="unlock-button" onClick={() => verifyMicroCheck(currentCheck.correct)}>VERIFICAR</button>}</div>}
               {message && level!==3 && level!==4 && <p className={message.startsWith('Desbloqueaste') ? 'success-message' : 'error-message'}>{message}</p>}
-              {unlocked && level >=5 && level<=7 && <div className="unlock-reveal compact"><div className="unlock-icon">✓</div><p className="eyebrow dark">MENSAJE DE FEDE DISPONIBLE</p><h2>{current.unlock}</h2><button className="primary-button" onClick={()=>setLateLevelDialog({level:level as 5|6|7,kind:'success'})}>ESCUCHAR A FEDE <span>→</span></button></div>}
+              {unlocked && level >=5 && level<=7 && <div className="unlock-reveal compact"><div className="unlock-icon">✓</div><p className="eyebrow dark">MENSAJE DE FEDE DISPONIBLE</p><h2>{current.unlock}</h2><button className="primary-button" onClick={()=>setLateLevelDialog({level:level as 5|6|7,kind:'success'})}>VER MENSAJE DE FEDE <span>→</span></button></div>}
             </section><LevelSideTabs level={level} prompt={current.prompt} placeholder={current.placeholder} answer={answer} busy={busy} unlocked={unlocked} canUnlock={canUnlock} message={message} missionMessageOpen={level===2?levelTwoIntro||levelTwoSuccess:level===3?Boolean(levelThreeDialog):level===4?Boolean(levelFourDialog):Boolean(lateLevelDialog)} onAnswer={setAnswer} onReplay={replayLevelIntro} onUnlock={submitLevel}/></>;
           })()}
 

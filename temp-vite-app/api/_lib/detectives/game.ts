@@ -49,7 +49,7 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
   }
   if(!Number.isInteger(level)||level<1||level>7||level>state.highestLevel) throw new GameError('Este nivel todavía está bloqueado.',403);
   if(level<state.highestLevel) return state;
-  if(body.action==='hint') { state.hints[level]=Math.min(levels[level-1].hints.length,(state.hints[level]||0)+1);return state; }
+  if(body.action==='hint') { const maximum=levels[level-1].hints.length;state.hints[level]=body.direct?maximum:Math.min(maximum,(state.hints[level]||0)+1);return state; }
   if(body.action==='deduction') {
     const index=Number(body.index), expected=state.checkProgress[level]||0;
     if(index<expected) return state;

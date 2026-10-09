@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createServer } from 'vite';
-test('pistas: siempre secuenciales, conservan progreso y respetan el máximo', async()=>{
+test('pistas: avanzan en orden o registran todas al pedir la solución directa', async()=>{
  const server=await createServer({configFile:false,server:{middlewareMode:true},appType:'custom'});
  try{
   const {applyAction,hashCode}=await server.ssrLoadModule('/api/_lib/detectives/game.ts');
@@ -16,6 +16,7 @@ test('pistas: siempre secuenciales, conservan progreso y respetan el máximo', a
   applyAction(state,{action:'hint',level:1});assert.equal(state.hints[1],4);
   const legacy={agent:'Prueba',highestLevel:1,hints:{1:1},checkProgress:{},completedAt:null};
   applyAction(legacy,{action:'hint',level:1});assert.equal(legacy.hints[1],2);
+  applyAction(legacy,{action:'hint',level:1,direct:true});assert.equal(legacy.hints[1],4);
   const codes=JSON.parse(readFileSync(new URL('../api/_lib/detectives/access-codes.json',import.meta.url),'utf8'));
   for(const code of Array.from({length:10},(_,i)=>`C${i+1}`)) assert.ok(codes.includes(await hashCode(` ${code.toLowerCase()} `)));
   assert.ok(!codes.includes(await hashCode('C11')));

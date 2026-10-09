@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createServer} from 'vite';
 
-test('Escondite: el sobre negro queda bloqueado hasta completar banderas', async()=>{
+test('Escondite: el sobre dirigido al agente queda bloqueado hasta completar banderas', async()=>{
  const server=await createServer({configFile:false,server:{middlewareMode:true},appType:'custom'});
  try {
   const {applyAction}=await server.ssrLoadModule('/api/_lib/detectives/game.ts');
