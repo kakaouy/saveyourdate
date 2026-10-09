@@ -172,6 +172,9 @@ export function playLevelComplete(level: number) {
     } else {
       [0, .08, .17].forEach((delay, index) => tone(ctx, [118, 164, 238][index], now + delay, .1 + index * .025, .035, 'triangle'));
     }
+    // Papel y golpe de sello: separa la recompensa narrativa del simple acierto.
+    tone(ctx, 92, now + .24, .08, .045, 'triangle');
+    tone(ctx, 58, now + .27, .16, .035, 'sine');
     tone(ctx, 392, now + .3, .32, .04, 'sine');
   } catch {
     // The reward sound is decorative and must never block progression.

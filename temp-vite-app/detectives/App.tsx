@@ -159,10 +159,20 @@ function SuspectImageViewer({initialIndex,onClose}:{initialIndex:number;onClose:
   </dialog>;
 }
 
-const evidenceRewards=['CORTE · 19:37','COARTADA · LEÓN','DESTINO · TALLER','RUTA · 9 → 3 → 7','REGISTRO · R-17','UBICACIÓN · FAROL','COMPARTIMENTO · ABIERTO'];
+const evidenceRewards=[
+ {type:'IMPRESIÓN DE TERMINAL',title:'CORTE · 19:37',meaning:'La hora real del apagón fija el intervalo crítico de la investigación.'},
+ {type:'FICHA DE COARTADA',title:'LEÓN · DESCARTADO',meaning:'Sus registros cubren todo el intervalo, sin dejar huecos.'},
+ {type:'REGISTRO DE RADIO',title:'DESTINO · TALLER',meaning:'Las seis señales reconstruidas indican el Taller de Mantenimiento.'},
+ {type:'FRAGMENTO DE PLANO',title:'RUTA · 9 → 3 → 7',meaning:'El recorrido conduce a un sector ausente del plano público.'},
+ {type:'FICHA DE LABORATORIO',title:'REGISTRO · R-17',meaning:'La Resina RX-4 conecta el movimiento con Martina y la Sala de Banderas.'},
+ {type:'TARJETA DE SEÑALES',title:'UBICACIÓN · FAROL',meaning:'Las banderas no forman una contraseña: señalan la linterna superior.'},
+ {type:'FOTOGRAFÍA DEL MECANISMO',title:'COMPARTIMENTO · ABIERTO',meaning:'La cerradura cede y autoriza la apertura del sobre dirigido al agente.'},
+];
 const achievementNames=['OJO DE FARO','COARTADA PERFECTA','RADIOOPERADOR','CARTÓGRAFO','RASTREADOR','SEÑALERO','MENTE MECÁNICA'];
 function LevelClearOverlay({level,onClose}:{level:number;onClose:()=>void}){
- return <div className={`level-clear-overlay ${level===1?'level-one-clear':''}`} role="dialog" aria-modal="true" aria-label={`Prueba ${level} confirmada`}><div className="level-clear-flash"/><section>{level===1?<div className="level-one-clear-message">CORTE CONFIRMADO · 19:37</div>:<><img className="level-clear-stamp-image" src="/los-archivos-f/images/stamp-evidence-confirmed-v1.png" alt="Agencia F · Prueba confirmada"/><div className="level-clear-evidence"><i aria-hidden="true">◆</i><span>NUEVA EVIDENCIA</span><b>{evidenceRewards[level-1]}</b></div></>}<button className="primary-button" type="button" onClick={onClose}>CONTINUAR <span>→</span></button></section></div>;
+ const evidence=evidenceRewards[level-1];
+ const viewBoard=()=>{onClose();window.dispatchEvent(new Event('archivos-f-open-mission'));};
+ return <div className="level-clear-overlay" role="dialog" aria-modal="true" aria-label={`Prueba ${level} confirmada`}><div className="level-clear-flash"/><section className={`evidence-unlock-drawer evidence-unlock-${level}`}><div className="evidence-stamp-stage"><img className="level-clear-stamp-image" src="/los-archivos-f/images/stamp-evidence-confirmed-v1.png" alt="Agencia F · Prueba verificada"/></div><div className="level-clear-evidence"><i aria-hidden="true">◆</i><span>{evidence.type}</span><b>{evidence.title}</b><p>{evidence.meaning}</p><small>EVIDENCIA {level}/7 · incorporada al tablero</small></div><div className="evidence-unlock-actions"><button className="reading-choice" type="button" onClick={viewBoard}>VER EN EL TABLERO</button><button className="primary-button" type="button" onClick={onClose}>CONTINUAR <span>→</span></button></div></section></div>;
 }
 
 export default function Home() {

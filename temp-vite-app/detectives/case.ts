@@ -72,13 +72,13 @@ export const levels = [
 ];
 
 export const unlockMessages = [
-  { audio: '/los-archivos-f/audio/fede-nivel-1.wav', text: 'Siete minutos pueden parecer poco, pero alcanzan para cruzar la sala y utilizar el corredor. Ahora compará las declaraciones.' },
+  { audio: '/los-archivos-f/audio/fede-nivel-1.wav', text: 'Confirmado: el corte ocurrió a las 19:37. Siete minutos pueden parecer poco, pero alcanzan para cruzar la sala y utilizar el corredor. Ahora comparemos las declaraciones para saber quién pudo moverse durante ese intervalo.' },
   { audio: '/los-archivos-f/audio/fede-nivel-2.wav', text: 'Coartada verificada. Las fuentes coinciden y cubren todo el intervalo. León queda descartado. Durante la pausa en la cafetería anotó algo extraño en una servilleta. Esa puede ser nuestra siguiente pista.' },
   { audio: '/los-archivos-f/audio/fede-nivel-3.wav', text: '¡TALLER! Las señales no eran un mensaje al azar: estaban marcando el Taller de Mantenimiento. Si alguien conocía ese sistema durante el apagón, pudo haber dejado allí otra parte del recorrido. Vamos a revisar el taller.' },
   { audio: '/los-archivos-f/audio/fede-nivel-4.wav', text: '¡Lo tenemos! La ruta oculta atraviesa 9, 3 y 7. El código abrió el conducto de mantenimiento. Este pasaje lleva hacia una zona que no aparece en el plano público del faro. Sigamos el corredor.' },
   { audio: '/los-archivos-f/audio/fede-nivel-5.wav', text: 'R-17 termina en la Sala de Banderas. El movimiento figura a nombre de T-04 y transporta Resina RX-4, el mismo material que vimos con Martina. Es una conexión importante, pero todavía no alcanza para acusarla.' },
-  { audio: '/los-archivos-f/audio/fede-nivel-6.wav', text: 'FAROL no es una contraseña: es una ubicación. Las señales estaban indicando la linterna superior del faro. Vamos.' },
-  { audio: '/los-archivos-f/audio/fede-nivel-7.wav', text: 'El mecanismo se abrió. Ya pueden abrir el sobre dirigido al agente y continuar con la reconstrucción final.' },
+  { audio: '/los-archivos-f/audio/fede-nivel-6.wav', text: 'FAROL no es una contraseña: es una ubicación. Las señales estaban indicando la linterna superior del faro, justo encima de la sala. Allí tiene que estar la última pieza del recorrido.' },
+  { audio: '/los-archivos-f/audio/fede-nivel-7.wav', text: 'La combinación encajó y el mecanismo se abrió. Ya reunimos la hora, la ruta, el registro y la ubicación final. Pueden abrir el sobre dirigido al agente: llegó el momento de reconstruir quién actuó, cómo lo hizo y dónde dejó el rubí.' },
 ];
 
 export const microChecks = [

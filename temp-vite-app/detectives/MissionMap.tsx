@@ -38,6 +38,7 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elaps
  const dialog=useRef<HTMLDialogElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
  const done=Math.max(0,Math.min(highestLevel-1,7));
+ useEffect(()=>{const openMission=()=>setOpen(true);window.addEventListener('archivos-f-open-mission',openMission);return()=>window.removeEventListener('archivos-f-open-mission',openMission);},[]);
  useEffect(()=>{
   if(!open)return;
   dialog.current?.showModal();

@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'vite';
 
-const testCodes = ['F01-D1-09B422','F01-D2-5AC2E6','F01-D3-EF2831','F01-D4-156647','F01-D5-9F02D6','F01-D6-F89950','F01-D7-40A208','F01-D8-513F49','F01-D9-1EDD66','F01-D10-0181BD'];
+const testCodes = ['F01-D1-09B422','F01-D2-5AC2E6','F01-D3-EF2831','F01-D4-156647','F01-D5-9F02D6','F01-D6-F89950','F01-D7-40A208','F01-D8-513F49','F01-D9-1EDD66','F01-D10-0181BD','F01-D11-7C4A91','F01-D12-B83E26','F01-D13-4F91CD','F01-D14-A62B70','F01-D15-3DE845','F01-D16-91C7AF','F01-D17-5B20E4','F01-D18-C74639','F01-D19-28AFD5','F01-D20-E9047B'];
 
-test('Sólo D1–D10 pasan la validación usada al activar partidas', async () => {
+test('D1–D20 pasan la validación usada al activar partidas', async () => {
   const server = await createServer({ configFile: false, server: { middlewareMode: true }, appType: 'custom' });
   try {
     const [{ hashCode }, { default: validHashes }] = await Promise.all([
