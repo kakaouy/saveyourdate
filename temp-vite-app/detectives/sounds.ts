@@ -34,6 +34,9 @@ export function playPageTurn(){playAudioClip('/los-archivos-f/audio/level2-page-
 export function playSignalBlip(){playAudioClip('/los-archivos-f/audio/level3-signal-blip.mp3',.3,.3);}
 export function playRadioStatic(){playAudioClip('/los-archivos-f/audio/level3-radio-static.mp3',.2,.7,Math.random()*3.5);}
 export function playRadarConfirm(){playAudioClip('/los-archivos-f/audio/level3-radar-confirm.mp3',.38,1.8);}
+export function playLevelTransition(){playAudioClip('/los-archivos-f/audio/cross-level-transition.mp3',.34,1.2);}
+export function playFedeRadioBeep(){playAudioClip('/los-archivos-f/audio/fede-radio-beep.mp3',.3,.52);}
+export function playEvidenceSlide(){playAudioClip('/los-archivos-f/audio/evidence-paper-slide.mp3',.38,.84);}
 
 function audioContext() {
   if (typeof window === 'undefined') return null;
@@ -157,6 +160,7 @@ export function playEffect(effect: Effect) {
     } else if (effect === 'error') {
       playAudioClip('/los-archivos-f/audio/feedback-error-thud.mp3',.48,.5);
     } else {
+      playAudioClip('/los-archivos-f/audio/cross-door-lock.mp3',.34,1.7);
       playAudioClip('/los-archivos-f/audio/feedback-metal-unlock.mp3',.36,.85);
       tone(ctx, 196, now, 0.12, 0.035, 'triangle');
       tone(ctx, 294, now + 0.09, 0.14, 0.04, 'triangle');
@@ -173,7 +177,7 @@ export function playLevelComplete(level: number) {
     const ctx = audioContext();
     if (!ctx || ctx.state !== 'running') return;
     const now = ctx.currentTime;
-    playAudioClip('/los-archivos-f/audio/evidence-stamp.mp3',.58,.58);
+    playAudioClip(Math.random()<.5?'/los-archivos-f/audio/evidence-stamp.mp3':'/los-archivos-f/audio/evidence-stamp-alt.mp3',.58,.62);
     if (level === 1 || level === 5) {
       [0, .075, .15].forEach((delay, index) => tone(ctx, 520 + index * 170, now + delay, .055, .024, 'square'));
     } else if (level === 3 || level === 6) {

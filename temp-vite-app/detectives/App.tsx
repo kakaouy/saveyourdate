@@ -6,7 +6,7 @@ import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import MissionMap from './MissionMap';
 import LevelSideTabs from './LevelSideTabs';
-import {playButtonClick,playCameraShutter,playDossierOpen,playEffect,playLevelComplete,playPageTurn,playPenMark,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
+import {playButtonClick,playCameraShutter,playDossierOpen,playEffect,playEvidenceSlide,playFedeRadioBeep,playLevelComplete,playLevelTransition,playPageTurn,playPenMark,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
 import FinalCaseAudio from './FinalCaseAudio';
 import PodiumAccess from './PodiumAccess';
 'use client';
@@ -39,7 +39,7 @@ const finalCaseLoop = '/los-archivos-f/images/federica-caso-cerrado-loop.webp';
 const finalCaseStill = '/los-archivos-f/images/federica-caso-cerrado-frame-1.webp';
 
 function SimulatedPlayer({label,onPlaying}:{label:string;onPlaying?:(value:boolean)=>void}){
-  useEffect(()=>{onPlaying?.(false);},[onPlaying]);
+  useEffect(()=>{onPlaying?.(false);if(/Fede|nivel|Presentación/i.test(label))playFedeRadioBeep();},[label,onPlaying]);
   return <div className="written-transmission" role="note" aria-label={`${label}. Transcripción disponible`}><span aria-hidden="true">⌁</span><b>TRANSMISIÓN ESCRITA</b><small>Mensaje recuperado · lectura disponible debajo</small></div>;
 }
 
@@ -171,6 +171,7 @@ const evidenceRewards=[
 const achievementNames=['OJO DE FARO','COARTADA PERFECTA','RADIOOPERADOR','CARTÓGRAFO','RASTREADOR','SEÑALERO','MENTE MECÁNICA'];
 function LevelClearOverlay({level,onClose}:{level:number;onClose:()=>void}){
  const evidence=evidenceRewards[level-1];
+ useEffect(()=>{const timer=window.setTimeout(playEvidenceSlide,360);return()=>window.clearTimeout(timer);},[]);
  const viewBoard=()=>{onClose();window.dispatchEvent(new Event('archivos-f-open-mission'));};
  return <div className="level-clear-overlay" role="dialog" aria-modal="true" aria-label={`Prueba ${level} confirmada`}><div className="level-clear-flash"/><section className={`evidence-unlock-drawer evidence-unlock-${level}`}><div className="evidence-stamp-stage"><img className="level-clear-stamp-image" src="/los-archivos-f/images/stamp-evidence-confirmed-v1.png" alt="Agencia F · Prueba verificada"/></div><div className="level-clear-evidence"><i aria-hidden="true">◆</i><span>{evidence.type}</span><b>{evidence.title}</b><p>{evidence.meaning}</p><small>EVIDENCIA {level}/7 · incorporada al tablero</small></div><div className="evidence-unlock-actions"><button className="reading-choice" type="button" onClick={viewBoard}>VER EN EL TABLERO</button><button className="primary-button" type="button" onClick={onClose}>CONTINUAR <span>→</span></button></div></section></div>;
 }
@@ -388,6 +389,7 @@ export default function Home() {
   }
 
   function continueInvestigation() {
+    playLevelTransition();
     visitLevel(level + 1);
   }
 
