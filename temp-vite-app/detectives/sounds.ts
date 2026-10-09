@@ -7,8 +7,21 @@ let stormEnabled = false;
 let stormSource: AudioBufferSourceNode | null = null;
 let stormGain: GainNode | null = null;
 let thunderTimer: number | null = null;
+let lastHintChime = 0;
 
 export function setEffectsEnabled(enabled: boolean) { effectsEnabled = enabled; }
+
+function playAudioClip(source:string,volume:number,duration?:number,startAt=0) {
+  if (!effectsEnabled || typeof Audio === 'undefined') return;
+  const audio=new Audio(source);audio.volume=volume;audio.preload='auto';
+  try{audio.currentTime=startAt;}catch{/* Metadata can arrive after playback starts. */}
+  void audio.play().catch(()=>{});
+  if(duration) window.setTimeout(()=>{audio.pause();audio.currentTime=0;},duration*1000);
+}
+
+export function playKeyboardKey(){playAudioClip('/los-archivos-f/audio/terminal-keyboard.mp3',.42,.16,Math.random()*.9);}
+export function playPowerSurge(){playAudioClip('/los-archivos-f/audio/terminal-power.mp3',.78);}
+export function playHintChime(){const now=performance.now();if(now-lastHintChime<1400)return;lastHintChime=now;playAudioClip('/los-archivos-f/audio/hint-chime.mp3',.34);}
 
 function audioContext() {
   if (typeof window === 'undefined') return null;

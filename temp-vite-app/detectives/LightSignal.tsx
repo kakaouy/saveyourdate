@@ -25,7 +25,13 @@ export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void
   const [dragged,setDragged]=useState<string|null>(null);
   function add(signal:Signal){playEffect('signal');setAvailable(items=>items.filter(item=>item.id!==signal.id));setOrdered(items=>[...items,signal]);setFeedback('');onSolved(false);}
   function remove(signal:Signal){playEffect('paper');setOrdered(items=>items.filter(item=>item.id!==signal.id));setAvailable(items=>[...items,signal]);setFeedback('');onSolved(false);}
-  function move(index:number,direction:-1|1){const target=index+direction;if(target<0||target>=ordered.length)return;playEffect('rotate');setOrdered(items=>{const next=[...items];[next[index],next[target]]=[next[target],next[index]];return next;});setFeedback('');onSolved(false);}
+  function dropAt(index:number){
+    if(!dragged)return;
+    const sourceIndex=ordered.findIndex(item=>item.id===dragged);
+    if(sourceIndex>=0){playEffect('rotate');setOrdered(items=>{const next=[...items];const [item]=next.splice(sourceIndex,1);next.splice(Math.min(index,next.length),0,item);return next;});}
+    else {const signal=available.find(item=>item.id===dragged);if(signal){playEffect('signal');setAvailable(items=>items.filter(item=>item.id!==signal.id));setOrdered(items=>{const next=[...items];next.splice(Math.min(index,next.length),0,signal);return next;});}}
+    setDragged(null);setFeedback('');onSolved(false);
+  }
   function reset(){playEffect('paper');setAvailable(signals);setOrdered([]);setFeedback('Secuencia reiniciada.');onSolved(false);}
   function analyze(){
     if(ordered.length<signals.length){playEffect('error');setFeedback('Ubicá las seis señales antes de analizar la secuencia.');return;}
@@ -36,10 +42,10 @@ export default function LightSignal({onSolved}: {onSolved:(solved:boolean)=>void
   }
   return <section className="signal-workbench" aria-label="Receptor de seis señales desordenadas">
     <header><span className="signal-lamp is-lit" aria-hidden="true"/><div><b>SEIS REGISTROS RECUPERADOS</b><small>Guardados fuera de secuencia</small></div></header>
-    <p className="signal-instruction">Seleccioná una tarjeta para llevarla a la bandeja. También podés arrastrarla y ajustar su posición con las flechas.</p>
+    <p className="signal-instruction">Seleccioná o arrastrá las tarjetas para reconstruir la secuencia.</p>
     <div className="signal-pool" aria-label="Señales sin ordenar">{available.map((signal,index)=><button draggable key={signal.id} onDragStart={()=>setDragged(signal.id)} onClick={()=>add(signal)} className="signal-card"><small>S-{String(index+1).padStart(2,'0')}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><SignalPattern pattern={signal.pattern}/></button>)}</div>
-    <div className="signal-sequence" onDragOver={event=>event.preventDefault()} onDrop={()=>{const signal=available.find(item=>item.id===dragged);if(signal)add(signal);setDragged(null);}} aria-label="Secuencia reconstruida">
-      {Array.from({length:6},(_,index)=>{const signal=ordered[index];return <div className={`signal-slot ${signal?'filled':''}`} key={signal?.id||index}>{signal?<><button className="signal-card" onClick={()=>remove(signal)} aria-label={`Quitar ${signal.name} de la posición ${index+1}`}><small>POSICIÓN {index+1}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><SignalPattern pattern={signal.pattern}/></button><span className="signal-movers"><button onClick={()=>move(index,-1)} disabled={index===0} aria-label={`Mover ${signal.name} a la izquierda`}>←</button><button onClick={()=>move(index,1)} disabled={index===ordered.length-1} aria-label={`Mover ${signal.name} a la derecha`}>→</button></span></>:<span>{index+1}</span>}</div>})}
+    <div className="signal-sequence" onDragOver={event=>event.preventDefault()} aria-label="Secuencia reconstruida">
+      {Array.from({length:6},(_,index)=>{const signal=ordered[index];return <div className={`signal-slot ${signal?'filled':''}`} onDragOver={event=>event.preventDefault()} onDrop={()=>dropAt(index)} key={signal?.id||index}>{signal?<button draggable onDragStart={()=>setDragged(signal.id)} className="signal-card" onClick={()=>remove(signal)} aria-label={`Quitar ${signal.name} de la posición ${index+1}`}><small>POSICIÓN {index+1}</small><strong aria-hidden="true">{signal.symbol}</strong><span>{signal.name}</span><SignalPattern pattern={signal.pattern}/></button>:<span>{index+1}</span>}</div>})}
     </div>
     <div className="signal-actions"><button type="button" className="reading-choice" onClick={reset} disabled={!ordered.length}>REINICIAR</button><button type="button" className="unlock-button" onClick={analyze}>ANALIZAR SECUENCIA</button></div>
     {feedback&&<p className={feedback.startsWith('Secuencia')?'signal-success':'signal-feedback'} role="status">{feedback}</p>}
