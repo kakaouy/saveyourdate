@@ -1,0 +1,31 @@
+temp-vite-app/detectives/style.css
+  s_ad2761a9c8222b::t_167343131c1a71 188
+temp-vite-app/detectives/App.tsx
+  s_ad2761a9c8222b::t_e9c55154e02127 511
+  s_ad2761a9c8222b::t_7674ebdc4661af 9,200-202,232-233,305,327,373,379,433-440
+  s_ad2761a9c8222b::t_622461404fdd34 451,456
+temp-vite-app/detectives/sounds.ts
+  s_ad2761a9c8222b::t_ee09823c747464 54
+  s_ad2761a9c8222b::t_5de763535308b6 10,36-38,53,55-60,196
+  s_ad2761a9c8222b::t_64d58ab39f7a5c 84-97,109
+temp-vite-app/detectives/TerminalLevel.tsx
+  s_ad2761a9c8222b::t_5de763535308b6 6,72
+temp-vite-app/detectives/LevelFourPlan.tsx
+  s_ad2761a9c8222b::t_5de763535308b6 2,49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "85035ebd4432263f93b2a31cbe3e584699e35115",
+  "prompts": {},
+  "sessions": {
+    "s_ad2761a9c8222b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11e3c-6733-7631-a227-de619d6c7cf4",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
