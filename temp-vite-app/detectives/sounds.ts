@@ -21,9 +21,10 @@ function playAudioClip(source:string,volume:number,duration?:number,startAt=0) {
 }
 
 export function playKeyboardKey(){playAudioClip('/los-archivos-f/audio/terminal-keyboard.mp3',.42,.16,Math.random()*.9);}
-export function playPowerSurge(){playAudioClip('/los-archivos-f/audio/terminal-power.mp3',.78);}
+export function playPowerSurge(){playAudioClip('/los-archivos-f/audio/terminal-crt-startup.mp3',.5,3.2);window.setTimeout(()=>playAudioClip('/los-archivos-f/audio/terminal-power.mp3',.42,.7),180);}
 export function playHintChime(){const now=performance.now();if(now-lastHintChime<1400)return;lastHintChime=now;playAudioClip('/los-archivos-f/audio/hint-chime.mp3',.34);}
 export function playButtonClick(){const now=performance.now();if(now-lastButtonClick<70)return;lastButtonClick=now;playAudioClip('/los-archivos-f/audio/ui-button-press.mp3',.18,.22);}
+export function playMapUnfold(){playAudioClip('/los-archivos-f/audio/mission-map-unfold.mp3',.32,1.45);}
 
 function audioContext() {
   if (typeof window === 'undefined') return null;
