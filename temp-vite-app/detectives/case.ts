@@ -31,7 +31,7 @@ export const levels = [
   },
   {
     title: 'El corredor oculto',
-    kicker: 'NIVEL 4 · CAJA FUERTE',
+    kicker: 'NIVEL 4 · SALA DE PLANOS',
     prompt: '¿Qué código de tres cifras revela el recorrido desde INICIO?',
     evidence: ['Sobre de evidencias del nivel 4', 'Material de reconstrucción sin clasificar'],
     digital: 'Al plano público le falta una parte del sector de mantenimiento. Reconstruí sus conexiones antes de examinar el resto de las evidencias.',
@@ -92,7 +92,5 @@ export const microChecks = [
     { question: '¿Qué sospechosa viste trabajando con Resina RX-4?', options: ['Vera', 'Martina', 'Bruno', 'León'], correct: 1, success: 'La ficha de Martina contiene Resina RX-4. T-04 queda asociado provisionalmente con ella.' },
   ],
   [],
-  [
-    { question: '¿Qué confirma que el mecanismo está listo para calcular?', options: ['Se ven los números y ambos recorridos completos', 'Todas las líneas desaparecen', 'Las piezas forman un círculo'], correct: 0, success: 'La lectura correcta revela los valores de los recorridos IMPARES y PARES.' },
-  ],
+  [],
 ];

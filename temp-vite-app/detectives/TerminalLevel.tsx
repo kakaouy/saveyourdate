@@ -50,7 +50,7 @@ export default function TerminalLevel({unlocked,busy,message,onUnlock,onContinue
   if(await onUnlock(answer)){
    playTerminalConfirm();
    setLighting(true);
-   timer.current=setTimeout(()=>{setLighting(false);onContinue();},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:900);
+   timer.current=setTimeout(()=>{setLighting(false);setSuccess(true);},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:900);
   }else{submitted.current=false;setValidating(0);input.current?.focus();}
  }
  if(intro)return <FedeTransmission success={false} onClose={()=>{setIntro(false);requestAnimationFrame(()=>input.current?.focus());}}/>;

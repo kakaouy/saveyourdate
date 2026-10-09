@@ -17,7 +17,7 @@ export default function Briefing({agent,alreadyAccepted,onComplete}:{agent:strin
   <div className="briefing-copy briefing-compact-copy">
    <p className="eyebrow">ARCHIVO F-01 · MENSAJE URGENTE</p>
    <h1>Agente {agent},<br/>robaron el Rubí del Faro.</h1>
-   <p className="briefing-deck">Seguí las pruebas y descubrí quién cambió la gema.</p>
+   <p className="briefing-deck">Seguí las pruebas y descubrí quién cambió la gema. Fede salió hacia el faro antiguo para comprobar una teoría; la tormenta interrumpió su señal, pero dejó instrucciones para guiarte.</p>
    <div className={`transmission-receiver ${radioOpen?'is-playing':''}`}>
     <button className="transmission-trigger" onClick={toggleRadio} aria-expanded={radioOpen} aria-controls="federica-transmission"><span className="transmitter-icon"><img src="/los-archivos-f/images/transmisor-federica.png" alt=""/><i/><i/></span><span>MENSAJE DE FEDERICA<small>{radioOpen?'Ocultar transmisión':'Audio opcional · tocar para escuchar'}</small></span><b>{radioOpen?'−':'+'}</b></button>
     <div id="federica-transmission" hidden={!radioOpen} className="briefing-player"><TransmissionPlayer audioRef={audio} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setAudioFailed(true)}/></div>
