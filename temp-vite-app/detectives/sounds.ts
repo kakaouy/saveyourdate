@@ -26,6 +26,12 @@ export function playPowerSurge(){playAudioClip('/los-archivos-f/audio/terminal-c
 export function playHintChime(){const now=performance.now();if(now-lastHintChime<1400)return;lastHintChime=now;playAudioClip('/los-archivos-f/audio/hint-chime.mp3',.34);}
 export function playButtonClick(){const now=performance.now();if(now-lastButtonClick<70)return;lastButtonClick=now;playAudioClip('/los-archivos-f/audio/ui-button-press.mp3',.18,.22);}
 export function playMapUnfold(){playAudioClip('/los-archivos-f/audio/mission-map-unfold.mp3',.32,1.45);}
+export function playMapFold(){playAudioClip('/los-archivos-f/audio/mission-map-fold.mp3',.3,1.15,.15);}
+export function playAchievement(){playAudioClip('/los-archivos-f/audio/achievement-warm.mp3',.32,1.75,.05);}
+export function playSecretCollect(){playAudioClip('/los-archivos-f/audio/secret-mark-collect.mp3',.42,.86);}
+export function playHintReveal(){playAudioClip('/los-archivos-f/audio/hint-reveal.mp3',.24,1.2,.12);}
+export function playPlanPiece(){playAudioClip('/los-archivos-f/audio/level4-piece-place.mp3',.38,.44);}
+export function playPlanComplete(){playAudioClip('/los-archivos-f/audio/level4-plan-complete.mp3',.42,1.4);}
 export function playTerminalDigital(){playAudioClip('/los-archivos-f/audio/level1-digital-interface.mp3',.38,1.45);}
 export function playTerminalConfirm(){playAudioClip('/los-archivos-f/audio/level1-access-confirm.mp3',.46,1.05);}
 export function playDossierOpen(){playAudioClip('/los-archivos-f/audio/level2-file-slide.mp3',.38,.68);}

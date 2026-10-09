@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { levels } from './case';
-import { playEffect, playHintChime, playMapUnfold, playTimeBurn } from './sounds';
+import { playEffect, playHintChime, playMapFold, playMapUnfold, playTimeBurn } from './sounds';
 
 export function MissionIcon({stage}: {stage:number}) {
  const art = [
@@ -38,6 +38,7 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elaps
  const dialog=useRef<HTMLDialogElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
  const done=Math.max(0,Math.min(highestLevel-1,7));
+ const closeMap=()=>{playMapFold();setOpen(false);};
  useEffect(()=>{const openMission=()=>{playMapUnfold();setOpen(true);};window.addEventListener('archivos-f-open-mission',openMission);return()=>window.removeEventListener('archivos-f-open-mission',openMission);},[]);
  useEffect(()=>{
   if(!open)return;
@@ -47,10 +48,10 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elaps
  },[open]);
  const nodes=[{title:'La misión',number:0},...levels.map((l,i)=>({title:l.title,number:i+1})),{title:'Acusación final',number:8},{title:'Resolución',number:9}];
  return <>
-  <div className="mission-toolbar"><div className="mission-toolbar-actions"><button ref={trigger} className={`mission-icon-button ${open?'is-open':''}`} aria-expanded={open} aria-controls="mission-map" aria-haspopup="dialog" aria-label={`Misión. ${done} de 7 niveles resueltos`} onClick={()=>{if(open)playEffect('panel');else playMapUnfold();setOpen(!open);}}><img src="/los-archivos-f/images/mission-scroll.png" alt=""/><span>MISIÓN</span></button><button ref={hintsTrigger} className="toolbar-hint-lens" aria-label="Abrir pistas" aria-haspopup="dialog" aria-expanded={hintsOpen} onMouseEnter={playHintChime} onFocus={playHintChime} onClick={()=>{playEffect('panel');setHintsOpen(true);}}><img src="/los-archivos-f/images/lupa-pista.png" alt=""/><span>PISTAS</span></button></div></div>
+  <div className="mission-toolbar"><div className="mission-toolbar-actions"><button ref={trigger} className={`mission-icon-button ${open?'is-open':''}`} aria-expanded={open} aria-controls="mission-map" aria-haspopup="dialog" aria-label={`Misión. ${done} de 7 niveles resueltos`} onClick={()=>{if(open)closeMap();else{playMapUnfold();setOpen(true);}}}><img src="/los-archivos-f/images/mission-scroll.png" alt=""/><span>MISIÓN</span></button><button ref={hintsTrigger} className="toolbar-hint-lens" aria-label="Abrir pistas" aria-haspopup="dialog" aria-expanded={hintsOpen} onMouseEnter={playHintChime} onFocus={playHintChime} onClick={()=>{playEffect('panel');setHintsOpen(true);}}><img src="/los-archivos-f/images/lupa-pista.png" alt=""/><span>PISTAS</span></button></div></div>
   <div className="side-time-button" tabIndex={0} onMouseEnter={playTimeBurn} onFocus={playTimeBurn} aria-label={`Tiempo transcurrido ${formatTime(elapsedSeconds)}`} title={`Tiempo transcurrido: ${formatTime(elapsedSeconds)}`}><img src="/los-archivos-f/images/reloj-arena.png" alt=""/><span>TIEMPO</span><b>{formatTime(elapsedSeconds)}</b></div>
-  {open && <dialog ref={dialog} id="mission-map" className="mission-map" aria-labelledby="mission-map-title" onCancel={()=>setOpen(false)} onClick={e=>{if(e.target===e.currentTarget)setOpen(false);}}>
-   <div className="mission-map-paper"><header className="mission-map-heading"><div><p className="eyebrow">AGENCIA F · MAPA DE LA INVESTIGACIÓN</p><h2 id="mission-map-title">El robo del Rubí del Faro</h2></div><button className="mission-close" onClick={()=>setOpen(false)} aria-label="Cerrar menú Misión">×</button></header>
+  {open && <dialog ref={dialog} id="mission-map" className="mission-map" aria-labelledby="mission-map-title" onCancel={event=>{event.preventDefault();closeMap();}} onClick={e=>{if(e.target===e.currentTarget)closeMap();}}>
+   <div className="mission-map-paper"><header className="mission-map-heading"><div><p className="eyebrow">AGENCIA F · MAPA DE LA INVESTIGACIÓN</p><h2 id="mission-map-title">El robo del Rubí del Faro</h2></div><button className="mission-close" onClick={closeMap} aria-label="Cerrar menú Misión">×</button></header>
    <div className="mission-progress" role="progressbar" aria-label="Niveles resueltos" aria-valuemin={0} aria-valuemax={7} aria-valuenow={done}><span style={{width:`${done/7*100}%`}}/></div><p className="mission-summary">{highestLevel===9?'Caso cerrado':`${done} de 7 niveles resueltos`} · {hintsUsed} pistas usadas</p>
    <nav className="mission-path" aria-label="Niveles del caso">{nodes.map(({number,title})=>{
     const available=number<=highestLevel,completed=number>0&&(number<highestLevel||number===9&&highestLevel===9);

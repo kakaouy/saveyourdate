@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {playEffect} from './sounds';
+import {playEffect,playPlanComplete,playPlanPiece} from './sounds';
 
 const pieces=[
   {id:'A1',slot:0,start:180},{id:'A3',slot:2,start:270},{id:'B3',slot:4,start:180},
@@ -35,7 +35,9 @@ export default function LevelFourPlan({solved,busy,onSolved}:{solved:boolean;bus
       setFeedback(activePiece.slot===slot?'La posición coincide, pero la orientación no. Girá la pieza.':'Una pared o una marca queda cortada. Probá otro sector.');
       window.setTimeout(()=>setWrongSlot(null),650);return;
     }
-    playEffect('piece');const next={...placed,[slot]:activePiece.id};setPlaced(next);setActive(null);setWrongSlot(null);
+    const next={...placed,[slot]:activePiece.id};
+    if(Object.keys(next).length===12)playPlanComplete();else playPlanPiece();
+    setPlaced(next);setActive(null);setWrongSlot(null);
     setFeedback(Object.keys(next).length===12?'Plano completo. Ahora seguí el recorrido desde INICIO.':`Fragmento confirmado. Faltan ${12-Object.keys(next).length} piezas.`);
   }
 

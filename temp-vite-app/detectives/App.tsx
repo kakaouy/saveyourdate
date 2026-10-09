@@ -6,7 +6,7 @@ import HintLenses from './HintLenses';
 import Typewriter from './Typewriter';
 import MissionMap from './MissionMap';
 import LevelSideTabs from './LevelSideTabs';
-import {playButtonClick,playCameraShutter,playDossierOpen,playEffect,playEvidenceSlide,playFedeRadioBeep,playLevelComplete,playLevelTransition,playPageTurn,playPenMark,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
+import {playAchievement,playButtonClick,playCameraShutter,playDossierOpen,playEffect,playEvidenceSlide,playFedeRadioBeep,playHintReveal,playLevelComplete,playLevelTransition,playPageTurn,playPenMark,playSecretCollect,setEffectsEnabled,setStormDucked,startStormAmbience,stopStormAmbience} from './sounds';
 import FinalCaseAudio from './FinalCaseAudio';
 import PodiumAccess from './PodiumAccess';
 'use client';
@@ -171,7 +171,7 @@ const evidenceRewards=[
 const achievementNames=['OJO DE FARO','COARTADA PERFECTA','RADIOOPERADOR','CARTÓGRAFO','RASTREADOR','SEÑALERO','MENTE MECÁNICA'];
 function LevelClearOverlay({level,achievement,onClose}:{level:number;achievement?:string;onClose:()=>void}){
  const evidence=evidenceRewards[level-1];
- useEffect(()=>{const timer=window.setTimeout(playEvidenceSlide,360);return()=>window.clearTimeout(timer);},[]);
+ useEffect(()=>{const evidenceTimer=window.setTimeout(playEvidenceSlide,360);const achievementTimer=achievement?window.setTimeout(playAchievement,1050):0;return()=>{window.clearTimeout(evidenceTimer);if(achievementTimer)window.clearTimeout(achievementTimer);};},[achievement]);
  const viewBoard=()=>{onClose();window.dispatchEvent(new Event('archivos-f-open-mission'));};
  return <div className="level-clear-overlay" role="dialog" aria-modal="true" aria-label={`Evidencia ${level} verificada`}><div className="level-clear-flash"/><section className={`evidence-unlock-drawer evidence-unlock-${level}`}><div className="evidence-stamp-stage"><img className="level-clear-stamp-image" src="/los-archivos-f/images/stamp-evidence-confirmed-v1.png" alt="Agencia F · Evidencia verificada"/></div><div className="level-clear-evidence"><i aria-hidden="true">◆</i><span>{evidence.type}</span><b>{evidence.title}</b><p>{evidence.meaning}</p><small>EVIDENCIA {level}/7 · incorporada al tablero</small>{achievement&&<small>LOGRO OBTENIDO · {achievement}</small>}</div><div className="evidence-unlock-actions"><button className="reading-choice" type="button" onClick={viewBoard}>VER EN EL TABLERO</button><button className="primary-button" type="button" onClick={onClose}>CONTINUAR <span>→</span></button></div></section></div>;
 }
@@ -216,9 +216,9 @@ export default function Home() {
   const [ambientEvent,setAmbientEvent]=useState<'beam'|'shadow'|'radio'|'ruby'|''>('');
   const [marks,setMarks]=useState<number[]>(()=>{try{return JSON.parse(localStorage.getItem('archivos-f-secret-marks')||'[]') as number[];}catch{return [];}});
 
-  function unlockAchievement(name:string,show=true){
+  function unlockAchievement(name:string,show=true,withSound=true){
     try{const current=JSON.parse(localStorage.getItem('archivos-f-achievements')||'[]') as string[];if(!current.includes(name))localStorage.setItem('archivos-f-achievements',JSON.stringify([...current,name]));}catch{/* Decorative progress must not interrupt the case. */}
-    if(show){setAchievement(name);window.setTimeout(()=>setAchievement(''),9500);}
+    if(show){if(withSound)playAchievement();setAchievement(name);window.setTimeout(()=>setAchievement(''),9500);}
   }
 
   function receiveState(state: GameState) {
@@ -336,7 +336,7 @@ export default function Home() {
 
   function collectMark(){
     if(level<1||level>7||marks.includes(level))return;
-    const next=[...marks,level].sort();setMarks(next);localStorage.setItem('archivos-f-secret-marks',JSON.stringify(next));playEffect('signal');unlockAchievement(next.length===7?'GUARDIÁN DE LAS SIETE LUCES':`MARCA SECRETA ${next.length}/7`);
+    const next=[...marks,level].sort();setMarks(next);localStorage.setItem('archivos-f-secret-marks',JSON.stringify(next));playSecretCollect();unlockAchievement(next.length===7?'GUARDIÁN DE LAS SIETE LUCES':`MARCA SECRETA ${next.length}/7`,true,false);
   }
 
   function visitLevel(destination: number) {
@@ -412,7 +412,7 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function requestHint(direct=false) { return Boolean(await gameAction({action:'hint',level,direct})); }
+  async function requestHint(direct=false) { const revealed=Boolean(await gameAction({action:'hint',level,direct}));if(revealed)playHintReveal();return revealed; }
 
   async function submitFinal(event: FormEvent) {
     event.preventDefault();
