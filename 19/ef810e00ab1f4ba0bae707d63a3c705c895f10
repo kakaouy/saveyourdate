@@ -1,0 +1,37 @@
+temp-vite-app/detectives/MissionMap.tsx
+  s_ad2761a9c8222b::t_698c3a3c9299bd 64
+temp-vite-app/detectives/App.tsx
+  s_ad2761a9c8222b::t_8569bfbad24572 278,388,478,490
+  s_ad2761a9c8222b::t_7dc710e8fd1896 62,75,81,85-87
+  s_ad2761a9c8222b::t_00b1aebb124bab 509
+  s_ad2761a9c8222b::t_9ca80070c06b41 94,172,176
+  s_ad2761a9c8222b::t_7c3abed44be94b 15
+temp-vite-app/tests/detectives-access-codes.test.ts
+  s_ad2761a9c8222b::t_bcb2183784fa2d 5,7
+temp-vite-app/detectives/terminal-script.ts
+  s_ad2761a9c8222b::t_9ca80070c06b41 2
+temp-vite-app/detectives/TerminalLevel.tsx
+  s_ad2761a9c8222b::t_7c3abed44be94b 53
+temp-vite-app/detectives/Briefing.tsx
+  s_ad2761a9c8222b::t_bcb2183784fa2d 20
+temp-vite-app/api/_lib/detectives/access-codes.json
+  s_ad2761a9c8222b::t_bcb2183784fa2d 21-31
+temp-vite-app/detectives/case.ts
+  s_ad2761a9c8222b::t_7c3abed44be94b 34,95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "19ef810e00ab1f4ba0bae707d63a3c705c895f10",
+  "prompts": {},
+  "sessions": {
+    "s_ad2761a9c8222b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11e3c-6733-7631-a227-de619d6c7cf4",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
