@@ -21,8 +21,8 @@ export default function FedericaFeedback({ suspect, onClose }: { suspect: AlibiN
         <h2 id="federica-feedback-title">Revisemos esa hipótesis.</h2>
         <p className="coach-subject">Sobre la coartada de {suspect}</p>
         <blockquote>{feedback.text}</blockquote>
-        <audio controls preload="none" src={`/los-archivos-f/audio/federica-ayuda-${feedback.id}.wav`} aria-label="Escuchar la orientación de Federica" />
-        <small>Voz sintética provisoria · También podés leer el mensaje.</small>
+        <audio controls preload="metadata" src={`/los-archivos-f/audio/fede-ayuda-${feedback.id}.m4a`} aria-label="Escuchar la orientación de Federica" />
+        <small>También podés leer el mensaje.</small>
         <p className="coach-progress">Tu progreso sigue guardado. Esta orientación no consume pistas.</p>
         <button className="primary-button story-page-action coach-action" onClick={onClose} autoFocus>VOLVER A REVISAR LAS COARTADAS <span>↗</span></button>
       </div>

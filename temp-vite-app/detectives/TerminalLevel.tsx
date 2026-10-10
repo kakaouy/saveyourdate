@@ -19,7 +19,7 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
     <FedericaPortrait audioRef={audio} kind={success?'success':'intro'}/>
    </div>
    <div className="terminal-dialog-copy"><p className="terminal-dialog-kicker">AGENCIA F · TRANSMISIÓN RECUPERADA</p><div className="terminal-dialog-title-row"><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2></div>
-   <TransmissionPlayer audioRef={audio} source={success?'/los-archivos-f/audio/fede-terminal-exito-v1.wav':'/los-archivos-f/audio/fede-mision-1-principal.m4a'} title="Mensaje de Federica" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setBlocked(true)}/>
+   <TransmissionPlayer audioRef={audio} source={`/los-archivos-f/audio/fede-nivel-1-${success?'final':'inicio'}.m4a`} title="Mensaje de Federica" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setBlocked(true)}/>
    <p className="terminal-dialog-message">{success?terminalSuccess:terminalIntro}</p>
    {success&&<div className="terminal-time-sources" aria-label="Comparación de las referencias horarias"><span><small>CAPTURAS DE CÁMARA</small><b>Antes y después del corte</b></span><i aria-hidden="true">→</i><span className="confirmed"><small>RELOJ DETENIDO</small><b>19:37 · hora exacta</b></span></div>}
    {blocked&&<small>Tocá reproducir para escuchar el mensaje. También podés leerlo.</small>}

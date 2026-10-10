@@ -1,6 +1,6 @@
 import { useState, useId, type RefObject, type CSSProperties } from 'react';
 const format = (value: number) => `${Math.floor(value / 60)}:${String(Math.floor(value % 60)).padStart(2,'0')}`;
-export default function TransmissionPlayer({ audioRef, onEnded, onError, onPlaying, onProgress, source="/los-archivos-f/audio/federica-bienvenida-v3.wav", title="Escuchá el mensaje completo de Federica", speaker="Federica", footnote=true }: {
+export default function TransmissionPlayer({ audioRef, onEnded, onError, onPlaying, onProgress, source="/los-archivos-f/audio/fede-bienvenida-completa.m4a", title="Escuchá el mensaje completo de Federica", speaker="Federica", footnote=true }: {
   audioRef: RefObject<HTMLAudioElement | null>; onEnded: () => void; onError: () => void; onPlaying: (playing: boolean) => void; onProgress?: (time:number)=>void; source?:string; title?:string; speaker?:string; footnote?:boolean;
 }) {
   const id=useId();
