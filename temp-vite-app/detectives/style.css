@@ -2491,15 +2491,16 @@ body:has(.federica-feedback[open]){overflow:hidden!important}
 
 /* Las piezas físicas aparecen como referencias visuales discretas, sin
    convertirlas en instrucciones ni competir con el desafío principal. */
-.physical-clue{position:relative;z-index:4;float:right;width:clamp(104px,14vw,170px);margin:-12px 2px 12px 18px;pointer-events:none;filter:drop-shadow(0 12px 12px #0009);transform:rotate(2.5deg);animation:physical-clue-float 5.6s ease-in-out infinite alternate}
+.physical-clue{position:relative;z-index:4;float:none;width:clamp(68px,8vw,98px);margin:4px 0 14px auto;pointer-events:none;filter:drop-shadow(0 8px 8px #0009);transform:rotate(2.5deg);animation:physical-clue-float 5.6s ease-in-out infinite alternate}
 .terminal-level{position:relative}
-.physical-clue img{display:block;width:100%;max-height:145px;border:1px solid #d5b96b88;border-radius:5px;object-fit:cover;object-position:center}
-.physical-clue-envelope{position:absolute;z-index:8;right:2.2%;bottom:4%;float:none;width:clamp(96px,16vw,190px);margin:0;transform:rotate(4deg)}
-.physical-clue-envelope img{max-height:155px;object-position:center 38%}
-.physical-clue-napkin{width:clamp(92px,13vw,150px);margin-top:8px;transform:rotate(-4deg)}
-.physical-clue-filter{display:flex;float:none;width:auto;max-width:240px;margin:-58px 0 12px auto;align-items:flex-end}
-.physical-clue-filter img{width:132px;height:105px;object-fit:cover}.physical-clue-filter img+img{width:96px;height:125px;margin-left:-25px;transform:rotate(7deg)}
-.physical-clue-mechanism{width:clamp(90px,13vw,145px);margin-top:-46px}.physical-clue-mechanism img{aspect-ratio:1;max-height:none;border-radius:50%;object-fit:cover}
+.physical-clue img{display:block;width:100%;max-height:92px;border:1px solid #d5b96b88;border-radius:5px;object-fit:cover;object-position:center}
+.physical-clue-envelope{position:relative;right:auto;bottom:auto;width:clamp(72px,8vw,100px);margin:6px 0 14px auto;transform:rotate(4deg)}
+.physical-clue-envelope img{max-height:82px;border:0;object-fit:contain;object-position:center}
+.physical-clue-napkin{width:clamp(66px,7vw,88px);margin:7px 0 13px auto;transform:rotate(-4deg)}
+.physical-clue-signal-set{display:flex;width:110px;margin:6px 0 13px auto;align-items:center}.physical-clue-signal-set img{width:62px;height:62px;object-fit:contain;border:0}.physical-clue-signal-set img+img{width:58px;height:68px;margin-left:-13px;transform:rotate(7deg);animation-delay:-2.1s}
+.physical-clue-filter{display:flex;width:auto;max-width:112px;margin:2px 0 12px auto;align-items:flex-end}
+.physical-clue-filter img{width:66px;height:54px;border:0;object-fit:contain}.physical-clue-filter img+img{width:48px;height:62px;margin-left:-13px;transform:rotate(7deg)}
+.physical-clue-mechanism{width:clamp(64px,7vw,86px);margin:3px 0 12px auto}.physical-clue-mechanism img{aspect-ratio:1;max-height:none;border-radius:50%;object-fit:cover}
 @keyframes physical-clue-float{to{translate:0 -6px;rotate:-1deg}}
 .signal-interpret-grid .signal-card input{display:block;width:46px;height:42px;margin:auto;border:1px solid #d1ae61;background:#061820;color:#ffe09a;text-align:center;font:800 26px/1 monospace;text-transform:uppercase;box-sizing:border-box}
 .alibi-code-panel label{display:block;margin:8px 0 12px;color:#e9dec5;font:600 clamp(16px,2vw,21px)/1.4 Georgia,serif}.alibi-code-panel>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}.alibi-code-panel input{min-width:0;padding:13px 15px;border:1px solid #a68a52;background:#061820;color:#f3dfb0;font:700 18px monospace;letter-spacing:.06em}.alibi-code-panel small{display:block;margin-top:9px;color:#8eaaa5}
@@ -2508,11 +2509,12 @@ body:has(.federica-feedback[open]){overflow:hidden!important}
 /* En pantallas táctiles las imágenes narrativas no capturan el gesto: el
    desplazamiento vertical continúa aunque el dedo empiece sobre ellas. */
 @media(max-width:899px),(orientation:portrait){
-  .story-page-view,.story-page-view .terminal-dialog-visual,.story-page-view .level-two-success-visual,.story-page-view .level-three-story-visual,.story-page-view .late-story-visual,.story-page-view .fede-artwork,.story-page-view picture,.story-page-view img{touch-action:pan-y!important}
+  .story-page-view,.story-page-view .terminal-dialog-layout,.story-page-view .terminal-dialog-visual,.story-page-view .federica-story-scene,.story-page-view .level-two-success-visual,.story-page-view .level-three-story-visual,.story-page-view .late-story-visual,.story-page-view .fede-artwork,.story-page-view picture,.story-page-view img{touch-action:pan-y!important}
   .story-page-view .terminal-dialog-visual img,.story-page-view .level-two-success-visual img,.story-page-view .level-three-story-visual img,.story-page-view .late-story-visual img,.story-page-view .fede-artwork-loop{pointer-events:none!important}
+  .terminal-dialog.story-page-view .terminal-dialog-visual,.terminal-dialog.story-page-view .federica-story-scene,.terminal-dialog.story-page-view .fede-artwork,.terminal-dialog.story-page-view picture{pointer-events:none!important;-webkit-user-select:none!important;user-select:none!important}
   .side-time-button b{display:block!important;right:68px!important;top:20px!important}
-  .physical-clue{width:92px;margin-left:10px}.physical-clue-filter{max-width:180px;margin-top:-30px}.physical-clue-filter img{width:100px;height:82px}.physical-clue-filter img+img{width:72px;height:98px}.physical-clue-envelope{right:3%;bottom:3%;width:104px}.physical-clue-mechanism{float:none;margin:-20px 0 12px auto}
-  .physical-clue-napkin{float:none;width:82px;margin:10px auto 14px;transform:rotate(-3deg)}
+  .physical-clue{width:68px;margin:5px 0 12px auto}.physical-clue-filter{width:auto;max-width:90px;margin:4px 0 12px auto}.physical-clue-filter img{width:52px;height:44px}.physical-clue-filter img+img{width:39px;height:51px;margin-left:-9px}.physical-clue-envelope{width:72px}.physical-clue-mechanism{width:64px;margin:4px 0 12px auto}
+  .physical-clue-napkin{width:62px;margin:8px 0 12px auto;transform:rotate(-3deg)}.physical-clue-signal-set{width:90px}.physical-clue-signal-set img{width:51px;height:51px}.physical-clue-signal-set img+img{width:47px;height:56px;margin-left:-9px}
   .alibi-code-panel>div{grid-template-columns:1fr}.alibi-code-panel .unlock-button{width:100%}
 }
 @media(prefers-reduced-motion:reduce){.physical-clue{animation:none}}
