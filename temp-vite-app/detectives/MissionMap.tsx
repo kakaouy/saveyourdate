@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { levels } from './case';
-import { playEvidenceBoardLock, playEvidenceCardHover, playHintChime, playMapFold, playMapUnfold, playTimeBurn } from './sounds';
+import { playEvidenceBoardLock, playEvidenceCardHover, playHintChime, playMapFold, playMapUnfold, playResourceBurn, playTimeBurn } from './sounds';
 
 export function MissionIcon({stage}: {stage:number}) {
  const art = [
@@ -37,12 +37,14 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elaps
  const [chainHighlighted,setChainHighlighted]=useState(false);
  const [timeVisible,setTimeVisible]=useState(false);
  const timeHideTimer=useRef<number|null>(null);
+ const [resourceVisible,setResourceVisible]=useState(false);
+ const resourceHideTimer=useRef<number|null>(null);
  const [selectedConclusion,setSelectedConclusion]=useState<number|null>(null);
  const hintsDialog=useRef<HTMLDialogElement>(null);
  const hintsTrigger=useRef<HTMLButtonElement>(null);
  const boardDialog=useRef<HTMLDialogElement>(null);
  const boardTrigger=useRef<HTMLButtonElement>(null);
- useEffect(()=>()=>{if(timeHideTimer.current!==null)window.clearTimeout(timeHideTimer.current);},[]);
+ useEffect(()=>()=>{if(timeHideTimer.current!==null)window.clearTimeout(timeHideTimer.current);if(resourceHideTimer.current!==null)window.clearTimeout(resourceHideTimer.current);},[]);
  useEffect(()=>{if(!hintsOpen)return;hintsDialog.current?.showModal();const before=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{hintsDialog.current?.close();document.body.style.overflow=before;hintsTrigger.current?.focus();};},[hintsOpen]);
  useEffect(()=>{if(!boardOpen)return;boardDialog.current?.showModal();const before=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{boardDialog.current?.close();document.body.style.overflow=before;boardTrigger.current?.focus();};},[boardOpen]);
  const dialog=useRef<HTMLDialogElement>(null);
@@ -60,9 +62,21 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elaps
   return ()=>{cancelAnimationFrame(frame);dialog.current?.close();document.body.style.overflow=before;trigger.current?.focus();};
  },[open]);
  const nodes=[{title:'La misión',number:0},...levels.map((l,i)=>({title:l.title,number:i+1})),{title:'Acusación final',number:8},{title:'Resolución',number:9}];
+ const resources:Record<number,{src?:string;alt:string;available:boolean}>={
+  1:{src:'/los-archivos-f/images/material-nivel1-sobre-fotos.png',alt:'Sobre confidencial y fotografías',available:true},
+  2:{alt:'Recurso físico bloqueado',available:false},
+  3:{src:'/los-archivos-f/images/material-nivel3-servilleta.png',alt:'Servilleta manuscrita',available:true},
+  4:{alt:'Recurso físico bloqueado',available:false},
+  5:{src:'/los-archivos-f/images/material-nivel5-filtros.png',alt:'Filtros rojos del museo',available:true},
+  6:{src:'/los-archivos-f/images/nivel6-disco-pulpo.webp',alt:'Círculo del pulpo',available:true},
+  7:{src:'/los-archivos-f/images/material-nivel5-fragmento-senales.png',alt:'Pieza naranja de señales',available:true},
+ };
+ const resource=resources[level];
+ const showResourceMessage=()=>{playResourceBurn();setResourceVisible(true);if(resourceHideTimer.current!==null)window.clearTimeout(resourceHideTimer.current);resourceHideTimer.current=window.setTimeout(()=>setResourceVisible(false),2000);};
  return <>
   <div className="mission-toolbar"><div className="mission-toolbar-actions"><button ref={trigger} className={`mission-icon-button ${open?'is-open':''}`} aria-expanded={open} aria-controls="mission-map" aria-haspopup="dialog" aria-label={`Misión. ${done} de 7 niveles resueltos`} onMouseEnter={playEvidenceCardHover} onFocus={playEvidenceCardHover} onClick={()=>{if(open)closeMap();else{playMapUnfold();setOpen(true);}}}><img src="/los-archivos-f/images/mission-scroll.png" alt=""/><span>MISIÓN</span></button><button ref={hintsTrigger} className="toolbar-hint-lens" aria-label="Abrir pistas" aria-haspopup="dialog" aria-expanded={hintsOpen} onMouseEnter={playHintChime} onFocus={playHintChime} onClick={()=>{playHintChime();setHintsOpen(true);}}><img src="/los-archivos-f/images/lupa-pista.png" alt=""/><span>PISTAS</span></button><button ref={boardTrigger} className="toolbar-evidence-board" aria-label={`Abrir tablero de evidencias. ${done} de 7 confirmadas`} aria-haspopup="dialog" aria-expanded={boardOpen} onMouseEnter={playEvidenceBoardLock} onFocus={playEvidenceBoardLock} onClick={()=>{playEvidenceBoardLock();setBoardOpen(true);}}><img src="/los-archivos-f/images/tablero-evidencias-candado.png" alt=""/><span>TABLERO</span></button></div></div>
   <button type="button" className={`side-time-button ${timeVisible?'is-time-visible':''}`} aria-expanded={timeVisible} onMouseEnter={()=>{playTimeBurn();setTimeVisible(true);}} onMouseLeave={()=>setTimeVisible(false)} onFocus={()=>{playTimeBurn();setTimeVisible(true);}} onBlur={()=>setTimeVisible(false)} onClick={()=>{playTimeBurn();setTimeVisible(true);if(timeHideTimer.current!==null)window.clearTimeout(timeHideTimer.current);timeHideTimer.current=window.setTimeout(()=>setTimeVisible(false),3200);}} aria-label={`Tiempo transcurrido ${formatTime(elapsedSeconds)}`} title={`Tiempo transcurrido: ${formatTime(elapsedSeconds)}`}><img src="/los-archivos-f/images/reloj-arena.png" alt=""/><span>TIEMPO</span><b aria-live="polite">{formatTime(elapsedSeconds)}</b></button>
+  {resource&&<button type="button" className={`side-resource-button ${resource.available?'is-available':'is-locked'} ${resourceVisible?'is-message-visible':''}`} aria-label={resource.available?`Recurso físico: ${resource.alt}`:'No se necesita recurso físico en este nivel'} onClick={showResourceMessage}>{resource.src?<img src={resource.src} alt=""/>:<span className="resource-lock" aria-hidden="true">⌑</span>}<small>RECURSO</small><b aria-live="polite">{resource.available?'RECURSO FÍSICO':'NO SE NECESITA'}</b></button>}
   {open && <dialog ref={dialog} id="mission-map" className="mission-map" aria-labelledby="mission-map-title" onCancel={event=>{event.preventDefault();closeMap();}} onClick={e=>{if(e.target===e.currentTarget)closeMap();}}>
    <div className="mission-map-paper"><header className="mission-map-heading"><div><p className="eyebrow">AGENCIA F · MAPA DE LA INVESTIGACIÓN</p><h2 id="mission-map-title">El robo del Rubí del Faro</h2></div><button className="mission-close" onClick={closeMap} aria-label="Cerrar menú Misión">×</button></header>
    <div className="mission-progress" role="progressbar" aria-label="Niveles resueltos" aria-valuemin={0} aria-valuemax={7} aria-valuenow={done}><span style={{width:`${done/7*100}%`}}/></div><p className="mission-summary">{highestLevel===9?'Caso cerrado':`${done} de 7 niveles resueltos`} · {hintsUsed} pistas usadas</p>

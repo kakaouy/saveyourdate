@@ -11,6 +11,7 @@ let stormLoop: HTMLAudioElement | null = null;
 let lastHintChime = 0;
 let lastButtonClick = 0;
 let lastTimeBurn = 0;
+let lastResourceBurn = 0;
 let lastMapPaper = 0;
 let lastEvidenceCard = 0;
 let lastEvidenceBoardLock = 0;
@@ -61,6 +62,7 @@ export function playEvidenceSlide(){playAudioClip('/los-archivos-f/audio/evidenc
 export function playEvidenceCardHover(){const now=performance.now();if(now-lastEvidenceCard<240)return;lastEvidenceCard=now;playAudioClip('/los-archivos-f/audio/evidence-card-hover.mp3',.22,.58,.04);}
 export function playEvidenceBoardLock(){const now=performance.now();if(now-lastEvidenceBoardLock<1200)return;lastEvidenceBoardLock=now;playAudioClip('/los-archivos-f/audio/evidence-board-lock-open.mp3',.3,1.45,.04);}
 export function playTimeBurn(){const now=performance.now();if(now-lastTimeBurn<5000)return;lastTimeBurn=now;playAudioClip('/los-archivos-f/audio/time-burning-bubbles.mp3',.24,1.65,1.1);}
+export function playResourceBurn(){const now=performance.now();if(now-lastResourceBurn<900)return;lastResourceBurn=now;playAudioClip('/los-archivos-f/audio/time-burning-bubbles.mp3',.24,1.65,1.1);}
 
 export function startOpeningMusic(){
   if(typeof Audio==='undefined')return;
