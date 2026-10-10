@@ -21,9 +21,10 @@ function FedeTransmission({success,onClose}:{success:boolean;onClose:()=>void}) 
    <div className="terminal-dialog-copy"><p className="terminal-dialog-kicker">AGENCIA F · TRANSMISIÓN RECUPERADA</p><div className="terminal-dialog-title-row"><h2 id="terminal-fede-title">{success?'Acceso recuperado.':'Agente, necesito tu ayuda.'}</h2></div>
    <TransmissionPlayer audioRef={audio} source={`/los-archivos-f/audio/fede-terminal-${success?'exito':'inicio'}-v1.wav`} title="Mensaje de Federica" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setBlocked(true)}/>
    <p className="terminal-dialog-message">{success?terminalSuccess:terminalIntro}</p>
+   {success&&<div className="terminal-time-sources" aria-label="Comparación de las referencias horarias"><span><small>CAPTURAS DE CÁMARA</small><b>Antes y después del corte</b></span><i aria-hidden="true">→</i><span className="confirmed"><small>RELOJ DETENIDO</small><b>19:37 · hora exacta</b></span></div>}
    {blocked&&<small>Tocá reproducir para escuchar el mensaje. También podés leerlo.</small>}
    </div>
-   <button className="primary-button terminal-dialog-action story-visual-action story-page-action" onClick={onClose} autoFocus>{success?'CONTINUAR':'COMENZAR LA MISIÓN'} →</button>
+   <button className="primary-button terminal-dialog-action story-visual-action story-page-action" onClick={onClose} autoFocus>{success?'CONTINUAR AL NIVEL 2':'COMENZAR LA MISIÓN'} →</button>
   </div>
  </section>;
 }
@@ -36,6 +37,7 @@ export default function TerminalLevel({unlocked,busy,message,deferSuccess,onUnlo
  const [success,setSuccess]=useState(false);
  const [validating,setValidating]=useState(0);
  const [powerSurge,setPowerSurge]=useState(false);
+ const [invalidAnswer,setInvalidAnswer]=useState(false);
  const timer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined);
  const submitted=useRef(false);
  const input=useRef<HTMLInputElement>(null);
@@ -51,7 +53,7 @@ export default function TerminalLevel({unlocked,busy,message,deferSuccess,onUnlo
    playTerminalConfirm();
    setLighting(true);
    timer.current=setTimeout(()=>{setLighting(false);setSuccess(true);},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:900);
-  }else{submitted.current=false;setValidating(0);input.current?.focus();}
+  }else{submitted.current=false;setValidating(0);setInvalidAnswer(true);input.current?.focus();}
  }
  if(intro)return <FedeTransmission success={false} onClose={()=>{setIntro(false);requestAnimationFrame(()=>input.current?.focus());}}/>;
  if(success&&!deferSuccess)return <FedeTransmission success onClose={()=>{setSuccess(false);onContinue();}}/>;
@@ -66,13 +68,13 @@ export default function TerminalLevel({unlocked,busy,message,deferSuccess,onUnlo
    {lightOn&&<span className="terminal-lamp-pulse" aria-hidden="true"/>}<span className="terminal-scanlines" aria-hidden="true"/>
    {powered&&<form className="terminal-screen" onSubmit={submit}>
     <h1>{unlocked?'ACCESO RECUPERADO':'RECUPERACIÓN DE ACCESO'}</h1>
-    {!unlocked?<><label htmlFor="terminal-answer">Instante de interrupción</label><input ref={input} id="terminal-answer" inputMode="numeric" value={answer} onChange={event=>{const next=event.target.value.replace(/\D/g,'').slice(0,4);if(next.length>answer.length)playKeyboardKey();setAnswer(next);}} placeholder="____" maxLength={4} autoComplete="off" disabled={validating>0}/>{validating>0&&<span className="terminal-digit-validation" role="status" aria-live="polite">{answer.split('').map((digit,index)=><i className={index<validating?'confirmed':''} key={`${digit}-${index}`}>{digit}{index<validating&&<b>✓</b>}</i>)}</span>}<button type="submit" disabled={busy||validating>0||answer.length!==4}>{validating>0?`VALIDANDO ${validating}/4…`:busy?'VERIFICANDO…':'RECUPERAR ACCESO'}</button></>:<p className="terminal-confirmed-result">CORTE CONFIRMADO · 19:37</p>}
+    {!unlocked?<><label htmlFor="terminal-answer">Instante de interrupción</label><input ref={input} className={invalidAnswer?'terminal-answer-error':''} id="terminal-answer" inputMode="numeric" value={answer} onChange={event=>{const next=event.target.value.replace(/\D/g,'').slice(0,4);setInvalidAnswer(false);if(next.length>answer.length)playKeyboardKey();if(next.length===4&&answer.length<4)playEffect('piece');setAnswer(next);}} placeholder="____" maxLength={4} autoComplete="off" disabled={validating>0}/>{answer.length===4&&!invalidAnswer&&validating===0&&<small className="terminal-ready-state">MECANISMO PREPARADO · verificá la hora</small>}{validating>0&&<span className="terminal-digit-validation" role="status" aria-live="polite">{answer.split('').map((digit,index)=><i className={index<validating?'confirmed':''} key={`${digit}-${index}`}>{digit}{index<validating&&<b>✓</b>}</i>)}</span>}<button type="submit" disabled={busy||validating>0||answer.length!==4}>{validating>0?`VALIDANDO ${validating}/4…`:busy?'VERIFICANDO…':'VERIFICAR RESPUESTA'}</button></>:<p className="terminal-confirmed-result">CORTE CONFIRMADO · 19:37</p>}
     <span className="terminal-command-cursor" aria-hidden="true">▌</span>
    </form>}
    <button type="button" className="terminal-power-button" aria-label={powered?'Apagar computadora':'Encender computadora'} aria-pressed={powered} onClick={()=>{playEffect('panel');setPowered(current=>{const next=!current;setLightOn(next);if(next){playPowerSurge();playLampBuzz();setPowerSurge(true);window.setTimeout(()=>setPowerSurge(false),650);requestAnimationFrame(()=>input.current?.focus());}return next;});}}><span className="sr-only">{powered?'Apagar':'Encender'}</span></button>
   </div>
   {message&&!unlocked&&<p className="terminal-error" role="status">{message}</p>}
-  {unlocked&&!lighting&&<button className="primary-button" onClick={onContinue}>CONTINUAR LA INVESTIGACIÓN →</button>}
+  {unlocked&&!lighting&&<button className="primary-button" onClick={onContinue}>CONTINUAR AL NIVEL 2 →</button>}
   <LevelSideTabs level={1} prompt="" placeholder="" answer={answer} busy={busy||lighting} unlocked={unlocked} canUnlock={false} message={message} missionMessageOpen={intro||success} onAnswer={setAnswer} onReplay={()=>setIntro(true)} onUnlock={submit} showUnlock={false}/>
  </section>;
 }

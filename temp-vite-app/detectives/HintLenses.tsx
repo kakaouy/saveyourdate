@@ -37,6 +37,6 @@ export default function HintLenses({hints, used, busy, canRequest, onRequest,onR
     })}
     <div className="hint-popover" style={{'--hint-index':active ?? 0} as CSSProperties} aria-live="polite" aria-atomic="true">{active !== null && consulted.includes(active) && <aside id="hint-parchment" className={`hint-parchment ${active===hints.length-1?'solution-parchment':''}`}><span>AGENCIA F · {active===hints.length-1?'SOLUCIÓN DIRECTA':`PISTA ${active+1}`}</span><p>{hints[active]}</p><button aria-label="Cerrar pista" onClick={()=>setActive(null)}>×</button></aside>}</div></div>
     {canRequest&&used<hints.length-1&&<button type="button" className="hint-direct-solution" disabled={busy} onClick={()=>void revealSolution()}>Necesito la solución directa</button>}
-    <p className="hint-lenses-help">Podés avanzar pista por pista o registrar las restantes para ver la solución directa. Toda pista consultada influye en el podio.</p>
+    <p className="hint-lenses-help">Las pistas van de observación a procedimiento. Usarlas puede cambiar tu rango final, pero nunca bloquea el caso. Las ya consultadas no vuelven a contabilizarse.</p>
   </section>;
 }

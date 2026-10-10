@@ -12,10 +12,10 @@ export default function Briefing({agent,alreadyAccepted,onComplete}:{agent:strin
  }
  return <section className="briefing-page discovery-briefing briefing-compact">
   <div className="briefing-left">
-   <figure className="federica-scene"><div className="federica-scene-visual transmitter-story-frames"><picture><source media="(prefers-reduced-motion: reduce)" srcSet="/los-archivos-f/images/federica-transmisor-frame-1.png"/><img className="transmitter-story-loop" src="/los-archivos-f/images/federica-transmisor-loop.webp" alt="Federica espera en el archivo del faro con una radio"/></picture><button className="scene-hotspot radio-hotspot" onClick={toggleRadio} aria-expanded={radioOpen} aria-controls="federica-transmission"><span>◉</span> {radioOpen?'Cerrar radio':'Sintonizar radio'}</button></div><figcaption><span className="signal-dot"/> CONTACTO ESTABLECIDO <b>FEDERICA · AGENCIA F</b></figcaption></figure>
+   <figure className="federica-scene"><div className="federica-scene-visual transmitter-story-frames"><picture><source media="(prefers-reduced-motion: reduce)" srcSet="/los-archivos-f/images/federica-transmisor-frame-1.png"/><img className="transmitter-story-loop" src="/los-archivos-f/images/federica-transmisor-loop.webp" alt="Federica espera en el archivo del faro con una radio"/></picture><button className="scene-hotspot radio-hotspot" onClick={toggleRadio} aria-expanded={radioOpen} aria-controls="federica-transmission"><span>◉</span> {radioOpen?'Cerrar mensaje':'Reproducir mensaje'}</button></div><figcaption><span className="signal-dot"/> TRANSMISIÓN RECUPERADA <b>FEDERICA · AGENCIA F</b></figcaption></figure>
   </div>
   <div className="briefing-copy briefing-compact-copy">
-   <p className="eyebrow">ARCHIVO F-01 · MENSAJE URGENTE</p>
+   <p className="eyebrow">ARCHIVO F-01 · TRANSMISIÓN RECUPERADA</p>
    <h1>Agente {agent},<br/>robaron el Rubí del Faro.</h1>
    <p className="briefing-deck">Seguí las pruebas y descubrí quién cambió la gema. Fede salió hacia el faro antiguo para comprobar una teoría; la tormenta interrumpió su señal, pero dejó instrucciones para guiarte.</p>
    <div className={`transmission-receiver ${radioOpen?'is-playing':''}`}>

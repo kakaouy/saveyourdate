@@ -4,20 +4,23 @@ let context: AudioContext | null = null;
 let lastTypeAt = 0;
 let effectsEnabled = true;
 let stormEnabled = false;
-let stormSource: AudioBufferSourceNode | null = null;
-let stormGain: GainNode | null = null;
 let thunderTimer: number | null = null;
+let stormWatchdog: number | null = null;
 let openingMusic: HTMLAudioElement | null = null;
+let stormLoop: HTMLAudioElement | null = null;
 let lastHintChime = 0;
 let lastButtonClick = 0;
 let lastTimeBurn = 0;
 let lastMapPaper = 0;
 let lastEvidenceCard = 0;
+let lastEvidenceBoardLock = 0;
+let lastAudioClipAt = 0;
 
 export function setEffectsEnabled(enabled: boolean) { effectsEnabled = enabled; }
 
 function playAudioClip(source:string,volume:number,duration?:number,startAt=0) {
   if (!effectsEnabled || typeof Audio === 'undefined') return;
+  lastAudioClipAt=performance.now();
   const audio=new Audio(source);audio.volume=volume;audio.preload='auto';
   try{audio.currentTime=startAt;}catch{/* Metadata can arrive after playback starts. */}
   void audio.play().catch(()=>{});
@@ -31,7 +34,7 @@ function playAudioClip(source:string,volume:number,duration?:number,startAt=0) {
 export function playKeyboardKey(){playAudioClip('/los-archivos-f/audio/terminal-keyboard.mp3',.42,.16,Math.random()*.9);}
 export function playPowerSurge(){playAudioClip('/los-archivos-f/audio/terminal-crt-startup.mp3',.5,3.2);playAudioClip('/los-archivos-f/audio/level1-electric-zap.mp3',.5,.75);window.setTimeout(()=>playAudioClip('/los-archivos-f/audio/terminal-power.mp3',.34,.7),180);}
 export function playHintChime(){const now=performance.now();if(now-lastHintChime<1400)return;lastHintChime=now;playAudioClip('/los-archivos-f/audio/hint-chime.mp3',.34);}
-export function playButtonClick(){const now=performance.now();if(now-lastButtonClick<70)return;lastButtonClick=now;playAudioClip('/los-archivos-f/audio/ui-button-press.mp3',.18,.22);}
+export function playButtonClick(){const now=performance.now();if(now-lastButtonClick<70||now-lastAudioClipAt<90)return;lastButtonClick=now;playAudioClip('/los-archivos-f/audio/ui-button-press.mp3',.18,.22);}
 export function playMapUnfold(){const now=performance.now();if(now-lastMapPaper<1100)return;lastMapPaper=now;playAudioClip('/los-archivos-f/audio/mission-map-unfold.mp3',.32,1.45);}
 export function playMapFold(){playAudioClip('/los-archivos-f/audio/mission-map-fold.mp3',.3,1.15,.15);}
 export function playAchievement(){playAudioClip('/los-archivos-f/audio/achievement-warm.mp3',.32,1.75,.05);}
@@ -56,6 +59,7 @@ export function playLevelTransition(){playAudioClip('/los-archivos-f/audio/cross
 export function playFedeRadioBeep(){playAudioClip('/los-archivos-f/audio/fede-radio-beep.mp3',.3,.52);}
 export function playEvidenceSlide(){playAudioClip('/los-archivos-f/audio/evidence-paper-slide.mp3',.38,.84);}
 export function playEvidenceCardHover(){const now=performance.now();if(now-lastEvidenceCard<240)return;lastEvidenceCard=now;playAudioClip('/los-archivos-f/audio/evidence-card-hover.mp3',.22,.58,.04);}
+export function playEvidenceBoardLock(){const now=performance.now();if(now-lastEvidenceBoardLock<1200)return;lastEvidenceBoardLock=now;playAudioClip('/los-archivos-f/audio/evidence-board-lock-open.mp3',.3,1.45,.04);}
 export function playTimeBurn(){const now=performance.now();if(now-lastTimeBurn<5000)return;lastTimeBurn=now;playAudioClip('/los-archivos-f/audio/time-burning-bubbles.mp3',.24,1.65,1.1);}
 
 export function startOpeningMusic(){
@@ -73,22 +77,6 @@ function audioContext() {
   return context;
 }
 
-function makeRainBuffer(ctx: AudioContext) {
-  const seconds = 7;
-  const buffer = ctx.createBuffer(2, ctx.sampleRate * seconds, ctx.sampleRate);
-  for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
-    const data = buffer.getChannelData(channel);
-    let previous = 0;
-    for (let index = 0; index < data.length; index += 1) {
-      const white = Math.random() * 2 - 1;
-      previous = previous * 0.82 + white * 0.18;
-      const drop = Math.random() < 0.0007 ? (Math.random() * 2 - 1) * 0.55 : 0;
-      data[index] = previous * 0.44 + white * 0.09 + drop;
-    }
-  }
-  return buffer;
-}
-
 function fadeAndStop(audio:HTMLAudioElement,totalMs:number,fadeMs:number) {
   const initialVolume=audio.volume;
   const fadeStart=window.setTimeout(()=>{
@@ -103,67 +91,55 @@ function fadeAndStop(audio:HTMLAudioElement,totalMs:number,fadeMs:number) {
   audio.addEventListener('ended',()=>window.clearTimeout(fadeStart),{once:true});
 }
 
-function playThunder(ctx: AudioContext) {
-  if (!stormEnabled || ctx.state !== 'running') return;
+function flashLightning() {
+  if (!stormEnabled) return;
   const strength = Math.pow(Math.random(), 0.72);
   const intensity = 0.28 + strength * 0.72;
   const side = Math.random()<.5?'left':'right';
-  const close=strength>.58;
-  const thunder=new Audio(close?'/los-archivos-f/audio/thunder-clap.mp3':'/los-archivos-f/audio/thunder-rumble.mp3');
-  thunder.preload='auto';
-  thunder.volume=close?Math.min(1,.76+strength*.22):Math.min(1,.62+strength*.28);
-  thunder.playbackRate=.94+Math.random()*.1;
-  void thunder.play().catch(()=>{});
-  fadeAndStop(thunder,close?2300:3600,close?850:1400);
   window.dispatchEvent(new CustomEvent('archivos-f-thunder', {detail:{intensity,side}}));
 }
 
-function scheduleThunder(ctx: AudioContext, first = false) {
+function scheduleLightning(first = false) {
   if (thunderTimer !== null) window.clearTimeout(thunderTimer);
   if (!stormEnabled) return;
   thunderTimer = window.setTimeout(() => {
-    playThunder(ctx);
-    scheduleThunder(ctx);
-  }, first ? 7000 + Math.random() * 9000 : 18000 + Math.random() * 27000);
+    flashLightning();
+    scheduleLightning();
+  }, first ? 3500 + Math.random() * 4500 : 14000 + Math.random() * 14000);
 }
 
 export function startStormAmbience() {
-  const ctx = audioContext();
-  if (!ctx) return;
+  if(typeof Audio==='undefined')return;
   const wasEnabled = stormEnabled;
   stormEnabled = true;
-  if (!stormSource) {
-    const source = ctx.createBufferSource();
-    source.buffer = makeRainBuffer(ctx);
-    source.loop = true;
-    const high = ctx.createBiquadFilter();
-    high.type = 'highpass';
-    high.frequency.value = 420;
-    const low = ctx.createBiquadFilter();
-    low.type = 'lowpass';
-    low.frequency.value = 7200;
-    const gain = ctx.createGain();
-    gain.gain.value = 0.12;
-    source.connect(high).connect(low).connect(gain).connect(ctx.destination);
-    source.start();
-    stormSource = source;
-    stormGain = gain;
+  if(!stormLoop){
+    stormLoop=new Audio('/los-archivos-f/audio/storm-loop.mp3');
+    stormLoop.addEventListener('ended',()=>{
+      if(!stormEnabled||!stormLoop)return;
+      stormLoop.currentTime=0;
+      void stormLoop.play().catch(()=>{});
+    });
   }
-  if (stormGain) stormGain.gain.setTargetAtTime(0.12, ctx.currentTime, 0.35);
-  if (!wasEnabled || thunderTimer === null) scheduleThunder(ctx, true);
+  stormLoop.loop=true;stormLoop.preload='auto';stormLoop.volume=.42;
+  void stormLoop.play().catch(()=>{});
+  // Algunos navegadores suspenden un <audio loop> al cambiar de vista o tras
+  // varios minutos. Este control conserva la tormenta activa sin superponer
+  // nuevas instancias ni reiniciar el sonido mientras sigue reproduciéndose.
+  if(stormWatchdog===null)stormWatchdog=window.setInterval(()=>{
+    if(!stormEnabled||!stormLoop||!stormLoop.paused)return;
+    if(stormLoop.ended||stormLoop.currentTime>=Math.max(0,stormLoop.duration-.12))stormLoop.currentTime=0;
+    void stormLoop.play().catch(()=>{});
+  },1500);
+  if (!wasEnabled || thunderTimer === null) scheduleLightning(true);
 }
 
 export function stopStormAmbience() {
   stormEnabled = false;
   if (thunderTimer !== null) window.clearTimeout(thunderTimer);
   thunderTimer = null;
-  const ctx = context;
-  if (ctx && stormGain) stormGain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.25);
-}
-
-export function setStormDucked(ducked: boolean) {
-  if (!context || !stormGain || !stormEnabled) return;
-  stormGain.gain.setTargetAtTime(ducked ? 0.035 : 0.12, context.currentTime, 0.3);
+  if(stormWatchdog!==null)window.clearInterval(stormWatchdog);
+  stormWatchdog=null;
+  if(stormLoop){stormLoop.pause();stormLoop.currentTime=0;}
 }
 
 function tone(ctx: AudioContext, frequency: number, start: number, duration: number, volume: number, kind: OscillatorType = 'sine') {
