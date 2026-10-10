@@ -1,0 +1,63 @@
+temp-vite-app/tests/detectives.test.ts
+  s_ad2761a9c8222b::t_6ea41e1c9012ff 59-60
+temp-vite-app/detectives/TerminalLevel.tsx
+  s_ad2761a9c8222b::t_621ac30b65b7f4 66
+  s_ad2761a9c8222b::t_6ea41e1c9012ff 64
+temp-vite-app/detectives/HintLenses.tsx
+  s_ad2761a9c8222b::t_525547eda6ec1a 4-5,38
+temp-vite-app/detectives/MissionMap.tsx
+  s_ad2761a9c8222b::t_621ac30b65b7f4 39,65
+  s_ad2761a9c8222b::t_6ea41e1c9012ff 45
+  s_ad2761a9c8222b::t_869bc671db8ba3 54
+temp-vite-app/detectives/LightSignal.tsx
+  s_ad2761a9c8222b::t_ba93b0638cd5e5 23,31-33,37-39,41
+temp-vite-app/detectives/case.ts
+  s_ad2761a9c8222b::t_621ac30b65b7f4 19,29
+temp-vite-app/detectives/App.tsx
+  s_ad2761a9c8222b::t_0142549a3c860c 144
+  s_ad2761a9c8222b::t_5c420cc1dafda2 254-257
+  s_ad2761a9c8222b::t_6d6cb4c0f5fdfe 60,95,331,427
+  s_ad2761a9c8222b::t_621ac30b65b7f4 636
+  s_ad2761a9c8222b::t_31a07428a71c67 243,248-249,251,258
+  s_ad2761a9c8222b::t_31f8e69b109f7e 641
+  s_ad2761a9c8222b::t_21f5d420adbf01 596
+  s_ad2761a9c8222b::t_1601bef5371144 247,656
+  s_ad2761a9c8222b::t_6ea41e1c9012ff 145
+  s_ad2761a9c8222b::t_fdf11e90cf802c 252-253
+  s_ad2761a9c8222b::t_999c85b70b1445 466
+  s_ad2761a9c8222b::t_869bc671db8ba3 550
+  s_ad2761a9c8222b::t_9a24a7b35ef874 250,260-262,291
+  s_ad2761a9c8222b::t_525547eda6ec1a 546-549,551-552,619
+  s_ad2761a9c8222b::t_f969152bcc4280 103
+  s_ad2761a9c8222b::t_d05769c6f16aaf 292,580,655
+  s_ad2761a9c8222b::t_01515ec9f2ce74 259
+temp-vite-app/detectives/style.css
+  s_ad2761a9c8222b::t_135378b6ed0a64 2603-2606
+  s_ad2761a9c8222b::t_6d4b05c754f94a 2482,2490-2494,2496-2514,2516-2518
+  s_ad2761a9c8222b::t_6ea41e1c9012ff 2495
+  s_ad2761a9c8222b::t_a83c6617e85be6 2541
+  s_ad2761a9c8222b::t_525547eda6ec1a 2433
+  s_ad2761a9c8222b::t_64cd3254e262ab 2532,2538,2540,2543-2544
+  s_ad2761a9c8222b::t_b2e8588c650524 2515
+  s_ad2761a9c8222b::t_1e1fe11072f3ad 2539,2542
+  s_ad2761a9c8222b::t_8b2f7ed34184b8 2597-2602,2607-2618
+  s_ad2761a9c8222b::t_38574f15431593 2545
+temp-vite-app/tests/detectives-alibis.test.ts
+  s_ad2761a9c8222b::t_b2e8588c650524 15-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "340b79da8032529f976e4c01e7545bdc7190c7a2",
+  "prompts": {},
+  "sessions": {
+    "s_ad2761a9c8222b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11e3c-6733-7631-a227-de619d6c7cf4",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
