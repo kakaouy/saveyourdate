@@ -1,0 +1,22 @@
+temp-vite-app/vite.config.ts
+  s_ad2761a9c8222b::t_901c1633c095b3 6,9-14,28-29,32-58,68-69,75,77-78,83,85,90
+  s_ad2761a9c8222b::t_2558226c045769 71
+  s_ad2761a9c8222b::t_5291ee404fb588 1-4,7,15-27,30-31,59-67,70,72-74,76,79-82,84,86-89,91-95,99
+  s_ad2761a9c8222b::t_70ea1fadecf31c 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "789790a4c0737c0ff954fb1c5b5e904f56614a62",
+  "prompts": {},
+  "sessions": {
+    "s_ad2761a9c8222b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11e3c-6733-7631-a227-de619d6c7cf4",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
