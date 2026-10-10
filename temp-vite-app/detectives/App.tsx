@@ -262,6 +262,11 @@ function BirthdayCredits({onClose}:{onClose:()=>void}){
  return <section className="birthday-epilogue birthday-credits-screen" aria-labelledby="birthday-epilogue-title"><div className="birthday-epilogue-copy"><img className="birthday-logo" src="/los-archivos-f/images/logo-archivos-f.png" alt="Los Archivos F"/><p className="eyebrow">AGENCIA F · MENSAJE DE FEDE</p><h1 id="birthday-epilogue-title">¡Gracias por haber compartido mi cumple y esta experiencia conmigo!</h1><p>Ojalá que nos volvamos a encontrar en otra misión.</p><div className="birthday-credits" aria-label="Créditos"><strong>FEDE PACIEL</strong><span>11 AÑOS</span><span>10 DE OCTUBRE 2026</span><b>LOS ARCHIVOS F</b></div><button className="primary-button" type="button" onClick={onClose}>CERRAR TRANSMISIÓN <span>→</span></button></div></section>;
 }
 
+const progressStorageKey=(kind:'achievements'|'secret-marks',code:string)=>`archivos-f-${kind}:${code.trim().toUpperCase()}`;
+const storedAccessCode=()=>{try{return localStorage.getItem('archivos-f-active-code')||'';}catch{return '';}};
+const storedAchievements=(code:string)=>{if(!code)return [];try{return normalizeAchievements(JSON.parse(localStorage.getItem(progressStorageKey('achievements',code))||'[]'));}catch{return [];}};
+const storedMarks=(code:string)=>{if(!code)return [];try{const saved:unknown=JSON.parse(localStorage.getItem(progressStorageKey('secret-marks',code))||'[]');if(!Array.isArray(saved))return [];return [...new Set(saved.filter((value):value is number=>Number.isInteger(value)&&value>=1&&value<=7))].sort((a,b)=>a-b);}catch{return [];}};
+
 export default function Home() {
   const [screen, setScreen] = useState<Screen>('home');
   const [showAccess, setShowAccess] = useState(false);
@@ -276,6 +281,7 @@ export default function Home() {
   const elapsedRef=useRef(0);
   const [saveStatus, setSaveStatus] = useState('');
   const legacyRef = useRef<(Partial<GameState> & { code?: string }) | null>(null);
+  const activeCodeRef=useRef(storedAccessCode());
   const unlocked = level >= 1 && level <= 7 && highestLevel > level;
   const [answer, setAnswer] = useState('');
   const [message, setMessage] = useState('');
@@ -307,24 +313,24 @@ export default function Home() {
   const [envelopeOpening,setEnvelopeOpening]=useState(()=>import.meta.env.DEV&&new URLSearchParams(window.location.search).get('preview')==='envelope');
   const [gameFeedback,setGameFeedback]=useState<'success'|'error'|''>('');
   const [achievement,setAchievement]=useState('');
-  const [earnedAchievements,setEarnedAchievements]=useState<string[]>(()=>{try{return normalizeAchievements(JSON.parse(localStorage.getItem('archivos-f-achievements')||'[]'));}catch{return [];}});
+  const [earnedAchievements,setEarnedAchievements]=useState<string[]>(()=>storedAchievements(activeCodeRef.current));
   const achievementTimerRef=useRef<number|null>(null);
   const [ambientEvent,setAmbientEvent]=useState<'beam'|'shadow'|'radio'|'ruby'|''>('');
-  const [marks,setMarks]=useState<number[]>(()=>{try{const saved:unknown=JSON.parse(localStorage.getItem('archivos-f-secret-marks')||'[]');if(!Array.isArray(saved))return [];return [...new Set(saved.filter((value):value is number=>Number.isInteger(value)&&value>=1&&value<=7))].sort((a,b)=>a-b);}catch{return [];}});
+  const [marks,setMarks]=useState<number[]>(()=>storedMarks(activeCodeRef.current));
 
   function unlockAchievement(name:string,show=true,withSound=true){
     let current=earnedAchievements;
-    try{current=normalizeAchievements(JSON.parse(localStorage.getItem('archivos-f-achievements')||'[]'));}catch{/* Fall back to the in-memory list. */}
+    try{current=normalizeAchievements(JSON.parse(localStorage.getItem(progressStorageKey('achievements',activeCodeRef.current))||'[]'));}catch{/* Fall back to the in-memory list. */}
     if(current.includes(name))return;
     const next=[...current,name];setEarnedAchievements(next);
-    try{localStorage.setItem('archivos-f-achievements',JSON.stringify(next));}catch{/* Decorative progress must not interrupt the case. */}
+    try{localStorage.setItem(progressStorageKey('achievements',activeCodeRef.current),JSON.stringify(next));}catch{/* Decorative progress must not interrupt the case. */}
     if(show){if(withSound)playAchievement();setAchievement(name);if(achievementTimerRef.current!==null)window.clearTimeout(achievementTimerRef.current);achievementTimerRef.current=window.setTimeout(()=>{setAchievement('');achievementTimerRef.current=null;},9500);}
   }
 
   useEffect(()=>()=>{if(achievementTimerRef.current!==null)window.clearTimeout(achievementTimerRef.current);},[]);
 
   function receiveState(state: GameState) {
-    const elapsed=Math.max(elapsedRef.current,Math.floor(Number(state.elapsedSeconds)||0));elapsedRef.current=elapsed;
+    const elapsed=Math.max(0,Math.floor(Number(state.elapsedSeconds)||0));elapsedRef.current=elapsed;
     setAgent(state.agent); setHighestLevel(state.highestLevel); setHints(state.hints); setCheckProgress(state.checkProgress); setCompletedAt(state.completedAt); setElapsedSeconds(elapsed); setActiveSession(true);
   }
 
@@ -459,7 +465,7 @@ export default function Home() {
   function collectMark(){
     if(level<1||level>7)return;
     if(marks.includes(level)){playSecretCollect();unlockAchievement('MARCA SECRETA RECUPERADA',true,false);return;}
-    const next=[...marks,level].sort();setMarks(next);localStorage.setItem('archivos-f-secret-marks',JSON.stringify(next));playSecretCollect();unlockAchievement(next.length===7?'GUARDIÁN DE LAS SIETE LUCES':`MARCA SECRETA ${next.length}/7`,true,false);
+    const next=[...marks,level].sort();setMarks(next);localStorage.setItem(progressStorageKey('secret-marks',activeCodeRef.current),JSON.stringify(next));playSecretCollect();unlockAchievement(next.length===7?'GUARDIÁN DE LAS SIETE LUCES':`MARCA SECRETA ${next.length}/7`,true,false);
   }
 
   function visitLevel(destination: number) {
@@ -493,6 +499,9 @@ export default function Home() {
     if (!agent.trim()) { setMessage('Escribí tu nombre o alias de agente.'); return; }
     const state = await gameAction({action:'activate',code,agent,legacy:legacyRef.current?.code === code ? legacyRef.current : undefined});
     if (!state) return;
+    const normalizedCode=code.trim().toUpperCase();activeCodeRef.current=normalizedCode;
+    try{localStorage.setItem('archivos-f-active-code',normalizedCode);}catch{/* The server session remains authoritative. */}
+    setMarks(storedMarks(normalizedCode));setEarnedAchievements(storedAchievements(normalizedCode));
     activateStormSoundscape();
     setLevel(state.highestLevel); setAnswer(''); setShowAccess(false); leaveGame('library');
     setCheckSelection(null); setCheckPassed(false); setCheckFeedback(''); setFinalAnswers({who:'',how:'',where:''});
