@@ -12,9 +12,12 @@ test('Las coartadas: el código verificado avanza sin alterar el progreso', asyn
       assert.throws(() => applyAction(state,{action:'unlock',level:2,answer:code}), error => error.code === 'WRONG_ANSWER' && error.status === 400);
       assert.deepEqual(state,before,`${code}: debe conservar pistas y nivel`);
     }
-    assert.equal(applyAction(state,{action:'unlock',level:2,answer:'LC-1888'}).highestLevel,3);
-    assert.deepEqual(state.hints,before.hints);
-    assert.deepEqual(state.checkProgress,before.checkProgress);
+    for (const code of ['LC-1888','lc1888','1888','LC 1888','lc 1888']) {
+      const variantState=structuredClone(before);
+      assert.equal(applyAction(variantState,{action:'unlock',level:2,answer:code}).highestLevel,3,code);
+      assert.deepEqual(variantState.hints,before.hints);
+      assert.deepEqual(variantState.checkProgress,before.checkProgress);
+    }
     assert.throws(() => applyAction({...before,highestLevel:1},{action:'unlock',level:2,answer:'Martina Ríos'}));
   } finally { await server.close(); }
 });

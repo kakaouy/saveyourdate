@@ -36,11 +36,13 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elaps
  const [boardOpen,setBoardOpen]=useState(false);
  const [chainHighlighted,setChainHighlighted]=useState(false);
  const [timeVisible,setTimeVisible]=useState(false);
+ const timeHideTimer=useRef<number|null>(null);
  const [selectedConclusion,setSelectedConclusion]=useState<number|null>(null);
  const hintsDialog=useRef<HTMLDialogElement>(null);
  const hintsTrigger=useRef<HTMLButtonElement>(null);
  const boardDialog=useRef<HTMLDialogElement>(null);
  const boardTrigger=useRef<HTMLButtonElement>(null);
+ useEffect(()=>()=>{if(timeHideTimer.current!==null)window.clearTimeout(timeHideTimer.current);},[]);
  useEffect(()=>{if(!hintsOpen)return;hintsDialog.current?.showModal();const before=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{hintsDialog.current?.close();document.body.style.overflow=before;hintsTrigger.current?.focus();};},[hintsOpen]);
  useEffect(()=>{if(!boardOpen)return;boardDialog.current?.showModal();const before=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{boardDialog.current?.close();document.body.style.overflow=before;boardTrigger.current?.focus();};},[boardOpen]);
  const dialog=useRef<HTMLDialogElement>(null);
@@ -49,6 +51,7 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elaps
  const closeMap=()=>{playMapFold();setOpen(false);};
  useEffect(()=>{const openMission=()=>{playMapUnfold();setOpen(true);};window.addEventListener('archivos-f-open-mission',openMission);return()=>window.removeEventListener('archivos-f-open-mission',openMission);},[]);
  useEffect(()=>{const openBoard=()=>{playEvidenceBoardLock();setBoardOpen(true);};window.addEventListener('archivos-f-open-evidence-board',openBoard);return()=>window.removeEventListener('archivos-f-open-evidence-board',openBoard);},[]);
+ useEffect(()=>{const closeHints=()=>setHintsOpen(false);window.addEventListener('archivos-f-close-hints',closeHints);return()=>window.removeEventListener('archivos-f-close-hints',closeHints);},[]);
  useEffect(()=>{
   if(!open)return;
   dialog.current?.showModal();
@@ -59,7 +62,7 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elaps
  const nodes=[{title:'La misión',number:0},...levels.map((l,i)=>({title:l.title,number:i+1})),{title:'Acusación final',number:8},{title:'Resolución',number:9}];
  return <>
   <div className="mission-toolbar"><div className="mission-toolbar-actions"><button ref={trigger} className={`mission-icon-button ${open?'is-open':''}`} aria-expanded={open} aria-controls="mission-map" aria-haspopup="dialog" aria-label={`Misión. ${done} de 7 niveles resueltos`} onMouseEnter={playEvidenceCardHover} onFocus={playEvidenceCardHover} onClick={()=>{if(open)closeMap();else{playMapUnfold();setOpen(true);}}}><img src="/los-archivos-f/images/mission-scroll.png" alt=""/><span>MISIÓN</span></button><button ref={hintsTrigger} className="toolbar-hint-lens" aria-label="Abrir pistas" aria-haspopup="dialog" aria-expanded={hintsOpen} onMouseEnter={playHintChime} onFocus={playHintChime} onClick={()=>{playHintChime();setHintsOpen(true);}}><img src="/los-archivos-f/images/lupa-pista.png" alt=""/><span>PISTAS</span></button><button ref={boardTrigger} className="toolbar-evidence-board" aria-label={`Abrir tablero de evidencias. ${done} de 7 confirmadas`} aria-haspopup="dialog" aria-expanded={boardOpen} onMouseEnter={playEvidenceBoardLock} onFocus={playEvidenceBoardLock} onClick={()=>{playEvidenceBoardLock();setBoardOpen(true);}}><img src="/los-archivos-f/images/tablero-evidencias-candado.png" alt=""/><span>TABLERO</span></button></div></div>
-  <button type="button" className={`side-time-button ${timeVisible?'is-time-visible':''}`} aria-expanded={timeVisible} onMouseEnter={()=>{playTimeBurn();setTimeVisible(true);}} onMouseLeave={()=>setTimeVisible(false)} onFocus={()=>{playTimeBurn();setTimeVisible(true);}} onBlur={()=>setTimeVisible(false)} onClick={()=>{playTimeBurn();setTimeVisible(value=>!value);}} aria-label={`Tiempo transcurrido ${formatTime(elapsedSeconds)}`} title={`Tiempo transcurrido: ${formatTime(elapsedSeconds)}`}><img src="/los-archivos-f/images/reloj-arena.png" alt=""/><span>TIEMPO</span><b aria-live="polite">{formatTime(elapsedSeconds)}</b></button>
+  <button type="button" className={`side-time-button ${timeVisible?'is-time-visible':''}`} aria-expanded={timeVisible} onMouseEnter={()=>{playTimeBurn();setTimeVisible(true);}} onMouseLeave={()=>setTimeVisible(false)} onFocus={()=>{playTimeBurn();setTimeVisible(true);}} onBlur={()=>setTimeVisible(false)} onClick={()=>{playTimeBurn();setTimeVisible(true);if(timeHideTimer.current!==null)window.clearTimeout(timeHideTimer.current);timeHideTimer.current=window.setTimeout(()=>setTimeVisible(false),3200);}} aria-label={`Tiempo transcurrido ${formatTime(elapsedSeconds)}`} title={`Tiempo transcurrido: ${formatTime(elapsedSeconds)}`}><img src="/los-archivos-f/images/reloj-arena.png" alt=""/><span>TIEMPO</span><b aria-live="polite">{formatTime(elapsedSeconds)}</b></button>
   {open && <dialog ref={dialog} id="mission-map" className="mission-map" aria-labelledby="mission-map-title" onCancel={event=>{event.preventDefault();closeMap();}} onClick={e=>{if(e.target===e.currentTarget)closeMap();}}>
    <div className="mission-map-paper"><header className="mission-map-heading"><div><p className="eyebrow">AGENCIA F · MAPA DE LA INVESTIGACIÓN</p><h2 id="mission-map-title">El robo del Rubí del Faro</h2></div><button className="mission-close" onClick={closeMap} aria-label="Cerrar menú Misión">×</button></header>
    <div className="mission-progress" role="progressbar" aria-label="Niveles resueltos" aria-valuemin={0} aria-valuemax={7} aria-valuenow={done}><span style={{width:`${done/7*100}%`}}/></div><p className="mission-summary">{highestLevel===9?'Caso cerrado':`${done} de 7 niveles resueltos`} · {hintsUsed} pistas usadas</p>

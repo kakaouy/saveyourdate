@@ -16,7 +16,7 @@ export const levels = [
     evidence: [],
     digital: 'El intervalo crítico va de 19:30 a 19:50. Una marca aislada prueba un momento; para descartar a alguien necesitás cubrir el recorrido completo, sin huecos.',
     placeholder: 'Código de 4 cifras', answer: ['1888'], lock: 'numeric',
-    hints: ['Una entrada, una salida o una foto aislada solo prueban un momento.', 'Buscá registros distintos que se completen entre sí, sin dejar huecos en el intervalo.', 'Compará los dos tramos de entrevista de León con su breve paso por la cafetería.', 'SOLUCIÓN DIRECTA · La coartada completa es la de León Costa. Su ficha registra LC-1888: revisala y proponela como conclusión.'],
+    hints: ['Una entrada, una salida o una foto aislada solo prueban un momento.', 'Buscá registros distintos que se completen entre sí, sin dejar huecos en el intervalo.', 'Revisá los dos tramos de entrevista de León y su breve paso por la cafetería.', 'SOLUCIÓN DIRECTA · La coartada completa es la de León Costa. Ingresá el código de su ficha: LC-1888 o 1888.'],
     unlock: 'Coartada verificada · nueva pista recuperada',
   },
   {
@@ -26,7 +26,7 @@ export const levels = [
     evidence: [],
     digital: 'Seis registros luminosos recuperados fuera de secuencia.',
     placeholder: '6 caracteres', answer: ['taller', 'el taller', 'taller de restauracion'], lock: 'letters',
-    hints: ['Cada patrón de destellos representa una letra. Hay una guía entre tus evidencias que puede ayudarte.', 'Saber las seis letras no alcanza: los registros llegaron desordenados. León dejó reglas sobre la posición de los símbolos.', 'La Brújula abre el mensaje. Las dos Olas deben quedar juntas y el Ancla cierra la señal.', 'El Farol queda antes de las dos Olas y la Llave está inmediatamente antes del Ancla.', 'SOLUCIÓN DIRECTA · Las seis señales forman la palabra TALLER.'],
+    hints: ['Antes de traducir los destellos, reconstruí el orden de los seis registros.', 'León dejó reglas sobre la posición de los símbolos en una de las evidencias impresas.', 'La Brújula abre el mensaje. Las dos Olas deben quedar juntas y el Ancla cierra la señal.', 'El Farol queda antes de las dos Olas y la Llave está inmediatamente antes del Ancla. Recién entonces interpretá los patrones.', 'SOLUCIÓN DIRECTA · En orden, las seis señales forman la palabra TALLER.'],
     unlock: 'Destino de las señales identificado',
   },
   {

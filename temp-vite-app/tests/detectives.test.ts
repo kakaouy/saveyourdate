@@ -56,8 +56,8 @@ test('Pistas conserva su campanilla y la investigación mezcla misterio con torm
 
   assert.match(missionMap, /className="toolbar-hint-lens"[\s\S]*?onMouseEnter=\{playHintChime\}[\s\S]*?onClick=\{\(\)=>\{playHintChime\(\);setHintsOpen\(true\);\}\}/);
   assert.match(sounds, /hint-chime\.mp3/);
-  assert.match(app, /function activateStormSoundscape\(\)\{[^}]*startOpeningMusic\(\);startStormAmbience\(\);/);
-  assert.match(app, /startOpeningMusic\(\);\s*if\(soundscapeRef\.current==='storm'\)startStormAmbience\(\);/);
+  assert.match(app, /function activateStormSoundscape\(\)\{[^}]*startStormAmbience\(\);startOpeningMusic\(\);/);
+  assert.match(app, /if\(soundscapeRef\.current==='storm'\)startStormAmbience\(\);\s*startOpeningMusic\(\);/);
   assert.match(sounds, /new Audio\('\/los-archivos-f\/audio\/storm-loop\.mp3'\)/);
   assert.match(sounds, /stormLoop\.loop=true;stormLoop\.preload='auto';stormLoop\.volume=\.42/);
   assert.match(sounds, /stormWatchdog=window\.setInterval/);

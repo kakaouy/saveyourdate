@@ -61,8 +61,9 @@ export default function TerminalLevel({unlocked,busy,message,deferSuccess,onUnlo
   <div className="terminal-heading"><p className="eyebrow">NIVEL 1 · ARCHIVO F-01</p></div>
   <div className="level-objective">
    <span>OBJETIVO</span>
-   <p>Revisá los registros de las cámaras de seguridad y comparalos con las fotografías de los sobres de Información confidencial.</p>
+   <p>Revisá los registros de las cámaras y recuperá el instante exacto de la interrupción.</p>
   </div>
+  <aside className="physical-clue physical-clue-envelope" aria-label="Recurso impreso vinculado con la terminal"><img src="/los-archivos-f/images/material-nivel1-sobre-fotos.jpeg" alt="Sobre de información confidencial con fotografías de cámaras"/></aside>
   <div className={`terminal-scene ${powered?'terminal-powered':'terminal-off'} ${lighting?'terminal-illuminated':''} ${powerSurge?'terminal-current-surge':''}`}>
    <img src={!lightOn?'/los-archivos-f/images/terminal-lampara-apagada-v1.png':powered?'/los-archivos-f/images/terminal-encendida-v1.png':'/los-archivos-f/images/terminal-recuperacion-v1.png'} alt={`Computadora antigua del archivo ${powered?'encendida':'apagada'} y lámpara ${lightOn?'encendida':'apagada'}`}/>
    {lightOn&&<span className="terminal-lamp-pulse" aria-hidden="true"/>}<span className="terminal-scanlines" aria-hidden="true"/>

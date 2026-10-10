@@ -1,8 +1,8 @@
 import { useRef, useState, type CSSProperties } from 'react';
 import {playEffect} from './sounds';
 
-export default function HintLenses({hints, used, busy, canRequest, onRequest,onRequestSolution}: {
-  hints: string[]; used: number; busy: boolean; canRequest: boolean; onRequest: () => Promise<boolean>;onRequestSolution:()=>Promise<boolean>;
+export default function HintLenses({hints, used, busy, canRequest, onRequest,onRequestSolution,onApplySolution}: {
+  hints: string[]; used: number; busy: boolean; canRequest: boolean; onRequest: () => Promise<boolean>;onRequestSolution:()=>Promise<boolean>;onApplySolution?:()=>Promise<void>;
 }) {
   const [active, setActive] = useState<number | null>(null);
   const pending = useRef(false);
@@ -35,7 +35,7 @@ export default function HintLenses({hints, used, busy, canRequest, onRequest,onR
         <span>{revealed?'Consultada':next?(solution?'Ver solución':'Descubrir'):(solution?'Solución sellada':'Sellada')}</span>
       </button>;
     })}
-    <div className="hint-popover" style={{'--hint-index':active ?? 0} as CSSProperties} aria-live="polite" aria-atomic="true">{active !== null && consulted.includes(active) && <aside id="hint-parchment" className={`hint-parchment ${active===hints.length-1?'solution-parchment':''}`}><span>AGENCIA F · {active===hints.length-1?'SOLUCIÓN DIRECTA':`PISTA ${active+1}`}</span><p>{hints[active]}</p><button aria-label="Cerrar pista" onClick={()=>setActive(null)}>×</button></aside>}</div></div>
+    <div className="hint-popover" style={{'--hint-index':active ?? 0} as CSSProperties} aria-live="polite" aria-atomic="true">{active !== null && consulted.includes(active) && <aside id="hint-parchment" className={`hint-parchment ${active===hints.length-1?'solution-parchment':''}`}><span>AGENCIA F · {active===hints.length-1?'SOLUCIÓN DIRECTA':`PISTA ${active+1}`}</span><p>{hints[active]}</p>{active===hints.length-1&&onApplySolution&&<button type="button" className="hint-apply-solution" disabled={busy} onClick={()=>void onApplySolution()}>APLICAR SOLUCIÓN Y VER EL CIERRE <b>→</b></button>}<button className="hint-parchment-close" aria-label="Cerrar pista" onClick={()=>setActive(null)}>×</button></aside>}</div></div>
     {canRequest&&used<hints.length-1&&<button type="button" className="hint-direct-solution" disabled={busy} onClick={()=>void revealSolution()}>Necesito la solución directa</button>}
     <p className="hint-lenses-help">Las pistas van de observación a procedimiento. Usarlas puede cambiar tu rango final, pero nunca bloquea el caso. Las ya consultadas no vuelven a contabilizarse.</p>
   </section>;
