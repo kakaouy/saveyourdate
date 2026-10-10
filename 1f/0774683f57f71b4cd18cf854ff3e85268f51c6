@@ -1,0 +1,34 @@
+temp-vite-app/detectives/alibi-feedback.ts
+  s_ad2761a9c8222b::t_3acb810bc30aeb 2-4
+temp-vite-app/detectives/App.tsx
+  s_ad2761a9c8222b::t_beb0d1874ed23f 92,97,105,111,124
+  s_ad2761a9c8222b::t_3d411b19d4f0d9 26-29,51-54,180
+  s_ad2761a9c8222b::t_8645d0532d4416 263,265
+  s_ad2761a9c8222b::t_bb920ee7a99225 12
+temp-vite-app/detectives/FinalCaseAudio.tsx
+  s_ad2761a9c8222b::t_3acb810bc30aeb 9
+temp-vite-app/detectives/FinalStatement.tsx
+  s_ad2761a9c8222b::t_8645d0532d4416 10
+temp-vite-app/detectives/TransmissionPlayer.tsx
+  s_ad2761a9c8222b::t_3acb810bc30aeb 3
+temp-vite-app/detectives/TerminalLevel.tsx
+  s_ad2761a9c8222b::t_3acb810bc30aeb 22
+temp-vite-app/detectives/FedericaFeedback.tsx
+  s_ad2761a9c8222b::t_3acb810bc30aeb 24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1f0774683f57f71b4cd18cf854ff3e85268f51c6",
+  "prompts": {},
+  "sessions": {
+    "s_ad2761a9c8222b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11e3c-6733-7631-a227-de619d6c7cf4",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
