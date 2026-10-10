@@ -1,19 +1,19 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { levels } from './case';
-import { playEffect, playEvidenceCardHover, playHintChime, playMapFold, playMapUnfold, playTimeBurn } from './sounds';
+import { playEvidenceBoardLock, playEvidenceCardHover, playHintChime, playMapFold, playMapUnfold, playTimeBurn } from './sounds';
 
 export function MissionIcon({stage}: {stage:number}) {
  const art = [
-  <g><path d="M8 22V14h16l5 6h25v30H8Z"/><path d="m8 29 7-6h40l-6 27H8"/><circle cx="34" cy="36" r="13"/><path className="compass-needle" d="m40 29-3 10-10 5 4-11Z"/></g>,
-  <g><rect x="6" y="10" width="52" height="36" rx="4"/><path d="M12 16h40v23H12ZM25 46v7m14-7v7M18 55h28M19 23l5 5-5 5m11 0h10"/></g>,
-  <g><path d="m7 15 16-5 18 6 16-5v39l-16 5-18-6-16 5ZM23 10v39M41 16v39"/><ellipse cx="29" cy="27" rx="4" ry="7" transform="rotate(-25 29 27)"/><ellipse cx="38" cy="41" rx="4" ry="7" transform="rotate(25 38 41)"/><path d="m25 17-2-3m16 17 2-3"/></g>,
-  <g><path d="m22 53 5-32h10l5 32M25 21v-9h14v9ZM23 12l9-7 9 7M17 55h30M29 47v-7h6v7M28 29h8"/><path className="lighthouse-rays" d="m18 16-12-5m12 10-12 4m40-9 12-5m-12 10 12 4"/></g>,
-  <g><path d="M9 52V10h31v13M15 47V16h19M15 16l10 6v24l-10 1"/><circle cx="40" cy="36" r="12"/><path d="m49 45 10 12M35 36h10m-5-5v10"/></g>,
-  <g><path d="m10 23 10-12h24l10 12-22 31ZM10 23h44M20 11l12 43 12-43M20 11l12 12 12-12"/><path className="icon-spark" d="M53 6v8m-4-4h8M7 40v8m-4-4h8"/></g>,
-  <g><rect x="10" y="10" width="44" height="44" rx="4"/><circle cx="32" cy="32" r="18"/><circle cx="32" cy="32" r="13"/><circle cx="32" cy="32" r="8"/><path d="M27 8h10M27 56h10"/></g>,
-  <g><rect x="9" y="12" width="46" height="42" rx="4"/><path d="M15 18h34v29H15ZM27 12V8h10v4"/><circle cx="32" cy="33" r="9"/><path className="compass-needle" d="M32 24v18M23 33h18"/><path d="M18 51h5m18 0h5"/></g>,
-  <g><path d="M10 18h17l5 6h23v29H10ZM16 18V9h31v15M23 16h17M19 35h12m-12 7h9"/><circle cx="42" cy="39" r="9"/><path d="m38 39 3 3 5-6"/></g>,
-  <g><path d="m6 24 13-14h26l13 14-26 33ZM6 24h52M19 10l13 47 13-47M19 10l13 14 13-14"/><path className="icon-spark" d="M32 2v4M6 8l4 4M58 8l-4 4"/></g>
+  <g key="briefing"><path d="M8 22V14h16l5 6h25v30H8Z"/><path d="m8 29 7-6h40l-6 27H8"/><circle cx="34" cy="36" r="13"/><path className="compass-needle" d="m40 29-3 10-10 5 4-11Z"/></g>,
+  <g key="terminal"><rect x="6" y="10" width="52" height="36" rx="4"/><path d="M12 16h40v23H12ZM25 46v7m14-7v7M18 55h28M19 23l5 5-5 5m11 0h10"/></g>,
+  <g key="map"><path d="m7 15 16-5 18 6 16-5v39l-16 5-18-6-16 5ZM23 10v39M41 16v39"/><ellipse cx="29" cy="27" rx="4" ry="7" transform="rotate(-25 29 27)"/><ellipse cx="38" cy="41" rx="4" ry="7" transform="rotate(25 38 41)"/><path d="m25 17-2-3m16 17 2-3"/></g>,
+  <g key="lighthouse"><path d="m22 53 5-32h10l5 32M25 21v-9h14v9ZM23 12l9-7 9 7M17 55h30M29 47v-7h6v7M28 29h8"/><path className="lighthouse-rays" d="m18 16-12-5m12 10-12 4m40-9 12-5m-12 10 12 4"/></g>,
+  <g key="door"><path d="M9 52V10h31v13M15 47V16h19M15 16l10 6v24l-10 1"/><circle cx="40" cy="36" r="12"/><path d="m49 45 10 12M35 36h10m-5-5v10"/></g>,
+  <g key="ruby"><path d="m10 23 10-12h24l10 12-22 31ZM10 23h44M20 11l12 43 12-43M20 11l12 12 12-12"/><path className="icon-spark" d="M53 6v8m-4-4h8M7 40v8m-4-4h8"/></g>,
+  <g key="mechanism"><rect x="10" y="10" width="44" height="44" rx="4"/><circle cx="32" cy="32" r="18"/><circle cx="32" cy="32" r="13"/><circle cx="32" cy="32" r="8"/><path d="M27 8h10M27 56h10"/></g>,
+  <g key="compartment"><rect x="9" y="12" width="46" height="42" rx="4"/><path d="M15 18h34v29H15ZM27 12V8h10v4"/><circle cx="32" cy="33" r="9"/><path className="compass-needle" d="M32 24v18M23 33h18"/><path d="M18 51h5m18 0h5"/></g>,
+  <g key="accusation"><path d="M10 18h17l5 6h23v29H10ZM16 18V9h31v15M23 16h17M19 35h12m-12 7h9"/><circle cx="42" cy="39" r="9"/><path d="m38 39 3 3 5-6"/></g>,
+  <g key="resolution"><path d="m6 24 13-14h26l13 14-26 33ZM6 24h52M19 10l13 47 13-47M19 10l13 14 13-14"/><path className="icon-spark" d="M32 2v4M6 8l4 4M58 8l-4 4"/></g>
  ];
  return <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{art[stage]}</svg>;
 }
@@ -21,35 +21,44 @@ export function MissionIcon({stage}: {stage:number}) {
 type Props={hintPanel:ReactNode;level:number;highestLevel:number;hintsUsed:number;elapsedSeconds:number;saveStatus:string;visitLevel:(n:number)=>void;onMission:()=>void;onLibrary:()=>void};
 const formatTime=(seconds:number)=>`${Math.floor(seconds/3600).toString().padStart(2,'0')}:${Math.floor(seconds%3600/60).toString().padStart(2,'0')}:${Math.floor(seconds%60).toString().padStart(2,'0')}`;
 const evidence=[
- {label:'CORTE ELÉCTRICO',value:'19:37',note:'Hora real del apagón.'},
- {label:'COARTADA',value:'LEÓN',note:'Su recorrido cubre todo el intervalo.'},
- {label:'SEÑALES',value:'TALLER',note:'Lugar indicado por el receptor.'},
- {label:'RUTA OCULTA',value:'9 → 3 → 7',note:'Recorrido del plano reconstruido.'},
- {label:'REGISTRO',value:'R-17',note:'Movimiento vinculado con la resina.'},
- {label:'UBICACIÓN',value:'FAROL',note:'Destino indicado por las banderas.'},
- {label:'COMPARTIMENTO',value:'ABIERTO',note:'La cerradura mecánica fue resuelta.'},
+ {label:'CORTE ELÉCTRICO',value:'19:37',note:'Hora real del apagón.',source:'Nivel 1 · Terminal',proves:'Fija el intervalo crítico de 19:30 a 19:50.',connects:'Se compara con las cuatro coartadas.'},
+ {label:'COARTADA',value:'LEÓN',note:'Su recorrido cubre todo el intervalo.',source:'Nivel 2 · Sospechosos',proves:'León queda descartado por registros continuos.',connects:'Su anotación abre la pista de las señales.'},
+ {label:'SEÑALES',value:'TALLER',note:'Lugar indicado por el receptor.',source:'Nivel 3 · Señales',proves:'Las seis señales forman un destino.',connects:'Conduce al plano incompleto del taller.'},
+ {label:'RUTA OCULTA',value:'9 → 3 → 7',note:'Recorrido del plano reconstruido.',source:'Nivel 4 · Plano',proves:'El corredor oculto existe y puede recorrerse.',connects:'La ruta conduce hasta el registro interrumpido.'},
+ {label:'REGISTRO',value:'R-17',note:'Movimiento vinculado con la resina.',source:'Nivel 5 · Registro',proves:'La resina relaciona el movimiento con Martina.',connects:'El destino registrado apunta a la Sala de Banderas.'},
+ {label:'UBICACIÓN',value:'FAROL',note:'Destino indicado por las banderas.',source:'Nivel 6 · Banderas',proves:'FAROL es una ubicación, no una contraseña.',connects:'Señala el compartimento de la linterna superior.'},
+ {label:'COMPARTIMENTO',value:'ABIERTO',note:'La cerradura mecánica fue resuelta.',source:'Nivel 7 · Mecanismo',proves:'El recorrido numérico abre el compartimento.',connects:'Autoriza la apertura del sobre y la acusación.'},
 ];
+const narrativeLinks=['','HORA','COARTADA','SEÑAL','RUTA','REGISTRO','UBICACIÓN','ACCESO','',''];
 export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elapsedSeconds,saveStatus,visitLevel,onMission,onLibrary}:Props) {
  const [open,setOpen]=useState(false);
  const [hintsOpen,setHintsOpen]=useState(false);
+ const [boardOpen,setBoardOpen]=useState(false);
+ const [chainHighlighted,setChainHighlighted]=useState(false);
  const [timeVisible,setTimeVisible]=useState(false);
+ const [selectedConclusion,setSelectedConclusion]=useState<number|null>(null);
  const hintsDialog=useRef<HTMLDialogElement>(null);
  const hintsTrigger=useRef<HTMLButtonElement>(null);
+ const boardDialog=useRef<HTMLDialogElement>(null);
+ const boardTrigger=useRef<HTMLButtonElement>(null);
  useEffect(()=>{if(!hintsOpen)return;hintsDialog.current?.showModal();const before=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{hintsDialog.current?.close();document.body.style.overflow=before;hintsTrigger.current?.focus();};},[hintsOpen]);
+ useEffect(()=>{if(!boardOpen)return;boardDialog.current?.showModal();const before=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{boardDialog.current?.close();document.body.style.overflow=before;boardTrigger.current?.focus();};},[boardOpen]);
  const dialog=useRef<HTMLDialogElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
  const done=Math.max(0,Math.min(highestLevel-1,7));
  const closeMap=()=>{playMapFold();setOpen(false);};
  useEffect(()=>{const openMission=()=>{playMapUnfold();setOpen(true);};window.addEventListener('archivos-f-open-mission',openMission);return()=>window.removeEventListener('archivos-f-open-mission',openMission);},[]);
+ useEffect(()=>{const openBoard=()=>{playEvidenceBoardLock();setBoardOpen(true);};window.addEventListener('archivos-f-open-evidence-board',openBoard);return()=>window.removeEventListener('archivos-f-open-evidence-board',openBoard);},[]);
  useEffect(()=>{
   if(!open)return;
   dialog.current?.showModal();
+  const frame=requestAnimationFrame(()=>dialog.current?.querySelector('.mission-node.selected')?.scrollIntoView({block:'center',inline:'center'}));
   const before=document.body.style.overflow;document.body.style.overflow='hidden';
-  return ()=>{dialog.current?.close();document.body.style.overflow=before;trigger.current?.focus();};
+  return ()=>{cancelAnimationFrame(frame);dialog.current?.close();document.body.style.overflow=before;trigger.current?.focus();};
  },[open]);
  const nodes=[{title:'La misión',number:0},...levels.map((l,i)=>({title:l.title,number:i+1})),{title:'Acusación final',number:8},{title:'Resolución',number:9}];
  return <>
-  <div className="mission-toolbar"><div className="mission-toolbar-actions"><button ref={trigger} className={`mission-icon-button ${open?'is-open':''}`} aria-expanded={open} aria-controls="mission-map" aria-haspopup="dialog" aria-label={`Misión. ${done} de 7 niveles resueltos`} onMouseEnter={playMapUnfold} onFocus={playMapUnfold} onClick={()=>{if(open)closeMap();else{playMapUnfold();setOpen(true);}}}><img src="/los-archivos-f/images/mission-scroll.png" alt=""/><span>MISIÓN</span></button><button ref={hintsTrigger} className="toolbar-hint-lens" aria-label="Abrir pistas" aria-haspopup="dialog" aria-expanded={hintsOpen} onMouseEnter={playHintChime} onFocus={playHintChime} onClick={()=>{playEffect('panel');setHintsOpen(true);}}><img src="/los-archivos-f/images/lupa-pista.png" alt=""/><span>PISTAS</span></button></div></div>
+  <div className="mission-toolbar"><div className="mission-toolbar-actions"><button ref={trigger} className={`mission-icon-button ${open?'is-open':''}`} aria-expanded={open} aria-controls="mission-map" aria-haspopup="dialog" aria-label={`Misión. ${done} de 7 niveles resueltos`} onMouseEnter={playEvidenceCardHover} onFocus={playEvidenceCardHover} onClick={()=>{if(open)closeMap();else{playMapUnfold();setOpen(true);}}}><img src="/los-archivos-f/images/mission-scroll.png" alt=""/><span>MISIÓN</span></button><button ref={hintsTrigger} className="toolbar-hint-lens" aria-label="Abrir pistas" aria-haspopup="dialog" aria-expanded={hintsOpen} onMouseEnter={playHintChime} onFocus={playHintChime} onClick={()=>{playHintChime();setHintsOpen(true);}}><img src="/los-archivos-f/images/lupa-pista.png" alt=""/><span>PISTAS</span></button><button ref={boardTrigger} className="toolbar-evidence-board" aria-label={`Abrir tablero de evidencias. ${done} de 7 confirmadas`} aria-haspopup="dialog" aria-expanded={boardOpen} onMouseEnter={playEvidenceBoardLock} onFocus={playEvidenceBoardLock} onClick={()=>{playEvidenceBoardLock();setBoardOpen(true);}}><img src="/los-archivos-f/images/tablero-evidencias-candado.png" alt=""/><span>TABLERO</span></button></div></div>
   <button type="button" className={`side-time-button ${timeVisible?'is-time-visible':''}`} aria-expanded={timeVisible} onMouseEnter={()=>{playTimeBurn();setTimeVisible(true);}} onMouseLeave={()=>setTimeVisible(false)} onFocus={()=>{playTimeBurn();setTimeVisible(true);}} onBlur={()=>setTimeVisible(false)} onClick={()=>{playTimeBurn();setTimeVisible(value=>!value);}} aria-label={`Tiempo transcurrido ${formatTime(elapsedSeconds)}`} title={`Tiempo transcurrido: ${formatTime(elapsedSeconds)}`}><img src="/los-archivos-f/images/reloj-arena.png" alt=""/><span>TIEMPO</span><b aria-live="polite">{formatTime(elapsedSeconds)}</b></button>
   {open && <dialog ref={dialog} id="mission-map" className="mission-map" aria-labelledby="mission-map-title" onCancel={event=>{event.preventDefault();closeMap();}} onClick={e=>{if(e.target===e.currentTarget)closeMap();}}>
    <div className="mission-map-paper"><header className="mission-map-heading"><div><p className="eyebrow">AGENCIA F · MAPA DE LA INVESTIGACIÓN</p><h2 id="mission-map-title">El robo del Rubí del Faro</h2></div><button className="mission-close" onClick={closeMap} aria-label="Cerrar menú Misión">×</button></header>
@@ -57,14 +66,12 @@ export default function MissionMap({hintPanel,level,highestLevel,hintsUsed,elaps
    <nav className="mission-path" aria-label="Niveles del caso">{nodes.map(({number,title})=>{
     const available=number<=highestLevel,completed=number>0&&(number<highestLevel||number===9&&highestLevel===9);
     const status=!available?'Bloqueado':number===0?'Mensaje de Fede':number===9?'Caso cerrado':completed?'Resuelto · volver a consultar':'Disponible · investigar';
-    return <button key={number} disabled={!available} className={`mission-node ${completed?'solved':''} ${number===level?'selected':''} ${number===9?'ruby-node':''}`} aria-current={number===level?'step':undefined} aria-label={`${title}. ${status}`} onClick={()=>{setOpen(false);if(number===0)onMission();else visitLevel(number);}}><span className="mission-orb"><MissionIcon stage={number}/><span className="mission-badge">{!available?'⌑':completed?'✓':number||'F'}</span></span><span className="mission-node-copy"><small>{number>0&&number<8?`ETAPA 0${number}`:number===0?'CÓMO JUGAR':'ARCHIVO F-01'}</small><strong>{title}</strong><span>{number===0?'Volver a escuchar y revisar cómo jugar':status}</span></span>{!available&&<svg className="mission-padlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>}</button>;
-   })}</nav>
-   <section className="evidence-board" aria-labelledby="evidence-board-title"><div className="evidence-board-heading"><h3 id="evidence-board-title">Tablero de evidencias</h3><span>{Math.max(0,Math.min(7,highestLevel-1))}/7 confirmadas</span></div><div className="evidence-thread" aria-hidden="true"/>
-    <div className="evidence-notes">{evidence.map((item,index)=>{const found=highestLevel>index+1;return <details key={item.label} className={`evidence-note evidence-note-${index+1} ${found?'found':'sealed'}`} onMouseEnter={playEvidenceCardHover} onFocus={playEvidenceCardHover}><summary><small>{found?item.label:'EVIDENCIA SELLADA'}</small><b>{found?item.value:'?'}</b></summary>{found&&<p>{item.note}</p>}</details>;})}</div>
-   </section>
+    return <button key={number} disabled={!available} className={`mission-node ${completed?'solved':''} ${number===level?'selected':''} ${number===9?'ruby-node':''}`} aria-current={number===level?'step':undefined} aria-label={`${title}. ${status}`} onClick={()=>{if(completed&&number>=1&&number<=7){setSelectedConclusion(number);return;}setOpen(false);if(number===0)onMission();else visitLevel(number);}}><span className="mission-orb"><MissionIcon stage={number}/><span className="mission-badge">{!available?'⌑':completed?'✓':number||'F'}</span></span><span className="mission-node-copy"><small>{number>0&&number<8?`ETAPA 0${number}`:number===0?'CÓMO JUGAR':'ARCHIVO F-01'}</small><strong>{title}</strong><span>{number===0?'Volver a escuchar y revisar cómo jugar':status}</span>{narrativeLinks[number]&&<em>{narrativeLinks[number]}</em>}</span>{!available&&<svg className="mission-padlock" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>}</button>;
+   })}</nav>{selectedConclusion&&<aside className="mission-conclusion" aria-live="polite"><span>CONCLUSIÓN · NIVEL {selectedConclusion}</span><h3>{evidence[selectedConclusion-1].value}</h3><p>{evidence[selectedConclusion-1].proves} {evidence[selectedConclusion-1].connects}</p><div><button type="button" className="reading-choice" onClick={()=>setSelectedConclusion(null)}>CERRAR CONCLUSIÓN</button><button type="button" className="primary-button" onClick={()=>{setOpen(false);visitLevel(selectedConclusion);}}>REVISAR PANTALLA RESUELTA</button></div></aside>}
    <div className="mission-hints"><h3>Pistas · {nodes[level]?.title}</h3>{hintPanel}</div>
-   <footer className="mission-map-footer"><button className="library-icon-button" aria-label="Biblioteca: abrir catálogo de juegos" onClick={()=>{setOpen(false);onLibrary();}}><img src="/los-archivos-f/images/biblioteca-libros.png" alt=""/><span>BIBLIOTECA</span></button><p><span className="signal-dot"/>{saveStatus||'Tu avance se guarda al resolver cada desafío.'}</p><p>{highestLevel>=8?'Fede autorizó la apertura del sobre dirigido al agente.':'Mantené cerrado el sobre dirigido al agente hasta recibir la indicación.'}</p></footer></div>
-  </dialog>}
+   <footer className="mission-map-footer"><button className="library-icon-button" aria-label="Biblioteca: abrir catálogo de juegos" onClick={()=>{setOpen(false);onLibrary();}}><img src="/los-archivos-f/images/biblioteca-libros.png" alt=""/><span>BIBLIOTECA</span></button><p><span className="signal-dot"/>{saveStatus||'Tu avance se guarda al resolver cada desafío.'}</p><p>{highestLevel>=9?'Acusación confirmada: ya pueden abrir el sobre dirigido al agente.':highestLevel>=8?'El expediente está completo. Presenten la acusación antes de abrir el sobre.':'Mantené cerrado el sobre dirigido al agente hasta recibir la indicación.'}</p></footer></div>
+ </dialog>}
+ {boardOpen&&<dialog ref={boardDialog} className="evidence-board-dialog" aria-labelledby="standalone-evidence-title" onCancel={()=>setBoardOpen(false)} onClick={event=>{if(event.target===event.currentTarget)setBoardOpen(false);}}><div className={`standalone-evidence-board ${chainHighlighted?'chain-highlighted':''}`} style={{'--chain-progress':`${done/7}`} as CSSProperties}><header><div><p className="eyebrow">AGENCIA F · RED DE LA INVESTIGACIÓN</p><h2 id="standalone-evidence-title">Tablero de evidencias</h2><span>{done}/7 confirmadas</span></div><div><button type="button" className="evidence-chain-toggle" aria-pressed={chainHighlighted} onClick={()=>setChainHighlighted(value=>!value)}>⌁ {chainHighlighted?'OCULTAR CADENA':'DESTACAR CADENA'}</button><button type="button" aria-label="Cerrar tablero de evidencias" onClick={()=>setBoardOpen(false)}>×</button></div></header><p className="evidence-board-guide">Abrí una evidencia para revisar qué demuestra. El hilo sigue el orden real de la investigación.</p><div className="standalone-evidence-chain" aria-hidden="true"><svg viewBox="0 0 1000 460" preserveAspectRatio="none"><path className="evidence-chain-base" d="M125 120 L375 120 L625 120 L875 120 L875 340 L625 340 L375 340" pathLength="1"/><path className="evidence-chain-active" d="M125 120 L375 120 L625 120 L875 120 L875 340 L625 340 L375 340" pathLength="1"/>{[125,375,625,875].map((x,index)=><circle key={`top-${x}`} cx={x} cy="120" r="10" className={done>index?'confirmed':''}/>)}{[875,625,375].map((x,index)=><circle key={`bottom-${x}`} cx={x} cy="340" r="10" className={done>index+4?'confirmed':''}/>)}</svg></div><div className="evidence-notes standalone">{evidence.map((item,index)=>{const found=highestLevel>index+1;return <details key={item.label} className={`evidence-note evidence-note-${index+1} ${found?'found':'sealed'}`} onMouseEnter={()=>found&&playEvidenceCardHover()} onFocus={()=>found&&playEvidenceCardHover()}><summary>{found?<><small>{String(index+1).padStart(2,'0')} · {item.label}</small><b>{item.value}</b><span>{item.source}</span></>:<><img src="/los-archivos-f/images/tablero-evidencias-candado.png" alt=""/><small>EVIDENCIA {String(index+1).padStart(2,'0')} · SELLADA</small><b>?</b></>}</summary>{found&&<div><p><strong>QUÉ DEMUESTRA</strong>{item.proves}</p><p><strong>SE CONECTA CON</strong>{item.connects}</p></div>}</details>;})}</div><aside className="evidence-chain-summary" aria-live="polite"><span>CADENA PRINCIPAL · {done}/7 ESLABONES</span><b>{evidence.filter((_,index)=>highestLevel>index+1).map(item=>item.value).join(' → ')||'Todavía no hay pruebas confirmadas'}</b></aside></div></dialog>}
  {hintsOpen&&<dialog ref={hintsDialog} className="hints-dialog" aria-labelledby="hints-dialog-title" onCancel={()=>setHintsOpen(false)} onClick={e=>{if(e.target===e.currentTarget)setHintsOpen(false);}}><div className="hints-dialog-paper"><header><h2 id="hints-dialog-title">Pistas · {nodes[level]?.title}</h2><button aria-label="Cerrar pistas" onClick={()=>setHintsOpen(false)}>×</button></header>{hintPanel}</div></dialog>}
  </>;
 }
