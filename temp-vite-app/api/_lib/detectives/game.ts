@@ -69,7 +69,10 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
 export async function leaderboard() {
   // A published code batch represents a fresh event. Remove stale games from
   // retired/test codes before returning the current children's leaderboard.
-  await supabaseRequest(`detective_games?code_hash=not.in.(${validHashes.join(',')})`, {method:'DELETE'});
+  const storedResponse=await supabaseRequest('detective_games?select=code_hash&limit=1000');
+  const storedRows=await storedResponse.json() as Array<{code_hash:string}>;
+  const activeHashes=new Set(validHashes);
+  await Promise.all(storedRows.filter(row=>!activeHashes.has(row.code_hash)).map(row=>supabaseRequest(`detective_games?code_hash=eq.${encodeURIComponent(row.code_hash)}`, {method:'DELETE'})));
   const response=await supabaseRequest('detective_games?select=state&order=updated_at.asc&limit=200');
   const rows=await response.json() as Array<{state:GameState}>;
   return rows.map(({state})=>({agent:String(state.agent||'Agente').slice(0,48),elapsedSeconds:Math.max(0,Math.floor(Number(state.elapsedSeconds)||0)),hintsUsed:Object.values(state.hints||{}).reduce((sum,value)=>sum+(Number(value)||0),0),completed:Boolean(state.completedAt),highestLevel:Number(state.highestLevel)||0})).filter(item=>item.highestLevel>0).sort(compareLeaderboardEntries).slice(0,50);
