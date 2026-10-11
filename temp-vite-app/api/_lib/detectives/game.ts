@@ -69,7 +69,7 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
 export async function leaderboard() {
   // Claim this reset exactly once. The marker prevents later leaderboard reads
   // from deleting any games created by the new F001-F050 batch.
-  const resetMarker='0000000000000000000000000000000000000000000000000000000000000051';
+  const resetMarker='0000000000000000000000000000000000000000000000000000000000000052';
   const markerState:GameState={agent:'__event_reset_f050__',highestLevel:0,hints:{},checkProgress:{},completedAt:null,elapsedSeconds:0};
   const markerResponse=await supabaseRequest('detective_games?on_conflict=code_hash', {
     method:'POST',
@@ -78,7 +78,13 @@ export async function leaderboard() {
   });
   const markerRows=await markerResponse.json() as unknown[];
   if(markerRows.length) {
-    await supabaseRequest(`detective_games?code_hash=neq.${resetMarker}`, {method:'DELETE'});
+    const storedResponse=await supabaseRequest('detective_games?select=code_hash&limit=1000');
+    const storedRows=await storedResponse.json() as Array<{code_hash:string}>;
+    const clearedState:GameState={agent:'',highestLevel:0,hints:{},checkProgress:{},completedAt:null,elapsedSeconds:0};
+    await Promise.all(storedRows.filter(row=>row.code_hash!==resetMarker).map(row=>supabaseRequest(`detective_games?code_hash=eq.${encodeURIComponent(row.code_hash)}`, {
+      method:'PATCH',
+      body:JSON.stringify({state:clearedState,version:0,updated_at:new Date().toISOString()})
+    })));
   }
   const response=await supabaseRequest('detective_games?select=state&order=updated_at.asc&limit=200');
   const rows=await response.json() as Array<{state:GameState}>;
