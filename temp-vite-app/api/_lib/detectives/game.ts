@@ -69,7 +69,7 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
 export async function leaderboard() {
   // Claim this reset exactly once. The marker prevents later leaderboard reads
   // from deleting any games created by the new F001-F050 batch.
-  const resetMarker='0000000000000000000000000000000000000000000000000000000000000050';
+  const resetMarker='0000000000000000000000000000000000000000000000000000000000000051';
   const markerState:GameState={agent:'__event_reset_f050__',highestLevel:0,hints:{},checkProgress:{},completedAt:null,elapsedSeconds:0};
   const markerResponse=await supabaseRequest('detective_games?on_conflict=code_hash', {
     method:'POST',
