@@ -1,0 +1,25 @@
+temp-vite-app/api/_lib/detectives/access-codes.json
+  s_ad2761a9c8222b::t_656b0087ef4f7c 2-51
+temp-vite-app/tests/detectives-access-codes.test.ts
+  s_ad2761a9c8222b::t_7e5106f883899b 5,7,14-16
+temp-vite-app/api/_lib/detectives/game.ts
+  s_ad2761a9c8222b::t_7e5106f883899b 70-72
+temp-vite-app/tests/detectives-hints.test.ts
+  s_ad2761a9c8222b::t_197e27e4b2e039 21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1588373ff5f35f0035fa6e49bd921bf564f1e829",
+  "prompts": {},
+  "sessions": {
+    "s_ad2761a9c8222b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11e3c-6733-7631-a227-de619d6c7cf4",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "ceciliapaciel <cecilia.paciel@pedidosya.com>"
+    }
+  }
+}
