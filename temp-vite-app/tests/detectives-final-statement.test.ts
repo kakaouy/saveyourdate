@@ -14,7 +14,7 @@ test('el audio final de Martina aparece después del compartimento y no cierra l
   applyAction(state,{action:'unlock',level:7,answer:'11820'});
   const before=structuredClone(state);
   const markup=renderToStaticMarkup(createElement(Statement,{highestLevel:state.highestLevel}));
-  for(const phrase of ['REGISTRO DE AUDIO','Martina Ríos','interrogatorio-martina.wav']) assert.ok(markup.includes(phrase));
+  for(const phrase of ['REGISTRO DE AUDIO','Martina Ríos','sospechosa-martina.m4a']) assert.ok(markup.includes(phrase));
   for(const phrase of ['Nueva declaración','K-01','Preparar la reconstrucción']) assert.ok(!markup.includes(phrase));
   assert.deepEqual(state,before);
   assert.equal(state.completedAt,null);
