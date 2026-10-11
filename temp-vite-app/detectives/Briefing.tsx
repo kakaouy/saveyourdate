@@ -1,10 +1,11 @@
 import TransmissionPlayer from './TransmissionPlayer';
-import {useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 
 export default function Briefing({agent,alreadyAccepted,onComplete}:{agent:string;alreadyAccepted:boolean;onComplete:()=>void}) {
- const [radioOpen,setRadioOpen]=useState(false);
+ const [radioOpen,setRadioOpen]=useState(true);
  const [audioFailed,setAudioFailed]=useState(false);
  const audio=useRef<HTMLAudioElement>(null);
+ useEffect(()=>{const timer=window.setTimeout(()=>void audio.current?.play().catch(()=>{}),220);return()=>{window.clearTimeout(timer);audio.current?.pause();};},[]);
  function toggleRadio(){
   if(radioOpen){audio.current?.pause();setRadioOpen(false);return;}
   setRadioOpen(true);setAudioFailed(false);

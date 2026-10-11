@@ -50,7 +50,7 @@ const finalCaseStill = '/los-archivos-f/images/federica-caso-cerrado-frame-1.web
 
 function SimulatedPlayer({label,source,onPlaying}:{label:string;source:string;onPlaying?:(value:boolean)=>void}){
   const audio=useRef<HTMLAudioElement>(null);const [failed,setFailed]=useState(false);
-  useEffect(()=>{onPlaying?.(false);if(/Fede|nivel|Presentación/i.test(label))playFedeRadioBeep();return()=>audio.current?.pause();},[label,onPlaying]);
+  useEffect(()=>{const isFede=/Fede|nivel|Presentación/i.test(label);onPlaying?.(false);if(isFede){playFedeRadioBeep();const timer=window.setTimeout(()=>void audio.current?.play().catch(()=>{}),180);return()=>{window.clearTimeout(timer);audio.current?.pause();};}return()=>audio.current?.pause();},[label,onPlaying]);
   return <div className="story-transmission-player"><TransmissionPlayer audioRef={audio} source={source} title={label} speaker={/Fede|nivel|Presentación/i.test(label)?'Fede':label.replace('Declaración de ','')} footnote={false} onEnded={()=>onPlaying?.(false)} onPlaying={value=>onPlaying?.(value)} onError={()=>setFailed(true)}/>{failed&&<small role="status">No se pudo reproducir el audio. Podés leer el mensaje debajo.</small>}</div>;
 }
 
@@ -261,7 +261,7 @@ function OpeningPresentation({onContinue}:{onContinue:()=>void}){
 
 function BirthdayCredits({onClose}:{onClose:()=>void}){
  const audio=useRef<HTMLAudioElement>(null);const [audioFailed,setAudioFailed]=useState(false);
- useEffect(()=>{stopStormAmbience();stopOpeningMusic();},[]);
+ useEffect(()=>{stopStormAmbience();stopOpeningMusic();const timer=window.setTimeout(()=>void audio.current?.play().catch(()=>{}),220);return()=>{window.clearTimeout(timer);audio.current?.pause();};},[]);
  return <section className="birthday-epilogue birthday-credits-screen" aria-labelledby="birthday-epilogue-title"><div className="birthday-epilogue-copy"><img className="birthday-logo" src="/los-archivos-f/images/logo-archivos-f.png" alt="Los Archivos F"/><p className="eyebrow">AGENCIA F · MENSAJE DE FEDE</p><h1 id="birthday-epilogue-title">¡Gracias por haber compartido mi cumple y esta experiencia conmigo!</h1><p>Ojalá que nos volvamos a encontrar en otra misión.</p><TransmissionPlayer audioRef={audio} source="/los-archivos-f/audio/fede-agradecimiento-final.m4a" title="Mensaje final de Fede" footnote={false} onEnded={()=>{}} onPlaying={()=>{}} onError={()=>setAudioFailed(true)}/>{audioFailed&&<small role="status">Podés leer el mensaje arriba.</small>}<div className="birthday-credits" aria-label="Créditos"><strong>FEDE PACIEL</strong><span>11 AÑOS</span><span>10 DE OCTUBRE 2026</span><b>LOS ARCHIVOS F</b></div><button className="primary-button" type="button" onClick={onClose}>CERRAR TRANSMISIÓN <span>→</span></button></div></section>;
 }
 

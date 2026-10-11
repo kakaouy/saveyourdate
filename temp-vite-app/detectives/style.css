@@ -2630,3 +2630,44 @@ body:has(.federica-feedback[open]){overflow:hidden!important}
 @keyframes resource-side-float{to{transform:translateY(-3px) rotate(2deg);filter:drop-shadow(0 7px 7px #000b) brightness(1.08)}}
 @media(max-width:700px),(orientation:portrait){.game-page .level-side-tabs.compact-side-tabs{top:clamp(112px,14dvh,150px)!important}.game-page .side-time-button{top:calc(clamp(112px,14dvh,150px) + 72px)!important}.game-page .side-resource-button{left:0;top:calc(clamp(112px,14dvh,150px) + 144px)!important;width:64px;height:64px;border-left:0;border-radius:0 14px 14px 0}.game-page .side-resource-button img{width:42px;height:42px}.game-page .side-resource-button b{left:70px;top:17px}.game-page .side-resource-button .resource-lock{width:38px;height:38px}}
 @media(prefers-reduced-motion:reduce){.side-resource-button img{animation:none}}
+
+/* Audio narrativo: la jerarquía se mantiene idéntica en todos los mensajes. */
+.story-page-view .story-dialog-kicker{order:1!important;margin:0 0 14px!important}
+.story-page-view .story-dialog-title-row{order:2!important;margin:0!important}
+.story-page-view .story-transmission-player{order:3!important;display:block!important;width:100%!important;margin:28px 0 30px!important}
+.story-page-view .story-transmission-player .transmission-console{width:100%!important;margin:0!important}
+.story-page-view .story-transmission-player+ p,
+.story-page-view .level-two-success-copy>p:not(.story-dialog-kicker),
+.story-page-view .level-three-story-copy>p:not(.story-dialog-kicker){order:4!important;margin:0 0 26px!important}
+.story-page-view .level-two-success-copy>.story-mission-objective{order:5!important;margin:8px 0 28px!important}
+.story-page-view .level-two-success-copy>.primary-button,
+.story-page-view .level-three-story-copy>.primary-button{order:6!important}
+.terminal-dialog-copy .transmission-console{margin:26px 0 28px!important}
+.terminal-dialog-copy .terminal-dialog-message{margin-top:0!important}
+
+/* Las tres herramientas laterales comparten exactamente la misma caja. */
+.game-page .level-side-tabs.compact-side-tabs,
+.game-page .side-time-button,
+.game-page .side-resource-button{width:82px!important}
+.game-page .compact-side-tabs .level-side-tab,
+.game-page .compact-side-tabs .level-side-tab:hover,
+.game-page .compact-side-tabs .level-side-tab:focus-within,
+.game-page .compact-side-tabs .level-side-tab-trigger,
+.game-page .side-time-button,
+.game-page .side-resource-button{height:82px!important;min-height:82px!important;box-sizing:border-box!important}
+.game-page .side-resource-button{grid-template-rows:minmax(0,1fr) auto;padding:6px!important}
+.game-page .side-resource-button img{width:54px!important;height:54px!important;transition:transform .22s ease,filter .22s ease}
+.game-page .side-resource-button:hover img,
+.game-page .side-resource-button:focus-visible img{animation-play-state:paused;transform:scale(1.24);filter:drop-shadow(0 7px 8px #000c) brightness(1.12)}
+
+@media(max-width:700px),(orientation:portrait){
+  .story-page-view .story-transmission-player{margin:22px 0 24px!important}
+  .game-page .level-side-tabs.compact-side-tabs,
+  .game-page .side-time-button,
+  .game-page .side-resource-button{width:64px!important;height:64px!important;min-height:64px!important}
+  .game-page .compact-side-tabs .level-side-tab,
+  .game-page .compact-side-tabs .level-side-tab:hover,
+  .game-page .compact-side-tabs .level-side-tab:focus-within,
+  .game-page .compact-side-tabs .level-side-tab-trigger{width:64px!important;height:64px!important;min-height:64px!important}
+  .game-page .side-resource-button img{width:43px!important;height:43px!important}
+}

@@ -3,6 +3,7 @@ import { alibiFeedback, type AlibiName } from './alibi-feedback';
 
 export default function FedericaFeedback({ suspect, onClose }: { suspect: AlibiName; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const feedback = alibiFeedback[suspect];
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
@@ -10,7 +11,8 @@ export default function FedericaFeedback({ suspect, onClose }: { suspect: AlibiN
     const dialog = ref.current;
     dialog?.showModal();
     document.body.style.overflow = 'hidden';
-    return () => { dialog?.close(); document.body.style.overflow = overflow; previous?.focus(); };
+    const timer=window.setTimeout(()=>void audioRef.current?.play().catch(()=>{}),180);
+    return () => { window.clearTimeout(timer);audioRef.current?.pause();dialog?.close(); document.body.style.overflow = overflow; previous?.focus(); };
   }, []);
   return <dialog ref={ref} className="federica-feedback" aria-labelledby="federica-feedback-title" onCancel={onClose} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
     <div className="federica-coach-layout">
@@ -21,7 +23,7 @@ export default function FedericaFeedback({ suspect, onClose }: { suspect: AlibiN
         <h2 id="federica-feedback-title">Revisemos esa hipótesis.</h2>
         <p className="coach-subject">Sobre la coartada de {suspect}</p>
         <blockquote>{feedback.text}</blockquote>
-        <audio controls preload="metadata" src={`/los-archivos-f/audio/fede-ayuda-${feedback.id}.m4a`} aria-label="Escuchar la orientación de Federica" />
+        <audio ref={audioRef} controls preload="metadata" src={`/los-archivos-f/audio/fede-ayuda-${feedback.id}.m4a`} aria-label="Escuchar la orientación de Federica" />
         <small>También podés leer el mensaje.</small>
         <p className="coach-progress">Tu progreso sigue guardado. Esta orientación no consume pistas.</p>
         <button className="primary-button story-page-action coach-action" onClick={onClose} autoFocus>VOLVER A REVISAR LAS COARTADAS <span>↗</span></button>
