@@ -67,6 +67,9 @@ export function applyAction(state: GameState, body: Record<string, unknown>) {
   throw new GameError('Acción no válida.');
 }
 export async function leaderboard() {
+  // A published code batch represents a fresh event. Remove stale games from
+  // retired/test codes before returning the current children's leaderboard.
+  await supabaseRequest(`detective_games?code_hash=not.in.(${validHashes.join(',')})`, {method:'DELETE'});
   const response=await supabaseRequest('detective_games?select=state&order=updated_at.asc&limit=200');
   const rows=await response.json() as Array<{state:GameState}>;
   return rows.map(({state})=>({agent:String(state.agent||'Agente').slice(0,48),elapsedSeconds:Math.max(0,Math.floor(Number(state.elapsedSeconds)||0)),hintsUsed:Object.values(state.hints||{}).reduce((sum,value)=>sum+(Number(value)||0),0),completed:Boolean(state.completedAt),highestLevel:Number(state.highestLevel)||0})).filter(item=>item.highestLevel>0).sort(compareLeaderboardEntries).slice(0,50);
