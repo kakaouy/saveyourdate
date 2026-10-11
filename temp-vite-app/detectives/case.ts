@@ -64,9 +64,9 @@ export const levels = [
     kicker: 'NIVEL 7 · CERRADURA MECÁNICA',
     prompt: '¿Cuál es el código del compartimento?',
     evidence: ['Sobre dirigido al agente', 'Mecanismo del compartimento preparado'],
-    digital: 'Mecanismo del compartimento detectado. La combinación no está registrada en el sistema. Seguí los recorridos IMPARES y PARES para reconstruirla.',
+    digital: 'Mecanismo del compartimento detectado. La combinación no está registrada en el sistema. Usá la máscara A con los PARES y la máscara B con los IMPARES para reconstruirla.',
     placeholder: '5 cifras', answer: ['11820'], lock: 'mechanical',
-    hints: ['La pieza ya está recortada. Observá qué parte puede moverse y qué marcas permiten alinearla.', 'La alineación revela dos recorridos rotulados IMPARES y PARES. Respetá qué valores quedan señalados en cada uno.', 'El recorrido IMPARES da un resultado de tres cifras y el recorrido PARES uno de dos. Escribilos juntos, en ese orden.', 'SOLUCIÓN DIRECTA · 19 + 21 + 23 + 25 + 30 = 118; 2 + 4 + 6 + 8 + 0 = 20. Ingresá 11820.'],
+    hints: ['La pieza ya está recortada. La máscara A va con los PARES y la máscara B con los IMPARES.', 'La alineación revela dos recorridos rotulados IMPARES y PARES. Respetá qué valores quedan señalados en cada uno.', 'El recorrido IMPARES da un resultado de tres cifras y el recorrido PARES uno de dos. Escribilos juntos, en ese orden.', 'SOLUCIÓN DIRECTA · 19 + 21 + 23 + 25 + 30 = 118; 2 + 4 + 6 + 8 + 0 = 20. Ingresá 11820.'],
     unlock: 'Acceso a la acusación final',
   },
 ];
